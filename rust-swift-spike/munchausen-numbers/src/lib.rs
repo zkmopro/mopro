@@ -41,3 +41,28 @@ fn is_munchausen_number(number: i32, cache: &[i32; 10]) -> bool {
 
     number == sum
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_munchausen_numbers() {
+        let mut cache = [0; 10];
+        let mut index = 0;
+        let mut munchausen_num: [i32; 4] = [0; 4];
+
+        for n in 1..=9 {
+            cache[n] = (n as i32).pow(n as u32);
+        }
+
+        for n in 0..500000000 {
+            if is_munchausen_number(n, &cache) {
+                munchausen_num[index] = n;
+                index += 1;
+            }
+        }
+
+        assert_eq!(munchausen_num, [0, 1, 3435, 438579088]);
+    }
+}
