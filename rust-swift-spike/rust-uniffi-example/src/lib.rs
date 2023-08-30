@@ -1,14 +1,10 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+// "example" is the name of the .udl file
+uniffi::include_scaffolding!("rust_uniffi_example");
+
+fn add(a: u32, b: u32) -> u32 {
+    a + b
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+fn hello() -> String {
+    "This is a hello from the rust library".to_string()
 }

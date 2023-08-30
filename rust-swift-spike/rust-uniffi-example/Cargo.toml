@@ -10,3 +10,11 @@ uniffi = { version = "0.24.3", features = ["cli"] }
 
 [build-dependencies]
 uniffi = { version = "0.24.3", features = ["build"] }
+
+[lib]
+crate-type = ["staticlib"]
+name = "rust_uniffi_example"
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"

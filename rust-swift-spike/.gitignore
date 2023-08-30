@@ -12,3 +12,20 @@ Cargo.lock
 
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
+
+# Xcode stuff
+/include
+
+/Example.xcframework/ios-arm64/Example.framework/*
+/Example.xcframework/ios-arm64/Example.framework/Headers/*
+!/Example.xcframework/ios-arm64/Example.framework/Info.plist
+!/Example.xcframework/ios-arm64/Example.framework/Modules
+!/Example.xcframework/ios-arm64/Example.framework/Headers
+!/Example.xcframework/ios-arm64/Example.framework/Headers/exampleFFI.h
+
+/Example.xcframework/ios-arm64_x86_64-simulator/Example.framework/*
+/Example.xcframework/ios-arm64_x86_64-simulator/Example.framework/Headers/*
+!/Example.xcframework/ios-arm64_x86_64-simulator/Example.framework/Info.plist
+!/Example.xcframework/ios-arm64_x86_64-simulator/Example.framework/Modules
+!/Example.xcframework/ios-arm64_x86_64-simulator/Example.framework/Headers
+!/Example.xcframework/ios-arm64_x86_64-simulator/Example.framework/Headers/exampleFFI.h

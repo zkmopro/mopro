@@ -1,0 +1,4 @@
+namespace rust_uniffi_example {
+  u32 add(u32 a, u32 b);
+  string hello();
+};
