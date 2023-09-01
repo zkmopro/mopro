@@ -1,6 +1,0 @@
-framework module RustUniFFIExample {
-  umbrella header "rust_uniffi_exampleFFI.h"
-
-  export *
-  module * { export * }
-}
