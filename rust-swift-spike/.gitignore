@@ -29,3 +29,5 @@ Cargo.lock
 !/Example.xcframework/ios-arm64_x86_64-simulator/Example.framework/Modules
 !/Example.xcframework/ios-arm64_x86_64-simulator/Example.framework/Headers
 !/Example.xcframework/ios-arm64_x86_64-simulator/Example.framework/Headers/exampleFFI.h
+
+*.DS_Store
