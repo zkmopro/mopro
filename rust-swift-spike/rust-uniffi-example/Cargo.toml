@@ -7,7 +7,7 @@ edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
-
+name = "rust_uniffi_example"
 
 [[bin]]
 name = "uniffi-bindgen"
