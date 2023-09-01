@@ -5,16 +5,16 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-uniffi = { version = "0.24.3", features = ["cli"] }
-
-[build-dependencies]
-uniffi = { version = "0.24.3", features = ["build"] }
-
 [lib]
-crate-type = ["staticlib"]
-name = "rust_uniffi_example"
+crate-type = ["cdylib", "staticlib"]
+
 
 [[bin]]
 name = "uniffi-bindgen"
 path = "uniffi-bindgen.rs"
+
+[dependencies]
+uniffi = { version = "0.24", features = ["cli"] }
+
+[build-dependencies]
+uniffi = { version = "0.24", features = ["build"] }
