@@ -1,2 +1,2 @@
 [bindings.swift]
-module_name = "org.test234.RustUniFFIExample"
+module_name = "RustUniFFIExample"

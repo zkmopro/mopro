@@ -8,12 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
+    let greeting: String = hello()
+    let sum: UInt32 = add(a: 5, b: 3)
+
+    
     var body: some View {
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundColor(.accentColor)
             Text("Hello, world!")
+            Text(greeting)
+            Text("5 + 3 = \(sum)")
         }
         .padding()
     }
