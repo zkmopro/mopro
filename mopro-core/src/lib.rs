@@ -1,5 +1,18 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use examples::circom::run_example;
+
+// name of the .udl file
+uniffi::include_scaffolding!("mopro_uniffi");
+
+fn add(a: u32, b: u32) -> u32 {
+    a + b
+}
+
+fn hello() -> String {
+    "Hello World from Rust".to_string()
+}
+
+fn run() {
+    run_example().unwrap();
 }
 
 #[cfg(test)]
