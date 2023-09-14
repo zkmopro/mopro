@@ -1,4 +1,4 @@
-namespace mopro_uniffi {
+namespace mopro {
   u32 add(u32 a, u32 b);
   string hello();
   void run();
