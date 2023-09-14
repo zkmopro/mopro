@@ -5,3 +5,7 @@ Core mobile Rust library, exposes UniFFI bindings to be used by `rust-ios`, etc.
 ## Overview
 
 TBD.
+
+## Examples
+
+Run `cargo run --example circom`.
