@@ -8,6 +8,8 @@ use color_eyre::Result;
 type GrothBn = Groth16<Bn254>;
 
 fn run_example() -> Result<()> {
+    println!("Setup");
+
     // Load the WASM and R1CS for witness and proof generation
     let cfg = CircomConfig::<Bn254>::new(
         "./examples/circom/target/multiplier2_js/multiplier2.wasm",
@@ -36,12 +38,17 @@ fn run_example() -> Result<()> {
     let inputs = circom.get_public_inputs().unwrap();
 
     // Generate the proof
+    println!("Generating proof");
     let proof = GrothBn::prove(&params, circom, &mut rng)?;
 
     // Check that the proof is valid
+    println!("Verifying proof");
     let pvk = GrothBn::process_vk(&params.vk)?;
     let proof_verified = GrothBn::verify_with_processed_vk(&pvk, &inputs, &proof)?;
-    println!("Proof verified: {}", proof_verified);
+    match proof_verified {
+        true => println!("Proof verified"),
+        false => println!("Proof not verified"),
+    }
     assert!(proof_verified);
 
     // To provide the instance manually, i.e. public input and output in Circom:
@@ -50,7 +57,7 @@ fn run_example() -> Result<()> {
     let inputs_manual = vec![c.into(), a.into()];
 
     let verified_alt = GrothBn::verify_with_processed_vk(&pvk, &inputs_manual, &proof)?;
-    println!("Proof verified (alt): {}", verified_alt);
+    //println!("Proof verified (alt): {}", verified_alt);
     assert!(verified_alt);
 
     Ok(())
