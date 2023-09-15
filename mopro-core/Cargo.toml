@@ -5,16 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[lib]
-crate-type = ["cdylib", "staticlib"]
-name = "mopro_core"
-
-[[bin]]
-name = "uniffi-bindgen"
-path = "uniffi-bindgen.rs"
-
 [dependencies]
-uniffi = { version = "0.24", features = ["cli"] }
 ark-circom = { git = "https://github.com/arkworks-rs/circom-compat.git" }
 
 # ZKP generation
@@ -31,6 +22,3 @@ ark-groth16 = { version = "=0.4.0", default-features = false, features = [
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 criterion = "=0.3.6"
-
-[build-dependencies]
-uniffi = { version = "0.24", features = ["build"] }
