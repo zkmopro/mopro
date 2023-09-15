@@ -1,0 +1,26 @@
+[package]
+name = "mopro-ffi"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+name = "mopro_ffi"
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+
+[dependencies]
+mopro-core = { path = "../mopro-core" }
+uniffi = { version = "0.24", features = ["cli"] }
+
+# Error handling
+thiserror = "=1.0.39"
+color-eyre = "=0.6.2"
+criterion = "=0.3.6"
+
+[build-dependencies]
+uniffi = { version = "0.24", features = ["build"] }
