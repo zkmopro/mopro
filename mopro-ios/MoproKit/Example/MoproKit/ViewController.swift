@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MoproKit
 
 class ViewController: UIViewController {
 
@@ -16,10 +17,17 @@ class ViewController: UIViewController {
         // Create a UILabel instance
         let helloLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
 
+        // TODO: Use MoproKit
+        let result = MoproKit.add(a: 10, b:20)
+        print("Result of add: \(result)")
+
+        let greeting = MoproKit.hello()
+
         // Set the label's properties
         helloLabel.center = view.center
         helloLabel.textAlignment = .center
-        helloLabel.text = "Hello, World!"
+        //helloLabel.text = "Hello, World!"
+        helloLabel.text = greeting
 
         // Add the label to the main view
         view.addSubview(helloLabel)
