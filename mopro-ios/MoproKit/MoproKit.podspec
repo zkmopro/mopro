@@ -31,7 +31,15 @@ TODO: Add long description of the pod here.
   s.ios.deployment_target = '13.0'
 
   s.source_files = 'MoproKit/Classes/**/*'
-  
+ 
+  # libmopro library, headers and modulemap
+  # XXX: static library is not in source control, and needs to be inlcuded manually
+  # Have to be mindful of architecture and simulator or not here, should be improved
+  s.preserve_paths = 'Libs/libmopro_uniffi.a'
+  s.vendored_libraries = 'Libs/libmopro_uniffi.a'
+  s.source_files = 'Include/*.h', 'Bindings/*.swift'
+  s.resource = 'Resources/moproFFI.modulemap'
+
   # s.resource_bundles = {
   #   'MoproKit' => ['MoproKit/Assets/*.png']
   # }
