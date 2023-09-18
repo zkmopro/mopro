@@ -1,3 +1,5 @@
+use crate::MoproError;
+
 use ark_bn254::Bn254;
 use ark_circom::{CircomBuilder, CircomConfig};
 use ark_crypto_primitives::snark::SNARK;
@@ -10,14 +12,15 @@ type GrothBn = Groth16<Bn254>;
 // TODO: Refactor this to be a proper API with setup, prove, verify etc
 // This is just a temporary function to get things working end-to-end.
 // Later we call as native Rust in example, and use from mopro-ffi
-pub fn run_example() -> Result<()> {
+pub fn run_example() -> Result<(), MoproError> {
     println!("Setup");
 
     // Load the WASM and R1CS for witness and proof generation
     let cfg = CircomConfig::<Bn254>::new(
         "./examples/circom/target/multiplier2_js/multiplier2.wasm",
         "./examples/circom/target/multiplier2.r1cs",
-    )?;
+    )
+    .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
     // Insert our inputs as key value pairs
     // In Circom this is the private input (witness) and public input
@@ -31,10 +34,13 @@ pub fn run_example() -> Result<()> {
 
     // Run a trusted setup
     let mut rng = thread_rng();
-    let params = GrothBn::generate_random_parameters_with_reduction(circom, &mut rng)?;
+    let params = GrothBn::generate_random_parameters_with_reduction(circom, &mut rng)
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
     // Get the populated instance of the circuit with the witness
-    let circom = builder.build()?;
+    let circom = builder
+        .build()
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
     // This is the instance, public input and public output
     // Together with the witness provided above this satisfies the circuit
@@ -42,12 +48,15 @@ pub fn run_example() -> Result<()> {
 
     // Generate the proof
     println!("Generating proof");
-    let proof = GrothBn::prove(&params, circom, &mut rng)?;
+    let proof = GrothBn::prove(&params, circom, &mut rng)
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
     // Check that the proof is valid
     println!("Verifying proof");
-    let pvk = GrothBn::process_vk(&params.vk)?;
-    let proof_verified = GrothBn::verify_with_processed_vk(&pvk, &inputs, &proof)?;
+    let pvk =
+        GrothBn::process_vk(&params.vk).map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let proof_verified = GrothBn::verify_with_processed_vk(&pvk, &inputs, &proof)
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
     match proof_verified {
         true => println!("Proof verified"),
         false => println!("Proof not verified"),
@@ -59,7 +68,8 @@ pub fn run_example() -> Result<()> {
     let a = 3;
     let inputs_manual = vec![c.into(), a.into()];
 
-    let verified_alt = GrothBn::verify_with_processed_vk(&pvk, &inputs_manual, &proof)?;
+    let verified_alt = GrothBn::verify_with_processed_vk(&pvk, &inputs_manual, &proof)
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
     //println!("Proof verified (alt): {}", verified_alt);
     assert!(verified_alt);
 
