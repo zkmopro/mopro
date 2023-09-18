@@ -1,15 +1,22 @@
 # mopro
 
-Mobile prover library for ZKPs.
+Making client-side proving on mobile simple.
 
 ## Overview
 
 This is a WIP.
 
-- `mopro-core` - core mobile Rust library, exposes UniFFI bindings.
-- `mopro-ios` - iOS library exposing native Swift bindings.
+- `mopro-core` - core mobile Rust library.
+- `mopro-ffi` - wraps `mopro-core` and exposes UniFFI bindings.
+- `mopro-ios` - iOS CocoaPod library exposing native Swift bindings.
 - `mopro-example-app` - example iOS app using `mopro-ios`.
 
 ## Architecture
 
-(To be filled in)
+The following illustration shows how mopro and its components fit together into the wider ZKP ecosystem:
+
+![mopro architecture (full)](images/mopro_architecture2_full.png)
+
+Zooming in a bit:
+
+![mopro architecture](images/mopro_architecture2.png)
