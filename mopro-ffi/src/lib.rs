@@ -1,4 +1,5 @@
-use mopro_core::middleware::circom::run_example;
+use mopro_core::middleware::circom;
+use mopro_core::MoproError;
 
 // name of the .udl file
 uniffi::include_scaffolding!("mopro_uniffi");
@@ -11,8 +12,8 @@ fn hello() -> String {
     "Hello World from Rust".to_string()
 }
 
-fn run() {
-    run_example().unwrap();
+fn run_example() -> Result<(), MoproError> {
+    circom::run_example()
 }
 
 #[cfg(test)]

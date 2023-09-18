@@ -1,5 +1,12 @@
+[Error]
+enum MoproError {
+  "CircomError",
+};
+
 namespace mopro {
   u32 add(u32 a, u32 b);
   string hello();
-  void run();
+
+  [Throws=MoproError]
+  void run_example();
 };
