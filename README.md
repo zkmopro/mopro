@@ -20,3 +20,7 @@ The following illustration shows how mopro and its components fit together into 
 Zooming in a bit:
 
 ![mopro architecture](images/mopro_architecture2.png)
+
+## Bindings
+
+To update bindings, run `./script/update_bindings.sh`.
