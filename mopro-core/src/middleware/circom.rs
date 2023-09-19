@@ -13,10 +13,7 @@ type GrothBn = Groth16<Bn254>;
 // TODO: Refactor this to be a proper API with setup, prove, verify etc
 // This is just a temporary function to get things working end-to-end.
 // Later we call as native Rust in example, and use from mopro-ffi
-pub fn run_example() -> Result<(), MoproError> {
-    let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
-    let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
-
+pub fn run_example(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
     // Check that the files exist - ark-circom should probably do this instead and not panic
     if !Path::new(wasm_path).exists() {
         return Err(MoproError::CircomError(format!(
@@ -90,4 +87,23 @@ pub fn run_example() -> Result<(), MoproError> {
     assert!(verified_alt);
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_run_example_ok() {
+        let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
+        let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
+        let result = run_example(wasm_path, r1cs_path);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_run_example_err() {
+        let result = run_example("foo", "bar");
+        assert!(result.is_err());
+    }
 }
