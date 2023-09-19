@@ -50,11 +50,11 @@ print_action "Generating Swift bindings..."
 uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro_uniffi.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
 
 print_action "Building mopro-ffi static library..."
-(cd ${PROJECT_DIR}/mopro-ffi && cargo build)
+(cd ${PROJECT_DIR}/mopro-ffi && make debug)
 
 # TODO: Update this to deal with different architectures and environments
 print_action "Using aarch64-apple-ios-sim libmopro_ffi.a static library..."
-print_warning "This only works on iOS simulator (aarch64)"
+print_warning "This only works on iOS simulator (ARM64)"
 
 cp ${PROJECT_DIR}/mopro-ffi/target/aarch64-apple-ios-sim/debug/libmopro_ffi.a ${TARGET_DIR}/
 
