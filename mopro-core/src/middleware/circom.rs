@@ -6,6 +6,7 @@ use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::Groth16;
 use ark_std::rand::thread_rng;
 use color_eyre::Result;
+use std::path::Path;
 
 type GrothBn = Groth16<Bn254>;
 
@@ -13,14 +14,29 @@ type GrothBn = Groth16<Bn254>;
 // This is just a temporary function to get things working end-to-end.
 // Later we call as native Rust in example, and use from mopro-ffi
 pub fn run_example() -> Result<(), MoproError> {
+    let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
+    let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
+
+    // Check that the files exist - ark-circom should probably do this instead and not panic
+    if !Path::new(wasm_path).exists() {
+        return Err(MoproError::CircomError(format!(
+            "Path does not exist: {}",
+            wasm_path
+        )));
+    }
+
+    if !Path::new(r1cs_path).exists() {
+        return Err(MoproError::CircomError(format!(
+            "Path does not exist: {}",
+            r1cs_path
+        )));
+    }
+
     println!("Setup");
 
     // Load the WASM and R1CS for witness and proof generation
-    let cfg = CircomConfig::<Bn254>::new(
-        "./examples/circom/target/multiplier2_js/multiplier2.wasm",
-        "./examples/circom/target/multiplier2.r1cs",
-    )
-    .map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let cfg = CircomConfig::<Bn254>::new(wasm_path, r1cs_path)
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
     // Insert our inputs as key value pairs
     // In Circom this is the private input (witness) and public input
