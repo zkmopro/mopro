@@ -8,5 +8,5 @@ namespace mopro {
   string hello();
 
   [Throws=MoproError]
-  void run_example();
+  void run_example(string wasm_path, string r1cs_path);
 };

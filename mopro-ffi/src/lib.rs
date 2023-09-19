@@ -12,8 +12,10 @@ fn hello() -> String {
     "Hello World from Rust".to_string()
 }
 
-fn run_example() -> Result<(), MoproError> {
-    circom::run_example()
+// UniFFI expects String type
+// See https://mozilla.github.io/uniffi-rs/udl/builtin_types.html
+fn run_example(wasm_path: String, r1cs_path: String) -> Result<(), MoproError> {
+    circom::run_example(wasm_path.as_str(), r1cs_path.as_str())
 }
 
 #[cfg(test)]
@@ -28,7 +30,9 @@ mod tests {
 
     #[test]
     fn run_example_ok_or_err() {
-        match circom::run_example() {
+        let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm".to_string();
+        let r1cs_path = "./examples/circom/target/multiplier2.r1cs".to_string();
+        match run_example(wasm_path, r1cs_path) {
             Ok(_) => println!("OK"),
             Err(e) => println!("Error: {}", e),
         }
