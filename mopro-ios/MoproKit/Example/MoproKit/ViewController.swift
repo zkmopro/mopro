@@ -14,19 +14,27 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Create a UILabel instance
         let helloLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
 
-        // TODO: Use MoproKit
-        let result = MoproKit.add(a: 10, b:20)
+        // Trying some MoproKit functions
+
+        let result = MoproKit.add(a: 10, b: 20)
         print("Result of add: \(result)")
 
         let greeting = MoproKit.hello()
+        NSLog(greeting)
+
+        print("Running MoproKit.runExample()")
+        do {
+            try MoproKit.runExample()
+            print("Finished running MoproKit.runExample()")
+        } catch {
+            print("Error running MoproKit.runExample(): \(error)")
+        }
 
         // Set the label's properties
         helloLabel.center = view.center
         helloLabel.textAlignment = .center
-        //helloLabel.text = "Hello, World!"
         helloLabel.text = greeting
 
         // Add the label to the main view
@@ -39,4 +47,3 @@ class ViewController: UIViewController {
     }
 
 }
-
