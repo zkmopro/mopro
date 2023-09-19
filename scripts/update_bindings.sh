@@ -15,8 +15,23 @@ GREY='\033[0;90m'
 DEBUG_COLOR="${DEFAULT}"
 trap 'echo -e ${DEBUG_COLOR}${BASH_COMMAND}${DEFAULT}' DEBUG
 
-color_printf() {
+# Function to handle exit
+handle_exit() {
+    # $? is a special variable that holds the exit code of the last command executed
+    if [ $? -ne 0 ]; then
+        echo -e "\n${RED}Script did not finish successfully!${DEFAULT}"
+    fi
+}
+
+# Set the trap
+trap handle_exit EXIT
+
+print_action() {
     printf "\n${GREEN}$1${DEFAULT}\n"
+}
+
+print_warning() {
+    printf "\n${YELLOW}$1${DEFAULT}\n"
 }
 
 # Assert we're in the project root
@@ -25,26 +40,28 @@ if [[ ! -d "mopro-ffi" || ! -d "mopro-core" || ! -d "mopro-ios" ]]; then
     exit 1
 fi
 
-color_printf "[Updating mopro-ffi bindings and library...]"
+print_action "Updating mopro-ffi bindings and library..."
 
 PROJECT_DIR=$(pwd)
 TARGET_DIR=${PROJECT_DIR}/target
 MOPROKIT_DIR=${PROJECT_DIR}/mopro-ios/MoproKit
 
-color_printf "[Generating Swift bindings...]"
+print_action "Generating Swift bindings..."
 uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro_uniffi.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
 
-color_printf "[Building mopro-ffi static library...]"
+print_action "Building mopro-ffi static library..."
 (cd ${PROJECT_DIR}/mopro-ffi && cargo build)
 
 # TODO: Update this to deal with different architectures and environments
-color_printf "[Using aarch64-apple-ios-sim static libmopro_ffi.a only...]"
+print_action "Using aarch64-apple-ios-sim libmopro_ffi.a static library..."
+print_warning "This only works on iOS simulator (aarch64)"
+
 cp ${PROJECT_DIR}/mopro-ffi/target/aarch64-apple-ios-sim/debug/libmopro_ffi.a ${TARGET_DIR}/
 
-color_printf "[Copying Swift bindings and static library to MoproKit...]"
+print_action "Copying Swift bindings and static library to MoproKit..."
 cp ${TARGET_DIR}/SwiftBindings/moproFFI.h ${MOPROKIT_DIR}/Include/
 cp ${TARGET_DIR}/SwiftBindings/mopro.swift ${MOPROKIT_DIR}/Bindings/
 cp ${TARGET_DIR}/SwiftBindings/moproFFI.modulemap ${MOPROKIT_DIR}/Resources/
 cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
 
-color_printf "[Done!]"
+print_action "Done! Please re-build your project in Xcode."
