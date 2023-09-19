@@ -70,7 +70,7 @@ uint32_t uniffi_mopro_fn_func_add(uint32_t a, uint32_t b, RustCallStatus *_Nonnu
 RustBuffer uniffi_mopro_fn_func_hello(RustCallStatus *_Nonnull out_status
     
 );
-void uniffi_mopro_fn_func_run(RustCallStatus *_Nonnull out_status
+void uniffi_mopro_fn_func_run_example(RustCallStatus *_Nonnull out_status
     
 );
 RustBuffer ffi_mopro_rustbuffer_alloc(int32_t size, RustCallStatus *_Nonnull out_status
@@ -87,7 +87,7 @@ uint16_t uniffi_mopro_checksum_func_add(void
 uint16_t uniffi_mopro_checksum_func_hello(void
     
 );
-uint16_t uniffi_mopro_checksum_func_run(void
+uint16_t uniffi_mopro_checksum_func_run_example(void
     
 );
 uint32_t ffi_mopro_uniffi_contract_version(void

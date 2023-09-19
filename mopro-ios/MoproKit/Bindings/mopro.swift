@@ -345,6 +345,41 @@ private struct FfiConverterString: FfiConverter {
     }
 }
 
+public enum MoproError {
+    // Simple error enums only carry a message
+    case CircomError(message: String)
+
+    fileprivate static func uniffiErrorHandler(_ error: RustBuffer) throws -> Error {
+        return try FfiConverterTypeMoproError.lift(error)
+    }
+}
+
+public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
+    typealias SwiftType = MoproError
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> MoproError {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        case 1: return try .CircomError(
+                message: FfiConverterString.read(from: &buf)
+            )
+
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: MoproError, into buf: inout [UInt8]) {
+        switch value {
+        case let .CircomError(message):
+            writeInt(&buf, Int32(1))
+        }
+    }
+}
+
+extension MoproError: Equatable, Hashable {}
+
+extension MoproError: Error {}
+
 public func add(a: UInt32, b: UInt32) -> UInt32 {
     return try! FfiConverterUInt32.lift(
         try! rustCall {
@@ -364,9 +399,9 @@ public func hello() -> String {
     )
 }
 
-public func run() {
-    try! rustCall {
-        uniffi_mopro_fn_func_run($0)
+public func runExample() throws {
+    try rustCallWithError(FfiConverterTypeMoproError.lift) {
+        uniffi_mopro_fn_func_run_example($0)
     }
 }
 
@@ -392,7 +427,7 @@ private var initializationResult: InitializationResult {
     if uniffi_mopro_checksum_func_hello() != 309 {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_checksum_func_run() != 17009 {
+    if uniffi_mopro_checksum_func_run_example() != 45702 {
         return InitializationResult.apiChecksumMismatch
     }
 
