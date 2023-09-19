@@ -21,8 +21,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
+    fn add_works() {
         let result = add(2, 2);
         assert_eq!(result, 4);
+    }
+
+    #[test]
+    fn run_example_ok_or_err() {
+        match circom::run_example() {
+            Ok(_) => println!("OK"),
+            Err(e) => println!("Error: {}", e),
+        }
     }
 }
