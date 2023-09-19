@@ -24,12 +24,20 @@ class ViewController: UIViewController {
         let greeting = MoproKit.hello()
         NSLog(greeting)
 
-        print("Running MoproKit.runExample()")
-        do {
-            try MoproKit.runExample()
-            print("Finished running MoproKit.runExample()")
-        } catch {
-            print("Error running MoproKit.runExample(): \(error)")
+        print("Loading circuit assets")
+        if let wasmPath = Bundle.main.path(forResource: "multiplier2", ofType: "wasm"),
+           let r1csPath = Bundle.main.path(forResource: "multiplier2", ofType: "r1cs") {
+
+           print("Running MoproKit.runExample()")
+           do {
+               try MoproKit.runExample(wasmPath: wasmPath, r1csPath: r1csPath)
+               print("Finished running MoproKit.runExample()")
+           } catch {
+               print("Error running MoproKit.runExample(): \(error)")
+           }
+
+        } else {
+            print("Error getting paths for resources")
         }
 
         // Set the label's properties
