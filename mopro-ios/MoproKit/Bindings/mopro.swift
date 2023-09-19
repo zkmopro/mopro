@@ -399,9 +399,12 @@ public func hello() -> String {
     )
 }
 
-public func runExample() throws {
+public func runExample(wasmPath: String, r1csPath: String) throws {
     try rustCallWithError(FfiConverterTypeMoproError.lift) {
-        uniffi_mopro_fn_func_run_example($0)
+        uniffi_mopro_fn_func_run_example(
+            FfiConverterString.lower(wasmPath),
+            FfiConverterString.lower(r1csPath), $0
+        )
     }
 }
 
@@ -427,7 +430,7 @@ private var initializationResult: InitializationResult {
     if uniffi_mopro_checksum_func_hello() != 309 {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_checksum_func_run_example() != 45702 {
+    if uniffi_mopro_checksum_func_run_example() != 36964 {
         return InitializationResult.apiChecksumMismatch
     }
 
