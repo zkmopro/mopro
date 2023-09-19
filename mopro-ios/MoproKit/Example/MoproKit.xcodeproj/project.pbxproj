@@ -15,6 +15,10 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		7A38AEC233A3880A843B0133 /* Pods_MoproKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE5A40EAC7D019B9C7566CA /* Pods_MoproKit_Example.framework */; };
+		CEA2D12F2AB96A7A00F292D2 /* multiplier2.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */; };
+		CEA2D1302AB96A7A00F292D2 /* multiplier2.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */; };
+		CEA2D1322AB96AB500F292D2 /* multiplier2.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */; };
+		CEA2D1332AB96AB500F292D2 /* multiplier2.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +51,8 @@
 		92580ABC3B6DBAD1A9544456 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		B4016A34BBB20BC381CCFC2D /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		C61628A63419B5C140B24AF7 /* Pods-MoproKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoproKit_Example.debug.xcconfig"; path = "Target Support Files/Pods-MoproKit_Example/Pods-MoproKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.wasm; path = "../../../../../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm"; sourceTree = "<group>"; };
+		CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.r1cs; path = "../../../../../mopro-core/examples/circom/target/multiplier2.r1cs"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +108,7 @@
 		607FACD21AFB9204008FA782 /* Example for MoproKit */ = {
 			isa = PBXGroup;
 			children = (
+				CEA2D1282AB9681E00F292D2 /* Resources */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -146,6 +153,15 @@
 				92580ABC3B6DBAD1A9544456 /* LICENSE */,
 			);
 			name = "Podspec Metadata";
+			sourceTree = "<group>";
+		};
+		CEA2D1282AB9681E00F292D2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */,
+				CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		EEB809FA0FFBEC7559BC7169 /* Pods */ = {
@@ -247,9 +263,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEA2D1322AB96AB500F292D2 /* multiplier2.r1cs in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
+				CEA2D12F2AB96A7A00F292D2 /* multiplier2.wasm in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,6 +275,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEA2D1332AB96AB500F292D2 /* multiplier2.r1cs in Resources */,
+				CEA2D1302AB96A7A00F292D2 /* multiplier2.wasm in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
