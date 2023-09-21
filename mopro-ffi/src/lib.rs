@@ -1,3 +1,5 @@
+use std::error;
+
 use mopro_core::middleware::circom;
 use mopro_core::MoproError;
 
@@ -10,6 +12,19 @@ fn add(a: u32, b: u32) -> u32 {
 
 fn hello() -> String {
     "Hello World from Rust".to_string()
+}
+
+// TODO: Use setup, prove and verify functions from mopro_core
+
+// Result<( ProvingKey<Bn254>, CircomCircuit<Bn254>, ThreadRng, Vec<<Bn254 as Pairing>::ScalarField>,
+fn setup(wasm_path: String, r1cs_path: String) -> Result<(), MoproError> {
+    let res = circom::setup(wasm_path.as_str(), r1cs_path.as_str())?;
+
+    // TODO: Implement FFI-friendly types and return this
+    // Result<( ProvingKey<Bn254>, CircomCircuit<Bn254>, ThreadRng, Vec<<Bn254 as Pairing>::ScalarField>,
+    let (pk, circuit, rng, s) = res;
+
+    Err(MoproError::CircomError("Not implemented yet".to_string()))
 }
 
 // UniFFI expects String type
