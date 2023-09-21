@@ -79,8 +79,6 @@ pub fn setup(
     let inputs = circom.get_public_inputs().unwrap();
 
     Ok((params, circom, rng, inputs))
-
-    //Err(MoproError::CircomError("Not implemented yet".to_string()))
 }
 
 pub fn generate_proof(
@@ -94,15 +92,13 @@ pub fn generate_proof(
         GrothBn::prove(&params, circom, rng).map_err(|e| MoproError::CircomError(e.to_string()))?;
 
     Ok(proof)
-
-    //Err(MoproError::CircomError("Not implemented yet".to_string()))
 }
 
 pub fn verify_proof(
     params: ProvingKey<Bn254>,
     inputs: Vec<<Bn254 as Pairing>::ScalarField>,
     proof: Proof<Bn254>,
-) -> Result<(), MoproError> {
+) -> Result<bool, MoproError> {
     // Check that the proof is valid
     println!("Verifying proof");
     let pvk =
@@ -116,6 +112,7 @@ pub fn verify_proof(
     assert!(proof_verified);
 
     // To provide the instance manually, i.e. public input and output in Circom:
+    println!("Verifying proof with manual inputs");
     let c = 15;
     let a = 3;
     let inputs_manual = vec![c.into(), a.into()];
@@ -125,7 +122,7 @@ pub fn verify_proof(
     //println!("Proof verified (alt): {}", verified_alt);
     assert!(verified_alt);
 
-    Err(MoproError::CircomError("Not implemented yet".to_string()))
+    Ok(proof_verified)
 }
 
 // TODO: Refactor this to be a proper API with setup, prove, verify etc
