@@ -209,16 +209,33 @@ mod tests {
         assert!(result.is_err());
     }
 
-    // TODO: Just a stub, make this work
+    #[test]
+    fn test_setup_prove_verify() {
+        let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
+        let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
+
+        // Setup
+        let setup_res = setup(wasm_path, r1cs_path);
+        assert!(setup_res.is_ok());
+
+        let (params, circom, mut rng, inputs) = setup_res.unwrap();
+
+        // Proof generation
+        let proof_res = generate_proof(params.clone(), circom.clone(), &mut rng);
+        assert!(proof_res.is_ok());
+
+        let proof = proof_res.unwrap();
+
+        // Proof verification
+        let verify_res = verify_proof(params, inputs, proof);
+        assert!(verify_res.is_ok());
+        assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
+    }
+
     #[test]
     fn test_setup_prove_verify_err() {
-        let result = setup();
-        assert!(result.is_err());
-
-        let result = generate_proof();
-        assert!(result.is_err());
-
-        let result = verify_proof();
-        assert!(result.is_err());
+        // Setup
+        let setup_res = setup("foo", "bar");
+        assert!(setup_res.is_err());
     }
 }
