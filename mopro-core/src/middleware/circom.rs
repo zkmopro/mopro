@@ -10,6 +10,18 @@ use std::path::Path;
 
 type GrothBn = Groth16<Bn254>;
 
+pub fn setup() -> Result<(), MoproError> {
+    Err(MoproError::CircomError("Not implemented yet".to_string()))
+}
+
+pub fn generate_proof() -> Result<(), MoproError> {
+    Err(MoproError::CircomError("Not implemented yet".to_string()))
+}
+
+pub fn verify_proof() -> Result<(), MoproError> {
+    Err(MoproError::CircomError("Not implemented yet".to_string()))
+}
+
 // TODO: Refactor this to be a proper API with setup, prove, verify etc
 // This is just a temporary function to get things working end-to-end.
 // Later we call as native Rust in example, and use from mopro-ffi
@@ -104,6 +116,19 @@ mod tests {
     #[test]
     fn test_run_example_err() {
         let result = run_example("foo", "bar");
+        assert!(result.is_err());
+    }
+
+    // TODO: Just a stub, make this work
+    #[test]
+    fn test_setup_prove_verify_err() {
+        let result = setup();
+        assert!(result.is_err());
+
+        let result = generate_proof();
+        assert!(result.is_err());
+
+        let result = verify_proof();
         assert!(result.is_err());
     }
 }
