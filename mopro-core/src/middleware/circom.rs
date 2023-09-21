@@ -10,6 +10,25 @@ use std::path::Path;
 
 type GrothBn = Groth16<Bn254>;
 
+fn assert_paths_exists(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
+    // Check that the files exist - ark-circom should probably do this instead and not panic
+    if !Path::new(wasm_path).exists() {
+        return Err(MoproError::CircomError(format!(
+            "Path does not exist: {}",
+            wasm_path
+        )));
+    }
+
+    if !Path::new(r1cs_path).exists() {
+        return Err(MoproError::CircomError(format!(
+            "Path does not exist: {}",
+            r1cs_path
+        )));
+    };
+
+    Ok(())
+}
+
 pub fn setup() -> Result<(), MoproError> {
     Err(MoproError::CircomError("Not implemented yet".to_string()))
 }
@@ -26,20 +45,7 @@ pub fn verify_proof() -> Result<(), MoproError> {
 // This is just a temporary function to get things working end-to-end.
 // Later we call as native Rust in example, and use from mopro-ffi
 pub fn run_example(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
-    // Check that the files exist - ark-circom should probably do this instead and not panic
-    if !Path::new(wasm_path).exists() {
-        return Err(MoproError::CircomError(format!(
-            "Path does not exist: {}",
-            wasm_path
-        )));
-    }
-
-    if !Path::new(r1cs_path).exists() {
-        return Err(MoproError::CircomError(format!(
-            "Path does not exist: {}",
-            r1cs_path
-        )));
-    }
+    assert_paths_exists(wasm_path, r1cs_path)?;
 
     println!("Setup");
 
