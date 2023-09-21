@@ -9,6 +9,9 @@ edition = "2021"
 ark-circom = { git = "https://github.com/arkworks-rs/circom-compat.git" }
 
 # ZKP generation
+ark-ec = { version = "=0.4.1", default-features = false, features = [
+    "parallel",
+] }
 ark-crypto-primitives = { version = "=0.4.0" }
 ark-std = { version = "=0.4.0", default-features = false, features = [
     "parallel",
