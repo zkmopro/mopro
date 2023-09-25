@@ -16,6 +16,8 @@ path = "uniffi-bindgen.rs"
 [dependencies]
 mopro-core = { path = "../mopro-core" }
 uniffi = { version = "0.24", features = ["cli"] }
+serde = { version = "1", features = ["derive"] }
+bincode = "1"
 
 # Error handling
 thiserror = "=1.0.39"

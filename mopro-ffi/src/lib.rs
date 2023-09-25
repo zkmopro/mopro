@@ -3,6 +3,20 @@ use std::error;
 use mopro_core::middleware::circom;
 use mopro_core::MoproError;
 
+mod utils;
+
+#[derive(Debug)]
+pub enum FFIError {
+    MoproError(mopro_core::MoproError),
+    SerializationError(String),
+}
+
+impl From<mopro_core::MoproError> for FFIError {
+    fn from(error: mopro_core::MoproError) -> Self {
+        FFIError::MoproError(error)
+    }
+}
+
 // name of the .udl file
 uniffi::include_scaffolding!("mopro_uniffi");
 
