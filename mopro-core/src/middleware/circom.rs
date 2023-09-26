@@ -5,13 +5,40 @@ use ark_circom::{CircomBuilder, CircomCircuit, CircomConfig};
 use ark_crypto_primitives::snark::SNARK;
 use ark_ec::pairing::Pairing;
 use ark_groth16::{Groth16, Proof, ProvingKey};
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_std::rand::{rngs::ThreadRng, thread_rng};
 use color_eyre::Result;
 use std::path::Path;
 
 type GrothBn = Groth16<Bn254>;
 
-// TODO: Do we want some kind of Circom object that we can use for setup, prove, verify etc?
+#[derive(CanonicalSerialize, CanonicalDeserialize, Clone)]
+pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
+
+#[derive(CanonicalSerialize, CanonicalDeserialize, Clone)]
+pub struct SerializableInputs(pub Vec<<Bn254 as Pairing>::ScalarField>);
+
+// XXX: Temporary function to test ark-serialize
+pub fn generate_serializable_proving_key(
+    wasm_path: &str,
+    r1cs_path: &str,
+) -> Result<SerializableProvingKey, MoproError> {
+    assert_paths_exists(wasm_path, r1cs_path)?;
+
+    let cfg = CircomConfig::<Bn254>::new(wasm_path, r1cs_path)
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+    let mut builder = CircomBuilder::new(cfg);
+    builder.push_input("a", 3);
+    builder.push_input("b", 5);
+    let circom = builder.setup();
+
+    let mut rng = thread_rng();
+    let raw_params = GrothBn::generate_random_parameters_with_reduction(circom, &mut rng)
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+    Ok(SerializableProvingKey(raw_params))
+}
 
 fn assert_paths_exists(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
     // Check that the files exist - ark-circom should probably do this instead and not panic
@@ -237,5 +264,32 @@ mod tests {
         // Setup
         let setup_res = setup("foo", "bar");
         assert!(setup_res.is_err());
+    }
+
+    #[test]
+    fn test_serialization_deserialization() {
+        let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
+        let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
+
+        // Generate a serializable proving key for testing
+        let serializable_pk = generate_serializable_proving_key(wasm_path, r1cs_path)
+            .expect("Failed to generate serializable proving key");
+
+        // Serialize
+        let mut serialized_data = Vec::new();
+        serializable_pk
+            .serialize_uncompressed(&mut serialized_data)
+            .expect("Serialization failed");
+
+        // Deserialize
+        let deserialized_pk: SerializableProvingKey =
+            CanonicalDeserialize::deserialize_uncompressed(&mut &serialized_data[..])
+                .expect("Deserialization failed");
+
+        // Assert that the original and deserialized ProvingKeys are the same
+        assert_eq!(
+            serializable_pk.0, deserialized_pk.0,
+            "Original and deserialized proving keys do not match"
+        );
     }
 }
