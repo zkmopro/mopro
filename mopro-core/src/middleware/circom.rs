@@ -18,6 +18,11 @@ pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone)]
 pub struct SerializableInputs(pub Vec<<Bn254 as Pairing>::ScalarField>);
 
+pub struct CircomState {
+    circuit: Option<CircomCircuit<Bn254>>,
+    // Add other state data members here as required
+}
+
 // XXX: Temporary function to test ark-serialize
 pub fn generate_serializable_proving_key(
     wasm_path: &str,
@@ -38,6 +43,57 @@ pub fn generate_serializable_proving_key(
         .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
     Ok(SerializableProvingKey(raw_params))
+}
+
+impl CircomState {
+    pub fn new() -> Self {
+        Self { circuit: None }
+    }
+
+    pub fn setup(
+        &mut self,
+        wasm_path: &str,
+        r1cs_path: &str,
+    ) -> Result<(SerializableProvingKey, SerializableInputs), MoproError> {
+        assert_paths_exists(wasm_path, r1cs_path)?;
+
+        println!("Setup");
+
+        // Load the WASM and R1CS for witness and proof generation
+        let cfg = CircomConfig::<Bn254>::new(wasm_path, r1cs_path)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+        // Insert our inputs as key value pairs
+        let mut builder = CircomBuilder::new(cfg);
+        builder.push_input("a", 3);
+        builder.push_input("b", 5);
+
+        // Create an empty instance for setting it up
+        let circom = builder.setup();
+
+        // Run a trusted setup using the rng in the state
+        let mut rng = thread_rng();
+
+        let params = GrothBn::generate_random_parameters_with_reduction(circom, &mut rng)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+        // Get the populated instance of the circuit with the witness
+        let circom = builder
+            .build()
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+        self.circuit = Some(circom.clone());
+
+        // This is the instance, public input and public output
+        // Together with the witness provided above this satisfies the circuit
+        let inputs = circom.get_public_inputs().ok_or(MoproError::CircomError(
+            "Failed to get public inputs".to_string(),
+        ))?;
+
+        Ok((SerializableProvingKey(params), SerializableInputs(inputs)))
+    }
+
+    // TODO: Add the `generate_proof`, `verify_proof` functions and any other required functions here
 }
 
 fn assert_paths_exists(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
@@ -264,6 +320,25 @@ mod tests {
         // Setup
         let setup_res = setup("foo", "bar");
         assert!(setup_res.is_err());
+    }
+
+    #[test]
+    fn test_setup() {
+        // Arrange: Create a new CircomState instance
+        let mut circom_state = CircomState::new();
+
+        let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
+        let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
+
+        // Act: Call the setup method
+        let result = circom_state.setup(wasm_path, r1cs_path);
+
+        // Assert: Check that the method returned an Ok
+        assert!(
+            result.is_ok(),
+            "Setup failed with error: {:?}",
+            result.err().unwrap()
+        );
     }
 
     #[test]
