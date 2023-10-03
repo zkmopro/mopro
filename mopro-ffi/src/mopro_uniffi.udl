@@ -1,12 +1,27 @@
-[Error]
-enum MoproError {
-  "CircomError",
-};
-
 namespace mopro {
   u32 add(u32 a, u32 b);
   string hello();
 
   [Throws=MoproError]
+  void init_circom_state();
+
+  [Throws=MoproError]
   void run_example(string wasm_path, string r1cs_path);
+
+};
+
+dictionary SetupResult {
+  bytes provingKey;
+  bytes inputs;
+};
+
+[Error]
+enum MoproError {
+  "CircomError",
+};
+
+interface MoproCircom {
+  constructor();
+  [Throws=MoproError]
+  SetupResult setup(string wasm_path, string r1cs_path);
 };
