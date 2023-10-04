@@ -16,10 +16,14 @@ type GrothBn = Groth16<Bn254>;
 pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone)]
+pub struct SerializableProof(pub Proof<Bn254>);
+
+#[derive(CanonicalSerialize, CanonicalDeserialize, Clone)]
 pub struct SerializableInputs(pub Vec<<Bn254 as Pairing>::ScalarField>);
 
 pub struct CircomState {
     circuit: Option<CircomCircuit<Bn254>>,
+    params: Option<ProvingKey<Bn254>>,
     // Add other state data members here as required
 }
 
@@ -47,9 +51,13 @@ pub fn generate_serializable_proving_key(
 
 impl CircomState {
     pub fn new() -> Self {
-        Self { circuit: None }
+        Self {
+            circuit: None,
+            params: None,
+        }
     }
 
+    // TODO: Improve how we add inputs
     pub fn setup(
         &mut self,
         wasm_path: &str,
@@ -77,6 +85,8 @@ impl CircomState {
         let params = GrothBn::generate_random_parameters_with_reduction(circom, &mut rng)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
+        self.params = Some(params.clone());
+
         // Get the populated instance of the circuit with the witness
         let circom = builder
             .build()
@@ -93,122 +103,46 @@ impl CircomState {
         Ok((SerializableProvingKey(params), SerializableInputs(inputs)))
     }
 
-    // TODO: Add the `generate_proof`, `verify_proof` functions and any other required functions here
-}
+    pub fn generate_proof(&mut self, rng: &mut ThreadRng) -> Result<SerializableProof, MoproError> {
+        println!("Generating proof");
 
-fn assert_paths_exists(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
-    // Check that the files exist - ark-circom should probably do this instead and not panic
-    if !Path::new(wasm_path).exists() {
-        return Err(MoproError::CircomError(format!(
-            "Path does not exist: {}",
-            wasm_path
-        )));
+        let circuit = self.circuit.as_ref().ok_or(MoproError::CircomError(
+            "Circuit has not been set up".to_string(),
+        ))?;
+
+        let params = self.params.as_ref().ok_or(MoproError::CircomError(
+            "Parameters have not been set up".to_string(),
+        ))?;
+
+        let proof = GrothBn::prove(params, circuit.clone(), rng)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+        Ok(SerializableProof(proof))
     }
 
-    if !Path::new(r1cs_path).exists() {
-        return Err(MoproError::CircomError(format!(
-            "Path does not exist: {}",
-            r1cs_path
-        )));
-    };
+    pub fn verify_proof(
+        &self,
+        serialized_proof: SerializableProof,
+        serialized_inputs: SerializableInputs,
+    ) -> Result<bool, MoproError> {
+        println!("Verifying proof");
 
-    Ok(())
-}
+        let params = self.params.as_ref().ok_or(MoproError::CircomError(
+            "Parameters have not been set up".to_string(),
+        ))?;
 
-pub fn setup(
-    wasm_path: &str,
-    r1cs_path: &str,
-) -> Result<
-    (
-        ProvingKey<Bn254>,
-        CircomCircuit<Bn254>,
-        ThreadRng,
-        Vec<<Bn254 as Pairing>::ScalarField>,
-    ),
-    MoproError,
-> {
-    assert_paths_exists(wasm_path, r1cs_path)?;
+        let pvk =
+            GrothBn::process_vk(&params.vk).map_err(|e| MoproError::CircomError(e.to_string()))?;
 
-    println!("Setup");
+        let proof_verified =
+            GrothBn::verify_with_processed_vk(&pvk, &serialized_inputs.0, &serialized_proof.0)
+                .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
-    // Load the WASM and R1CS for witness and proof generation
-    let cfg = CircomConfig::<Bn254>::new(wasm_path, r1cs_path)
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-
-    // Insert our inputs as key value pairs
-    // In Circom this is the private input (witness) and public input
-    // It does not include the public output
-    let mut builder = CircomBuilder::new(cfg);
-
-    // XXX: We probably want to do this separately, after trusted setup
-    builder.push_input("a", 3);
-    builder.push_input("b", 5);
-
-    // Create an empty instance for setting it up
-    let circom = builder.setup();
-
-    // Run a trusted setup
-    let mut rng = thread_rng();
-    let params = GrothBn::generate_random_parameters_with_reduction(circom, &mut rng)
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-
-    // Get the populated instance of the circuit with the witness
-    let circom = builder
-        .build()
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-
-    // This is the instance, public input and public output
-    // Together with the witness provided above this satisfies the circuit
-    let inputs = circom.get_public_inputs().unwrap();
-
-    Ok((params, circom, rng, inputs))
-}
-
-pub fn generate_proof(
-    params: ProvingKey<Bn254>,
-    circom: CircomCircuit<Bn254>,
-    rng: &mut ThreadRng,
-) -> Result<Proof<Bn254>, MoproError> {
-    // Generate the proof
-    println!("Generating proof");
-    let proof =
-        GrothBn::prove(&params, circom, rng).map_err(|e| MoproError::CircomError(e.to_string()))?;
-
-    Ok(proof)
-}
-
-pub fn verify_proof(
-    params: ProvingKey<Bn254>,
-    inputs: Vec<<Bn254 as Pairing>::ScalarField>,
-    proof: Proof<Bn254>,
-) -> Result<bool, MoproError> {
-    // Check that the proof is valid
-    println!("Verifying proof");
-    let pvk =
-        GrothBn::process_vk(&params.vk).map_err(|e| MoproError::CircomError(e.to_string()))?;
-    let proof_verified = GrothBn::verify_with_processed_vk(&pvk, &inputs, &proof)
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-    match proof_verified {
-        true => println!("Proof verified"),
-        false => println!("Proof not verified"),
+        Ok(proof_verified)
     }
-    assert!(proof_verified);
-
-    // To provide the instance manually, i.e. public input and output in Circom:
-    println!("Verifying proof with manual inputs");
-    let c = 15;
-    let a = 3;
-    let inputs_manual = vec![c.into(), a.into()];
-
-    let verified_alt = GrothBn::verify_with_processed_vk(&pvk, &inputs_manual, &proof)
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-    //println!("Proof verified (alt): {}", verified_alt);
-    assert!(verified_alt);
-
-    Ok(proof_verified)
 }
 
-// TODO: Refactor this to be a proper API with setup, prove, verify etc
+// TODO: Remove this once end-to-end with CircomState is working
 // This is just a temporary function to get things working end-to-end.
 // Later we call as native Rust in example, and use from mopro-ffi
 pub fn run_example(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
@@ -274,6 +208,25 @@ pub fn run_example(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
     Ok(())
 }
 
+fn assert_paths_exists(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
+    // Check that the files exist - ark-circom should probably do this instead and not panic
+    if !Path::new(wasm_path).exists() {
+        return Err(MoproError::CircomError(format!(
+            "Path does not exist: {}",
+            wasm_path
+        )));
+    }
+
+    if !Path::new(r1cs_path).exists() {
+        return Err(MoproError::CircomError(format!(
+            "Path does not exist: {}",
+            r1cs_path
+        )));
+    };
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -287,9 +240,22 @@ mod tests {
     }
 
     #[test]
-    fn test_run_example_err() {
-        let result = run_example("foo", "bar");
-        assert!(result.is_err());
+    fn test_setup_failure() {
+        // Providing incorrect paths
+        let wasm_path = "./nonexistent_path/multiplier2.wasm";
+        let r1cs_path = "./nonexistent_path/multiplier2.r1cs";
+
+        let mut circom_state = CircomState::new();
+        let setup_res = circom_state.setup(wasm_path, r1cs_path);
+
+        // The setup should fail and return an error
+        assert!(setup_res.is_err());
+        if let Err(e) = setup_res {
+            assert_eq!(
+                format!("{}", e),
+                "CircomError: Path does not exist: ./nonexistent_path/multiplier2.wasm"
+            );
+        }
     }
 
     #[test]
@@ -297,30 +263,42 @@ mod tests {
         let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
         let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
 
+        // Instantiate CircomState
+        let mut circom_state = CircomState::new();
+
         // Setup
-        let setup_res = setup(wasm_path, r1cs_path);
+        let setup_res = circom_state.setup(wasm_path, r1cs_path);
         assert!(setup_res.is_ok());
 
-        let (params, circom, mut rng, inputs) = setup_res.unwrap();
+        let (serialized_pk, serialized_inputs) = setup_res.unwrap();
+
+        // Deserialize the proving key and inputs if necessary
 
         // Proof generation
-        let proof_res = generate_proof(params.clone(), circom.clone(), &mut rng);
+        let mut rng = thread_rng();
+        let proof_res = circom_state.generate_proof(&mut rng);
+
+        // Check and print the error if there is one
+        if let Err(e) = &proof_res {
+            eprintln!("Error: {:?}", e);
+        }
+
         assert!(proof_res.is_ok());
 
-        let proof = proof_res.unwrap();
+        let serialized_proof = proof_res.unwrap();
 
         // Proof verification
-        let verify_res = verify_proof(params, inputs, proof);
+        let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
         assert!(verify_res.is_ok());
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
-    #[test]
-    fn test_setup_prove_verify_err() {
-        // Setup
-        let setup_res = setup("foo", "bar");
-        assert!(setup_res.is_err());
-    }
+    // #[test]
+    // fn test_setup_prove_verify_err() {
+    //     // Setup
+    //     let setup_res = setup("foo", "bar");
+    //     assert!(setup_res.is_err());
+    // }
 
     #[test]
     fn test_setup() {
