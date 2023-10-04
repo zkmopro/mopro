@@ -24,8 +24,6 @@ impl From<mopro_core::MoproError> for FFIError {
     }
 }
 
-uniffi::include_scaffolding!("mopro_uniffi");
-
 pub struct MoproCircom {
     state: RwLock<circom::CircomState>,
 }
@@ -85,6 +83,8 @@ pub fn init_circom_state() -> Result<(), MoproError> {
 fn run_example(wasm_path: String, r1cs_path: String) -> Result<(), MoproError> {
     circom::run_example(wasm_path.as_str(), r1cs_path.as_str())
 }
+
+uniffi::include_scaffolding!("mopro");
 
 #[cfg(test)]
 mod tests {
