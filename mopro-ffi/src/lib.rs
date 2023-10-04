@@ -98,11 +98,35 @@ mod tests {
 
     #[test]
     fn run_example_ok_or_err() {
-        let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm".to_string();
-        let r1cs_path = "./examples/circom/target/multiplier2.r1cs".to_string();
+        let wasm_path =
+            "../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm".to_string();
+        let r1cs_path = "../mopro-core/examples/circom/target/multiplier2.r1cs".to_string();
         match run_example(wasm_path, r1cs_path) {
             Ok(_) => println!("OK"),
             Err(e) => println!("Error: {}", e),
+        }
+    }
+
+    #[test]
+    fn it_sets_up_mopro_circom() {
+        let mopro_circom = MoproCircom::new();
+
+        let wasm_path =
+            "./../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm".to_string();
+        let r1cs_path = "./../mopro-core/examples/circom/target/multiplier2.r1cs".to_string();
+
+        match mopro_circom.setup(wasm_path, r1cs_path) {
+            Ok(setup_result) => {
+                assert!(
+                    !setup_result.provingKey.is_empty(),
+                    "Proving key should not be empty"
+                );
+                assert!(
+                    !setup_result.inputs.is_empty(),
+                    "Inputs should not be empty"
+                );
+            }
+            Err(e) => panic!("Setup failed with error: {:?}", e),
         }
     }
 }
