@@ -7,12 +7,15 @@ namespace mopro {
 
   [Throws=MoproError]
   void run_example(string wasm_path, string r1cs_path);
-
 };
 
 dictionary SetupResult {
   bytes provingKey;
   bytes inputs;
+};
+
+dictionary GenerateProofResult {
+  bytes proof;
 };
 
 [Error]
@@ -22,6 +25,13 @@ enum MoproError {
 
 interface MoproCircom {
   constructor();
+
   [Throws=MoproError]
   SetupResult setup(string wasm_path, string r1cs_path);
+
+  [Throws=MoproError]
+  GenerateProofResult generate_proof();
+
+  [Throws=MoproError]
+  boolean verify_proof(bytes proof, bytes public_input);
 };
