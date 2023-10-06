@@ -21,6 +21,30 @@ pub struct SerializableProof(pub Proof<Bn254>);
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone)]
 pub struct SerializableInputs(pub Vec<<Bn254 as Pairing>::ScalarField>);
 
+pub fn serialize_proof(proof: &SerializableProof) -> Vec<u8> {
+    let mut serialized_data = Vec::new();
+    proof
+        .serialize_uncompressed(&mut serialized_data)
+        .expect("Serialization failed");
+    serialized_data
+}
+
+pub fn deserialize_proof(data: Vec<u8>) -> SerializableProof {
+    SerializableProof::deserialize_uncompressed(&mut &data[..]).expect("Deserialization failed")
+}
+
+pub fn serialize_proving_key(pk: &SerializableProvingKey) -> Vec<u8> {
+    let mut serialized_data = Vec::new();
+    pk.serialize_uncompressed(&mut serialized_data)
+        .expect("Serialization failed");
+    serialized_data
+}
+
+pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
+    SerializableProvingKey::deserialize_uncompressed(&mut &data[..])
+        .expect("Deserialization failed")
+}
+
 pub struct CircomState {
     circuit: Option<CircomCircuit<Bn254>>,
     params: Option<ProvingKey<Bn254>>,
@@ -270,7 +294,7 @@ mod tests {
         let setup_res = circom_state.setup(wasm_path, r1cs_path);
         assert!(setup_res.is_ok());
 
-        let (serialized_pk, serialized_inputs) = setup_res.unwrap();
+        let (_serialized_pk, serialized_inputs) = setup_res.unwrap();
 
         // Deserialize the proving key and inputs if necessary
 
@@ -329,15 +353,10 @@ mod tests {
             .expect("Failed to generate serializable proving key");
 
         // Serialize
-        let mut serialized_data = Vec::new();
-        serializable_pk
-            .serialize_uncompressed(&mut serialized_data)
-            .expect("Serialization failed");
+        let serialized_data = serialize_proving_key(&serializable_pk);
 
         // Deserialize
-        let deserialized_pk: SerializableProvingKey =
-            CanonicalDeserialize::deserialize_uncompressed(&mut &serialized_data[..])
-                .expect("Deserialization failed");
+        let deserialized_pk = deserialize_proving_key(serialized_data);
 
         // Assert that the original and deserialized ProvingKeys are the same
         assert_eq!(
