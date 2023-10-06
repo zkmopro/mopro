@@ -6,11 +6,13 @@ use ark_crypto_primitives::snark::SNARK;
 use ark_ec::pairing::Pairing;
 use ark_groth16::{Groth16, Proof, ProvingKey};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
-use ark_std::rand::{rngs::ThreadRng, thread_rng};
+use ark_std::rand::thread_rng;
 use color_eyre::Result;
 use std::path::Path;
 
 type GrothBn = Groth16<Bn254>;
+
+// TODO: Move out serialization logic to separate file
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone)]
 pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
@@ -43,6 +45,18 @@ pub fn serialize_proving_key(pk: &SerializableProvingKey) -> Vec<u8> {
 pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
     SerializableProvingKey::deserialize_uncompressed(&mut &data[..])
         .expect("Deserialization failed")
+}
+
+pub fn serialize_inputs(inputs: &SerializableInputs) -> Vec<u8> {
+    let mut serialized_data = Vec::new();
+    inputs
+        .serialize_uncompressed(&mut serialized_data)
+        .expect("Serialization failed");
+    serialized_data
+}
+
+pub fn deserialize_inputs(data: Vec<u8>) -> SerializableInputs {
+    SerializableInputs::deserialize_uncompressed(&mut &data[..]).expect("Deserialization failed")
 }
 
 pub struct CircomState {
@@ -127,8 +141,11 @@ impl CircomState {
         Ok((SerializableProvingKey(params), SerializableInputs(inputs)))
     }
 
-    pub fn generate_proof(&mut self, rng: &mut ThreadRng) -> Result<SerializableProof, MoproError> {
+    // TODO: Improve API: This should probably take private input
+    pub fn generate_proof(&self) -> Result<SerializableProof, MoproError> {
         println!("Generating proof");
+
+        let mut rng = thread_rng();
 
         let circuit = self.circuit.as_ref().ok_or(MoproError::CircomError(
             "Circuit has not been set up".to_string(),
@@ -138,7 +155,7 @@ impl CircomState {
             "Parameters have not been set up".to_string(),
         ))?;
 
-        let proof = GrothBn::prove(params, circuit.clone(), rng)
+        let proof = GrothBn::prove(params, circuit.clone(), &mut rng)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
         Ok(SerializableProof(proof))
@@ -299,8 +316,7 @@ mod tests {
         // Deserialize the proving key and inputs if necessary
 
         // Proof generation
-        let mut rng = thread_rng();
-        let proof_res = circom_state.generate_proof(&mut rng);
+        let proof_res = circom_state.generate_proof();
 
         // Check and print the error if there is one
         if let Err(e) = &proof_res {
