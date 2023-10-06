@@ -2,9 +2,6 @@ use std::sync::RwLock;
 
 use mopro_core::middleware::circom;
 use mopro_core::MoproError;
-mod utils;
-
-//use rand::rngs::ThreadRng;
 
 #[derive(Debug)]
 pub enum FFIError {
