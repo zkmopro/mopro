@@ -1,15 +1,20 @@
 use std::sync::RwLock;
 
-use ark_serialize::CanonicalSerialize;
 use mopro_core::middleware::circom;
 use mopro_core::MoproError;
-
 mod utils;
+
+//use rand::rngs::ThreadRng;
 
 #[derive(Debug)]
 pub enum FFIError {
     MoproError(mopro_core::MoproError),
     SerializationError(String),
+}
+
+#[derive(Debug, Clone)]
+pub struct GenerateProofResult {
+    pub proof: Vec<u8>,
 }
 
 #[derive(Debug, Clone)]
@@ -39,28 +44,28 @@ impl MoproCircom {
     }
 
     pub fn setup(&self, wasm_path: String, r1cs_path: String) -> Result<SetupResult, MoproError> {
-        // Lock the state for writing since we're potentially modifying it
         let mut state_guard = self.state.write().unwrap();
-
         let (pk, inputs) = state_guard.setup(wasm_path.as_str(), r1cs_path.as_str())?;
-
-        let mut proving_key_bytes = Vec::new();
-        pk.serialize_uncompressed(&mut proving_key_bytes)
-            .map_err(|_| {
-                mopro_core::MoproError::CircomError("Failed to serialize proving key".to_string())
-            })?;
-
-        let mut inputs_bytes = Vec::new();
-        inputs
-            .serialize_uncompressed(&mut inputs_bytes)
-            .map_err(|_| {
-                mopro_core::MoproError::CircomError("Failed to serialize inputs".to_string())
-            })?;
-
         Ok(SetupResult {
-            provingKey: proving_key_bytes,
-            inputs: inputs_bytes,
+            provingKey: circom::serialize_proving_key(&pk),
+            inputs: circom::serialize_inputs(&inputs),
         })
+    }
+
+    pub fn generate_proof(&self) -> Result<GenerateProofResult, MoproError> {
+        let state_guard = self.state.read().unwrap();
+        let proof = state_guard.generate_proof()?;
+        Ok(GenerateProofResult {
+            proof: circom::serialize_proof(&proof),
+        })
+    }
+
+    pub fn verify_proof(&self, proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
+        let state_guard = self.state.read().unwrap();
+        let deserialized_proof = circom::deserialize_proof(proof);
+        let deserialized_public_input = circom::deserialize_inputs(public_input);
+        let is_valid = state_guard.verify_proof(deserialized_proof, deserialized_public_input)?;
+        Ok(is_valid)
     }
 }
 
