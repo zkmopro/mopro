@@ -113,25 +113,28 @@ mod tests {
     }
 
     #[test]
-    fn it_sets_up_mopro_circom() {
+    fn test_end_to_end() -> Result<(), MoproError> {
+        // Paths to your wasm and r1cs files
+        let wasm_path = "./../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm";
+        let r1cs_path = "./../mopro-core/examples/circom/target/multiplier2.r1cs";
+
+        // Create a new MoproCircom instance
         let mopro_circom = MoproCircom::new();
 
-        let wasm_path =
-            "./../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm".to_string();
-        let r1cs_path = "./../mopro-core/examples/circom/target/multiplier2.r1cs".to_string();
+        // Step 1: Setup
+        let setup_result = mopro_circom.setup(wasm_path.to_string(), r1cs_path.to_string())?;
+        assert!(setup_result.provingKey.len() > 0);
+        assert!(setup_result.inputs.len() > 0);
 
-        match mopro_circom.setup(wasm_path, r1cs_path) {
-            Ok(setup_result) => {
-                assert!(
-                    !setup_result.provingKey.is_empty(),
-                    "Proving key should not be empty"
-                );
-                assert!(
-                    !setup_result.inputs.is_empty(),
-                    "Inputs should not be empty"
-                );
-            }
-            Err(e) => panic!("Setup failed with error: {:?}", e),
-        }
+        // Step 2: Generate Proof
+        let generate_proof_result = mopro_circom.generate_proof()?;
+        assert!(generate_proof_result.proof.len() > 0);
+
+        // Step 3: Verify Proof
+        let is_valid =
+            mopro_circom.verify_proof(generate_proof_result.proof, setup_result.inputs)?;
+        assert!(is_valid);
+
+        Ok(())
     }
 }
