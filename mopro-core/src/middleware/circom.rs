@@ -65,6 +65,12 @@ pub struct CircomState {
     // Add other state data members here as required
 }
 
+impl Default for CircomState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // XXX: Temporary function to test ark-serialize
 pub fn generate_serializable_proving_key(
     wasm_path: &str,

@@ -14,6 +14,8 @@ pub struct GenerateProofResult {
     pub proof: Vec<u8>,
 }
 
+// NOTE: Make UniFFI and Rust happy, can maybe do some renaming here
+#[allow(non_snake_case)]
 #[derive(Debug, Clone)]
 pub struct SetupResult {
     pub provingKey: Vec<u8>,
@@ -28,6 +30,12 @@ impl From<mopro_core::MoproError> for FFIError {
 
 pub struct MoproCircom {
     state: RwLock<circom::CircomState>,
+}
+
+impl Default for MoproCircom {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // TODO: Use setup, prove and verify functions from mopro_core
