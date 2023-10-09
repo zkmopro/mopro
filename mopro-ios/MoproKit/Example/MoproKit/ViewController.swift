@@ -77,19 +77,31 @@ class ViewController: UIViewController {
             return
         }
         do {
+
+            // Prepare inputs
+            var inputs = [String: [Int32]]()
+            inputs["a"] = [3]
+            inputs["b"] = [5]
+
+            // Record start time
             let start = CFAbsoluteTimeGetCurrent()
-            let generateProofResult = try moproCircom.generateProof()
+
+            // Generate Proof
+            let generateProofResult = try moproCircom.generateProof(circuitInputs: inputs)
+            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+
+            // Record end time and compute duration
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
+
             textView.text += "Proof generation took \(timeTaken) seconds.\n"
-            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
             verifyButton.isEnabled = true // Enable the Verify button once proof has been generated
         } catch let error as MoproError {
             print("MoproError: \(error)")
         } catch {
             print("Unexpected error: \(error)")
         }
-       }
+    }
 
     @objc func runVerifyAction() {
         guard let setupResult = setupResult else {
@@ -97,17 +109,30 @@ class ViewController: UIViewController {
             return
         }
         do {
-             // Get the proof again, ideally this should be stored and reused
-            let generateProofResult = try moproCircom.generateProof()
-            let isValid = try moproCircom.verifyProof(proof: generateProofResult.proof, publicInput: setupResult.inputs)
+
+            // Re-prepare inputs (you might want to store the inputs to reuse them)
+            var inputs = [String: [Int32]]()
+            inputs["a"] = [3]
+            inputs["b"] = [5]
+
+            // Re-generate Proof (ideally, you should store and reuse the generateProofResult)
+            let generateProofResult = try moproCircom.generateProof(circuitInputs: inputs)
+            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+
+            let proof = generateProofResult.proof
+            let publicInputs = generateProofResult.inputs
+
+            // Verify Proof
+            let isValid = try moproCircom.verifyProof(proof: proof, publicInput: publicInputs)
             assert(isValid, "Proof verification should succeed")
+
             textView.text += "Proof verification succeeded.\n"
         } catch let error as MoproError {
             print("MoproError: \(error)")
         } catch {
             print("Unexpected error: \(error)")
         }
-     }
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
