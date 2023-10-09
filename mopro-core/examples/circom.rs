@@ -1,4 +1,5 @@
 use mopro_core::middleware::circom::CircomState;
+use num_bigint::BigInt;
 use std::collections::HashMap;
 
 fn main() {
@@ -18,8 +19,8 @@ fn main() {
 
     // Prepare inputs
     let mut inputs = HashMap::new();
-    inputs.insert("a".to_string(), 3);
-    inputs.insert("b".to_string(), 5);
+    inputs.insert("a".to_string(), vec![BigInt::from(3)]);
+    inputs.insert("b".to_string(), vec![BigInt::from(5)]);
 
     // Proof generation
     let generate_proof_res = circom_state.generate_proof(inputs);

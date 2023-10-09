@@ -12,11 +12,14 @@ use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{Groth16, ProvingKey};
 use ark_std::rand::thread_rng;
 use color_eyre::Result;
+use num_bigint::BigInt;
 
 pub mod serialization;
 pub mod utils;
 
 type GrothBn = Groth16<Bn254>;
+
+type CircuitInputs = HashMap<String, Vec<BigInt>>;
 
 pub struct CircomState {
     builder: Option<CircomBuilder<Bn254>>,
@@ -64,9 +67,10 @@ impl CircomState {
     }
 
     // NOTE: Consider generate_proof<T: Into<BigInt>> API
+    // XXX: BigInt might present problems for UniFFI
     pub fn generate_proof(
         &mut self,
-        inputs: HashMap<String, i32>,
+        inputs: CircuitInputs,
     ) -> Result<(SerializableProof, SerializableInputs), MoproError> {
         println!("Generating proof");
 
@@ -77,8 +81,10 @@ impl CircomState {
         ))?;
 
         // Insert our inputs as key value pairs
-        for (key, value) in inputs {
-            builder.push_input(&key, value);
+        for (key, values) in &inputs {
+            for value in values {
+                builder.push_input(&key, value.clone());
+            }
         }
 
         // Clone the builder, then build the circuit
@@ -172,8 +178,8 @@ mod tests {
 
         // Prepare inputs
         let mut inputs = HashMap::new();
-        inputs.insert("a".to_string(), 3);
-        inputs.insert("b".to_string(), 5);
+        inputs.insert("a".to_string(), vec![BigInt::from(3)]);
+        inputs.insert("b".to_string(), vec![BigInt::from(5)]);
 
         // Proof generation
         let generate_proof_res = circom_state.generate_proof(inputs);
