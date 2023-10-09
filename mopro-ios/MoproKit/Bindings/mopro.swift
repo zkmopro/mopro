@@ -307,6 +307,19 @@ private struct FfiConverterUInt32: FfiConverterPrimitive {
     }
 }
 
+private struct FfiConverterInt32: FfiConverterPrimitive {
+    typealias FfiType = Int32
+    typealias SwiftType = Int32
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Int32 {
+        return try lift(readInt(&buf))
+    }
+
+    public static func write(_ value: Int32, into buf: inout [UInt8]) {
+        writeInt(&buf, lower(value))
+    }
+}
+
 private struct FfiConverterBool: FfiConverter {
     typealias FfiType = Int8
     typealias SwiftType = Bool
@@ -383,7 +396,7 @@ private struct FfiConverterData: FfiConverterRustBuffer {
 
 public protocol MoproCircomProtocol {
     func setup(wasmPath: String, r1csPath: String) throws -> SetupResult
-    func generateProof() throws -> GenerateProofResult
+    func generateProof(circuitInputs: [String: [Int32]]) throws -> GenerateProofResult
     func verifyProof(proof: Data, publicInput: Data) throws -> Bool
 }
 
@@ -417,10 +430,11 @@ public class MoproCircom: MoproCircomProtocol {
         )
     }
 
-    public func generateProof() throws -> GenerateProofResult {
+    public func generateProof(circuitInputs: [String: [Int32]]) throws -> GenerateProofResult {
         return try FfiConverterTypeGenerateProofResult.lift(
             rustCallWithError(FfiConverterTypeMoproError.lift) {
-                uniffi_mopro_fn_method_moprocircom_generate_proof(self.pointer, $0)
+                uniffi_mopro_fn_method_moprocircom_generate_proof(self.pointer,
+                                                                  FfiConverterDictionaryStringSequenceInt32.lower(circuitInputs), $0)
             }
         )
     }
@@ -476,11 +490,13 @@ public func FfiConverterTypeMoproCircom_lower(_ value: MoproCircom) -> UnsafeMut
 
 public struct GenerateProofResult {
     public var proof: Data
+    public var inputs: Data
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(proof: Data) {
+    public init(proof: Data, inputs: Data) {
         self.proof = proof
+        self.inputs = inputs
     }
 }
 
@@ -489,23 +505,29 @@ extension GenerateProofResult: Equatable, Hashable {
         if lhs.proof != rhs.proof {
             return false
         }
+        if lhs.inputs != rhs.inputs {
+            return false
+        }
         return true
     }
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(proof)
+        hasher.combine(inputs)
     }
 }
 
 public struct FfiConverterTypeGenerateProofResult: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> GenerateProofResult {
         return try GenerateProofResult(
-            proof: FfiConverterData.read(from: &buf)
+            proof: FfiConverterData.read(from: &buf),
+            inputs: FfiConverterData.read(from: &buf)
         )
     }
 
     public static func write(_ value: GenerateProofResult, into buf: inout [UInt8]) {
         FfiConverterData.write(value.proof, into: &buf)
+        FfiConverterData.write(value.inputs, into: &buf)
     }
 }
 
@@ -519,13 +541,11 @@ public func FfiConverterTypeGenerateProofResult_lower(_ value: GenerateProofResu
 
 public struct SetupResult {
     public var provingKey: Data
-    public var inputs: Data
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(provingKey: Data, inputs: Data) {
+    public init(provingKey: Data) {
         self.provingKey = provingKey
-        self.inputs = inputs
     }
 }
 
@@ -534,29 +554,23 @@ extension SetupResult: Equatable, Hashable {
         if lhs.provingKey != rhs.provingKey {
             return false
         }
-        if lhs.inputs != rhs.inputs {
-            return false
-        }
         return true
     }
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(provingKey)
-        hasher.combine(inputs)
     }
 }
 
 public struct FfiConverterTypeSetupResult: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SetupResult {
         return try SetupResult(
-            provingKey: FfiConverterData.read(from: &buf),
-            inputs: FfiConverterData.read(from: &buf)
+            provingKey: FfiConverterData.read(from: &buf)
         )
     }
 
     public static func write(_ value: SetupResult, into buf: inout [UInt8]) {
         FfiConverterData.write(value.provingKey, into: &buf)
-        FfiConverterData.write(value.inputs, into: &buf)
     }
 }
 
@@ -603,6 +617,51 @@ extension MoproError: Equatable, Hashable {}
 
 extension MoproError: Error {}
 
+private struct FfiConverterSequenceInt32: FfiConverterRustBuffer {
+    typealias SwiftType = [Int32]
+
+    public static func write(_ value: [Int32], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterInt32.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [Int32] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [Int32]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            try seq.append(FfiConverterInt32.read(from: &buf))
+        }
+        return seq
+    }
+}
+
+private struct FfiConverterDictionaryStringSequenceInt32: FfiConverterRustBuffer {
+    public static func write(_ value: [String: [Int32]], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for (key, value) in value {
+            FfiConverterString.write(key, into: &buf)
+            FfiConverterSequenceInt32.write(value, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [String: [Int32]] {
+        let len: Int32 = try readInt(&buf)
+        var dict = [String: [Int32]]()
+        dict.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            let key = try FfiConverterString.read(from: &buf)
+            let value = try FfiConverterSequenceInt32.read(from: &buf)
+            dict[key] = value
+        }
+        return dict
+    }
+}
+
 public func add(a: UInt32, b: UInt32) -> UInt32 {
     return try! FfiConverterUInt32.lift(
         try! rustCall {
@@ -625,15 +684,6 @@ public func hello() -> String {
 public func initCircomState() throws {
     try rustCallWithError(FfiConverterTypeMoproError.lift) {
         uniffi_mopro_fn_func_init_circom_state($0)
-    }
-}
-
-public func runExample(wasmPath: String, r1csPath: String) throws {
-    try rustCallWithError(FfiConverterTypeMoproError.lift) {
-        uniffi_mopro_fn_func_run_example(
-            FfiConverterString.lower(wasmPath),
-            FfiConverterString.lower(r1csPath), $0
-        )
     }
 }
 
@@ -662,13 +712,10 @@ private var initializationResult: InitializationResult {
     if uniffi_mopro_checksum_func_init_circom_state() != 20999 {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_checksum_func_run_example() != 36964 {
-        return InitializationResult.apiChecksumMismatch
-    }
     if uniffi_mopro_checksum_method_moprocircom_setup() != 40345 {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_checksum_method_moprocircom_generate_proof() != 49620 {
+    if uniffi_mopro_checksum_method_moprocircom_generate_proof() != 59966 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_checksum_method_moprocircom_verify_proof() != 51813 {

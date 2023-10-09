@@ -50,7 +50,9 @@ print_action "Generating Swift bindings..."
 uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
 
 print_action "Building mopro-ffi static library..."
+#(cd ${PROJECT_DIR}/mopro-ffi && make release)
 (cd ${PROJECT_DIR}/mopro-ffi && make debug)
+
 
 # TODO: Update this to deal with different architectures and environments
 print_action "Using aarch64-apple-ios-sim libmopro_ffi.a static library..."
