@@ -194,21 +194,17 @@ mod tests {
     }
 
     #[test]
-    fn test_setup() {
+    fn test_setup_error() {
         // Arrange: Create a new CircomState instance
         let mut circom_state = CircomState::new();
 
-        let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
-        let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
+        let wasm_path = "badpath/multiplier2.wasm";
+        let r1cs_path = "badpath/multiplier2.r1cs";
 
         // Act: Call the setup method
         let result = circom_state.setup(wasm_path, r1cs_path);
 
-        // Assert: Check that the method returned an Ok
-        assert!(
-            result.is_ok(),
-            "Setup failed with error: {:?}",
-            result.err().unwrap()
-        );
+        // Assert: Check that the method returns an error
+        assert!(result.is_err());
     }
 }
