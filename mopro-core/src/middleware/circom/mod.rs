@@ -4,6 +4,8 @@ use self::{
 };
 use crate::MoproError;
 
+use std::collections::HashMap;
+
 use ark_bn254::Bn254;
 use ark_circom::{CircomBuilder, CircomCircuit, CircomConfig};
 use ark_crypto_primitives::snark::SNARK;
@@ -20,7 +22,6 @@ pub struct CircomState {
     builder: Option<CircomBuilder<Bn254>>,
     circuit: Option<CircomCircuit<Bn254>>,
     params: Option<ProvingKey<Bn254>>,
-    // Add other state data members here as required
 }
 
 impl Default for CircomState {
@@ -61,9 +62,10 @@ impl CircomState {
         Ok(SerializableProvingKey(params))
     }
 
-    // TODO: Improve API: This should probably take private input
+    // NOTE: Consider generate_proof<T: Into<BigInt>> API
     pub fn generate_proof(
         &mut self,
+        inputs: HashMap<String, i32>,
     ) -> Result<(SerializableProof, SerializableInputs), MoproError> {
         println!("Generating proof");
 
@@ -74,8 +76,9 @@ impl CircomState {
         ))?;
 
         // Insert our inputs as key value pairs
-        builder.push_input("a", 3);
-        builder.push_input("b", 5);
+        for (key, value) in inputs {
+            builder.push_input(&key, value);
+        }
 
         // Clone the builder, then build the circuit
         let circom = builder
@@ -261,8 +264,13 @@ mod tests {
 
         // Deserialize the proving key and inputs if necessary
 
+        // Prepare inputs
+        let mut inputs = HashMap::new();
+        inputs.insert("a".to_string(), 3);
+        inputs.insert("b".to_string(), 5);
+
         // Proof generation
-        let generate_proof_res = circom_state.generate_proof();
+        let generate_proof_res = circom_state.generate_proof(inputs);
 
         // Check and print the error if there is one
         if let Err(e) = &generate_proof_res {
