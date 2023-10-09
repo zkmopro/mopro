@@ -5,6 +5,7 @@ use self::{
 use crate::MoproError;
 
 use std::collections::HashMap;
+use std::time::Instant;
 
 use ark_bn254::Bn254;
 use ark_circom::{CircomBuilder, CircomCircuit, CircomConfig};
@@ -51,6 +52,7 @@ impl CircomState {
     ) -> Result<SerializableProvingKey, MoproError> {
         assert_paths_exists(wasm_path, r1cs_path)?;
         println!("Setup");
+        let start = Instant::now();
 
         // Load the WASM and R1CS for witness and proof generation
         let cfg = self.load_config(wasm_path, r1cs_path)?;
@@ -63,6 +65,9 @@ impl CircomState {
 
         self.params = Some(params.clone());
 
+        let setup_duration = start.elapsed();
+        println!("Setup time: {:?}", setup_duration);
+
         Ok(SerializableProvingKey(params))
     }
 
@@ -72,6 +77,7 @@ impl CircomState {
         &mut self,
         inputs: CircuitInputs,
     ) -> Result<(SerializableProof, SerializableInputs), MoproError> {
+        let start = Instant::now();
         println!("Generating proof");
 
         let mut rng = thread_rng();
@@ -107,6 +113,9 @@ impl CircomState {
         let proof = GrothBn::prove(params, circom.clone(), &mut rng)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
+        let proof_duration = start.elapsed();
+        println!("Proof generation time: {:?}", proof_duration);
+
         Ok((SerializableProof(proof), SerializableInputs(inputs)))
     }
 
@@ -115,6 +124,8 @@ impl CircomState {
         serialized_proof: SerializableProof,
         serialized_inputs: SerializableInputs,
     ) -> Result<bool, MoproError> {
+        let start = Instant::now();
+
         println!("Verifying proof");
 
         let params = self.params.as_ref().ok_or(MoproError::CircomError(
@@ -128,6 +139,8 @@ impl CircomState {
             GrothBn::verify_with_processed_vk(&pvk, &serialized_inputs.0, &serialized_proof.0)
                 .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
+        let verification_duration = start.elapsed();
+        println!("Verification time: {:?}", verification_duration);
         Ok(proof_verified)
     }
 
