@@ -25,7 +25,7 @@ Run `make` to build debug and release static libraries for suppotrted platforms.
 
 The following command generates Swift bindings:
 
-`uniffi-bindgen generate src/mopro_uniffi.udl --language swift --out-dir target/SwiftBindings`
+`uniffi-bindgen generate src/mopro.udl --language swift --out-dir target/SwiftBindings`
 
 ## Test bindings
 

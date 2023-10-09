@@ -6,8 +6,6 @@ use num_bigint::BigInt;
 use std::collections::HashMap;
 use std::sync::RwLock;
 
-// TODO: Cleanup imports, a bit wierd to import some as qualified circom and others as raw
-
 #[derive(Debug)]
 pub enum FFIError {
     MoproError(mopro_core::MoproError),
