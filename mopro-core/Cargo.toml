@@ -10,6 +10,10 @@ ark-circom = { git = "https://github.com/arkworks-rs/circom-compat.git" }
 serde = { version = "1.0", features = ["derive"] }
 ark-serialize = { version = "=0.4.1", features = ["derive"] }
 
+num-bigint = { version = "=0.4.3", default-features = false, features = [
+    "rand",
+] }
+
 # ZKP generation
 ark-ec = { version = "=0.4.1", default-features = false, features = [
     "parallel",
