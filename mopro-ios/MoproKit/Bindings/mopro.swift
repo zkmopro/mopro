@@ -307,6 +307,27 @@ private struct FfiConverterUInt32: FfiConverterPrimitive {
     }
 }
 
+private struct FfiConverterBool: FfiConverter {
+    typealias FfiType = Int8
+    typealias SwiftType = Bool
+
+    public static func lift(_ value: Int8) throws -> Bool {
+        return value != 0
+    }
+
+    public static func lower(_ value: Bool) -> Int8 {
+        return value ? 1 : 0
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Bool {
+        return try lift(readInt(&buf))
+    }
+
+    public static func write(_ value: Bool, into buf: inout [UInt8]) {
+        writeInt(&buf, lower(value))
+    }
+}
+
 private struct FfiConverterString: FfiConverter {
     typealias SwiftType = String
     typealias FfiType = RustBuffer
@@ -343,6 +364,208 @@ private struct FfiConverterString: FfiConverter {
         writeInt(&buf, len)
         writeBytes(&buf, value.utf8)
     }
+}
+
+private struct FfiConverterData: FfiConverterRustBuffer {
+    typealias SwiftType = Data
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Data {
+        let len: Int32 = try readInt(&buf)
+        return try Data(bytes: readBytes(&buf, count: Int(len)))
+    }
+
+    public static func write(_ value: Data, into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        writeBytes(&buf, value)
+    }
+}
+
+public protocol MoproCircomProtocol {
+    func setup(wasmPath: String, r1csPath: String) throws -> SetupResult
+    func generateProof() throws -> GenerateProofResult
+    func verifyProof(proof: Data, publicInput: Data) throws -> Bool
+}
+
+public class MoproCircom: MoproCircomProtocol {
+    fileprivate let pointer: UnsafeMutableRawPointer
+
+    // TODO: We'd like this to be `private` but for Swifty reasons,
+    // we can't implement `FfiConverter` without making this `required` and we can't
+    // make it `required` without making it `public`.
+    required init(unsafeFromRawPointer pointer: UnsafeMutableRawPointer) {
+        self.pointer = pointer
+    }
+
+    public convenience init() {
+        self.init(unsafeFromRawPointer: try! rustCall {
+            uniffi_mopro_fn_constructor_moprocircom_new($0)
+        })
+    }
+
+    deinit {
+        try! rustCall { uniffi_mopro_fn_free_moprocircom(pointer, $0) }
+    }
+
+    public func setup(wasmPath: String, r1csPath: String) throws -> SetupResult {
+        return try FfiConverterTypeSetupResult.lift(
+            rustCallWithError(FfiConverterTypeMoproError.lift) {
+                uniffi_mopro_fn_method_moprocircom_setup(self.pointer,
+                                                         FfiConverterString.lower(wasmPath),
+                                                         FfiConverterString.lower(r1csPath), $0)
+            }
+        )
+    }
+
+    public func generateProof() throws -> GenerateProofResult {
+        return try FfiConverterTypeGenerateProofResult.lift(
+            rustCallWithError(FfiConverterTypeMoproError.lift) {
+                uniffi_mopro_fn_method_moprocircom_generate_proof(self.pointer, $0)
+            }
+        )
+    }
+
+    public func verifyProof(proof: Data, publicInput: Data) throws -> Bool {
+        return try FfiConverterBool.lift(
+            rustCallWithError(FfiConverterTypeMoproError.lift) {
+                uniffi_mopro_fn_method_moprocircom_verify_proof(self.pointer,
+                                                                FfiConverterData.lower(proof),
+                                                                FfiConverterData.lower(publicInput), $0)
+            }
+        )
+    }
+}
+
+public struct FfiConverterTypeMoproCircom: FfiConverter {
+    typealias FfiType = UnsafeMutableRawPointer
+    typealias SwiftType = MoproCircom
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> MoproCircom {
+        let v: UInt64 = try readInt(&buf)
+        // The Rust code won't compile if a pointer won't fit in a UInt64.
+        // We have to go via `UInt` because that's the thing that's the size of a pointer.
+        let ptr = UnsafeMutableRawPointer(bitPattern: UInt(truncatingIfNeeded: v))
+        if ptr == nil {
+            throw UniffiInternalError.unexpectedNullPointer
+        }
+        return try lift(ptr!)
+    }
+
+    public static func write(_ value: MoproCircom, into buf: inout [UInt8]) {
+        // This fiddling is because `Int` is the thing that's the same size as a pointer.
+        // The Rust code won't compile if a pointer won't fit in a `UInt64`.
+        writeInt(&buf, UInt64(bitPattern: Int64(Int(bitPattern: lower(value)))))
+    }
+
+    public static func lift(_ pointer: UnsafeMutableRawPointer) throws -> MoproCircom {
+        return MoproCircom(unsafeFromRawPointer: pointer)
+    }
+
+    public static func lower(_ value: MoproCircom) -> UnsafeMutableRawPointer {
+        return value.pointer
+    }
+}
+
+public func FfiConverterTypeMoproCircom_lift(_ pointer: UnsafeMutableRawPointer) throws -> MoproCircom {
+    return try FfiConverterTypeMoproCircom.lift(pointer)
+}
+
+public func FfiConverterTypeMoproCircom_lower(_ value: MoproCircom) -> UnsafeMutableRawPointer {
+    return FfiConverterTypeMoproCircom.lower(value)
+}
+
+public struct GenerateProofResult {
+    public var proof: Data
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(proof: Data) {
+        self.proof = proof
+    }
+}
+
+extension GenerateProofResult: Equatable, Hashable {
+    public static func == (lhs: GenerateProofResult, rhs: GenerateProofResult) -> Bool {
+        if lhs.proof != rhs.proof {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(proof)
+    }
+}
+
+public struct FfiConverterTypeGenerateProofResult: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> GenerateProofResult {
+        return try GenerateProofResult(
+            proof: FfiConverterData.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: GenerateProofResult, into buf: inout [UInt8]) {
+        FfiConverterData.write(value.proof, into: &buf)
+    }
+}
+
+public func FfiConverterTypeGenerateProofResult_lift(_ buf: RustBuffer) throws -> GenerateProofResult {
+    return try FfiConverterTypeGenerateProofResult.lift(buf)
+}
+
+public func FfiConverterTypeGenerateProofResult_lower(_ value: GenerateProofResult) -> RustBuffer {
+    return FfiConverterTypeGenerateProofResult.lower(value)
+}
+
+public struct SetupResult {
+    public var provingKey: Data
+    public var inputs: Data
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(provingKey: Data, inputs: Data) {
+        self.provingKey = provingKey
+        self.inputs = inputs
+    }
+}
+
+extension SetupResult: Equatable, Hashable {
+    public static func == (lhs: SetupResult, rhs: SetupResult) -> Bool {
+        if lhs.provingKey != rhs.provingKey {
+            return false
+        }
+        if lhs.inputs != rhs.inputs {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(provingKey)
+        hasher.combine(inputs)
+    }
+}
+
+public struct FfiConverterTypeSetupResult: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SetupResult {
+        return try SetupResult(
+            provingKey: FfiConverterData.read(from: &buf),
+            inputs: FfiConverterData.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: SetupResult, into buf: inout [UInt8]) {
+        FfiConverterData.write(value.provingKey, into: &buf)
+        FfiConverterData.write(value.inputs, into: &buf)
+    }
+}
+
+public func FfiConverterTypeSetupResult_lift(_ buf: RustBuffer) throws -> SetupResult {
+    return try FfiConverterTypeSetupResult.lift(buf)
+}
+
+public func FfiConverterTypeSetupResult_lower(_ value: SetupResult) -> RustBuffer {
+    return FfiConverterTypeSetupResult.lower(value)
 }
 
 public enum MoproError {
@@ -399,6 +622,12 @@ public func hello() -> String {
     )
 }
 
+public func initCircomState() throws {
+    try rustCallWithError(FfiConverterTypeMoproError.lift) {
+        uniffi_mopro_fn_func_init_circom_state($0)
+    }
+}
+
 public func runExample(wasmPath: String, r1csPath: String) throws {
     try rustCallWithError(FfiConverterTypeMoproError.lift) {
         uniffi_mopro_fn_func_run_example(
@@ -430,7 +659,22 @@ private var initializationResult: InitializationResult {
     if uniffi_mopro_checksum_func_hello() != 309 {
         return InitializationResult.apiChecksumMismatch
     }
+    if uniffi_mopro_checksum_func_init_circom_state() != 20999 {
+        return InitializationResult.apiChecksumMismatch
+    }
     if uniffi_mopro_checksum_func_run_example() != 36964 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_mopro_checksum_method_moprocircom_setup() != 40345 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_mopro_checksum_method_moprocircom_generate_proof() != 49620 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_mopro_checksum_method_moprocircom_verify_proof() != 51813 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_mopro_checksum_constructor_moprocircom_new() != 56690 {
         return InitializationResult.apiChecksumMismatch
     }
 
