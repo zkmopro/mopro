@@ -229,12 +229,18 @@ mod tests {
         // Deserialize the proving key and inputs if necessary
 
         // Prepare inputs
-        let vec_int = vec![
+        let input_vec = vec![
             116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
         ];
 
-        let inputs = bytes_to_circuit_inputs(&vec_int);
+        // Expected output
+        let _expected_output_vec = vec![
+            37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
+            212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
+        ];
+
+        let inputs = bytes_to_circuit_inputs(&input_vec);
 
         // Proof generation
         let generate_proof_res = circom_state.generate_proof(inputs);
@@ -248,9 +254,12 @@ mod tests {
 
         let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
 
+        // TODO: Use expected_output_vec here when verifying proof
+
         // Proof verification
         let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
         assert!(verify_res.is_ok());
+
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
