@@ -24,3 +24,7 @@ Zooming in a bit:
 ## Bindings
 
 To update bindings, run `./script/update_bindings.sh debug|release`.
+
+## Acknowledgements
+
+This work is sponsored by a joint grant from [PSE](https://pse.dev/) and [0xPARC](https://0xparc.org/).
