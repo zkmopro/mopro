@@ -30,6 +30,8 @@ impl Default for CircomState {
     }
 }
 
+// TODO: Replace printlns with logging
+
 impl CircomState {
     pub fn new() -> Self {
         Self {
@@ -45,7 +47,6 @@ impl CircomState {
         r1cs_path: &str,
     ) -> Result<SerializableProvingKey, MoproError> {
         assert_paths_exists(wasm_path, r1cs_path)?;
-
         println!("Setup");
 
         // Load the WASM and R1CS for witness and proof generation
@@ -149,104 +150,9 @@ impl CircomState {
     }
 }
 
-// TODO: Remove this once end-to-end with CircomState is working
-// This is just a temporary function to get things working end-to-end.
-// Later we call as native Rust in example, and use from mopro-ffi
-pub fn run_example(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
-    assert_paths_exists(wasm_path, r1cs_path)?;
-
-    println!("Setup");
-
-    // Load the WASM and R1CS for witness and proof generation
-    let cfg = CircomConfig::<Bn254>::new(wasm_path, r1cs_path)
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-
-    // Insert our inputs as key value pairs
-    // In Circom this is the private input (witness) and public input
-    // It does not include the public output
-    let mut builder = CircomBuilder::new(cfg);
-    builder.push_input("a", 3);
-    builder.push_input("b", 5);
-
-    // Create an empty instance for setting it up
-    let circom = builder.setup();
-
-    // Run a trusted setup
-    let mut rng = thread_rng();
-    let params = GrothBn::generate_random_parameters_with_reduction(circom, &mut rng)
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-
-    // Get the populated instance of the circuit with the witness
-    let circom = builder
-        .build()
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-
-    // This is the instance, public input and public output
-    // Together with the witness provided above this satisfies the circuit
-    let inputs = circom.get_public_inputs().ok_or(MoproError::CircomError(
-        "Failed to get public inputs".to_string(),
-    ))?;
-
-    // Generate the proof
-    println!("Generating proof");
-    let proof = GrothBn::prove(&params, circom, &mut rng)
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-
-    // Check that the proof is valid
-    println!("Verifying proof");
-    let pvk =
-        GrothBn::process_vk(&params.vk).map_err(|e| MoproError::CircomError(e.to_string()))?;
-    let proof_verified = GrothBn::verify_with_processed_vk(&pvk, &inputs, &proof)
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-    match proof_verified {
-        true => println!("Proof verified"),
-        false => println!("Proof not verified"),
-    }
-    assert!(proof_verified);
-
-    // To provide the instance manually, i.e. public input and output in Circom:
-    let c = 15;
-    let a = 3;
-    let inputs_manual = vec![c.into(), a.into()];
-
-    let verified_alt = GrothBn::verify_with_processed_vk(&pvk, &inputs_manual, &proof)
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
-    //println!("Proof verified (alt): {}", verified_alt);
-    assert!(verified_alt);
-
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_run_example_ok() {
-        let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
-        let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
-        let result = run_example(wasm_path, r1cs_path);
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_setup_failure() {
-        // Providing incorrect paths
-        let wasm_path = "./nonexistent_path/multiplier2.wasm";
-        let r1cs_path = "./nonexistent_path/multiplier2.r1cs";
-
-        let mut circom_state = CircomState::new();
-        let setup_res = circom_state.setup(wasm_path, r1cs_path);
-
-        // The setup should fail and return an error
-        assert!(setup_res.is_err());
-        if let Err(e) = setup_res {
-            assert_eq!(
-                format!("{}", e),
-                "CircomError: Path does not exist: ./nonexistent_path/multiplier2.wasm"
-            );
-        }
-    }
 
     #[test]
     fn test_setup_prove_verify() {
