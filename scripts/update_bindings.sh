@@ -47,7 +47,7 @@ TARGET_DIR=${PROJECT_DIR}/target
 MOPROKIT_DIR=${PROJECT_DIR}/mopro-ios/MoproKit
 
 print_action "Generating Swift bindings..."
-uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro_uniffi.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
+uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
 
 print_action "Building mopro-ffi static library..."
 (cd ${PROJECT_DIR}/mopro-ffi && make debug)
