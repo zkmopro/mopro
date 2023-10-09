@@ -11,9 +11,8 @@ import MoproKit
 
 class ViewController: UIViewController {
 
-
-    var proveButton = UIButton()
-    var verifyButton = UIButton()
+    var proveButton = UIButton(type: .system)
+    var verifyButton = UIButton(type: .system)
     var textView = UITextView()
     let moproCircom = MoproKit.MoproCircom()
     var setupResult: SetupResult?
@@ -22,10 +21,6 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         runSetup()
-
-        view.addSubview(proveButton)
-        view.addSubview(verifyButton)
-        view.addSubview(textView)
     }
 
     func runSetup() {
@@ -45,49 +40,35 @@ class ViewController: UIViewController {
     }
 
     func setupUI() {
-        // Setup buttons and text view
+        self.title = "MoproKit Demo"
+        view.backgroundColor = .white
+
         proveButton.setTitle("Prove", for: .normal)
         verifyButton.setTitle("Verify", for: .normal)
         textView.isEditable = false
 
-        // Set button colors for visibility
-        proveButton.backgroundColor = .blue
-        verifyButton.backgroundColor = .blue
+        // Make buttons bigger
+        proveButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        verifyButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
 
-        // Set button action targets
         proveButton.addTarget(self, action: #selector(runProveAction), for: .touchUpInside)
         verifyButton.addTarget(self, action: #selector(runVerifyAction), for: .touchUpInside)
 
-        // Add subviews
-        view.addSubview(proveButton)
-        view.addSubview(verifyButton)
-        view.addSubview(textView)
+        let stackView = UIStackView(arrangedSubviews: [proveButton, verifyButton, textView])
+        stackView.axis = .vertical
+        stackView.spacing = 10
+        stackView.translatesAutoresizingMaskIntoConstraints = false
 
-        let buttonWidth: CGFloat = 200
-        let buttonHeight: CGFloat = 50
-        let padding: CGFloat = 20
-        let verticalOffset: CGFloat = 100  // Adjust this value to position buttons higher or lower
+        // Make text view visibile
+        textView.heightAnchor.constraint(equalToConstant: 200).isActive = true
 
-        proveButton.frame = CGRect(
-            x: (view.frame.width - buttonWidth) / 2,
-            y: verticalOffset,
-            width: buttonWidth,
-            height: buttonHeight
-        )
+        view.addSubview(stackView)
 
-        verifyButton.frame = CGRect(
-            x: (view.frame.width - buttonWidth) / 2,
-            y: verticalOffset + buttonHeight + padding,
-            width: buttonWidth,
-            height: buttonHeight
-        )
-
-        textView.frame = CGRect(
-            x: padding,
-            y: verticalOffset + 2 * (buttonHeight + padding),
-            width: view.frame.width - 2 * padding,
-            height: view.frame.height / 2 - padding * 2
-        )
+        NSLayoutConstraint.activate([
+            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
+        ])
     }
 
     @objc func runProveAction() {
