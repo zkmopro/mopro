@@ -15,6 +15,10 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		7A38AEC233A3880A843B0133 /* Pods_MoproKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE5A40EAC7D019B9C7566CA /* Pods_MoproKit_Example.framework */; };
+		CE5A5C062AD43A790074539D /* keccak256_256_test.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */; };
+		CE5A5C072AD43A790074539D /* keccak256_256_test.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */; };
+		CE5A5C092AD43A860074539D /* keccak256_256_test.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */; };
+		CE5A5C0A2AD43A860074539D /* keccak256_256_test.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */; };
 		CEA2D12F2AB96A7A00F292D2 /* multiplier2.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */; };
 		CEA2D1302AB96A7A00F292D2 /* multiplier2.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */; };
 		CEA2D1322AB96AB500F292D2 /* multiplier2.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */; };
@@ -51,6 +55,8 @@
 		92580ABC3B6DBAD1A9544456 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		B4016A34BBB20BC381CCFC2D /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		C61628A63419B5C140B24AF7 /* Pods-MoproKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoproKit_Example.debug.xcconfig"; path = "Target Support Files/Pods-MoproKit_Example/Pods-MoproKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.wasm; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm"; sourceTree = "<group>"; };
+		CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.r1cs; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test.r1cs"; sourceTree = "<group>"; };
 		CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.wasm; path = "../../../../../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm"; sourceTree = "<group>"; };
 		CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.r1cs; path = "../../../../../mopro-core/examples/circom/target/multiplier2.r1cs"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -158,6 +164,8 @@
 		CEA2D1282AB9681E00F292D2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */,
+				CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */,
 				CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */,
 				CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */,
 			);
@@ -266,8 +274,10 @@
 				CEA2D1322AB96AB500F292D2 /* multiplier2.r1cs in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
+				CE5A5C062AD43A790074539D /* keccak256_256_test.wasm in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
 				CEA2D12F2AB96A7A00F292D2 /* multiplier2.wasm in Resources */,
+				CE5A5C092AD43A860074539D /* keccak256_256_test.r1cs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,6 +285,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE5A5C0A2AD43A860074539D /* keccak256_256_test.r1cs in Resources */,
+				CE5A5C072AD43A790074539D /* keccak256_256_test.wasm in Resources */,
 				CEA2D1332AB96AB500F292D2 /* multiplier2.r1cs in Resources */,
 				CEA2D1302AB96A7A00F292D2 /* multiplier2.wasm in Resources */,
 			);
