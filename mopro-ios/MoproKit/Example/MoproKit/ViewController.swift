@@ -9,6 +9,7 @@
 import UIKit
 import MoproKit
 
+
 class ViewController: UIViewController {
 
     var proveButton = UIButton(type: .system)
@@ -27,8 +28,11 @@ class ViewController: UIViewController {
     }
 
     func runSetup() {
-        if let wasmPath = Bundle.main.path(forResource: "multiplier2", ofType: "wasm"),
-           let r1csPath = Bundle.main.path(forResource: "multiplier2", ofType: "r1cs") {
+        if let wasmPath = Bundle.main.path(forResource: "keccak256_256_test", ofType: "wasm"),
+           let r1csPath = Bundle.main.path(forResource: "keccak256_256_test", ofType: "r1cs") {
+        // Multiplier example
+        // if let wasmPath = Bundle.main.path(forResource: "multiplier2", ofType: "wasm"),
+        //    let r1csPath = Bundle.main.path(forResource: "multiplier2", ofType: "r1cs") {
             do {
                 setupResult = try moproCircom.setup(wasmPath: wasmPath, r1csPath: r1csPath)
                 proveButton.isEnabled = true // Enable the Prove button upon successful setup
@@ -82,9 +86,18 @@ class ViewController: UIViewController {
         do {
 
             // Prepare inputs
+            let inputVec: [UInt8] = [
+                116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0,
+            ]
+            let bits = bytesToBits(bytes: inputVec)
             var inputs = [String: [Int32]]()
-            inputs["a"] = [3]
-            inputs["b"] = [5]
+            inputs["in"] = bits
+
+            // Multiplier example
+            // var inputs = [String: [Int32]]()
+            // inputs["a"] = [3]
+            // inputs["b"] = [5]
 
             // Record start time
             let start = CFAbsoluteTimeGetCurrent()
@@ -135,4 +148,15 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+}
+
+func bytesToBits(bytes: [UInt8]) -> [Int32] {
+    var bits = [Int32]()
+    for byte in bytes {
+        for j in 0..<8 {
+            let bit = (byte >> j) & 1
+            bits.append(Int32(bit))
+        }
+    }
+    return bits
 }
