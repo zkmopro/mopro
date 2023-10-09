@@ -11,62 +11,122 @@ import MoproKit
 
 class ViewController: UIViewController {
 
+
+    var proveButton = UIButton()
+    var verifyButton = UIButton()
+    var textView = UITextView()
+    let moproCircom = MoproKit.MoproCircom()
+    var setupResult: SetupResult?
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
+        runSetup()
 
-        let helloLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
+        view.addSubview(proveButton)
+        view.addSubview(verifyButton)
+        view.addSubview(textView)
+    }
 
-        // Trying some MoproKit functions
-
-        let result = MoproKit.add(a: 10, b: 20)
-        print("Result of add: \(result)")
-
-        let greeting = MoproKit.hello()
-        NSLog(greeting)
-
-        let moproCircom = MoproKit.MoproCircom()
-
-        print("Loading circuit assets")
+    func runSetup() {
         if let wasmPath = Bundle.main.path(forResource: "multiplier2", ofType: "wasm"),
            let r1csPath = Bundle.main.path(forResource: "multiplier2", ofType: "r1cs") {
-
             do {
-                // Setup
-                NSLog("Setup")
-                let setupResult = try moproCircom.setup(wasmPath: wasmPath, r1csPath: r1csPath)
-                assert(!setupResult.provingKey.isEmpty, "Proving key should not be empty")
-                assert(!setupResult.inputs.isEmpty, "Inputs should not be empty")
-
-                // Generate Proof
-                NSLog("Generate proof")
-                let generateProofResult = try moproCircom.generateProof()
-                assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
-
-                print(generateProofResult.proof)
-
-                // Verify Proof
-                NSLog("Verify proof")
-                let isValid = try moproCircom.verifyProof(proof: generateProofResult.proof, publicInput: setupResult.inputs)
-                assert(isValid, "Proof verification should succeed")
-
+                setupResult = try moproCircom.setup(wasmPath: wasmPath, r1csPath: r1csPath)
+                proveButton.isEnabled = true // Enable the Prove button upon successful setup
             } catch let error as MoproError {
                 print("MoproError: \(error)")
             } catch {
                 print("Unexpected error: \(error)")
             }
-
         } else {
             print("Error getting paths for resources")
         }
-
-        // Set the label's properties
-        helloLabel.center = view.center
-        helloLabel.textAlignment = .center
-        helloLabel.text = greeting
-
-        // Add the label to the main view
-        view.addSubview(helloLabel)
     }
+
+    func setupUI() {
+        // Setup buttons and text view
+        proveButton.setTitle("Prove", for: .normal)
+        verifyButton.setTitle("Verify", for: .normal)
+        textView.isEditable = false
+
+        // Set button colors for visibility
+        proveButton.backgroundColor = .blue
+        verifyButton.backgroundColor = .blue
+
+        // Set button action targets
+        proveButton.addTarget(self, action: #selector(runProveAction), for: .touchUpInside)
+        verifyButton.addTarget(self, action: #selector(runVerifyAction), for: .touchUpInside)
+
+        // Add subviews
+        view.addSubview(proveButton)
+        view.addSubview(verifyButton)
+        view.addSubview(textView)
+
+        let buttonWidth: CGFloat = 200
+        let buttonHeight: CGFloat = 50
+        let padding: CGFloat = 20
+        let verticalOffset: CGFloat = 100  // Adjust this value to position buttons higher or lower
+
+        proveButton.frame = CGRect(
+            x: (view.frame.width - buttonWidth) / 2,
+            y: verticalOffset,
+            width: buttonWidth,
+            height: buttonHeight
+        )
+
+        verifyButton.frame = CGRect(
+            x: (view.frame.width - buttonWidth) / 2,
+            y: verticalOffset + buttonHeight + padding,
+            width: buttonWidth,
+            height: buttonHeight
+        )
+
+        textView.frame = CGRect(
+            x: padding,
+            y: verticalOffset + 2 * (buttonHeight + padding),
+            width: view.frame.width - 2 * padding,
+            height: view.frame.height / 2 - padding * 2
+        )
+    }
+
+    @objc func runProveAction() {
+        guard let setupResult = setupResult else {
+            print("Setup is not completed yet.")
+            return
+        }
+        do {
+            let start = CFAbsoluteTimeGetCurrent()
+            let generateProofResult = try moproCircom.generateProof()
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+            textView.text += "Proof generation took \(timeTaken) seconds.\n"
+            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+            verifyButton.isEnabled = true // Enable the Verify button once proof has been generated
+        } catch let error as MoproError {
+            print("MoproError: \(error)")
+        } catch {
+            print("Unexpected error: \(error)")
+        }
+       }
+
+    @objc func runVerifyAction() {
+        guard let setupResult = setupResult else {
+            print("Setup is not completed yet.")
+            return
+        }
+        do {
+             // Get the proof again, ideally this should be stored and reused
+            let generateProofResult = try moproCircom.generateProof()
+            let isValid = try moproCircom.verifyProof(proof: generateProofResult.proof, publicInput: setupResult.inputs)
+            assert(isValid, "Proof verification should succeed")
+            textView.text += "Proof verification succeeded.\n"
+        } catch let error as MoproError {
+            print("MoproError: \(error)")
+        } catch {
+            print("Unexpected error: \(error)")
+        }
+     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
