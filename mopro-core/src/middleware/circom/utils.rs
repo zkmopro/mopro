@@ -20,3 +20,14 @@ pub fn assert_paths_exists(wasm_path: &str, r1cs_path: &str) -> Result<(), Mopro
 
     Ok(())
 }
+
+pub fn bytes_to_bits(bytes: &[u8]) -> Vec<bool> {
+    let mut bits = Vec::new();
+    for &byte in bytes {
+        for j in 0..8 {
+            let bit = (byte >> j) & 1;
+            bits.push(bit == 1);
+        }
+    }
+    bits
+}

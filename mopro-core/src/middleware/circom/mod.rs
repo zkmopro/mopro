@@ -1,6 +1,6 @@
 use self::{
     serialization::{SerializableInputs, SerializableProof, SerializableProvingKey},
-    utils::assert_paths_exists,
+    utils::{assert_paths_exists, bytes_to_bits},
 };
 use crate::MoproError;
 
@@ -156,12 +156,24 @@ impl CircomState {
     }
 }
 
+// Helper function for Keccak256 example
+pub fn bytes_to_circuit_inputs(bytes: &[u8]) -> CircuitInputs {
+    let bits = bytes_to_bits(bytes);
+    let big_int_bits = bits
+        .into_iter()
+        .map(|bit| BigInt::from(bit as u8))
+        .collect();
+    let mut inputs = HashMap::new();
+    inputs.insert("in".to_string(), big_int_bits);
+    inputs
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_setup_prove_verify() {
+    fn test_setup_prove_verify_simple() {
         let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
         let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
 
@@ -180,6 +192,49 @@ mod tests {
         let mut inputs = HashMap::new();
         inputs.insert("a".to_string(), vec![BigInt::from(3)]);
         inputs.insert("b".to_string(), vec![BigInt::from(5)]);
+
+        // Proof generation
+        let generate_proof_res = circom_state.generate_proof(inputs);
+
+        // Check and print the error if there is one
+        if let Err(e) = &generate_proof_res {
+            println!("Error: {:?}", e);
+        }
+
+        assert!(generate_proof_res.is_ok());
+
+        let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
+
+        // Proof verification
+        let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
+        assert!(verify_res.is_ok());
+        assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
+    }
+
+    #[test]
+    fn test_setup_prove_verify_keccak() {
+        let wasm_path =
+            "./examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
+        let r1cs_path = "./examples/circom/keccak256/target/keccak256_256_test.r1cs";
+
+        // Instantiate CircomState
+        let mut circom_state = CircomState::new();
+
+        // Setup
+        let setup_res = circom_state.setup(wasm_path, r1cs_path);
+        assert!(setup_res.is_ok());
+
+        let _serialized_pk = setup_res.unwrap();
+
+        // Deserialize the proving key and inputs if necessary
+
+        // Prepare inputs
+        let vec_int = vec![
+            116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+        ];
+
+        let inputs = bytes_to_circuit_inputs(&vec_int);
 
         // Proof generation
         let generate_proof_res = circom_state.generate_proof(inputs);
