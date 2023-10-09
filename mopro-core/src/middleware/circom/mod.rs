@@ -17,6 +17,7 @@ pub mod utils;
 type GrothBn = Groth16<Bn254>;
 
 pub struct CircomState {
+    builder: Option<CircomBuilder<Bn254>>,
     circuit: Option<CircomCircuit<Bn254>>,
     params: Option<ProvingKey<Bn254>>,
     // Add other state data members here as required
@@ -31,75 +32,72 @@ impl Default for CircomState {
 impl CircomState {
     pub fn new() -> Self {
         Self {
+            builder: None,
             circuit: None,
             params: None,
         }
     }
 
-    // TODO: Improve how we add inputs
     pub fn setup(
         &mut self,
         wasm_path: &str,
         r1cs_path: &str,
-    ) -> Result<(SerializableProvingKey, SerializableInputs), MoproError> {
+    ) -> Result<SerializableProvingKey, MoproError> {
         assert_paths_exists(wasm_path, r1cs_path)?;
 
         println!("Setup");
 
         // Load the WASM and R1CS for witness and proof generation
-        let cfg = CircomConfig::<Bn254>::new(wasm_path, r1cs_path)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let cfg = self.load_config(wasm_path, r1cs_path)?;
 
-        // Insert our inputs as key value pairs
-        let mut builder = CircomBuilder::new(cfg);
-        builder.push_input("a", 3);
-        builder.push_input("b", 5);
-
-        // Create an empty instance for setting it up
-        let circom = builder.setup();
+        // Create an empty instance for setup
+        self.builder = Some(CircomBuilder::new(cfg));
 
         // Run a trusted setup using the rng in the state
-        let mut rng = thread_rng();
-
-        let params = GrothBn::generate_random_parameters_with_reduction(circom, &mut rng)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let params = self.run_trusted_setup()?;
 
         self.params = Some(params.clone());
 
-        // Get the populated instance of the circuit with the witness
-        let circom = builder
-            .build()
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-
-        self.circuit = Some(circom.clone());
-
-        // This is the instance, public input and public output
-        // Together with the witness provided above this satisfies the circuit
-        let inputs = circom.get_public_inputs().ok_or(MoproError::CircomError(
-            "Failed to get public inputs".to_string(),
-        ))?;
-
-        Ok((SerializableProvingKey(params), SerializableInputs(inputs)))
+        Ok(SerializableProvingKey(params))
     }
 
     // TODO: Improve API: This should probably take private input
-    pub fn generate_proof(&self) -> Result<SerializableProof, MoproError> {
+    pub fn generate_proof(
+        &mut self,
+    ) -> Result<(SerializableProof, SerializableInputs), MoproError> {
         println!("Generating proof");
 
         let mut rng = thread_rng();
 
-        let circuit = self.circuit.as_ref().ok_or(MoproError::CircomError(
-            "Circuit has not been set up".to_string(),
+        let builder = self.builder.as_mut().ok_or(MoproError::CircomError(
+            "Builder has not been set up".to_string(),
         ))?;
+
+        // Insert our inputs as key value pairs
+        builder.push_input("a", 3);
+        builder.push_input("b", 5);
+
+        // Clone the builder, then build the circuit
+        let circom = builder
+            .clone()
+            .build()
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+        // Update the circuit in self
+        self.circuit = Some(circom.clone());
 
         let params = self.params.as_ref().ok_or(MoproError::CircomError(
             "Parameters have not been set up".to_string(),
         ))?;
 
-        let proof = GrothBn::prove(params, circuit.clone(), &mut rng)
+        let inputs = circom.get_public_inputs().ok_or(MoproError::CircomError(
+            "Failed to get public inputs".to_string(),
+        ))?;
+
+        let proof = GrothBn::prove(params, circom.clone(), &mut rng)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
-        Ok(SerializableProof(proof))
+        Ok((SerializableProof(proof), SerializableInputs(inputs)))
     }
 
     pub fn verify_proof(
@@ -121,6 +119,30 @@ impl CircomState {
                 .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
         Ok(proof_verified)
+    }
+
+    fn load_config(
+        &self,
+        wasm_path: &str,
+        r1cs_path: &str,
+    ) -> Result<CircomConfig<Bn254>, MoproError> {
+        CircomConfig::<Bn254>::new(wasm_path, r1cs_path)
+            .map_err(|e| MoproError::CircomError(e.to_string()))
+    }
+
+    fn run_trusted_setup(&mut self) -> Result<ProvingKey<Bn254>, MoproError> {
+        let circom_setup = self
+            .builder
+            .as_mut()
+            .ok_or(MoproError::CircomError(
+                "Builder has not been set up".to_string(),
+            ))?
+            .setup();
+
+        let mut rng = thread_rng();
+
+        GrothBn::generate_random_parameters_with_reduction(circom_setup, &mut rng)
+            .map_err(|e| MoproError::CircomError(e.to_string()))
     }
 }
 
@@ -158,7 +180,9 @@ pub fn run_example(wasm_path: &str, r1cs_path: &str) -> Result<(), MoproError> {
 
     // This is the instance, public input and public output
     // Together with the witness provided above this satisfies the circuit
-    let inputs = circom.get_public_inputs().unwrap();
+    let inputs = circom.get_public_inputs().ok_or(MoproError::CircomError(
+        "Failed to get public inputs".to_string(),
+    ))?;
 
     // Generate the proof
     println!("Generating proof");
@@ -233,21 +257,21 @@ mod tests {
         let setup_res = circom_state.setup(wasm_path, r1cs_path);
         assert!(setup_res.is_ok());
 
-        let (_serialized_pk, serialized_inputs) = setup_res.unwrap();
+        let _serialized_pk = setup_res.unwrap();
 
         // Deserialize the proving key and inputs if necessary
 
         // Proof generation
-        let proof_res = circom_state.generate_proof();
+        let generate_proof_res = circom_state.generate_proof();
 
         // Check and print the error if there is one
-        if let Err(e) = &proof_res {
-            eprintln!("Error: {:?}", e);
+        if let Err(e) = &generate_proof_res {
+            println!("Error: {:?}", e);
         }
 
-        assert!(proof_res.is_ok());
+        assert!(generate_proof_res.is_ok());
 
-        let serialized_proof = proof_res.unwrap();
+        let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
 
         // Proof verification
         let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
