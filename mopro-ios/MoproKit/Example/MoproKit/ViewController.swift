@@ -24,17 +24,36 @@ class ViewController: UIViewController {
         let greeting = MoproKit.hello()
         NSLog(greeting)
 
+        let moproCircom = MoproKit.MoproCircom()
+
         print("Loading circuit assets")
         if let wasmPath = Bundle.main.path(forResource: "multiplier2", ofType: "wasm"),
            let r1csPath = Bundle.main.path(forResource: "multiplier2", ofType: "r1cs") {
 
-           print("Running MoproKit.runExample()")
-           do {
-               try MoproKit.runExample(wasmPath: wasmPath, r1csPath: r1csPath)
-               print("Finished running MoproKit.runExample()")
-           } catch {
-               print("Error running MoproKit.runExample(): \(error)")
-           }
+            do {
+                // Setup
+                NSLog("Setup")
+                let setupResult = try moproCircom.setup(wasmPath: wasmPath, r1csPath: r1csPath)
+                assert(!setupResult.provingKey.isEmpty, "Proving key should not be empty")
+                assert(!setupResult.inputs.isEmpty, "Inputs should not be empty")
+
+                // Generate Proof
+                NSLog("Generate proof")
+                let generateProofResult = try moproCircom.generateProof()
+                assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+
+                print(generateProofResult.proof)
+
+                // Verify Proof
+                NSLog("Verify proof")
+                let isValid = try moproCircom.verifyProof(proof: generateProofResult.proof, publicInput: setupResult.inputs)
+                assert(isValid, "Proof verification should succeed")
+
+            } catch let error as MoproError {
+                print("MoproError: \(error)")
+            } catch {
+                print("Unexpected error: \(error)")
+            }
 
         } else {
             print("Error getting paths for resources")
