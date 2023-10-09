@@ -119,6 +119,14 @@ uniffi::include_scaffolding!("mopro");
 mod tests {
     use super::*;
 
+    fn bytes_to_circuit_inputs(input_vec: &Vec<u8>) -> HashMap<String, Vec<i32>> {
+        let bits = circom::utils::bytes_to_bits(&input_vec);
+        let converted_vec: Vec<i32> = bits.into_iter().map(|bit| bit as i32).collect();
+        let mut inputs = HashMap::new();
+        inputs.insert("in".to_string(), converted_vec);
+        inputs
+    }
+
     #[test]
     fn add_works() {
         let result = add(2, 2);
@@ -141,6 +149,43 @@ mod tests {
         let mut inputs = HashMap::new();
         inputs.insert("a".to_string(), vec![3_i32; 1]);
         inputs.insert("b".to_string(), vec![5_i32; 1]);
+
+        // Step 2: Generate Proof
+        let generate_proof_result = mopro_circom.generate_proof(inputs)?;
+        let serialized_proof = generate_proof_result.proof;
+        let serialized_inputs = generate_proof_result.inputs;
+
+        assert!(serialized_proof.len() > 0);
+
+        // Step 3: Verify Proof
+        // TODO: This should also check inputs, make sure it does
+        let is_valid = mopro_circom.verify_proof(serialized_proof, serialized_inputs)?;
+        assert!(is_valid);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_end_to_end_keccak() -> Result<(), MoproError> {
+        // Paths to your wasm and r1cs files
+        let wasm_path =
+            "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
+        let r1cs_path = "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test.r1cs";
+
+        // Create a new MoproCircom instance
+        let mopro_circom = MoproCircom::new();
+
+        // Step 1: Setup
+        let setup_result = mopro_circom.setup(wasm_path.to_string(), r1cs_path.to_string())?;
+        assert!(setup_result.provingKey.len() > 0);
+
+        // Prepare inputs
+        let input_vec = vec![
+            116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+        ];
+
+        let inputs = bytes_to_circuit_inputs(&input_vec);
 
         // Step 2: Generate Proof
         let generate_proof_result = mopro_circom.generate_proof(inputs)?;
