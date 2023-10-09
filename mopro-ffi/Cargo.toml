@@ -19,6 +19,9 @@ uniffi = { version = "0.24", features = ["cli"] }
 serde = { version = "1", features = ["derive"] }
 bincode = "1"
 ark-serialize = { version = "=0.4.1", features = ["derive"] }
+num-bigint = { version = "=0.4.3", default-features = false, features = [
+    "rand",
+] }
 
 # Error handling
 thiserror = "=1.0.39"

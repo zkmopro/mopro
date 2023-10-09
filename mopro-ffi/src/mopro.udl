@@ -4,18 +4,15 @@ namespace mopro {
 
   [Throws=MoproError]
   void init_circom_state();
-
-  [Throws=MoproError]
-  void run_example(string wasm_path, string r1cs_path);
 };
 
 dictionary SetupResult {
   bytes provingKey;
-  bytes inputs;
 };
 
 dictionary GenerateProofResult {
   bytes proof;
+  bytes inputs;
 };
 
 [Error]
@@ -30,7 +27,7 @@ interface MoproCircom {
   SetupResult setup(string wasm_path, string r1cs_path);
 
   [Throws=MoproError]
-  GenerateProofResult generate_proof();
+  GenerateProofResult generate_proof(record<string, sequence<i32>> circuit_inputs);
 
   [Throws=MoproError]
   boolean verify_proof(bytes proof, bytes public_input);
