@@ -23,4 +23,4 @@ Zooming in a bit:
 
 ## Bindings
 
-To update bindings, run `./script/update_bindings.sh`.
+To update bindings, run `./script/update_bindings.sh debug|release`.

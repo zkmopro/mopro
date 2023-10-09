@@ -40,6 +40,18 @@ if [[ ! -d "mopro-ffi" || ! -d "mopro-core" || ! -d "mopro-ios" ]]; then
     exit 1
 fi
 
+# Check for the argument
+if [[ "$1" == "debug" ]]; then
+    BUILD_MODE="debug"
+    LIB_DIR="debug"
+elif [[ "$1" == "release" ]]; then
+    BUILD_MODE="release"
+    LIB_DIR="release"
+else
+    echo -e "${RED}Error: Please specify either 'debug' or 'release' as the argument.${DEFAULT}"
+    exit 1
+fi
+
 print_action "Updating mopro-ffi bindings and library..."
 
 PROJECT_DIR=$(pwd)
@@ -49,16 +61,13 @@ MOPROKIT_DIR=${PROJECT_DIR}/mopro-ios/MoproKit
 print_action "Generating Swift bindings..."
 uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
 
-print_action "Building mopro-ffi static library..."
-(cd ${PROJECT_DIR}/mopro-ffi && make release)
-#(cd ${PROJECT_DIR}/mopro-ffi && make debug)
-
+print_action "Building mopro-ffi static library (${BUILD_MODE})..."
+(cd ${PROJECT_DIR}/mopro-ffi && make ${BUILD_MODE})
 
 # TODO: Update this to deal with different architectures and environments
-print_action "Using aarch64-apple-ios-sim libmopro_ffi.a static library..."
+print_action "Using aarch64-apple-ios-sim libmopro_ffi.a (${LIB_DIR}) static library..."
 print_warning "This only works on iOS simulator (ARM64)"
-
-cp ${PROJECT_DIR}/mopro-ffi/target/aarch64-apple-ios-sim/debug/libmopro_ffi.a ${TARGET_DIR}/
+cp ${PROJECT_DIR}/mopro-ffi/target/aarch64-apple-ios-sim/${LIB_DIR}/libmopro_ffi.a ${TARGET_DIR}/
 
 print_action "Copying Swift bindings and static library to MoproKit..."
 cp ${TARGET_DIR}/SwiftBindings/moproFFI.h ${MOPROKIT_DIR}/Include/
