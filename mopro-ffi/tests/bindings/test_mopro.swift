@@ -2,8 +2,8 @@ import mopro
 
 let moproCircom = MoproCircom()
 
-let wasmPath = "./../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm"
-let r1csPath = "./../mopro-core/examples/circom/target/multiplier2.r1cs"
+let wasmPath = "./../../../../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm"
+let r1csPath = "./../../../../mopro-core/examples/circom/target/multiplier2.r1cs"
 
 do {
     // Setup
