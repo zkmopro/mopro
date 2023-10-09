@@ -16,6 +16,9 @@ class ViewController: UIViewController {
     var textView = UITextView()
     let moproCircom = MoproKit.MoproCircom()
     var setupResult: SetupResult?
+    var generatedProof: Data?
+    var publicInputs: Data?
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,6 +97,10 @@ class ViewController: UIViewController {
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
 
+            // Store the generated proof and public inputs for later verification
+            generatedProof = generateProofResult.proof
+            publicInputs = generateProofResult.inputs
+
             textView.text += "Proof generation took \(timeTaken) seconds.\n"
             verifyButton.isEnabled = true // Enable the Verify button once proof has been generated
         } catch let error as MoproError {
@@ -104,24 +111,13 @@ class ViewController: UIViewController {
     }
 
     @objc func runVerifyAction() {
-        guard let setupResult = setupResult else {
-            print("Setup is not completed yet.")
+        guard let setupResult = setupResult,
+              let proof = generatedProof,
+              let publicInputs = publicInputs else {
+            print("Setup is not completed or proof has not been generated yet.")
             return
         }
         do {
-
-            // Re-prepare inputs (you might want to store the inputs to reuse them)
-            var inputs = [String: [Int32]]()
-            inputs["a"] = [3]
-            inputs["b"] = [5]
-
-            // Re-generate Proof (ideally, you should store and reuse the generateProofResult)
-            let generateProofResult = try moproCircom.generateProof(circuitInputs: inputs)
-            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
-
-            let proof = generateProofResult.proof
-            let publicInputs = generateProofResult.inputs
-
             // Verify Proof
             let isValid = try moproCircom.verifyProof(proof: proof, publicInput: publicInputs)
             assert(isValid, "Proof verification should succeed")
