@@ -32,3 +32,7 @@ The following command generates Swift bindings:
 To test bindings:
 
 `cargo test --test test_generated_bindings`
+
+To test bindings in release mode without warning:
+
+`cargo test --test test_generated_bindings --release 2>/dev/null`
