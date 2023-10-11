@@ -23,7 +23,10 @@ Zooming in a bit:
 
 ## Bindings
 
-To update bindings, run `./script/update_bindings.sh debug|release`.
+To update bindings, run `./script/update_bindings.sh simulator|device debug|release`.
+
+- `simulator` is for building library to run on iOS simulator, `device` is for running on a real device
+- `debug` is for Rust library to be in debug mode and `release` for release mode
 
 ## Acknowledgements
 

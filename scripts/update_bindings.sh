@@ -40,19 +40,37 @@ if [[ ! -d "mopro-ffi" || ! -d "mopro-core" || ! -d "mopro-ios" ]]; then
     exit 1
 fi
 
-# Check for the argument
-if [[ "$1" == "debug" ]]; then
-    BUILD_MODE="debug"
-    LIB_DIR="debug"
-elif [[ "$1" == "release" ]]; then
-    BUILD_MODE="release"
-    LIB_DIR="release"
-else
-    echo -e "${RED}Error: Please specify either 'debug' or 'release' as the argument.${DEFAULT}"
+# Ensure there are at least two arguments
+if [[ $# -lt 2 ]]; then
+    echo -e "${RED}Error: Please specify the device type ('simulator' or 'device') and build mode ('debug' or 'release') as arguments.${DEFAULT}"
     exit 1
 fi
 
-print_action "Updating mopro-ffi bindings and library..."
+# Check for the device type argument
+if [[ "$1" == "simulator" ]]; then
+    DEVICE_TYPE="simulator"
+    ARCHITECTURE="aarch64-apple-ios-sim"
+elif [[ "$1" == "device" ]]; then
+    DEVICE_TYPE="device"
+    ARCHITECTURE="aarch64-apple-ios"
+else
+    echo -e "${RED}Error: Please specify either 'simulator' or 'device' as the first argument.${DEFAULT}"
+    exit 1
+fi
+
+# Check for the build mode argument
+if [[ "$2" == "debug" ]]; then
+    BUILD_MODE="debug"
+    LIB_DIR="debug"
+elif [[ "$2" == "release" ]]; then
+    BUILD_MODE="release"
+    LIB_DIR="release"
+else
+    echo -e "${RED}Error: Please specify either 'debug' or 'release' as the second argument.${DEFAULT}"
+    exit 1
+fi
+
+print_action "Updating mopro-ffi bindings and library (${BUILD_MODE} ${DEVICE_TYPE})..."
 
 PROJECT_DIR=$(pwd)
 TARGET_DIR=${PROJECT_DIR}/target
@@ -64,10 +82,16 @@ uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro.udl --language swift 
 print_action "Building mopro-ffi static library (${BUILD_MODE})..."
 (cd ${PROJECT_DIR}/mopro-ffi && make ${BUILD_MODE})
 
-# TODO: Update this to deal with different architectures and environments
-print_action "Using aarch64-apple-ios-sim libmopro_ffi.a (${LIB_DIR}) static library..."
-print_warning "This only works on iOS simulator (ARM64)"
-cp ${PROJECT_DIR}/mopro-ffi/target/aarch64-apple-ios-sim/${LIB_DIR}/libmopro_ffi.a ${TARGET_DIR}/
+# Print appropriate message based on device type
+if [[ "$DEVICE_TYPE" == "simulator" ]]; then
+    print_action "Using ${ARCHITECTURE} libmopro_ffi.a (${LIB_DIR}) static library..."
+    print_warning "This only works on iOS simulator (ARM64)"
+elif [[ "$DEVICE_TYPE" == "device" ]]; then
+    print_action "Using ${ARCHITECTURE} libmopro_ffi.a (${LIB_DIR}) static library..."
+    print_warning "This only works on iOS devices (ARM64)"
+fi
+
+cp ${PROJECT_DIR}/mopro-ffi/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a ${TARGET_DIR}/
 
 print_action "Copying Swift bindings and static library to MoproKit..."
 cp ${TARGET_DIR}/SwiftBindings/moproFFI.h ${MOPROKIT_DIR}/Include/
