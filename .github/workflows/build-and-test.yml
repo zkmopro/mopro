@@ -1,0 +1,29 @@
+name: Rust
+
+on:
+  [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install circom
+      run: |
+        git clone https://github.com/iden3/circom.git
+        cd circom
+        cargo build --release
+        cargo install --path circom
+    - name: Build
+      run: ./scripts/build_ios.sh simulator debug
+    - name: Run core tests
+      run: cd mopro-core/ && cargo test --verbose
+    - name: Run ffi tests
+      run: cd mopro-ffi/ && cargo test --verbose
+    - name: Run bundle tests
+      run: cd mopro-ffi/ && cargo test --test test_generated_bindings
