@@ -21,6 +21,16 @@ Zooming in a bit:
 
 ![mopro architecture](images/mopro_architecture2.png)
 
+## Build Bindings
+
+To build bindings for iOS simulator debug mode, run
+
+```sh
+./scripts/build_ios.sh simulator debug
+```
+
+Open the `mopro-ios/MoproKit/Example/MoproKit.xcworkspace` in Xcode.
+
 ## Bindings
 
 To update bindings, run `./script/update_bindings.sh simulator|device debug|release`.
