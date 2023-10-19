@@ -25,5 +25,5 @@ jobs:
       run: cd mopro-core/ && cargo test --verbose
     - name: Run ffi tests
       run: cd mopro-ffi/ && cargo test --verbose
-    - name: Run bundle tests
+    - name: Run bindings tests
       run: cd mopro-ffi/ && cargo test --test test_generated_bindings
