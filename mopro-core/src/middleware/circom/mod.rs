@@ -5,15 +5,21 @@ use self::{
 use crate::MoproError;
 //use color_eyre::eyre::Result;
 
-use std::collections::HashMap;
 use std::time::Instant;
+use std::{collections::HashMap, sync::Mutex};
 
 use ark_bn254::Bn254;
-use ark_circom::{CircomBuilder, CircomCircuit, CircomConfig};
+use ark_circom::{CircomBuilder, CircomCircuit, CircomConfig, WitnessCalculator};
 use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{Groth16, ProvingKey};
 use ark_std::rand::thread_rng;
 use num_bigint::BigInt;
+
+#[cfg(feature = "dylib")]
+use std::{env, path::Path};
+#[cfg(feature = "dylib")]
+use wasmer::Dylib;
+use wasmer::{Module, Store};
 
 pub mod serialization;
 pub mod utils;
@@ -302,9 +308,63 @@ mod tests {
         assert!(result.is_err());
     }
 
+    // NOTE: Can't have two tests with same dylib with current code (?) due to this error:
+    // panicked at 'assertion failed: prev.start > max', .cargo/registry/src/index.crates.io-6f17d22bba15001f/wasmer-engine-2.3.0/src/trap/frame_info.rs:225:9
+    // #[cfg(feature = "dylib")]
+    // #[test]
+    // fn test_dylib() {
+    //     let _foo = from_dylib(Path::new("target/debug/keccak256.dylib"));
+    // }
+
     #[cfg(feature = "dylib")]
     #[test]
-    fn test_dylib() {
-        let _foo = from_dylib(Path::new("target/debug/keccak256.dylib"));
+    fn test_setup_prove_verify_keccak_dylib() {
+        let dylib_path = "target/debug/keccak256.dylib";
+        let r1cs_path = "./examples/circom/keccak256/target/keccak256_256_test.r1cs";
+
+        // Instantiate CircomState
+        let mut circom_state = CircomState::new();
+
+        // Setup
+        let setup_res = circom_state.setup(dylib_path, r1cs_path);
+        assert!(setup_res.is_ok());
+
+        let _serialized_pk = setup_res.unwrap();
+
+        // Deserialize the proving key and inputs if necessary
+
+        // Prepare inputs
+        let input_vec = vec![
+            116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+        ];
+
+        // Expected output
+        let _expected_output_vec = vec![
+            37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
+            212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
+        ];
+
+        let inputs = bytes_to_circuit_inputs(&input_vec);
+
+        // Proof generation
+        let generate_proof_res = circom_state.generate_proof(inputs);
+
+        // Check and print the error if there is one
+        if let Err(e) = &generate_proof_res {
+            println!("Error: {:?}", e);
+        }
+
+        assert!(generate_proof_res.is_ok());
+
+        let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
+
+        // TODO: Use expected_output_vec here when verifying proof
+
+        // Proof verification
+        let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
+        assert!(verify_res.is_ok());
+
+        assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 }

@@ -10,7 +10,9 @@ default = []
 dylib = ["wasmer/dylib", "wasmer-engine-dylib", "wasmer-compiler-cranelift"]
 
 [dependencies]
-ark-circom = { git = "https://github.com/arkworks-rs/circom-compat.git" }
+#ark-circom = { git = "https://github.com/arkworks-rs/circom-compat.git" }
+ark-circom = { git = "https://github.com/oskarth/circom-compat.git", branch = "feat/support-dylib" }
+
 serde = { version = "1.0", features = ["derive"] }
 ark-serialize = { version = "=0.4.1", features = ["derive"] }
 num-bigint = { version = "=0.4.3", default-features = false, features = [
