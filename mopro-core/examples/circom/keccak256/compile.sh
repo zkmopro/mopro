@@ -1,4 +1,4 @@
 #!/bin/bash
 
-mkdir target
+mkdir -p target
 circom ./keccak256_256_test.circom --r1cs --wasm --sym --output ./target

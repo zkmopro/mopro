@@ -2,6 +2,10 @@
 
 PROJECT_DIR=$(pwd)
 
+# Color definitions
+DEFAULT='\033[0m'
+RED='\033[0;31m'
+
 # Check for the device type argument
 if [[ "$1" == "simulator" ]]; then
     DEVICE_TYPE="simulator"
@@ -27,17 +31,11 @@ else
 fi
 
 # build circom circuits in mopro-core
-
-cd ${PROJECT_DIR}/mopro-core/examples/circom/keccak256
-npm install
-./compile.sh
 cd ${PROJECT_DIR}/mopro-core
 cargo build --release
 
 # build ffi in mopro-ffi
 cd ${PROJECT_DIR}/mopro-ffi
-rustup target add x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim
-cargo install --bin uniffi-bindgen --path .
 make
 cargo build --release
 
@@ -47,16 +45,15 @@ pod install
 
 # update bindings
 cd ${PROJECT_DIR}
-./scripts/update_bindings.sh $1 $2
+./scripts/update_bindings.sh ${DEVICE_TYPE} ${BUILD_MODE}
 
 # update xcconfig
-
 MODES="debug release"
 XCCONFIG_PATH=mopro-ios/MoproKit/Example/Pods/Target\ Support\ Files/MoproKit
 CONFIGS="
-    LIBRARY_SEARCH_PATHS=\${SRCROOT}/../../Libs
-    OTHER_LDFLAGS=-lmopro_ffi
-    USER_HEADER_SEARCH_PATHS=\${SRCROOT}/../../include
+LIBRARY_SEARCH_PATHS=\${SRCROOT}/../../Libs
+OTHER_LDFLAGS=-lmopro_ffi
+USER_HEADER_SEARCH_PATHS=\${SRCROOT}/../../include
 "
 for mode in ${MODES}
 do
