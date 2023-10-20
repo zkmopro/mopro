@@ -3,6 +3,7 @@ use self::{
     utils::{assert_paths_exists, bytes_to_bits},
 };
 use crate::MoproError;
+//use color_eyre::eyre::Result;
 
 use std::collections::HashMap;
 use std::time::Instant;
@@ -12,7 +13,6 @@ use ark_circom::{CircomBuilder, CircomCircuit, CircomConfig};
 use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{Groth16, ProvingKey};
 use ark_std::rand::thread_rng;
-use color_eyre::Result;
 use num_bigint::BigInt;
 
 pub mod serialization;

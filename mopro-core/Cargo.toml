@@ -31,3 +31,11 @@ ark-groth16 = { version = "=0.4.0", default-features = false, features = [
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 criterion = "=0.3.6"
+
+[build-dependencies]
+color-eyre = "0.6"
+enumset = "1.0.8"
+uniffi = { version = "0.24", features = ["build"] }
+wasmer = { version = "2.3" }
+wasmer-engine-dylib = { version = "2.2.1" }
+wasmer-compiler-cranelift = { version = "2.2.1" }
