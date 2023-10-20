@@ -36,6 +36,17 @@ impl Default for CircomState {
 
 // TODO: Replace printlns with logging
 
+#[cfg(feature = "dylib")]
+fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
+    let store = Store::new(&Dylib::headless().engine());
+    let module = unsafe {
+        Module::deserialize_from_file(&store, path).expect("Failed to load wasm dylib module")
+    };
+    let result =
+        WitnessCalculator::from_module(module).expect("Failed to create witness calculator");
+    Mutex::new(result)
+}
+
 impl CircomState {
     pub fn new() -> Self {
         Self {
@@ -289,5 +300,11 @@ mod tests {
 
         // Assert: Check that the method returns an error
         assert!(result.is_err());
+    }
+
+    #[cfg(feature = "dylib")]
+    #[test]
+    fn test_dylib() {
+        let _foo = from_dylib(Path::new("target/debug/keccak256.dylib"));
     }
 }
