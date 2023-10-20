@@ -1,19 +1,22 @@
-use color_eyre::eyre::eyre;
 use color_eyre::eyre::Result;
-use enumset::enum_set;
-use enumset::EnumSet;
-use std::path::Path;
-use std::{env, str::FromStr};
-
-use wasmer::{Module, Store, Target, Triple};
-use wasmer_compiler_cranelift::Cranelift;
-use wasmer_engine_dylib::Dylib;
 
 // NOTE: This is just a build test for middleware/circom/mod.rs to turn it a dylib
 // This is done to deal with memory restrictions on iOS
 
 // Inspired by https://github.com/worldcoin/semaphore-rs/blob/main/build.rs
+#[cfg(feature = "dylib")]
 fn build_dylib() -> Result<()> {
+    use color_eyre::eyre::eyre;
+    use enumset::enum_set;
+    use enumset::EnumSet;
+    use std::path::Path;
+    use std::{env, str::FromStr};
+
+    use wasmer::{Module, Store, Target, Triple};
+
+    use wasmer_compiler_cranelift::Cranelift;
+    use wasmer_engine_dylib::Dylib;
+
     let wasm_path = "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
     let wasm_file = Path::new(wasm_path).to_path_buf();
 
@@ -48,7 +51,7 @@ fn build_dylib() -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    println!("cargo:warning=Building dylib");
+    #[cfg(feature = "dylib")]
     build_dylib()?;
     Ok(())
 }
