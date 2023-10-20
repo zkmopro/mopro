@@ -21,6 +21,12 @@ Zooming in a bit:
 
 ![mopro architecture](images/mopro_architecture2.png)
 
+## Prepare
+
+- Install [circom](https://docs.circom.io/)
+- Install [cocoapods](https://cocoapods.org/)
+- Run `./scripts/prepare.sh` to check all prerequisites are set.
+
 ## Build Bindings
 
 To build bindings for iOS simulator debug mode, run
