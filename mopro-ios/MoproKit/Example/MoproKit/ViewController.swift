@@ -33,7 +33,16 @@ class ViewController: UIViewController {
         let dylibPath = ProcessInfo.processInfo.environment["CIRCUIT_WASM_DYLIB"] ?? ""
 
         print("CIRCUIT_WASM_DYLIB path: \(dylibPath)");
-        // TODO: Pass env variable to Rust with initalize fn
+
+        // Pass env variable to Rust with initalize fn
+        do {
+            try MoproKit.initialize(path: dylibPath)
+        } catch let error as MoproError {
+            print("MoproError: \(error)")
+        } catch {
+            print("Unexpected error: \(error)")
+        }
+
     }
 
     func runGenerateProof2() {
