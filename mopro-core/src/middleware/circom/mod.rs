@@ -47,7 +47,13 @@ impl Default for CircomState {
 
 static WITNESS_CALCULATOR: OnceCell<Mutex<WitnessCalculator>> = OnceCell::new();
 
-// TODO: Initialize function for WitnessCalculator?
+// Initialize dylib library
+#[cfg(feature = "dylib")]
+pub fn initialize(dylib_path: &Path) {
+    WITNESS_CALCULATOR
+        .set(from_dylib(dylib_path))
+        .expect("Failed to set witness calculator");
+}
 
 #[cfg(feature = "dylib")]
 pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
