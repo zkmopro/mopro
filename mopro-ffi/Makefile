@@ -1,4 +1,6 @@
-TARGETS = x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim
+# XXX: Problem with x86 for wasmer cranelift (x86 support requires SSE2)
+#TARGETS = x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim
+TARGETS = aarch64-apple-ios aarch64-apple-ios-sim
 BUILD_TYPES = debug release
 
 all: $(BUILD_TYPES)
