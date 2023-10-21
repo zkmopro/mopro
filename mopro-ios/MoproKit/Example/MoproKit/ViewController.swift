@@ -25,7 +25,15 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         //runSetup()
+        runInit()
         runGenerateProof2()
+    }
+
+    func runInit() {
+        let dylibPath = ProcessInfo.processInfo.environment["CIRCUIT_WASM_DYLIB"] ?? ""
+
+        print("CIRCUIT_WASM_DYLIB path: \(dylibPath)");
+        // TODO: Pass env variable to Rust with initalize fn
     }
 
     func runGenerateProof2() {
