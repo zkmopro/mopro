@@ -16,6 +16,9 @@ use ark_std::rand::thread_rng;
 use num_bigint::BigInt;
 
 #[cfg(feature = "dylib")]
+use once_cell::sync::OnceCell; //Lazy
+
+#[cfg(feature = "dylib")]
 use std::{env, path::Path};
 #[cfg(feature = "dylib")]
 use wasmer::Dylib;
@@ -41,6 +44,50 @@ impl Default for CircomState {
 }
 
 // TODO: Replace printlns with logging
+
+static WITNESS_CALCULATOR: OnceCell<Mutex<WitnessCalculator>> = OnceCell::new();
+
+// TODO: Initialize function for WitnessCalculator?
+
+#[cfg(feature = "dylib")]
+pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
+    let var_name = "CIRCUIT_WASM_DYLIB";
+    WITNESS_CALCULATOR.get_or_init(|| {
+        let path = env::var(var_name).unwrap_or_else(|_| {
+            panic!(
+                "Mopro Circuit WASM Dylib not initialized. \
+            Please set {} environment variable to the path of the dylib file",
+                var_name
+            )
+        });
+        from_dylib(Path::new(&path))
+    })
+}
+
+// TODO Deal with zkey files
+pub fn generate_proof2(
+    inputs: CircuitInputs,
+    // TODO: Result (SerializableProof, SerializableInputs)
+) -> Result<(), MoproError> {
+    let now = Instant::now();
+    println!("Generating proof2");
+
+    //let mut rng = thread_rng();
+
+    let full_assignment = witness_calculator()
+        .lock()
+        .expect("Failed to lock witness calculator")
+        .calculate_witness_element::<Bn254, _>(inputs, false)
+        // TODO: WitnessError
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+    println!("Witness generation took: {:.2?}", now.elapsed());
+    //println!("Full assignment: {:?}", full_assignment);
+
+    // TODO: Rest of proof stuff, for now just focusing on witness generation
+
+    Ok(())
+}
 
 #[cfg(feature = "dylib")]
 fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
@@ -366,5 +413,30 @@ mod tests {
         assert!(verify_res.is_ok());
 
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
+    }
+
+    #[cfg(feature = "dylib")]
+    #[test]
+    fn test_generate_proof2() {
+        // XXX Right now dylib is hardcoded to Keccak
+
+        // Prepare inputs
+        let input_vec = vec![
+            116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+        ];
+
+        let inputs = bytes_to_circuit_inputs(&input_vec);
+
+        //let inputs = CircuitInputs { ... }; // provide inputs for testing
+
+        match generate_proof2(inputs) {
+            Ok(()) => {
+                // Test passed, no assertion needed here
+            }
+            Err(error) => {
+                panic!("Test failed with error: {:?}", error);
+            }
+        }
     }
 }
