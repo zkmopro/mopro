@@ -86,7 +86,7 @@
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "CIRCUIT_WASM_DYLIB"
-            value = "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Resources/keccak256.dylib"
+            value = "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/keccak256.dylib"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>
