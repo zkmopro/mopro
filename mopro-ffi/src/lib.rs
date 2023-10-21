@@ -4,6 +4,7 @@ use mopro_core::MoproError;
 use num_bigint::BigInt;
 
 use std::collections::HashMap;
+use std::path::Path;
 use std::sync::RwLock;
 
 #[derive(Debug)]
@@ -41,6 +42,10 @@ impl Default for MoproCircom {
     fn default() -> Self {
         Self::new()
     }
+}
+
+fn initialize(path: String) {
+    circom::initialize(Path::new(path.as_str()));
 }
 
 // TODO: Basic generate_proof thing here
