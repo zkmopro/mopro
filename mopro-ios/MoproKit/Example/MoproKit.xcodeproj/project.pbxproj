@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -20,13 +20,11 @@
 		CE5A5C072AD43A790074539D /* keccak256_256_test.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */; };
 		CE5A5C092AD43A860074539D /* keccak256_256_test.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */; };
 		CE5A5C0A2AD43A860074539D /* keccak256_256_test.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */; };
-		CE8CCA862AE3C2E8004B55A0 /* keccak256.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = CE8CCA852AE3C2E8004B55A0 /* keccak256.dylib */; };
-		CE8CCA872AE3C2E8004B55A0 /* keccak256.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = CE8CCA852AE3C2E8004B55A0 /* keccak256.dylib */; platformFilter = ios; };
-		CE8CCA882AE3C320004B55A0 /* keccak256.dylib in Resources */ = {isa = PBXBuildFile; fileRef = CE8CCA852AE3C2E8004B55A0 /* keccak256.dylib */; };
 		CEA2D12F2AB96A7A00F292D2 /* multiplier2.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */; };
 		CEA2D1302AB96A7A00F292D2 /* multiplier2.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */; };
 		CEA2D1322AB96AB500F292D2 /* multiplier2.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */; };
 		CEA2D1332AB96AB500F292D2 /* multiplier2.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */; };
+		CEE022F72AE53BEC00FF9257 /* keccak256.dylib in Resources */ = {isa = PBXBuildFile; fileRef = CEE022F62AE53BEC00FF9257 /* keccak256.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,9 +60,10 @@
 		CE0E1A112AE3E494009DE4CB /* libmopro_ffi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmopro_ffi.dylib; path = ../../../Libs/libmopro_ffi.dylib; sourceTree = "<group>"; };
 		CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.wasm; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm"; sourceTree = "<group>"; };
 		CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.r1cs; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test.r1cs"; sourceTree = "<group>"; };
-		CE8CCA852AE3C2E8004B55A0 /* keccak256.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = keccak256.dylib; path = "../../../../../mopro-core/target/debug/keccak256.dylib"; sourceTree = "<group>"; };
+		CE87BBCF2AE539FD00F6D8E5 /* keccak256.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = keccak256.dylib; sourceTree = "<group>"; };
 		CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.wasm; path = "../../../../../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm"; sourceTree = "<group>"; };
 		CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.r1cs; path = "../../../../../mopro-core/examples/circom/target/multiplier2.r1cs"; sourceTree = "<group>"; };
+		CEE022F62AE53BEC00FF9257 /* keccak256.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = keccak256.dylib; path = ../Libs/keccak256.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,7 +71,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE8CCA862AE3C2E8004B55A0 /* keccak256.dylib in Frameworks */,
 				7A38AEC233A3880A843B0133 /* Pods_MoproKit_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -81,7 +79,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE8CCA872AE3C2E8004B55A0 /* keccak256.dylib in Frameworks */,
 				4384FD09A96F702A375841EE /* Pods_MoproKit_Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -101,6 +98,7 @@
 		607FACC71AFB9204008FA782 = {
 			isa = PBXGroup;
 			children = (
+				CEE022F62AE53BEC00FF9257 /* keccak256.dylib */,
 				607FACF51AFB993E008FA782 /* Podspec Metadata */,
 				607FACD21AFB9204008FA782 /* Example for MoproKit */,
 				607FACE81AFB9204008FA782 /* Tests */,
@@ -173,8 +171,8 @@
 		CE8CCA842AE3C2D9004B55A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CE87BBCF2AE539FD00F6D8E5 /* keccak256.dylib */,
 				CE0E1A112AE3E494009DE4CB /* libmopro_ffi.dylib */,
-				CE8CCA852AE3C2E8004B55A0 /* keccak256.dylib */,
 			);
 			path = Frameworks;
 			sourceTree = "<group>";
@@ -255,10 +253,12 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = 2699K68G5P;
 						LastSwiftMigration = 0900;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = 2699K68G5P;
 						LastSwiftMigration = 0900;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
@@ -289,8 +289,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEE022F72AE53BEC00FF9257 /* keccak256.dylib in Resources */,
 				CE0E1A142AE3E5DB009DE4CB /* libmopro_ffi.dylib in Resources */,
-				CE8CCA882AE3C320004B55A0 /* keccak256.dylib in Resources */,
 				CEA2D1322AB96AB500F292D2 /* multiplier2.r1cs in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
@@ -541,8 +541,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -555,11 +554,7 @@
 				DEVELOPMENT_TEAM = 2699K68G5P;
 				INFOPLIST_FILE = MoproKit/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
@@ -591,11 +586,7 @@
 				DEVELOPMENT_TEAM = 2699K68G5P;
 				INFOPLIST_FILE = MoproKit/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
@@ -633,12 +624,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-					"@executable_path",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks @executable_path";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
@@ -677,12 +663,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-					"@executable_path",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks @executable_path";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",

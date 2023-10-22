@@ -20,10 +20,21 @@ fn build_dylib() -> Result<()> {
     let wasm_path = "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
     let wasm_file = Path::new(wasm_path).to_path_buf();
 
-    let out_path = "./target/debug/";
+    //let out_path = "./target/debug/";
 
-    let out_dir = Path::new(&out_path).to_path_buf();
-    let dylib_file = out_dir.join(format!("keccak256.dylib"));
+    // XXX: Try this
+    let out_dir = env::var("TARGET_DIR")?;
+    //let out_dir = env::var("OUT_DIR")?;
+
+    let out_dir = Path::new(&out_dir).to_path_buf();
+    //    let out_dir = out_dir.join(env::var("TARGET").unwrap());
+    //    let out_dir = out_dir.join(env::var("BUILD_MODE").unwrap());
+    println!(
+        "cargo:warning=TARGET_DIR (mopro-core): {}",
+        out_dir.display()
+    );
+    let dylib_file = out_dir.join("keccak256.dylib");
+
     println!(
         "cargo:rustc-env=CIRCUIT_WASM_DYLIB={}",
         dylib_file.display()
@@ -35,6 +46,16 @@ fn build_dylib() -> Result<()> {
 
     // Create a WASM engine for the target that can compile
     let triple = Triple::from_str(&env::var("TARGET")?).map_err(|e| eyre!(e))?;
+    println!("cargo:warning=TRIPLE TARGET (mopro-core): {}", triple);
+
+    let real_device = &env::var("TARGET").unwrap() == "aarch64-apple-ios";
+    println!("cargo:warning=REAL DEVICE (mopro-core): {}", real_device);
+
+    //    if real_device {
+    // println!(
+    //     "cargo:warning=Building for real device (mopro-core): {}",
+    //     real_device
+    // );
 
     let cpu_features = enum_set!();
     let target = Target::new(triple, cpu_features);

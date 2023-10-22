@@ -76,8 +76,18 @@ PROJECT_DIR=$(pwd)
 TARGET_DIR=${PROJECT_DIR}/target
 MOPROKIT_DIR=${PROJECT_DIR}/mopro-ios/MoproKit
 
+# For dylib stuff
+mkdir -p ${TARGET_DIR}/${ARCHITECTURE}/${BUILD_MODE}
+
+export TARGET_DIR
+export BUILD_MODE
+
 print_action "Generating Swift bindings..."
 uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
+
+# XXX
+#print_action "Building universal libraries with cargo lipo..."
+#(cd ${PROJECT_DIR}/mopro-ffi && cargo lipo --release --targets aarch64-apple-ios,aarch64-apple-darwin)
 
 print_action "Building mopro-ffi static library (${BUILD_MODE})..."
 (cd ${PROJECT_DIR}/mopro-ffi && make ${BUILD_MODE})
@@ -98,5 +108,6 @@ cp ${TARGET_DIR}/SwiftBindings/moproFFI.h ${MOPROKIT_DIR}/Include/
 cp ${TARGET_DIR}/SwiftBindings/mopro.swift ${MOPROKIT_DIR}/Bindings/
 cp ${TARGET_DIR}/SwiftBindings/moproFFI.modulemap ${MOPROKIT_DIR}/Resources/
 cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
+cp ${TARGET_DIR}/keccak256.dylib ${MOPROKIT_DIR}/Libs/
 
 print_action "Done! Please re-build your project in Xcode."

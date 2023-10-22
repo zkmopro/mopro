@@ -50,6 +50,9 @@ static WITNESS_CALCULATOR: OnceCell<Mutex<WitnessCalculator>> = OnceCell::new();
 // Initialize dylib library
 #[cfg(feature = "dylib")]
 pub fn initialize(dylib_path: &Path) {
+    println!("Initializing dylib: {:?}", dylib_path);
+    println!("cargo:warning=Initializing dylib: {:?}", dylib_path);
+
     WITNESS_CALCULATOR
         .set(from_dylib(dylib_path))
         .expect("Failed to set witness calculator");
@@ -58,6 +61,8 @@ pub fn initialize(dylib_path: &Path) {
 #[cfg(feature = "dylib")]
 pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
     let var_name = "CIRCUIT_WASM_DYLIB";
+    println!("Getting witness calculator, var_name: {}", var_name);
+    println!("cargo:warning=Getting witness calculator");
     WITNESS_CALCULATOR.get_or_init(|| {
         let path = env::var(var_name).unwrap_or_else(|_| {
             panic!(
