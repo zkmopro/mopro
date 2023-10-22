@@ -15,6 +15,7 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		7A38AEC233A3880A843B0133 /* Pods_MoproKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE5A40EAC7D019B9C7566CA /* Pods_MoproKit_Example.framework */; };
+		CE0E1A142AE3E5DB009DE4CB /* libmopro_ffi.dylib in Resources */ = {isa = PBXBuildFile; fileRef = CE0E1A112AE3E494009DE4CB /* libmopro_ffi.dylib */; };
 		CE5A5C062AD43A790074539D /* keccak256_256_test.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */; };
 		CE5A5C072AD43A790074539D /* keccak256_256_test.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */; };
 		CE5A5C092AD43A860074539D /* keccak256_256_test.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */; };
@@ -40,7 +41,7 @@
 
 /* Begin PBXFileReference section */
 		1E5E014D70B48C9A59F14658 /* Pods-MoproKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoproKit_Example.release.xcconfig"; path = "Target Support Files/Pods-MoproKit_Example/Pods-MoproKit_Example.release.xcconfig"; sourceTree = "<group>"; };
-		47F8ADB0AC4168C6E874818D /* MoproKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = MoproKit.podspec; path = ../MoproKit.podspec; sourceTree = "<group>"; };
+		47F8ADB0AC4168C6E874818D /* MoproKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = MoproKit.podspec; path = ../MoproKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		5DAF212A114DFA0C9F4282B2 /* Pods-MoproKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoproKit_Tests.debug.xcconfig"; path = "Target Support Files/Pods-MoproKit_Tests/Pods-MoproKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* MoproKit_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoproKit_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -58,6 +59,7 @@
 		92580ABC3B6DBAD1A9544456 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		B4016A34BBB20BC381CCFC2D /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		C61628A63419B5C140B24AF7 /* Pods-MoproKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoproKit_Example.debug.xcconfig"; path = "Target Support Files/Pods-MoproKit_Example/Pods-MoproKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		CE0E1A112AE3E494009DE4CB /* libmopro_ffi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmopro_ffi.dylib; path = ../../../Libs/libmopro_ffi.dylib; sourceTree = "<group>"; };
 		CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.wasm; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm"; sourceTree = "<group>"; };
 		CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.r1cs; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test.r1cs"; sourceTree = "<group>"; };
 		CE8CCA852AE3C2E8004B55A0 /* keccak256.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = keccak256.dylib; path = "../../../../../mopro-core/target/debug/keccak256.dylib"; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 		CE8CCA842AE3C2D9004B55A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CE0E1A112AE3E494009DE4CB /* libmopro_ffi.dylib */,
 				CE8CCA852AE3C2E8004B55A0 /* keccak256.dylib */,
 			);
 			path = Frameworks;
@@ -286,6 +289,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE0E1A142AE3E5DB009DE4CB /* libmopro_ffi.dylib in Resources */,
 				CE8CCA882AE3C320004B55A0 /* keccak256.dylib in Resources */,
 				CEA2D1322AB96AB500F292D2 /* multiplier2.r1cs in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
@@ -554,13 +558,24 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+					"@executable_path",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
 					/usr/lib/swift,
+					"$(PROJECT_DIR)/MoproKit/Libs",
+					Frameworks,
+					"$(SRCROOT)/MoproKit/Frameworks",
+					.,
+					"$(BUILT_PRODUCTS_DIR)",
 				);
 				MODULE_NAME = ExampleApp;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"MoproKit\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -579,13 +594,24 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+					"@executable_path",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
 					/usr/lib/swift,
+					"$(PROJECT_DIR)/MoproKit/Libs",
+					Frameworks,
+					"$(SRCROOT)/MoproKit/Frameworks",
+					.,
+					"$(BUILT_PRODUCTS_DIR)",
 				);
 				MODULE_NAME = ExampleApp;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"MoproKit\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -611,11 +637,27 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+					"@executable_path",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
 					/usr/lib/swift,
+					.,
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"MoproKit\"",
+					"-framework",
+					"\"Nimble\"",
+					"-framework",
+					"\"Quick\"",
+					"-framework",
+					"\"XCTest\"",
+					"-weak_framework",
+					"\"XCTest\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -639,11 +681,27 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+					"@executable_path",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
 					/usr/lib/swift,
+					.,
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"MoproKit\"",
+					"-framework",
+					"\"Nimble\"",
+					"-framework",
+					"\"Quick\"",
+					"-framework",
+					"\"XCTest\"",
+					"-weak_framework",
+					"\"XCTest\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";

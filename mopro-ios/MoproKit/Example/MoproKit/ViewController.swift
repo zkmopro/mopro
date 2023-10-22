@@ -26,11 +26,14 @@ class ViewController: UIViewController {
         setupUI()
         //runSetup()
         runInit()
-        runGenerateProof2()
+        //runGenerateProof2()
     }
 
     func runInit() {
-        let dylibPath = ProcessInfo.processInfo.environment["CIRCUIT_WASM_DYLIB"] ?? ""
+        // XXX This path is wrong, relative to build dir not actual bundle
+        //let dylibPath = ProcessInfo.processInfo.environment["CIRCUIT_WASM_DYLIB"] ?? ""
+
+        let dylibPath = Bundle.main.bundlePath + "/keccak256.dylib"
 
         print("CIRCUIT_WASM_DYLIB path: \(dylibPath)");
 
