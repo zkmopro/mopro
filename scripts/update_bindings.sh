@@ -101,13 +101,35 @@ elif [[ "$DEVICE_TYPE" == "device" ]]; then
     print_warning "This only works on iOS devices (ARM64)"
 fi
 
-cp ${PROJECT_DIR}/mopro-ffi/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a ${TARGET_DIR}/
+#cp ${PROJECT_DIR}/mopro-ffi/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a ${TARGET_DIR}/
+# Copy dynamic lib
+cp ${PROJECT_DIR}/mopro-ffi/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.dylib ${TARGET_DIR}/
 
 print_action "Copying Swift bindings and static library to MoproKit..."
 cp ${TARGET_DIR}/SwiftBindings/moproFFI.h ${MOPROKIT_DIR}/Include/
 cp ${TARGET_DIR}/SwiftBindings/mopro.swift ${MOPROKIT_DIR}/Bindings/
 cp ${TARGET_DIR}/SwiftBindings/moproFFI.modulemap ${MOPROKIT_DIR}/Resources/
-cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
+
+
+#cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
+cp ${TARGET_DIR}/libmopro_ffi.dylib ${MOPROKIT_DIR}/Libs/
 cp ${TARGET_DIR}/keccak256.dylib ${MOPROKIT_DIR}/Libs/
 
 print_action "Done! Please re-build your project in Xcode."
+
+# Fix dynamic lib install paths
+install_name_tool -id @rpath/libmopro_ffi.dylib ${MOPROKIT_DIR}/Libs/libmopro_ffi.dylib
+
+# XXX: Actually a bit complicated, because we want the iOS compiled one
+# But we can't compile this in build.rs with forked wasmer, so instead we do this ad-hoc
+# The iOS compiled one should be in right target dir, and then we only install iOS one
+#install_name_tool -id @rpath/keccak256.dylib ${MOPROKIT_DIR}/Libs/keccak256.dylib
+# Instead we do ad hoc
+#cp mopro-ios/MoproKit/Libs/keccak256_real.dylib mopro-ios/MoproKit/Libs/keccak256.dylib           
+#install_name_tool -id @rpath/keccak256.dylib mopro-ios/MoproKit/Libs/keccak256.dylib               
+#codesign -f -s "$#{APPLE_SIGNING_IDENTITY}" mopro-ios/MoproKit/Libs/keccak256.dylib
+
+# where _real is compiled for iOS (before wasmer memory fix fork)
+
+# NOTE: Need to set APPLE_SIGNING_IDENTITY environment variable (Keychain Access)
+codesign -f -s "${APPLE_SIGNING_IDENTITY}" mopro-ios/MoproKit/Libs/libmopro_ffi.dylib

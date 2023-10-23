@@ -26,7 +26,7 @@ class ViewController: UIViewController {
         setupUI()
         //runSetup()
         runInit()
-        //runGenerateProof2()
+        runGenerateProof2()
     }
 
     func runInit() {

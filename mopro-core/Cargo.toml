@@ -7,7 +7,8 @@ edition = "2021"
 
 [features]
 default = ["dylib"]
-dylib = ["wasmer/dylib", "wasmer-engine-dylib", "wasmer-compiler-cranelift"]
+dylib = ["wasmer/dylib"]
+#dylib = ["wasmer/dylib", "wasmer-engine-dylib", "wasmer-compiler-cranelift"]
 
 [dependencies]
 #ark-circom = { git = "https://github.com/arkworks-rs/circom-compat.git" }
@@ -42,6 +43,10 @@ ark-groth16 = { version = "=0.4.0", default-features = false, features = [
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 criterion = "=0.3.6"
+
+[patch.crates-io]
+wasmer = { git = "https://github.com/oskarth/wasmer.git", branch = "fix/memory2" }
+
 
 [build-dependencies]
 color-eyre = "0.6"
