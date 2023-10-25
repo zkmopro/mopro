@@ -118,6 +118,7 @@ uniffi::include_scaffolding!("mopro");
 #[cfg(test)]
 mod tests {
     use super::*;
+    use ark_bn254::Fr;
 
     fn bytes_to_circuit_inputs(input_vec: &Vec<u8>) -> HashMap<String, Vec<i32>> {
         let bits = circom::utils::bytes_to_bits(&input_vec);
@@ -125,6 +126,13 @@ mod tests {
         let mut inputs = HashMap::new();
         inputs.insert("in".to_string(), converted_vec);
         inputs
+    }
+
+    fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<u8> {
+        let bits = circom::utils::bytes_to_bits(bytes);
+        let field_bits = bits.into_iter().map(|bit| Fr::from(bit as u8)).collect();
+        let circom_outputs = circom::serialization::SerializableInputs(field_bits);
+        circom::serialization::serialize_inputs(&circom_outputs)
     }
 
     #[test]
@@ -147,8 +155,15 @@ mod tests {
         assert!(setup_result.provingKey.len() > 0);
 
         let mut inputs = HashMap::new();
-        inputs.insert("a".to_string(), vec![3_i32; 1]);
-        inputs.insert("b".to_string(), vec![5_i32; 1]);
+        let a = 3;
+        let b = 5;
+        let c = a * b;
+        inputs.insert("a".to_string(), vec![a]);
+        inputs.insert("b".to_string(), vec![b]);
+        // output = [public output c, public input a]
+        let expected_output = vec![Fr::from(c), Fr::from(a)];
+        let circom_outputs = circom::serialization::SerializableInputs(expected_output);
+        let serialized_outputs = circom::serialization::serialize_inputs(&circom_outputs);
 
         // Step 2: Generate Proof
         let generate_proof_result = mopro_circom.generate_proof(inputs)?;
@@ -156,9 +171,9 @@ mod tests {
         let serialized_inputs = generate_proof_result.inputs;
 
         assert!(serialized_proof.len() > 0);
+        assert_eq!(serialized_inputs, serialized_outputs);
 
         // Step 3: Verify Proof
-        // TODO: This should also check inputs, make sure it does
         let is_valid = mopro_circom.verify_proof(serialized_proof, serialized_inputs)?;
         assert!(is_valid);
 
@@ -185,7 +200,14 @@ mod tests {
             0, 0, 0, 0, 0, 0,
         ];
 
+        // Expected output
+        let expected_output_vec = vec![
+            37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
+            212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
+        ];
+
         let inputs = bytes_to_circuit_inputs(&input_vec);
+        let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
 
         // Step 2: Generate Proof
         let generate_proof_result = mopro_circom.generate_proof(inputs)?;
@@ -193,9 +215,10 @@ mod tests {
         let serialized_inputs = generate_proof_result.inputs;
 
         assert!(serialized_proof.len() > 0);
+        assert_eq!(serialized_inputs, serialized_outputs);
 
         // Step 3: Verify Proof
-        // TODO: This should also check inputs, make sure it does
+
         let is_valid = mopro_circom.verify_proof(serialized_proof, serialized_inputs)?;
         assert!(is_valid);
 

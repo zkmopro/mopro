@@ -7,7 +7,7 @@ use crate::MoproError;
 use std::collections::HashMap;
 use std::time::Instant;
 
-use ark_bn254::Bn254;
+use ark_bn254::{Bn254, Fr};
 use ark_circom::{CircomBuilder, CircomCircuit, CircomConfig};
 use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{Groth16, ProvingKey};
@@ -181,6 +181,12 @@ pub fn bytes_to_circuit_inputs(bytes: &[u8]) -> CircuitInputs {
     inputs
 }
 
+pub fn bytes_to_circuit_outputs(bytes: &[u8]) -> SerializableInputs {
+    let bits = bytes_to_bits(bytes);
+    let field_bits = bits.into_iter().map(|bit| Fr::from(bit as u8)).collect();
+    SerializableInputs(field_bits)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -203,8 +209,14 @@ mod tests {
 
         // Prepare inputs
         let mut inputs = HashMap::new();
-        inputs.insert("a".to_string(), vec![BigInt::from(3)]);
-        inputs.insert("b".to_string(), vec![BigInt::from(5)]);
+        let a = 3;
+        let b = 5;
+        let c = a * b;
+        inputs.insert("a".to_string(), vec![BigInt::from(a)]);
+        inputs.insert("b".to_string(), vec![BigInt::from(b)]);
+        // output = [public output c, public input a]
+        let expected_output = vec![Fr::from(c), Fr::from(a)];
+        let serialized_outputs = SerializableInputs(expected_output);
 
         // Proof generation
         let generate_proof_res = circom_state.generate_proof(inputs);
@@ -217,6 +229,9 @@ mod tests {
         assert!(generate_proof_res.is_ok());
 
         let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
+
+        // Check output
+        assert_eq!(serialized_inputs, serialized_outputs);
 
         // Proof verification
         let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
@@ -248,12 +263,13 @@ mod tests {
         ];
 
         // Expected output
-        let _expected_output_vec = vec![
+        let expected_output_vec = vec![
             37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
             212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
         ];
 
         let inputs = bytes_to_circuit_inputs(&input_vec);
+        let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
 
         // Proof generation
         let generate_proof_res = circom_state.generate_proof(inputs);
@@ -267,7 +283,8 @@ mod tests {
 
         let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
 
-        // TODO: Use expected_output_vec here when verifying proof
+        // Check output
+        assert_eq!(serialized_inputs, serialized_outputs);
 
         // Proof verification
         let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);

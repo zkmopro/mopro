@@ -10,7 +10,7 @@ pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug)]
 pub struct SerializableProof(pub Proof<Bn254>);
 
-#[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug)]
+#[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
 pub struct SerializableInputs(pub Vec<<Bn254 as Pairing>::ScalarField>);
 
 pub fn serialize_proof(proof: &SerializableProof) -> Vec<u8> {
