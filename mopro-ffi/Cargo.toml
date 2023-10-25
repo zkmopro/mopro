@@ -33,3 +33,4 @@ uniffi = { version = "0.24", features = ["build"] }
 
 [dev-dependencies]
 uniffi = { version = "0.24", features = ["bindgen-tests"] }
+ark-bn254 = { version = "=0.4.0" }

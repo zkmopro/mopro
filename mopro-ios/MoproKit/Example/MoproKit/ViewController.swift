@@ -94,10 +94,20 @@ class ViewController: UIViewController {
             var inputs = [String: [Int32]]()
             inputs["in"] = bits
 
+            // Expected outputs
+            let outputVec: [UInt8] = [
+                37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
+                212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
+            ]
+            let outputBits: [Int32] = bytesToBits(bytes: outputVec)
+            let expectedOutput: [UInt8] = serializeOutputs(outputBits)
+
             // Multiplier example
             // var inputs = [String: [Int32]]()
             // inputs["a"] = [3]
             // inputs["b"] = [5]
+            // let outputs: [Int32] = [15, 3]
+            // let expectedOutput: [UInt8] = serializeOutputs(outputs)
 
             // Record start time
             let start = CFAbsoluteTimeGetCurrent()
@@ -105,6 +115,7 @@ class ViewController: UIViewController {
             // Generate Proof
             let generateProofResult = try moproCircom.generateProof(circuitInputs: inputs)
             assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+            assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
 
             // Record end time and compute duration
             let end = CFAbsoluteTimeGetCurrent()
@@ -159,4 +170,29 @@ func bytesToBits(bytes: [UInt8]) -> [Int32] {
         }
     }
     return bits
+}
+
+// TODO: should handle 254-bit input
+func serializeOutputs(_ int32Array: [Int32]) -> [UInt8] {
+    var bytesArray: [UInt8] = []
+    let length = int32Array.count
+    var littleEndianLength = length.littleEndian
+    let targetLength = 32
+    withUnsafeBytes(of: &littleEndianLength) {
+        bytesArray.append(contentsOf: $0)
+    }
+    for value in int32Array {
+        var littleEndian = value.littleEndian
+        var byteLength = 0
+        withUnsafeBytes(of: &littleEndian) {
+            bytesArray.append(contentsOf: $0)
+            byteLength = byteLength + $0.count
+        }
+        if byteLength < targetLength {
+            let paddingCount = targetLength - byteLength
+            let paddingArray = [UInt8](repeating: 0, count: paddingCount)
+            bytesArray.append(contentsOf: paddingArray)
+        } 
+    }
+    return bytesArray
 }
