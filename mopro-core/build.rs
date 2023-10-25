@@ -6,7 +6,8 @@ fn build_dylib() -> Result<()> {
     use enumset::enum_set;
     use enumset::EnumSet;
     use std::path::Path;
-    use std::{env, str::FromStr};
+    use std::path::PathBuf;
+    use std::{env, fs, str::FromStr};
 
     use wasmer::Cranelift;
     use wasmer::Target;
@@ -21,12 +22,7 @@ fn build_dylib() -> Result<()> {
     // We can copy assets and clean up install_paths after
     let out_dir = env::var("OUT_DIR")?;
     let out_dir = Path::new(&out_dir).to_path_buf();
-    println!("cargo:warning=mopro-core: OUT_DIR={}", out_dir.display());
     let dylib_file = out_dir.join("keccak256.dylib");
-    println!(
-        "cargo:rustc-env=CIRCUIT_WASM_DYLIB={}",
-        dylib_file.display()
-    );
 
     // if dylib_file.exists() {
     //     return Ok(());
@@ -38,14 +34,27 @@ fn build_dylib() -> Result<()> {
     let cpu_features = enum_set!();
     let target = Target::new(triple, cpu_features);
     let engine = Dylib::new(Cranelift::default()).target(target).engine();
-    println!("cargo:warning=mopro-core: TARGET={}", target_arch);
+    println!("cargo:warning=Building dylib for {}", target_arch);
 
     // Compile the WASM module
     let store = Store::new(&engine);
     let module = Module::from_file(&store, &wasm_file).unwrap();
     module.serialize_to_file(&dylib_file).unwrap();
     assert!(dylib_file.exists());
-    println!("cargo:warning=mopro-core: Dylib {}", dylib_file.display());
+
+    // Copy dylib to a more predictable path
+    let target_arch = env::var("TARGET")?;
+    let project_dir = env::var("CARGO_MANIFEST_DIR")?;
+    let final_dir = PathBuf::from(&project_dir)
+        .join("target/debug")
+        .join(target_arch);
+
+    // Ensure the final directory exists
+    fs::create_dir_all(&final_dir)?;
+
+    let final_path = final_dir.join("keccak256.dylib");
+    fs::copy(&dylib_file, &final_path)?;
+    println!("cargo:warning=Dylib location: {}", final_path.display());
 
     Ok(())
 }
