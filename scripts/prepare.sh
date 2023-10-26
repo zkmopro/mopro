@@ -30,9 +30,13 @@ compile_circuit multiplier2 multiplier2.circom
 (cd keccak256 && npm install)
 compile_circuit keccak256 keccak256_256_test.circom
 
-# TODO: Finish trusted setup script
-#echo "mopro-core: Running trusted setup for keccak256..."
-#./scripts/trusted_setup.sh
+# Run trusted setup for multiplier2
+echo "mopro-core: Running trusted setup for multiplier2..."
+./scripts/trusted_setup.sh multiplier2 08 multiplier2
+
+# Run trusted setup for keccak256
+echo "mopro-core: Running trusted setup for keccak256..."
+./scripts/trusted_setup.sh keccak256 18 keccak256_256_test
 
 # Add support for target architectures
 echo "mopro-ffi: Adding support for target architectures..."

@@ -8,7 +8,7 @@ set -euo pipefail
 
 # Check if arguments are provided
 if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <directory> <circuit>"
+    echo "Usage: $0 <directory> <circom-circuit>"
     exit 1
 fi
 
