@@ -363,4 +363,31 @@ mod tests {
         // Assert: Check that the method returns an error
         assert!(result.is_err());
     }
+
+    #[cfg(feature = "dylib")]
+    #[test]
+    fn test_dylib_init_and_generate_witness() {
+        // Assumes that the dylib file has been built and is in the following location
+        let dylib_path = "target/debug/aarch64-apple-darwin/keccak256.dylib";
+
+        // Initialize libray
+        initialize(Path::new(&dylib_path));
+
+        let input_vec = vec![
+            116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+        ];
+
+        let inputs = bytes_to_circuit_inputs(&input_vec);
+        let now = std::time::Instant::now();
+        let full_assignment = witness_calculator()
+            .lock()
+            .expect("Failed to lock witness calculator")
+            .calculate_witness_element::<Bn254, _>(inputs, false)
+            .map_err(|e| MoproError::CircomError(e.to_string()));
+
+        println!("Witness generation took: {:.2?}", now.elapsed());
+
+        assert!(full_assignment.is_ok());
+    }
 }
