@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Deal with errors
+set -euo pipefail
+
 PROJECT_DIR=$(pwd)
 
 # build circom circuits in mopro-core
@@ -10,4 +13,13 @@ npm install
 # build ffi in mopro-ffi
 cd ${PROJECT_DIR}/mopro-ffi
 rustup target add x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim
-cargo install --bin uniffi-bindgen --path .
+
+# Install uniffi-bindgen binary in mopro-ffi
+echo "mopro-ffi: Installing uniffi-bindgen..."
+if ! command -v uniffi-bindgen &> /dev/null
+then
+    echo "mopro-ffi: Installing uniffi-bindgen..."
+    cargo install --bin uniffi-bindgen --path .
+else
+    echo "mopro-ffi: uniffi-bindgen already installed, skipping."
+fi
