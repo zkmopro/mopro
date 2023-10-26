@@ -36,6 +36,62 @@ impl Default for CircomState {
 
 // TODO: Replace printlns with logging
 
+#[cfg(feature = "dylib")]
+use {
+    ark_circom::WitnessCalculator,
+    once_cell::sync::OnceCell,
+    std::{env, path::Path, sync::Mutex},
+    wasmer::{Dylib, Module, Store},
+};
+
+// `WITNESS_CALCULATOR` is a lazily initialized, thread-safe singleton of type `WitnessCalculator`.
+// `OnceCell` ensures that the initialization occurs exactly once, and `Mutex` allows safe shared
+// access from multiple threads.
+#[cfg(feature = "dylib")]
+static WITNESS_CALCULATOR: OnceCell<Mutex<WitnessCalculator>> = OnceCell::new();
+
+/// Initializes the `WITNESS_CALCULATOR` singleton with a `WitnessCalculator` instance created from
+/// a specified dylib file (WASM circuit).
+#[cfg(feature = "dylib")]
+pub fn initialize(dylib_path: &Path) {
+    println!("Initializing dylib: {:?}", dylib_path);
+
+    WITNESS_CALCULATOR
+        .set(from_dylib(dylib_path))
+        .expect("Failed to set WITNESS_CALCULATOR")
+}
+
+/// Creates a `WitnessCalculator` instance from a dylib file.
+#[cfg(feature = "dylib")]
+fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
+    let store = Store::new(&Dylib::headless().engine());
+    let module = unsafe {
+        Module::deserialize_from_file(&store, path).expect("Failed to load dylib module")
+    };
+    let result =
+        WitnessCalculator::from_module(module).expect("Failed to create WitnessCalculator");
+
+    Mutex::new(result)
+}
+
+/// Provides access to the `WITNESS_CALCULATOR` singleton, initializing it if necessary.
+/// It expects the path to the dylib file to be set in the `CIRCUIT_WASM_DYLIB` environment variable.
+#[cfg(feature = "dylib")]
+pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
+    let var_name = "CIRCUIT_WASM_DYLIB";
+
+    WITNESS_CALCULATOR.get_or_init(|| {
+        let path = env::var(var_name).unwrap_or_else(|_| {
+            panic!(
+                "Mopro circuit WASM Dylib not initialized. \
+            Please set {} environment variable to the path of the dylib file",
+                var_name
+            )
+        });
+        from_dylib(Path::new(&path))
+    })
+}
+
 impl CircomState {
     pub fn new() -> Self {
         Self {
