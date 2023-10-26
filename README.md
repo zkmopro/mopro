@@ -23,7 +23,7 @@ Zooming in a bit:
 
 ## Prepare
 
-- Install [circom](https://docs.circom.io/)
+- Install [circom](https://docs.circom.io/) and [snarkjs](https://github.com/iden3/snarkjs)
 - Install [cocoapods](https://cocoapods.org/)
 - Run `./scripts/prepare.sh` to check all prerequisites are set.
 

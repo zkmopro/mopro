@@ -8,7 +8,7 @@ TBD.
 
 ## Examples
 
-Run `cargo run --example circom`.
+Run `cargo run --example circom`. Also see `examples/circom/README.md` for more information.
 
 ## Build dylib
 
