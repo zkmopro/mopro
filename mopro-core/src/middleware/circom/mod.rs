@@ -5,15 +5,19 @@ use self::{
 use crate::MoproError;
 
 use std::collections::HashMap;
+use std::io::Cursor;
 use std::time::Instant;
 
 use ark_bn254::{Bn254, Fr};
-use ark_circom::{CircomBuilder, CircomCircuit, CircomConfig};
+use ark_circom::{read_zkey, CircomBuilder, CircomCircuit, CircomConfig};
 use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{Groth16, ProvingKey};
+use ark_relations::r1cs::ConstraintMatrices;
 use ark_std::rand::thread_rng;
 use color_eyre::Result;
+use core::include_bytes;
 use num_bigint::BigInt;
+use once_cell::sync::Lazy; //OnceCell
 
 pub mod serialization;
 pub mod utils;
@@ -21,6 +25,8 @@ pub mod utils;
 type GrothBn = Groth16<Bn254>;
 
 type CircuitInputs = HashMap<String, Vec<BigInt>>;
+
+// TODO: Split up this namespace a bit, right now quite a lot of things going on
 
 pub struct CircomState {
     builder: Option<CircomBuilder<Bn254>>,
@@ -34,6 +40,8 @@ impl Default for CircomState {
     }
 }
 
+// NOTE: A lot of the contents of this file is inspired by github.com/worldcoin/semaphore-rs
+
 // TODO: Replace printlns with logging
 
 #[cfg(feature = "dylib")]
@@ -44,21 +52,34 @@ use {
     wasmer::{Dylib, Module, Store},
 };
 
-// `WITNESS_CALCULATOR` is a lazily initialized, thread-safe singleton of type `WitnessCalculator`.
-// `OnceCell` ensures that the initialization occurs exactly once, and `Mutex` allows safe shared
-// access from multiple threads.
+// TODO: Set env variable at compile time
+const ZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ZKEY_FILE"));
+
+// TODO: static zkey
+static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
+    let mut reader = Cursor::new(ZKEY_BYTES);
+    read_zkey(&mut reader).expect("Failed to read zkey")
+});
+
+/// `WITNESS_CALCULATOR` is a lazily initialized, thread-safe singleton of type `WitnessCalculator`.
+/// `OnceCell` ensures that the initialization occurs exactly once, and `Mutex` allows safe shared
+/// access from multiple threads.
+// TODO: This should probably be used regardless of whether the dylib feature is enabled
 #[cfg(feature = "dylib")]
 static WITNESS_CALCULATOR: OnceCell<Mutex<WitnessCalculator>> = OnceCell::new();
 
 /// Initializes the `WITNESS_CALCULATOR` singleton with a `WitnessCalculator` instance created from
-/// a specified dylib file (WASM circuit).
+/// a specified dylib file (WASM circuit). Also initialize `ZKEY`.
 #[cfg(feature = "dylib")]
 pub fn initialize(dylib_path: &Path) {
     println!("Initializing dylib: {:?}", dylib_path);
 
     WITNESS_CALCULATOR
         .set(from_dylib(dylib_path))
-        .expect("Failed to set WITNESS_CALCULATOR")
+        .expect("Failed to set WITNESS_CALCULATOR");
+
+    // Initialize ZKEY
+    Lazy::force(&ZKEY);
 }
 
 /// Creates a `WitnessCalculator` instance from a dylib file.
@@ -72,6 +93,10 @@ fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
         WitnessCalculator::from_module(module).expect("Failed to create WitnessCalculator");
 
     Mutex::new(result)
+}
+
+pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
+    &ZKEY
 }
 
 /// Provides access to the `WITNESS_CALCULATOR` singleton, initializing it if necessary.

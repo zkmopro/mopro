@@ -1,10 +1,22 @@
 use color_eyre::eyre::Result;
+use std::env;
+use std::path::PathBuf;
+
+fn prepare_env(zkey_path: &str) -> Result<()> {
+    let project_dir = env::var("CARGO_MANIFEST_DIR")?;
+    let zkey_file = PathBuf::from(&project_dir).join(zkey_path);
+    println!("cargo:warning=zkey_file: {}", zkey_file.display());
+
+    // Set BUILD_RS_ZKEY_FILE env var
+    println!("cargo:rustc-env=BUILD_RS_ZKEY_FILE={}", zkey_file.display());
+
+    Ok(())
+}
 
 #[cfg(feature = "dylib")]
 fn build_dylib(wasm_path: &str, dylib_name: &str) -> Result<()> {
     use std::path::Path;
-    use std::path::PathBuf;
-    use std::{env, fs, str::FromStr};
+    use std::{fs, str::FromStr};
 
     use color_eyre::eyre::eyre;
     use enumset::enum_set;
@@ -55,6 +67,10 @@ fn build_dylib(wasm_path: &str, dylib_name: &str) -> Result<()> {
 }
 
 fn main() -> Result<()> {
+    // TODO: build_circuit function to builds all related artifacts, instead of doing this externally
+    let zkey_path = "examples/circom/keccak256/target/keccak256_256_test_final.zkey";
+    prepare_env(zkey_path)?;
+
     #[cfg(feature = "dylib")]
     {
         let wasm_path = "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
