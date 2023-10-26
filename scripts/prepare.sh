@@ -6,18 +6,29 @@ set -euo pipefail
 PROJECT_DIR=$(pwd)
 CIRCOM_DIR="${PROJECT_DIR}/mopro-core/examples/circom"
 
+compile_circuit() {
+    local circuit_dir=$1
+    local circuit_file=$2
+    local target_file="$circuit_dir/target/$(basename $circuit_file .circom).r1cs"
+
+    echo "Compiling $circuit_file example circuit..."
+    if [ ! -f "$target_file" ]; then
+        ./scripts/compile.sh $circuit_dir $circuit_file
+    else
+        echo "File $target_file already exists, skipping compilation."
+    fi
+}
+
 # Build Circom circuits in mopro-core and run trusted setup
 echo "mopro-core: Compiling example circuits..."
 cd $CIRCOM_DIR
 
-# NOTE: multiplier2 is already pre-compiled
-# echo "Compiling multiplier example circuit..."
-# ./scripts/compile.sh multiplier2 multiplier2.circom
+# Compile multiplier2
+compile_circuit multiplier2 multiplier2.circom
 
 # Setup and compile keccak256
-echo "Compiling keccak256 example circuit..."
 (cd keccak256 && npm install)
-./scripts/compile.sh keccak256 keccak256_256_test.circom
+compile_circuit keccak256 keccak256_256_test.circom
 
 # TODO: Finish trusted setup script
 #echo "mopro-core: Running trusted setup for keccak256..."
