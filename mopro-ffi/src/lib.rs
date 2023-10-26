@@ -144,8 +144,9 @@ mod tests {
     #[test]
     fn test_end_to_end() -> Result<(), MoproError> {
         // Paths to your wasm and r1cs files
-        let wasm_path = "./../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm";
-        let r1cs_path = "./../mopro-core/examples/circom/target/multiplier2.r1cs";
+        let wasm_path =
+            "./../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
+        let r1cs_path = "./../mopro-core/examples/circom/multiplier2/target/multiplier2.r1cs";
 
         // Create a new MoproCircom instance
         let mopro_circom = MoproCircom::new();

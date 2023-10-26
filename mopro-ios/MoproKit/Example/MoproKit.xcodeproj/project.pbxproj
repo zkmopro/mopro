@@ -57,8 +57,8 @@
 		C61628A63419B5C140B24AF7 /* Pods-MoproKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoproKit_Example.debug.xcconfig"; path = "Target Support Files/Pods-MoproKit_Example/Pods-MoproKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.wasm; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm"; sourceTree = "<group>"; };
 		CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.r1cs; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test.r1cs"; sourceTree = "<group>"; };
-		CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.wasm; path = "../../../../../mopro-core/examples/circom/target/multiplier2_js/multiplier2.wasm"; sourceTree = "<group>"; };
-		CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.r1cs; path = "../../../../../mopro-core/examples/circom/target/multiplier2.r1cs"; sourceTree = "<group>"; };
+		CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.wasm; path = "../../../../../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm"; sourceTree = "<group>"; };
+		CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.r1cs; path = "../../../../../mopro-core/examples/circom/multiplier2/target/multiplier2.r1cs"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

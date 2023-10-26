@@ -84,8 +84,8 @@ mod tests {
 
     #[test]
     fn test_serialization_deserialization() {
-        let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
-        let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
+        let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
+        let r1cs_path = "./examples/circom/multiplier2/target/multiplier2.r1cs";
 
         // Generate a serializable proving key for testing
         let serializable_pk = generate_serializable_proving_key(wasm_path, r1cs_path)

@@ -249,8 +249,8 @@ mod tests {
 
     #[test]
     fn test_setup_prove_verify_simple() {
-        let wasm_path = "./examples/circom/target/multiplier2_js/multiplier2.wasm";
-        let r1cs_path = "./examples/circom/target/multiplier2.r1cs";
+        let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
+        let r1cs_path = "./examples/circom/multiplier2/target/multiplier2.r1cs";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
