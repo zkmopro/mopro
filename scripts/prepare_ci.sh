@@ -75,31 +75,33 @@ download_files() {
     local circuit=$2
     local target_dir="${CIRCOM_DIR}/${dir}/target"
     local js_target_dir="${target_dir}/${circuit}_js"
-    
+
     # Create directories if they don't exist
     mkdir -p "$target_dir" "$js_target_dir"
-    
+
     # Download files to the specified directories
     wget -P "$target_dir" "https://zkstuff.ams3.cdn.digitaloceanspaces.com/mopro/circom-examples-artifacts/${dir}/${circuit}_final.zkey"
     wget -P "$js_target_dir" "https://zkstuff.ams3.cdn.digitaloceanspaces.com/mopro/circom-examples-artifacts/${dir}/${circuit}.wasm"
 }
+
+# TODO: Comment out compile_circuit stuff again once zkey is integrated and we don't need r1cs file anymore
 
 # NOTE: On CI instead of compiling circuits and running trusted setup
 # We just download test artifacts and use these
 # We thus skip all of the below steps that are run locally in `prepare.sh`
 print_action "[core/circom] Downloading artifacts for example circuits..."
 
-# # Build Circom circuits in mopro-core and run trusted setup
-# print_action "[core/circom] Compiling example circuits..."
-# cd $CIRCOM_DIR
-#
-# # Compile multiplier2
-# compile_circuit multiplier2 multiplier2.circom
-#
-# # Setup and compile keccak256
-# npm_install keccak256
-# compile_circuit keccak256 keccak256_256_test.circom
-#
+# Build Circom circuits in mopro-core and run trusted setup
+print_action "[core/circom] Compiling example circuits..."
+cd $CIRCOM_DIR
+
+# Compile multiplier2
+compile_circuit multiplier2 multiplier2.circom
+
+# Setup and compile keccak256
+npm_install keccak256
+compile_circuit keccak256 keccak256_256_test.circom
+
 # # Run trusted setup for multiplier2
 # print_action "[core/circom] Running trusted setup for multiplier2..."
 # ./scripts/trusted_setup.sh multiplier2 08 multiplier2
