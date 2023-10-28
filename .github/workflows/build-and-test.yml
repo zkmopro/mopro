@@ -11,14 +11,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Install circom
-        run: |
-          git clone https://github.com/iden3/circom.git
-          cd circom
-          cargo build --release
-          cargo install --path circom
-      - name: Prepare
-        run: ./scripts/prepare.sh
+      - name: Prepare CI
+        run: ./scripts/prepare_ci.sh
       - name: Build
         run: ./scripts/build_ios.sh simulator debug
       - name: Run core tests
