@@ -6,18 +6,31 @@ use crate::MoproError;
 
 use std::collections::HashMap;
 use std::io::Cursor;
+use std::sync::Mutex;
 use std::time::Instant;
 
 use ark_bn254::{Bn254, Fr};
-use ark_circom::{read_zkey, CircomBuilder, CircomCircuit, CircomConfig};
+use ark_circom::{
+    read_zkey, CircomBuilder, CircomCircuit, CircomConfig, CircomReduction, WitnessCalculator,
+};
 use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{Groth16, ProvingKey};
+use ark_std::UniformRand;
+
 use ark_relations::r1cs::ConstraintMatrices;
 use ark_std::rand::thread_rng;
 use color_eyre::Result;
 use core::include_bytes;
 use num_bigint::BigInt;
-use once_cell::sync::Lazy; //OnceCell
+use once_cell::sync::{Lazy, OnceCell};
+
+use wasmer::{Module, Store};
+
+#[cfg(feature = "dylib")]
+use {
+    std::{env, path::Path},
+    wasmer::Dylib,
+};
 
 pub mod serialization;
 pub mod utils;
@@ -44,28 +57,18 @@ impl Default for CircomState {
 
 // TODO: Replace printlns with logging
 
-#[cfg(feature = "dylib")]
-use {
-    ark_circom::WitnessCalculator,
-    once_cell::sync::OnceCell,
-    std::{env, path::Path, sync::Mutex},
-    wasmer::{Dylib, Module, Store},
-};
-
-// TODO: Set env variable at compile time
 const ZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ZKEY_FILE"));
 
-// TODO: static zkey
 static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
     let mut reader = Cursor::new(ZKEY_BYTES);
     read_zkey(&mut reader).expect("Failed to read zkey")
 });
 
+const WASM: &[u8] = include_bytes!(env!("BUILD_RS_WASM_FILE"));
+
 /// `WITNESS_CALCULATOR` is a lazily initialized, thread-safe singleton of type `WitnessCalculator`.
 /// `OnceCell` ensures that the initialization occurs exactly once, and `Mutex` allows safe shared
 /// access from multiple threads.
-// TODO: This should probably be used regardless of whether the dylib feature is enabled
-#[cfg(feature = "dylib")]
 static WITNESS_CALCULATOR: OnceCell<Mutex<WitnessCalculator>> = OnceCell::new();
 
 /// Initializes the `WITNESS_CALCULATOR` singleton with a `WitnessCalculator` instance created from
@@ -115,6 +118,58 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
         });
         from_dylib(Path::new(&path))
     })
+}
+
+#[cfg(not(feature = "dylib"))]
+pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
+    WITNESS_CALCULATOR.get_or_init(|| {
+        let store = Store::default();
+        let module = Module::from_binary(&store, WASM).expect("WASM should be valid");
+        let result =
+            WitnessCalculator::from_module(module).expect("Failed to create WitnessCalculator");
+        Mutex::new(result)
+    })
+}
+
+// TODO: Generate proof using zkey
+// (inputs: CircuitInputs) -> Result<(SerializableProof, SerializableInputs), MoproError> {
+pub fn generate_proof2(inputs: CircuitInputs) -> Result<SerializableProof, MoproError> {
+    let mut rng = thread_rng();
+    let rng = &mut rng;
+
+    let r = ark_bn254::Fr::rand(rng);
+    let s = ark_bn254::Fr::rand(rng);
+
+    println!("Generating proof 2");
+
+    let now = std::time::Instant::now();
+    let full_assignment = witness_calculator()
+        .lock()
+        .expect("Failed to lock witness calculator")
+        .calculate_witness_element::<Bn254, _>(inputs, false)
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+    println!("Witness generation took: {:.2?}", now.elapsed());
+
+    let now = std::time::Instant::now();
+    let zkey = zkey();
+
+    let ark_proof = Groth16::<_, CircomReduction>::create_proof_with_reduction_and_matrices(
+        &zkey.0,
+        r,
+        s,
+        &zkey.1,
+        zkey.1.num_instance_variables,
+        zkey.1.num_constraints,
+        full_assignment.as_slice(),
+    );
+
+    let proof = ark_proof.map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+    println!("proof generation took: {:.2?}", now.elapsed());
+
+    // TODO: Add SerializableInputs(inputs)))
+    Ok(SerializableProof(proof))
 }
 
 impl CircomState {
@@ -414,5 +469,16 @@ mod tests {
         println!("Witness generation took: {:.2?}", now.elapsed());
 
         assert!(full_assignment.is_ok());
+    }
+
+    #[test]
+    fn test_generate_proof2() {
+        let input_vec = vec![
+            116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+        ];
+
+        let inputs = bytes_to_circuit_inputs(&input_vec);
+        let _ = generate_proof2(inputs);
     }
 }
