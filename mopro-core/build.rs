@@ -2,13 +2,18 @@ use color_eyre::eyre::Result;
 use std::env;
 use std::path::PathBuf;
 
-fn prepare_env(zkey_path: &str) -> Result<()> {
+fn prepare_env(zkey_path: String, wasm_path: String) -> Result<()> {
     let project_dir = env::var("CARGO_MANIFEST_DIR")?;
     let zkey_file = PathBuf::from(&project_dir).join(zkey_path);
-    println!("cargo:warning=zkey_file: {}", zkey_file.display());
+    let wasm_file = PathBuf::from(&project_dir).join(wasm_path);
 
-    // Set BUILD_RS_ZKEY_FILE env var
+    // TODO: Right now emitting as warnings for visibility, figure out better way to do this?
+    println!("cargo:warning=zkey_file: {}", zkey_file.display());
+    println!("cargo:warning=wasm_file: {}", wasm_file.display());
+
+    // Set BUILD_RS_ZKEY_FILE and BUILD_RS_WASM_FILE env var
     println!("cargo:rustc-env=BUILD_RS_ZKEY_FILE={}", zkey_file.display());
+    println!("cargo:rustc-env=BUILD_RS_WASM_FILE={}", wasm_file.display());
 
     Ok(())
 }
@@ -68,12 +73,16 @@ fn build_dylib(wasm_path: &str, dylib_name: &str) -> Result<()> {
 
 fn main() -> Result<()> {
     // TODO: build_circuit function to builds all related artifacts, instead of doing this externally
-    let zkey_path = "examples/circom/keccak256/target/keccak256_256_test_final.zkey";
-    prepare_env(zkey_path)?;
+    let dir = "examples/circom/keccak256";
+    let circuit = "keccak256_256_test";
+
+    let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
+    let wasm_path = format!("{}/target/{}_js/{}.wasm", dir, circuit, circuit);
+
+    prepare_env(zkey_path, wasm_path)?;
 
     #[cfg(feature = "dylib")]
     {
-        let wasm_path = "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
         let dylib_name = "keccak256.dylib";
         build_dylib(wasm_path, dylib_name)?;
     }
