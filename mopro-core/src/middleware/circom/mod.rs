@@ -153,7 +153,9 @@ pub fn generate_proof2(inputs: CircuitInputs) -> Result<SerializableProof, Mopro
 
     let now = std::time::Instant::now();
     let zkey = zkey();
+    println!("Loading zkey took: {:.2?}", now.elapsed());
 
+    let now = std::time::Instant::now();
     let ark_proof = Groth16::<_, CircomReduction>::create_proof_with_reduction_and_matrices(
         &zkey.0,
         r,
