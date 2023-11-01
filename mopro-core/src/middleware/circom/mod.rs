@@ -134,9 +134,9 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
     })
 }
 
-// TODO: Generate proof using zkey
-// (inputs: CircuitInputs) -> Result<(SerializableProof, SerializableInputs), MoproError> {
-pub fn generate_proof2(inputs: CircuitInputs) -> Result<SerializableProof, MoproError> {
+pub fn generate_proof2(
+    inputs: CircuitInputs,
+) -> Result<(SerializableProof, SerializableInputs), MoproError> {
     let mut rng = thread_rng();
     let rng = &mut rng;
 
@@ -151,6 +151,25 @@ pub fn generate_proof2(inputs: CircuitInputs) -> Result<SerializableProof, Mopro
         .expect("Failed to lock witness calculator")
         .calculate_witness_element::<Bn254, _>(inputs, false)
         .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+    // FIXME: Mock inputs
+    let public_inputs = vec![Fr::from(0)];
+
+    // TODO: Get public inputs
+    // NOTE: Here's what we do to get public inputs with ark-circom
+    // pub fn get_public_inputs(&self) -> Option<Vec<E::ScalarField>> {
+    //     match &self.witness {
+    //         None => None,
+    //         Some(w) => match &self.r1cs.wire_mapping {
+    //             None => Some(w[1..self.r1cs.num_inputs].to_vec()),
+    //             Some(m) => Some(m[1..self.r1cs.num_inputs].iter().map(|i| w[*i]).collect()),
+    //         },
+    //     }
+    // }
+    //
+    // In or case we have:
+    // zkey.1.num_instance_variables contains number of instance variables
+    // We need to extract the public inputs from the full assignment
 
     println!("Witness generation took: {:.2?}", now.elapsed());
 
@@ -174,8 +193,10 @@ pub fn generate_proof2(inputs: CircuitInputs) -> Result<SerializableProof, Mopro
     println!("proof generation took: {:.2?}", now.elapsed());
 
     // TODO: Add SerializableInputs(inputs)))
-    Ok(SerializableProof(proof))
+    Ok((SerializableProof(proof), SerializableInputs(public_inputs)))
 }
+
+// TODO: Write pub fn verify_proof2 function
 
 impl CircomState {
     pub fn new() -> Self {
