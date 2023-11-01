@@ -98,6 +98,7 @@ fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
     Mutex::new(result)
 }
 
+#[must_use]
 pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
     &ZKEY
 }
@@ -105,6 +106,7 @@ pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
 /// Provides access to the `WITNESS_CALCULATOR` singleton, initializing it if necessary.
 /// It expects the path to the dylib file to be set in the `CIRCUIT_WASM_DYLIB` environment variable.
 #[cfg(feature = "dylib")]
+#[must_use]
 pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
     let var_name = "CIRCUIT_WASM_DYLIB";
 
@@ -121,6 +123,7 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
 }
 
 #[cfg(not(feature = "dylib"))]
+#[must_use]
 pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
     WITNESS_CALCULATOR.get_or_init(|| {
         let store = Store::default();
