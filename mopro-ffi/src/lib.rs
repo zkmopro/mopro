@@ -44,7 +44,31 @@ impl Default for MoproCircom {
     }
 }
 
-// TODO: Use setup, prove and verify functions from mopro_core
+pub fn generate_proof2(
+    inputs: HashMap<String, Vec<String>>,
+) -> Result<GenerateProofResult, MoproError> {
+    // Convert inputs to BigInt
+    let bigint_inputs = inputs
+        .into_iter()
+        .map(|(k, v)| {
+            (
+                k,
+                v.into_iter()
+                    .map(|i| BigInt::from_str(&i).unwrap())
+                    .collect(),
+            )
+        })
+        .collect();
+
+    let (proof, inputs) = circom::generate_proof2(bigint_inputs)?;
+
+    let serialized_proof = circom::serialization::serialize_proof(&proof);
+    let serialized_inputs = circom::serialization::serialize_inputs(&inputs);
+    Ok(GenerateProofResult {
+        proof: serialized_proof,
+        inputs: serialized_inputs,
+    })
+}
 
 // TODO: Use FFIError::SerializationError instead
 impl MoproCircom {

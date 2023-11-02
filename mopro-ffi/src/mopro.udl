@@ -4,6 +4,9 @@ namespace mopro {
 
   [Throws=MoproError]
   void init_circom_state();
+
+  [Throws=MoproError]
+  GenerateProofResult generate_proof2(record<string, sequence<string>> circuit_inputs);
 };
 
 dictionary SetupResult {
