@@ -4,6 +4,7 @@ use mopro_core::MoproError;
 use num_bigint::BigInt;
 
 use std::collections::HashMap;
+use std::str::FromStr;
 use std::sync::RwLock;
 
 #[derive(Debug)]
@@ -65,14 +66,21 @@ impl MoproCircom {
 
     pub fn generate_proof(
         &self,
-        inputs: HashMap<String, Vec<i32>>,
+        inputs: HashMap<String, Vec<String>>,
     ) -> Result<GenerateProofResult, MoproError> {
         let mut state_guard = self.state.write().unwrap();
 
         // Convert inputs to BigInt
         let bigint_inputs = inputs
             .into_iter()
-            .map(|(k, v)| (k, v.into_iter().map(|i| BigInt::from(i)).collect()))
+            .map(|(k, v)| {
+                (
+                    k,
+                    v.into_iter()
+                        .map(|i| BigInt::from_str(&i).unwrap())
+                        .collect(),
+                )
+            })
             .collect();
 
         let (proof, inputs) = state_guard.generate_proof(bigint_inputs)?;
@@ -119,10 +127,14 @@ uniffi::include_scaffolding!("mopro");
 mod tests {
     use super::*;
     use ark_bn254::Fr;
+    use num_bigint::BigUint;
 
-    fn bytes_to_circuit_inputs(input_vec: &Vec<u8>) -> HashMap<String, Vec<i32>> {
+    fn bytes_to_circuit_inputs(input_vec: &Vec<u8>) -> HashMap<String, Vec<String>> {
         let bits = circom::utils::bytes_to_bits(&input_vec);
-        let converted_vec: Vec<i32> = bits.into_iter().map(|bit| bit as i32).collect();
+        let converted_vec: Vec<String> = bits
+            .into_iter()
+            .map(|bit| (bit as i32).to_string())
+            .collect();
         let mut inputs = HashMap::new();
         inputs.insert("in".to_string(), converted_vec);
         inputs
@@ -156,11 +168,14 @@ mod tests {
         assert!(setup_result.provingKey.len() > 0);
 
         let mut inputs = HashMap::new();
-        let a = 3;
-        let b = 5;
-        let c = a * b;
-        inputs.insert("a".to_string(), vec![a]);
-        inputs.insert("b".to_string(), vec![b]);
+        let a = BigUint::from_str(
+            "21888242871839275222246405745257275088548364400416034343698204186575808495616",
+        )
+        .unwrap();
+        let b = BigUint::from(1u8);
+        let c = a.clone() * b.clone();
+        inputs.insert("a".to_string(), vec![a.to_string()]);
+        inputs.insert("b".to_string(), vec![b.to_string()]);
         // output = [public output c, public input a]
         let expected_output = vec![Fr::from(c), Fr::from(a)];
         let circom_outputs = circom::serialization::SerializableInputs(expected_output);

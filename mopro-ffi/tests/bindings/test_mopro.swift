@@ -6,17 +6,17 @@ let moproCircom = MoproCircom()
 let wasmPath = "./../../../../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm"
 let r1csPath = "./../../../../mopro-core/examples/circom/multiplier2/target/multiplier2.r1cs"
 
-// TODO: should handle 254-bit input
-func serializeOutputs(_ int32Array: [Int32]) -> [UInt8] {
+func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
     var bytesArray: [UInt8] = []
-    let length = int32Array.count
+    let length = stringArray.count
     var littleEndianLength = length.littleEndian
     let targetLength = 32
     withUnsafeBytes(of: &littleEndianLength) {
         bytesArray.append(contentsOf: $0)
     }
-    for value in int32Array {
-        var littleEndian = value.littleEndian
+    for value in stringArray {
+        // TODO: should handle 254-bit input
+        var littleEndian = Int32(value)!.littleEndian
         var byteLength = 0
         withUnsafeBytes(of: &littleEndian) {
             bytesArray.append(contentsOf: $0)
@@ -37,12 +37,15 @@ do {
     assert(!setupResult.provingKey.isEmpty, "Proving key should not be empty")
 
     // Prepare inputs
-    var inputs = [String: [Int32]]()
-    inputs["a"] = [3]
-    inputs["b"] = [5]
+    var inputs = [String: [String]]()
+    let a = 3
+    let b = 5
+    let c = a*b
+    inputs["a"] = [String(a)]
+    inputs["b"] = [String(b)]
 
     // Expected outputs
-    let outputs: [Int32] = [15, 3]
+    let outputs: [String] = [String(c), String(a)]
     let expectedOutput: [UInt8] = serializeOutputs(outputs)
 
     // Generate Proof

@@ -27,7 +27,7 @@ interface MoproCircom {
   SetupResult setup(string wasm_path, string r1cs_path);
 
   [Throws=MoproError]
-  GenerateProofResult generate_proof(record<string, sequence<i32>> circuit_inputs);
+  GenerateProofResult generate_proof(record<string, sequence<string>> circuit_inputs);
 
   [Throws=MoproError]
   boolean verify_proof(bytes proof, bytes public_input);
