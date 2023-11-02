@@ -91,7 +91,7 @@ class ViewController: UIViewController {
                 0, 0, 0, 0, 0, 0,
             ]
             let bits = bytesToBits(bytes: inputVec)
-            var inputs = [String: [Int32]]()
+            var inputs = [String: [String]]()
             inputs["in"] = bits
 
             // Expected outputs
@@ -99,14 +99,17 @@ class ViewController: UIViewController {
                 37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
                 212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
             ]
-            let outputBits: [Int32] = bytesToBits(bytes: outputVec)
+            let outputBits: [String] = bytesToBits(bytes: outputVec)
             let expectedOutput: [UInt8] = serializeOutputs(outputBits)
 
             // Multiplier example
-            // var inputs = [String: [Int32]]()
-            // inputs["a"] = [3]
-            // inputs["b"] = [5]
-            // let outputs: [Int32] = [15, 3]
+            // var inputs = [String: [String]]()
+            // let a = 3
+            // let b = 5
+            // let c = a*b
+            // inputs["a"] = [String(a)]
+            // inputs["b"] = [String(b)]
+            // let outputs: [String] = [String(c), String(a)]
             // let expectedOutput: [UInt8] = serializeOutputs(outputs)
 
             // Record start time
@@ -161,28 +164,28 @@ class ViewController: UIViewController {
 
 }
 
-func bytesToBits(bytes: [UInt8]) -> [Int32] {
-    var bits = [Int32]()
+func bytesToBits(bytes: [UInt8]) -> [String] {
+    var bits = [String]()
     for byte in bytes {
         for j in 0..<8 {
             let bit = (byte >> j) & 1
-            bits.append(Int32(bit))
+            bits.append(String(bit))
         }
     }
     return bits
 }
 
-// TODO: should handle 254-bit input
-func serializeOutputs(_ int32Array: [Int32]) -> [UInt8] {
+func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
     var bytesArray: [UInt8] = []
-    let length = int32Array.count
+    let length = stringArray.count
     var littleEndianLength = length.littleEndian
     let targetLength = 32
     withUnsafeBytes(of: &littleEndianLength) {
         bytesArray.append(contentsOf: $0)
     }
-    for value in int32Array {
-        var littleEndian = value.littleEndian
+    for value in stringArray {
+        // TODO: should handle 254-bit input
+        var littleEndian = Int32(value)!.littleEndian
         var byteLength = 0
         withUnsafeBytes(of: &littleEndian) {
             bytesArray.append(contentsOf: $0)

@@ -7,28 +7,28 @@ let wasmPath = "./../../../../mopro-core/examples/circom/keccak256/target/keccak
 let r1csPath = "./../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test.r1cs"
 
 // Helper function to convert bytes to bits
-func bytesToBits(bytes: [UInt8]) -> [Int32] {
-    var bits = [Int32]()
+func bytesToBits(bytes: [UInt8]) -> [String] {
+    var bits = [String]()
     for byte in bytes {
         for j in 0..<8 {
             let bit = (byte >> j) & 1
-            bits.append(Int32(bit))
+            bits.append(String(bit))
         }
     }
     return bits
 }
 
-// TODO: should handle 254-bit input
-func serializeOutputs(_ int32Array: [Int32]) -> [UInt8] {
+func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
     var bytesArray: [UInt8] = []
-    let length = int32Array.count
+    let length = stringArray.count
     var littleEndianLength = length.littleEndian
     let targetLength = 32
     withUnsafeBytes(of: &littleEndianLength) {
         bytesArray.append(contentsOf: $0)
     }
-    for value in int32Array {
-        var littleEndian = value.littleEndian
+    for value in stringArray {
+        // TODO: should handle 254-bit input
+        var littleEndian = Int32(value)!.littleEndian
         var byteLength = 0
         withUnsafeBytes(of: &littleEndian) {
             bytesArray.append(contentsOf: $0)
@@ -54,7 +54,7 @@ do {
         0, 0, 0, 0, 0, 0,
     ]
     let bits = bytesToBits(bytes: inputVec)
-    var inputs = [String: [Int32]]()
+    var inputs = [String: [String]]()
     inputs["in"] = bits
 
     // Expected outputs
@@ -62,7 +62,7 @@ do {
         37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
         212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
     ]
-    let outputBits: [Int32] = bytesToBits(bytes: outputVec)
+    let outputBits: [String] = bytesToBits(bytes: outputVec)
     let expectedOutput: [UInt8] = serializeOutputs(outputBits)
 
     // Generate Proof
