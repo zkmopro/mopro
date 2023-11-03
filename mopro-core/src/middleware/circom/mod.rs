@@ -34,6 +34,7 @@ use {
 
 pub mod serialization;
 pub mod utils;
+pub mod zarkkey;
 
 type GrothBn = Groth16<Bn254>;
 

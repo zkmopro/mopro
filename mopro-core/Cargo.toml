@@ -5,6 +5,10 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[[bin]]
+name = "zarkkey-util"
+path = "zarkkey-util.rs"
+
 [patch.crates-io]
 # NOTE: Forked wasmer to work around memory limits
 # See https://github.com/wasmerio/wasmer/commit/09c7070
