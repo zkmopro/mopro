@@ -7,8 +7,8 @@ use color_eyre::eyre::{Result, WrapErr};
 use std::fs::File;
 use std::io::Cursor;
 use std::io::Read;
+use std::io::{self, BufReader};
 use std::path::PathBuf;
-use std::time::Instant;
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
 pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
@@ -45,32 +45,27 @@ impl<F: Field> From<SerializableMatrix<F>> for Vec<Vec<(F, usize)>> {
 
 pub fn serialize_proving_key(pk: &SerializableProvingKey) -> Vec<u8> {
     let mut serialized_data = Vec::new();
-    pk.serialize_uncompressed(&mut serialized_data)
+    pk.serialize_compressed(&mut serialized_data)
         .expect("Serialization failed");
     serialized_data
 }
 
 pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
-    SerializableProvingKey::deserialize_uncompressed(&mut &data[..])
-        .expect("Deserialization failed")
+    SerializableProvingKey::deserialize_compressed(&mut &data[..]).expect("Deserialization failed")
 }
 
 pub fn read_arkzkey(
     arkzkey_path: &str,
 ) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
     let arkzkey_file_path = PathBuf::from(arkzkey_path);
-    let mut arkzkey_file = File::open(arkzkey_file_path).wrap_err("Failed to open arkzkey file")?;
-    let mut serialized_data = Vec::new();
-    arkzkey_file
-        .read_to_end(&mut serialized_data)
-        .wrap_err("Failed to read arkzkey file")?;
+    let arkzkey_file = File::open(arkzkey_file_path).wrap_err("Failed to open arkzkey file")?;
+    let mut buf_reader = BufReader::new(arkzkey_file);
 
-    let mut cursor = Cursor::new(serialized_data);
-
-    let proving_key = SerializableProvingKey::deserialize_uncompressed(&mut cursor)
+    let proving_key = SerializableProvingKey::deserialize_compressed(&mut buf_reader)
         .wrap_err("Failed to deserialize proving key")?;
-    let constraint_matrices = SerializableConstraintMatrices::deserialize_uncompressed(&mut cursor)
-        .wrap_err("Failed to deserialize constraint matrices")?;
+    let constraint_matrices =
+        SerializableConstraintMatrices::deserialize_compressed(&mut buf_reader)
+            .wrap_err("Failed to deserialize constraint matrices")?;
 
     Ok((proving_key, constraint_matrices))
 }
@@ -80,7 +75,11 @@ pub fn read_proving_key_and_matrices_from_zkey(
 ) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
     let zkey_file_path = PathBuf::from(zkey_path);
     let mut zkey_file = File::open(zkey_file_path).wrap_err("Failed to open zkey file")?;
-    let (proving_key, matrices) = read_zkey(&mut zkey_file).wrap_err("Failed to read zkey file")?;
+
+    let mut buf_reader = BufReader::new(zkey_file);
+
+    let (proving_key, matrices) =
+        read_zkey(&mut buf_reader).wrap_err("Failed to read zkey file")?;
 
     let serializable_proving_key = SerializableProvingKey(proving_key);
     let serializable_constrain_matrices = SerializableConstraintMatrices {
@@ -111,11 +110,11 @@ pub fn convert_zkey(
         File::create(&serialized_path).wrap_err("Failed to create serialized proving key file")?;
 
     proving_key
-        .serialize_uncompressed(&mut file)
+        .serialize_compressed(&mut file)
         .wrap_err("Failed to serialize proving key")?;
 
     constraint_matrices
-        .serialize_uncompressed(&mut file)
+        .serialize_compressed(&mut file)
         .wrap_err("Failed to serialize constraint matrices")?;
 
     Ok(())
@@ -124,16 +123,17 @@ pub fn convert_zkey(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::Instant;
 
     #[test]
     fn test_serialization_deserialization() -> Result<()> {
         // multiplier
-        let dir = "../mopro-core/examples/circom/multiplier2";
-        let circuit = "multiplier2";
+        // let dir = "../mopro-core/examples/circom/multiplier2";
+        // let circuit = "multiplier2";
 
-        // keccak256
-        // let dir = "../mopro-core/examples/circom/keccak256";
-        // let circuit = "keccak256_256_test";
+        //keccak256
+        let dir = "../mopro-core/examples/circom/keccak256";
+        let circuit = "keccak256_256_test";
 
         let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
