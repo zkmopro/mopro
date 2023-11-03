@@ -2,15 +2,12 @@ use ark_bn254::{Bn254, Fr};
 use ark_circom::read_zkey;
 use ark_ff::Field;
 use ark_groth16::ProvingKey;
-use ark_relations::r1cs::ConstraintMatrices;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use color_eyre::eyre::{Result, WrapErr};
 use std::fs::File;
+use std::io::Cursor;
 use std::io::Read;
 use std::path::PathBuf;
-
-// NOTE: Starting with ProvingKey
-// TODO: Add ConstraintMatrices
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
 pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
@@ -19,9 +16,6 @@ pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
 pub struct SerializableMatrix<F: Field> {
     pub data: Vec<Vec<(F, usize)>>,
 }
-
-// #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
-// pub struct SerializableConstraintMatrices(pub ConstraintMatrices<Fr>);
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
 pub struct SerializableConstraintMatrices<F: Field> {
@@ -70,11 +64,12 @@ pub fn read_arkzkey(
         .read_to_end(&mut serialized_data)
         .wrap_err("Failed to read arkzkey file")?;
 
-    let proving_key = SerializableProvingKey::deserialize_uncompressed(&mut &serialized_data[..])
+    let mut cursor = Cursor::new(serialized_data);
+
+    let proving_key = SerializableProvingKey::deserialize_uncompressed(&mut cursor)
         .wrap_err("Failed to deserialize proving key")?;
-    let constraint_matrices =
-        SerializableConstraintMatrices::deserialize_uncompressed(&mut &serialized_data[..])
-            .wrap_err("Failed to deserialize constraint matrices")?;
+    let constraint_matrices = SerializableConstraintMatrices::deserialize_uncompressed(&mut cursor)
+        .wrap_err("Failed to deserialize constraint matrices")?;
 
     Ok((proving_key, constraint_matrices))
 }
@@ -108,7 +103,6 @@ pub fn convert_zkey(
     arkzkey_path: &str,
 ) -> Result<()> {
     let arkzkey_file_path = PathBuf::from(arkzkey_path);
-    println!("arkzkey_file_path: {:?}", arkzkey_file_path);
 
     let serialized_path = PathBuf::from(arkzkey_file_path);
 
@@ -143,16 +137,18 @@ mod tests {
         let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
 
-        // Read the original proving key
+        println!("Reading zkey from: {}", zkey_path);
         let (original_proving_key, original_constraint_matrices) =
             read_proving_key_and_matrices_from_zkey(&zkey_path)?;
 
+        println!("Writing arkzkey to: {}", arkzkey_path);
         convert_zkey(
             original_proving_key.clone(),
             original_constraint_matrices.clone(),
             &arkzkey_path,
         )?;
 
+        println!("Reading arkzkey from: {}", arkzkey_path);
         let (deserialized_proving_key, deserialized_constraint_matrices) =
             read_arkzkey(&arkzkey_path)?;
 
