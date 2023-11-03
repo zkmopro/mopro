@@ -59,15 +59,29 @@ pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
 pub fn read_arkzkey(
     arkzkey_path: &str,
 ) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
+    let now = std::time::Instant::now();
     let arkzkey_file_path = PathBuf::from(arkzkey_path);
     let arkzkey_file = File::open(arkzkey_file_path).wrap_err("Failed to open arkzkey file")?;
-    let mut buf_reader = BufReader::new(arkzkey_file);
+    println!("Time to open arkzkey file: {:?}", now.elapsed());
 
-    let proving_key = SerializableProvingKey::deserialize_compressed(&mut buf_reader)
+    //let mut buf_reader = BufReader::new(arkzkey_file);
+
+    // Using mmap
+    let now = std::time::Instant::now();
+    let mmap = unsafe { Mmap::map(&arkzkey_file)? };
+    let mut cursor = std::io::Cursor::new(mmap);
+    println!("Time to mmap: {:?}", now.elapsed());
+
+    // Was &mut buf_reader
+    let now = std::time::Instant::now();
+    let proving_key = SerializableProvingKey::deserialize_compressed(&mut cursor)
         .wrap_err("Failed to deserialize proving key")?;
-    let constraint_matrices =
-        SerializableConstraintMatrices::deserialize_compressed(&mut buf_reader)
-            .wrap_err("Failed to deserialize constraint matrices")?;
+    println!("Time to deserialize proving key: {:?}", now.elapsed());
+
+    let now = std::time::Instant::now();
+    let constraint_matrices = SerializableConstraintMatrices::deserialize_compressed(&mut cursor)
+        .wrap_err("Failed to deserialize constraint matrices")?;
+    println!("Time to deserialize matrices: {:?}", now.elapsed());
 
     Ok((proving_key, constraint_matrices))
 }
@@ -151,10 +165,10 @@ mod tests {
         let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
 
-        println!("Reading mmaped zkey from: {}", zkey_path);
-        let now = Instant::now();
-        let (original_proving_key, original_constraint_matrices) = read_zkey_with_mmap(&zkey_path)?;
-        println!("Time to read mmaped zkey: {:?}", now.elapsed());
+        // println!("Reading mmaped zkey from: {}", zkey_path);
+        // let now = Instant::now();
+        // let (original_proving_key, original_constraint_matrices) = read_zkey_with_mmap(&zkey_path)?;
+        // println!("Time to read mmaped zkey: {:?}", now.elapsed());
 
         println!("Reading zkey from: {}", zkey_path);
         let now = Instant::now();
@@ -186,6 +200,8 @@ mod tests {
             original_constraint_matrices, deserialized_constraint_matrices,
             "Original and deserialized constraint matrices do not match"
         );
+
+        flame::dump_html(&mut std::fs::File::create("flame-graph.html").unwrap()).unwrap();
 
         Ok(())
     }
