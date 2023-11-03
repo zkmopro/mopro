@@ -60,28 +60,53 @@ pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
         .expect("Deserialization failed")
 }
 
-pub fn read_arkzkey(arkzkey_path: &str) -> Result<SerializableProvingKey> {
+pub fn read_arkzkey(
+    arkzkey_path: &str,
+) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
     let arkzkey_file_path = PathBuf::from(arkzkey_path);
     let mut arkzkey_file = File::open(arkzkey_file_path).wrap_err("Failed to open arkzkey file")?;
     let mut serialized_data = Vec::new();
     arkzkey_file
         .read_to_end(&mut serialized_data)
         .wrap_err("Failed to read arkzkey file")?;
-    Ok(
-        SerializableProvingKey::deserialize_uncompressed(&mut &serialized_data[..])
-            .wrap_err("Failed to deserialize proving key")?,
-    )
+
+    let proving_key = SerializableProvingKey::deserialize_uncompressed(&mut &serialized_data[..])
+        .wrap_err("Failed to deserialize proving key")?;
+    let constraint_matrices =
+        SerializableConstraintMatrices::deserialize_uncompressed(&mut &serialized_data[..])
+            .wrap_err("Failed to deserialize constraint matrices")?;
+
+    Ok((proving_key, constraint_matrices))
 }
 
-pub fn read_proving_key_from_zkey(zkey_path: &str) -> Result<SerializableProvingKey> {
+pub fn read_proving_key_and_matrices_from_zkey(
+    zkey_path: &str,
+) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
     let zkey_file_path = PathBuf::from(zkey_path);
     let mut zkey_file = File::open(zkey_file_path).wrap_err("Failed to open zkey file")?;
-    let (proving_key, _) = read_zkey(&mut zkey_file).wrap_err("Failed to read zkey file")?;
-    Ok(SerializableProvingKey(proving_key))
+    let (proving_key, matrices) = read_zkey(&mut zkey_file).wrap_err("Failed to read zkey file")?;
+
+    let serializable_proving_key = SerializableProvingKey(proving_key);
+    let serializable_constrain_matrices = SerializableConstraintMatrices {
+        num_instance_variables: matrices.num_instance_variables,
+        num_witness_variables: matrices.num_witness_variables,
+        num_constraints: matrices.num_constraints,
+        a_num_non_zero: matrices.a_num_non_zero,
+        b_num_non_zero: matrices.b_num_non_zero,
+        c_num_non_zero: matrices.c_num_non_zero,
+        a: SerializableMatrix { data: matrices.a },
+        b: SerializableMatrix { data: matrices.b },
+        c: SerializableMatrix { data: matrices.c },
+    };
+
+    Ok((serializable_proving_key, serializable_constrain_matrices))
 }
 
-// TODO: Add ConstraintMatrices
-pub fn convert_zkey(proving_key: SerializableProvingKey, arkzkey_path: &str) -> Result<()> {
+pub fn convert_zkey(
+    proving_key: SerializableProvingKey,
+    constraint_matrices: SerializableConstraintMatrices<Fr>,
+    arkzkey_path: &str,
+) -> Result<()> {
     let arkzkey_file_path = PathBuf::from(arkzkey_path);
     println!("arkzkey_file_path: {:?}", arkzkey_file_path);
 
@@ -89,9 +114,14 @@ pub fn convert_zkey(proving_key: SerializableProvingKey, arkzkey_path: &str) -> 
 
     let mut file =
         File::create(&serialized_path).wrap_err("Failed to create serialized proving key file")?;
+
     proving_key
         .serialize_uncompressed(&mut file)
         .wrap_err("Failed to serialize proving key")?;
+
+    constraint_matrices
+        .serialize_uncompressed(&mut file)
+        .wrap_err("Failed to serialize constraint matrices")?;
 
     Ok(())
 }
@@ -114,16 +144,26 @@ mod tests {
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
 
         // Read the original proving key
-        let original_proving_key = read_proving_key_from_zkey(&zkey_path)?;
-        convert_zkey(original_proving_key.clone(), &arkzkey_path)?;
+        let (original_proving_key, original_constraint_matrices) =
+            read_proving_key_and_matrices_from_zkey(&zkey_path)?;
 
-        // Read the serialized and then deserialized proving key
-        let deserialized_proving_key = read_arkzkey(&arkzkey_path)?;
+        convert_zkey(
+            original_proving_key.clone(),
+            original_constraint_matrices.clone(),
+            &arkzkey_path,
+        )?;
 
-        // Compare the original and deserialized proving keys
+        let (deserialized_proving_key, deserialized_constraint_matrices) =
+            read_arkzkey(&arkzkey_path)?;
+
         assert_eq!(
             original_proving_key, deserialized_proving_key,
             "Original and deserialized proving keys do not match"
+        );
+
+        assert_eq!(
+            original_constraint_matrices, deserialized_constraint_matrices,
+            "Original and deserialized constraint matrices do not match"
         );
 
         Ok(())
