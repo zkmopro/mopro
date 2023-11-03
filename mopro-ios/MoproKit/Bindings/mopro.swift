@@ -307,19 +307,6 @@ private struct FfiConverterUInt32: FfiConverterPrimitive {
     }
 }
 
-private struct FfiConverterInt32: FfiConverterPrimitive {
-    typealias FfiType = Int32
-    typealias SwiftType = Int32
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Int32 {
-        return try lift(readInt(&buf))
-    }
-
-    public static func write(_ value: Int32, into buf: inout [UInt8]) {
-        writeInt(&buf, lower(value))
-    }
-}
-
 private struct FfiConverterBool: FfiConverter {
     typealias FfiType = Int8
     typealias SwiftType = Bool
@@ -396,7 +383,7 @@ private struct FfiConverterData: FfiConverterRustBuffer {
 
 public protocol MoproCircomProtocol {
     func setup(wasmPath: String, r1csPath: String) throws -> SetupResult
-    func generateProof(circuitInputs: [String: [Int32]]) throws -> GenerateProofResult
+    func generateProof(circuitInputs: [String: [String]]) throws -> GenerateProofResult
     func verifyProof(proof: Data, publicInput: Data) throws -> Bool
 }
 
@@ -430,11 +417,11 @@ public class MoproCircom: MoproCircomProtocol {
         )
     }
 
-    public func generateProof(circuitInputs: [String: [Int32]]) throws -> GenerateProofResult {
+    public func generateProof(circuitInputs: [String: [String]]) throws -> GenerateProofResult {
         return try FfiConverterTypeGenerateProofResult.lift(
             rustCallWithError(FfiConverterTypeMoproError.lift) {
                 uniffi_mopro_fn_method_moprocircom_generate_proof(self.pointer,
-                                                                  FfiConverterDictionaryStringSequenceInt32.lower(circuitInputs), $0)
+                                                                  FfiConverterDictionaryStringSequenceString.lower(circuitInputs), $0)
             }
         )
     }
@@ -617,45 +604,45 @@ extension MoproError: Equatable, Hashable {}
 
 extension MoproError: Error {}
 
-private struct FfiConverterSequenceInt32: FfiConverterRustBuffer {
-    typealias SwiftType = [Int32]
+private struct FfiConverterSequenceString: FfiConverterRustBuffer {
+    typealias SwiftType = [String]
 
-    public static func write(_ value: [Int32], into buf: inout [UInt8]) {
+    public static func write(_ value: [String], into buf: inout [UInt8]) {
         let len = Int32(value.count)
         writeInt(&buf, len)
         for item in value {
-            FfiConverterInt32.write(item, into: &buf)
+            FfiConverterString.write(item, into: &buf)
         }
     }
 
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [Int32] {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [String] {
         let len: Int32 = try readInt(&buf)
-        var seq = [Int32]()
+        var seq = [String]()
         seq.reserveCapacity(Int(len))
         for _ in 0 ..< len {
-            try seq.append(FfiConverterInt32.read(from: &buf))
+            try seq.append(FfiConverterString.read(from: &buf))
         }
         return seq
     }
 }
 
-private struct FfiConverterDictionaryStringSequenceInt32: FfiConverterRustBuffer {
-    public static func write(_ value: [String: [Int32]], into buf: inout [UInt8]) {
+private struct FfiConverterDictionaryStringSequenceString: FfiConverterRustBuffer {
+    public static func write(_ value: [String: [String]], into buf: inout [UInt8]) {
         let len = Int32(value.count)
         writeInt(&buf, len)
         for (key, value) in value {
             FfiConverterString.write(key, into: &buf)
-            FfiConverterSequenceInt32.write(value, into: &buf)
+            FfiConverterSequenceString.write(value, into: &buf)
         }
     }
 
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [String: [Int32]] {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [String: [String]] {
         let len: Int32 = try readInt(&buf)
-        var dict = [String: [Int32]]()
+        var dict = [String: [String]]()
         dict.reserveCapacity(Int(len))
         for _ in 0 ..< len {
             let key = try FfiConverterString.read(from: &buf)
-            let value = try FfiConverterSequenceInt32.read(from: &buf)
+            let value = try FfiConverterSequenceString.read(from: &buf)
             dict[key] = value
         }
         return dict
@@ -687,6 +674,16 @@ public func initCircomState() throws {
     }
 }
 
+public func generateProof2(circuitInputs: [String: [String]]) throws -> GenerateProofResult {
+    return try FfiConverterTypeGenerateProofResult.lift(
+        rustCallWithError(FfiConverterTypeMoproError.lift) {
+            uniffi_mopro_fn_func_generate_proof2(
+                FfiConverterDictionaryStringSequenceString.lower(circuitInputs), $0
+            )
+        }
+    )
+}
+
 private enum InitializationResult {
     case ok
     case contractVersionMismatch
@@ -712,10 +709,13 @@ private var initializationResult: InitializationResult {
     if uniffi_mopro_checksum_func_init_circom_state() != 20999 {
         return InitializationResult.apiChecksumMismatch
     }
+    if uniffi_mopro_checksum_func_generate_proof2() != 6969 {
+        return InitializationResult.apiChecksumMismatch
+    }
     if uniffi_mopro_checksum_method_moprocircom_setup() != 40345 {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_checksum_method_moprocircom_generate_proof() != 59966 {
+    if uniffi_mopro_checksum_method_moprocircom_generate_proof() != 30646 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_checksum_method_moprocircom_verify_proof() != 51813 {
