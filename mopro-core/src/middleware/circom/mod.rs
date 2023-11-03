@@ -59,6 +59,7 @@ impl Default for CircomState {
 
 const ZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ZKEY_FILE"));
 
+// TODO: This can probably be pre-processed
 static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
     let mut reader = Cursor::new(ZKEY_BYTES);
     read_zkey(&mut reader).expect("Failed to read zkey")
@@ -83,6 +84,14 @@ pub fn initialize(dylib_path: &Path) {
 
     // Initialize ZKEY
     // TODO: Speed this up
+    let now = std::time::Instant::now();
+    Lazy::force(&ZKEY);
+    println!("Initializing zkey took: {:.2?}", now.elapsed());
+}
+
+#[cfg(not(feature = "dylib"))]
+pub fn initialize_zkey() {
+    println!("Initializing zkey");
     let now = std::time::Instant::now();
     Lazy::force(&ZKEY);
     println!("Initializing zkey took: {:.2?}", now.elapsed());
@@ -510,6 +519,12 @@ mod tests {
 
             // Initialize libray
             initialize(Path::new(&dylib_path));
+        }
+
+        #[cfg(not(feature = "dylib"))]
+        {
+            // Do this separately to remove zkey loading from proof generation time
+            initialize_zkey();
         }
 
         let input_vec = vec![
