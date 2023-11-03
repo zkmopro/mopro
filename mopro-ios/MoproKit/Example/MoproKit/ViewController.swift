@@ -25,6 +25,54 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         runSetup()
+        // Uncomment this line to use zkey logic
+        //runGenerateProof2()
+    }
+
+// TODO: Run init separately?
+    func runGenerateProof2() {
+        do {
+
+            // Prepare inputs
+            let inputVec: [UInt8] = [
+                116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0,
+            ]
+            let bits = bytesToBits(bytes: inputVec)
+            var inputs = [String: [String]]()
+            inputs["in"] = bits
+
+            // Expected outputs
+            let outputVec: [UInt8] = [
+                37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
+                212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
+            ]
+            let outputBits: [String] = bytesToBits(bytes: outputVec)
+//            let expectedOutput: [UInt8] = serializeOutputs(outputBits)
+
+            // Record start time
+            let start = CFAbsoluteTimeGetCurrent()
+
+            // Generate Proof
+            let generateProofResult = try generateProof2(circuitInputs: inputs)
+            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+            //assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
+
+            // Record end time and compute duration
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+
+            // Store the generated proof and public inputs for later verification
+            generatedProof = generateProofResult.proof
+            publicInputs = generateProofResult.inputs
+
+            textView.text += "Proof generation took \(timeTaken) seconds.\n"
+            verifyButton.isEnabled = true // Enable the Verify button once proof has been generated
+        } catch let error as MoproError {
+            print("MoproError: \(error)")
+        } catch {
+            print("Unexpected error: \(error)")
+        }
     }
 
     func runSetup() {
