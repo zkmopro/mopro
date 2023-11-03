@@ -2,8 +2,10 @@ use ark_bn254::{Bn254, Fr};
 use ark_circom::read_zkey;
 use ark_ff::Field;
 use ark_groth16::ProvingKey;
+use ark_relations::r1cs::ConstraintMatrices;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use color_eyre::eyre::{Result, WrapErr};
+use memmap2::Mmap;
 use std::fs::File;
 use std::io::Cursor;
 use std::io::Read;
@@ -120,6 +122,17 @@ pub fn convert_zkey(
     Ok(())
 }
 
+fn read_zkey_with_mmap(zkey_path: &str) -> Result<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> {
+    let file = File::open(zkey_path)?;
+
+    let mmap = unsafe { Mmap::map(&file)? };
+
+    let cursor = Cursor::new(&mmap);
+    let (proving_key, matrices) = read_zkey(&mut cursor.clone())?;
+
+    Ok((proving_key, matrices))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -137,6 +150,11 @@ mod tests {
 
         let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
+
+        println!("Reading mmaped zkey from: {}", zkey_path);
+        let now = Instant::now();
+        let (original_proving_key, original_constraint_matrices) = read_zkey_with_mmap(&zkey_path)?;
+        println!("Time to read mmaped zkey: {:?}", now.elapsed());
 
         println!("Reading zkey from: {}", zkey_path);
         let now = Instant::now();

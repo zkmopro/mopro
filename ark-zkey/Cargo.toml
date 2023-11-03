@@ -15,6 +15,7 @@ wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 
 [dependencies]
 color-eyre = "0.6"
+memmap2 = "0.9"
 
 ark-serialize = { version = "=0.4.1", features = ["derive"] }
 ark-bn254 = { version = "=0.4.0" }
