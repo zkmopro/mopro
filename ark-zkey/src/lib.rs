@@ -8,6 +8,7 @@ use std::fs::File;
 use std::io::Cursor;
 use std::io::Read;
 use std::path::PathBuf;
+use std::time::Instant;
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
 pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
@@ -138,19 +139,25 @@ mod tests {
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
 
         println!("Reading zkey from: {}", zkey_path);
+        let now = Instant::now();
         let (original_proving_key, original_constraint_matrices) =
             read_proving_key_and_matrices_from_zkey(&zkey_path)?;
+        println!("Time to read zkey: {:?}", now.elapsed());
 
         println!("Writing arkzkey to: {}", arkzkey_path);
+        let now = Instant::now();
         convert_zkey(
             original_proving_key.clone(),
             original_constraint_matrices.clone(),
             &arkzkey_path,
         )?;
+        println!("Time to write zkey: {:?}", now.elapsed());
 
         println!("Reading arkzkey from: {}", arkzkey_path);
+        let now = Instant::now();
         let (deserialized_proving_key, deserialized_constraint_matrices) =
             read_arkzkey(&arkzkey_path)?;
+        println!("Time to read arkzkey: {:?}", now.elapsed());
 
         assert_eq!(
             original_proving_key, deserialized_proving_key,
