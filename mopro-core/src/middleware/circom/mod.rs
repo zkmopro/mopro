@@ -82,7 +82,10 @@ pub fn initialize(dylib_path: &Path) {
         .expect("Failed to set WITNESS_CALCULATOR");
 
     // Initialize ZKEY
+    // TODO: Speed this up
+    let now = std::time::Instant::now();
     Lazy::force(&ZKEY);
+    println!("Initializing zkey took: {:.2?}", now.elapsed());
 }
 
 /// Creates a `WitnessCalculator` instance from a dylib file.
@@ -499,6 +502,16 @@ mod tests {
 
     #[test]
     fn test_generate_proof2() {
+        // XXX: This can be done better
+        #[cfg(feature = "dylib")]
+        {
+            // Assumes that the dylib file has been built and is in the following location
+            let dylib_path = "target/debug/aarch64-apple-darwin/keccak256.dylib";
+
+            // Initialize libray
+            initialize(Path::new(&dylib_path));
+        }
+
         let input_vec = vec![
             116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
