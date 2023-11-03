@@ -1,6 +1,8 @@
-use ark_bn254::Bn254;
+use ark_bn254::{Bn254, Fr};
 use ark_circom::read_zkey;
+use ark_ff::Field;
 use ark_groth16::ProvingKey;
+use ark_relations::r1cs::ConstraintMatrices;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use color_eyre::eyre::{Result, WrapErr};
 use std::fs::File;
@@ -12,6 +14,39 @@ use std::path::PathBuf;
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
 pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
+
+#[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
+pub struct SerializableMatrix<F: Field> {
+    pub data: Vec<Vec<(F, usize)>>,
+}
+
+// #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
+// pub struct SerializableConstraintMatrices(pub ConstraintMatrices<Fr>);
+
+#[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
+pub struct SerializableConstraintMatrices<F: Field> {
+    pub num_instance_variables: usize,
+    pub num_witness_variables: usize,
+    pub num_constraints: usize,
+    pub a_num_non_zero: usize,
+    pub b_num_non_zero: usize,
+    pub c_num_non_zero: usize,
+    pub a: SerializableMatrix<F>,
+    pub b: SerializableMatrix<F>,
+    pub c: SerializableMatrix<F>,
+}
+
+impl<F: Field> From<Vec<Vec<(F, usize)>>> for SerializableMatrix<F> {
+    fn from(matrix: Vec<Vec<(F, usize)>>) -> Self {
+        SerializableMatrix { data: matrix }
+    }
+}
+
+impl<F: Field> From<SerializableMatrix<F>> for Vec<Vec<(F, usize)>> {
+    fn from(serializable_matrix: SerializableMatrix<F>) -> Self {
+        serializable_matrix.data
+    }
+}
 
 pub fn serialize_proving_key(pk: &SerializableProvingKey) -> Vec<u8> {
     let mut serialized_data = Vec::new();
