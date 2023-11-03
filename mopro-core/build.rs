@@ -19,7 +19,7 @@ fn prepare_env(zkey_path: String, wasm_path: String) -> Result<()> {
 }
 
 #[cfg(feature = "dylib")]
-fn build_dylib(wasm_path: &str, dylib_name: &str) -> Result<()> {
+fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
     use std::path::Path;
     use std::{fs, str::FromStr};
 
@@ -38,8 +38,8 @@ fn build_dylib(wasm_path: &str, dylib_name: &str) -> Result<()> {
     let target_arch = env::var("TARGET")?;
 
     let out_dir = Path::new(&out_dir).to_path_buf();
-    let wasm_file = Path::new(wasm_path).to_path_buf();
-    let dylib_file = out_dir.join(dylib_name);
+    let wasm_file = Path::new(&wasm_path).to_path_buf();
+    let dylib_file = out_dir.join(&dylib_name);
     let final_dir = PathBuf::from(&project_dir)
         .join("target")
         .join(build_mode)
@@ -79,12 +79,12 @@ fn main() -> Result<()> {
     let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
     let wasm_path = format!("{}/target/{}_js/{}.wasm", dir, circuit, circuit);
 
-    prepare_env(zkey_path, wasm_path)?;
+    prepare_env(zkey_path, wasm_path.clone())?;
 
     #[cfg(feature = "dylib")]
     {
         let dylib_name = "keccak256.dylib";
-        build_dylib(wasm_path, dylib_name)?;
+        build_dylib(wasm_path.clone(), dylib_name.to_string())?;
     }
     Ok(())
 }
