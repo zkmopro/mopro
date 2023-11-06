@@ -7,7 +7,10 @@ DEFAULT='\033[0m'
 RED='\033[0;31m'
 
 # Check for the device type argument
-if [[ "$1" == "simulator" ]]; then
+if [[ "$1" == "x86_64" ]]; then
+    DEVICE_TYPE="x86_64"
+    ARCHITECTURE="x86_64-apple-ios"
+elif [[ "$1" == "simulator" ]]; then
     DEVICE_TYPE="simulator"
     ARCHITECTURE="aarch64-apple-ios-sim"
 elif [[ "$1" == "device" ]]; then
