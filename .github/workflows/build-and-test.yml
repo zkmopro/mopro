@@ -20,10 +20,15 @@ jobs:
       - name: Prepare CI
         run: ./scripts/prepare_ci.sh
       - name: Build
-        run: ./scripts/build_ios.sh simulator debug
+        run: ./scripts/build_ios.sh x86_64 debug
       - name: Run core tests
         run: cd mopro-core/ && cargo test --verbose
       - name: Run ffi tests
         run: cd mopro-ffi/ && cargo test --verbose
       - name: Run bindings tests
         run: cd mopro-ffi/ && cargo test --test test_generated_bindings
+      - name: Run ios tests
+        run: |
+          cd mopro-ios/MoproKit/Example
+          xcodebuild test -scheme MoproKit-Example -workspace MoproKit.xcworkspace -destination "platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro" 
+

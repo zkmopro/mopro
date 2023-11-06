@@ -47,7 +47,10 @@ if [[ $# -lt 2 ]]; then
 fi
 
 # Check for the device type argument
-if [[ "$1" == "simulator" ]]; then
+if [[ "$1" == "x86_64" ]]; then
+    DEVICE_TYPE="x86_64"
+    ARCHITECTURE="x86_64-apple-ios"
+elif [[ "$1" == "simulator" ]]; then
     DEVICE_TYPE="simulator"
     ARCHITECTURE="aarch64-apple-ios-sim"
 elif [[ "$1" == "device" ]]; then
@@ -83,7 +86,10 @@ print_action "Building mopro-ffi static library (${BUILD_MODE})..."
 (cd ${PROJECT_DIR}/mopro-ffi && make ${BUILD_MODE})
 
 # Print appropriate message based on device type
-if [[ "$DEVICE_TYPE" == "simulator" ]]; then
+if [[ "$DEVICE_TYPE" == "x86_64" ]]; then
+    print_action "Using ${ARCHITECTURE} libmopro_ffi.a (${LIB_DIR}) static library..."
+    print_warning "This only works on iOS simulator (x86_64)"
+elif [[ "$DEVICE_TYPE" == "simulator" ]]; then
     print_action "Using ${ARCHITECTURE} libmopro_ffi.a (${LIB_DIR}) static library..."
     print_warning "This only works on iOS simulator (ARM64)"
 elif [[ "$DEVICE_TYPE" == "device" ]]; then
