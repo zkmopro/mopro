@@ -25,3 +25,27 @@ LIBRARY_SEARCH_PATHS=${SRCROOT}/../../Libs
 OTHER_LDFLAGS=-lmopro_ffi
 USER_HEADER_SEARCH_PATHS=${SRCROOT}/../../include
 ```
+
+## Tests
+
+There are two ways to run tests:
+
+1. Xcode
+   Open the `MoproKit/Example/MoproKit.xcworkspace` in Xcode.
+   Use `command`+`U` to run tests.
+
+2. CLI
+   Run tests with command line:
+
+    ```sh
+    cd MoproKit/Example
+    xcodebuild test -scheme MoproKit-Example \
+                    -workspace MoproKit.xcworkspace \
+                    -destination "platform=iOS Simulator,OS=17.0.1,name=iPhone 15 Pro"
+    ```
+
+    Check your simulator version and the OS with:
+
+    ```sh
+    xcodebuild -showdestinations -workspace MoproKit.xcworkspace -scheme MoproKit-Example
+    ```
