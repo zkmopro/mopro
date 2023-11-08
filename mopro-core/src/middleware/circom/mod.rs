@@ -155,29 +155,12 @@ pub fn generate_proof2(
         .calculate_witness_element::<Bn254, _>(inputs, false)
         .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
-    // FIXME: Mock inputs
-    let public_inputs = vec![Fr::from(0)];
-
-    // TODO: Get public inputs
-    // NOTE: Here's what we do to get public inputs with ark-circom
-    // pub fn get_public_inputs(&self) -> Option<Vec<E::ScalarField>> {
-    //     match &self.witness {
-    //         None => None,
-    //         Some(w) => match &self.r1cs.wire_mapping {
-    //             None => Some(w[1..self.r1cs.num_inputs].to_vec()),
-    //             Some(m) => Some(m[1..self.r1cs.num_inputs].iter().map(|i| w[*i]).collect()),
-    //         },
-    //     }
-    // }
-    //
-    // In or case we have:
-    // zkey.1.num_instance_variables contains number of instance variables
-    // We need to extract the public inputs from the full assignment
-
     println!("Witness generation took: {:.2?}", now.elapsed());
 
     let now = std::time::Instant::now();
     let zkey = zkey();
+
+    let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
     println!("Loading zkey took: {:.2?}", now.elapsed());
 
     let now = std::time::Instant::now();
@@ -516,8 +499,15 @@ mod tests {
             116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
         ];
-
+        let expected_output_vec = vec![
+            37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
+            212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
+        ];
         let inputs = bytes_to_circuit_inputs(&input_vec);
-        let _ = generate_proof2(inputs);
+        let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
+
+        let generate_proof_res = generate_proof2(inputs);
+        let (_, serialized_inputs) = generate_proof_res.unwrap();
+        assert_eq!(serialized_inputs, serialized_outputs);
     }
 }
