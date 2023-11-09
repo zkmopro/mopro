@@ -57,7 +57,7 @@ elif [[ "$1" == "device" ]]; then
     DEVICE_TYPE="device"
     ARCHITECTURE="aarch64-apple-ios"
 else
-    echo -e "${RED}Error: Please specify either 'simulator' or 'device' as the first argument.${DEFAULT}"
+    echo -e "${RED}Error: Please specify either 'x86_64', 'simulator' or 'device' as the first argument.${DEFAULT}"
     exit 1
 fi
 
@@ -73,7 +73,7 @@ else
     exit 1
 fi
 
-print_action "Updating mopro-ffi bindings and library (${BUILD_MODE} ${DEVICE_TYPE})..."
+print_action "Updating mopro-ffi bindings and library ($BUILD_MODE $DEVICE_TYPE)..."
 
 PROJECT_DIR=$(pwd)
 TARGET_DIR=${PROJECT_DIR}/target
@@ -82,18 +82,23 @@ MOPROKIT_DIR=${PROJECT_DIR}/mopro-ios/MoproKit
 print_action "Generating Swift bindings..."
 uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
 
-print_action "Building mopro-ffi static library (${BUILD_MODE})..."
-(cd ${PROJECT_DIR}/mopro-ffi && make ${BUILD_MODE})
+print_action "Building mopro-ffi static library ($BUILD_MODE)..."
+cd ${PROJECT_DIR}/mopro-ffi
+if [[ "$BUILD_MODE" == "debug" ]]; then
+    cargo build --target ${ARCHITECTURE}
+elif [[ "$BUILD_MODE" == "release" ]]; then
+    cargo build --release --target ${ARCHITECTURE}
+fi
 
 # Print appropriate message based on device type
 if [[ "$DEVICE_TYPE" == "x86_64" ]]; then
-    print_action "Using ${ARCHITECTURE} libmopro_ffi.a (${LIB_DIR}) static library..."
+    print_action "Using $ARCHITECTURE libmopro_ffi.a ($LIB_DIR) static library..."
     print_warning "This only works on iOS simulator (x86_64)"
 elif [[ "$DEVICE_TYPE" == "simulator" ]]; then
-    print_action "Using ${ARCHITECTURE} libmopro_ffi.a (${LIB_DIR}) static library..."
+    print_action "Using $ARCHITECTURE libmopro_ffi.a ($LIB_DIR) static library..."
     print_warning "This only works on iOS simulator (ARM64)"
 elif [[ "$DEVICE_TYPE" == "device" ]]; then
-    print_action "Using ${ARCHITECTURE} libmopro_ffi.a (${LIB_DIR}) static library..."
+    print_action "Using $ARCHITECTURE libmopro_ffi.a ($LIB_DIR) static library..."
     print_warning "This only works on iOS devices (ARM64)"
 fi
 
