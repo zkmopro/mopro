@@ -17,7 +17,7 @@ elif [[ "$1" == "device" ]]; then
     DEVICE_TYPE="device"
     ARCHITECTURE="aarch64-apple-ios"
 else
-    echo -e "${RED}Error: Please specify either 'simulator' or 'device' as the first argument.${DEFAULT}"
+    echo -e "${RED}Error: Please specify either 'x86_64', 'simulator' or 'device' as the first argument.${DEFAULT}"
     exit 1
 fi
 
@@ -35,12 +35,11 @@ fi
 
 # build circom circuits in mopro-core
 cd ${PROJECT_DIR}/mopro-core
-cargo build --release
-
-# build ffi in mopro-ffi
-cd ${PROJECT_DIR}/mopro-ffi
-make
-cargo build --release
+if [[ "$BUILD_MODE" == "debug" ]]; then
+    cargo build
+elif [[ "$BUILD_MODE" == "release" ]]; then
+    cargo build --release
+fi
 
 # build MoproKit pods
 cd ${PROJECT_DIR}/mopro-ios/MoproKit/Example
