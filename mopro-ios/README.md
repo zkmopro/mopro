@@ -26,9 +26,9 @@ OTHER_LDFLAGS=-lmopro_ffi
 USER_HEADER_SEARCH_PATHS=${SRCROOT}/../../include
 ```
 
-## Tests
+## Tests for the example app
 
-There are two ways to run tests:
+There are two ways to run tests for the example app:
 
 1. Xcode
    Open the `MoproKit/Example/MoproKit.xcworkspace` in Xcode.
