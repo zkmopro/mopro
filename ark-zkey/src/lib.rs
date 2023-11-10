@@ -259,24 +259,9 @@ mod tests {
     use super::*;
     use std::time::Instant;
 
-    #[test]
-    fn test_serialization_deserialization() -> Result<()> {
-        // multiplier
-        let dir = "../mopro-core/examples/circom/multiplier2";
-        let circuit = "multiplier2";
-
-        //keccak256
-        // let dir = "../mopro-core/examples/circom/keccak256";
-        // let circuit = "keccak256_256_test";
-
+    fn test_circuit_serialization_deserialization(dir: &str, circuit: &str) -> Result<()> {
         let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
-
-        // Not much faster
-        // println!("Reading mmaped zkey from: {}", zkey_path);
-        // let now = Instant::now();
-        // let (original_proving_key, original_constraint_matrices) = read_zkey_with_mmap(&zkey_path)?;
-        // println!("Time to read mmaped zkey: {:?}", now.elapsed());
 
         let (original_proving_key, original_constraint_matrices) =
             read_proving_key_and_matrices_from_zkey(&zkey_path)?;
@@ -311,5 +296,21 @@ mod tests {
         flame::dump_html(&mut std::fs::File::create("flame-graph.html").unwrap()).unwrap();
 
         Ok(())
+    }
+
+    #[test]
+    fn test_multiplier2_serialization_deserialization() -> Result<()> {
+        test_circuit_serialization_deserialization(
+            "../mopro-core/examples/circom/multiplier2",
+            "multiplier2",
+        )
+    }
+
+    #[test]
+    fn test_keccak256_serialization_deserialization() -> Result<()> {
+        test_circuit_serialization_deserialization(
+            "../mopro-core/examples/circom/keccak256",
+            "keccak256_256_test",
+        )
     }
 }

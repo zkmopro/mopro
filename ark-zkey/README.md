@@ -11,7 +11,7 @@ See https://github.com/oskarth/mopro/issues/25 for context.
 
 ## multiplier2 test
 
-(Release)
+`cargo test multiplier2 --release -- --nocapture`
 
 ```
 running 1 test
