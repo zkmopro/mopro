@@ -329,6 +329,13 @@ pub fn bytes_to_circuit_inputs(bytes: &[u8]) -> CircuitInputs {
     inputs
 }
 
+pub fn strings_to_circuit_inputs(strings: &[&str]) -> Vec<BigInt> {
+    strings
+        .iter()
+        .map(|&value| BigInt::parse_bytes(value.as_bytes(), 10).unwrap())
+        .collect()
+}
+
 pub fn bytes_to_circuit_outputs(bytes: &[u8]) -> SerializableInputs {
     let bits = bytes_to_bits(bytes);
     let field_bits = bits.into_iter().map(|bit| Fr::from(bit as u8)).collect();
@@ -509,5 +516,156 @@ mod tests {
         let generate_proof_res = generate_proof2(inputs);
         let (_, serialized_inputs) = generate_proof_res.unwrap();
         assert_eq!(serialized_inputs, serialized_outputs);
+    }
+
+    #[test]
+    fn test_setup_prove_rsa() {
+        let wasm_path = "./examples/circom/rsa/target/main_js/main.wasm";
+        let r1cs_path = "./examples/circom/rsa/target/main.r1cs";
+
+        // Instantiate CircomState
+        let mut circom_state = CircomState::new();
+
+        // Setup
+        let setup_res = circom_state.setup(wasm_path, r1cs_path);
+        assert!(setup_res.is_ok());
+
+        let _serialized_pk = setup_res.unwrap();
+
+        // Deserialize the proving key and inputs if necessary
+
+        // Prepare inputs
+        let signature = [
+            "3582320600048169363",
+            "7163546589759624213",
+            "18262551396327275695",
+            "4479772254206047016",
+            "1970274621151677644",
+            "6547632513799968987",
+            "921117808165172908",
+            "7155116889028933260",
+            "16769940396381196125",
+            "17141182191056257954",
+            "4376997046052607007",
+            "17471823348423771450",
+            "16282311012391954891",
+            "70286524413490741",
+            "1588836847166444745",
+            "15693430141227594668",
+            "13832254169115286697",
+            "15936550641925323613",
+            "323842208142565220",
+            "6558662646882345749",
+            "15268061661646212265",
+            "14962976685717212593",
+            "15773505053543368901",
+            "9586594741348111792",
+            "1455720481014374292",
+            "13945813312010515080",
+            "6352059456732816887",
+            "17556873002865047035",
+            "2412591065060484384",
+            "11512123092407778330",
+            "8499281165724578877",
+            "12768005853882726493",
+          ];
+        let modulus = [
+            "13792647154200341559",
+            "12773492180790982043",
+            "13046321649363433702",
+            "10174370803876824128",
+            "7282572246071034406",
+            "1524365412687682781",
+            "4900829043004737418",
+            "6195884386932410966",
+            "13554217876979843574",
+            "17902692039595931737",
+            "12433028734895890975",
+            "15971442058448435996",
+            "4591894758077129763",
+            "11258250015882429548",
+            "16399550288873254981",
+            "8246389845141771315",
+            "14040203746442788850",
+            "7283856864330834987",
+            "12297563098718697441",
+            "13560928146585163504",
+            "7380926829734048483",
+            "14591299561622291080",
+            "8439722381984777599",
+            "17375431987296514829",
+            "16727607878674407272",
+            "3233954801381564296",
+            "17255435698225160983",
+            "15093748890170255670",
+            "15810389980847260072",
+            "11120056430439037392",
+            "5866130971823719482",
+            "13327552690270163501",
+          ];
+        let base_message = [
+            "18114495772705111902",
+            "2254271930739856077",
+            "2068851770",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+          ];
+
+        // let expected_output_vec = vec![0, 0, 0, 0, 0, 0, 0, 0, 32, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 171, 176, 96, 15, 67, 180, 73];
+
+        let mut inputs: HashMap<String, Vec<BigInt>> = HashMap::new();
+        inputs.insert("signature".to_string(), strings_to_circuit_inputs(&signature));
+        inputs.insert("modulus".to_string(), strings_to_circuit_inputs(&modulus));
+        inputs.insert("base_message".to_string(), strings_to_circuit_inputs(&base_message));
+
+        // let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
+
+        // Proof generation
+        let generate_proof_res = circom_state.generate_proof(inputs);
+
+        // Check and print the error if there is one
+        if let Err(e) = &generate_proof_res {
+            println!("Error: {:?}", e);
+        }
+
+        assert!(generate_proof_res.is_ok());
+
+        let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
+
+        // Check output
+       //  assert_eq!(serialized_inputs, serialized_outputs);
+
+        // Proof verification
+        let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
+        assert!(verify_res.is_ok());
+
+        assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 }
