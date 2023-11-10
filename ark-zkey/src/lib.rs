@@ -11,6 +11,7 @@ use std::io::Cursor;
 use std::io::Read;
 use std::io::{self, BufReader};
 use std::path::PathBuf;
+use std::time::Instant;
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
 pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
@@ -70,7 +71,7 @@ pub fn read_arkzkey(
     let now = std::time::Instant::now();
     let mmap = unsafe { Mmap::map(&arkzkey_file)? };
     let mut cursor = std::io::Cursor::new(mmap);
-    println!("Time to mmap: {:?}", now.elapsed());
+    println!("Time to mmap arkzkey: {:?}", now.elapsed());
 
     // Was &mut buf_reader
     let now = std::time::Instant::now();
@@ -89,6 +90,8 @@ pub fn read_arkzkey(
 pub fn read_proving_key_and_matrices_from_zkey(
     zkey_path: &str,
 ) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
+    println!("Reading zkey from: {}", zkey_path);
+    let now = Instant::now();
     let zkey_file_path = PathBuf::from(zkey_path);
     let mut zkey_file = File::open(zkey_file_path).wrap_err("Failed to open zkey file")?;
 
@@ -96,7 +99,10 @@ pub fn read_proving_key_and_matrices_from_zkey(
 
     let (proving_key, matrices) =
         read_zkey(&mut buf_reader).wrap_err("Failed to read zkey file")?;
+    println!("Time to read zkey: {:?}", now.elapsed());
 
+    println!("Serializing proving key and constraint matrices");
+    let now = Instant::now();
     let serializable_proving_key = SerializableProvingKey(proving_key);
     let serializable_constrain_matrices = SerializableConstraintMatrices {
         num_instance_variables: matrices.num_instance_variables,
@@ -109,6 +115,10 @@ pub fn read_proving_key_and_matrices_from_zkey(
         b: SerializableMatrix { data: matrices.b },
         c: SerializableMatrix { data: matrices.c },
     };
+    println!(
+        "Time to serialize proving key and constraint matrices: {:?}",
+        now.elapsed()
+    );
 
     Ok((serializable_proving_key, serializable_constrain_matrices))
 }
@@ -155,26 +165,24 @@ mod tests {
     #[test]
     fn test_serialization_deserialization() -> Result<()> {
         // multiplier
-        // let dir = "../mopro-core/examples/circom/multiplier2";
-        // let circuit = "multiplier2";
+        let dir = "../mopro-core/examples/circom/multiplier2";
+        let circuit = "multiplier2";
 
         //keccak256
-        let dir = "../mopro-core/examples/circom/keccak256";
-        let circuit = "keccak256_256_test";
+        // let dir = "../mopro-core/examples/circom/keccak256";
+        // let circuit = "keccak256_256_test";
 
         let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
 
+        // Not much faster
         // println!("Reading mmaped zkey from: {}", zkey_path);
         // let now = Instant::now();
         // let (original_proving_key, original_constraint_matrices) = read_zkey_with_mmap(&zkey_path)?;
         // println!("Time to read mmaped zkey: {:?}", now.elapsed());
 
-        println!("Reading zkey from: {}", zkey_path);
-        let now = Instant::now();
         let (original_proving_key, original_constraint_matrices) =
             read_proving_key_and_matrices_from_zkey(&zkey_path)?;
-        println!("Time to read zkey: {:?}", now.elapsed());
 
         println!("Writing arkzkey to: {}", arkzkey_path);
         let now = Instant::now();
