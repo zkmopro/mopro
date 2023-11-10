@@ -15,48 +15,8 @@ use std::io::{self, BufReader};
 use std::path::PathBuf;
 use std::time::Instant;
 
-// #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
-// pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
-
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
-pub struct SerializableProvingKey {
-    pub vk: VerifyingKey<Bn254>,
-    pub beta_g1: <Bn254 as Pairing>::G1Affine,
-    pub delta_g1: <Bn254 as Pairing>::G1Affine,
-    pub a_query: Vec<<Bn254 as Pairing>::G1Affine>,
-    pub b_g1_query: Vec<<Bn254 as Pairing>::G1Affine>,
-    pub b_g2_query: Vec<<Bn254 as Pairing>::G2Affine>,
-    pub h_query: Vec<<Bn254 as Pairing>::G1Affine>,
-    pub l_query: Vec<<Bn254 as Pairing>::G1Affine>,
-}
-
-impl SerializableProvingKey {
-    pub fn from_proving_key(pk: ProvingKey<Bn254>) -> Self {
-        SerializableProvingKey {
-            vk: pk.vk,
-            beta_g1: pk.beta_g1,
-            delta_g1: pk.delta_g1,
-            a_query: pk.a_query,
-            b_g1_query: pk.b_g1_query,
-            b_g2_query: pk.b_g2_query,
-            h_query: pk.h_query,
-            l_query: pk.l_query,
-        }
-    }
-
-    pub fn into_proving_key(self) -> ProvingKey<Bn254> {
-        ProvingKey {
-            vk: self.vk,
-            beta_g1: self.beta_g1,
-            delta_g1: self.delta_g1,
-            a_query: self.a_query,
-            b_g1_query: self.b_g1_query,
-            b_g2_query: self.b_g2_query,
-            h_query: self.h_query,
-            l_query: self.l_query,
-        }
-    }
-}
+pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
 pub struct SerializableMatrix<F: Field> {
@@ -115,17 +75,7 @@ pub fn read_proving_key_and_matrices(
 
     println!("Serializing proving key and constraint matrices");
     let now = Instant::now();
-    //    let serializable_proving_key = SerializableProvingKey(proving_key);
-    let serializable_proving_key = SerializableProvingKey {
-        vk: proving_key.vk,
-        beta_g1: proving_key.beta_g1,
-        delta_g1: proving_key.delta_g1,
-        a_query: proving_key.a_query,
-        b_g1_query: proving_key.b_g1_query,
-        b_g2_query: proving_key.b_g2_query,
-        h_query: proving_key.h_query,
-        l_query: proving_key.l_query,
-    };
+    let serializable_proving_key = SerializableProvingKey(proving_key);
     let serializable_constrain_matrices = SerializableConstraintMatrices {
         num_instance_variables: matrices.num_instance_variables,
         num_witness_variables: matrices.num_witness_variables,
@@ -192,17 +142,7 @@ pub fn read_proving_key_and_matrices_from_zkey(
 
     println!("Serializing proving key and constraint matrices");
     let now = Instant::now();
-    // let serializable_proving_key = SerializableProvingKey(proving_key);
-    let serializable_proving_key = SerializableProvingKey {
-        vk: proving_key.vk,
-        beta_g1: proving_key.beta_g1,
-        delta_g1: proving_key.delta_g1,
-        a_query: proving_key.a_query,
-        b_g1_query: proving_key.b_g1_query,
-        b_g2_query: proving_key.b_g2_query,
-        h_query: proving_key.h_query,
-        l_query: proving_key.l_query,
-    };
+    let serializable_proving_key = SerializableProvingKey(proving_key);
     let serializable_constrain_matrices = SerializableConstraintMatrices {
         num_instance_variables: matrices.num_instance_variables,
         num_witness_variables: matrices.num_witness_variables,
