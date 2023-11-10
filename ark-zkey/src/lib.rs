@@ -1,17 +1,17 @@
 use ark_bn254::{Bn254, Fr};
 use ark_circom::read_zkey;
-use ark_ec::pairing::Pairing;
+//use ark_ec::pairing::Pairing;
 use ark_ff::Field;
 use ark_groth16::ProvingKey;
-use ark_groth16::VerifyingKey;
-use ark_relations::r1cs::ConstraintMatrices;
+//use ark_groth16::VerifyingKey;
+//use ark_relations::r1cs::ConstraintMatrices;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use color_eyre::eyre::{Result, WrapErr};
 use memmap2::Mmap;
 use std::fs::File;
 use std::io::Cursor;
-use std::io::Read;
-use std::io::{self, BufReader};
+//use std::io::{Read,self};
+use std::io::BufReader;
 use std::path::PathBuf;
 use std::time::Instant;
 
@@ -60,21 +60,23 @@ pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
         .expect("Deserialization failed")
 }
 
+// TODO: Change this to multiplier2 or keccak as appropriate
 const ZKEY_DATA: &[u8] = include_bytes!(
+    //"../../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey"
     "../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.zkey"
 );
 
 pub fn read_proving_key_and_matrices(
 ) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
-    println!("Processing zkey data...");
+    println!("[build] Processing zkey data...");
     let now = Instant::now();
 
     let mut cursor = Cursor::new(ZKEY_DATA);
 
     let (proving_key, matrices) = read_zkey(&mut cursor).wrap_err("Failed to process zkey data")?;
-    println!("Time to process zkey data: {:?}", now.elapsed());
+    println!("[build] Time to process zkey data: {:?}", now.elapsed());
 
-    println!("Serializing proving key and constraint matrices");
+    println!("[build] Serializing proving key and constraint matrices");
     let now = Instant::now();
     let serializable_proving_key = SerializableProvingKey(proving_key);
     let serializable_constrain_matrices = SerializableConstraintMatrices {
@@ -89,7 +91,7 @@ pub fn read_proving_key_and_matrices(
         c: SerializableMatrix { data: matrices.c },
     };
     println!(
-        "Time to serialize proving key and constraint matrices: {:?}",
+        "[build] Time to serialize proving key and constraint matrices: {:?}",
         now.elapsed()
     );
 
@@ -186,39 +188,49 @@ pub fn convert_zkey(
     Ok(())
 }
 
-fn read_zkey_with_mmap(zkey_path: &str) -> Result<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> {
-    let file = File::open(zkey_path)?;
+// fn read_zkey_with_mmap(zkey_path: &str) -> Result<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> {
+//     let file = File::open(zkey_path)?;
 
-    let mmap = unsafe { Mmap::map(&file)? };
+//     let mmap = unsafe { Mmap::map(&file)? };
 
-    let cursor = Cursor::new(&mmap);
-    let (proving_key, matrices) = read_zkey(&mut cursor.clone())?;
+//     let cursor = Cursor::new(&mmap);
+//     let (proving_key, matrices) = read_zkey(&mut cursor.clone())?;
 
-    Ok((proving_key, matrices))
-}
+//     Ok((proving_key, matrices))
+// }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::time::Instant;
 
+    fn circuit_naive_read() -> Result<()> {
+        println!("Reading zkey...");
+        let now = Instant::now();
+
+        let mut cursor = Cursor::new(ZKEY_DATA);
+
+        let (_proving_key, _matrices) =
+            read_zkey(&mut cursor).wrap_err("Failed to process zkey data")?;
+        println!("Time to read zkey data: {:?}", now.elapsed());
+
+        Ok(())
+    }
+
     fn test_circuit_serialization_deserialization(dir: &str, circuit: &str) -> Result<()> {
         let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
 
-        // let (original_proving_key, original_constraint_matrices) =
-        //     read_proving_key_and_matrices_from_zkey(&zkey_path)?;
-
         let (original_proving_key, original_constraint_matrices) = read_proving_key_and_matrices()?;
 
-        println!("Writing arkzkey to: {}", arkzkey_path);
+        println!("[build] Writing arkzkey to: {}", arkzkey_path);
         let now = Instant::now();
         convert_zkey(
             original_proving_key.clone(),
             original_constraint_matrices.clone(),
             &arkzkey_path,
         )?;
-        println!("Time to write zkey: {:?}", now.elapsed());
+        println!("[build] Time to write arkzkey: {:?}", now.elapsed());
 
         println!("Reading arkzkey from: {}", arkzkey_path);
         let now = Instant::now();
@@ -236,7 +248,7 @@ mod tests {
             "Original and deserialized constraint matrices do not match"
         );
 
-        flame::dump_html(&mut std::fs::File::create("flame-graph.html").unwrap()).unwrap();
+        //flame::dump_html(&mut std::fs::File::create("flame-graph.html").unwrap()).unwrap();
 
         Ok(())
     }
@@ -255,5 +267,11 @@ mod tests {
             "../mopro-core/examples/circom/keccak256",
             "keccak256_256_test",
         )
+    }
+
+    // XXX: We do include_bytes for zkey data, so need to manually change this
+    #[test]
+    fn test_circuit_naive_read() -> Result<()> {
+        circuit_naive_read()
     }
 }
