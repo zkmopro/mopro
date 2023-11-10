@@ -159,9 +159,9 @@ pub fn generate_proof2(
 
     let now = std::time::Instant::now();
     let zkey = zkey();
+    println!("Loading zkey took: {:.2?}", now.elapsed());
 
     let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
-    println!("Loading zkey took: {:.2?}", now.elapsed());
 
     let now = std::time::Instant::now();
     let ark_proof = Groth16::<_, CircomReduction>::create_proof_with_reduction_and_matrices(
