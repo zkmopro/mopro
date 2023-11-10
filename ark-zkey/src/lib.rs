@@ -57,6 +57,41 @@ pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
     SerializableProvingKey::deserialize_compressed(&mut &data[..]).expect("Deserialization failed")
 }
 
+const ZKEY_DATA: &[u8] =
+    include_bytes!("../../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey");
+
+pub fn read_proving_key_and_matrices(
+) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
+    println!("Processing zkey data...");
+    let now = Instant::now();
+
+    let mut cursor = Cursor::new(ZKEY_DATA);
+
+    let (proving_key, matrices) = read_zkey(&mut cursor).wrap_err("Failed to process zkey data")?;
+    println!("Time to process zkey data: {:?}", now.elapsed());
+
+    println!("Serializing proving key and constraint matrices");
+    let now = Instant::now();
+    let serializable_proving_key = SerializableProvingKey(proving_key);
+    let serializable_constrain_matrices = SerializableConstraintMatrices {
+        num_instance_variables: matrices.num_instance_variables,
+        num_witness_variables: matrices.num_witness_variables,
+        num_constraints: matrices.num_constraints,
+        a_num_non_zero: matrices.a_num_non_zero,
+        b_num_non_zero: matrices.b_num_non_zero,
+        c_num_non_zero: matrices.c_num_non_zero,
+        a: SerializableMatrix { data: matrices.a },
+        b: SerializableMatrix { data: matrices.b },
+        c: SerializableMatrix { data: matrices.c },
+    };
+    println!(
+        "Time to serialize proving key and constraint matrices: {:?}",
+        now.elapsed()
+    );
+
+    Ok((serializable_proving_key, serializable_constrain_matrices))
+}
+
 pub fn read_arkzkey(
     arkzkey_path: &str,
 ) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
@@ -183,6 +218,8 @@ mod tests {
 
         let (original_proving_key, original_constraint_matrices) =
             read_proving_key_and_matrices_from_zkey(&zkey_path)?;
+
+        let (_proving_key2, _constraint_matrices2) = read_proving_key_and_matrices()?;
 
         println!("Writing arkzkey to: {}", arkzkey_path);
         let now = Instant::now();
