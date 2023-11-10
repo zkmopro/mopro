@@ -265,10 +265,10 @@ mod tests {
         let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
 
-        let (original_proving_key, original_constraint_matrices) =
-            read_proving_key_and_matrices_from_zkey(&zkey_path)?;
+        // let (original_proving_key, original_constraint_matrices) =
+        //     read_proving_key_and_matrices_from_zkey(&zkey_path)?;
 
-        let (_proving_key2, _constraint_matrices2) = read_proving_key_and_matrices()?;
+        let (original_proving_key, original_constraint_matrices) = read_proving_key_and_matrices()?;
 
         println!("Writing arkzkey to: {}", arkzkey_path);
         let now = Instant::now();

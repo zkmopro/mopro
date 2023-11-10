@@ -8,30 +8,25 @@ cargo test --release -- --nocapture
 
 See https://github.com/oskarth/mopro/issues/25 for context.
 
+## Keccak
 
-## multiplier2 test
+In-memory, custom serialization and unchecked
 
-`cargo test multiplier2 --release -- --nocapture`
+`cargo test keccak256 --release -- --nocapture`
 
 ```
 running 1 test
-Reading zkey from: ../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey
-Time to read zkey: 7.561959ms
-Serializing proving key and constraint matrices
-Time to serialize proving key and constraint matrices: 42ns
 Processing zkey data...
-Time to process zkey data: 6.311958ms
+Time to process zkey data: 2.995291ms
 Serializing proving key and constraint matrices
 Time to serialize proving key and constraint matrices: 42ns
-Writing arkzkey to: ../mopro-core/examples/circom/multiplier2/target/multiplier2_final.arkzkey
-Time to write zkey: 776.209µs
-Reading arkzkey from: ../mopro-core/examples/circom/multiplier2/target/multiplier2_final.arkzkey
-Time to open arkzkey file: 15.333µs
-Time to mmap arkzkey: 9.583µs
-Time to deserialize proving key: 4.260667ms
-Time to deserialize matrices: 1µs
-Time to read arkzkey: 4.301084ms
-test tests::test_serialization_deserialization ... ok
+Writing arkzkey to: ../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.arkzkey
+Time to write zkey: 432.917µs
+Reading arkzkey from: ../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.arkzkey
+Time to open arkzkey file: 10µs
+Time to mmap arkzkey: 3.791µs
+Time to deserialize proving key: 253.875µs
+Time to deserialize matrices: 5.709µs
+Time to read arkzkey: 315.875µs
+test tests::test_keccak256_serialization_deserialization ... ok
 ```
-
-Deserializing proving key should be a lot faster.
