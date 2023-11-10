@@ -96,7 +96,8 @@ pub fn serialize_proving_key(pk: &SerializableProvingKey) -> Vec<u8> {
 }
 
 pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
-    SerializableProvingKey::deserialize_compressed(&mut &data[..]).expect("Deserialization failed")
+    SerializableProvingKey::deserialize_compressed_unchecked(&mut &data[..])
+        .expect("Deserialization failed")
 }
 
 const ZKEY_DATA: &[u8] =
@@ -162,13 +163,14 @@ pub fn read_arkzkey(
 
     // Was &mut buf_reader
     let now = std::time::Instant::now();
-    let proving_key = SerializableProvingKey::deserialize_compressed(&mut cursor)
+    let proving_key = SerializableProvingKey::deserialize_compressed_unchecked(&mut cursor)
         .wrap_err("Failed to deserialize proving key")?;
     println!("Time to deserialize proving key: {:?}", now.elapsed());
 
     let now = std::time::Instant::now();
-    let constraint_matrices = SerializableConstraintMatrices::deserialize_compressed(&mut cursor)
-        .wrap_err("Failed to deserialize constraint matrices")?;
+    let constraint_matrices =
+        SerializableConstraintMatrices::deserialize_compressed_unchecked(&mut cursor)
+            .wrap_err("Failed to deserialize constraint matrices")?;
     println!("Time to deserialize matrices: {:?}", now.elapsed());
 
     Ok((proving_key, constraint_matrices))
