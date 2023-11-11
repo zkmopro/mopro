@@ -21,6 +21,10 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Maybe black nice, need more style tweaks though
         view.backgroundColor = .white
+
+        // TODO: NOt shownig up for some reason
+        navigationController?.navigationBar.prefersLargeTitles = true
+        self.title = "Mopro Examples"
         setupMainUI()
     }
 
@@ -39,8 +43,6 @@ class ViewController: UIViewController {
         stackView.spacing = 20
         stackView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stackView)
-
-        self.title = "Mopro Examples"
 
         NSLayoutConstraint.activate([
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),

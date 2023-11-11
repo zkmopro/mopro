@@ -24,6 +24,9 @@ class KeccakZkeyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+
+        navigationController?.navigationBar.prefersLargeTitles = true
+        self.title = "Keccak256 (zkey)"
         setupUI()
     }
 
@@ -120,7 +123,9 @@ class KeccakZkeyViewController: UIViewController {
             publicInputs = generateProofResult.inputs
 
             textView.text += "Proof generation took \(timeTaken) seconds.\n"
-            verifyButton.isEnabled = true // Enable the Verify button once proof has been generated
+            // TODO: Enable verify
+            verifyButton.isEnabled = false
+            //verifyButton.isEnabled = true // Enable the Verify button once proof has been generated
         } catch let error as MoproError {
             print("MoproError: \(error)")
         } catch {

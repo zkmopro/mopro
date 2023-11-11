@@ -24,6 +24,10 @@ class KeccakSetupViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+        navigationController?.navigationBar.barTintColor = UIColor.white // or any other contrasting color
+        self.title = "Keccak256 (setup)"
         setupUI()
     }
 
