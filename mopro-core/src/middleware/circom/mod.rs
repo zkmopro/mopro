@@ -5,13 +5,17 @@ use self::{
 use crate::MoproError;
 
 use std::collections::HashMap;
-use std::io::Cursor;
+//use std::io::Cursor;
 use std::sync::Mutex;
 use std::time::Instant;
 
 use ark_bn254::{Bn254, Fr};
 use ark_circom::{
-    read_zkey, CircomBuilder, CircomCircuit, CircomConfig, CircomReduction, WitnessCalculator,
+    CircomBuilder,
+    CircomCircuit,
+    CircomConfig,
+    CircomReduction,
+    WitnessCalculator, //read_zkey,
 };
 use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{Groth16, ProvingKey};
@@ -26,7 +30,7 @@ use once_cell::sync::{Lazy, OnceCell};
 
 use wasmer::{Module, Store};
 
-use ark_zkey::{read_arkzkey_from_bytes, SerializableConstraintMatrices};
+use ark_zkey::read_arkzkey_from_bytes; //SerializableConstraintMatrices
 
 #[cfg(feature = "dylib")]
 use {
@@ -59,14 +63,14 @@ impl Default for CircomState {
 
 // TODO: Replace printlns with logging
 
-const ZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ZKEY_FILE"));
+//const ZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ZKEY_FILE"));
 
 const ARKZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ARKZKEY_FILE"));
 
-static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
-    let mut reader = Cursor::new(ZKEY_BYTES);
-    read_zkey(&mut reader).expect("Failed to read zkey")
-});
+// static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
+//     let mut reader = Cursor::new(ZKEY_BYTES);
+//     read_zkey(&mut reader).expect("Failed to read zkey")
+// });
 
 static ARKZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
     //let mut reader = Cursor::new(ARKZKEY_BYTES);
@@ -596,7 +600,7 @@ mod tests {
             "11512123092407778330",
             "8499281165724578877",
             "12768005853882726493",
-          ];
+        ];
         let modulus = [
             "13792647154200341559",
             "12773492180790982043",
@@ -630,7 +634,7 @@ mod tests {
             "11120056430439037392",
             "5866130971823719482",
             "13327552690270163501",
-          ];
+        ];
         let base_message = [
             "18114495772705111902",
             "2254271930739856077",
@@ -664,12 +668,18 @@ mod tests {
             "0",
             "0",
             "0",
-          ];
+        ];
 
         let mut inputs: HashMap<String, Vec<BigInt>> = HashMap::new();
-        inputs.insert("signature".to_string(), strings_to_circuit_inputs(&signature));
+        inputs.insert(
+            "signature".to_string(),
+            strings_to_circuit_inputs(&signature),
+        );
         inputs.insert("modulus".to_string(), strings_to_circuit_inputs(&modulus));
-        inputs.insert("base_message".to_string(), strings_to_circuit_inputs(&base_message));
+        inputs.insert(
+            "base_message".to_string(),
+            strings_to_circuit_inputs(&base_message),
+        );
 
         // Proof generation
         let generate_proof_res = circom_state.generate_proof(inputs);
