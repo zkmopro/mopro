@@ -22,7 +22,7 @@ class ViewController: UIViewController {
         // Maybe black nice, need more style tweaks though
         view.backgroundColor = .white
 
-        // TODO: NOt shownig up for some reason
+        // TODO: Not showing up for some reason
         navigationController?.navigationBar.prefersLargeTitles = true
         self.title = "Mopro Examples"
         setupMainUI()
