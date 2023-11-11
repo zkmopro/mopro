@@ -1,4 +1,5 @@
 use mopro_core::middleware::circom;
+use mopro_core::middleware::kimchi;
 use mopro_core::MoproError;
 
 use num_bigint::BigInt;
@@ -144,6 +145,12 @@ fn hello() -> String {
 // fn run_example(wasm_path: String, r1cs_path: String) -> Result<(), MoproError> {
 //     circom::run_example(wasm_path.as_str(), r1cs_path.as_str())
 // }
+
+// Kimchi stuff
+pub fn kimchi_bench() -> Result<(), MoproError> {
+    kimchi::bench();
+    Ok(())
+}
 
 uniffi::include_scaffolding!("mopro");
 

@@ -7,6 +7,9 @@ namespace mopro {
 
   [Throws=MoproError]
   GenerateProofResult generate_proof2(record<string, sequence<string>> circuit_inputs);
+
+  [Throws=MoproError]
+  void kimchi_bench();
 };
 
 dictionary SetupResult {
