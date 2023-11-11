@@ -304,6 +304,11 @@ mod tests {
         )
     }
 
+    #[test]
+    fn test_rsa_serialization_deserialization() -> Result<()> {
+        test_circuit_serialization_deserialization("../mopro-core/examples/circom/rsa", "main")
+    }
+
     // XXX: We do include_bytes for zkey data, so need to manually change this
     #[test]
     fn test_circuit_naive_read() -> Result<()> {
