@@ -3,7 +3,7 @@ import XCTest
 
 final class CircomUITests: XCTestCase {
     
-    let ui = ViewController()
+    let ui = KeccakSetupViewController()
 
     func testSuccessUI() {
         XCTAssertNoThrow(ui.setupUI(), "Setup UI failed")
