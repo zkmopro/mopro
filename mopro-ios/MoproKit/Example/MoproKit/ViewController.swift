@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     let keccakSetupButton = UIButton(type: .system)
     let keccakZkeyButton = UIButton(type: .system)
     let rsaButton = UIButton(type: .system)
+    let aadhaarButton = UIButton(type: .system)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,6 +43,9 @@ class ViewController: UIViewController {
 
         rsaButton.setTitle("RSA", for: .normal)
         rsaButton.addTarget(self, action: #selector(openRSA), for: .touchUpInside)
+        
+        aadhaarButton.setTitle("Anon Aadhaar", for: .normal)
+        aadhaarButton.addTarget(self, action: #selector(openAnonAadhaar), for: .touchUpInside)
 
 
        keccakSetupButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
@@ -52,7 +56,7 @@ class ViewController: UIViewController {
 //        navigationController?.navigationBar.prefersLargeTitles = true
 
 
-        let stackView = UIStackView(arrangedSubviews: [keccakSetupButton, keccakZkeyButton, rsaButton])
+        let stackView = UIStackView(arrangedSubviews: [keccakSetupButton, keccakZkeyButton, rsaButton, aadhaarButton])
         stackView.axis = .vertical
         stackView.spacing = 20
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -77,6 +81,11 @@ class ViewController: UIViewController {
     @objc func openRSA() {
         let rsaVC = RSAViewController()
         navigationController?.pushViewController(rsaVC, animated: true)
+    }
+    
+    @objc func openAnonAadhaar() {
+        let anonAadhaarVC = AnonAadhaarViewController()
+        navigationController?.pushViewController(anonAadhaarVC, animated: true)
     }
 }
 
