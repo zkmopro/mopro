@@ -129,6 +129,27 @@ pub fn read_arkzkey(
     Ok((proving_key, constraint_matrices))
 }
 
+pub fn read_arkzkey_from_bytes(
+    arkzkey_bytes: &[u8],
+) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
+    let now = std::time::Instant::now();
+    let mut cursor = std::io::Cursor::new(arkzkey_bytes);
+    println!("Time to prepare cursor for arkzkey: {:?}", now.elapsed());
+
+    let now = std::time::Instant::now();
+    let proving_key = SerializableProvingKey::deserialize_compressed_unchecked(&mut cursor)
+        .wrap_err("Failed to deserialize proving key")?;
+    println!("Time to deserialize proving key: {:?}", now.elapsed());
+
+    let now = std::time::Instant::now();
+    let constraint_matrices =
+        SerializableConstraintMatrices::deserialize_compressed_unchecked(&mut cursor)
+            .wrap_err("Failed to deserialize constraint matrices")?;
+    println!("Time to deserialize matrices: {:?}", now.elapsed());
+
+    Ok((proving_key, constraint_matrices))
+}
+
 pub fn read_proving_key_and_matrices_from_zkey(
     zkey_path: &str,
 ) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
@@ -218,7 +239,7 @@ mod tests {
     }
 
     fn test_circuit_serialization_deserialization(dir: &str, circuit: &str) -> Result<()> {
-        let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
+        let _zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
         let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
 
         let (original_proving_key, original_constraint_matrices) = read_proving_key_and_matrices()?;
@@ -273,5 +294,20 @@ mod tests {
     #[test]
     fn test_circuit_naive_read() -> Result<()> {
         circuit_naive_read()
+    }
+
+    #[test]
+    fn test_read_arkzkey_from_bytes() -> Result<()> {
+        const ARKZKEY_BYTES: &[u8] = include_bytes!(
+            "../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.arkzkey"
+        );
+
+        println!("Reading arkzkey from bytes (keccak)");
+        let now = Instant::now();
+        let (_deserialized_proving_key, _deserialized_constraint_matrices) =
+            read_arkzkey_from_bytes(ARKZKEY_BYTES)?;
+        println!("Time to read arkzkey: {:?}", now.elapsed());
+
+        Ok(())
     }
 }
