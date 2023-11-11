@@ -43,6 +43,11 @@ class ViewController: UIViewController {
         rsaButton.setTitle("RSA", for: .normal)
         rsaButton.addTarget(self, action: #selector(openRSA), for: .touchUpInside)
 
+
+       keccakSetupButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+       keccakZkeyButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+       rsaButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+
 //        self.title = "Mopro Examples"
 //        navigationController?.navigationBar.prefersLargeTitles = true
 

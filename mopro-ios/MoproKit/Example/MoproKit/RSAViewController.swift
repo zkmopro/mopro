@@ -52,6 +52,10 @@ class RSAViewController: UIViewController {
         proveButton.addTarget(self, action: #selector(runProveAction), for: .touchUpInside)
         verifyButton.addTarget(self, action: #selector(runVerifyAction), for: .touchUpInside)
 
+       initButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+       proveButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+       verifyButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+
         let stackView = UIStackView(arrangedSubviews: [initButton, proveButton, verifyButton, textView])
         stackView.axis = .vertical
         stackView.spacing = 10
