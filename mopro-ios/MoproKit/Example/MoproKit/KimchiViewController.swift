@@ -12,14 +12,15 @@ import MoproKit
 class KimchiViewController: UIViewController {
 
     var benchButton = UIButton(type: .system)
-    // var initButton = UIButton(type: .system)
-    // var proveButton = UIButton(type: .system)
-    // var verifyButton = UIButton(type: .system)
+    //var initButton = UIButton(type: .system)
+    var proveButton = UIButton(type: .system)
+    var verifyButton = UIButton(type: .system)
     var textView = UITextView()
 
-    //let moproCircom = MoproKit.MoproCircom()
-    //var setupResult: SetupResult?
-    // var generatedProof: Data?
+    // TODO: Put this in init
+    let moproKimchi = MoproKit.MoproKimchi()
+
+    var generatedProof: Data?
     // var publicInputs: Data?
 
     override func viewDidLoad() {
@@ -40,26 +41,26 @@ class KimchiViewController: UIViewController {
    func setupUI() {
         benchButton.setTitle("Bench", for: .normal)
         // initButton.setTitle("Init", for: .normal)
-        // proveButton.setTitle("Prove", for: .normal)
-        // verifyButton.setTitle("Verify", for: .normal)
+        proveButton.setTitle("Prove", for: .normal)
+        verifyButton.setTitle("Verify", for: .normal)
 
-        // proveButton.isEnabled = true
-        // verifyButton.isEnabled = false
-        // textView.isEditable = false
+        proveButton.isEnabled = true
+        verifyButton.isEnabled = false
+        textView.isEditable = false
 
         // Setup actions for buttons
         benchButton.addTarget(self, action: #selector(runBenchAction), for: .touchUpInside)
         // initButton.addTarget(self, action: #selector(runInitAction), for: .touchUpInside)
-        // proveButton.addTarget(self, action: #selector(runProveAction), for: .touchUpInside)
-        // verifyButton.addTarget(self, action: #selector(runVerifyAction), for: .touchUpInside)
+        proveButton.addTarget(self, action: #selector(runProveAction), for: .touchUpInside)
+        verifyButton.addTarget(self, action: #selector(runVerifyAction), for: .touchUpInside)
 
         benchButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
         // initButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
-        // proveButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
-        // verifyButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        proveButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        verifyButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
 
         //let stackView = UIStackView(arrangedSubviews: [initButton, proveButton, verifyButton, textView])
-        let stackView = UIStackView(arrangedSubviews: [benchButton, textView])
+        let stackView = UIStackView(arrangedSubviews: [benchButton, proveButton, verifyButton, textView])
         stackView.axis = .vertical
         stackView.spacing = 10
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -114,9 +115,43 @@ class KimchiViewController: UIViewController {
 
     @objc func runProveAction() {
         // Logic for prove
+        // Create a proof
+        do {
+            let start = CFAbsoluteTimeGetCurrent()
+            generatedProof = try moproKimchi.createProof()
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+            print("Proof creation took \(timeTaken) seconds.")
+            textView.text += "Proof creation took \(timeTaken) seconds.\n"
+            verifyButton.isEnabled = true
+        } catch let error as MoproError {
+            print("MoproError: \(error)")
+            textView.text += "MoproError: \(error)\n"
+        } catch {
+            print("Unexpected error: \(error)")
+            textView.text += "Unexpected error: \(error)\n"
+        }
     }
 
     @objc func runVerifyAction() {
-        // Logic for verify
+         // Verify the proof
+
+         guard let proof = generatedProof else {
+            print("Proof has not been generated yet.")
+            return
+        }
+         do {
+            let start = CFAbsoluteTimeGetCurrent()
+            let isProofValid = try moproKimchi.verifyProof(proof: proof)
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+            textView.text += "Proof verification took: \(timeTaken)\n"
+        } catch let error as MoproError {
+            print("MoproError: \(error)")
+            textView.text += "MoproError: \(error)\n"
+        } catch {
+            print("Unexpected error: \(error)")
+            textView.text += "Unexpected error: \(error)\n"
+        }
     }
 }
