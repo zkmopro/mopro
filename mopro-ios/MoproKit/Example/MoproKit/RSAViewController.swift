@@ -203,8 +203,7 @@ class RSAViewController: UIViewController {
             publicInputs = generateProofResult.inputs
 
             textView.text += "Proof generation took \(timeTaken) seconds.\n"
-            // TODO: Enable verify
-            verifyButton.isEnabled = false
+            verifyButton.isEnabled = true
         } catch let error as MoproError {
             print("MoproError: \(error)")
             textView.text += "MoproError: \(error)\n"
@@ -216,5 +215,21 @@ class RSAViewController: UIViewController {
 
     @objc func runVerifyAction() {
         // Logic for verify
+        guard let proof = generatedProof,
+            let publicInputs = publicInputs else {
+            print("Proof has not been generated yet.")
+            return
+        }
+        do {
+            // Verify Proof
+            let isValid = try verifyProof2(proof: proof, publicInput: publicInputs)
+            assert(isValid, "Proof verification should succeed")
+
+            textView.text += "Proof verification succeeded.\n"
+        } catch let error as MoproError {
+            print("MoproError: \(error)")
+        } catch {
+            print("Unexpected error: \(error)")
+        }
     }
 }
