@@ -23,7 +23,7 @@ dictionary GenerateProofResult {
 
 [Error]
 enum MoproError {
-  "CircomError",
+  "CircomError"
 };
 
 interface MoproCircom {
@@ -37,4 +37,14 @@ interface MoproCircom {
 
   [Throws=MoproError]
   boolean verify_proof(bytes proof, bytes public_input);
+};
+
+interface MoproKimchi {
+    constructor();
+
+    [Throws=MoproError]
+    bytes create_proof();
+
+    [Throws=MoproError]
+    boolean verify_proof(bytes proof);
 };

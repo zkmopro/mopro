@@ -1,9 +1,10 @@
 use mopro_core::middleware::circom;
-use mopro_core::middleware::kimchi;
+use mopro_core::middleware::kimchi::{self, KimchiContext, SerializableProverProof};
 use mopro_core::MoproError;
 
 use num_bigint::BigInt;
 
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::RwLock;
@@ -150,6 +151,59 @@ fn hello() -> String {
 pub fn kimchi_bench() -> Result<(), MoproError> {
     kimchi::bench();
     Ok(())
+}
+
+// TODO:: Should probably be in mopro-core
+// TODO: Error handling
+fn serialize_kimchi_proof(proof: &SerializableProverProof) -> Vec<u8> {
+    //fn serialize_kimchi_proof(proof: &SerializableProverProof) -> Result<Vec<u8>, MoproError> {
+    // Use bincode or similar binary format for serialization
+    bincode::serialize(proof).unwrap()
+    //        .map_err(|e| MoproError::CircomError(format!("Serialization error: {}", e)))
+    //        .map_err(|e| FFIError::SerializationError(format!("Serialization error: {}", e)))
+}
+
+fn deserialize_kimchi_proof(data: Vec<u8>) -> SerializableProverProof {
+    //fn deserialize_kimchi_proof(data: Vec<u8>) -> Result<SerializableProverProof, MoproError> {
+    // Use bincode or similar binary format for deserialization
+    bincode::deserialize(&data[..]).unwrap()
+    //        .map_err(|e| MoproError::CircomError(format!("Serialization error: {}", e)))
+    //.map_err(|e| FFIError::SerializationError(format!("Deserialization error: {}", e)))
+}
+
+pub struct MoproKimchi {
+    kimchi_context: RwLock<KimchiContext>,
+}
+
+impl MoproKimchi {
+    pub fn new() -> Self {
+        Self {
+            kimchi_context: RwLock::new(KimchiContext::bench_init(4)),
+        }
+    }
+
+    pub fn create_proof(&self) -> Result<Vec<u8>, MoproError> {
+        let mut kimchi_guard = self.kimchi_context.write().unwrap();
+        let proof = kimchi_guard.create_proof();
+
+        // Serialize the proof for FFI
+        // Assuming serialization returns Vec<u8>
+        let serialized_proof = serialize_kimchi_proof(&proof);
+
+        Ok(serialized_proof)
+    }
+
+    pub fn verify_proof(&self, proof: Vec<u8>) -> Result<bool, MoproError> {
+        let kimchi_guard = self.kimchi_context.read().unwrap();
+
+        // Deserialize the proof
+        // Assuming deserialize_kimchi_proof exists
+        let deserialized_proof = deserialize_kimchi_proof(proof);
+
+        let is_valid = kimchi_guard.verify_proof(deserialized_proof);
+
+        Ok(is_valid)
+    }
 }
 
 uniffi::include_scaffolding!("mopro");
