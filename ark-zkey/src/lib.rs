@@ -4,7 +4,7 @@ use ark_circom::read_zkey;
 use ark_ff::Field;
 use ark_groth16::ProvingKey;
 //use ark_groth16::VerifyingKey;
-//use ark_relations::r1cs::ConstraintMatrices;
+use ark_relations::r1cs::ConstraintMatrices;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use color_eyre::eyre::{Result, WrapErr};
 use memmap2::Mmap;
@@ -129,23 +129,37 @@ pub fn read_arkzkey(
     Ok((proving_key, constraint_matrices))
 }
 
+// TODO: Return ProvingKey<Bn254>, ConstraintMatrices<Fr>?
 pub fn read_arkzkey_from_bytes(
     arkzkey_bytes: &[u8],
-) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
-    let now = std::time::Instant::now();
+) -> Result<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> {
     let mut cursor = std::io::Cursor::new(arkzkey_bytes);
-    println!("Time to prepare cursor for arkzkey: {:?}", now.elapsed());
 
     let now = std::time::Instant::now();
-    let proving_key = SerializableProvingKey::deserialize_compressed_unchecked(&mut cursor)
-        .wrap_err("Failed to deserialize proving key")?;
+    let serialized_proving_key =
+        SerializableProvingKey::deserialize_compressed_unchecked(&mut cursor)
+            .wrap_err("Failed to deserialize proving key")?;
     println!("Time to deserialize proving key: {:?}", now.elapsed());
 
     let now = std::time::Instant::now();
-    let constraint_matrices =
+    let serialized_constraint_matrices =
         SerializableConstraintMatrices::deserialize_compressed_unchecked(&mut cursor)
             .wrap_err("Failed to deserialize constraint matrices")?;
     println!("Time to deserialize matrices: {:?}", now.elapsed());
+
+    // Get on right form for API
+    let proving_key: ProvingKey<Bn254> = serialized_proving_key.0;
+    let constraint_matrices: ConstraintMatrices<Fr> = ConstraintMatrices {
+        num_instance_variables: serialized_constraint_matrices.num_instance_variables,
+        num_witness_variables: serialized_constraint_matrices.num_witness_variables,
+        num_constraints: serialized_constraint_matrices.num_constraints,
+        a_num_non_zero: serialized_constraint_matrices.a_num_non_zero,
+        b_num_non_zero: serialized_constraint_matrices.b_num_non_zero,
+        c_num_non_zero: serialized_constraint_matrices.c_num_non_zero,
+        a: serialized_constraint_matrices.a.data,
+        b: serialized_constraint_matrices.b.data,
+        c: serialized_constraint_matrices.c.data,
+    };
 
     Ok((proving_key, constraint_matrices))
 }
@@ -156,7 +170,7 @@ pub fn read_proving_key_and_matrices_from_zkey(
     println!("Reading zkey from: {}", zkey_path);
     let now = Instant::now();
     let zkey_file_path = PathBuf::from(zkey_path);
-    let mut zkey_file = File::open(zkey_file_path).wrap_err("Failed to open zkey file")?;
+    let zkey_file = File::open(zkey_file_path).wrap_err("Failed to open zkey file")?;
 
     let mut buf_reader = BufReader::new(zkey_file);
 
