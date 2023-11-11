@@ -684,6 +684,17 @@ public func generateProof2(circuitInputs: [String: [String]]) throws -> Generate
     )
 }
 
+public func verifyProof2(proof: Data, publicInput: Data) throws -> Bool {
+    return try FfiConverterBool.lift(
+        rustCallWithError(FfiConverterTypeMoproError.lift) {
+            uniffi_mopro_fn_func_verify_proof2(
+                FfiConverterData.lower(proof),
+                FfiConverterData.lower(publicInput), $0
+            )
+        }
+    )
+}
+
 private enum InitializationResult {
     case ok
     case contractVersionMismatch
@@ -710,6 +721,9 @@ private var initializationResult: InitializationResult {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_checksum_func_generate_proof2() != 6969 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_mopro_checksum_func_verify_proof2() != 6153 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_checksum_method_moprocircom_setup() != 40345 {
