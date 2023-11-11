@@ -234,8 +234,10 @@ class RSAViewController: UIViewController {
             //verifyButton.isEnabled = true // Enable the Verify button once proof has been generated
         } catch let error as MoproError {
             print("MoproError: \(error)")
+            textView.text += "MoproError: \(error)\n"
         } catch {
             print("Unexpected error: \(error)")
+            textView.text += "Unexpected error: \(error)\n"
         }
     }
 
