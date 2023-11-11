@@ -23,11 +23,22 @@ class KeccakSetupViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+
+        // Set title
+        let title = UILabel()
+        title.text = "Keccak256 (setup)"
+        title.textColor = .white
+        title.textAlignment = .center
+        navigationItem.titleView = title
+        navigationController?.navigationBar.isHidden = false
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
-        navigationController?.navigationBar.barTintColor = UIColor.white // or any other contrasting color
-        self.title = "Keccak256 (setup)"
+
+        // view.backgroundColor = .white
+        // navigationController?.navigationBar.prefersLargeTitles = true
+        // navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+        // navigationController?.navigationBar.barTintColor = UIColor.white // or any other contrasting color
+        // self.title = "Keccak256 (setup)"
+
         setupUI()
     }
 
@@ -38,13 +49,17 @@ class KeccakSetupViewController: UIViewController {
 
        textView.isEditable = false
 
-        self.title = "Keccak256 (setup)"
+        //self.title = "Keccak256 (setup)"
         //view.backgroundColor = .black
 
         // Setup actions for buttons
         setupButton.addTarget(self, action: #selector(runSetupAction), for: .touchUpInside)
         proveButton.addTarget(self, action: #selector(runProveAction), for: .touchUpInside)
         verifyButton.addTarget(self, action: #selector(runVerifyAction), for: .touchUpInside)
+
+       setupButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+       proveButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+       verifyButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
 
         let stackView = UIStackView(arrangedSubviews: [setupButton, proveButton, verifyButton, textView])
         stackView.axis = .vertical
