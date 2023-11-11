@@ -64,8 +64,23 @@ class KeccakZkeyViewController: UIViewController {
 
     @objc func runInitAction() {
         // Logic for init
-        // TODO: Add this and call init for zkey
-        textView.text += "NYI: Init\n"
+        do {
+            textView.text += "Initializing library\n"
+            // Record start time
+            let start = CFAbsoluteTimeGetCurrent()
+
+            try initializeMopro()
+
+            // Record end time and compute duration
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+
+            textView.text += "Initializing arkzkey took \(timeTaken) seconds.\n"
+        } catch let error as MoproError {
+            print("MoproError: \(error)")
+        } catch {
+            print("Unexpected error: \(error)")
+        }
     }
 
     @objc func runProveAction() {
