@@ -88,6 +88,8 @@ void uniffi_mopro_fn_func_initialize_mopro(RustCallStatus *_Nonnull out_status
 );
 RustBuffer uniffi_mopro_fn_func_generate_proof2(RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
 );
+int8_t uniffi_mopro_fn_func_verify_proof2(RustBuffer proof, RustBuffer public_input, RustCallStatus *_Nonnull out_status
+);
 RustBuffer ffi_mopro_rustbuffer_alloc(int32_t size, RustCallStatus *_Nonnull out_status
 );
 RustBuffer ffi_mopro_rustbuffer_from_bytes(ForeignBytes bytes, RustCallStatus *_Nonnull out_status
@@ -106,6 +108,9 @@ uint16_t uniffi_mopro_checksum_func_initialize_mopro(void
     
 );
 uint16_t uniffi_mopro_checksum_func_generate_proof2(void
+    
+);
+uint16_t uniffi_mopro_checksum_func_verify_proof2(void
     
 );
 uint16_t uniffi_mopro_checksum_method_moprocircom_setup(void
