@@ -475,6 +475,87 @@ public func FfiConverterTypeMoproCircom_lower(_ value: MoproCircom) -> UnsafeMut
     return FfiConverterTypeMoproCircom.lower(value)
 }
 
+public protocol MoproKimchiProtocol {
+    func createProof() throws -> Data
+    func verifyProof(proof: Data) throws -> Bool
+}
+
+public class MoproKimchi: MoproKimchiProtocol {
+    fileprivate let pointer: UnsafeMutableRawPointer
+
+    // TODO: We'd like this to be `private` but for Swifty reasons,
+    // we can't implement `FfiConverter` without making this `required` and we can't
+    // make it `required` without making it `public`.
+    required init(unsafeFromRawPointer pointer: UnsafeMutableRawPointer) {
+        self.pointer = pointer
+    }
+
+    public convenience init() {
+        self.init(unsafeFromRawPointer: try! rustCall {
+            uniffi_mopro_fn_constructor_moprokimchi_new($0)
+        })
+    }
+
+    deinit {
+        try! rustCall { uniffi_mopro_fn_free_moprokimchi(pointer, $0) }
+    }
+
+    public func createProof() throws -> Data {
+        return try FfiConverterData.lift(
+            rustCallWithError(FfiConverterTypeMoproError.lift) {
+                uniffi_mopro_fn_method_moprokimchi_create_proof(self.pointer, $0)
+            }
+        )
+    }
+
+    public func verifyProof(proof: Data) throws -> Bool {
+        return try FfiConverterBool.lift(
+            rustCallWithError(FfiConverterTypeMoproError.lift) {
+                uniffi_mopro_fn_method_moprokimchi_verify_proof(self.pointer,
+                                                                FfiConverterData.lower(proof), $0)
+            }
+        )
+    }
+}
+
+public struct FfiConverterTypeMoproKimchi: FfiConverter {
+    typealias FfiType = UnsafeMutableRawPointer
+    typealias SwiftType = MoproKimchi
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> MoproKimchi {
+        let v: UInt64 = try readInt(&buf)
+        // The Rust code won't compile if a pointer won't fit in a UInt64.
+        // We have to go via `UInt` because that's the thing that's the size of a pointer.
+        let ptr = UnsafeMutableRawPointer(bitPattern: UInt(truncatingIfNeeded: v))
+        if ptr == nil {
+            throw UniffiInternalError.unexpectedNullPointer
+        }
+        return try lift(ptr!)
+    }
+
+    public static func write(_ value: MoproKimchi, into buf: inout [UInt8]) {
+        // This fiddling is because `Int` is the thing that's the same size as a pointer.
+        // The Rust code won't compile if a pointer won't fit in a `UInt64`.
+        writeInt(&buf, UInt64(bitPattern: Int64(Int(bitPattern: lower(value)))))
+    }
+
+    public static func lift(_ pointer: UnsafeMutableRawPointer) throws -> MoproKimchi {
+        return MoproKimchi(unsafeFromRawPointer: pointer)
+    }
+
+    public static func lower(_ value: MoproKimchi) -> UnsafeMutableRawPointer {
+        return value.pointer
+    }
+}
+
+public func FfiConverterTypeMoproKimchi_lift(_ pointer: UnsafeMutableRawPointer) throws -> MoproKimchi {
+    return try FfiConverterTypeMoproKimchi.lift(pointer)
+}
+
+public func FfiConverterTypeMoproKimchi_lower(_ value: MoproKimchi) -> UnsafeMutableRawPointer {
+    return FfiConverterTypeMoproKimchi.lower(value)
+}
+
 public struct GenerateProofResult {
     public var proof: Data
     public var inputs: Data
@@ -730,7 +811,16 @@ private var initializationResult: InitializationResult {
     if uniffi_mopro_checksum_method_moprocircom_verify_proof() != 51813 {
         return InitializationResult.apiChecksumMismatch
     }
+    if uniffi_mopro_checksum_method_moprokimchi_create_proof() != 29607 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_mopro_checksum_method_moprokimchi_verify_proof() != 46960 {
+        return InitializationResult.apiChecksumMismatch
+    }
     if uniffi_mopro_checksum_constructor_moprocircom_new() != 56690 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_mopro_checksum_constructor_moprokimchi_new() != 23200 {
         return InitializationResult.apiChecksumMismatch
     }
 

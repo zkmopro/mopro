@@ -64,6 +64,7 @@ typedef void (*UniFfiFutureCallbackUInt8)(const void * _Nonnull, uint8_t, RustCa
 typedef void (*UniFfiFutureCallbackInt8)(const void * _Nonnull, int8_t, RustCallStatus);
 typedef void (*UniFfiFutureCallbackUInt32)(const void * _Nonnull, uint32_t, RustCallStatus);
 typedef void (*UniFfiFutureCallbackUnsafeMutableRawPointer)(const void * _Nonnull, void*_Nonnull, RustCallStatus);
+typedef void (*UniFfiFutureCallbackUnsafeMutableRawPointer)(const void * _Nonnull, void*_Nonnull, RustCallStatus);
 typedef void (*UniFfiFutureCallbackRustBuffer)(const void * _Nonnull, RustBuffer, RustCallStatus);
 
 // Scaffolding functions
@@ -77,6 +78,15 @@ RustBuffer uniffi_mopro_fn_method_moprocircom_setup(void*_Nonnull ptr, RustBuffe
 RustBuffer uniffi_mopro_fn_method_moprocircom_generate_proof(void*_Nonnull ptr, RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
 );
 int8_t uniffi_mopro_fn_method_moprocircom_verify_proof(void*_Nonnull ptr, RustBuffer proof, RustBuffer public_input, RustCallStatus *_Nonnull out_status
+);
+void uniffi_mopro_fn_free_moprokimchi(void*_Nonnull ptr, RustCallStatus *_Nonnull out_status
+);
+void*_Nonnull uniffi_mopro_fn_constructor_moprokimchi_new(RustCallStatus *_Nonnull out_status
+    
+);
+RustBuffer uniffi_mopro_fn_method_moprokimchi_create_proof(void*_Nonnull ptr, RustCallStatus *_Nonnull out_status
+);
+int8_t uniffi_mopro_fn_method_moprokimchi_verify_proof(void*_Nonnull ptr, RustBuffer proof, RustCallStatus *_Nonnull out_status
 );
 uint32_t uniffi_mopro_fn_func_add(uint32_t a, uint32_t b, RustCallStatus *_Nonnull out_status
 );
@@ -123,7 +133,16 @@ uint16_t uniffi_mopro_checksum_method_moprocircom_generate_proof(void
 uint16_t uniffi_mopro_checksum_method_moprocircom_verify_proof(void
     
 );
+uint16_t uniffi_mopro_checksum_method_moprokimchi_create_proof(void
+    
+);
+uint16_t uniffi_mopro_checksum_method_moprokimchi_verify_proof(void
+    
+);
 uint16_t uniffi_mopro_checksum_constructor_moprocircom_new(void
+    
+);
+uint16_t uniffi_mopro_checksum_constructor_moprokimchi_new(void
     
 );
 uint32_t ffi_mopro_uniffi_contract_version(void
