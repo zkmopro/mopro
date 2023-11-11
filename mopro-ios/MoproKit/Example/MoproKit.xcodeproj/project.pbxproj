@@ -24,6 +24,9 @@
 		CEA2D1302AB96A7A00F292D2 /* multiplier2.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */; };
 		CEA2D1322AB96AB500F292D2 /* multiplier2.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */; };
 		CEA2D1332AB96AB500F292D2 /* multiplier2.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */; };
+		CEB804502AFF81960063F091 /* KeccakSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB8044F2AFF81960063F091 /* KeccakSetupViewController.swift */; };
+		CEB804562AFF81AF0063F091 /* KeccakZkeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB804552AFF81AF0063F091 /* KeccakZkeyViewController.swift */; };
+		CEB804582AFF81BF0063F091 /* RSAViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB804572AFF81BF0063F091 /* RSAViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +64,9 @@
 		CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.r1cs; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test.r1cs"; sourceTree = "<group>"; };
 		CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.wasm; path = "../../../../../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm"; sourceTree = "<group>"; };
 		CEA2D1312AB96AB500F292D2 /* multiplier2.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.r1cs; path = "../../../../../mopro-core/examples/circom/multiplier2/target/multiplier2.r1cs"; sourceTree = "<group>"; };
+		CEB8044F2AFF81960063F091 /* KeccakSetupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeccakSetupViewController.swift; sourceTree = "<group>"; };
+		CEB804552AFF81AF0063F091 /* KeccakZkeyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeccakZkeyViewController.swift; sourceTree = "<group>"; };
+		CEB804572AFF81BF0063F091 /* RSAViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSAViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +122,9 @@
 		607FACD21AFB9204008FA782 /* Example for MoproKit */ = {
 			isa = PBXGroup;
 			children = (
+				CEB804572AFF81BF0063F091 /* RSAViewController.swift */,
+				CEB804552AFF81AF0063F091 /* KeccakZkeyViewController.swift */,
+				CEB8044F2AFF81960063F091 /* KeccakSetupViewController.swift */,
 				CEA2D1282AB9681E00F292D2 /* Resources */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
@@ -387,7 +396,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEB804582AFF81BF0063F091 /* RSAViewController.swift in Sources */,
+				CEB804562AFF81AF0063F091 /* KeccakZkeyViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				CEB804502AFF81960063F091 /* KeccakSetupViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

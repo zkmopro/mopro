@@ -668,9 +668,9 @@ public func hello() -> String {
     )
 }
 
-public func initCircomState() throws {
+public func initializeMopro() throws {
     try rustCallWithError(FfiConverterTypeMoproError.lift) {
-        uniffi_mopro_fn_func_init_circom_state($0)
+        uniffi_mopro_fn_func_initialize_mopro($0)
     }
 }
 
@@ -706,7 +706,7 @@ private var initializationResult: InitializationResult {
     if uniffi_mopro_checksum_func_hello() != 309 {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_checksum_func_init_circom_state() != 20999 {
+    if uniffi_mopro_checksum_func_initialize_mopro() != 10574 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_checksum_func_generate_proof2() != 6969 {
