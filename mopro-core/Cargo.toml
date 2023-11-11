@@ -40,7 +40,13 @@ ark-groth16 = { version = "=0.4.0", default-features = false, features = [
 ark-relations = { version = "0.4", default-features = false }
 ark-zkey = { path = "../ark-zkey" }
 
+# This should correspond to https://github.com/oskarth/proof-systems
+# Some hacks for embedding SRS
 kimchi = { path = "../../o1-labs/proof-systems/kimchi" }
+mina-curves = { path = "../../o1-labs/proof-systems/curves", version = "0.1.0" }
+
+# XXX Old version
+# ark-ff = { version = "0.3.0" }
 
 # Error handling
 thiserror = "=1.0.39"
