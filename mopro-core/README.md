@@ -33,3 +33,7 @@ Note that:
 - It has to be built for the right architecture
 - Have to run `install_name_tool` to adjust install name
 - Run `codesign` to sign dylib for use on iOS
+
+## To use ark-zkey
+
+Experimental support for significantly faster zkey loading. See `../ark-zkey` README for how to build arkzkey.

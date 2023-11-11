@@ -4,6 +4,20 @@ Library to read `zkey` faster by serializing to `arkworks` friendly format.
 
 See https://github.com/oskarth/mopro/issues/25 for context.
 
+## To generate arkzkey
+
+Hacky, but the way we generate `arkzkey` now is by running the corresponding test.
+
+E.g.:
+
+```
+cargo test multiplier2 --release -- --nocapture
+cargo test keccak256 --release -- --nocapture
+cargo test rsa --release -- --nocapture
+```
+
+Will take corresponding `zkey` and put `arkzkey`` in same folder.
+
 ## Multiplier
 
 NOTE: Need to change const ZKEY here
