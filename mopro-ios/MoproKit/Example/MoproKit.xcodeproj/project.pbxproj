@@ -18,6 +18,8 @@
 		7A38AEC233A3880A843B0133 /* Pods_MoproKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE5A40EAC7D019B9C7566CA /* Pods_MoproKit_Example.framework */; };
 		CE2C1B8C2AFFCC5E002AF8BC /* main.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CE2C1B8B2AFFCC5E002AF8BC /* main.wasm */; };
 		CE2C1B8D2AFFCC5E002AF8BC /* main.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CE2C1B8B2AFFCC5E002AF8BC /* main.wasm */; };
+		CE2C1B8F2AFFE371002AF8BC /* KimchiViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2C1B8E2AFFE371002AF8BC /* KimchiViewController.swift */; };
+		CE2C1B902AFFE371002AF8BC /* KimchiViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2C1B8E2AFFE371002AF8BC /* KimchiViewController.swift */; };
 		CE5A5C062AD43A790074539D /* keccak256_256_test.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */; };
 		CE5A5C072AD43A790074539D /* keccak256_256_test.wasm in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */; };
 		CE5A5C092AD43A860074539D /* keccak256_256_test.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */; };
@@ -63,6 +65,7 @@
 		B4016A34BBB20BC381CCFC2D /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		C61628A63419B5C140B24AF7 /* Pods-MoproKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoproKit_Example.debug.xcconfig"; path = "Target Support Files/Pods-MoproKit_Example/Pods-MoproKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		CE2C1B8B2AFFCC5E002AF8BC /* main.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = main.wasm; path = "../../../../../mopro-core/examples/circom/rsa/target/main_js/main.wasm"; sourceTree = "<group>"; };
+		CE2C1B8E2AFFE371002AF8BC /* KimchiViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KimchiViewController.swift; path = MoproKit/KimchiViewController.swift; sourceTree = SOURCE_ROOT; };
 		CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.wasm; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm"; sourceTree = "<group>"; };
 		CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_256_test.r1cs; path = "../../../../../mopro-core/examples/circom/keccak256/target/keccak256_256_test.r1cs"; sourceTree = "<group>"; };
 		CEA2D12E2AB96A7A00F292D2 /* multiplier2.wasm */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2.wasm; path = "../../../../../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm"; sourceTree = "<group>"; };
@@ -179,6 +182,7 @@
 		CEA2D1282AB9681E00F292D2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				CE2C1B8E2AFFE371002AF8BC /* KimchiViewController.swift */,
 				CE2C1B8B2AFFCC5E002AF8BC /* main.wasm */,
 				CE5A5C082AD43A860074539D /* keccak256_256_test.r1cs */,
 				CE5A5C052AD43A790074539D /* keccak256_256_test.wasm */,
@@ -407,6 +411,7 @@
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				CEB804502AFF81960063F091 /* KeccakSetupViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				CE2C1B8F2AFFE371002AF8BC /* KimchiViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,6 +421,7 @@
 			files = (
 				2A6E5BAF2AF499460052A601 /* CircomTests.swift in Sources */,
 				2A418AB02AF4B1200004B747 /* CircomUITests.swift in Sources */,
+				CE2C1B902AFFE371002AF8BC /* KimchiViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

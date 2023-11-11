@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     let keccakSetupButton = UIButton(type: .system)
     let keccakZkeyButton = UIButton(type: .system)
     let rsaButton = UIButton(type: .system)
+    let kimchiButton = UIButton(type: .system)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,16 +44,18 @@ class ViewController: UIViewController {
         rsaButton.setTitle("RSA", for: .normal)
         rsaButton.addTarget(self, action: #selector(openRSA), for: .touchUpInside)
 
+        kimchiButton.setTitle("Kimchi", for: .normal)
+        kimchiButton.addTarget(self, action: #selector(openKimchi), for: .touchUpInside)
 
-       keccakSetupButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
-       keccakZkeyButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
-       rsaButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        keccakSetupButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        keccakZkeyButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        rsaButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        kimchiButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
 
 //        self.title = "Mopro Examples"
 //        navigationController?.navigationBar.prefersLargeTitles = true
 
-
-        let stackView = UIStackView(arrangedSubviews: [keccakSetupButton, keccakZkeyButton, rsaButton])
+        let stackView = UIStackView(arrangedSubviews: [keccakSetupButton, keccakZkeyButton, rsaButton, kimchiButton])
         stackView.axis = .vertical
         stackView.spacing = 20
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -78,14 +81,9 @@ class ViewController: UIViewController {
         let rsaVC = RSAViewController()
         navigationController?.pushViewController(rsaVC, animated: true)
     }
+
+    @objc func openKimchi() {
+        let kimchiVC = KimchiViewController()
+        navigationController?.pushViewController(kimchiVC, animated: true)
+    }
 }
-
-//        // Make buttons bigger
-//        proveButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
-//        verifyButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
-
-//        NSLayoutConstraint.activate([
-//            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-//            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-//            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
-//        ])
