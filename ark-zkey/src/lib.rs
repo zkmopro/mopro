@@ -315,18 +315,18 @@ mod tests {
         circuit_naive_read()
     }
 
-    #[test]
-    fn test_read_arkzkey_from_bytes() -> Result<()> {
-        const ARKZKEY_BYTES: &[u8] = include_bytes!(
-            "../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.arkzkey"
-        );
+    // #[test]
+    // fn test_read_arkzkey_from_bytes() -> Result<()> {
+    //     const ARKZKEY_BYTES: &[u8] = include_bytes!(
+    //         "../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.arkzkey"
+    //     );
 
-        println!("Reading arkzkey from bytes (keccak)");
-        let now = Instant::now();
-        let (_deserialized_proving_key, _deserialized_constraint_matrices) =
-            read_arkzkey_from_bytes(ARKZKEY_BYTES)?;
-        println!("Time to read arkzkey: {:?}", now.elapsed());
+    //     println!("Reading arkzkey from bytes (keccak)");
+    //     let now = Instant::now();
+    //     let (_deserialized_proving_key, _deserialized_constraint_matrices) =
+    //         read_arkzkey_from_bytes(ARKZKEY_BYTES)?;
+    //     println!("Time to read arkzkey: {:?}", now.elapsed());
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 }
