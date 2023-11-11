@@ -684,6 +684,12 @@ public func generateProof2(circuitInputs: [String: [String]]) throws -> Generate
     )
 }
 
+public func kimchiBench() throws {
+    try rustCallWithError(FfiConverterTypeMoproError.lift) {
+        uniffi_mopro_fn_func_kimchi_bench($0)
+    }
+}
+
 private enum InitializationResult {
     case ok
     case contractVersionMismatch
@@ -710,6 +716,9 @@ private var initializationResult: InitializationResult {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_checksum_func_generate_proof2() != 6969 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_mopro_checksum_func_kimchi_bench() != 3758 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_checksum_method_moprocircom_setup() != 40345 {
