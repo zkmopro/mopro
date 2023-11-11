@@ -39,7 +39,7 @@ Open the `mopro-ios/MoproKit/Example/MoproKit.xcworkspace` in Xcode.
 
 ## Bindings
 
-To update bindings, run `./script/update_bindings.sh simulator|device debug|release`.
+To update bindings, run `./scripts/update_bindings.sh simulator|device debug|release`.
 
 - `simulator` is for building library to run on iOS simulator, `device` is for running on a real device
 - `debug` is for Rust library to be in debug mode and `release` for release mode
