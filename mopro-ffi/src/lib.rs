@@ -44,6 +44,12 @@ impl Default for MoproCircom {
     }
 }
 
+pub fn initialize_mopro() -> Result<(), MoproError> {
+    // TODO: Error handle / panic?
+    circom::initialize();
+    Ok(())
+}
+
 pub fn generate_proof2(
     inputs: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
@@ -130,12 +136,6 @@ fn add(a: u32, b: u32) -> u32 {
 
 fn hello() -> String {
     "Hello World from Rust".to_string()
-}
-
-// XXX: Do we need this?
-pub fn init_circom_state() -> Result<(), MoproError> {
-    //let mut circom_state = circom::CircomState::new();
-    Ok(())
 }
 
 // TODO: Remove me

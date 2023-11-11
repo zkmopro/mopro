@@ -98,6 +98,17 @@ pub fn initialize(dylib_path: &Path) {
     println!("Initializing zkey took: {:.2?}", now.elapsed());
 }
 
+#[cfg(not(feature = "dylib"))]
+pub fn initialize() {
+    println!("Initializing library with arkzkey");
+
+    // Initialize ARKZKEY
+    // TODO: Speed this up even more!
+    let now = std::time::Instant::now();
+    Lazy::force(&ARKZKEY);
+    println!("Initializing arkzkey took: {:.2?}", now.elapsed());
+}
+
 /// Creates a `WitnessCalculator` instance from a dylib file.
 #[cfg(feature = "dylib")]
 fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {

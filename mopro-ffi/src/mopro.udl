@@ -3,7 +3,7 @@ namespace mopro {
   string hello();
 
   [Throws=MoproError]
-  void init_circom_state();
+  void initialize_mopro();
 
   [Throws=MoproError]
   GenerateProofResult generate_proof2(record<string, sequence<string>> circuit_inputs);
