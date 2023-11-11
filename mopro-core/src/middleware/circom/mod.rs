@@ -18,7 +18,7 @@ use ark_circom::{
     WitnessCalculator, //read_zkey,
 };
 use ark_crypto_primitives::snark::SNARK;
-use ark_groth16::{Groth16, ProvingKey};
+use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey};
 use ark_std::UniformRand;
 
 use ark_relations::r1cs::ConstraintMatrices;
@@ -214,7 +214,22 @@ pub fn generate_proof2(
     Ok((SerializableProof(proof), SerializableInputs(public_inputs)))
 }
 
-// TODO: Write pub fn verify_proof2 function
+pub fn verify_proof2(
+    serialized_proof: SerializableProof,
+    serialized_inputs: SerializableInputs,
+) -> Result<bool, MoproError> {
+    let start = Instant::now();
+    let zkey = arkzkey();
+    let pvk = prepare_verifying_key(&zkey.0.vk);
+
+    let proof_verified =
+        GrothBn::verify_with_processed_vk(&pvk, &serialized_inputs.0, &serialized_proof.0)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+    let verification_duration = start.elapsed();
+    println!("Verification time 2: {:?}", verification_duration);
+    Ok(proof_verified)
+}
 
 impl CircomState {
     pub fn new() -> Self {
@@ -546,8 +561,13 @@ mod tests {
         let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
 
         let generate_proof_res = generate_proof2(inputs);
-        let (_, serialized_inputs) = generate_proof_res.unwrap();
+        let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
         assert_eq!(serialized_inputs, serialized_outputs);
+
+        // Proof verification
+        let verify_res = verify_proof2(serialized_proof, serialized_inputs);
+        assert!(verify_res.is_ok());
+        assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
     #[test]
