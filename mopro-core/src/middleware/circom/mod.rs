@@ -26,6 +26,8 @@ use once_cell::sync::{Lazy, OnceCell};
 
 use wasmer::{Module, Store};
 
+use ark_zkey::{read_arkzkey_from_bytes, SerializableConstraintMatrices};
+
 #[cfg(feature = "dylib")]
 use {
     std::{env, path::Path},
@@ -59,9 +61,17 @@ impl Default for CircomState {
 
 const ZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ZKEY_FILE"));
 
+const ARKZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ARKZKEY_FILE"));
+
 static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
     let mut reader = Cursor::new(ZKEY_BYTES);
     read_zkey(&mut reader).expect("Failed to read zkey")
+});
+
+static ARKZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
+    //let mut reader = Cursor::new(ARKZKEY_BYTES);
+    // TODO: Use reader? More flexible; unclear if perf diff
+    read_arkzkey_from_bytes(ARKZKEY_BYTES).expect("Failed to read arkzkey")
 });
 
 const WASM: &[u8] = include_bytes!(env!("BUILD_RS_WASM_FILE"));
@@ -101,9 +111,15 @@ fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
     Mutex::new(result)
 }
 
+// #[must_use]
+// pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
+//     &ZKEY
+// }
+
+// Experimental
 #[must_use]
-pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
-    &ZKEY
+pub fn arkzkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
+    &ARKZKEY
 }
 
 /// Provides access to the `WITNESS_CALCULATOR` singleton, initializing it if necessary.
@@ -158,8 +174,9 @@ pub fn generate_proof2(
     println!("Witness generation took: {:.2?}", now.elapsed());
 
     let now = std::time::Instant::now();
-    let zkey = zkey();
-    println!("Loading zkey took: {:.2?}", now.elapsed());
+    //let zkey = zkey();
+    let zkey = arkzkey();
+    println!("Loading arkzkey took: {:.2?}", now.elapsed());
 
     let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
 

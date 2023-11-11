@@ -2,18 +2,24 @@ use color_eyre::eyre::Result;
 use std::env;
 use std::path::PathBuf;
 
-fn prepare_env(zkey_path: String, wasm_path: String) -> Result<()> {
+fn prepare_env(zkey_path: String, wasm_path: String, arkzkey_path: String) -> Result<()> {
     let project_dir = env::var("CARGO_MANIFEST_DIR")?;
     let zkey_file = PathBuf::from(&project_dir).join(zkey_path);
     let wasm_file = PathBuf::from(&project_dir).join(wasm_path);
+    let arkzkey_file = PathBuf::from(&project_dir).join(arkzkey_path);
 
     // TODO: Right now emitting as warnings for visibility, figure out better way to do this?
     println!("cargo:warning=zkey_file: {}", zkey_file.display());
     println!("cargo:warning=wasm_file: {}", wasm_file.display());
+    println!("cargo:warning=arkzkey_file: {}", arkzkey_file.display());
 
     // Set BUILD_RS_ZKEY_FILE and BUILD_RS_WASM_FILE env var
     println!("cargo:rustc-env=BUILD_RS_ZKEY_FILE={}", zkey_file.display());
     println!("cargo:rustc-env=BUILD_RS_WASM_FILE={}", wasm_file.display());
+    println!(
+        "cargo:rustc-env=BUILD_RS_ARKZKEY_FILE={}",
+        arkzkey_file.display()
+    );
 
     Ok(())
 }
@@ -78,8 +84,10 @@ fn main() -> Result<()> {
 
     let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
     let wasm_path = format!("{}/target/{}_js/{}.wasm", dir, circuit, circuit);
+    // TODO: Need to modify script for this
+    let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
 
-    prepare_env(zkey_path, wasm_path.clone())?;
+    prepare_env(zkey_path, wasm_path.clone(), arkzkey_path)?;
 
     #[cfg(feature = "dylib")]
     {
