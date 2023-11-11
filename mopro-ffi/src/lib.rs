@@ -76,6 +76,13 @@ pub fn generate_proof2(
     })
 }
 
+pub fn verify_proof2(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
+    let deserialized_proof = circom::serialization::deserialize_proof(proof);
+    let deserialized_public_input = circom::serialization::deserialize_inputs(public_input);
+    let is_valid = circom::verify_proof2(deserialized_proof, deserialized_public_input)?;
+    Ok(is_valid)
+}
+
 // TODO: Use FFIError::SerializationError instead
 impl MoproCircom {
     pub fn new() -> Self {
