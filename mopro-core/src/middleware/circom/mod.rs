@@ -638,14 +638,10 @@ mod tests {
             "0",
           ];
 
-        // let expected_output_vec = vec![0, 0, 0, 0, 0, 0, 0, 0, 32, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 171, 176, 96, 15, 67, 180, 73];
-
         let mut inputs: HashMap<String, Vec<BigInt>> = HashMap::new();
         inputs.insert("signature".to_string(), strings_to_circuit_inputs(&signature));
         inputs.insert("modulus".to_string(), strings_to_circuit_inputs(&modulus));
         inputs.insert("base_message".to_string(), strings_to_circuit_inputs(&base_message));
-
-        // let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
 
         // Proof generation
         let generate_proof_res = circom_state.generate_proof(inputs);
@@ -658,9 +654,6 @@ mod tests {
         assert!(generate_proof_res.is_ok());
 
         let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
-
-        // Check output
-       //  assert_eq!(serialized_inputs, serialized_outputs);
 
         // Proof verification
         let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
