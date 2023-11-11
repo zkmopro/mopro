@@ -23,11 +23,22 @@ class KeccakSetupViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+
+        // Set title
+        let title = UILabel()
+        title.text = "Keccak256 (setup)"
+        title.textColor = .white
+        title.textAlignment = .center
+        navigationItem.titleView = title
+        navigationController?.navigationBar.isHidden = false
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
-        navigationController?.navigationBar.barTintColor = UIColor.white // or any other contrasting color
-        self.title = "Keccak256 (setup)"
+
+        // view.backgroundColor = .white
+        // navigationController?.navigationBar.prefersLargeTitles = true
+        // navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+        // navigationController?.navigationBar.barTintColor = UIColor.white // or any other contrasting color
+        // self.title = "Keccak256 (setup)"
+
         setupUI()
     }
 
@@ -38,7 +49,7 @@ class KeccakSetupViewController: UIViewController {
 
        textView.isEditable = false
 
-        self.title = "Keccak256 (setup)"
+        //self.title = "Keccak256 (setup)"
         //view.backgroundColor = .black
 
         // Setup actions for buttons

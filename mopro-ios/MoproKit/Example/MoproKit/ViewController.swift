@@ -19,12 +19,17 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Maybe black nice, need more style tweaks though
-        view.backgroundColor = .white
+        // TODO: Improve style
 
-        // TODO: Not showing up for some reason
+        // Set title
+        let title = UILabel()
+        title.text = "Mopro Examples"
+        title.textColor = .white
+        title.textAlignment = .center
+        navigationItem.titleView = title
+        navigationController?.navigationBar.isHidden = false
         navigationController?.navigationBar.prefersLargeTitles = true
-        self.title = "Mopro Examples"
+
         setupMainUI()
     }
 
@@ -37,6 +42,10 @@ class ViewController: UIViewController {
 
         rsaButton.setTitle("RSA", for: .normal)
         rsaButton.addTarget(self, action: #selector(openRSA), for: .touchUpInside)
+
+//        self.title = "Mopro Examples"
+//        navigationController?.navigationBar.prefersLargeTitles = true
+
 
         let stackView = UIStackView(arrangedSubviews: [keccakSetupButton, keccakZkeyButton, rsaButton])
         stackView.axis = .vertical

@@ -23,9 +23,16 @@ class RSAViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
 
+        // Set title
+        let title = UILabel()
+        title.text = "RSA (Zkey)"
+        title.textColor = .white
+        title.textAlignment = .center
+        navigationItem.titleView = title
+        navigationController?.navigationBar.isHidden = false
         navigationController?.navigationBar.prefersLargeTitles = true
+
         setupUI()
     }
 
@@ -39,8 +46,6 @@ class RSAViewController: UIViewController {
         proveButton.isEnabled = true
         verifyButton.isEnabled = false
         textView.isEditable = false
-
-        self.title = "RSA (zkey)"
 
         // Setup actions for buttons
         initButton.addTarget(self, action: #selector(runInitAction), for: .touchUpInside)
