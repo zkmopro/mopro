@@ -8,6 +8,8 @@ See https://github.com/oskarth/mopro/issues/25 for context.
 
 Hacky, but the way we generate `arkzkey` now is by running the corresponding test.
 
+Note that we also neeed to change the const `ZKEY_BYTES` above.
+
 E.g.:
 
 ```
