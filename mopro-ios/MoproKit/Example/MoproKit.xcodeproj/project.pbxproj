@@ -256,6 +256,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = 7BMWCJP4MA;
 						LastSwiftMigration = 0900;
 					};
 					607FACE41AFB9204008FA782 = {
