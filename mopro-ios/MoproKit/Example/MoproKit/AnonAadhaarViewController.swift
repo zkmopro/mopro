@@ -16,9 +16,13 @@ class AnonAadhaarViewController: UIViewController, WKScriptMessageHandler, WKNav
     //var setupResult: SetupResult?
     var generatedProof: Data?
     var publicInputs: Data?
+    let containerView = UIView()
+    var textView = UITextView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+            runInitAction()
+            setupUI()
             
             let contentController = WKUserContentController()
             contentController.add(self, name: "startProvingHandler")
@@ -31,39 +35,67 @@ class AnonAadhaarViewController: UIViewController, WKScriptMessageHandler, WKNav
             // Assign the configuration to the WKWebView
             let webView = WKWebView(frame: view.bounds, configuration: configuration)
             webView.navigationDelegate = self
-            
+                
             view.addSubview(webView)
+            view.addSubview(textView)
             
             guard let url = URL(string: "https://webview-anon-adhaar.vercel.app/") else { return }
             webView.load(URLRequest(url: url))
     }
     
+    func setupUI() {
+         textView.isEditable = false
+
+        textView.translatesAutoresizingMaskIntoConstraints = false
+         view.addSubview(textView)
+
+         // Make text view visible
+         textView.heightAnchor.constraint(equalToConstant: 200).isActive = true
+
+         NSLayoutConstraint.activate([
+            textView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+                    textView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+                    textView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+         ])
+     }
+    
     
     
     @objc func runInitAction() {
-        // Logic for init
-        do {
-            //textView.text += "Initializing library\n"
+        // Update the textView on the main thread
+        DispatchQueue.main.async {
+            self.textView.text += "Initializing library\n"
+        }
+
+        // Execute long-running tasks in the background
+        DispatchQueue.global(qos: .userInitiated).async {
             // Record start time
             let start = CFAbsoluteTimeGetCurrent()
 
-            try initializeMopro()
+            do {
+                try initializeMopro()
 
-            // Record end time and compute duration
-            let end = CFAbsoluteTimeGetCurrent()
-            let timeTaken = end - start
+                // Record end time and compute duration
+                let end = CFAbsoluteTimeGetCurrent()
+                let timeTaken = end - start
 
-            //textView.text += "Initializing arkzkey took \(timeTaken) seconds.\n"
-        } catch let error as MoproError {
-            print("MoproError: \(error)")
-        } catch {
-            print("Unexpected error: \(error)")
+                // Again, update the UI on the main thread
+                DispatchQueue.main.async {
+                    self.textView.text += "Initializing arkzkey took \(timeTaken) seconds.\n"
+                }
+            } catch {
+                // Handle errors - update UI on main thread
+                DispatchQueue.main.async {
+                    self.textView.text += "An error occurred during initialization: \(error)\n"
+                }
+            }
         }
     }
     
     @objc func runProveAction(inputs: [String: [String]]) {
         // Logic for prove (generate_proof2)
         do {
+            textView.text += "Starts proving...\n"
             // Record start time
             let start = CFAbsoluteTimeGetCurrent()
             
@@ -82,10 +114,10 @@ class AnonAadhaarViewController: UIViewController, WKScriptMessageHandler, WKNav
             
             print("Proof generation took \(timeTaken) seconds.\n")
             
-            //textView.text += "Proof generation took \(timeTaken) seconds.\n"
-            // TODO: Enable verify
-            //verifyButton.isEnabled = false
-            //verifyButton.isEnabled = true // Enable the Verify button once proof has been generated
+            textView.text += "Proof generated!!! \n"
+            textView.text += "Proof generation took \(timeTaken) seconds.\n"
+            textView.text += "---\n"
+            runVerifyAction()
         } catch let error as MoproError {
             print("MoproError: \(error)")
         } catch {
@@ -135,6 +167,26 @@ class AnonAadhaarViewController: UIViewController, WKScriptMessageHandler, WKNav
             } else {
                 print("No valid data keys found in the message data.")
             }
+        }
+    }
+    
+    @objc func runVerifyAction() {
+        // Logic for verify
+        guard let proof = generatedProof,
+            let publicInputs = publicInputs else {
+            print("Proof has not been generated yet.")
+            return
+        }
+        do {
+            // Verify Proof
+            let isValid = try verifyProof2(proof: proof, publicInput: publicInputs)
+            assert(isValid, "Proof verification should succeed")
+
+            textView.text += "Proof verification succeeded.\n"
+        } catch let error as MoproError {
+            print("MoproError: \(error)")
+        } catch {
+            print("Unexpected error: \(error)")
         }
     }
 }

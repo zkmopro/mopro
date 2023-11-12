@@ -721,14 +721,13 @@ public func `generateProof2`(`circuitInputs`: [String: [String]]) throws -> Gene
     )
 }
 
-public func verifyProof2(proof: Data, publicInput: Data) throws -> Bool {
-    return try FfiConverterBool.lift(
-        rustCallWithError(FfiConverterTypeMoproError.lift) {
-            uniffi_mopro_fn_func_verify_proof2(
-                FfiConverterData.lower(proof),
-                FfiConverterData.lower(publicInput), $0
-            )
-        }
+public func `verifyProof2`(`proof`: Data, `publicInput`: Data) throws -> Bool {
+    return try  FfiConverterBool.lift(
+        try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_fn_func_verify_proof2(
+        FfiConverterData.lower(`proof`),
+        FfiConverterData.lower(`publicInput`),$0)
+}
     )
 }
 
@@ -759,10 +758,10 @@ private var initializationResult: InitializationResult {
     if (uniffi_mopro_checksum_func_generate_proof2() != 6969) {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_checksum_func_verify_proof2() != 6153 {
+    if (uniffi_mopro_checksum_func_verify_proof2() != 6153) {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_checksum_method_moprocircom_setup() != 40345 {
+    if (uniffi_mopro_checksum_method_moprocircom_setup() != 40345) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_checksum_method_moprocircom_generate_proof() != 30646) {
