@@ -71,6 +71,7 @@ check_target_support() {
 }
 
 download_files() {
+    local url="https://mopro.vivianjeng.xyz"
     local dir=$1
     local circuit=$2
     local target_dir="${CIRCOM_DIR}/${dir}/target"
@@ -82,19 +83,19 @@ download_files() {
     # Check if file exists
     # Download files to the specified directories
     if ! [ -f "${target_dir}/${circuit}_final.arkzkey" ]; then
-        wget -P "$target_dir" "https://mopro.vivianjeng.xyz/${circuit}_final.arkzkey"
+        wget -P "$target_dir" "${url}/${circuit}_final.arkzkey"
     else
         echo "File ${circuit}_final.arkzkey already exists, skipping download."
     fi
 
     if ! [ -f "${target_dir}/${circuit}_final.zkey" ]; then
-        wget -P "$target_dir" "https://zkstuff.ams3.cdn.digitaloceanspaces.com/mopro/circom-examples-artifacts/${dir}/${circuit}_final.zkey"
+        wget -P "$target_dir" "${url}/${circuit}_final.zkey"
     else
         echo "File ${circuit}_final.zkey already exists, skipping download."
     fi
 
     if ! [ -f "${js_target_dir}/${circuit}.wasm" ]; then
-        wget -P "$js_target_dir" "https://zkstuff.ams3.cdn.digitaloceanspaces.com/mopro/circom-examples-artifacts/${dir}/${circuit}.wasm"
+        wget -P "$js_target_dir" "${url}/${circuit}.wasm"
     else
         echo "File ${circuit}.wasm already exists, skipping download."
     fi
@@ -119,6 +120,10 @@ compile_circuit multiplier2 multiplier2.circom
 npm_install keccak256
 compile_circuit keccak256 keccak256_256_test.circom
 
+# Setup and compile rsa
+npm_install rsa
+compile_circuit rsa main.circom
+
 # # Run trusted setup for multiplier2
 # print_action "[core/circom] Running trusted setup for multiplier2..."
 # ./scripts/trusted_setup.sh multiplier2 08 multiplier2
@@ -132,6 +137,9 @@ download_files "multiplier2" "multiplier2"
 
 print_action "[core/circom] Downloading artifacts for keccak256..."
 download_files "keccak256" "keccak256_256_test"
+
+print_action "[core/circom] Downloading artifacts for rsa..."
+download_files "rsa" "main"
 
 # Add support for target architectures
 print_action "[ffi] Adding support for target architectures..."
