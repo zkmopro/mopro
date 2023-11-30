@@ -63,8 +63,7 @@ pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
 // TODO: Change this to multiplier2 or keccak as appropriate
 const ZKEY_DATA: &[u8] = include_bytes!(
     //"../../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey"
-    //"../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.zkey"
-    "../../mopro-core/examples/circom/rsa/target/main_final.zkey"
+    "../../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.zkey" // "../../mopro-core/examples/circom/rsa/target/main_final.zkey"
 );
 
 pub fn read_proving_key_and_matrices(

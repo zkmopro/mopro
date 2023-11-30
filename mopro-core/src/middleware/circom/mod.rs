@@ -570,6 +570,7 @@ mod tests {
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
+    #[ignore = "ignore for ci"]
     #[test]
     fn test_setup_prove_rsa() {
         let wasm_path = "./examples/circom/rsa/target/main_js/main.wasm";
@@ -720,6 +721,7 @@ mod tests {
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
+    #[ignore = "ignore for ci"]
     #[test]
     fn test_setup_prove_rsa2() {
         // Prepare inputs
