@@ -22,13 +22,20 @@ jobs:
       - name: Build
         run: ./scripts/build_ios.sh x86_64 debug
       - name: Run core tests
-        run: cd mopro-core/ && cargo test --verbose
+        run: cd mopro-core && cargo test -- --nocapture
       - name: Run ffi tests
-        run: cd mopro-ffi/ && cargo test --verbose
-      - name: Run bindings tests
-        run: cd mopro-ffi/ && cargo test --test test_generated_bindings
+        run: cd mopro-ffi/ && cargo test -- --nocapture
       - name: Run ios tests
         run: |
           cd mopro-ios/MoproKit/Example
           xcodebuild test -scheme MoproKit-Example -workspace MoproKit.xcworkspace -destination "platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro" 
-
+  lint: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check mopro-core formatting
+        run: cd ark-zkey/ && cargo fmt --all -- --check
+      - name: Check mopro-core formatting
+        run: cd mopro-core/ && cargo fmt --all -- --check
+      - name: Check mopro-ffi formatting
+        run: cd mopro-ffi/ && cargo fmt --all -- --check
