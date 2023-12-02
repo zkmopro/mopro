@@ -8,7 +8,7 @@ See https://github.com/oskarth/mopro/issues/25 for context.
 
 Hacky, but the way we generate `arkzkey` now is by running the corresponding test.
 
-Note that we also neeed to change the const `ZKEY_BYTES` above.
+Note that we also neeed to change the const `ZKEY_DATA` above.
 
 E.g.:
 
@@ -18,7 +18,7 @@ cargo test keccak256 --release -- --nocapture
 cargo test rsa --release -- --nocapture
 ```
 
-Will take corresponding `zkey` and put `arkzkey`` in same folder.
+Will take corresponding `zkey` and put `arkzkey` in same folder.
 
 ## Multiplier
 
