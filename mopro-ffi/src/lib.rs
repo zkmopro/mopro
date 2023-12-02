@@ -1,5 +1,6 @@
 use mopro_core::middleware::circom;
 use mopro_core::MoproError;
+use mopro_core::middleware::gpu_exploration;
 
 use num_bigint::BigInt;
 
@@ -137,6 +138,11 @@ impl MoproCircom {
     }
 }
 
+pub fn run_msm_benchmark(num_msm: Option<usize>) -> Result<(), MoproError> {
+    gpu_exploration::run_msm_bench(num_msm);
+    Ok(())
+}
+
 fn add(a: u32, b: u32) -> u32 {
     a + b
 }
@@ -269,6 +275,12 @@ mod tests {
         let is_valid = mopro_circom.verify_proof(serialized_proof, serialized_inputs)?;
         assert!(is_valid);
 
+        Ok(())
+    }
+
+    #[test]
+    fn test_run_msm_benchmark() -> Result<(), MoproError> {
+        run_msm_benchmark(None).unwrap();
         Ok(())
     }
 }
