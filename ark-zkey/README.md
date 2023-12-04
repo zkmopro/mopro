@@ -8,7 +8,7 @@ See https://github.com/oskarth/mopro/issues/25 for context.
 
 Hacky, but the way we generate `arkzkey` now is by running the corresponding test.
 
-Note that we also neeed to change the const `ZKEY_DATA` above.
+Note that we also need to change the const `ZKEY_DATA` above.
 
 E.g.:
 
