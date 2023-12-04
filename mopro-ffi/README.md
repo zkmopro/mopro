@@ -19,7 +19,7 @@ Currently iOS is the main target, but Android will soon follow. PRs welcome.
 
 ### Building
 
-Run `make` to build debug and release static libraries for suppotrted platforms.
+Run `make` to build debug and release static libraries for supported platforms.
 
 ### Generate UniFFI bindings
 
