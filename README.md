@@ -1,6 +1,6 @@
 # mopro
 
-Making client-side proving on mobile simple.
+Making client-side proving on mobile simple (and fast).
 
 ## Overview
 
@@ -85,6 +85,18 @@ To build bindings for android simulator, run
 Join the Telegram group [here](https://t.me/zkmopro).
 
 Talk by @oskarth at ProgCrypto/Devconnect (Istanbul, November 2023): [Slides](https://docs.google.com/presentation/d/1afIEgm8oYRvteWxUd04CcMOxChAiHaD55d5AKd0RkvY/edit#slide=id.g284ac8f47d5_2_24) (video pending)
+
+## Performance
+
+Preliminary benchmarks on an iPhone 14 Max Pro:
+
+- Keccak256 (150k constraints): 1.5s
+    - ~x10-20 faster vs comparable circuit in browser
+- anon-aadhaar / RSA Verify: ~6.5s
+    - ~5s for witness generation (still in WASM), ~2s prover time
+    - 80% of time on witness generation
+    - ~x10 faster vs browser on phone
+- Bottlenecks: loading zkey and wasm witness generation
 
 ## Acknowledgements
 
