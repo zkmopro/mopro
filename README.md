@@ -4,12 +4,12 @@ Making client-side proving on mobile simple.
 
 ## Overview
 
-This is a WIP.
-
--   `mopro-core` - core mobile Rust library.
--   `mopro-ffi` - wraps `mopro-core` and exposes UniFFI bindings.
--   `mopro-ios` - iOS CocoaPod library exposing native Swift bindings.
--   `mopro-example-app` - example iOS app using `mopro-ios`.
+- `mopro-core` - core mobile Rust library.
+- `mopro-ffi` - wraps `mopro-core` and exposes UniFFI bindings.
+- `mopro-ios` - iOS CocoaPod library exposing native Swift bindings.
+- `mopro-android` - Android library exposing native Kotlin bindings.
+- `mopro-example-app` - example iOS app using `mopro-ios`.
+- `ark-zkey` - helper utility to make zkey more usable and faster in arkworks.
 
 ## Architecture
 
@@ -21,18 +21,20 @@ Zooming in a bit:
 
 ![mopro architecture](images/mopro_architecture2.png)
 
-## Prepare circuits
+## How to use
+
+### Prepare circuits
 
 -   Install [circom](https://docs.circom.io/) and [snarkjs](https://github.com/iden3/snarkjs)
 -   Run `./scripts/prepare.sh` to check all prerequisites are set.
 
-## iOS
+### iOS
 
-### Prepare
+#### Prepare
 
 -   Install [cocoapods](https://cocoapods.org/)
 
-### Build Bindings
+#### Build Bindings
 
 To build bindings for iOS simulator debug mode, run
 
@@ -42,16 +44,16 @@ To build bindings for iOS simulator debug mode, run
 
 Open the `mopro-ios/MoproKit/Example/MoproKit.xcworkspace` in Xcode.
 
-### Bindings
+#### Update Bindings
 
 To update bindings, run `./scripts/update_bindings.sh simulator|device debug|release`.
 
 -   `simulator` is for building library to run on iOS simulator, `device` is for running on a real device
 -   `debug` is for Rust library to be in debug mode and `release` for release mode
 
-## Android
+### Android
 
-### Prepare
+#### Prepare
 
 -   Install [Android Studio](https://developer.android.com/studio)
 -   Open Android Studio, and navigate to SDK Manager > SDK Tools > NDK (Side by Side) as laid out on the [Android Developer site](https://developer.android.com/studio/projects/install-ndk#default-version).
@@ -70,13 +72,19 @@ To update bindings, run `./scripts/update_bindings.sh simulator|device debug|rel
     ```
     > Reference: [Running Rust on Android with UniFFI](https://sal.dev/android/intro-rust-android-uniffi/)
 
-### Build and Update Bindings
+#### Build and Update Bindings
 
 To build bindings for android simulator, run
 
 ```sh
 ./scripts/build_android.sh
 ```
+
+## Community and Talks
+
+Join the Telegram group [here](https://t.me/zkmopro).
+
+Talk by @oskarth at ProgCrypto/Devconnect (Istanbul, November 2023): [Slides](https://docs.google.com/presentation/d/1afIEgm8oYRvteWxUd04CcMOxChAiHaD55d5AKd0RkvY/edit#slide=id.g284ac8f47d5_2_24) (video pending)
 
 ## Acknowledgements
 
