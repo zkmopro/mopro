@@ -20,30 +20,30 @@ func bytesToBits(bytes: [UInt8]) -> [String] {
   return bits
 }
 
-// func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
-//     var bytesArray: [UInt8] = []
-//     let length = stringArray.count
-//     var littleEndianLength = length.littleEndian
-//     let targetLength = 32
-//     withUnsafeBytes(of: &littleEndianLength) {
-//         bytesArray.append(contentsOf: $0)
-//     }
-//     for value in stringArray {
-//         // TODO: should handle 254-bit input
-//         var littleEndian = Int32(value)!.littleEndian
-//         var byteLength = 0
-//         withUnsafeBytes(of: &littleEndian) {
-//             bytesArray.append(contentsOf: $0)
-//             byteLength = byteLength + $0.count
-//         }
-//         if byteLength < targetLength {
-//             let paddingCount = targetLength - byteLength
-//             let paddingArray = [UInt8](repeating: 0, count: paddingCount)
-//             bytesArray.append(contentsOf: paddingArray)
-//         }
-//     }
-//     return bytesArray
-// }
+func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
+    var bytesArray: [UInt8] = []
+    let length = stringArray.count
+    var littleEndianLength = length.littleEndian
+    let targetLength = 32
+    withUnsafeBytes(of: &littleEndianLength) {
+        bytesArray.append(contentsOf: $0)
+    }
+    for value in stringArray {
+        // TODO: should handle 254-bit input
+        var littleEndian = Int32(value)!.littleEndian
+        var byteLength = 0
+        withUnsafeBytes(of: &littleEndian) {
+            bytesArray.append(contentsOf: $0)
+            byteLength = byteLength + $0.count
+        }
+        if byteLength < targetLength {
+            let paddingCount = targetLength - byteLength
+            let paddingArray = [UInt8](repeating: 0, count: paddingCount)
+            bytesArray.append(contentsOf: paddingArray)
+        }
+    }
+    return bytesArray
+}
 
 do {
   // // Setup
@@ -59,25 +59,25 @@ do {
   var inputs = [String: [String]]()
   inputs["in"] = bits
 
-  // // Expected outputs
-  // let outputVec: [UInt8] = [
-  //     37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
-  //     212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
-  // ]
-  // let outputBits: [String] = bytesToBits(bytes: outputVec)
-  // let expectedOutput: [UInt8] = serializeOutputs(outputBits)
+  // Expected outputs
+  let outputVec: [UInt8] = [
+      37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
+      212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
+  ]
+  let outputBits: [String] = bytesToBits(bytes: outputVec)
+  let expectedOutput: [UInt8] = serializeOutputs(outputBits)
 
   // // Generate Proof
   let generateProofResult = try generateProof2(circuitInputs: inputs)
   // let generateProofResult = try moproCircom.generateProof(circuitInputs: inputs)
-  // assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+  assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
 
   // // Verify Proof
-  // assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
+  assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
 
   let isValid = try verifyProof2(
     proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
-  // assert(isValid, "Proof verification should succeed")
+  assert(isValid, "Proof verification should succeed")
 
 } catch let error as MoproError {
   print("MoproError: \(error)")

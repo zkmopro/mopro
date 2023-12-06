@@ -20,7 +20,7 @@ wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 
 [dependencies]
 mopro-core = { path = "../mopro-core" }
-uniffi = { version = "0.24", features = ["cli"] }
+uniffi = { version = "0.25", features = ["cli"] }
 serde = { version = "1", features = ["derive"] }
 bincode = "1"
 ark-serialize = { version = "=0.4.1", features = ["derive"] }
@@ -34,8 +34,8 @@ color-eyre = "=0.6.2"
 criterion = "=0.3.6"
 
 [build-dependencies]
-uniffi = { version = "0.24", features = ["build"] }
+uniffi = { version = "0.25", features = ["build"] }
 
 [dev-dependencies]
-uniffi = { version = "0.24", features = ["bindgen-tests"] }
+uniffi = { version = "0.25", features = ["bindgen-tests"] }
 ark-bn254 = { version = "=0.4.0" }

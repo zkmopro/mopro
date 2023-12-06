@@ -24,7 +24,10 @@ jobs:
       - name: Run core tests
         run: cd mopro-core && cargo test -- --nocapture
       - name: Run ffi tests
-        run: cd mopro-ffi/ && cargo test -- --nocapture
+        run: |
+          cd mopro-ffi/
+          curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o target/jna-5.13.0.jar
+          CLASSPATH=target/jna-5.13.0.jar cargo test -- --nocapture
       - name: Run ios tests
         run: |
           cd mopro-ios/MoproKit/Example
