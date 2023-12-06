@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ProofComponent() {
+    var initTime by remember { mutableStateOf("init time:") }
     var provingTime by remember { mutableStateOf("proving time:") }
     var verifyingTime by remember { mutableStateOf("verifying time: ") }
     var valid by remember { mutableStateOf("valid:") }
@@ -293,11 +294,37 @@ fun ProofComponent() {
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
         Button(
                 onClick = {
-                    val startTime = System.currentTimeMillis()
-                    res = uniffi.mopro.generateProof2(inputs)
-                    val endTime = System.currentTimeMillis()
-                    provingTime = "proving time: " + (endTime - startTime).toString() + " ms"
-                }
+                    Thread(
+                                    Runnable {
+                                        val startTime = System.currentTimeMillis()
+                                        uniffi.mopro.initializeMopro()
+                                        val endTime = System.currentTimeMillis()
+                                        initTime =
+                                                "init time: " +
+                                                        (endTime - startTime).toString() +
+                                                        " ms"
+                                    }
+                            )
+                            .start()
+                },
+                modifier = Modifier.padding(bottom = 80.dp)
+        ) { Text(text = "init") }
+        Button(
+                onClick = {
+                    Thread(
+                                    Runnable {
+                                        val startTime = System.currentTimeMillis()
+                                        res = uniffi.mopro.generateProof2(inputs)
+                                        val endTime = System.currentTimeMillis()
+                                        provingTime =
+                                                "proving time: " +
+                                                        (endTime - startTime).toString() +
+                                                        " ms"
+                                    }
+                            )
+                            .start()
+                },
+                modifier = Modifier.padding(top = 20.dp)
         ) { Text(text = "generate proof") }
         Button(
                 onClick = {
@@ -306,16 +333,17 @@ fun ProofComponent() {
                     val endTime = System.currentTimeMillis()
                     verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
                 },
-                modifier = Modifier.padding(top = 100.dp)
+                modifier = Modifier.padding(top = 120.dp)
         ) { Text(text = "verify proof") }
         Text(
                 text = "Keccak256 proof",
-                modifier = Modifier.padding(bottom = 80.dp),
+                modifier = Modifier.padding(bottom = 180.dp),
                 fontWeight = FontWeight.Bold
         )
 
-        Text(text = valid, modifier = Modifier.padding(top = 250.dp).width(200.dp))
-        Text(text = provingTime, modifier = Modifier.padding(top = 300.dp).width(200.dp))
+        Text(text = initTime, modifier = Modifier.padding(top = 200.dp).width(200.dp))
+        Text(text = provingTime, modifier = Modifier.padding(top = 250.dp).width(200.dp))
+        Text(text = valid, modifier = Modifier.padding(top = 300.dp).width(200.dp))
         Text(text = verifyingTime, modifier = Modifier.padding(top = 350.dp).width(200.dp))
     }
 }
