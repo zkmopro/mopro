@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [[bin]]
-name = "zkey_to_arkzkey"
-path = "src/bin/zkey_to_arkzkey.rs"
+name = "arkzkey-util"
+path = "src/bin/arkzkey_util.rs"
 
 # XXX: Shouldn't be necessary, but this way we stay consistent with wasmer version and fix
 # error[E0432]: unresolved import `wasmer` error

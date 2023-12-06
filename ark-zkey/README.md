@@ -8,9 +8,13 @@ See https://github.com/oskarth/mopro/issues/25 for context.
 
 Run the following to convert a `zkey` to an `arkzkey`. This should be done as a pre-processing step.
 
-`cargo run --bin zkey_to_arkzkey --release -- ../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.zkey`
+`cargo run --bin arkzkey-util --release -- ../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.zkey`
 
 This will generate and place an `arkzkey` file in the same directory as the original zkey.
+
+You can also install it locally:
+
+`cargo install --bin arkzkey-util --path . --release`
 
 ## Tests
 
