@@ -42,6 +42,7 @@ fi
 
 PROJECT_DIR=$(pwd)
 CIRCOM_DIR="${PROJECT_DIR}/mopro-core/examples/circom"
+ARKZKEY_DIR="${PROJECT_DIR}/ark-zkey"
 
 compile_circuit() {
     local circuit_dir=$1
@@ -70,6 +71,16 @@ check_target_support() {
     rustup target list | grep installed | grep -q "$1"
 }
 
+# Install arkzkey-util binary in ark-zkey
+cd $ARKZKEY_DIR
+print_action "[ark-zkey] Installing arkzkey-util..."
+if ! command -v arkzkey-util &> /dev/null
+then
+    cargo install --bin arkzkey-util --path .
+else
+    echo "arkzkey-util already installed, skipping."
+fi
+
 # Build Circom circuits in mopro-core and run trusted setup
 print_action "[core/circom] Compiling example circuits..."
 cd $CIRCOM_DIR
@@ -89,13 +100,25 @@ compile_circuit rsa main.circom
 print_action "[core/circom] Running trusted setup for multiplier2..."
 ./scripts/trusted_setup.sh multiplier2 08 multiplier2
 
+# Generate arkzkey for multipler2
+print_action "[core/circom] Generating arkzkey for multiplier2..."
+arkzkey-util  multiplier2/target/multiplier2_final.zkey
+
 # Run trusted setup for keccak256
 print_action "[core/circom] Running trusted setup for keccak256..."
 ./scripts/trusted_setup.sh keccak256 18 keccak256_256_test
 
+# Generate arkzkey for keccak256
+print_action "[core/circom] Generating arkzkey for keccak256..."
+arkzkey-util keccak256/target/keccak256_256_test_final.zkey
+
 # Run trusted setup for rsa
 print_action "[core/circom] Running trusted setup for rsa..."
 ./scripts/trusted_setup.sh rsa 18 main
+
+# Generate arkzkey for rsa
+print_action "[core/circom] Generating arkzkey for rsa..."
+arkzkey-util rsa/target/main_final.zkey
 
 # Add support for target architectures
 print_action "[ffi] Adding support for target architectures..."
