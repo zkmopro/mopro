@@ -102,7 +102,7 @@ print_action "[core/circom] Running trusted setup for multiplier2..."
 
 # Generate arkzkey for multipler2
 print_action "[core/circom] Generating arkzkey for multiplier2..."
-arkzkey-util  multiplier2/target/multiplier2_final.zkey
+./scripts/generate_arkzkey.sh multiplier2 multiplier2
 
 # Run trusted setup for keccak256
 print_action "[core/circom] Running trusted setup for keccak256..."
@@ -110,7 +110,7 @@ print_action "[core/circom] Running trusted setup for keccak256..."
 
 # Generate arkzkey for keccak256
 print_action "[core/circom] Generating arkzkey for keccak256..."
-arkzkey-util keccak256/target/keccak256_256_test_final.zkey
+./scripts/generate_arkzkey.sh keccak256 keccak256_256_test
 
 # Run trusted setup for rsa
 print_action "[core/circom] Running trusted setup for rsa..."
@@ -118,7 +118,7 @@ print_action "[core/circom] Running trusted setup for rsa..."
 
 # Generate arkzkey for rsa
 print_action "[core/circom] Generating arkzkey for rsa..."
-arkzkey-util rsa/target/main_final.zkey
+./scripts/generate_arkzkey.sh rsa main
 
 # Add support for target architectures
 print_action "[ffi] Adding support for target architectures..."
