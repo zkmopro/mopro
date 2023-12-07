@@ -6,63 +6,71 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-ios:
+  setup:
     runs-on: macos-latest
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
     steps:
       - uses: actions/checkout@v3
-      - name: Cache cargo registry
-        uses: actions/cache@v2
-        with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-      - name: Cache cargo index
-        uses: actions/cache@v2
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-      - name: Cache cargo build output
-        uses: actions/cache@v2
-        with:
-          path: target
-          key: ${{ runner.os }}-cargo-build-output-${{ hashFiles('**/Cargo.lock') }}
       - name: Install circom
         run: |
           git clone https://github.com/iden3/circom.git
           cd circom
           cargo build --release
           cargo install --path circom
+      - name: Prepare CI
+        run: ./scripts/prepare_ci.sh
+      - name: Generate cache key
+        id: cache-key
+        run: echo "::set-output name=key::$(date +%s)"
+
+  build-ios:
+    needs: setup
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
       - name: Build for iOS
         run: ./scripts/build_ios.sh x86_64 debug
-      - name: Run ios tests
-        run: |
-          cd mopro-ios/MoproKit/Example
-          xcodebuild test -scheme MoproKit-Example -workspace MoproKit.xcworkspace -destination "platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro" 
 
   build-android:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Build for android
         run: ./scripts/build_android.sh arm64 debug
 
-  test-core-ffi:
+  test:
+    needs: [build-ios, build-android]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        crate: ['mopro-core', 'mopro-ffi']
+        test-suite: ['core', 'ffi', 'ios']
     steps:
       - uses: actions/checkout@v3
-      - name: Run tests for ${{ matrix.crate }}
+      - name: Run core tests
+        if: matrix.test-suite == 'core'
+        run: cd mopro-core && cargo test -- --nocapture
+      - name: Run ffi tests
+        if: matrix.test-suite == 'ffi'
         run: |
-          cd ${{ matrix.crate }}
-          cargo test -- --nocapture
+          cd mopro-ffi/
+          curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o target/jna-5.13.0.jar
+          CLASSPATH=target/jna-5.13.0.jar cargo test -- --nocapture
+      - name: Run ios tests
+        if: matrix.test-suite == 'ios'
+        run: |
+          cd mopro-ios/MoproKit/Example
+          xcodebuild test -scheme MoproKit-Example -workspace MoproKit.xcworkspace -destination "platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro"
 
   lint:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Check formatting
-        run: |
-          cd ark-zkey/ && cargo fmt --all -- --check
-          cd ../mopro-core/ && cargo fmt --all -- --check
-          cd ../mopro-ffi/ && cargo fmt --all -- --check
+      - name: Check mopro-core formatting
+        run: cd ark-zkey/ && cargo fmt --all -- --check
+      - name: Check mopro-core formatting
+        run: cd mopro-core/ && cargo fmt --all -- --check
+      - name: Check mopro-ffi formatting
+        run: cd mopro-ffi/ && cargo fmt --all -- --check
