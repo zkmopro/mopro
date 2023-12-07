@@ -39,7 +39,7 @@ jobs:
 
   build-android:
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - name: Build for android
