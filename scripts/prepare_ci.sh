@@ -145,7 +145,7 @@ download_files "rsa" "main"
 print_action "[ffi] Adding support for target architectures..."
 cd ${PROJECT_DIR}/mopro-ffi
 
-for target in x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim; do
+for target in x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim aarch64-linux-android; do
     if ! check_target_support $target; then
         rustup target add $target
     else
