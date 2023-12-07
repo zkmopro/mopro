@@ -17,20 +17,22 @@ jobs:
       - name: Check mopro-ffi formatting
         run: cd mopro-ffi/ && cargo fmt --all -- --check
 
-  setup:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest]
+  setup-macos:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - name: Prepare CI
         run: ./scripts/prepare_ci.sh
-      - name: Generate cache key
-        run: echo "cache-key-$(date +%s)"
+
+  setup-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Prepare CI
+        run: ./scripts/prepare_ci.sh
 
   build-ios:
-    needs: setup
+    needs: setup-macos
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -38,32 +40,38 @@ jobs:
         run: ./scripts/build_ios.sh x86_64 debug
 
   build-android:
-    needs: setup
-    runs-on: macos-latest
+    needs: setup-ubuntu
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Build for android
         run: ./scripts/build_android.sh arm64 debug
 
-  test:
-    needs: [build-ios, build-android]
+  test-core:
+    needs: setup-ubuntu
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        test-suite: ['core', 'ffi', 'ios']
     steps:
       - uses: actions/checkout@v3
       - name: Run core tests
-        if: matrix.test-suite == 'core'
         run: cd mopro-core && cargo test -- --nocapture
-      - name: Run ffi tests
-        if: matrix.test-suite == 'ffi'
+
+  test-ios:
+    needs: build-ios
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run ios tests
+        run: |
+          cd mopro-ios/MoproKit/Example
+          xcodebuild test -scheme MoproKit-Example -workspace MoproKit.xcworkspace -destination "platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro"
+
+  test-android:
+    needs: build-android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run core tests
         run: |
           cd mopro-ffi/
           curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o target/jna-5.13.0.jar
           CLASSPATH=target/jna-5.13.0.jar cargo test -- --nocapture
-      - name: Run ios tests
-        if: matrix.test-suite == 'ios'
-        run: |
-          cd mopro-ios/MoproKit/Example
-          xcodebuild test -scheme MoproKit-Example -workspace MoproKit.xcworkspace -destination "platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro"
