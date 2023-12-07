@@ -114,15 +114,15 @@ print_action "[core/circom] Compiling example circuits..."
 cd $CIRCOM_DIR
 
 # Compile multiplier2
-compile_circuit multiplier2 multiplier2.circom
+#compile_circuit multiplier2 multiplier2.circom
 
 # Setup and compile keccak256
 npm_install keccak256
-compile_circuit keccak256 keccak256_256_test.circom
+#compile_circuit keccak256 keccak256_256_test.circom
 
 # Setup and compile rsa
 npm_install rsa
-compile_circuit rsa main.circom
+#compile_circuit rsa main.circom
 
 # # Run trusted setup for multiplier2
 # print_action "[core/circom] Running trusted setup for multiplier2..."
