@@ -6,11 +6,12 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # TODO: Add a job to run clippy
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Check mopro-core formatting
+      - name: Check ark-zkey formatting
         run: cd ark-zkey/ && cargo fmt --all -- --check
       - name: Check mopro-core formatting
         run: cd mopro-core/ && cargo fmt --all -- --check
@@ -48,7 +49,8 @@ jobs:
         run: ./scripts/build_android.sh arm64 debug
 
   test-core:
-    needs: setup-ubuntu
+    # NOTE: This needs build-android because of cargo build step, we can optimize this later
+    needs: build-android
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -71,6 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Run core tests
+      # TODO: Fix this custom jar thing
         run: |
           cd mopro-ffi/
           curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o target/jna-5.13.0.jar

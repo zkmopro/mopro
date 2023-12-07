@@ -59,6 +59,15 @@ else
     exit 1
 fi
 
+# TODO: Deduplicate this with build-ios?
+# build circom circuits in mopro-core
+cd ${PROJECT_DIR}/mopro-core
+if [[ "$BUILD_MODE" == "debug" ]]; then
+    cargo build
+elif [[ "$BUILD_MODE" == "release" ]]; then
+    cargo build --release
+fi
+
 cd ${PROJECT_DIR}/mopro-ffi
 
 # Print appropriate message based on device type
