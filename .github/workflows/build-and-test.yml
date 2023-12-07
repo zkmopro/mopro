@@ -19,8 +19,10 @@ jobs:
           cargo install --path circom
       - name: Prepare CI
         run: ./scripts/prepare_ci.sh
-      - name: Build
+      - name: Build for iOS
         run: ./scripts/build_ios.sh x86_64 debug
+      - name: Build for android
+        run: ./scripts/build_android.sh arm64 debug
       - name: Run core tests
         run: cd mopro-core && cargo test -- --nocapture
       - name: Run ffi tests

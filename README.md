@@ -74,11 +74,16 @@ To update bindings, run `./scripts/update_bindings.sh simulator|device debug|rel
 
 #### Build and Update Bindings
 
-To build bindings for android simulator, run
+To build bindings for android simulator debug mode, run
 
 ```sh
-./scripts/build_android.sh
+./scripts/build_android.sh arm64 debug
 ```
+
+- **Device types:** `x86_64`, `x86`, `arm`, `arm64`
+  Check your device architecture here: https://doc.e.foundation/devices
+  For Android Studio simulator (Pixel series), choose `arm64`
+- **Mode:** `debug`, `release`
 
 ## Community and Talks
 
