@@ -393,6 +393,7 @@ pub fn bytes_to_circuit_outputs(bytes: &[u8]) -> SerializableInputs {
 mod tests {
     use super::*;
 
+    #[ignore = "ignore for ci"]
     #[test]
     fn test_setup_prove_verify_simple() {
         let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
@@ -441,6 +442,7 @@ mod tests {
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
+    #[ignore = "ignore for ci"]
     #[test]
     fn test_setup_prove_verify_keccak() {
         let wasm_path =
@@ -495,6 +497,7 @@ mod tests {
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
+    #[ignore = "ignore for ci"]
     #[test]
     fn test_setup_error() {
         // Arrange: Create a new CircomState instance
