@@ -1,4 +1,4 @@
-name: Rust
+name: Mopro Build and Test
 
 on: [push, pull_request]
 
@@ -18,61 +18,30 @@ jobs:
       - name: Check mopro-ffi formatting
         run: cd mopro-ffi/ && cargo fmt --all -- --check
 
-  setup-macos:
+  test-ios:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Prepare CI
+      - name: Prepare CI for iOS
         run: ./scripts/prepare_ci.sh
-
-  setup-ubuntu:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Prepare CI
-        run: ./scripts/prepare_ci.sh
-
-  build-ios:
-    needs: setup-macos
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: Build for iOS
         run: ./scripts/build_ios.sh x86_64 debug
-
-  build-android:
-    needs: setup-ubuntu
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build for android
-        run: ./scripts/build_android.sh arm64 debug
-
-  test-core:
-    # NOTE: This needs build-android because of cargo build step, we can optimize this later
-    needs: build-android
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run core tests
-        run: cd mopro-core && cargo test -- --nocapture
-
-  test-ios:
-    needs: build-ios
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run ios tests
+      - name: Run iOS tests
         run: |
           cd mopro-ios/MoproKit/Example
           xcodebuild test -scheme MoproKit-Example -workspace MoproKit.xcworkspace -destination "platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro"
 
   test-android:
-    needs: build-android
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Prepare CI for Core and FFI
+        run: ./scripts/prepare_ci.sh
+      - name: Build for Android
+        run: ./scripts/build_android.sh arm64 debug
       - name: Run core tests
+        run: cd mopro-core && cargo test -- --nocapture
+      - name: Run FFI tests
       # TODO: Fix this custom jar thing
         run: |
           cd mopro-ffi/
