@@ -57,7 +57,7 @@ elif [[ "$1" == "device" ]]; then
     DEVICE_TYPE="device"
     ARCHITECTURE="aarch64-apple-ios"
 else
-    echo -e "${RED}Error: Please specify either 'x86_64', 'simulator' or 'device' as the first argument.${DEFAULT}"
+    echo -e "${RED}Error: Please specify either 'x86_64', 'simulator' or 'device' as the first argument, and 'debug' or 'release' as the second argument.${DEFAULT}"
     exit 1
 fi
 
@@ -73,21 +73,45 @@ else
     exit 1
 fi
 
+# Check if the third argument is 'dylib'
+USE_DYLIB=false
+if [[ $# -ge 3 ]] && [[ "$3" == "dylib" ]]; then
+    USE_DYLIB=true
+fi
+
 print_action "Updating mopro-ffi bindings and library ($BUILD_MODE $DEVICE_TYPE)..."
 
 PROJECT_DIR=$(pwd)
 TARGET_DIR=${PROJECT_DIR}/target
 MOPROKIT_DIR=${PROJECT_DIR}/mopro-ios/MoproKit
 
+# Dylib directory and settings
+if [[ "$USE_DYLIB" == true ]]; then
+    mkdir -p ${TARGET_DIR}/${ARCHITECTURE}/${BUILD_MODE}
+    export TARGET_DIR
+    export BUILD_MODE
+fi
+
 print_action "Generating Swift bindings..."
 uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
 
-print_action "Building mopro-ffi static library ($BUILD_MODE)..."
 cd ${PROJECT_DIR}/mopro-ffi
-if [[ "$BUILD_MODE" == "debug" ]]; then
-    cargo build --target ${ARCHITECTURE}
-elif [[ "$BUILD_MODE" == "release" ]]; then
-    cargo build --release --target ${ARCHITECTURE}
+
+if [[ "$USE_DYLIB" == true ]]; then
+    # Build dylib
+    print_action "Building mopro-ffi with dylib flag ($BUILD_MODE)..."
+    if [[ "$BUILD_MODE" == "debug" ]]; then
+        cargo build --target ${ARCHITECTURE} --features dylib
+    elif [[ "$BUILD_MODE" == "release" ]]; then
+        cargo build --release --target ${ARCHITECTURE} --features dylib
+    fi
+else
+    print_action "Building mopro-ffi static library ($BUILD_MODE)..."
+    if [[ "$BUILD_MODE" == "debug" ]]; then
+        cargo build --target ${ARCHITECTURE}
+    elif [[ "$BUILD_MODE" == "release" ]]; then
+        cargo build --release --target ${ARCHITECTURE}
+    fi
 fi
 
 # Print appropriate message based on device type
@@ -109,5 +133,17 @@ cp ${TARGET_DIR}/SwiftBindings/moproFFI.h ${MOPROKIT_DIR}/Include/
 cp ${TARGET_DIR}/SwiftBindings/mopro.swift ${MOPROKIT_DIR}/Bindings/
 cp ${TARGET_DIR}/SwiftBindings/moproFFI.modulemap ${MOPROKIT_DIR}/Resources/
 cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
+
+# Dylib assets
+# TODO: Hardcoded to rsa for now
+if [[ "$USE_DYLIB" == true ]]; then
+    print_action "Copying dynamic library asset (rsa)..."
+    cp ${PROJECT_DIR}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/rsa.dylib ${TARGET_DIR}/
+    cp ${TARGET_DIR}/rsa.dylib ${MOPROKIT_DIR}/Libs/
+    # Fix dynamic lib install paths
+    # NOTE: Xcode might already do this for us
+    install_name_tool -id @rpath/rsa.dylib ${MOPROKIT_DIR}/Libs/rsa.dylib
+    codesign -f -s "${APPLE_SIGNING_IDENTITY}" ${MOPROKIT_DIR}/Libs/rsa.dylib
+fi
 
 print_action "Done! Please re-build your project in Xcode."
