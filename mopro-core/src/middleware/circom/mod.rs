@@ -95,11 +95,11 @@ pub fn initialize(dylib_path: &Path) {
         .set(from_dylib(dylib_path))
         .expect("Failed to set WITNESS_CALCULATOR");
 
-    // Initialize ZKEY
-    // TODO: Speed this up
+    // Initialize ARKZKEY
+    // TODO: Speed this up even more
     let now = std::time::Instant::now();
-    Lazy::force(&ZKEY);
-    println!("Initializing zkey took: {:.2?}", now.elapsed());
+    Lazy::force(&ARKZKEY);
+    println!("Initializing arkzkey took: {:.2?}", now.elapsed());
 }
 
 #[cfg(not(feature = "dylib"))]

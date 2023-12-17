@@ -6,14 +6,25 @@ PROJECT_DIR=$(pwd)
 DEFAULT='\033[0m'
 RED='\033[0;31m'
 
+# Function to handle exit
+handle_exit() {
+    # $? is a special variable that holds the exit code of the last command executed
+    if [ $? -ne 0 ]; then
+        echo -e "\n${RED}Script did not finish successfully!${DEFAULT}"
+    fi
+}
+
+# Set the trap
+trap handle_exit EXIT
+
 # Check for the device type argument
 if [[ "$1" == "x86_64" ]]; then
     DEVICE_TYPE="x86_64"
     ARCHITECTURE="x86_64-apple-ios"
-elif [[ "$1" == "simulator" ]]; then
+    elif [[ "$1" == "simulator" ]]; then
     DEVICE_TYPE="simulator"
     ARCHITECTURE="aarch64-apple-ios-sim"
-elif [[ "$1" == "device" ]]; then
+    elif [[ "$1" == "device" ]]; then
     DEVICE_TYPE="device"
     ARCHITECTURE="aarch64-apple-ios"
 else
@@ -25,7 +36,7 @@ fi
 if [[ "$2" == "debug" ]]; then
     BUILD_MODE="debug"
     LIB_DIR="debug"
-elif [[ "$2" == "release" ]]; then
+    elif [[ "$2" == "release" ]]; then
     BUILD_MODE="release"
     LIB_DIR="release"
 else
@@ -37,7 +48,7 @@ fi
 cd ${PROJECT_DIR}/mopro-core
 if [[ "$BUILD_MODE" == "debug" ]]; then
     cargo build
-elif [[ "$BUILD_MODE" == "release" ]]; then
+    elif [[ "$BUILD_MODE" == "release" ]]; then
     cargo build --release
 fi
 

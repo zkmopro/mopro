@@ -1,4 +1,0 @@
-module Munchausen {
-  header "munchausen.h"
-  export *
-}
