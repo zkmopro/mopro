@@ -13,6 +13,9 @@ namespace mopro {
 
   [Throws=MoproError]
   boolean verify_proof2(bytes proof, bytes public_input);
+
+  [Throws=MoproError]
+  void run_msm_benchmark(u32? num_msm);
 };
 
 dictionary SetupResult {
