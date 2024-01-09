@@ -27,7 +27,7 @@ fn single_msm() -> Result<(), Box<dyn Error>> {
 }
 
 // Run the msm benchmark with timing
-pub fn run_msm_bench(num_msm: Option<usize>) -> Result<(), Box<dyn Error>> {
+pub fn run_msm_bench(num_msm: Option<u32>) -> Result<(), Box<dyn Error>> {
     let num_msm = num_msm.unwrap_or(1000);    // default to 1000 msm operations
 
     let allocated_before = stats::allocated::read().unwrap();

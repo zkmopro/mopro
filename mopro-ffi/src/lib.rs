@@ -159,8 +159,8 @@ impl MoproCircom {
     }
 }
 
-pub fn run_msm_benchmark(num_msm: Option<usize>) -> Result<(), MoproError> {
-    gpu_exploration::run_msm_bench(num_msm);
+pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<(), MoproError> {
+    gpu_exploration::run_msm_bench(num_msm).unwrap();
     Ok(())
 }
 
