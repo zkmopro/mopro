@@ -8,6 +8,8 @@ Think of it as Foundry for client-side proving.
 
 To use `mopro`, you need to have Rust and Cargo installed on your system. You can install them from [the official Rust website](https://www.rust-lang.org/learn/get-started).
 
+Run `cargo install --path .` to install `mopro`.
+
 ## Usage
 
 Here are the basic commands of `mopro`:
@@ -16,6 +18,12 @@ Here are the basic commands of `mopro`:
 - `mopro build`: Build the project for specified platforms.
 - `mopro update`: Update bindings with new API for specified platforms.
 - `mopro test`: Run tests for specific platform and test cases.
+
+### Example
+
+For example, to create a hello world with desktop bindings (Rust), run:
+
+`mopro init --adapter circom --platform desktop hello-world`
 
 ## Contributing
 
