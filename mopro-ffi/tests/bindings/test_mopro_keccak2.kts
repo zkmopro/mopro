@@ -1,4 +1,4 @@
-import uniffi.mopro.*;
+import uniffi.mopro.*
 
 try {
     initializeMopro()
@@ -240,14 +240,34 @@ try {
                     "0",
                     "0",
                     "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
+                    "0",
                     "0"
             )
 
     var generateProofResult = generateProof2(inputs)
-    assert(generateProofResult.proof.size > 0) { "Proof is empty"}
+    assert(generateProofResult.proof.size > 0) { "Proof is empty" }
     var isValid = verifyProof2(generateProofResult.proof, generateProofResult.inputs)
-    // FIXME: assert(isValid) { "Proof is invalid"}
-    println("Proof is invalid: $isValid")
+    assert(isValid) { "Proof is invalid" }
 } catch (e: Exception) {
-    println(e);
+    println(e)
 }

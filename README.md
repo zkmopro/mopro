@@ -4,6 +4,7 @@ Making client-side proving on mobile simple (and fast).
 
 ## Overview
 
+- `mopro-cli` - core Rust CLI util (NOTE: Very early; use `mopro-core` for now).
 - `mopro-core` - core mobile Rust library.
 - `mopro-ffi` - wraps `mopro-core` and exposes UniFFI bindings.
 - `mopro-ios` - iOS CocoaPod library exposing native Swift bindings.
