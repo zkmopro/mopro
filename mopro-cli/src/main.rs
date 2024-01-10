@@ -1,5 +1,7 @@
 use clap::{Parser, Subcommand};
 
+mod init;
+
 /// CLI for multi-platform project management
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -57,7 +59,14 @@ fn main() {
                 adapter, platform, project_name
             );
             // Implement initialization logic here
-            println!("Not yet implemented")
+            // If adapter is 'circom', platform is 'desktop', then do something
+            if adapter == "circom" && platform == "desktop" {
+                println!("Initializing circom project for desktop");
+                init::create_project_structure(project_name);
+                println!("Project {} created successfully", project_name);
+            } else {
+                println!("Not yet implemented")
+            }
         }
         Commands::Build { adapter, platform } => {
             println!("Building project for platform {}: {}", platform, adapter);
