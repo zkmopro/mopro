@@ -2,9 +2,26 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
+// TODO: Add error handling
 pub fn create_project_structure(project_name: &str) {
     // Create the base project directory
     let base_dir = Path::new(project_name);
+
+    // Check if directory exists and is not empty
+    if base_dir.exists()
+        && base_dir
+            .read_dir()
+            .expect("Failed to read directory")
+            .next()
+            .is_some()
+    {
+        println!(
+            "Error: Directory '{}' is not empty. Aborting initialization.",
+            project_name
+        );
+        return;
+    }
+
     if !base_dir.exists() {
         fs::create_dir(base_dir).expect("Failed to create project directory");
     }
