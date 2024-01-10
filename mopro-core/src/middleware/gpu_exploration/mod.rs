@@ -65,6 +65,6 @@ mod tests {
 
     #[test]
     fn test_run_msm_bench() {
-        assert!(run_msm_bench(Some(100)).is_ok());
+        assert!(run_msm_bench(None).is_ok());
     }
 }
