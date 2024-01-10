@@ -53,3 +53,18 @@ pub fn run_msm_bench(num_msm: Option<u32>) -> Result<(), Box<dyn Error>> {
     println!("└─ Resident memory: {} MiB", resident_size);
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_single_msm() {
+        assert!(single_msm().is_ok());
+    }
+
+    #[test]
+    fn test_run_msm_bench() {
+        assert!(run_msm_bench(Some(100)).is_ok());
+    }
+}
