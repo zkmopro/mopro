@@ -9,12 +9,13 @@ use std::time::{Duration, Instant};
 // For ouputting benchmark data
 use std::{env, fs::File, io::Write};
 
-pub struct BenchmarkData {
-    num_msm: u32,
-    avg_processing_time: f64,
-    total_processing_time: f64,
-    memory_allocated: f64,
-    resident_memory: f64,
+#[derive(Debug, Clone)]
+pub struct BenchmarkResult {
+    pub num_msm: u32,
+    pub avg_processing_time: f64,
+    pub total_processing_time: f64,
+    pub allocated_memory: f64,
+    pub resident_memory: f64,
 }
 
 #[global_allocator]
@@ -36,7 +37,7 @@ fn single_msm() -> Result<(), Box<dyn Error>> {
 }
 
 // Run the msm benchmark with timing
-pub fn run_msm_bench(num_msm: Option<u32>) -> Result<BenchmarkData, Box<dyn Error>> {
+pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, Box<dyn Error>> {
     let num_msm = num_msm.unwrap_or(1000); // default to 1000 msm operations
 
     let mem_epoch = epoch::mib().unwrap(); // For updating jemalloc stats of memory usage
@@ -58,18 +59,11 @@ pub fn run_msm_bench(num_msm: Option<u32>) -> Result<BenchmarkData, Box<dyn Erro
     let msm_avg = total_msm / num_msm.try_into().unwrap();
     let msm_avg = msm_avg.subsec_nanos() as f64 / 1_000_000_000f64 + (msm_avg.as_secs() as f64);
 
-    println!("\nBenchmarking {:?} msm on BN254 curve", num_msm);
-    println!(
-        "└─ Average msm time: {:.5} seconds\n└─ Overall processing time: {:.5} seconds",
-        msm_avg, total_msm.as_secs_f64()
-    );
-    println!("└─ Memory allocated: {:.5} MiB\n└─ Resident memory: {:.5} MiB", allocated_size, resident_size);
-
-    Ok(BenchmarkData {
+    Ok(BenchmarkResult {
         num_msm,
         avg_processing_time: msm_avg,
         total_processing_time: total_msm.as_secs_f64(),
-        memory_allocated: allocated_size,
+        allocated_memory: allocated_size,
         resident_memory: resident_size,
     })
 }
@@ -84,25 +78,36 @@ mod tests {
     }
 
     #[test]
-    fn test_run_msm_bench() {
-        assert!(run_msm_bench(None).is_ok());
+    fn test_run_msm_benchmark() {
+        let benchmarks = run_msm_benchmark(None).unwrap();
+        println!("\nBenchmarking {:?} msm on BN254 curve", benchmarks.num_msm);
+        println!(
+            "└─ Average msm time: {:.5} seconds\n└─ Overall processing time: {:.5} seconds",
+            benchmarks.avg_processing_time, benchmarks.total_processing_time
+        );
+        println!(
+            "└─ Memory allocated: {:.5} MiB\n└─ Resident memory: {:.5} MiB",
+            benchmarks.allocated_memory, benchmarks.resident_memory
+        );
     }
 
     #[test]
-    fn test_output_msm_bench() {
-        let path = env::current_dir().unwrap().join("src/middleware/gpu_exploration/msm_bench.csv");
+    fn test_output_msm_benchmark() {
+        let path = env::current_dir()
+            .unwrap()
+            .join("src/middleware/gpu_exploration/msm_bench.csv");
         let mut file = File::create(path).unwrap();
         writeln!(file, "num_msm,avg_processing_time(sec),total_processing_time(sec),memory_allocated(MiB),resident_memory(MiB)").unwrap();
         let trials = vec![1, 10, 50, 100, 500, 1_000, 5_000, 10_000];
         for each in trials {
-            let bench_data = run_msm_bench(Some(each)).unwrap();
+            let bench_data = run_msm_benchmark(Some(each)).unwrap();
             writeln!(
                 file,
                 "{},{},{},{},{}",
                 bench_data.num_msm,
                 bench_data.avg_processing_time,
                 bench_data.total_processing_time,
-                bench_data.memory_allocated,
+                bench_data.allocated_memory,
                 bench_data.resident_memory
             )
             .unwrap();
