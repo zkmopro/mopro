@@ -15,7 +15,7 @@ namespace mopro {
   boolean verify_proof2(bytes proof, bytes public_input);
 
   [Throws=MoproError]
-  void run_msm_benchmark(u32? num_msm);
+  BenchmarkResult run_msm_benchmark(u32? num_msm);
 };
 
 dictionary SetupResult {
@@ -25,6 +25,14 @@ dictionary SetupResult {
 dictionary GenerateProofResult {
   bytes proof;
   bytes inputs;
+};
+
+dictionary BenchmarkResult {
+  u32 num_msm;
+  double avg_processing_time;
+  double total_processing_time;
+  double allocated_memory;
+  double resident_memory;
 };
 
 [Error]
