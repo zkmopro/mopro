@@ -14,7 +14,9 @@ fn main() {
         "num_msm,avg_processing_time(sec),total_processing_time(sec),memory_allocated(MiB)"
     )
     .unwrap();
-    let trials = vec![1, 10, 50, 100, 250, 500, 750, 1_000];
+    // generate 30 figures to run (range from 1 to 1000)
+    let trials = (1..1000).step_by(30);
+
     for each in trials {
         let bench_data = run_msm_benchmark(Some(each)).unwrap();
         writeln!(
