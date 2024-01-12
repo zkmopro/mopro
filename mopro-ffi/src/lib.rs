@@ -1,6 +1,6 @@
 use mopro_core::middleware::circom;
-use mopro_core::MoproError;
 use mopro_core::middleware::gpu_exploration::{self, BenchmarkResult};
+use mopro_core::MoproError;
 
 use num_bigint::BigInt;
 use std::collections::HashMap;
