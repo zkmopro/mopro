@@ -308,8 +308,8 @@ mod tests {
             benchmarks.avg_processing_time, benchmarks.total_processing_time
         );
         println!(
-            "└─ Memory allocated: {:.5} MiB\n└─ Resident memory: {:.5} MiB",
-            benchmarks.allocated_memory, benchmarks.resident_memory
+            "└─ Memory allocated: {:.5} MiB",
+            benchmarks.allocated_memory,
         );
         Ok(())
     }

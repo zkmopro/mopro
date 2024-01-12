@@ -9,18 +9,21 @@ fn main() {
         .unwrap()
         .join("src/middleware/gpu_exploration/msm_bench.csv");
     let mut file = File::create(path).unwrap();
-    writeln!(file, "num_msm,avg_processing_time(sec),total_processing_time(sec),memory_allocated(MiB),resident_memory(MiB)").unwrap();
-    let trials = vec![1, 10, 50, 100, 500, 1_000, 5_000];
+    writeln!(
+        file,
+        "num_msm,avg_processing_time(sec),total_processing_time(sec),memory_allocated(MiB)"
+    )
+    .unwrap();
+    let trials = vec![1, 10, 50, 100, 250, 500, 750, 1_000];
     for each in trials {
         let bench_data = run_msm_benchmark(Some(each)).unwrap();
         writeln!(
             file,
-            "{},{},{},{},{}",
+            "{},{},{},{}",
             bench_data.num_msm,
             bench_data.avg_processing_time,
             bench_data.total_processing_time,
             bench_data.allocated_memory,
-            bench_data.resident_memory
         )
         .unwrap();
     }

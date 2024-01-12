@@ -32,7 +32,6 @@ dictionary BenchmarkResult {
   double avg_processing_time;
   double total_processing_time;
   double allocated_memory;
-  double resident_memory;
 };
 
 [Error]
