@@ -44,8 +44,14 @@ ark-zkey = { path = "../ark-zkey" }
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 criterion = "=0.3.6"
+jemalloc-ctl = "0.5.4"
+jemallocator = "0.5.4"
 
 [build-dependencies]
 color-eyre = "0.6"
 enumset = "1.0.8"
 wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
+
+[[bin]]
+name = "generate_benchmark_report"
+path = "src/middleware/gpu_exploration/bin/generate_benchmark_report.rs"

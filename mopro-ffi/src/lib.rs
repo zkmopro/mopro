@@ -1,4 +1,5 @@
 use mopro_core::middleware::circom;
+use mopro_core::middleware::gpu_exploration::{self, BenchmarkResult};
 use mopro_core::MoproError;
 
 use num_bigint::BigInt;
@@ -158,6 +159,11 @@ impl MoproCircom {
     }
 }
 
+pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
+    let benchmarks = gpu_exploration::run_msm_benchmark(num_msm).unwrap();
+    Ok(benchmarks)
+}
+
 fn add(a: u32, b: u32) -> u32 {
     a + b
 }
@@ -290,6 +296,21 @@ mod tests {
         let is_valid = mopro_circom.verify_proof(serialized_proof, serialized_inputs)?;
         assert!(is_valid);
 
+        Ok(())
+    }
+
+    #[test]
+    fn test_run_msm_benchmark() -> Result<(), MoproError> {
+        let benchmarks = run_msm_benchmark(None).unwrap();
+        println!("\nBenchmarking {:?} msm on BN254 curve", benchmarks.num_msm);
+        println!(
+            "└─ Average msm time: {:.5} seconds\n└─ Overall processing time: {:.5} seconds",
+            benchmarks.avg_processing_time, benchmarks.total_processing_time
+        );
+        println!(
+            "└─ Memory allocated: {:.5} MiB",
+            benchmarks.allocated_memory,
+        );
         Ok(())
     }
 }
