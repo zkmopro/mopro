@@ -12,7 +12,6 @@ pub struct BenchmarkResult {
     pub avg_processing_time: f64,
     pub total_processing_time: f64,
     pub allocated_memory: f64,
-    pub resident_memory: f64,
 }
 
 #[global_allocator]
@@ -39,11 +38,6 @@ pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, Box<dy
 
     let mem_epoch = epoch::mib().unwrap(); // For updating jemalloc stats of memory usage
     let allocated = stats::allocated::mib().unwrap();
-    let resident = stats::resident::mib().unwrap();
-
-    mem_epoch.advance().unwrap(); // update current memory usage
-    let allocated_size_before = allocated.read().unwrap() as f64;
-    let resident_size_before = resident.read().unwrap() as f64;
 
     let mut total_msm = Duration::new(0, 0);
 
@@ -54,10 +48,7 @@ pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, Box<dy
     }
     mem_epoch.advance().unwrap(); // Update msm memory usage
 
-    let allocated_size =
-        (allocated.read().unwrap() as f64 - allocated_size_before) / usize::pow(1_024, 2) as f64; // Convert to MiB
-    let resident_size =
-        (resident.read().unwrap() as f64 - resident_size_before) / usize::pow(1_024, 2) as f64; // Convert to MiB
+    let allocated_size = allocated.read().unwrap() as f64 / usize::pow(1_024, 2) as f64; // Convert to MiB
 
     let msm_avg = total_msm / num_msm.try_into().unwrap();
     let msm_avg = msm_avg.subsec_nanos() as f64 / 1_000_000_000f64 + (msm_avg.as_secs() as f64);
@@ -67,7 +58,6 @@ pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, Box<dy
         avg_processing_time: msm_avg,
         total_processing_time: total_msm.as_secs_f64(),
         allocated_memory: allocated_size,
-        resident_memory: resident_size,
     })
 }
 
@@ -89,8 +79,8 @@ mod tests {
             benchmarks.avg_processing_time, benchmarks.total_processing_time
         );
         println!(
-            "└─ Memory allocated: {:.5} MiB\n└─ Resident memory: {:.5} MiB",
-            benchmarks.allocated_memory, benchmarks.resident_memory
+            "└─ Memory allocated: {:.5} MiB",
+            benchmarks.allocated_memory,
         );
     }
 }
