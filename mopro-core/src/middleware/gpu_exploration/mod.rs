@@ -6,9 +6,6 @@ use ark_std::{error::Error, UniformRand};
 use jemalloc_ctl::{epoch, stats};
 use std::time::{Duration, Instant};
 
-// For ouputting benchmark data
-use std::{env, fs::File, io::Write};
-
 #[derive(Debug, Clone)]
 pub struct BenchmarkResult {
     pub num_msm: u32,
@@ -44,6 +41,10 @@ pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, Box<dy
     let allocated = stats::allocated::mib().unwrap();
     let resident = stats::resident::mib().unwrap();
 
+    mem_epoch.advance().unwrap(); // update current memory usage
+    let allocated_size_before = allocated.read().unwrap() as f64;
+    let resident_size_before = resident.read().unwrap() as f64;
+
     let mut total_msm = Duration::new(0, 0);
 
     for _ in 0..num_msm {
@@ -51,10 +52,10 @@ pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, Box<dy
         single_msm()?;
         total_msm += start.elapsed();
     }
-    mem_epoch.advance().unwrap(); // Update jemalloc stats
+    mem_epoch.advance().unwrap(); // Update msm memory usage
 
-    let allocated_size = allocated.read().unwrap() as f64 / usize::pow(1_024, 2) as f64; // Convert to MiB
-    let resident_size = resident.read().unwrap() as f64 / usize::pow(1_024, 2) as f64; // Convert to MiB
+    let allocated_size = (allocated.read().unwrap() as f64 - allocated_size_before) / usize::pow(1_024, 2) as f64; // Convert to MiB
+    let resident_size = (resident.read().unwrap() as f64 - resident_size_before) / usize::pow(1_024, 2) as f64; // Convert to MiB
 
     let msm_avg = total_msm / num_msm.try_into().unwrap();
     let msm_avg = msm_avg.subsec_nanos() as f64 / 1_000_000_000f64 + (msm_avg.as_secs() as f64);
@@ -89,28 +90,5 @@ mod tests {
             "└─ Memory allocated: {:.5} MiB\n└─ Resident memory: {:.5} MiB",
             benchmarks.allocated_memory, benchmarks.resident_memory
         );
-    }
-
-    #[test]
-    fn test_output_msm_benchmark() {
-        let path = env::current_dir()
-            .unwrap()
-            .join("src/middleware/gpu_exploration/msm_bench.csv");
-        let mut file = File::create(path).unwrap();
-        writeln!(file, "num_msm,avg_processing_time(sec),total_processing_time(sec),memory_allocated(MiB),resident_memory(MiB)").unwrap();
-        let trials = vec![1, 10, 50, 100, 500, 1_000, 5_000, 10_000];
-        for each in trials {
-            let bench_data = run_msm_benchmark(Some(each)).unwrap();
-            writeln!(
-                file,
-                "{},{},{},{},{}",
-                bench_data.num_msm,
-                bench_data.avg_processing_time,
-                bench_data.total_processing_time,
-                bench_data.allocated_memory,
-                bench_data.resident_memory
-            )
-            .unwrap();
-        }
     }
 }
