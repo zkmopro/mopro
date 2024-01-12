@@ -54,8 +54,10 @@ pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, Box<dy
     }
     mem_epoch.advance().unwrap(); // Update msm memory usage
 
-    let allocated_size = (allocated.read().unwrap() as f64 - allocated_size_before) / usize::pow(1_024, 2) as f64; // Convert to MiB
-    let resident_size = (resident.read().unwrap() as f64 - resident_size_before) / usize::pow(1_024, 2) as f64; // Convert to MiB
+    let allocated_size =
+        (allocated.read().unwrap() as f64 - allocated_size_before) / usize::pow(1_024, 2) as f64; // Convert to MiB
+    let resident_size =
+        (resident.read().unwrap() as f64 - resident_size_before) / usize::pow(1_024, 2) as f64; // Convert to MiB
 
     let msm_avg = total_msm / num_msm.try_into().unwrap();
     let msm_avg = msm_avg.subsec_nanos() as f64 / 1_000_000_000f64 + (msm_avg.as_secs() as f64);
