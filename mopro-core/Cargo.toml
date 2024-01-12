@@ -51,3 +51,7 @@ jemallocator = "0.5.4"
 color-eyre = "0.6"
 enumset = "1.0.8"
 wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
+
+[[bin]]
+name = "generate_benchmark_report"
+path = "src/middleware/gpu_exploration/bin/generate_benchmark_report.rs"
