@@ -1,9 +1,14 @@
 // This file is used to generate the benchmark report for the GPU exploration middleware.
 
-use std::{env, fs::File, io::Write};
 
-use mopro_core::middleware::gpu_exploration::run_msm_benchmark;
+#[cfg(feature = "gpu-benchmarks")]
+use {
+    std::{env, fs::File, io::Write},
+    mopro_core::middleware::gpu_exploration::run_msm_benchmark
+};
 
+
+#[cfg(feature = "gpu-benchmarks")]
 fn main() {
     let path = env::current_dir()
         .unwrap()

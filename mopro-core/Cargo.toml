@@ -13,6 +13,7 @@ wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 [features]
 default = []
 dylib = ["wasmer/dylib"]
+gpu-benchmarks = ["jemalloc-ctl", "jemallocator"]
 
 [dependencies]
 ark-circom = { git = "https://github.com/arkworks-rs/circom-compat.git" }
@@ -44,8 +45,10 @@ ark-zkey = { path = "../ark-zkey" }
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 criterion = "=0.3.6"
-jemalloc-ctl = "0.5.4"
-jemallocator = "0.5.4"
+
+# GPU benchmarks
+jemalloc-ctl = { version = "0.5.4", optional = true}
+jemallocator = { version = "0.5.4", optional = true}
 
 [build-dependencies]
 color-eyre = "0.6"
@@ -54,4 +57,4 @@ wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 
 [[bin]]
 name = "generate_benchmark_report"
-path = "src/middleware/gpu_exploration/bin/generate_benchmark_report.rs"
+path = "src/middleware/gpu_explorations/bin/generate_benchmark_report.rs"
