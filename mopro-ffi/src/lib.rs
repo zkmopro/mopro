@@ -2,7 +2,7 @@ use mopro_core::middleware::circom;
 use mopro_core::MoproError;
 
 #[cfg(feature = "gpu-benchmarks")]
-use mopro_core::middleware::gpu_exploration::{self, BenchmarkResult};
+use mopro_core::middleware::gpu_explorations::{self, BenchmarkResult};
 
 use num_bigint::BigInt;
 use std::collections::HashMap;
@@ -163,7 +163,7 @@ impl MoproCircom {
 
 #[cfg(feature = "gpu-benchmarks")]
 pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
-    let benchmarks = gpu_exploration::run_msm_benchmark(num_msm).unwrap();
+    let benchmarks = gpu_explorations::run_msm_benchmark(num_msm).unwrap();
     Ok(benchmarks)
 }
 
