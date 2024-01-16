@@ -14,8 +14,8 @@ namespace mopro {
   [Throws=MoproError]
   boolean verify_proof2(bytes proof, bytes public_input);
 
-  [Throws=MoproError]
-  BenchmarkResult run_msm_benchmark(u32? num_msm);
+  // [Throws=MoproError]
+  // BenchmarkResult run_msm_benchmark(u32? num_msm);
 };
 
 dictionary SetupResult {
@@ -27,12 +27,12 @@ dictionary GenerateProofResult {
   bytes inputs;
 };
 
-dictionary BenchmarkResult {
-  u32 num_msm;
-  double avg_processing_time;
-  double total_processing_time;
-  double allocated_memory;
-};
+// dictionary BenchmarkResult {
+//  u32 num_msm;
+//  double avg_processing_time;
+//  double total_processing_time;
+//  double allocated_memory;
+// };
 
 [Error]
 enum MoproError {
