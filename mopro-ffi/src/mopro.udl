@@ -31,7 +31,7 @@ dictionary GenerateProofResult {
 //  u32 num_msm;
 //  double avg_processing_time;
 //  double total_processing_time;
-//  double allocated_memory;
+//  u32 allocated_memory;
 // };
 
 [Error]

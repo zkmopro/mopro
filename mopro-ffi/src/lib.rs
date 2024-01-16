@@ -308,11 +308,11 @@ mod tests {
         let benchmarks = run_msm_benchmark(None).unwrap();
         println!("\nBenchmarking {:?} msm on BN254 curve", benchmarks.num_msm);
         println!(
-            "└─ Average msm time: {:.5} seconds\n└─ Overall processing time: {:.5} seconds",
+            "└─ Average msm time: {:.5} ms\n└─ Overall processing time: {:.5} ms",
             benchmarks.avg_processing_time, benchmarks.total_processing_time
         );
         println!(
-            "└─ Memory allocated: {:.5} MiB",
+            "└─ Memory allocated: {:.5} Bytes",
             benchmarks.allocated_memory,
         );
         Ok(())

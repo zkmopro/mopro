@@ -14,7 +14,7 @@ fn main() {
     let mut file = File::create(path).unwrap();
     writeln!(
         file,
-        "num_msm,avg_processing_time(sec),total_processing_time(sec),memory_allocated(MiB)"
+        "num_msm,avg_processing_time(ms),total_processing_time(ms),memory_allocated(Bytes)"
     )
     .unwrap();
     // generate 30 figures to run (range from 1 to 1000)
