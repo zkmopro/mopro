@@ -29,6 +29,8 @@ Zooming in a bit:
 -   Install [circom](https://docs.circom.io/) and [snarkjs](https://github.com/iden3/snarkjs)
 -   Run `./scripts/prepare.sh` to check all prerequisites are set.
 
+(Note that we require `uniffi-bindgen` to be `0.25`, if you have an older version you might need to remove this to re-install the latest).
+
 ### iOS
 
 #### Prepare
