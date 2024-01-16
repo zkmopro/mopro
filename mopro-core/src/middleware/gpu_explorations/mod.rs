@@ -14,9 +14,6 @@ pub struct BenchmarkResult {
     pub allocated_memory: f64,
 }
 
-#[global_allocator]
-static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
-
 fn single_msm() -> Result<(), Box<dyn Error>> {
     let mut rng = ark_std::test_rng();
 
