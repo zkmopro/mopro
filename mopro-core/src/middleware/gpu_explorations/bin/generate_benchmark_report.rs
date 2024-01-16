@@ -4,7 +4,7 @@
 #[cfg(feature = "gpu-benchmarks")]
 use {
     std::{env, fs::File, io::Write},
-    mopro_core::middleware::gpu_exploration::run_msm_benchmark
+    mopro_core::middleware::gpu_explorations::run_msm_benchmark
 };
 
 
