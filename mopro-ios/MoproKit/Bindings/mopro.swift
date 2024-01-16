@@ -19,13 +19,13 @@ fileprivate extension RustBuffer {
     }
 
     static func from(_ ptr: UnsafeBufferPointer<UInt8>) -> RustBuffer {
-        try! rustCall { ffi_mopro_rustbuffer_from_bytes(ForeignBytes(bufferPointer: ptr), $0) }
+        try! rustCall { ffi_mopro_ffi_rustbuffer_from_bytes(ForeignBytes(bufferPointer: ptr), $0) }
     }
 
     // Frees the buffer in place.
     // The buffer must not be used after this is called.
     func deallocate() {
-        try! rustCall { ffi_mopro_rustbuffer_free(self, $0) }
+        try! rustCall { ffi_mopro_ffi_rustbuffer_free(self, $0) }
     }
 }
 
@@ -223,6 +223,7 @@ fileprivate enum UniffiInternalError: LocalizedError {
 fileprivate let CALL_SUCCESS: Int8 = 0
 fileprivate let CALL_ERROR: Int8 = 1
 fileprivate let CALL_PANIC: Int8 = 2
+fileprivate let CALL_CANCELLED: Int8 = 3
 
 fileprivate extension RustCallStatus {
     init() {
@@ -284,6 +285,9 @@ private func uniffiCheckCallStatus(
                 callStatus.errorBuf.deallocate()
                 throw UniffiInternalError.rustPanic("Rust panic")
             }
+
+        case CALL_CANCELLED:
+                throw CancellationError()
 
         default:
             throw UniffiInternalError.unexpectedRustCallStatusCode
@@ -370,7 +374,7 @@ fileprivate struct FfiConverterData: FfiConverterRustBuffer {
 
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Data {
         let len: Int32 = try readInt(&buf)
-        return Data(bytes: try readBytes(&buf, count: Int(len)))
+        return Data(try readBytes(&buf, count: Int(len)))
     }
 
     public static func write(_ value: Data, into buf: inout [UInt8]) {
@@ -382,9 +386,9 @@ fileprivate struct FfiConverterData: FfiConverterRustBuffer {
 
 
 public protocol MoproCircomProtocol {
-    func `setup`(`wasmPath`: String, `r1csPath`: String)  throws -> SetupResult
-    func `generateProof`(`circuitInputs`: [String: [String]])  throws -> GenerateProofResult
-    func `verifyProof`(`proof`: Data, `publicInput`: Data)  throws -> Bool
+    func generateProof(circuitInputs: [String: [String]])  throws -> GenerateProofResult
+    func setup(wasmPath: String, r1csPath: String)  throws -> SetupResult
+    func verifyProof(proof: Data, publicInput: Data)  throws -> Bool
     
 }
 
@@ -399,12 +403,12 @@ public class MoproCircom: MoproCircomProtocol {
     }
     public convenience init()  {
         self.init(unsafeFromRawPointer: try! rustCall() {
-    uniffi_mopro_fn_constructor_moprocircom_new($0)
+    uniffi_mopro_ffi_fn_constructor_moprocircom_new($0)
 })
     }
 
     deinit {
-        try! rustCall { uniffi_mopro_fn_free_moprocircom(pointer, $0) }
+        try! rustCall { uniffi_mopro_ffi_fn_free_moprocircom(pointer, $0) }
     }
 
     
@@ -412,36 +416,36 @@ public class MoproCircom: MoproCircomProtocol {
     
     
 
-    public func `setup`(`wasmPath`: String, `r1csPath`: String) throws -> SetupResult {
-        return try  FfiConverterTypeSetupResult.lift(
-            try 
-    rustCallWithError(FfiConverterTypeMoproError.lift) {
-    uniffi_mopro_fn_method_moprocircom_setup(self.pointer, 
-        FfiConverterString.lower(`wasmPath`),
-        FfiConverterString.lower(`r1csPath`),$0
-    )
-}
-        )
-    }
-
-    public func `generateProof`(`circuitInputs`: [String: [String]]) throws -> GenerateProofResult {
+    public func generateProof(circuitInputs: [String: [String]]) throws -> GenerateProofResult {
         return try  FfiConverterTypeGenerateProofResult.lift(
             try 
     rustCallWithError(FfiConverterTypeMoproError.lift) {
-    uniffi_mopro_fn_method_moprocircom_generate_proof(self.pointer, 
-        FfiConverterDictionaryStringSequenceString.lower(`circuitInputs`),$0
+    uniffi_mopro_ffi_fn_method_moprocircom_generate_proof(self.pointer, 
+        FfiConverterDictionaryStringSequenceString.lower(circuitInputs),$0
     )
 }
         )
     }
 
-    public func `verifyProof`(`proof`: Data, `publicInput`: Data) throws -> Bool {
+    public func setup(wasmPath: String, r1csPath: String) throws -> SetupResult {
+        return try  FfiConverterTypeSetupResult.lift(
+            try 
+    rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_ffi_fn_method_moprocircom_setup(self.pointer, 
+        FfiConverterString.lower(wasmPath),
+        FfiConverterString.lower(r1csPath),$0
+    )
+}
+        )
+    }
+
+    public func verifyProof(proof: Data, publicInput: Data) throws -> Bool {
         return try  FfiConverterBool.lift(
             try 
     rustCallWithError(FfiConverterTypeMoproError.lift) {
-    uniffi_mopro_fn_method_moprocircom_verify_proof(self.pointer, 
-        FfiConverterData.lower(`proof`),
-        FfiConverterData.lower(`publicInput`),$0
+    uniffi_mopro_ffi_fn_method_moprocircom_verify_proof(self.pointer, 
+        FfiConverterData.lower(proof),
+        FfiConverterData.lower(publicInput),$0
     )
 }
         )
@@ -489,32 +493,32 @@ public func FfiConverterTypeMoproCircom_lower(_ value: MoproCircom) -> UnsafeMut
 
 
 public struct GenerateProofResult {
-    public var `proof`: Data
-    public var `inputs`: Data
+    public var proof: Data
+    public var inputs: Data
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(`proof`: Data, `inputs`: Data) {
-        self.`proof` = `proof`
-        self.`inputs` = `inputs`
+    public init(proof: Data, inputs: Data) {
+        self.proof = proof
+        self.inputs = inputs
     }
 }
 
 
 extension GenerateProofResult: Equatable, Hashable {
     public static func ==(lhs: GenerateProofResult, rhs: GenerateProofResult) -> Bool {
-        if lhs.`proof` != rhs.`proof` {
+        if lhs.proof != rhs.proof {
             return false
         }
-        if lhs.`inputs` != rhs.`inputs` {
+        if lhs.inputs != rhs.inputs {
             return false
         }
         return true
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(`proof`)
-        hasher.combine(`inputs`)
+        hasher.combine(proof)
+        hasher.combine(inputs)
     }
 }
 
@@ -522,14 +526,14 @@ extension GenerateProofResult: Equatable, Hashable {
 public struct FfiConverterTypeGenerateProofResult: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> GenerateProofResult {
         return try GenerateProofResult(
-            `proof`: FfiConverterData.read(from: &buf), 
-            `inputs`: FfiConverterData.read(from: &buf)
+            proof: FfiConverterData.read(from: &buf), 
+            inputs: FfiConverterData.read(from: &buf)
         )
     }
 
     public static func write(_ value: GenerateProofResult, into buf: inout [UInt8]) {
-        FfiConverterData.write(value.`proof`, into: &buf)
-        FfiConverterData.write(value.`inputs`, into: &buf)
+        FfiConverterData.write(value.proof, into: &buf)
+        FfiConverterData.write(value.inputs, into: &buf)
     }
 }
 
@@ -544,26 +548,26 @@ public func FfiConverterTypeGenerateProofResult_lower(_ value: GenerateProofResu
 
 
 public struct SetupResult {
-    public var `provingKey`: Data
+    public var provingKey: Data
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(`provingKey`: Data) {
-        self.`provingKey` = `provingKey`
+    public init(provingKey: Data) {
+        self.provingKey = provingKey
     }
 }
 
 
 extension SetupResult: Equatable, Hashable {
     public static func ==(lhs: SetupResult, rhs: SetupResult) -> Bool {
-        if lhs.`provingKey` != rhs.`provingKey` {
+        if lhs.provingKey != rhs.provingKey {
             return false
         }
         return true
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(`provingKey`)
+        hasher.combine(provingKey)
     }
 }
 
@@ -571,12 +575,12 @@ extension SetupResult: Equatable, Hashable {
 public struct FfiConverterTypeSetupResult: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SetupResult {
         return try SetupResult(
-            `provingKey`: FfiConverterData.read(from: &buf)
+            provingKey: FfiConverterData.read(from: &buf)
         )
     }
 
     public static func write(_ value: SetupResult, into buf: inout [UInt8]) {
-        FfiConverterData.write(value.`provingKey`, into: &buf)
+        FfiConverterData.write(value.provingKey, into: &buf)
     }
 }
 
@@ -628,7 +632,7 @@ public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
         
 
         
-        case let .CircomError(message):
+        case .CircomError(_ /* message is ignored*/):
             writeInt(&buf, Int32(1))
 
         
@@ -686,47 +690,56 @@ fileprivate struct FfiConverterDictionaryStringSequenceString: FfiConverterRustB
     }
 }
 
-public func `add`(`a`: UInt32, `b`: UInt32)  -> UInt32 {
+public func add(a: UInt32, b: UInt32)  -> UInt32 {
     return try!  FfiConverterUInt32.lift(
         try! rustCall() {
-    uniffi_mopro_fn_func_add(
-        FfiConverterUInt32.lower(`a`),
-        FfiConverterUInt32.lower(`b`),$0)
+    uniffi_mopro_ffi_fn_func_add(
+        FfiConverterUInt32.lower(a),
+        FfiConverterUInt32.lower(b),$0)
 }
     )
 }
 
-public func `hello`()  -> String {
-    return try!  FfiConverterString.lift(
-        try! rustCall() {
-    uniffi_mopro_fn_func_hello($0)
-}
-    )
-}
-
-public func `initializeMopro`() throws {
-    try rustCallWithError(FfiConverterTypeMoproError.lift) {
-    uniffi_mopro_fn_func_initialize_mopro($0)
-}
-}
-
-
-
-public func `generateProof2`(`circuitInputs`: [String: [String]]) throws -> GenerateProofResult {
+public func generateProof2(circuitInputs: [String: [String]]) throws -> GenerateProofResult {
     return try  FfiConverterTypeGenerateProofResult.lift(
         try rustCallWithError(FfiConverterTypeMoproError.lift) {
-    uniffi_mopro_fn_func_generate_proof2(
-        FfiConverterDictionaryStringSequenceString.lower(`circuitInputs`),$0)
+    uniffi_mopro_ffi_fn_func_generate_proof2(
+        FfiConverterDictionaryStringSequenceString.lower(circuitInputs),$0)
 }
     )
 }
 
-public func `verifyProof2`(`proof`: Data, `publicInput`: Data) throws -> Bool {
+public func hello()  -> String {
+    return try!  FfiConverterString.lift(
+        try! rustCall() {
+    uniffi_mopro_ffi_fn_func_hello($0)
+}
+    )
+}
+
+public func initializeMopro() throws {
+    try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_ffi_fn_func_initialize_mopro($0)
+}
+}
+
+
+
+public func initializeMoproDylib(dylibPath: String) throws {
+    try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_ffi_fn_func_initialize_mopro_dylib(
+        FfiConverterString.lower(dylibPath),$0)
+}
+}
+
+
+
+public func verifyProof2(proof: Data, publicInput: Data) throws -> Bool {
     return try  FfiConverterBool.lift(
         try rustCallWithError(FfiConverterTypeMoproError.lift) {
-    uniffi_mopro_fn_func_verify_proof2(
-        FfiConverterData.lower(`proof`),
-        FfiConverterData.lower(`publicInput`),$0)
+    uniffi_mopro_ffi_fn_func_verify_proof2(
+        FfiConverterData.lower(proof),
+        FfiConverterData.lower(publicInput),$0)
 }
     )
 }
@@ -740,37 +753,40 @@ private enum InitializationResult {
 // the code inside is only computed once.
 private var initializationResult: InitializationResult {
     // Get the bindings contract version from our ComponentInterface
-    let bindings_contract_version = 22
+    let bindings_contract_version = 24
     // Get the scaffolding contract version by calling the into the dylib
-    let scaffolding_contract_version = ffi_mopro_uniffi_contract_version()
+    let scaffolding_contract_version = ffi_mopro_ffi_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if (uniffi_mopro_checksum_func_add() != 19178) {
+    if (uniffi_mopro_ffi_checksum_func_add() != 8411) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_checksum_func_hello() != 309) {
+    if (uniffi_mopro_ffi_checksum_func_generate_proof2() != 40187) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_checksum_func_initialize_mopro() != 10574) {
+    if (uniffi_mopro_ffi_checksum_func_hello() != 46136) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_checksum_func_generate_proof2() != 6969) {
+    if (uniffi_mopro_ffi_checksum_func_initialize_mopro() != 17540) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_checksum_func_verify_proof2() != 6153) {
+    if (uniffi_mopro_ffi_checksum_func_initialize_mopro_dylib() != 64476) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_checksum_method_moprocircom_setup() != 40345) {
+    if (uniffi_mopro_ffi_checksum_func_verify_proof2() != 37192) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_checksum_method_moprocircom_generate_proof() != 30646) {
+    if (uniffi_mopro_ffi_checksum_method_moprocircom_generate_proof() != 64602) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_checksum_method_moprocircom_verify_proof() != 51813) {
+    if (uniffi_mopro_ffi_checksum_method_moprocircom_setup() != 57700) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_checksum_constructor_moprocircom_new() != 56690) {
+    if (uniffi_mopro_ffi_checksum_method_moprocircom_verify_proof() != 61522) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_mopro_ffi_checksum_constructor_moprocircom_new() != 42205) {
         return InitializationResult.apiChecksumMismatch
     }
 
