@@ -29,6 +29,16 @@ pub struct SetupResult {
     pub provingKey: Vec<u8>,
 }
 
+// NOTE: Need to hardcode the types here, otherwise UniFFI will complain if the gpu-benchmarks feature is not enabled
+#[derive(Debug, Clone)]
+#[cfg(not(feature = "gpu-benchmarks"))]
+pub struct BenchmarkResult {
+    pub num_msm: u32,
+    pub avg_processing_time: f64,
+    pub total_processing_time: f64,
+    pub allocated_memory: u32,
+}
+
 //     pub inputs: Vec<u8>,
 
 impl From<mopro_core::MoproError> for FFIError {
@@ -165,6 +175,12 @@ impl MoproCircom {
 pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
     let benchmarks = gpu_explorations::run_msm_benchmark(num_msm).unwrap();
     Ok(benchmarks)
+}
+
+#[cfg(not(feature = "gpu-benchmarks"))]
+pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
+    println!("gpu-benchmarks feature not enabled!");
+    panic!("gpu-benchmarks feature not enabled!");
 }
 
 fn add(a: u32, b: u32) -> u32 {
