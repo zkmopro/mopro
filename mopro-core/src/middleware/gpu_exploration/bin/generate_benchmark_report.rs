@@ -12,7 +12,7 @@ use {
 fn main() {
     let path = env::current_dir()
         .unwrap()
-        .join("src/middleware/gpu_exploration/msm_bench.csv");
+        .join("benchmarks/gpu_explorations/msm_bench.csv");
     let mut file = File::create(path).unwrap();
     writeln!(
         file,
