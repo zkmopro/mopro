@@ -376,10 +376,10 @@ pub fn bytes_to_circuit_inputs(bytes: &[u8]) -> CircuitInputs {
     inputs
 }
 
-pub fn strings_to_circuit_inputs(strings: &[&str]) -> Vec<BigInt> {
+pub fn strings_to_circuit_inputs(strings: Vec<String>) -> Vec<BigInt> {
     strings
-        .iter()
-        .map(|&value| BigInt::parse_bytes(value.as_bytes(), 10).unwrap())
+        .into_iter()  // Note: using into_iter() instead of iter() to consume the Vec
+        .map(|value| BigInt::parse_bytes(value.as_bytes(), 10).unwrap())
         .collect()
 }
 
@@ -570,7 +570,7 @@ mod tests {
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
-    #[ignore = "ignore for ci"]
+    // #[ignore = "ignore for ci"]
     #[test]
     fn test_setup_prove_rsa() {
         let wasm_path = "./examples/circom/rsa/target/main_js/main.wasm";
@@ -585,121 +585,85 @@ mod tests {
 
         let _serialized_pk = setup_res.unwrap();
 
-        // Deserialize the proving key and inputs if necessary
-
         // Prepare inputs
-        let signature = [
-            "3582320600048169363",
-            "7163546589759624213",
-            "18262551396327275695",
-            "4479772254206047016",
-            "1970274621151677644",
-            "6547632513799968987",
-            "921117808165172908",
-            "7155116889028933260",
-            "16769940396381196125",
-            "17141182191056257954",
-            "4376997046052607007",
-            "17471823348423771450",
-            "16282311012391954891",
-            "70286524413490741",
-            "1588836847166444745",
-            "15693430141227594668",
-            "13832254169115286697",
-            "15936550641925323613",
-            "323842208142565220",
-            "6558662646882345749",
-            "15268061661646212265",
-            "14962976685717212593",
-            "15773505053543368901",
-            "9586594741348111792",
-            "1455720481014374292",
-            "13945813312010515080",
-            "6352059456732816887",
-            "17556873002865047035",
-            "2412591065060484384",
-            "11512123092407778330",
-            "8499281165724578877",
-            "12768005853882726493",
-        ];
-        let modulus = [
-            "13792647154200341559",
-            "12773492180790982043",
-            "13046321649363433702",
-            "10174370803876824128",
-            "7282572246071034406",
-            "1524365412687682781",
-            "4900829043004737418",
-            "6195884386932410966",
-            "13554217876979843574",
-            "17902692039595931737",
-            "12433028734895890975",
-            "15971442058448435996",
-            "4591894758077129763",
-            "11258250015882429548",
-            "16399550288873254981",
-            "8246389845141771315",
-            "14040203746442788850",
-            "7283856864330834987",
-            "12297563098718697441",
-            "13560928146585163504",
-            "7380926829734048483",
-            "14591299561622291080",
-            "8439722381984777599",
-            "17375431987296514829",
-            "16727607878674407272",
-            "3233954801381564296",
-            "17255435698225160983",
-            "15093748890170255670",
-            "15810389980847260072",
-            "11120056430439037392",
-            "5866130971823719482",
-            "13327552690270163501",
-        ];
-        let base_message = [
-            "18114495772705111902",
-            "2254271930739856077",
-            "2068851770",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-        ];
+        #[derive(serde::Deserialize)]
+        struct InputData {
+            signature: Vec<String>,
+            modulus: Vec<String>,
+            base_message: Vec<String>,
+        }
+
+        let file_data = std::fs::read_to_string("./examples/circom/rsa/input.json").expect("Unable to read file");
+        let data: InputData = serde_json::from_str(&file_data).expect("JSON was not well-formatted");
 
         let mut inputs: HashMap<String, Vec<BigInt>> = HashMap::new();
         inputs.insert(
             "signature".to_string(),
-            strings_to_circuit_inputs(&signature),
+            strings_to_circuit_inputs(data.signature),
         );
-        inputs.insert("modulus".to_string(), strings_to_circuit_inputs(&modulus));
+        inputs.insert("modulus".to_string(), strings_to_circuit_inputs(data.modulus));
         inputs.insert(
             "base_message".to_string(),
-            strings_to_circuit_inputs(&base_message),
+            strings_to_circuit_inputs(data.base_message),
+        );
+
+        // Proof generation
+        let generate_proof_res = circom_state.generate_proof(inputs);
+
+        // Check and print the error if there is one
+        if let Err(e) = &generate_proof_res {
+            println!("Error: {:?}", e);
+        }
+
+        assert!(generate_proof_res.is_ok());
+
+        let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
+
+        // Proof verification
+        let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
+        assert!(verify_res.is_ok());
+
+        assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
+    }
+
+    #[test]
+    fn test_setup_prove_anon_aadhaar() {
+        let wasm_path = "./examples/circom/anonAadhaar/target/qr_verify_js/qr_verify.wasm";
+        let r1cs_path = "./examples/circom/anonAadhaar/target/qr_verify.r1cs";
+
+        // Instantiate CircomState
+        let mut circom_state = CircomState::new();
+
+        // Setup
+        let setup_res = circom_state.setup(wasm_path, r1cs_path);
+        assert!(setup_res.is_ok());
+
+        let _serialized_pk = setup_res.unwrap();
+
+        // Prepare inputs
+        #[derive(serde::Deserialize)]
+        struct InputData {
+            padded_message: Vec<String>,
+            signature: Vec<String>,
+            modulus: Vec<String>,
+        }
+
+        let file_data = std::fs::read_to_string("./examples/circom/anonAadhaar/input.json").expect("Unable to read file");
+        let data: InputData = serde_json::from_str(&file_data).expect("JSON was not well-formatted");
+
+        let mut inputs: CircuitInputs = HashMap::new();
+        inputs.insert(
+            "padded_message".to_string(),
+            strings_to_circuit_inputs(data.padded_message),
+        );
+        inputs.insert("message_len".to_string(), vec![BigInt::from(64)]);
+        inputs.insert(
+            "signature".to_string(),
+            strings_to_circuit_inputs(data.signature),
+        );
+        inputs.insert(
+            "modulus".to_string(),
+            strings_to_circuit_inputs(data.modulus),
         );
 
         // Proof generation
@@ -725,118 +689,26 @@ mod tests {
     #[test]
     fn test_setup_prove_rsa2() {
         // Prepare inputs
-        let signature = [
-            "3582320600048169363",
-            "7163546589759624213",
-            "18262551396327275695",
-            "4479772254206047016",
-            "1970274621151677644",
-            "6547632513799968987",
-            "921117808165172908",
-            "7155116889028933260",
-            "16769940396381196125",
-            "17141182191056257954",
-            "4376997046052607007",
-            "17471823348423771450",
-            "16282311012391954891",
-            "70286524413490741",
-            "1588836847166444745",
-            "15693430141227594668",
-            "13832254169115286697",
-            "15936550641925323613",
-            "323842208142565220",
-            "6558662646882345749",
-            "15268061661646212265",
-            "14962976685717212593",
-            "15773505053543368901",
-            "9586594741348111792",
-            "1455720481014374292",
-            "13945813312010515080",
-            "6352059456732816887",
-            "17556873002865047035",
-            "2412591065060484384",
-            "11512123092407778330",
-            "8499281165724578877",
-            "12768005853882726493",
-        ];
-        let modulus = [
-            "13792647154200341559",
-            "12773492180790982043",
-            "13046321649363433702",
-            "10174370803876824128",
-            "7282572246071034406",
-            "1524365412687682781",
-            "4900829043004737418",
-            "6195884386932410966",
-            "13554217876979843574",
-            "17902692039595931737",
-            "12433028734895890975",
-            "15971442058448435996",
-            "4591894758077129763",
-            "11258250015882429548",
-            "16399550288873254981",
-            "8246389845141771315",
-            "14040203746442788850",
-            "7283856864330834987",
-            "12297563098718697441",
-            "13560928146585163504",
-            "7380926829734048483",
-            "14591299561622291080",
-            "8439722381984777599",
-            "17375431987296514829",
-            "16727607878674407272",
-            "3233954801381564296",
-            "17255435698225160983",
-            "15093748890170255670",
-            "15810389980847260072",
-            "11120056430439037392",
-            "5866130971823719482",
-            "13327552690270163501",
-        ];
-        let base_message = [
-            "18114495772705111902",
-            "2254271930739856077",
-            "2068851770",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0",
-        ];
+        #[derive(serde::Deserialize)]
+        struct InputData {
+            signature: Vec<String>,
+            modulus: Vec<String>,
+            base_message: Vec<String>,
+        }
+
+        let file_data = std::fs::read_to_string("./examples/circom/rsa/input.json").expect("Unable to read file");
+        let data: InputData = serde_json::from_str(&file_data).expect("JSON was not well-formatted");
+
 
         let mut inputs: HashMap<String, Vec<BigInt>> = HashMap::new();
         inputs.insert(
             "signature".to_string(),
-            strings_to_circuit_inputs(&signature),
+            strings_to_circuit_inputs(data.signature),
         );
-        inputs.insert("modulus".to_string(), strings_to_circuit_inputs(&modulus));
+        inputs.insert("modulus".to_string(), strings_to_circuit_inputs(data.modulus));
         inputs.insert(
             "base_message".to_string(),
-            strings_to_circuit_inputs(&base_message),
+            strings_to_circuit_inputs(data.base_message),
         );
 
         // Proof generation

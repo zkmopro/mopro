@@ -310,6 +310,19 @@ fileprivate struct FfiConverterUInt32: FfiConverterPrimitive {
     }
 }
 
+fileprivate struct FfiConverterDouble: FfiConverterPrimitive {
+    typealias FfiType = Double
+    typealias SwiftType = Double
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Double {
+        return try lift(readDouble(&buf))
+    }
+
+    public static func write(_ value: Double, into buf: inout [UInt8]) {
+        writeDouble(&buf, lower(value))
+    }
+}
+
 fileprivate struct FfiConverterBool : FfiConverter {
     typealias FfiType = Int8
     typealias SwiftType = Bool
@@ -492,6 +505,77 @@ public func FfiConverterTypeMoproCircom_lower(_ value: MoproCircom) -> UnsafeMut
 }
 
 
+public struct BenchmarkResult {
+    public var numMsm: UInt32
+    public var avgProcessingTime: Double
+    public var totalProcessingTime: Double
+    public var allocatedMemory: UInt32
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(numMsm: UInt32, avgProcessingTime: Double, totalProcessingTime: Double, allocatedMemory: UInt32) {
+        self.numMsm = numMsm
+        self.avgProcessingTime = avgProcessingTime
+        self.totalProcessingTime = totalProcessingTime
+        self.allocatedMemory = allocatedMemory
+    }
+}
+
+
+extension BenchmarkResult: Equatable, Hashable {
+    public static func ==(lhs: BenchmarkResult, rhs: BenchmarkResult) -> Bool {
+        if lhs.numMsm != rhs.numMsm {
+            return false
+        }
+        if lhs.avgProcessingTime != rhs.avgProcessingTime {
+            return false
+        }
+        if lhs.totalProcessingTime != rhs.totalProcessingTime {
+            return false
+        }
+        if lhs.allocatedMemory != rhs.allocatedMemory {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(numMsm)
+        hasher.combine(avgProcessingTime)
+        hasher.combine(totalProcessingTime)
+        hasher.combine(allocatedMemory)
+    }
+}
+
+
+public struct FfiConverterTypeBenchmarkResult: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> BenchmarkResult {
+        return try BenchmarkResult(
+            numMsm: FfiConverterUInt32.read(from: &buf), 
+            avgProcessingTime: FfiConverterDouble.read(from: &buf), 
+            totalProcessingTime: FfiConverterDouble.read(from: &buf), 
+            allocatedMemory: FfiConverterUInt32.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: BenchmarkResult, into buf: inout [UInt8]) {
+        FfiConverterUInt32.write(value.numMsm, into: &buf)
+        FfiConverterDouble.write(value.avgProcessingTime, into: &buf)
+        FfiConverterDouble.write(value.totalProcessingTime, into: &buf)
+        FfiConverterUInt32.write(value.allocatedMemory, into: &buf)
+    }
+}
+
+
+public func FfiConverterTypeBenchmarkResult_lift(_ buf: RustBuffer) throws -> BenchmarkResult {
+    return try FfiConverterTypeBenchmarkResult.lift(buf)
+}
+
+public func FfiConverterTypeBenchmarkResult_lower(_ value: BenchmarkResult) -> RustBuffer {
+    return FfiConverterTypeBenchmarkResult.lower(value)
+}
+
+
 public struct GenerateProofResult {
     public var proof: Data
     public var inputs: Data
@@ -645,6 +729,27 @@ extension MoproError: Equatable, Hashable {}
 
 extension MoproError: Error { }
 
+fileprivate struct FfiConverterOptionUInt32: FfiConverterRustBuffer {
+    typealias SwiftType = UInt32?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterUInt32.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterUInt32.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
 fileprivate struct FfiConverterSequenceString: FfiConverterRustBuffer {
     typealias SwiftType = [String]
 
@@ -734,6 +839,15 @@ public func initializeMoproDylib(dylibPath: String) throws {
 
 
 
+public func runMsmBenchmark(numMsm: UInt32?) throws -> BenchmarkResult {
+    return try  FfiConverterTypeBenchmarkResult.lift(
+        try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_ffi_fn_func_run_msm_benchmark(
+        FfiConverterOptionUInt32.lower(numMsm),$0)
+}
+    )
+}
+
 public func verifyProof2(proof: Data, publicInput: Data) throws -> Bool {
     return try  FfiConverterBool.lift(
         try rustCallWithError(FfiConverterTypeMoproError.lift) {
@@ -772,6 +886,9 @@ private var initializationResult: InitializationResult {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_func_initialize_mopro_dylib() != 64476) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_mopro_ffi_checksum_func_run_msm_benchmark() != 7930) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_func_verify_proof2() != 37192) {

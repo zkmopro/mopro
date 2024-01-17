@@ -85,40 +85,52 @@ fi
 print_action "[core/circom] Compiling example circuits..."
 cd $CIRCOM_DIR
 
-# Compile multiplier2
-compile_circuit multiplier2 multiplier2.circom
+# # Compile multiplier2
+# compile_circuit multiplier2 multiplier2.circom
 
-# Setup and compile keccak256
-npm_install keccak256
-compile_circuit keccak256 keccak256_256_test.circom
+# # Setup and compile keccak256
+# npm_install keccak256
+# compile_circuit keccak256 keccak256_256_test.circom
 
-# Setup and compile rsa
-npm_install rsa
-compile_circuit rsa main.circom
+# # Setup and compile rsa
+# npm_install rsa
+# compile_circuit rsa main.circom
 
-# Run trusted setup for multiplier2
-print_action "[core/circom] Running trusted setup for multiplier2..."
-./scripts/trusted_setup.sh multiplier2 08 multiplier2
+# Setup and compile anonAadhaar
+npm_install anonAadhaar
+compile_circuit anonAadhaar qr_verify.circom
 
-# Generate arkzkey for multipler2
-print_action "[core/circom] Generating arkzkey for multiplier2..."
-./scripts/generate_arkzkey.sh multiplier2 multiplier2
+# # Run trusted setup for multiplier2
+# print_action "[core/circom] Running trusted setup for multiplier2..."
+# ./scripts/trusted_setup.sh multiplier2 08 multiplier2
 
-# Run trusted setup for keccak256
-print_action "[core/circom] Running trusted setup for keccak256..."
-./scripts/trusted_setup.sh keccak256 18 keccak256_256_test
+# # Generate arkzkey for multipler2
+# print_action "[core/circom] Generating arkzkey for multiplier2..."
+# ./scripts/generate_arkzkey.sh multiplier2 multiplier2
 
-# Generate arkzkey for keccak256
-print_action "[core/circom] Generating arkzkey for keccak256..."
-./scripts/generate_arkzkey.sh keccak256 keccak256_256_test
+# # Run trusted setup for keccak256
+# print_action "[core/circom] Running trusted setup for keccak256..."
+# ./scripts/trusted_setup.sh keccak256 18 keccak256_256_test
 
-# Run trusted setup for rsa
+# # Generate arkzkey for keccak256
+# print_action "[core/circom] Generating arkzkey for keccak256..."
+# ./scripts/generate_arkzkey.sh keccak256 keccak256_256_test
+
+# # Run trusted setup for rsa
+# print_action "[core/circom] Running trusted setup for rsa..."
+# ./scripts/trusted_setup.sh rsa 18 main
+
+# # Generate arkzkey for rsa
+# print_action "[core/circom] Generating arkzkey for rsa..."
+# ./scripts/generate_arkzkey.sh rsa main
+
+# Run trusted setup for anonAadhaar
 print_action "[core/circom] Running trusted setup for rsa..."
-./scripts/trusted_setup.sh rsa 18 main
+./scripts/trusted_setup.sh anonAadhaar 20 qr_verify
 
-# Generate arkzkey for rsa
+# Generate arkzkey for anonAadhaar
 print_action "[core/circom] Generating arkzkey for rsa..."
-./scripts/generate_arkzkey.sh rsa main
+./scripts/generate_arkzkey.sh anonAadhaar qr_verify
 
 # Add support for target architectures
 print_action "[ffi] Adding support for target architectures..."
