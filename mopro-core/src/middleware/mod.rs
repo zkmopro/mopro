@@ -1,2 +1,4 @@
 pub mod circom;
-pub mod gpu_exploration;
+
+#[cfg(feature = "gpu-benchmarks")]
+pub mod gpu_explorations;

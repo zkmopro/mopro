@@ -16,8 +16,9 @@ path = "uniffi-bindgen.rs"
 [features]
 default = []
 
-# If we enable dylib here it should be enabled in mopro-core as well
+# If we enable them here, they should be enabled in mopro-core as well
 dylib = ["mopro-core/dylib"]
+gpu-benchmarks = ["mopro-core/gpu-benchmarks"]
 
 [patch.crates-io]
 # NOTE: Forked wasmer to work around memory limits
