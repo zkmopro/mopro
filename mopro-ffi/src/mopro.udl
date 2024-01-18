@@ -16,6 +16,9 @@ namespace mopro {
 
   [Throws=MoproError]
   BenchmarkResult run_msm_benchmark(u32? num_msm);
+  
+  ProofCalldata convert_proof(bytes proof);
+  sequence<string> convert_inputs(bytes inputs);
 };
 
 dictionary SetupResult {
@@ -33,6 +36,23 @@ dictionary BenchmarkResult {
   double total_processing_time;
   u32 allocated_memory;
 };
+
+dictionary G1 {
+  string x;
+  string y;
+};
+
+dictionary G2 {
+  sequence<string> x;
+  sequence<string> y;
+};
+
+dictionary ProofCalldata {
+  G1 a;
+  G2 b;
+  G1 c;
+};
+
 
 [Error]
 enum MoproError {
