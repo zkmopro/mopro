@@ -136,9 +136,10 @@ pub fn verify_proof2(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, Mopr
     Ok(is_valid)
 }
 
-pub fn convert_proof(proof: Vec<u8>) -> ProofCalldata {
+// Convert proof to String-tuples as expected by the Solidity Groth16 Verifier
+pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
     let deserialized_proof = circom::serialization::deserialize_proof(proof);
-    let proof = circom::serialization::convert_proof(&deserialized_proof);
+    let proof = circom::serialization::to_ethereum_proof(&deserialized_proof);
     let a = G1 {
         x: proof.a.x.to_string(),
         y: proof.a.y.to_string(),
@@ -154,7 +155,7 @@ pub fn convert_proof(proof: Vec<u8>) -> ProofCalldata {
     ProofCalldata { a, b, c }
 }
 
-pub fn convert_inputs(inputs: Vec<u8>) -> Vec<String> {
+pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
     let deserialized_inputs = circom::serialization::deserialize_inputs(inputs);
     let inputs = deserialized_inputs
         .0
@@ -319,8 +320,8 @@ mod tests {
         assert!(is_valid);
 
         // Step 4: Convert Proof
-        let proof_calldata = convert_proof(serialized_proof);
-        let inputs_calldata = convert_inputs(serialized_inputs);
+        let proof_calldata = to_ethereum_proof(serialized_proof);
+        let inputs_calldata = to_ethereum_inputs(serialized_inputs);
         assert!(proof_calldata.a.x.len() > 0);
         assert!(inputs_calldata.len() > 0);
 
@@ -371,8 +372,8 @@ mod tests {
         assert!(is_valid);
 
         // Step 4: Convert Proof
-        let proof_calldata = convert_proof(serialized_proof);
-        let inputs_calldata = convert_inputs(serialized_inputs);
+        let proof_calldata = to_ethereum_proof(serialized_proof);
+        let inputs_calldata = to_ethereum_inputs(serialized_inputs);
         assert!(proof_calldata.a.x.len() > 0);
         assert!(inputs_calldata.len() > 0);
 

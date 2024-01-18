@@ -978,24 +978,6 @@ public func add(a: UInt32, b: UInt32)  -> UInt32 {
     )
 }
 
-public func convertInputs(inputs: Data)  -> [String] {
-    return try!  FfiConverterSequenceString.lift(
-        try! rustCall() {
-    uniffi_mopro_ffi_fn_func_convert_inputs(
-        FfiConverterData.lower(inputs),$0)
-}
-    )
-}
-
-public func convertProof(proof: Data)  -> ProofCalldata {
-    return try!  FfiConverterTypeProofCalldata.lift(
-        try! rustCall() {
-    uniffi_mopro_ffi_fn_func_convert_proof(
-        FfiConverterData.lower(proof),$0)
-}
-    )
-}
-
 public func generateProof2(circuitInputs: [String: [String]]) throws -> GenerateProofResult {
     return try  FfiConverterTypeGenerateProofResult.lift(
         try rustCallWithError(FfiConverterTypeMoproError.lift) {
@@ -1039,6 +1021,24 @@ public func runMsmBenchmark(numMsm: UInt32?) throws -> BenchmarkResult {
     )
 }
 
+public func toEthereumInputs(inputs: Data)  -> [String] {
+    return try!  FfiConverterSequenceString.lift(
+        try! rustCall() {
+    uniffi_mopro_ffi_fn_func_to_ethereum_inputs(
+        FfiConverterData.lower(inputs),$0)
+}
+    )
+}
+
+public func toEthereumProof(proof: Data)  -> ProofCalldata {
+    return try!  FfiConverterTypeProofCalldata.lift(
+        try! rustCall() {
+    uniffi_mopro_ffi_fn_func_to_ethereum_proof(
+        FfiConverterData.lower(proof),$0)
+}
+    )
+}
+
 public func verifyProof2(proof: Data, publicInput: Data) throws -> Bool {
     return try  FfiConverterBool.lift(
         try rustCallWithError(FfiConverterTypeMoproError.lift) {
@@ -1067,12 +1067,6 @@ private var initializationResult: InitializationResult {
     if (uniffi_mopro_ffi_checksum_func_add() != 8411) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_ffi_checksum_func_convert_inputs() != 59191) {
-        return InitializationResult.apiChecksumMismatch
-    }
-    if (uniffi_mopro_ffi_checksum_func_convert_proof() != 6119) {
-        return InitializationResult.apiChecksumMismatch
-    }
     if (uniffi_mopro_ffi_checksum_func_generate_proof2() != 40187) {
         return InitializationResult.apiChecksumMismatch
     }
@@ -1086,6 +1080,12 @@ private var initializationResult: InitializationResult {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_func_run_msm_benchmark() != 7930) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_mopro_ffi_checksum_func_to_ethereum_inputs() != 30405) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_mopro_ffi_checksum_func_to_ethereum_proof() != 60110) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_func_verify_proof2() != 37192) {

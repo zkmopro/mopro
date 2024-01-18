@@ -58,9 +58,9 @@ do {
     let isValid = try moproCircom.verifyProof(proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
     assert(isValid, "Proof verification should succeed")
 
-    // Convert Proof
-    let convertProofResult = convertProof(proof: generateProofResult.proof)
-    let convertInputsResult = convertInputs(inputs: generateProofResult.inputs)
+    // Convert proof to Ethereum compatible proof
+    let convertProofResult = toEthereumProof(proof: generateProofResult.proof)
+    let convertInputsResult = toEthereumInputs(inputs: generateProofResult.inputs)
     assert(convertProofResult.a.x.count > 0, "Proof should not be empty")
     assert(convertInputsResult.count > 0, "Inputs should not be empty")
 

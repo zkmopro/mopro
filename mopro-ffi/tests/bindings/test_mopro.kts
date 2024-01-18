@@ -22,9 +22,9 @@ try {
     var isValid = moproCircom.verifyProof(generateProofResult.proof, generateProofResult.inputs)
     assert(isValid) { "Proof is invalid" }
 
-    // Convert proof
-    var convertProofResult = convertProof(generateProofResult.proof)
-    var convertInputsResult = convertInputs(generateProofResult.inputs)
+    // Convert proof to Ethereum compatible proof
+    var convertProofResult = toEthereumProof(generateProofResult.proof)
+    var convertInputsResult = toEthereumInputs(generateProofResult.inputs)
     assert(convertProofResult.a.x.isNotEmpty()) { "Proof is empty" }
     assert(convertInputsResult.size > 0) { "Inputs are empty" }
 

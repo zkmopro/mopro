@@ -17,8 +17,8 @@ namespace mopro {
   [Throws=MoproError]
   BenchmarkResult run_msm_benchmark(u32? num_msm);
   
-  ProofCalldata convert_proof(bytes proof);
-  sequence<string> convert_inputs(bytes inputs);
+  ProofCalldata to_ethereum_proof(bytes proof);
+  sequence<string> to_ethereum_inputs(bytes inputs);
 };
 
 dictionary SetupResult {

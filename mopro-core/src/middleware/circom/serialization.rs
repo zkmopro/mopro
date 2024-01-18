@@ -50,11 +50,12 @@ pub fn deserialize_inputs(data: Vec<u8>) -> SerializableInputs {
     SerializableInputs::deserialize_uncompressed(&mut &data[..]).expect("Deserialization failed")
 }
 
-pub fn convert_proof(proof: &SerializableProof) -> ethereum::Proof {
+// Convert proof to U256-tuples as expected by the Solidity Groth16 Verifier
+pub fn to_ethereum_proof(proof: &SerializableProof) -> ethereum::Proof {
     ethereum::Proof::from(proof.0.clone())
 }
 
-pub fn convert_inputs(inputs: &SerializableInputs) -> ethereum::Inputs {
+pub fn to_ethereum_inputs(inputs: &SerializableInputs) -> ethereum::Inputs {
     ethereum::Inputs::from(&inputs.0[..])
 }
 
