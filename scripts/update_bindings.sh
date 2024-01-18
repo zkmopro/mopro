@@ -138,12 +138,12 @@ cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
 # TODO: Hardcoded to rsa for now
 if [[ "$USE_DYLIB" == true ]]; then
     print_action "Copying dynamic library asset (rsa)..."
-    cp ${PROJECT_DIR}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/rsa.dylib ${TARGET_DIR}/
-    cp ${TARGET_DIR}/rsa.dylib ${MOPROKIT_DIR}/Libs/
+    cp ${PROJECT_DIR}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/anonAadhaar.dylib ${TARGET_DIR}/
+    cp ${TARGET_DIR}/anonAadhaar.dylib ${MOPROKIT_DIR}/Libs/
     # Fix dynamic lib install paths
     # NOTE: Xcode might already do this for us
-    install_name_tool -id @rpath/rsa.dylib ${MOPROKIT_DIR}/Libs/rsa.dylib
-    codesign -f -s "${APPLE_SIGNING_IDENTITY}" ${MOPROKIT_DIR}/Libs/rsa.dylib
+    install_name_tool -id @rpath/anonAadhaar.dylib ${MOPROKIT_DIR}/Libs/anonAadhaar.dylib
+    codesign -f -s "${APPLE_SIGNING_IDENTITY}" ${MOPROKIT_DIR}/Libs/anonAadhaar.dylib
 fi
 
 print_action "Done! Please re-build your project in Xcode."

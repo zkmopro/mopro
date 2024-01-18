@@ -30,6 +30,7 @@
 		CEB804562AFF81AF0063F091 /* KeccakZkeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB804552AFF81AF0063F091 /* KeccakZkeyViewController.swift */; };
 		CEB804582AFF81BF0063F091 /* RSAViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB804572AFF81BF0063F091 /* RSAViewController.swift */; };
 		E69338642AFFDB1A00B80312 /* AnonAadhaarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E69338632AFFDB1A00B80312 /* AnonAadhaarViewController.swift */; };
+		E6E6F42E2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E6F42D2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +73,7 @@
 		CEB804552AFF81AF0063F091 /* KeccakZkeyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeccakZkeyViewController.swift; sourceTree = "<group>"; };
 		CEB804572AFF81BF0063F091 /* RSAViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSAViewController.swift; sourceTree = "<group>"; };
 		E69338632AFFDB1A00B80312 /* AnonAadhaarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonAadhaarViewController.swift; sourceTree = "<group>"; };
+		E6E6F42D2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonAadhaarViewControllerNew.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				CEB804572AFF81BF0063F091 /* RSAViewController.swift */,
+				E6E6F42D2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift */,
 				E69338632AFFDB1A00B80312 /* AnonAadhaarViewController.swift */,
 				CEB804552AFF81AF0063F091 /* KeccakZkeyViewController.swift */,
 				CEB8044F2AFF81960063F091 /* KeccakSetupViewController.swift */,
@@ -411,6 +414,7 @@
 				CEB804562AFF81AF0063F091 /* KeccakZkeyViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				CEB804502AFF81960063F091 /* KeccakSetupViewController.swift in Sources */,
+				E6E6F42E2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				E69338642AFFDB1A00B80312 /* AnonAadhaarViewController.swift in Sources */,
 			);

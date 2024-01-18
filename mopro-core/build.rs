@@ -79,8 +79,10 @@ fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
 
 fn main() -> Result<()> {
     // TODO: build_circuit function to builds all related artifacts, instead of doing this externally
-    let dir = "examples/circom/keccak256";
-    let circuit = "keccak256_256_test";
+    // let dir = "examples/circom/keccak256";
+    // let circuit = "keccak256_256_test";
+    let dir = "examples/circom/anonAadhaar";
+    let circuit = "qr_verify";
 
     // XXX: Use RSA
     // let dir = "examples/circom/rsa";
@@ -97,7 +99,7 @@ fn main() -> Result<()> {
     {
         // TODO: This should depends on the circuit name
         //let dylib_name = "keccak256.dylib";
-        let dylib_name = "rsa.dylib";
+        let dylib_name = "anonAadhaar.dylib";
         build_dylib(wasm_path.clone(), dylib_name.to_string())?;
     }
     Ok(())
