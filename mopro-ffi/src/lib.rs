@@ -319,7 +319,7 @@ mod tests {
             mopro_circom.verify_proof(serialized_proof.clone(), serialized_inputs.clone())?;
         assert!(is_valid);
 
-        // Step 4: Convert Proof
+        // Step 4: Convert Proof to Ethereum compatible proof
         let proof_calldata = to_ethereum_proof(serialized_proof);
         let inputs_calldata = to_ethereum_inputs(serialized_inputs);
         assert!(proof_calldata.a.x.len() > 0);
@@ -371,7 +371,7 @@ mod tests {
             mopro_circom.verify_proof(serialized_proof.clone(), serialized_inputs.clone())?;
         assert!(is_valid);
 
-        // Step 4: Convert Proof
+        // Step 4: Convert Proof to Ethereum compatible proof
         let proof_calldata = to_ethereum_proof(serialized_proof);
         let inputs_calldata = to_ethereum_inputs(serialized_inputs);
         assert!(proof_calldata.a.x.len() > 0);
