@@ -141,7 +141,7 @@ pub fn convert_proof(proof: Vec<u8>) -> ProofCalldata {
     let proof = circom::serialization::convert_proof(&deserialized_proof);
     let a = G1 {
         x: proof.a.x.to_string(),
-        y: proof.a.y.to_string()
+        y: proof.a.y.to_string(),
     };
     let b = G2 {
         x: proof.b.x.iter().map(|x| x.to_string()).collect(),
@@ -149,14 +149,18 @@ pub fn convert_proof(proof: Vec<u8>) -> ProofCalldata {
     };
     let c = G1 {
         x: proof.c.x.to_string(),
-        y: proof.c.y.to_string()
+        y: proof.c.y.to_string(),
     };
     ProofCalldata { a, b, c }
 }
 
 pub fn convert_inputs(inputs: Vec<u8>) -> Vec<String> {
     let deserialized_inputs = circom::serialization::deserialize_inputs(inputs);
-    let inputs = deserialized_inputs.0.iter().map(|x| x.to_string()).collect();
+    let inputs = deserialized_inputs
+        .0
+        .iter()
+        .map(|x| x.to_string())
+        .collect();
     inputs
 }
 
@@ -310,7 +314,8 @@ mod tests {
         assert_eq!(serialized_inputs, serialized_outputs);
 
         // Step 3: Verify Proof
-        let is_valid = mopro_circom.verify_proof(serialized_proof.clone(), serialized_inputs.clone())?;
+        let is_valid =
+            mopro_circom.verify_proof(serialized_proof.clone(), serialized_inputs.clone())?;
         assert!(is_valid);
 
         // Step 4: Convert Proof
@@ -361,7 +366,8 @@ mod tests {
 
         // Step 3: Verify Proof
 
-        let is_valid = mopro_circom.verify_proof(serialized_proof.clone(), serialized_inputs.clone())?;
+        let is_valid =
+            mopro_circom.verify_proof(serialized_proof.clone(), serialized_inputs.clone())?;
         assert!(is_valid);
 
         // Step 4: Convert Proof
