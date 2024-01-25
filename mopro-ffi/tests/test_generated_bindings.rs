@@ -1,4 +1,5 @@
 uniffi::build_foreign_language_testcases!(
+    // "tests/bindings/test_mopro_gen_benchmarks_report.swift", // uncomment this to generate the benchmarks report in swift
     "tests/bindings/test_mopro_gpu_benchmarks.swift",
     "tests/bindings/test_mopro.swift",
     "tests/bindings/test_mopro.kts",
