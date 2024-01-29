@@ -141,4 +141,16 @@ else
     echo "uniffi-bindgen already installed, skipping."
 fi
 
+# Check uniffi-bindgen version
+print_action "[ffi] Checking uniffi-bindgen version..."
+UNIFFI_VERSION=$(uniffi-bindgen --version | grep -oE '0\.25\.[0-9]+' || echo "not found")
+EXPECTED_VERSION_PREFIX="0.25"
+if [[ $UNIFFI_VERSION != $EXPECTED_VERSION_PREFIX* ]]; then
+    echo -e "${RED}Error: uniffi-bindgen version is not 0.25.x. Current version: $(uniffi-bindgen --version)${DEFAULT}"
+    echo -e "${RED}Please uninstall uniffi-bindgen and run this script again.${DEFAULT}"
+    exit 1
+else
+    echo "uniffi-bindgen version is $UNIFFI_VERSION, which is acceptable."
+fi
+
 print_action "Done! Please run ./scripts/buld_ios.sh to build for iOS."
