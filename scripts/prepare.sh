@@ -85,44 +85,44 @@ fi
 print_action "[core/circom] Compiling example circuits..."
 cd $CIRCOM_DIR
 
-# # Compile multiplier2
-# compile_circuit multiplier2 multiplier2.circom
+# Compile multiplier2
+compile_circuit multiplier2 multiplier2.circom
 
-# # Setup and compile keccak256
-# npm_install keccak256
-# compile_circuit keccak256 keccak256_256_test.circom
+# Setup and compile keccak256
+npm_install keccak256
+compile_circuit keccak256 keccak256_256_test.circom
 
-# # Setup and compile rsa
-# npm_install rsa
-# compile_circuit rsa main.circom
+# Setup and compile rsa
+npm_install rsa
+compile_circuit rsa main.circom
 
 # Setup and compile anonAadhaar
 npm_install anonAadhaar
 compile_circuit anonAadhaar qr_verify.circom
 
-# # Run trusted setup for multiplier2
-# print_action "[core/circom] Running trusted setup for multiplier2..."
-# ./scripts/trusted_setup.sh multiplier2 08 multiplier2
+# Run trusted setup for multiplier2
+print_action "[core/circom] Running trusted setup for multiplier2..."
+./scripts/trusted_setup.sh multiplier2 08 multiplier2
 
-# # Generate arkzkey for multipler2
-# print_action "[core/circom] Generating arkzkey for multiplier2..."
-# ./scripts/generate_arkzkey.sh multiplier2 multiplier2
+# Generate arkzkey for multipler2
+print_action "[core/circom] Generating arkzkey for multiplier2..."
+./scripts/generate_arkzkey.sh multiplier2 multiplier2
 
-# # Run trusted setup for keccak256
-# print_action "[core/circom] Running trusted setup for keccak256..."
-# ./scripts/trusted_setup.sh keccak256 18 keccak256_256_test
+# Run trusted setup for keccak256
+print_action "[core/circom] Running trusted setup for keccak256..."
+./scripts/trusted_setup.sh keccak256 18 keccak256_256_test
 
-# # Generate arkzkey for keccak256
-# print_action "[core/circom] Generating arkzkey for keccak256..."
-# ./scripts/generate_arkzkey.sh keccak256 keccak256_256_test
+# Generate arkzkey for keccak256
+print_action "[core/circom] Generating arkzkey for keccak256..."
+./scripts/generate_arkzkey.sh keccak256 keccak256_256_test
 
-# # Run trusted setup for rsa
-# print_action "[core/circom] Running trusted setup for rsa..."
-# ./scripts/trusted_setup.sh rsa 18 main
+# Run trusted setup for rsa
+print_action "[core/circom] Running trusted setup for rsa..."
+./scripts/trusted_setup.sh rsa 18 main
 
-# # Generate arkzkey for rsa
-# print_action "[core/circom] Generating arkzkey for rsa..."
-# ./scripts/generate_arkzkey.sh rsa main
+# Generate arkzkey for rsa
+print_action "[core/circom] Generating arkzkey for rsa..."
+./scripts/generate_arkzkey.sh rsa main
 
 # Run trusted setup for anonAadhaar
 print_action "[core/circom] Running trusted setup for rsa..."
@@ -151,6 +151,18 @@ then
     cargo install --bin uniffi-bindgen --path .
 else
     echo "uniffi-bindgen already installed, skipping."
+fi
+
+# Check uniffi-bindgen version
+print_action "[ffi] Checking uniffi-bindgen version..."
+UNIFFI_VERSION=$(uniffi-bindgen --version | grep -oE '0\.25\.[0-9]+' || echo "not found")
+EXPECTED_VERSION_PREFIX="0.25"
+if [[ $UNIFFI_VERSION != $EXPECTED_VERSION_PREFIX* ]]; then
+    echo -e "${RED}Error: uniffi-bindgen version is not 0.25.x. Current version: $(uniffi-bindgen --version)${DEFAULT}"
+    echo -e "${RED}Please uninstall uniffi-bindgen and run this script again.${DEFAULT}"
+    exit 1
+else
+    echo "uniffi-bindgen version is $UNIFFI_VERSION, which is acceptable."
 fi
 
 print_action "Done! Please run ./scripts/buld_ios.sh to build for iOS."

@@ -88,6 +88,10 @@ void uniffi_mopro_ffi_fn_func_initialize_mopro_dylib(RustBuffer dylib_path, Rust
 );
 RustBuffer uniffi_mopro_ffi_fn_func_run_msm_benchmark(RustBuffer num_msm, RustCallStatus *_Nonnull out_status
 );
+RustBuffer uniffi_mopro_ffi_fn_func_to_ethereum_inputs(RustBuffer inputs, RustCallStatus *_Nonnull out_status
+);
+RustBuffer uniffi_mopro_ffi_fn_func_to_ethereum_proof(RustBuffer proof, RustCallStatus *_Nonnull out_status
+);
 int8_t uniffi_mopro_ffi_fn_func_verify_proof2(RustBuffer proof, RustBuffer public_input, RustCallStatus *_Nonnull out_status
 );
 RustBuffer ffi_mopro_ffi_rustbuffer_alloc(int32_t size, RustCallStatus *_Nonnull out_status
@@ -220,6 +224,12 @@ uint16_t uniffi_mopro_ffi_checksum_func_initialize_mopro_dylib(void
     
 );
 uint16_t uniffi_mopro_ffi_checksum_func_run_msm_benchmark(void
+    
+);
+uint16_t uniffi_mopro_ffi_checksum_func_to_ethereum_inputs(void
+    
+);
+uint16_t uniffi_mopro_ffi_checksum_func_to_ethereum_proof(void
     
 );
 uint16_t uniffi_mopro_ffi_checksum_func_verify_proof2(void

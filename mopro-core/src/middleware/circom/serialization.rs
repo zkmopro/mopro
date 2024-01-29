@@ -1,4 +1,5 @@
 use ark_bn254::Bn254;
+use ark_circom::ethereum;
 use ark_ec::pairing::Pairing;
 use ark_groth16::{Proof, ProvingKey};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
@@ -47,6 +48,15 @@ pub fn serialize_inputs(inputs: &SerializableInputs) -> Vec<u8> {
 
 pub fn deserialize_inputs(data: Vec<u8>) -> SerializableInputs {
     SerializableInputs::deserialize_uncompressed(&mut &data[..]).expect("Deserialization failed")
+}
+
+// Convert proof to U256-tuples as expected by the Solidity Groth16 Verifier
+pub fn to_ethereum_proof(proof: &SerializableProof) -> ethereum::Proof {
+    ethereum::Proof::from(proof.0.clone())
+}
+
+pub fn to_ethereum_inputs(inputs: &SerializableInputs) -> ethereum::Inputs {
+    ethereum::Inputs::from(&inputs.0[..])
 }
 
 #[cfg(test)]

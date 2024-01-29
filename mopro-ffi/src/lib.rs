@@ -22,6 +22,25 @@ pub struct GenerateProofResult {
     pub inputs: Vec<u8>,
 }
 
+#[derive(Debug, Clone)]
+pub struct G1 {
+    pub x: String,
+    pub y: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct G2 {
+    pub x: Vec<String>,
+    pub y: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ProofCalldata {
+    pub a: G1,
+    pub b: G2,
+    pub c: G1,
+}
+
 // NOTE: Make UniFFI and Rust happy, can maybe do some renaming here
 #[allow(non_snake_case)]
 #[derive(Debug, Clone)]
@@ -115,6 +134,35 @@ pub fn verify_proof2(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, Mopr
     let deserialized_public_input = circom::serialization::deserialize_inputs(public_input);
     let is_valid = circom::verify_proof2(deserialized_proof, deserialized_public_input)?;
     Ok(is_valid)
+}
+
+// Convert proof to String-tuples as expected by the Solidity Groth16 Verifier
+pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
+    let deserialized_proof = circom::serialization::deserialize_proof(proof);
+    let proof = circom::serialization::to_ethereum_proof(&deserialized_proof);
+    let a = G1 {
+        x: proof.a.x.to_string(),
+        y: proof.a.y.to_string(),
+    };
+    let b = G2 {
+        x: proof.b.x.iter().map(|x| x.to_string()).collect(),
+        y: proof.b.y.iter().map(|x| x.to_string()).collect(),
+    };
+    let c = G1 {
+        x: proof.c.x.to_string(),
+        y: proof.c.y.to_string(),
+    };
+    ProofCalldata { a, b, c }
+}
+
+pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
+    let deserialized_inputs = circom::serialization::deserialize_inputs(inputs);
+    let inputs = deserialized_inputs
+        .0
+        .iter()
+        .map(|x| x.to_string())
+        .collect();
+    inputs
 }
 
 // TODO: Use FFIError::SerializationError instead
@@ -267,8 +315,15 @@ mod tests {
         assert_eq!(serialized_inputs, serialized_outputs);
 
         // Step 3: Verify Proof
-        let is_valid = mopro_circom.verify_proof(serialized_proof, serialized_inputs)?;
+        let is_valid =
+            mopro_circom.verify_proof(serialized_proof.clone(), serialized_inputs.clone())?;
         assert!(is_valid);
+
+        // Step 4: Convert Proof to Ethereum compatible proof
+        let proof_calldata = to_ethereum_proof(serialized_proof);
+        let inputs_calldata = to_ethereum_inputs(serialized_inputs);
+        assert!(proof_calldata.a.x.len() > 0);
+        assert!(inputs_calldata.len() > 0);
 
         Ok(())
     }
@@ -312,8 +367,15 @@ mod tests {
 
         // Step 3: Verify Proof
 
-        let is_valid = mopro_circom.verify_proof(serialized_proof, serialized_inputs)?;
+        let is_valid =
+            mopro_circom.verify_proof(serialized_proof.clone(), serialized_inputs.clone())?;
         assert!(is_valid);
+
+        // Step 4: Convert Proof to Ethereum compatible proof
+        let proof_calldata = to_ethereum_proof(serialized_proof);
+        let inputs_calldata = to_ethereum_inputs(serialized_inputs);
+        assert!(proof_calldata.a.x.len() > 0);
+        assert!(inputs_calldata.len() > 0);
 
         Ok(())
     }
