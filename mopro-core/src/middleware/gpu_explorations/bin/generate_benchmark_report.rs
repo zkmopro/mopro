@@ -32,3 +32,8 @@ fn main() {
         .unwrap();
     }
 }
+
+#[cfg(not(feature = "gpu-benchmarks"))]
+fn main() {
+    println!("The gpu-benchmarks feature is not enabled.");
+}
