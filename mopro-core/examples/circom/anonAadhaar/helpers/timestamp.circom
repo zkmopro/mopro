@@ -114,4 +114,3 @@ template DateStringToTimestamp(maxYears, includeHours, includeMinutes, includeSe
 
     out <== secondsPassed[0] + secondsPassed[1] + secondsPassed[2] + secondsPassed[3];
 }
-
