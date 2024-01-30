@@ -98,7 +98,7 @@ compile_circuit rsa main.circom
 
 # Setup and compile anonAadhaar
 npm_install anonAadhaar
-compile_circuit anonAadhaar qr_verify.circom
+compile_circuit anonAadhaar aadhaar-verifier.circom
 
 # Run trusted setup for multiplier2
 print_action "[core/circom] Running trusted setup for multiplier2..."
@@ -126,11 +126,11 @@ print_action "[core/circom] Generating arkzkey for rsa..."
 
 # Run trusted setup for anonAadhaar
 print_action "[core/circom] Running trusted setup for rsa..."
-./scripts/trusted_setup.sh anonAadhaar 20 qr_verify
+./scripts/trusted_setup.sh anonAadhaar 21 aadhaar-verifier
 
 # Generate arkzkey for anonAadhaar
 print_action "[core/circom] Generating arkzkey for rsa..."
-./scripts/generate_arkzkey.sh anonAadhaar qr_verify
+./scripts/generate_arkzkey.sh anonAadhaar aadhaar-verifier
 
 # Add support for target architectures
 print_action "[ffi] Adding support for target architectures..."

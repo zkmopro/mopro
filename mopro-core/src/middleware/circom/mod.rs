@@ -628,6 +628,51 @@ mod tests {
 
     #[ignore = "ignore for ci"]
     #[test]
+    fn test_setup_prove_rsa2() {
+        // Prepare inputs
+        #[derive(serde::Deserialize)]
+        struct InputData {
+            signature: Vec<String>,
+            modulus: Vec<String>,
+            base_message: Vec<String>,
+        }
+
+        let file_data = std::fs::read_to_string("./examples/circom/rsa/input.json").expect("Unable to read file");
+        let data: InputData = serde_json::from_str(&file_data).expect("JSON was not well-formatted");
+
+
+        let mut inputs: HashMap<String, Vec<BigInt>> = HashMap::new();
+        inputs.insert(
+            "signature".to_string(),
+            strings_to_circuit_inputs(data.signature),
+        );
+        inputs.insert("modulus".to_string(), strings_to_circuit_inputs(data.modulus));
+        inputs.insert(
+            "base_message".to_string(),
+            strings_to_circuit_inputs(data.base_message),
+        );
+
+        // Proof generation
+        let generate_proof_res = generate_proof2(inputs);
+
+        // Check and print the error if there is one
+        if let Err(e) = &generate_proof_res {
+            println!("Error: {:?}", e);
+        }
+
+        assert!(generate_proof_res.is_ok());
+
+        let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
+
+        // Proof verification
+        let verify_res = verify_proof2(serialized_proof, serialized_inputs);
+        assert!(verify_res.is_ok());
+
+        assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
+    }
+
+    #[ignore = "ignore for ci"]
+    #[test]
     fn test_setup_prove_anon_aadhaar() {
         let wasm_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier_js/aadhaar-verifier.wasm";
         let r1cs_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier.r1cs";
@@ -681,51 +726,6 @@ mod tests {
 
         // Proof verification
         let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
-        assert!(verify_res.is_ok());
-
-        assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
-    }
-
-    #[ignore = "ignore for ci"]
-    #[test]
-    fn test_setup_prove_rsa2() {
-        // Prepare inputs
-        #[derive(serde::Deserialize)]
-        struct InputData {
-            signature: Vec<String>,
-            modulus: Vec<String>,
-            base_message: Vec<String>,
-        }
-
-        let file_data = std::fs::read_to_string("./examples/circom/rsa/input.json").expect("Unable to read file");
-        let data: InputData = serde_json::from_str(&file_data).expect("JSON was not well-formatted");
-
-
-        let mut inputs: HashMap<String, Vec<BigInt>> = HashMap::new();
-        inputs.insert(
-            "signature".to_string(),
-            strings_to_circuit_inputs(data.signature),
-        );
-        inputs.insert("modulus".to_string(), strings_to_circuit_inputs(data.modulus));
-        inputs.insert(
-            "base_message".to_string(),
-            strings_to_circuit_inputs(data.base_message),
-        );
-
-        // Proof generation
-        let generate_proof_res = generate_proof2(inputs);
-
-        // Check and print the error if there is one
-        if let Err(e) = &generate_proof_res {
-            println!("Error: {:?}", e);
-        }
-
-        assert!(generate_proof_res.is_ok());
-
-        let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
-
-        // Proof verification
-        let verify_res = verify_proof2(serialized_proof, serialized_inputs);
         assert!(verify_res.is_ok());
 
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
