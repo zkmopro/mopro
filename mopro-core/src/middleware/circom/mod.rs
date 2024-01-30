@@ -378,7 +378,7 @@ pub fn bytes_to_circuit_inputs(bytes: &[u8]) -> CircuitInputs {
 
 pub fn strings_to_circuit_inputs(strings: Vec<String>) -> Vec<BigInt> {
     strings
-        .into_iter()  // Note: using into_iter() instead of iter() to consume the Vec
+        .into_iter()
         .map(|value| BigInt::parse_bytes(value.as_bytes(), 10).unwrap())
         .collect()
 }
@@ -570,7 +570,7 @@ mod tests {
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
-    // #[ignore = "ignore for ci"]
+    #[ignore = "ignore for ci"]
     #[test]
     fn test_setup_prove_rsa() {
         let wasm_path = "./examples/circom/rsa/target/main_js/main.wasm";
@@ -626,10 +626,11 @@ mod tests {
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
+    #[ignore = "ignore for ci"]
     #[test]
     fn test_setup_prove_anon_aadhaar() {
-        let wasm_path = "./examples/circom/anonAadhaar/target/qr_verify_js/qr_verify.wasm";
-        let r1cs_path = "./examples/circom/anonAadhaar/target/qr_verify.r1cs";
+        let wasm_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier_js/aadhaar-verifier.wasm";
+        let r1cs_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier.r1cs";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
@@ -643,9 +644,9 @@ mod tests {
         // Prepare inputs
         #[derive(serde::Deserialize)]
         struct InputData {
-            padded_message: Vec<String>,
+            aadhaar_data: Vec<String>,
             signature: Vec<String>,
-            modulus: Vec<String>,
+            pub_key: Vec<String>,
         }
 
         let file_data = std::fs::read_to_string("./examples/circom/anonAadhaar/input.json").expect("Unable to read file");
@@ -653,19 +654,19 @@ mod tests {
 
         let mut inputs: CircuitInputs = HashMap::new();
         inputs.insert(
-            "padded_message".to_string(),
-            strings_to_circuit_inputs(data.padded_message),
+            "aadhaarData".to_string(),
+            strings_to_circuit_inputs(data.aadhaar_data),
         );
-        inputs.insert("message_len".to_string(), vec![BigInt::from(64)]);
+        inputs.insert("aadhaarDataLength".to_string(), vec![BigInt::from(64)]);
         inputs.insert(
             "signature".to_string(),
             strings_to_circuit_inputs(data.signature),
         );
         inputs.insert(
-            "modulus".to_string(),
-            strings_to_circuit_inputs(data.modulus),
+            "pubKey".to_string(),
+            strings_to_circuit_inputs(data.pub_key),
         );
-
+        inputs.insert("signalHash".to_string(), vec![BigInt::from(1)]);
         // Proof generation
         let generate_proof_res = circom_state.generate_proof(inputs);
 

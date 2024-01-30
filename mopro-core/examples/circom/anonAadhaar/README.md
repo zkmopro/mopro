@@ -1,3 +1,3 @@
 # Notes
 
-This version of the AA is the one with just Sha256 + RSA and no nullifiers with 917,344 contraints.
+This is the latest version of the AA circuits with in total 1,767,153 contraints.

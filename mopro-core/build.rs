@@ -82,7 +82,7 @@ fn main() -> Result<()> {
     // let dir = "examples/circom/keccak256";
     // let circuit = "keccak256_256_test";
     let dir = "examples/circom/anonAadhaar";
-    let circuit = "qr_verify";
+    let circuit = "aadhaar-verifier";
 
     // XXX: Use RSA
     // let dir = "examples/circom/rsa";
