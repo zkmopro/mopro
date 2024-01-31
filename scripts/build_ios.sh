@@ -12,6 +12,9 @@ fi
 # Read the path to the TOML configuration file from the first argument
 CONFIG_FILE="$1"
 
+# Export the configuration file path as an environment variable
+export BUILD_CONFIG_PATH="$(pwd)/$CONFIG_FILE"
+
 # Print which configuration file is being used
 echo "Using configuration file: $CONFIG_FILE"
 
