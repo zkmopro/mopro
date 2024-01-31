@@ -66,7 +66,7 @@ pod install
 
 # Update bindings
 cd "${PROJECT_DIR}"
-./scripts/update_bindings.sh $DEVICE_TYPE $BUILD_MODE
+./scripts/update_bindings.sh $CONFIG_FILE
 
 # Update xcconfig
 MODES="debug release"
