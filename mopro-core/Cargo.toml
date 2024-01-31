@@ -13,7 +13,7 @@ wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 [features]
 default = ["wasmer/dylib"]
 dylib = []                                        # NOTE: can probably remove this if we use env config instead
-gpu-benchmarks = ["jemalloc-ctl", "jemallocator"]
+gpu-benchmarks = []
 
 [dependencies]
 ark-circom = { git = "https://github.com/arkworks-rs/circom-compat.git" }
@@ -45,10 +45,6 @@ ark-zkey = { path = "../ark-zkey" }
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 criterion = "=0.3.6"
-
-# GPU benchmarks
-jemalloc-ctl = { version = "0.5.4", optional = true }
-jemallocator = { version = "0.5.4", optional = true }
 
 [build-dependencies]
 color-eyre = "0.6"

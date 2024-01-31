@@ -1,6 +1,6 @@
 #[cfg(feature = "gpu-benchmarks")]
 uniffi::build_foreign_language_testcases!(
-    "tests/bindings/test_mopro_gen_benchmarks_report.swift",
+    // "tests/bindings/test_mopro_gen_benchmarks_report.swift", // Uncomment to generate benchmarks report, takes nearly 10 minutes
     "tests/bindings/test_mopro_gpu_benchmarks.swift",
     "tests/bindings/test_mopro.swift",
     "tests/bindings/test_mopro.kts",

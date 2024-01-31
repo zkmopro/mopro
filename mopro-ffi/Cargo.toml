@@ -14,8 +14,8 @@ name = "uniffi-bindgen"
 path = "uniffi-bindgen.rs"
 
 [features]
-# default = ["gpu-benchmarks"]  
-default = []
+# default = []
+default = ["gpu-benchmarks"]
 
 # If we enable them here, they should be enabled in mopro-core as well
 dylib = ["mopro-core/dylib"]

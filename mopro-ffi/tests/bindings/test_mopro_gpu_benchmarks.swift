@@ -6,7 +6,6 @@ do {
     print("\nBenchmarking \(1000) msm on BN254 curve")
     print("└─ Average msm time: \(benchData.avgProcessingTime) ms")
     print("└─ Overall processing time: \(benchData.totalProcessingTime) ms")
-    print("└─ Memory allocated: \(benchData.allocatedMemory) Bytes")
 } catch let error as MoproError{
     print("Error running benchmark: \(error)")
 }
