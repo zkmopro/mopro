@@ -46,3 +46,9 @@ To test bindings:
 To test bindings in release mode without warning:
 
 `cargo test --test test_generated_bindings --release 2>/dev/null`
+
+## Generate MSM benchmark report in swift on laptop
+
+* Uncomment the 3rd line in `mopro-ffi/tests/test_generated_bindings.rs` to enable report generation
+* run `cargo test --test test_generated_bindings --features gpu-benchmarks --release`
+* The report would be generated at `mopro-core/benchmarks/gpu_explorations/msm_bench_swift_laptop.csv`
