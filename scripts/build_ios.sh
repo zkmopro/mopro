@@ -1,30 +1,7 @@
 #!/bin/bash
 
-# Color definitions
-DEFAULT='\033[0m'
-RED='\033[0;31m'
-
-# Function to handle exit
-handle_exit() {
-    # $? is a special variable that holds the exit code of the last command executed
-    if [ $? -ne 0 ]; then
-        echo -e "\n${RED}Script did not finish successfully!${DEFAULT}"
-    fi
-}
-
-# Set the trap
-trap handle_exit EXIT
-
-# Check if toml-cli is installed
-if ! command -v toml &> /dev/null; then
-    echo -e "\n${RED}toml-cli is not installed. Please install it to continue.${DEFAULT}"
-    exit 1
-fi
-
-# Function to read value from TOML file and remove quotes
-read_toml() {
-    toml get "$1" "$2" | tr -d '"'
-}
+# Source the script prelude
+source "scripts/_prelude.sh"
 
 # Check if a configuration file was passed as an argument
 if [ "$#" -ne 1 ]; then
@@ -73,7 +50,6 @@ case $BUILD_MODE in
         ;;
 esac
 
-# Rest of the script
 PROJECT_DIR=$(pwd)
 
 # Build circom circuits in mopro-core
