@@ -141,6 +141,15 @@ else
     echo "uniffi-bindgen already installed, skipping."
 fi
 
+# Install toml-cli binary
+print_action "[config] Installing toml-cli..."
+if ! command -v toml &> /dev/null
+then
+    cargo install toml-cli
+else
+    echo "toml already installed, skipping."
+fi
+
 # Check uniffi-bindgen version
 print_action "[ffi] Checking uniffi-bindgen version..."
 UNIFFI_VERSION=$(uniffi-bindgen --version | grep -oE '0\.25\.[0-9]+' || echo "not found")
