@@ -1,0 +1,5 @@
+# config-example.toml
+
+[build]
+device_type = "simulator" # Options: x86_64, simulator, device
+build_mode = "release"    # Options: debug, release
