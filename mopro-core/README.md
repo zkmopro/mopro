@@ -36,9 +36,10 @@ Note that:
 
 ### Script
 
-Add third argument: `dylib`:
+- Add third argument `dylib`
+- Add forth argument with name of dylib, e.g. `rsa` if you want `rsa.dylib`
 
-`./scripts/update_bindings.sh device release dylib`
+`./scripts/update_bindings.sh device release dylib rsa`
 
 Note that `APPLE_SIGNING_IDENTITY` must be set.
 

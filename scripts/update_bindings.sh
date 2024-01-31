@@ -73,10 +73,17 @@ else
     exit 1
 fi
 
-# Check if the third argument is 'dylib'
-USE_DYLIB=false
+# Check if the third argument is 'dylib' and validate the fourth argument
 if [[ $# -ge 3 ]] && [[ "$3" == "dylib" ]]; then
     USE_DYLIB=true
+    # Check if the fourth argument is provided
+    if [[ $# -lt 4 ]]; then
+        echo -e "${RED}Error: Please specify the name of the dylib file as the fourth argument.${DEFAULT}"
+        exit 1
+    fi
+    DYLIB_NAME="$4.dylib" # Assuming the extension is always .dylib
+else
+    USE_DYLIB=false
 fi
 
 print_action "Updating mopro-ffi bindings and library ($BUILD_MODE $DEVICE_TYPE)..."
@@ -134,16 +141,15 @@ cp ${TARGET_DIR}/SwiftBindings/mopro.swift ${MOPROKIT_DIR}/Bindings/
 cp ${TARGET_DIR}/SwiftBindings/moproFFI.modulemap ${MOPROKIT_DIR}/Resources/
 cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
 
+# TODO: Improve CLI, positional arguments a bit messy
 # Dylib assets
-# TODO: Hardcoded to rsa for now
 if [[ "$USE_DYLIB" == true ]]; then
-    print_action "Copying dynamic library asset (rsa)..."
-    cp ${PROJECT_DIR}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/rsa.dylib ${TARGET_DIR}/
-    cp ${TARGET_DIR}/rsa.dylib ${MOPROKIT_DIR}/Libs/
+    print_action "Copying dynamic library asset (${DYLIB_NAME})..."
+    cp "${PROJECT_DIR}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}" "${TARGET_DIR}/"
+    cp "${TARGET_DIR}/${DYLIB_NAME}" "${MOPROKIT_DIR}/Libs/"
     # Fix dynamic lib install paths
-    # NOTE: Xcode might already do this for us
-    install_name_tool -id @rpath/rsa.dylib ${MOPROKIT_DIR}/Libs/rsa.dylib
-    codesign -f -s "${APPLE_SIGNING_IDENTITY}" ${MOPROKIT_DIR}/Libs/rsa.dylib
-fi
+    # NOTE: Xcode might already do this for us; verify this
+    install_name_tool -id "@rpath/${DYLIB_NAME}" "${MOPROKIT_DIR}/Libs/${DYLIB_NAME}"
+    codesign -f -s "${APPLE_SIGNING_IDENTITY}" "${MOPROKIT_DIR}/Libs/${DYLIB_NAME}"
 
 print_action "Done! Please re-build your project in Xcode."
