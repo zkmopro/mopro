@@ -1,6 +1,26 @@
 use color_eyre::eyre::Result;
+use serde::Deserialize;
 use std::env;
+use std::fs;
 use std::path::PathBuf;
+use toml;
+
+#[derive(Deserialize)]
+struct Config {
+    circuit: CircuitConfig,
+    dylib: DylibConfig,
+}
+
+#[derive(Deserialize)]
+struct CircuitConfig {
+    dir: String,
+    name: String,
+}
+
+#[derive(Deserialize)]
+struct DylibConfig {
+    name: String,
+}
 
 fn prepare_env(zkey_path: String, wasm_path: String, arkzkey_path: String) -> Result<()> {
     let project_dir = env::var("CARGO_MANIFEST_DIR")?;
@@ -77,7 +97,25 @@ fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
     Ok(())
 }
 
-fn main() -> Result<()> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Read and parse the TOML configuration file
+    let config_path =
+        env::var("BUILD_CONFIG_PATH").unwrap_or_else(|_| "config-example.toml".to_string());
+    let config_str = fs::read_to_string(config_path)?;
+    let config: Config = toml::from_str(&config_str)?;
+
+    // Use values from the configuration
+    let dir = &config.circuit.dir;
+    let circuit = &config.circuit.name;
+    let dylib_name = &config.dylib.name;
+
+    // TODO: Actually use these values!
+
+    println!("cargo:warning=TOML config path: {}", config_str);
+    println!("cargo:warning=dir: {}", dir);
+    println!("cargo:warning=circuit: {}", circuit);
+    println!("cargo:warning=dylib_name: {}", dylib_name);
+
     // TODO: build_circuit function to builds all related artifacts, instead of doing this externally
     let dir = "examples/circom/keccak256";
     let circuit = "keccak256_256_test";

@@ -3,6 +3,11 @@
 # Source the script prelude
 source "scripts/_prelude.sh"
 
+# NOTE: This is quite noisy so turning off by default
+# Coloring the -x output (commands)
+DEBUG_COLOR="${DEFAULT}"
+trap 'echo -e ${DEBUG_COLOR}${BASH_COMMAND}${DEFAULT}' DEBUG
+
 # Check if a configuration file was passed as an argument
 if [ "$#" -ne 1 ]; then
     echo -e "\n${RED}Usage: $0 path/to/config.toml${DEFAULT}"
@@ -11,6 +16,9 @@ fi
 
 # Read the path to the TOML configuration file from the first argument
 CONFIG_FILE="$1"
+
+# Export the configuration file path as an environment variable
+export BUILD_CONFIG_PATH="$(pwd)/$CONFIG_FILE"
 
 # Print which configuration file is being used
 echo "Using configuration file: $CONFIG_FILE"
