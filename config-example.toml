@@ -1,13 +1,18 @@
 # config-example.toml
 
 [build]
-device_type = "simulator" # Options: x86_64, simulator, device
-build_mode = "release"    # Options: debug, release
+# For iOS device_type can be x86_64, simulator, device
+# For Android device_type can be x86_64, arm, arm64
+device_type = "simulator" # Options: x86_64, simulator, device, arm, arm64
+
+# debug is for Rust library to be in debug mode and release for release mode
+# We recommend release mode by default for performance
+build_mode = "release" # Options: debug, release
 
 [circuit]
 dir = "examples/circom/keccak256" # Directory of the circuit
 name = "keccak256_256_test"       # Name of the circuit
 
 [dylib]
-use_dylib = false        # Options: true, false
+use_dylib = true         # Options: true, false
 name = "keccak256.dylib" # Name of the dylib file, only used if use_dylib is true
