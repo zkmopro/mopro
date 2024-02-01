@@ -32,7 +32,7 @@ jobs:
       - name: Prepare CI for iOS
         run: ./scripts/prepare_ci.sh
       - name: Build for iOS
-        run: ./scripts/build_ios.sh x86_64 debug
+        run: ./scripts/build_ios.sh config-example.toml
       - name: Run iOS tests
         run: |
           cd mopro-ios/MoproKit/Example
@@ -51,7 +51,7 @@ jobs:
       - name: Prepare CI for Core and FFI
         run: ./scripts/prepare_ci.sh
       - name: Build for Android
-        run: ./scripts/build_android.sh arm64 debug
+        run: ./scripts/build_android.sh config-example-android.toml
       - name: Run core tests
         run: cd mopro-core && cargo test -- --nocapture
       - name: Run FFI tests
