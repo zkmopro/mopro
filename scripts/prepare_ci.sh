@@ -122,6 +122,15 @@ for target in x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim; do
     fi
 done
 
+# Install toml-cli binary
+print_action "[config] Installing toml-cli..."
+if ! command -v toml &> /dev/null
+then
+    cargo install toml-cli
+else
+    echo "toml already installed, skipping."
+fi
+
 # Install uniffi-bindgen binary in mopro-ffi
 print_action "[ffi] Installing uniffi-bindgen..."
 if ! command -v uniffi-bindgen &> /dev/null
