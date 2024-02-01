@@ -11,8 +11,8 @@ edition = "2021"
 wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 
 [features]
-default = []
-dylib = ["wasmer/dylib"]
+default = ["wasmer/dylib"]
+dylib = []                                        # NOTE: can probably remove this if we use env config instead
 gpu-benchmarks = ["jemalloc-ctl", "jemallocator"]
 
 [dependencies]
