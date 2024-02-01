@@ -35,14 +35,3 @@ print_action() {
 print_warning() {
     printf "\n${YELLOW}$1${DEFAULT}\n"
 }
-
-# Check if toml-cli is installed
-if ! command -v toml &> /dev/null; then
-    echo -e "${RED}toml (toml-cli) is not installed. Please install it to continue.${DEFAULT}"
-    exit 1
-fi
-
-# Function to read value from TOML file and remove quotes
-read_toml() {
-    toml get "$1" "$2" | tr -d '"'
-}
