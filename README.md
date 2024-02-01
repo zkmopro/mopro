@@ -52,7 +52,7 @@ dir = "examples/circom/keccak256" # Directory of the circuit
 name = "keccak256_256_test"       # Name of the circuit
 
 [dylib]
-use_dylib = true         # Options: true, false
+use_dylib = false         # Options: true, false
 name = "keccak256.dylib" # Name of the dylib file, only used if use_dylib is true
 ```
 
