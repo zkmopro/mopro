@@ -131,13 +131,4 @@ else
     echo "uniffi-bindgen already installed, skipping."
 fi
 
-# Install toml-cli binary
-print_action "[config] Installing toml-cli..."
-if ! command -v toml &> /dev/null
-then
-    cargo install toml-cli
-else
-    echo "toml already installed, skipping."
-fi
-
 print_action "Done! Please run ./scripts/buld_ios.sh to build for iOS."

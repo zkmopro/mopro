@@ -3,6 +3,17 @@
 # Source the script prelude
 source "scripts/_prelude.sh"
 
+# Check if toml-cli is installed
+if ! command -v toml &> /dev/null; then
+    echo -e "${RED}toml (toml-cli) is not installed. Please install it to continue.${DEFAULT}"
+    exit 1
+fi
+
+# Function to read value from TOML file and remove quotes
+read_toml() {
+    toml get "$1" "$2" | tr -d '"'
+}
+
 # NOTE: This is quite noisy so turning off by default
 # Coloring the -x output (commands)
 DEBUG_COLOR="${DEFAULT}"
