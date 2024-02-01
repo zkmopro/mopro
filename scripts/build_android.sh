@@ -3,39 +3,67 @@
 # Source the script prelude
 source "scripts/_prelude.sh"
 
-# Check for the device type argument
-if [[ "$1" == "x86_64" ]]; then
-    ARCHITECTURE="x86_64-linux-android"
-    FOLDER="x86_64"
-    elif [[ "$1" == "x86" ]]; then
-    ARCHITECTURE="i686-linux-android"
-    FOLDER="x86"
-    elif [[ "$1" == "arm" ]]; then
-    ARCHITECTURE="armv7-linux-androideabi"
-    FOLDER="armeabi-v7a"
-    elif [[ "$1" == "arm64" ]]; then
-    ARCHITECTURE="aarch64-linux-android"
-    FOLDER="arm64-v8a"
-else
-    echo -e "${RED}Error: Please specify either 'x86_64', 'x86', 'arm' or 'arm64' as the first argument.${DEFAULT}"
+# Check if a configuration file was passed as an argument
+if [ "$#" -ne 1 ]; then
+    echo -e "\n${RED}Usage: $0 path/to/config.toml${DEFAULT}"
     exit 1
 fi
 
-# Check for the build mode argument
-if [[ "$2" == "debug" ]]; then
-    BUILD_MODE="debug"
-    LIB_DIR="debug"
-    COMMAND=""
-    elif [[ "$2" == "release" ]]; then
-    BUILD_MODE="release"
-    LIB_DIR="release"
-    COMMAND="--release"
-else
-    echo -e "${RED}Error: Please specify either 'debug' or 'release' as the second argument.${DEFAULT}"
-    exit 1
-fi
+# Read the path to the TOML configuration file from the first argument
+CONFIG_FILE="$1"
+
+# Export the configuration file path as an environment variable
+export BUILD_CONFIG_PATH="$(pwd)/$CONFIG_FILE"
+
+# Print which configuration file is being used
+echo "Using configuration file: $CONFIG_FILE"
+
+# Read configurations from TOML file within [build] block
+DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
+BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
+
+# Determine the architecture and folder based on device type
+case $DEVICE_TYPE in
+    "x86_64")
+        ARCHITECTURE="x86_64-linux-android"
+        FOLDER="x86_64"
+        ;;
+    "x86")
+        ARCHITECTURE="i686-linux-android"
+        FOLDER="x86"
+        ;;
+    "arm")
+        ARCHITECTURE="armv7-linux-androideabi"
+        FOLDER="armeabi-v7a"
+        ;;
+    "arm64")
+        ARCHITECTURE="aarch64-linux-android"
+        FOLDER="arm64-v8a"
+        ;;
+    *)
+        echo -e "${RED}Error: Invalid device type specified in config: $DEVICE_TYPE${DEFAULT}"
+        exit 1
+        ;;
+esac
+
+# Determine the library directory and build command based on build mode
+case $BUILD_MODE in
+    "debug")
+        LIB_DIR="debug"
+        COMMAND=""
+        ;;
+    "release")
+        LIB_DIR="release"
+        COMMAND="--release"
+        ;;
+    *)
+        echo -e "${RED}Error: Invalid build mode specified in config: $BUILD_MODE${DEFAULT}"
+        exit 1
+        ;;
+esac
 
 PROJECT_DIR=$(pwd)
+
 cd ${PROJECT_DIR}/mopro-ffi
 
 # Print appropriate message based on device type
