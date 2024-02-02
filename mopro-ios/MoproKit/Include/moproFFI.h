@@ -76,7 +76,7 @@ int8_t uniffi_mopro_ffi_fn_method_moprocircom_verify_proof(void*_Nonnull ptr, Ru
 );
 uint32_t uniffi_mopro_ffi_fn_func_add(uint32_t a, uint32_t b, RustCallStatus *_Nonnull out_status
 );
-RustBuffer uniffi_mopro_ffi_fn_func_generate_proof2(RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
+RustBuffer uniffi_mopro_ffi_fn_func_generate_proof2(RustBuffer zkey_path, RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
 );
 RustBuffer uniffi_mopro_ffi_fn_func_hello(RustCallStatus *_Nonnull out_status
     
@@ -92,7 +92,7 @@ RustBuffer uniffi_mopro_ffi_fn_func_to_ethereum_inputs(RustBuffer inputs, RustCa
 );
 RustBuffer uniffi_mopro_ffi_fn_func_to_ethereum_proof(RustBuffer proof, RustCallStatus *_Nonnull out_status
 );
-int8_t uniffi_mopro_ffi_fn_func_verify_proof2(RustBuffer proof, RustBuffer public_input, RustCallStatus *_Nonnull out_status
+int8_t uniffi_mopro_ffi_fn_func_verify_proof2(RustBuffer zkey_path, RustBuffer proof, RustBuffer public_input, RustCallStatus *_Nonnull out_status
 );
 RustBuffer ffi_mopro_ffi_rustbuffer_alloc(int32_t size, RustCallStatus *_Nonnull out_status
 );

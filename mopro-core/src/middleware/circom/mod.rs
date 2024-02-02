@@ -4,7 +4,10 @@ use self::{
 };
 use crate::MoproError;
 
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    fs::{self},
+};
 //use std::io::Cursor;
 use std::sync::Mutex;
 use std::time::Instant;
@@ -71,7 +74,15 @@ const ARKZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ARKZKEY_FILE"));
 //     let mut reader = Cursor::new(ZKEY_BYTES);
 //     read_zkey(&mut reader).expect("Failed to read zkey")
 // });
+// #[cfg(feature = "use_external_zkey")]
+fn load_arkzkey_from_file(
+    zkey_path: &str,
+) -> Result<(ProvingKey<Bn254>, ConstraintMatrices<Fr>), MoproError> {
+    let bytes = fs::read(zkey_path).map_err(|e| MoproError::IoError(e.to_string()))?;
+    read_arkzkey_from_bytes(&bytes).map_err(|e| MoproError::CircomError(e.to_string()))
+}
 
+#[cfg(not(feature = "use_external_zkey"))]
 static ARKZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
     //let mut reader = Cursor::new(ARKZKEY_BYTES);
     // TODO: Use reader? More flexible; unclear if perf diff
@@ -133,8 +144,9 @@ fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
 
 // Experimental
 #[must_use]
-pub fn arkzkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
-    &ARKZKEY
+pub fn arkzkey(zkey_path: &str) -> (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
+    load_arkzkey_from_file(zkey_path).unwrap()
+    // ARKZKEY.clone()
 }
 
 /// Provides access to the `WITNESS_CALCULATOR` singleton, initializing it if necessary.
@@ -169,6 +181,7 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
 }
 
 pub fn generate_proof2(
+    zkey_path: &str,
     inputs: CircuitInputs,
 ) -> Result<(SerializableProof, SerializableInputs), MoproError> {
     let mut rng = thread_rng();
@@ -190,7 +203,7 @@ pub fn generate_proof2(
 
     let now = std::time::Instant::now();
     //let zkey = zkey();
-    let zkey = arkzkey();
+    let zkey = arkzkey(zkey_path);
     println!("Loading arkzkey took: {:.2?}", now.elapsed());
 
     let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
@@ -215,11 +228,12 @@ pub fn generate_proof2(
 }
 
 pub fn verify_proof2(
+    zkey_path: &str,
     serialized_proof: SerializableProof,
     serialized_inputs: SerializableInputs,
 ) -> Result<bool, MoproError> {
     let start = Instant::now();
-    let zkey = arkzkey();
+    let zkey = arkzkey(zkey_path);
     let pvk = prepare_verifying_key(&zkey.0.vk);
 
     let proof_verified =
@@ -549,6 +563,8 @@ mod tests {
             initialize(Path::new(&dylib_path));
         }
 
+        let zkey_path = "./examples/circom/keccak256/target/keccak256_256_test_final.arkzkey";
+
         let input_vec = vec![
             116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -560,12 +576,12 @@ mod tests {
         let inputs = bytes_to_circuit_inputs(&input_vec);
         let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
 
-        let generate_proof_res = generate_proof2(inputs);
+        let generate_proof_res = generate_proof2(zkey_path, inputs);
         let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
         assert_eq!(serialized_inputs, serialized_outputs);
 
         // Proof verification
-        let verify_res = verify_proof2(serialized_proof, serialized_inputs);
+        let verify_res = verify_proof2(zkey_path, serialized_proof, serialized_inputs);
         assert!(verify_res.is_ok());
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
@@ -724,6 +740,8 @@ mod tests {
     #[ignore = "ignore for ci"]
     #[test]
     fn test_setup_prove_rsa2() {
+
+        let zkey_path = "./examples/circom/rsa/target/main_final.arkzkey";
         // Prepare inputs
         let signature = [
             "3582320600048169363",
@@ -840,7 +858,7 @@ mod tests {
         );
 
         // Proof generation
-        let generate_proof_res = generate_proof2(inputs);
+        let generate_proof_res = generate_proof2(zkey_path, inputs);
 
         // Check and print the error if there is one
         if let Err(e) = &generate_proof_res {
@@ -852,7 +870,7 @@ mod tests {
         let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
 
         // Proof verification
-        let verify_res = verify_proof2(serialized_proof, serialized_inputs);
+        let verify_res = verify_proof2(zkey_path, serialized_proof, serialized_inputs);
         assert!(verify_res.is_ok());
 
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified

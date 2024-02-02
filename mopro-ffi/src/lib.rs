@@ -104,6 +104,7 @@ pub fn initialize_mopro_dylib(dylib_path: String) -> Result<(), MoproError> {
 }
 
 pub fn generate_proof2(
+    zkey_path: String,
     inputs: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
     // Convert inputs to BigInt
@@ -119,7 +120,7 @@ pub fn generate_proof2(
         })
         .collect();
 
-    let (proof, inputs) = circom::generate_proof2(bigint_inputs)?;
+    let (proof, inputs) = circom::generate_proof2(&zkey_path, bigint_inputs)?;
 
     let serialized_proof = circom::serialization::serialize_proof(&proof);
     let serialized_inputs = circom::serialization::serialize_inputs(&inputs);
@@ -129,10 +130,10 @@ pub fn generate_proof2(
     })
 }
 
-pub fn verify_proof2(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
+pub fn verify_proof2(zkey_path: String,proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
     let deserialized_proof = circom::serialization::deserialize_proof(proof);
     let deserialized_public_input = circom::serialization::deserialize_inputs(public_input);
-    let is_valid = circom::verify_proof2(deserialized_proof, deserialized_public_input)?;
+    let is_valid = circom::verify_proof2(&zkey_path, deserialized_proof, deserialized_public_input)?;
     Ok(is_valid)
 }
 

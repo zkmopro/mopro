@@ -857,6 +857,9 @@ public enum MoproError {
     // Simple error enums only carry a message
     case CircomError(message: String)
     
+    // Simple error enums only carry a message
+    case IoError(message: String)
+    
 
     fileprivate static func uniffiErrorHandler(_ error: RustBuffer) throws -> Error {
         return try FfiConverterTypeMoproError.lift(error)
@@ -878,6 +881,10 @@ public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
             message: try FfiConverterString.read(from: &buf)
         )
         
+        case 2: return .IoError(
+            message: try FfiConverterString.read(from: &buf)
+        )
+        
 
         default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -891,6 +898,8 @@ public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
         
         case .CircomError(_ /* message is ignored*/):
             writeInt(&buf, Int32(1))
+        case .IoError(_ /* message is ignored*/):
+            writeInt(&buf, Int32(2))
 
         
         }
@@ -978,10 +987,11 @@ public func add(a: UInt32, b: UInt32)  -> UInt32 {
     )
 }
 
-public func generateProof2(circuitInputs: [String: [String]]) throws -> GenerateProofResult {
+public func generateProof2(zkeyPath: String, circuitInputs: [String: [String]]) throws -> GenerateProofResult {
     return try  FfiConverterTypeGenerateProofResult.lift(
         try rustCallWithError(FfiConverterTypeMoproError.lift) {
     uniffi_mopro_ffi_fn_func_generate_proof2(
+        FfiConverterString.lower(zkeyPath),
         FfiConverterDictionaryStringSequenceString.lower(circuitInputs),$0)
 }
     )
@@ -1039,10 +1049,11 @@ public func toEthereumProof(proof: Data)  -> ProofCalldata {
     )
 }
 
-public func verifyProof2(proof: Data, publicInput: Data) throws -> Bool {
+public func verifyProof2(zkeyPath: String, proof: Data, publicInput: Data) throws -> Bool {
     return try  FfiConverterBool.lift(
         try rustCallWithError(FfiConverterTypeMoproError.lift) {
     uniffi_mopro_ffi_fn_func_verify_proof2(
+        FfiConverterString.lower(zkeyPath),
         FfiConverterData.lower(proof),
         FfiConverterData.lower(publicInput),$0)
 }
@@ -1067,7 +1078,7 @@ private var initializationResult: InitializationResult {
     if (uniffi_mopro_ffi_checksum_func_add() != 8411) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_ffi_checksum_func_generate_proof2() != 40187) {
+    if (uniffi_mopro_ffi_checksum_func_generate_proof2() != 37475) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_func_hello() != 46136) {
@@ -1088,7 +1099,7 @@ private var initializationResult: InitializationResult {
     if (uniffi_mopro_ffi_checksum_func_to_ethereum_proof() != 60110) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_ffi_checksum_func_verify_proof2() != 37192) {
+    if (uniffi_mopro_ffi_checksum_func_verify_proof2() != 30573) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_method_moprocircom_generate_proof() != 64602) {

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2A418AB02AF4B1200004B747 /* CircomUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A418AAF2AF4B1200004B747 /* CircomUITests.swift */; };
 		2A6E5BAF2AF499460052A601 /* CircomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A6E5BAE2AF499460052A601 /* CircomTests.swift */; };
+		2AAD38B22B6CC318004F37BB /* FileDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAD38B12B6CC318004F37BB /* FileDownloader.swift */; };
 		4384FD09A96F702A375841EE /* Pods_MoproKit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78B0F9CBE5DD22576996A993 /* Pods_MoproKit_Tests.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
@@ -46,6 +47,7 @@
 		1E5E014D70B48C9A59F14658 /* Pods-MoproKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoproKit_Example.release.xcconfig"; path = "Target Support Files/Pods-MoproKit_Example/Pods-MoproKit_Example.release.xcconfig"; sourceTree = "<group>"; };
 		2A418AAF2AF4B1200004B747 /* CircomUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircomUITests.swift; sourceTree = "<group>"; };
 		2A6E5BAE2AF499460052A601 /* CircomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircomTests.swift; sourceTree = "<group>"; };
+		2AAD38B12B6CC318004F37BB /* FileDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloader.swift; sourceTree = "<group>"; };
 		47F8ADB0AC4168C6E874818D /* MoproKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = MoproKit.podspec; path = ../MoproKit.podspec; sourceTree = "<group>"; };
 		5DAF212A114DFA0C9F4282B2 /* Pods-MoproKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoproKit_Tests.debug.xcconfig"; path = "Target Support Files/Pods-MoproKit_Tests/Pods-MoproKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* MoproKit_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoproKit_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -127,6 +129,7 @@
 		607FACD21AFB9204008FA782 /* Example for MoproKit */ = {
 			isa = PBXGroup;
 			children = (
+				2AAD38B12B6CC318004F37BB /* FileDownloader.swift */,
 				CEB804572AFF81BF0063F091 /* RSAViewController.swift */,
 				E69338632AFFDB1A00B80312 /* AnonAadhaarViewController.swift */,
 				CEB804552AFF81AF0063F091 /* KeccakZkeyViewController.swift */,
@@ -408,6 +411,7 @@
 			files = (
 				CEB804582AFF81BF0063F091 /* RSAViewController.swift in Sources */,
 				CEB804562AFF81AF0063F091 /* KeccakZkeyViewController.swift in Sources */,
+				2AAD38B22B6CC318004F37BB /* FileDownloader.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				CEB804502AFF81960063F091 /* KeccakSetupViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
