@@ -225,7 +225,7 @@ pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproE
 }
 
 #[cfg(not(feature = "gpu-benchmarks"))]
-pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
+pub fn run_msm_benchmark(_num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
     println!("gpu-benchmarks feature not enabled!");
     panic!("gpu-benchmarks feature not enabled!");
 }
