@@ -11,8 +11,8 @@ edition = "2021"
 wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 
 [features]
-default = []
-dylib = ["wasmer/dylib"]
+default = ["wasmer/dylib"]
+dylib = []                                        # NOTE: can probably remove this if we use env config instead
 gpu-benchmarks = ["jemalloc-ctl", "jemallocator"]
 
 [dependencies]
@@ -48,13 +48,16 @@ color-eyre = "=0.6.2"
 criterion = "=0.3.6"
 
 # GPU benchmarks
-jemalloc-ctl = { version = "0.5.4", optional = true}
-jemallocator = { version = "0.5.4", optional = true}
+jemalloc-ctl = { version = "0.5.4", optional = true }
+jemallocator = { version = "0.5.4", optional = true }
 
 [build-dependencies]
 color-eyre = "0.6"
 enumset = "1.0.8"
 wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
+toml = "0.8"
+serde = "1.0"
+serde_derive = "1.0"
 
 [[bin]]
 name = "generate_benchmark_report"

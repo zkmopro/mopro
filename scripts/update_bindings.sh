@@ -1,38 +1,44 @@
 #!/bin/bash
 
-# Deal with errors
-set -euo pipefail
+# Source the script prelude
+source "scripts/_prelude.sh"
 
-# Color definitions
-DEFAULT='\033[0m'
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-GREY='\033[0;90m'
+# Check if toml-cli is installed
+if ! command -v toml &> /dev/null; then
+    echo -e "${RED}toml (toml-cli) is not installed. Please install it to continue.${DEFAULT}"
+    exit 1
+fi
 
+# Function to read value from TOML file and remove quotes
+read_toml() {
+    toml get "$1" "$2" | tr -d '"'
+}
+
+# NOTE: This is quite noisy so turning off by default
 # Coloring the -x output (commands)
 DEBUG_COLOR="${DEFAULT}"
 trap 'echo -e ${DEBUG_COLOR}${BASH_COMMAND}${DEFAULT}' DEBUG
 
-# Function to handle exit
-handle_exit() {
-    # $? is a special variable that holds the exit code of the last command executed
-    if [ $? -ne 0 ]; then
-        echo -e "\n${RED}Script did not finish successfully!${DEFAULT}"
-    fi
-}
+# Check if a configuration file was passed as an argument
+if [ "$#" -ne 1 ]; then
+    echo -e "\n${RED}Usage: $0 path/to/config.toml${DEFAULT}"
+    exit 1
+fi
 
-# Set the trap
-trap handle_exit EXIT
+# Read the path to the TOML configuration file from the first argument
+CONFIG_FILE="$1"
 
-print_action() {
-    printf "\n${GREEN}$1${DEFAULT}\n"
-}
+# Export the configuration file path as an environment variable
+export BUILD_CONFIG_PATH="$(pwd)/$CONFIG_FILE"
 
-print_warning() {
-    printf "\n${YELLOW}$1${DEFAULT}\n"
-}
+# Print which configuration file is being used
+echo "Using configuration file: $CONFIG_FILE"
+
+# Read configurations from TOML file
+DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
+BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
+USE_DYLIB=$(read_toml "$CONFIG_FILE" "dylib.use_dylib")
+DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")
 
 # Assert we're in the project root
 if [[ ! -d "mopro-ffi" || ! -d "mopro-core" || ! -d "mopro-ios" ]]; then
@@ -40,50 +46,43 @@ if [[ ! -d "mopro-ffi" || ! -d "mopro-core" || ! -d "mopro-ios" ]]; then
     exit 1
 fi
 
-# Ensure there are at least two arguments
-if [[ $# -lt 2 ]]; then
-    echo -e "${RED}Error: Please specify the device type ('simulator' or 'device') and build mode ('debug' or 'release') as arguments.${DEFAULT}"
-    exit 1
-fi
+# Determine architecture based on device type
+case $DEVICE_TYPE in
+    "x86_64")
+        ARCHITECTURE="x86_64-apple-ios"
+        ;;
+    "simulator")
+        ARCHITECTURE="aarch64-apple-ios-sim"
+        ;;
+    "device")
+        ARCHITECTURE="aarch64-apple-ios"
+        ;;
+    *)
+        echo -e "${RED}Error: Invalid device type specified in config: $DEVICE_TYPE${DEFAULT}"
+        exit 1
+        ;;
+esac
 
-# Check for the device type argument
-if [[ "$1" == "x86_64" ]]; then
-    DEVICE_TYPE="x86_64"
-    ARCHITECTURE="x86_64-apple-ios"
-elif [[ "$1" == "simulator" ]]; then
-    DEVICE_TYPE="simulator"
-    ARCHITECTURE="aarch64-apple-ios-sim"
-elif [[ "$1" == "device" ]]; then
-    DEVICE_TYPE="device"
-    ARCHITECTURE="aarch64-apple-ios"
-else
-    echo -e "${RED}Error: Please specify either 'x86_64', 'simulator' or 'device' as the first argument, and 'debug' or 'release' as the second argument.${DEFAULT}"
-    exit 1
-fi
+# Determine library directory based on build mode
+case $BUILD_MODE in
+    "debug")
+        LIB_DIR="debug"
+        ;;
+    "release")
+        LIB_DIR="release"
+        ;;
+    *)
+        echo -e "${RED}Error: Invalid build mode specified in config: $BUILD_MODE${DEFAULT}"
+        exit 1
+        ;;
+esac
 
-# Check for the build mode argument
-if [[ "$2" == "debug" ]]; then
-    BUILD_MODE="debug"
-    LIB_DIR="debug"
-elif [[ "$2" == "release" ]]; then
-    BUILD_MODE="release"
-    LIB_DIR="release"
-else
-    echo -e "${RED}Error: Please specify either 'debug' or 'release' as the second argument.${DEFAULT}"
-    exit 1
-fi
-
-# Check if the third argument is 'dylib' and validate the fourth argument
-if [[ $# -ge 3 ]] && [[ "$3" == "dylib" ]]; then
-    USE_DYLIB=true
-    # Check if the fourth argument is provided
-    if [[ $# -lt 4 ]]; then
-        echo -e "${RED}Error: Please specify the name of the dylib file as the fourth argument.${DEFAULT}"
+# Check dylib usage and name
+if [[ "$USE_DYLIB" == true ]]; then
+    if [[ -z "$DYLIB_NAME" ]]; then
+        echo -e "${RED}Error: Dylib name not specified in config while 'use_dylib' is set to true.${DEFAULT}"
         exit 1
     fi
-    DYLIB_NAME="$4.dylib" # Assuming the extension is always .dylib
-else
-    USE_DYLIB=false
 fi
 
 print_action "Updating mopro-ffi bindings and library ($BUILD_MODE $DEVICE_TYPE)..."
@@ -99,11 +98,12 @@ if [[ "$USE_DYLIB" == true ]]; then
     export BUILD_MODE
 fi
 
+# Generate Swift bindings
 print_action "Generating Swift bindings..."
 uniffi-bindgen generate ${PROJECT_DIR}/mopro-ffi/src/mopro.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
 
-cd ${PROJECT_DIR}/mopro-ffi
-
+# Build mopro-ffi
+cd mopro-ffi
 if [[ "$USE_DYLIB" == true ]]; then
     # Build dylib
     print_action "Building mopro-ffi with dylib flag ($BUILD_MODE)..."
@@ -151,5 +151,6 @@ if [[ "$USE_DYLIB" == true ]]; then
     # NOTE: Xcode might already do this for us; verify this
     install_name_tool -id "@rpath/${DYLIB_NAME}" "${MOPROKIT_DIR}/Libs/${DYLIB_NAME}"
     codesign -f -s "${APPLE_SIGNING_IDENTITY}" "${MOPROKIT_DIR}/Libs/${DYLIB_NAME}"
+fi
 
 print_action "Done! Please re-build your project in Xcode."

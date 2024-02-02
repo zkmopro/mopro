@@ -1,33 +1,30 @@
 use color_eyre::eyre::Result;
-use std::env;
+use serde::Deserialize;
 use std::path::PathBuf;
+use std::{env, fs};
+use toml;
 
-fn prepare_env(zkey_path: String, wasm_path: String, arkzkey_path: String) -> Result<()> {
-    let project_dir = env::var("CARGO_MANIFEST_DIR")?;
-    let zkey_file = PathBuf::from(&project_dir).join(zkey_path);
-    let wasm_file = PathBuf::from(&project_dir).join(wasm_path);
-    let arkzkey_file = PathBuf::from(&project_dir).join(arkzkey_path);
-
-    // TODO: Right now emitting as warnings for visibility, figure out better way to do this?
-    println!("cargo:warning=zkey_file: {}", zkey_file.display());
-    println!("cargo:warning=wasm_file: {}", wasm_file.display());
-    println!("cargo:warning=arkzkey_file: {}", arkzkey_file.display());
-
-    // Set BUILD_RS_ZKEY_FILE and BUILD_RS_WASM_FILE env var
-    println!("cargo:rustc-env=BUILD_RS_ZKEY_FILE={}", zkey_file.display());
-    println!("cargo:rustc-env=BUILD_RS_WASM_FILE={}", wasm_file.display());
-    println!(
-        "cargo:rustc-env=BUILD_RS_ARKZKEY_FILE={}",
-        arkzkey_file.display()
-    );
-
-    Ok(())
+#[derive(Deserialize)]
+struct Config {
+    circuit: CircuitConfig,
+    dylib: Option<DylibConfig>,
 }
 
-#[cfg(feature = "dylib")]
+#[derive(Deserialize)]
+struct CircuitConfig {
+    dir: String,
+    name: String,
+}
+
+#[derive(Deserialize)]
+struct DylibConfig {
+    use_dylib: bool,
+    name: String,
+}
+
 fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
     use std::path::Path;
-    use std::{fs, str::FromStr};
+    use std::str::FromStr;
 
     use color_eyre::eyre::eyre;
     use enumset::enum_set;
@@ -76,31 +73,83 @@ fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
 
     Ok(())
 }
+fn build_circuit(config: &Config) -> Result<()> {
+    let project_dir = env::var("CARGO_MANIFEST_DIR")?;
+    let circuit_dir = &config.circuit.dir;
+    let circuit_name = &config.circuit.name;
 
-fn main() -> Result<()> {
-    // TODO: build_circuit function to builds all related artifacts, instead of doing this externally
-    // let dir = "examples/circom/keccak256";
-    // let circuit = "keccak256_256_test";
-    let dir = "examples/circom/anonAadhaar";
-    let circuit = "aadhaar-verifier";
+    let zkey_path = PathBuf::from(&project_dir).join(format!(
+        "{}/target/{}_final.zkey",
+        circuit_dir, circuit_name
+    ));
+    let wasm_path = PathBuf::from(&project_dir).join(format!(
+        "{}/target/{}_js/{}.wasm",
+        circuit_dir, circuit_name, circuit_name
+    ));
+    let arkzkey_path = PathBuf::from(&project_dir).join(format!(
+        "{}/target/{}_final.arkzkey",
+        circuit_dir, circuit_name
+    ));
 
-    // XXX: Use RSA
-    // let dir = "examples/circom/rsa";
-    // let circuit = "main";
+    println!("cargo:warning=zkey_file: {}", zkey_path.display());
+    println!("cargo:warning=wasm_file: {}", wasm_path.display());
+    println!("cargo:warning=arkzkey_file: {}", arkzkey_path.display());
 
-    let zkey_path = format!("{}/target/{}_final.zkey", dir, circuit);
-    let wasm_path = format!("{}/target/{}_js/{}.wasm", dir, circuit, circuit);
-    // TODO: Need to modify script for this
-    let arkzkey_path = format!("{}/target/{}_final.arkzkey", dir, circuit);
+    // Set BUILD_RS_* environment variables
+    println!("cargo:rustc-env=BUILD_RS_ZKEY_FILE={}", zkey_path.display());
+    println!("cargo:rustc-env=BUILD_RS_WASM_FILE={}", wasm_path.display());
+    println!(
+        "cargo:rustc-env=BUILD_RS_ARKZKEY_FILE={}",
+        arkzkey_path.display()
+    );
 
-    prepare_env(zkey_path, wasm_path.clone(), arkzkey_path)?;
+    Ok(())
+}
 
-    #[cfg(feature = "dylib")]
-    {
-        // TODO: This should depends on the circuit name
-        //let dylib_name = "keccak256.dylib";
-        let dylib_name = "anonAadhaar.dylib";
-        build_dylib(wasm_path.clone(), dylib_name.to_string())?;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let config_str = match env::var("BUILD_CONFIG_PATH") {
+        Ok(config_path) => {
+            println!("cargo:warning=config: {}", config_path);
+            fs::read_to_string(config_path)?
+        }
+        Err(_) => {
+            println!("cargo:warning=BUILD_CONFIG_PATH not set. Using default configuration.");
+            // Default configuration
+            let default_config = r#"
+                    [circuit]
+                    dir = "examples/circom/keccak256"
+                    name = "keccak256_256_test"
+    
+                    #[dylib]
+                    use_dlib = false
+                    #name = "keccak256.dylib"
+                "#;
+            default_config.to_string()
+        }
+    };
+
+    let config: Config = toml::from_str(&config_str)?;
+
+    // Build circuit
+    build_circuit(&config)?;
+
+    // Build dylib if enabled
+    if let Some(dylib_config) = &config.dylib {
+        if dylib_config.use_dylib {
+            println!("cargo:warning=Building dylib: {}", dylib_config.name);
+            build_dylib(
+                config.circuit.dir.clone()
+                    + "/target/"
+                    + &config.circuit.name
+                    + "_js/"
+                    + &config.circuit.name
+                    + ".wasm",
+                dylib_config.name.clone(),
+            )?;
+        } else {
+            println!("cargo:warning=Dylib usage is disabled in the config.");
+        }
     }
+
     Ok(())
 }

@@ -79,19 +79,17 @@ class AnonAadhaarViewControllerNew: UIViewController {
             self.textView.text += "Initializing library\n"
         }
 
-        if let frameworksPath = Bundle.main.privateFrameworksPath {
+        // Execute long-running tasks in the background
+        DispatchQueue.global(qos: .userInitiated).async {
+            // Record start time
             let start = CFAbsoluteTimeGetCurrent()
-            let dylibPath = frameworksPath + "/anonAadhaar.dylib"
-
-            self.textView.text += "CIRCUIT_WASM_DYLIB path: \(dylibPath)\n";
 
             do {
-                try initializeMoproDylib(dylibPath: dylibPath)
+                try initializeMopro()
 
                 // Record end time and compute duration
                 let end = CFAbsoluteTimeGetCurrent()
                 let timeTaken = end - start
-                self.textView.text += "Initializing arkzkey took \(timeTaken) seconds.\n"
 
                 // Again, update the UI on the main thread
                 DispatchQueue.main.async {
@@ -102,12 +100,8 @@ class AnonAadhaarViewControllerNew: UIViewController {
                 DispatchQueue.main.async {
                     self.textView.text += "An error occurred during initialization: \(error)\n"
                 }
-                self.textView.text += "An error occurred during initialization: \(error)\n"
             }
         }
-        else {
-                print("Error getting paths for resources")
-            }
     }
               
 
@@ -1725,12 +1719,14 @@ class AnonAadhaarViewControllerNew: UIViewController {
               ]
             
             let message_len = ["64"]
+            let signal_hash = ["1"]
 
             var inputs = [String: [String]]()
             inputs["signature"] = signature;
             inputs["modulus"] = modulus;
             inputs["padded_message"] = padded_message;
             inputs["message_len"] = message_len;
+            inputs["signal_hash"] = signal_hash;
 
             let start = CFAbsoluteTimeGetCurrent()
 

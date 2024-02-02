@@ -1,38 +1,7 @@
 #!/bin/bash
 
-# Deal with errors
-set -euo pipefail
-
-# Color definitions
-DEFAULT='\033[0m'
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-GREY='\033[0;90m'
-
-# Coloring the -x output (commands)
-# DEBUG_COLOR="${DEFAULT}"
-# trap 'echo -e ${DEBUG_COLOR}${BASH_COMMAND}${DEFAULT}' DEBUG
-
-# Function to handle exit
-handle_exit() {
-    # $? is a special variable that holds the exit code of the last command executed
-    if [ $? -ne 0 ]; then
-        echo -e "\n${RED}Script did not finish successfully!${DEFAULT}"
-    fi
-}
-
-# Set the trap
-trap handle_exit EXIT
-
-print_action() {
-    printf "\n${GREEN}$1${DEFAULT}\n"
-}
-
-print_warning() {
-    printf "\n${YELLOW}$1${DEFAULT}\n"
-}
+# Source the script prelude
+source "scripts/_prelude.sh"
 
 # Assert we're in the project root
 if [[ ! -d "mopro-ffi" || ! -d "mopro-core" || ! -d "mopro-ios" ]]; then
@@ -136,7 +105,7 @@ print_action "[core/circom] Generating arkzkey for rsa..."
 print_action "[ffi] Adding support for target architectures..."
 cd ${PROJECT_DIR}/mopro-ffi
 
-for target in x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim; do
+for target in x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android; do
     if ! check_target_support $target; then
         rustup target add $target
     else
@@ -151,6 +120,15 @@ then
     cargo install --bin uniffi-bindgen --path .
 else
     echo "uniffi-bindgen already installed, skipping."
+fi
+
+# Install toml-cli binary
+print_action "[config] Installing toml-cli..."
+if ! command -v toml &> /dev/null
+then
+    cargo install toml-cli
+else
+    echo "toml already installed, skipping."
 fi
 
 # Check uniffi-bindgen version
