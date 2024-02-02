@@ -730,4 +730,53 @@ mod tests {
 
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
+
+    #[ignore = "ignore for ci"]
+    #[test]
+    fn test_setup_prove_anon_aadhaar2() {
+        // Prepare inputs
+        #[derive(serde::Deserialize)]
+        struct InputData {
+            aadhaar_data: Vec<String>,
+            signature: Vec<String>,
+            pub_key: Vec<String>,
+        }
+
+        let file_data = std::fs::read_to_string("./examples/circom/anonAadhaar/input.json").expect("Unable to read file");
+        let data: InputData = serde_json::from_str(&file_data).expect("JSON was not well-formatted");
+
+        let mut inputs: CircuitInputs = HashMap::new();
+        inputs.insert(
+            "aadhaarData".to_string(),
+            strings_to_circuit_inputs(data.aadhaar_data),
+        );
+        inputs.insert("aadhaarDataLength".to_string(), vec![BigInt::from(64)]);
+        inputs.insert(
+            "signature".to_string(),
+            strings_to_circuit_inputs(data.signature),
+        );
+        inputs.insert(
+            "pubKey".to_string(),
+            strings_to_circuit_inputs(data.pub_key),
+        );
+        inputs.insert("signalHash".to_string(), vec![BigInt::from(1)]);
+
+        // Proof generation
+        let generate_proof_res = generate_proof2(inputs);
+
+        // Check and print the error if there is one
+        if let Err(e) = &generate_proof_res {
+            println!("Error: {:?}", e);
+        }
+
+        assert!(generate_proof_res.is_ok());
+
+        let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
+
+        // Proof verification
+        let verify_res = verify_proof2(serialized_proof, serialized_inputs);
+        assert!(verify_res.is_ok());
+
+        assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
+    }
 }

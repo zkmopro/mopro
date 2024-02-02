@@ -15,3 +15,11 @@ To build bindings for iOS, adjust settings in your config file (we recommend sta
 ```sh
 ./scripts/build_ios.sh anon-aadhaar-config.toml
 ```
+
+#### Update Bindings
+
+To update bindings, run
+
+```sh
+./scripts/update_bindings.sh anon-aadhaar-config.toml
+```

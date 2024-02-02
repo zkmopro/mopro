@@ -144,7 +144,7 @@ class AnonAadhaarViewControllerNew: UIViewController {
                 "14356387821014970882"
               ]
 
-            let modulus: [String] = [
+            let pub_key: [String] = [
                 "2748755575296325817",
                 "6712742551966290655",
                 "1051781274257245427",
@@ -179,7 +179,7 @@ class AnonAadhaarViewControllerNew: UIViewController {
                 "14806506225332883466"
               ]
 
-            let padded_message: [String] = [
+            let aadhaar_data: [String] = [
                 "72",
                 "101",
                 "108",
@@ -1718,15 +1718,15 @@ class AnonAadhaarViewControllerNew: UIViewController {
                 "0"
               ]
             
-            let message_len = ["64"]
-            let signal_hash = ["1"]
+            let aadhaarDataLength = ["64"]
+            let signalHash = ["1"]
 
             var inputs = [String: [String]]()
             inputs["signature"] = signature;
-            inputs["modulus"] = modulus;
-            inputs["padded_message"] = padded_message;
-            inputs["message_len"] = message_len;
-            inputs["signal_hash"] = signal_hash;
+            inputs["pubKey"] = pub_key;
+            inputs["aadhaarData"] = aadhaar_data;
+            inputs["aadhaarDataLength"] = aadhaarDataLength;
+            inputs["signalHash"] = signalHash;
 
             let start = CFAbsoluteTimeGetCurrent()
 
