@@ -72,3 +72,17 @@ interface MoproCircom {
   [Throws=MoproError]
   boolean verify_proof(bytes proof, bytes public_input);
 };
+
+interface MoproCircom2 {
+  constructor();
+
+  [Throws=MoproError]
+  void initialize(string zkey_path);
+
+  [Throws=MoproError]
+  GenerateProofResult generate_proof(record<string, sequence<string>> circuit_inputs);
+
+  [Throws=MoproError]
+  boolean verify_proof(bytes proof, bytes public_input);
+};
+
