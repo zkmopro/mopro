@@ -143,4 +143,4 @@ else
     echo "uniffi-bindgen version is $UNIFFI_VERSION, which is acceptable."
 fi
 
-print_action "Done! Please run ./scripts/buld_ios.sh to build for iOS."
+print_action "Done! Please run './scripts/build_ios.sh config-example.toml' to build for iOS."
