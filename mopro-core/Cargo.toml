@@ -18,6 +18,7 @@ gpu-benchmarks = ["jemalloc-ctl", "jemallocator"]
 [dependencies]
 ark-circom = { git = "https://github.com/arkworks-rs/circom-compat.git" }
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 ark-serialize = { version = "=0.4.1", features = ["derive"] }
 num-bigint = { version = "=0.4.3", default-features = false, features = [
     "rand",

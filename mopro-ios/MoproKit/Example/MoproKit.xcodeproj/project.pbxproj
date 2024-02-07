@@ -30,6 +30,7 @@
 		CEB804562AFF81AF0063F091 /* KeccakZkeyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB804552AFF81AF0063F091 /* KeccakZkeyViewController.swift */; };
 		CEB804582AFF81BF0063F091 /* RSAViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB804572AFF81BF0063F091 /* RSAViewController.swift */; };
 		E69338642AFFDB1A00B80312 /* AnonAadhaarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E69338632AFFDB1A00B80312 /* AnonAadhaarViewController.swift */; };
+		E6E6F42E2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E6F42D2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +73,7 @@
 		CEB804552AFF81AF0063F091 /* KeccakZkeyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeccakZkeyViewController.swift; sourceTree = "<group>"; };
 		CEB804572AFF81BF0063F091 /* RSAViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSAViewController.swift; sourceTree = "<group>"; };
 		E69338632AFFDB1A00B80312 /* AnonAadhaarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonAadhaarViewController.swift; sourceTree = "<group>"; };
+		E6E6F42D2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonAadhaarViewControllerNew.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				CEB804572AFF81BF0063F091 /* RSAViewController.swift */,
+				E6E6F42D2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift */,
 				E69338632AFFDB1A00B80312 /* AnonAadhaarViewController.swift */,
 				CEB804552AFF81AF0063F091 /* KeccakZkeyViewController.swift */,
 				CEB8044F2AFF81960063F091 /* KeccakSetupViewController.swift */,
@@ -261,6 +264,7 @@
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = 7BMWCJP4MA;
 						LastSwiftMigration = 0900;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
@@ -410,6 +414,7 @@
 				CEB804562AFF81AF0063F091 /* KeccakZkeyViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				CEB804502AFF81960063F091 /* KeccakSetupViewController.swift in Sources */,
+				E6E6F42E2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				E69338642AFFDB1A00B80312 /* AnonAadhaarViewController.swift in Sources */,
 			);
@@ -499,7 +504,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -545,7 +550,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -558,10 +563,10 @@
 			baseConfigurationReference = C61628A63419B5C140B24AF7 /* Pods-MoproKit_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 7BMWCJP4MA;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = MoproKit/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = org.mopro.examples;
@@ -579,7 +584,7 @@
 				DEVELOPMENT_TEAM = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = MoproKit/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = org.mopro.examples;
@@ -594,7 +599,7 @@
 			baseConfigurationReference = 5DAF212A114DFA0C9F4282B2 /* Pods-MoproKit_Tests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/MoproKit_Example.app/MoproKit_Example";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 7BMWCJP4MA;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -605,7 +610,7 @@
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = org.mopro.examples.test;
+				PRODUCT_BUNDLE_IDENTIFIER = org.mopro.examples;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -625,7 +630,7 @@
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = org.mopro.examples.test;
+				PRODUCT_BUNDLE_IDENTIFIER = org.mopro.examples;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;

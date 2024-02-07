@@ -1,0 +1,20 @@
+# anon-aadhaar-config.toml
+
+[build]
+# For iOS device_type can be x86_64, simulator, device
+# For Android device_type can be x86_64, arm, arm64
+device_type = "x86_64" # Options: x86_64, simulator, device, arm, arm64
+
+# debug is for Rust library to be in debug mode and release for release mode
+# We recommend release mode by default for performance
+build_mode = "release" # Options: debug, release
+
+[circuit]
+dir = "examples/circom/anonAadhaar" # Directory of the circuit
+name = "aadhaar-verifier"       # Name of the circuit
+
+[dylib]
+# NOTE: Dylib support is experimental and requires some fiddling in iOS
+# See https://github.com/oskarth/mopro/pull/37 and https://github.com/oskarth/mopro/pull/38
+use_dylib = false        # Options: true, false
+name = "anonAadhaar.dylib" # Name of the dylib file, only used if use_dylib is true
