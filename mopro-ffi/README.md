@@ -46,3 +46,15 @@ To test bindings:
 To test bindings in release mode without warning:
 
 `cargo test --test test_generated_bindings --release 2>/dev/null`
+
+## Generate MSM benchmark report in swift on laptop
+
+1. Comment `default=[]` and uncomment `default=["gpu-benchmarks"]` to enable `gpu-benchmarks` feature flag
+2. run `RUSTFLAGS="-C opt-level=3" cargo test --test test_generated_bindings --release`
+3. The report will be generated at `mopro-core/benchmarks/gpu_explorations/msm_bench_swift_laptop.csv`
+
+![msm benchmarks of time (rust vs. swift)](https://hackmd.io/_uploads/BkxRMMtca.png)
+
+The above report was conducted on an M1 Pro MacBook Pro.
+
+For more information, read this report we have completed, which compares the time performance of MSM running in rust and swift.

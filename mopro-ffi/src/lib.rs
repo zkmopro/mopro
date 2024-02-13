@@ -55,7 +55,6 @@ pub struct BenchmarkResult {
     pub num_msm: u32,
     pub avg_processing_time: f64,
     pub total_processing_time: f64,
-    pub allocated_memory: u32,
 }
 
 //     pub inputs: Vec<u8>,
@@ -226,7 +225,7 @@ pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproE
 }
 
 #[cfg(not(feature = "gpu-benchmarks"))]
-pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
+pub fn run_msm_benchmark(_num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
     println!("gpu-benchmarks feature not enabled!");
     panic!("gpu-benchmarks feature not enabled!");
 }
@@ -388,10 +387,6 @@ mod tests {
         println!(
             "└─ Average msm time: {:.5} ms\n└─ Overall processing time: {:.5} ms",
             benchmarks.avg_processing_time, benchmarks.total_processing_time
-        );
-        println!(
-            "└─ Memory allocated: {:.5} Bytes",
-            benchmarks.allocated_memory,
         );
         Ok(())
     }

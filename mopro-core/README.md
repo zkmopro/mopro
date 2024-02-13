@@ -46,3 +46,9 @@ Note that `APPLE_SIGNING_IDENTITY` must be set.
 ## To use ark-zkey
 
 Experimental support for significantly faster zkey loading. See `../ark-zkey` README for how to build arkzkey.
+
+## To run msm benchmark report on laptop
+
+`cargo run --release --features gpu-benchmarks --package mopro-core --bin generate_benchmark_report`
+
+The report will be in `mopro-core/benchmarks/gpu_explorations/msm_bench_rust_laptop.csv`.

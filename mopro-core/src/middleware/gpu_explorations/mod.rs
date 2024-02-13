@@ -3,7 +3,6 @@ use ark_ec::VariableBaseMSM;
 use ark_std::{error::Error, UniformRand};
 
 // For benchmarking
-use jemalloc_ctl::{epoch, stats};
 use std::time::{Duration, Instant};
 
 #[derive(Debug, Clone)]
@@ -11,7 +10,6 @@ pub struct BenchmarkResult {
     pub num_msm: u32,
     pub avg_processing_time: f64,
     pub total_processing_time: f64,
-    pub allocated_memory: u32,
 }
 
 fn single_msm() -> Result<(), Box<dyn Error>> {
@@ -33,26 +31,19 @@ fn single_msm() -> Result<(), Box<dyn Error>> {
 pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, Box<dyn Error>> {
     let num_msm = num_msm.unwrap_or(1000); // default to 1000 msm operations
 
-    let mem_epoch = epoch::mib().unwrap(); // For updating jemalloc stats of memory usage
-    let allocated = stats::allocated::mib().unwrap();
-
     let mut total_msm = Duration::new(0, 0);
-
     for _ in 0..num_msm {
         let start = Instant::now();
         single_msm()?;
         total_msm += start.elapsed();
     }
-    mem_epoch.advance().unwrap(); // Update msm memory usage
 
-    let allocated_size = allocated.read().unwrap() as u32; // in Bytes
     let msm_avg = (total_msm.as_secs_f64() / num_msm as f64) * 1_000.0; // in ms
 
     Ok(BenchmarkResult {
         num_msm,
         avg_processing_time: msm_avg,
         total_processing_time: total_msm.as_secs_f64() * 1_000.0,
-        allocated_memory: allocated_size,
     })
 }
 
@@ -72,10 +63,6 @@ mod tests {
         println!(
             "└─ Average msm time: {:.5} ms\n└─ Overall processing time: {:.5} ms",
             benchmarks.avg_processing_time, benchmarks.total_processing_time
-        );
-        println!(
-            "└─ Memory allocated: {:.5} Bytes",
-            benchmarks.allocated_memory,
         );
     }
 }

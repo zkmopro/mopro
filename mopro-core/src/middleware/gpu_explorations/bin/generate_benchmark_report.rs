@@ -10,11 +10,11 @@ use {
 fn main() {
     let path = env::current_dir()
         .unwrap()
-        .join("benchmarks/gpu_explorations/msm_bench.csv");
-    let mut file = File::create(path).unwrap();
+        .join("benchmarks/gpu_explorations/msm_bench_rust_laptop.csv");
+    let mut file = File::create(path.clone()).unwrap();
     writeln!(
         file,
-        "num_msm,avg_processing_time(ms),total_processing_time(ms),memory_allocated(Bytes)"
+        "num_msm,avg_processing_time(ms),total_processing_time(ms)"
     )
     .unwrap();
     // generate trials = [1, 500, 1_000, 1_500, ..., 10_000]
@@ -23,14 +23,12 @@ fn main() {
         let bench_data = run_msm_benchmark(Some(each)).unwrap();
         writeln!(
             file,
-            "{},{},{},{}",
-            bench_data.num_msm,
-            bench_data.avg_processing_time,
-            bench_data.total_processing_time,
-            bench_data.allocated_memory,
+            "{},{},{}",
+            bench_data.num_msm, bench_data.avg_processing_time, bench_data.total_processing_time,
         )
         .unwrap();
     }
+    println!("Report generated at {:?}", path);
 }
 
 #[cfg(not(feature = "gpu-benchmarks"))]

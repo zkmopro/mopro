@@ -34,7 +34,6 @@ dictionary BenchmarkResult {
   u32 num_msm;
   double avg_processing_time;
   double total_processing_time;
-  u32 allocated_memory;
 };
 
 dictionary G1 {

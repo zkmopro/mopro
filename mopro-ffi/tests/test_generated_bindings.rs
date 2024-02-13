@@ -1,3 +1,10 @@
+#[cfg(feature = "gpu-benchmarks")]
+uniffi::build_foreign_language_testcases!(
+    "tests/bindings/test_mopro_gen_benchmarks_report.swift",
+    "tests/bindings/test_mopro_gpu_benchmarks.swift",
+);
+
+#[cfg(not(feature = "gpu-benchmarks"))]
 uniffi::build_foreign_language_testcases!(
     "tests/bindings/test_mopro.swift",
     "tests/bindings/test_mopro.kts",
