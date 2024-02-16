@@ -18,6 +18,7 @@ class ViewController: UIViewController {
     let rsaButton = UIButton(type: .system)
     let aadhaarButton = UIButton(type: .system)
     let aadhaarNewButton = UIButton(type: .system)
+    let complexNewButton = UIButton(type: .system)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +51,9 @@ class ViewController: UIViewController {
         
         aadhaarNewButton.setTitle("Anon Aadhaar New", for: .normal)
         aadhaarNewButton.addTarget(self, action: #selector(openAnonAadhaarNew), for: .touchUpInside)
+        
+        complexNewButton.setTitle("Complex Test", for: .normal)
+        complexNewButton.addTarget(self, action: #selector(openComplex), for: .touchUpInside)
 
 
        keccakSetupButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
@@ -60,7 +64,7 @@ class ViewController: UIViewController {
 //        navigationController?.navigationBar.prefersLargeTitles = true
 
 
-        let stackView = UIStackView(arrangedSubviews: [keccakSetupButton, keccakZkeyButton, rsaButton, aadhaarButton, aadhaarNewButton])
+        let stackView = UIStackView(arrangedSubviews: [keccakSetupButton, keccakZkeyButton, rsaButton, aadhaarButton, aadhaarNewButton, complexNewButton])
         stackView.axis = .vertical
         stackView.spacing = 20
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -95,6 +99,11 @@ class ViewController: UIViewController {
     @objc func openAnonAadhaarNew() {
         let anonAadhaarVCNew = AnonAadhaarViewControllerNew()
         navigationController?.pushViewController(anonAadhaarVCNew, animated: true)
+    }
+    
+    @objc func openComplex() {
+        let complexVCNew = ComplexZkeyViewController()
+        navigationController?.pushViewController(complexVCNew, animated: true)
     }
 }
 
