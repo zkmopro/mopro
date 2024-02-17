@@ -21,8 +21,8 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     var resultsTableView: UITableView!
     var submitButton: UIButton!
 
-    let algorithms = ["Arkwork MSM", "Example Algo 1", "Example Algo 2"]
-    var selectedAlgorithms: Set<Int> = []
+    let algorithms = ["Arkwork (Baseline)", "Example Algo 1", "Example Algo 2"]
+    var selectedAlgorithms: Set<Int> = [0]  // Default to select the baseline MSM algorithm
 
     var benchmarkResults: [AlgorithmBenchmark] = []
     
@@ -30,7 +30,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     
     // update the mapping with function in the future
     let msmBenchmarkMapping: [String: (UInt32?) throws -> BenchmarkResult] = [
-        "Arkwork MSM": runMsmBenchmark,
+        "Arkwork (Baseline)": runMsmBenchmark,
         // "Example Algo 1": ,
         // "Example Algo 2": ,
     ]
@@ -141,7 +141,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
             let result = benchmarkResults[indexPath.row]
             cell.nameLabel.text = result.algorithm
             cell.avgTimeLabel.text = String(format: "%.2f ms", result.avgMsmTime)
-            cell.diffLabel.text = String(format: "%+.2f ms", result.diffWithBaseline)
+            cell.diffLabel.text = String(format: "%.2f %%", result.diffWithBaseline)
             
             // Adjust the font size or other properties as needed
             cell.nameLabel.font = UIFont.systemFont(ofSize: 14)
@@ -186,7 +186,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
         lineView.translatesAutoresizingMaskIntoConstraints = false
         
         if tableView == self.tableView {
-            headerLabel.text = "Select Algorithms"
+            headerLabel.text = "Select MSM Algorithms"
         } else {    // Results table
             // Define additional labels for each column if it's the results table
             let nameLabel = UILabel()
@@ -256,6 +256,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
             guard let self = self else { return }
 
             var tempResults: [AlgorithmBenchmark] = []
+            var baselineTiming: Double = 0.0
 
             for index in self.selectedAlgorithms.sorted() {
                 let algorithm = self.algorithms[index]
@@ -264,13 +265,19 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
                     do {
                         print("Running MSM in algorithm: \(algorithm)...")
                         let benchData: BenchmarkResult = try benchmarkFunction(10000)
+                        if algorithm == "Arkwork (Baseline)" {
+                            baselineTiming = benchData.avgProcessingTime
+                        }
+
                         let algorithmBenchmark = AlgorithmBenchmark(
                             algorithm: algorithm,
                             avgMsmTime: benchData.avgProcessingTime,
-                            diffWithBaseline: 0.0 // Consider calculating this in background too
+                            // Calculate the percentage difference with baseline
+                            diffWithBaseline: (benchData.avgProcessingTime - baselineTiming) / baselineTiming * 100
                         )
                         tempResults.append(algorithmBenchmark)
-                        print("Result of \(algorithmBenchmark.algorithm): \(algorithmBenchmark.avgMsmTime) ms (diff: \(algorithmBenchmark.diffWithBaseline) ms)")
+                        print("Result of \(algorithmBenchmark.algorithm): \(algorithmBenchmark.avgMsmTime) ms (diff: \(algorithmBenchmark.diffWithBaseline) %)")
+
                     } catch {
                         print("Error running benchmark: \(error)")
                     }
