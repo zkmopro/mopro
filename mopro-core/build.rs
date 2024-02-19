@@ -73,6 +73,7 @@ fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
 
     Ok(())
 }
+
 fn build_circuit(config: &Config) -> Result<()> {
     let project_dir = env::var("CARGO_MANIFEST_DIR")?;
     let circuit_dir = &config.circuit.dir;
@@ -90,6 +91,17 @@ fn build_circuit(config: &Config) -> Result<()> {
         "{}/target/{}_final.arkzkey",
         circuit_dir, circuit_name
     ));
+
+    // TODO: Improve this to be more user-friendly
+    assert!(
+        zkey_path.exists(),
+        "Make sure the zkey file exists. Did you forget to run a trusted setup? Adjust prepare.sh if necessary."
+    );
+    assert!(
+        wasm_path.exists(),
+        "Make sure the wasm file exists. Did you forget to compile the circuit to wasm? Adjust prepare.sh if necessary."
+    );
+    assert!(arkzkey_path.exists(), "Make sure the arkzkey file exists. Did you forget to generate the arkzkey? Adjust prepare.sh if necessary.");
 
     println!("cargo:warning=zkey_file: {}", zkey_path.display());
     println!("cargo:warning=wasm_file: {}", wasm_path.display());
