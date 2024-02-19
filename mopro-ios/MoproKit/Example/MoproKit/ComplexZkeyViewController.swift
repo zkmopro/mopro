@@ -26,7 +26,7 @@ class ComplexZkeyViewController: UIViewController {
 
         // Set title
         let title = UILabel()
-        title.text = "Keccak256 (Zkey)"
+        title.text = "Complex Circuit (Zkey)"
         title.textColor = .white
         title.textAlignment = .center
         navigationItem.titleView = title
