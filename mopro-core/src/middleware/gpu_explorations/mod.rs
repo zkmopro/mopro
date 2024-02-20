@@ -12,6 +12,7 @@ pub struct BenchmarkResult {
     pub total_processing_time: f64,
 }
 
+// TODO: refactor fn name and add more benchmarks in the future
 fn single_msm() -> Result<(), Box<dyn Error>> {
     let mut rng = ark_std::test_rng();
 
@@ -27,6 +28,7 @@ fn single_msm() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+// TODO: figure out a way to configure the algorithm fn used
 // Run the msm benchmark with timing
 pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, Box<dyn Error>> {
     let num_msm = num_msm.unwrap_or(1000); // default to 1000 msm operations
