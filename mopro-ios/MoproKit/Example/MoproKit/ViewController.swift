@@ -19,6 +19,7 @@ class ViewController: UIViewController {
     let aadhaarButton = UIButton(type: .system)
     let aadhaarNewButton = UIButton(type: .system)
     let complexNewButton = UIButton(type: .system)
+    let msmbenchmarkButton = UIButton(type: .system)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,6 +56,8 @@ class ViewController: UIViewController {
         complexNewButton.setTitle("Complex Test", for: .normal)
         complexNewButton.addTarget(self, action: #selector(openComplex), for: .touchUpInside)
 
+        msmbenchmarkButton.setTitle("MSM Benchmark", for: .normal)
+        msmbenchmarkButton.addTarget(self, action: #selector(openMSMBenchmark), for: .touchUpInside)
 
        keccakSetupButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
        keccakZkeyButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
@@ -64,7 +67,7 @@ class ViewController: UIViewController {
 //        navigationController?.navigationBar.prefersLargeTitles = true
 
 
-        let stackView = UIStackView(arrangedSubviews: [keccakSetupButton, keccakZkeyButton, rsaButton, aadhaarButton, aadhaarNewButton, complexNewButton])
+        let stackView = UIStackView(arrangedSubviews: [keccakSetupButton, keccakZkeyButton, rsaButton, aadhaarButton, aadhaarNewButton, complexNewButton, msmbenchmarkButton])
         stackView.axis = .vertical
         stackView.spacing = 20
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -105,6 +108,11 @@ class ViewController: UIViewController {
         let complexVCNew = ComplexZkeyViewController()
         navigationController?.pushViewController(complexVCNew, animated: true)
     }
+
+    @objc func openMSMBenchmark() {
+         let msmbenchmarkVC = MSMBenchmarkViewController()
+         navigationController?.pushViewController(msmbenchmarkVC, animated: true)
+    }
 }
 
 //        // Make buttons bigger
@@ -116,3 +124,5 @@ class ViewController: UIViewController {
 //            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 //            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
 //        ])
+
+
