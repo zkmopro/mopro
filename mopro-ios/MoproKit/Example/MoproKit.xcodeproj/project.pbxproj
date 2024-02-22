@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1ECF32642B728A6F00482C55 /* MSMBenchmarkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECF32632B728A6F00482C55 /* MSMBenchmarkViewController.swift */; };
 		2A418AB02AF4B1200004B747 /* CircomUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A418AAF2AF4B1200004B747 /* CircomUITests.swift */; };
 		2A6E5BAF2AF499460052A601 /* CircomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A6E5BAE2AF499460052A601 /* CircomTests.swift */; };
 		4384FD09A96F702A375841EE /* Pods_MoproKit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78B0F9CBE5DD22576996A993 /* Pods_MoproKit_Tests.framework */; };
@@ -46,6 +47,7 @@
 
 /* Begin PBXFileReference section */
 		1E5E014D70B48C9A59F14658 /* Pods-MoproKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoproKit_Example.release.xcconfig"; path = "Target Support Files/Pods-MoproKit_Example/Pods-MoproKit_Example.release.xcconfig"; sourceTree = "<group>"; };
+		1ECF32632B728A6F00482C55 /* MSMBenchmarkViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSMBenchmarkViewController.swift; sourceTree = "<group>"; };
 		2A418AAF2AF4B1200004B747 /* CircomUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircomUITests.swift; sourceTree = "<group>"; };
 		2A6E5BAE2AF499460052A601 /* CircomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircomTests.swift; sourceTree = "<group>"; };
 		47F8ADB0AC4168C6E874818D /* MoproKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = MoproKit.podspec; path = ../MoproKit.podspec; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 		607FACD21AFB9204008FA782 /* Example for MoproKit */ = {
 			isa = PBXGroup;
 			children = (
+				1ECF32632B728A6F00482C55 /* MSMBenchmarkViewController.swift */,
 				CEB804572AFF81BF0063F091 /* RSAViewController.swift */,
 				E6E6F42D2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift */,
 				E69338632AFFDB1A00B80312 /* AnonAadhaarViewController.swift */,
@@ -416,6 +419,7 @@
 				CEB804582AFF81BF0063F091 /* RSAViewController.swift in Sources */,
 				CEB804562AFF81AF0063F091 /* KeccakZkeyViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				1ECF32642B728A6F00482C55 /* MSMBenchmarkViewController.swift in Sources */,
 				CEB804502AFF81960063F091 /* KeccakSetupViewController.swift in Sources */,
 				E6D848592B766C8C00DBAF30 /* ComplexZkeyViewController.swift in Sources */,
 				E6E6F42E2B5860F7002F5F18 /* AnonAadhaarViewControllerNew.swift in Sources */,

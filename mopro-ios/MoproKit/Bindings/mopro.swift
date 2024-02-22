@@ -509,15 +509,13 @@ public struct BenchmarkResult {
     public var numMsm: UInt32
     public var avgProcessingTime: Double
     public var totalProcessingTime: Double
-    public var allocatedMemory: UInt32
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(numMsm: UInt32, avgProcessingTime: Double, totalProcessingTime: Double, allocatedMemory: UInt32) {
+    public init(numMsm: UInt32, avgProcessingTime: Double, totalProcessingTime: Double) {
         self.numMsm = numMsm
         self.avgProcessingTime = avgProcessingTime
         self.totalProcessingTime = totalProcessingTime
-        self.allocatedMemory = allocatedMemory
     }
 }
 
@@ -533,9 +531,6 @@ extension BenchmarkResult: Equatable, Hashable {
         if lhs.totalProcessingTime != rhs.totalProcessingTime {
             return false
         }
-        if lhs.allocatedMemory != rhs.allocatedMemory {
-            return false
-        }
         return true
     }
 
@@ -543,7 +538,6 @@ extension BenchmarkResult: Equatable, Hashable {
         hasher.combine(numMsm)
         hasher.combine(avgProcessingTime)
         hasher.combine(totalProcessingTime)
-        hasher.combine(allocatedMemory)
     }
 }
 
@@ -553,8 +547,7 @@ public struct FfiConverterTypeBenchmarkResult: FfiConverterRustBuffer {
         return try BenchmarkResult(
             numMsm: FfiConverterUInt32.read(from: &buf), 
             avgProcessingTime: FfiConverterDouble.read(from: &buf), 
-            totalProcessingTime: FfiConverterDouble.read(from: &buf), 
-            allocatedMemory: FfiConverterUInt32.read(from: &buf)
+            totalProcessingTime: FfiConverterDouble.read(from: &buf)
         )
     }
 
@@ -562,7 +555,6 @@ public struct FfiConverterTypeBenchmarkResult: FfiConverterRustBuffer {
         FfiConverterUInt32.write(value.numMsm, into: &buf)
         FfiConverterDouble.write(value.avgProcessingTime, into: &buf)
         FfiConverterDouble.write(value.totalProcessingTime, into: &buf)
-        FfiConverterUInt32.write(value.allocatedMemory, into: &buf)
     }
 }
 
