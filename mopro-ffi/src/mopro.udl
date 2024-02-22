@@ -21,10 +21,6 @@ namespace mopro {
   sequence<string> to_ethereum_inputs(bytes inputs);
 };
 
-dictionary SetupResult {
-  bytes provingKey;
-};
-
 dictionary GenerateProofResult {
   bytes proof;
   bytes inputs;
@@ -62,7 +58,7 @@ interface MoproCircom {
   constructor();
 
   [Throws=MoproError]
-  SetupResult setup(string wasm_path, string r1cs_path);
+  void initialize(string arkzkey_path, string wasm_path);
 
   [Throws=MoproError]
   GenerateProofResult generate_proof(record<string, sequence<string>> circuit_inputs);

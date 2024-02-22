@@ -1,13 +1,12 @@
 import uniffi.mopro.*
 
 var wasmPath = "../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm"
-var r1csPath = "../mopro-core/examples/circom/multiplier2/target/multiplier2.r1cs"
+var arkzkeyPath = "../mopro-core/examples/circom/multiplier2/target/multiplier2_final.arkzkey"
 
 try {
     // Setup
     var moproCircom = MoproCircom()
-    var setupResult = moproCircom.setup(wasmPath, r1csPath)
-    assert(setupResult.provingKey.size > 0) { "Proving key should not be empty" }
+    moproCircom.initialize(arkzkeyPath, wasmPath)
 
     // Prepare inputs
     val inputs = mutableMapOf<String, List<String>>()

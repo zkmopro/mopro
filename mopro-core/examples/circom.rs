@@ -4,13 +4,13 @@ use std::collections::HashMap;
 
 fn main() {
     let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
-    let r1cs_path = "./examples/circom/multiplier2/target/multiplier2.r1cs";
+    let arkzkey_path = "./examples/circom/multiplier2/target/multiplier2_final.arkzkey";
 
     // Instantiate CircomState
     let mut circom_state = CircomState::new();
 
     // Setup
-    let setup_res = circom_state.setup(wasm_path, r1cs_path);
+    let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
     assert!(setup_res.is_ok());
 
     let _serialized_pk = setup_res.unwrap();

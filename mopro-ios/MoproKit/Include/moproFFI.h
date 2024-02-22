@@ -70,7 +70,7 @@ void*_Nonnull uniffi_mopro_ffi_fn_constructor_moprocircom_new(RustCallStatus *_N
 );
 RustBuffer uniffi_mopro_ffi_fn_method_moprocircom_generate_proof(void*_Nonnull ptr, RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
 );
-RustBuffer uniffi_mopro_ffi_fn_method_moprocircom_setup(void*_Nonnull ptr, RustBuffer wasm_path, RustBuffer r1cs_path, RustCallStatus *_Nonnull out_status
+void uniffi_mopro_ffi_fn_method_moprocircom_initialize(void*_Nonnull ptr, RustBuffer arkzkey_path, RustBuffer wasm_path, RustCallStatus *_Nonnull out_status
 );
 int8_t uniffi_mopro_ffi_fn_method_moprocircom_verify_proof(void*_Nonnull ptr, RustBuffer proof, RustBuffer public_input, RustCallStatus *_Nonnull out_status
 );
@@ -238,7 +238,7 @@ uint16_t uniffi_mopro_ffi_checksum_func_verify_proof2(void
 uint16_t uniffi_mopro_ffi_checksum_method_moprocircom_generate_proof(void
     
 );
-uint16_t uniffi_mopro_ffi_checksum_method_moprocircom_setup(void
+uint16_t uniffi_mopro_ffi_checksum_method_moprocircom_initialize(void
     
 );
 uint16_t uniffi_mopro_ffi_checksum_method_moprocircom_verify_proof(void
