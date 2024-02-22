@@ -46,9 +46,6 @@ func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
 }
 
 do {
-  // // Setup
-  // let setupResult = try moproCircom.setup(wasmPath: wasmPath, r1csPath: r1csPath)
-  // assert(!setupResult.provingKey.isEmpty, "Proving key should not be empty")
 
   // Prepare inputs
   let inputVec: [UInt8] = [

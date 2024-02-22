@@ -60,9 +60,7 @@ pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
         .expect("Deserialization failed")
 }
 
-pub fn read_arkzkey(
-    arkzkey_path: &str,
-) -> Result<(SerializableProvingKey, SerializableConstraintMatrices<Fr>)> {
+pub fn read_arkzkey(arkzkey_path: &str) -> Result<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> {
     let now = std::time::Instant::now();
     let arkzkey_file_path = PathBuf::from(arkzkey_path);
     let arkzkey_file = File::open(arkzkey_file_path).wrap_err("Failed to open arkzkey file")?;
@@ -78,20 +76,33 @@ pub fn read_arkzkey(
 
     // Was &mut buf_reader
     let now = std::time::Instant::now();
-    let proving_key = SerializableProvingKey::deserialize_compressed_unchecked(&mut cursor)
-        .wrap_err("Failed to deserialize proving key")?;
+    let serialized_proving_key =
+        SerializableProvingKey::deserialize_compressed_unchecked(&mut cursor)
+            .wrap_err("Failed to deserialize proving key")?;
     println!("Time to deserialize proving key: {:?}", now.elapsed());
 
     let now = std::time::Instant::now();
-    let constraint_matrices =
+    let serialized_constraint_matrices =
         SerializableConstraintMatrices::deserialize_compressed_unchecked(&mut cursor)
             .wrap_err("Failed to deserialize constraint matrices")?;
     println!("Time to deserialize matrices: {:?}", now.elapsed());
 
+    let proving_key: ProvingKey<Bn254> = serialized_proving_key.0;
+    let constraint_matrices: ConstraintMatrices<Fr> = ConstraintMatrices {
+        num_instance_variables: serialized_constraint_matrices.num_instance_variables,
+        num_witness_variables: serialized_constraint_matrices.num_witness_variables,
+        num_constraints: serialized_constraint_matrices.num_constraints,
+        a_num_non_zero: serialized_constraint_matrices.a_num_non_zero,
+        b_num_non_zero: serialized_constraint_matrices.b_num_non_zero,
+        c_num_non_zero: serialized_constraint_matrices.c_num_non_zero,
+        a: serialized_constraint_matrices.a.data,
+        b: serialized_constraint_matrices.b.data,
+        c: serialized_constraint_matrices.c.data,
+    };
+
     Ok((proving_key, constraint_matrices))
 }
 
-// TODO: Return ProvingKey<Bn254>, ConstraintMatrices<Fr>?
 pub fn read_arkzkey_from_bytes(
     arkzkey_bytes: &[u8],
 ) -> Result<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> {
@@ -212,12 +223,24 @@ mod tests {
         println!("Time to read arkzkey: {:?}", now.elapsed());
 
         assert_eq!(
-            original_proving_key, deserialized_proving_key,
+            original_proving_key.0, deserialized_proving_key,
             "Original and deserialized proving keys do not match"
         );
 
+        let original_deserialized_constraint_matrices: ConstraintMatrices<Fr> =
+            ConstraintMatrices {
+                num_instance_variables: original_constraint_matrices.num_instance_variables,
+                num_witness_variables: original_constraint_matrices.num_witness_variables,
+                num_constraints: original_constraint_matrices.num_constraints,
+                a_num_non_zero: original_constraint_matrices.a_num_non_zero,
+                b_num_non_zero: original_constraint_matrices.b_num_non_zero,
+                c_num_non_zero: original_constraint_matrices.c_num_non_zero,
+                a: original_constraint_matrices.a.data,
+                b: original_constraint_matrices.b.data,
+                c: original_constraint_matrices.c.data,
+            };
         assert_eq!(
-            original_constraint_matrices, deserialized_constraint_matrices,
+            original_deserialized_constraint_matrices, deserialized_constraint_matrices,
             "Original and deserialized constraint matrices do not match"
         );
 

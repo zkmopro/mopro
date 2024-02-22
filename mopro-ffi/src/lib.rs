@@ -41,13 +41,6 @@ pub struct ProofCalldata {
     pub c: G1,
 }
 
-// NOTE: Make UniFFI and Rust happy, can maybe do some renaming here
-#[allow(non_snake_case)]
-#[derive(Debug, Clone)]
-pub struct SetupResult {
-    pub provingKey: Vec<u8>,
-}
-
 // NOTE: Need to hardcode the types here, otherwise UniFFI will complain if the gpu-benchmarks feature is not enabled
 #[derive(Debug, Clone)]
 #[cfg(not(feature = "gpu-benchmarks"))]
@@ -172,12 +165,10 @@ impl MoproCircom {
         }
     }
 
-    pub fn setup(&self, wasm_path: String, r1cs_path: String) -> Result<SetupResult, MoproError> {
+    pub fn initialize(&self, arkzkey_path: String, wasm_path: String) -> Result<(), MoproError> {
         let mut state_guard = self.state.write().unwrap();
-        let pk = state_guard.setup(wasm_path.as_str(), r1cs_path.as_str())?;
-        Ok(SetupResult {
-            provingKey: circom::serialization::serialize_proving_key(&pk),
-        })
+        state_guard.initialize(arkzkey_path.as_str(), wasm_path.as_str())?;
+        Ok(())
     }
 
     //             inputs: circom::serialization::serialize_inputs(&inputs),
@@ -279,17 +270,18 @@ mod tests {
 
     #[test]
     fn test_end_to_end() -> Result<(), MoproError> {
-        // Paths to your wasm and r1cs files
+        // Paths to your wasm and arkzkey files
         let wasm_path =
             "./../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
-        let r1cs_path = "./../mopro-core/examples/circom/multiplier2/target/multiplier2.r1cs";
+        let arkzkey_path =
+            "./../mopro-core/examples/circom/multiplier2/target/multiplier2_final.arkzkey";
 
         // Create a new MoproCircom instance
         let mopro_circom = MoproCircom::new();
 
-        // Step 1: Setup
-        let setup_result = mopro_circom.setup(wasm_path.to_string(), r1cs_path.to_string())?;
-        assert!(setup_result.provingKey.len() > 0);
+        // Step 1: Initialize
+        let init_result = mopro_circom.initialize(arkzkey_path.to_string(), wasm_path.to_string());
+        assert!(init_result.is_ok());
 
         let mut inputs = HashMap::new();
         let a = BigUint::from_str(
@@ -332,14 +324,15 @@ mod tests {
         // Paths to your wasm and r1cs files
         let wasm_path =
             "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
-        let r1cs_path = "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test.r1cs";
+        let arkzkey_path =
+            "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.arkzkey";
 
         // Create a new MoproCircom instance
         let mopro_circom = MoproCircom::new();
 
         // Step 1: Setup
-        let setup_result = mopro_circom.setup(wasm_path.to_string(), r1cs_path.to_string())?;
-        assert!(setup_result.provingKey.len() > 0);
+        let setup_result = mopro_circom.initialize(arkzkey_path.to_string(), wasm_path.to_string());
+        assert!(setup_result.is_ok());
 
         // Prepare inputs
         let input_vec = vec![

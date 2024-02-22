@@ -400,7 +400,7 @@ fileprivate struct FfiConverterData: FfiConverterRustBuffer {
 
 public protocol MoproCircomProtocol {
     func generateProof(circuitInputs: [String: [String]])  throws -> GenerateProofResult
-    func setup(wasmPath: String, r1csPath: String)  throws -> SetupResult
+    func initialize(arkzkeyPath: String, wasmPath: String)  throws
     func verifyProof(proof: Data, publicInput: Data)  throws -> Bool
     
 }
@@ -440,16 +440,14 @@ public class MoproCircom: MoproCircomProtocol {
         )
     }
 
-    public func setup(wasmPath: String, r1csPath: String) throws -> SetupResult {
-        return try  FfiConverterTypeSetupResult.lift(
-            try 
+    public func initialize(arkzkeyPath: String, wasmPath: String) throws {
+        try 
     rustCallWithError(FfiConverterTypeMoproError.lift) {
-    uniffi_mopro_ffi_fn_method_moprocircom_setup(self.pointer, 
-        FfiConverterString.lower(wasmPath),
-        FfiConverterString.lower(r1csPath),$0
+    uniffi_mopro_ffi_fn_method_moprocircom_initialize(self.pointer, 
+        FfiConverterString.lower(arkzkeyPath),
+        FfiConverterString.lower(wasmPath),$0
     )
 }
-        )
     }
 
     public func verifyProof(proof: Data, publicInput: Data) throws -> Bool {
@@ -509,15 +507,13 @@ public struct BenchmarkResult {
     public var numMsm: UInt32
     public var avgProcessingTime: Double
     public var totalProcessingTime: Double
-    public var allocatedMemory: UInt32
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(numMsm: UInt32, avgProcessingTime: Double, totalProcessingTime: Double, allocatedMemory: UInt32) {
+    public init(numMsm: UInt32, avgProcessingTime: Double, totalProcessingTime: Double) {
         self.numMsm = numMsm
         self.avgProcessingTime = avgProcessingTime
         self.totalProcessingTime = totalProcessingTime
-        self.allocatedMemory = allocatedMemory
     }
 }
 
@@ -533,9 +529,6 @@ extension BenchmarkResult: Equatable, Hashable {
         if lhs.totalProcessingTime != rhs.totalProcessingTime {
             return false
         }
-        if lhs.allocatedMemory != rhs.allocatedMemory {
-            return false
-        }
         return true
     }
 
@@ -543,7 +536,6 @@ extension BenchmarkResult: Equatable, Hashable {
         hasher.combine(numMsm)
         hasher.combine(avgProcessingTime)
         hasher.combine(totalProcessingTime)
-        hasher.combine(allocatedMemory)
     }
 }
 
@@ -553,8 +545,7 @@ public struct FfiConverterTypeBenchmarkResult: FfiConverterRustBuffer {
         return try BenchmarkResult(
             numMsm: FfiConverterUInt32.read(from: &buf), 
             avgProcessingTime: FfiConverterDouble.read(from: &buf), 
-            totalProcessingTime: FfiConverterDouble.read(from: &buf), 
-            allocatedMemory: FfiConverterUInt32.read(from: &buf)
+            totalProcessingTime: FfiConverterDouble.read(from: &buf)
         )
     }
 
@@ -562,7 +553,6 @@ public struct FfiConverterTypeBenchmarkResult: FfiConverterRustBuffer {
         FfiConverterUInt32.write(value.numMsm, into: &buf)
         FfiConverterDouble.write(value.avgProcessingTime, into: &buf)
         FfiConverterDouble.write(value.totalProcessingTime, into: &buf)
-        FfiConverterUInt32.write(value.allocatedMemory, into: &buf)
     }
 }
 
@@ -801,53 +791,6 @@ public func FfiConverterTypeProofCalldata_lift(_ buf: RustBuffer) throws -> Proo
 
 public func FfiConverterTypeProofCalldata_lower(_ value: ProofCalldata) -> RustBuffer {
     return FfiConverterTypeProofCalldata.lower(value)
-}
-
-
-public struct SetupResult {
-    public var provingKey: Data
-
-    // Default memberwise initializers are never public by default, so we
-    // declare one manually.
-    public init(provingKey: Data) {
-        self.provingKey = provingKey
-    }
-}
-
-
-extension SetupResult: Equatable, Hashable {
-    public static func ==(lhs: SetupResult, rhs: SetupResult) -> Bool {
-        if lhs.provingKey != rhs.provingKey {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(provingKey)
-    }
-}
-
-
-public struct FfiConverterTypeSetupResult: FfiConverterRustBuffer {
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SetupResult {
-        return try SetupResult(
-            provingKey: FfiConverterData.read(from: &buf)
-        )
-    }
-
-    public static func write(_ value: SetupResult, into buf: inout [UInt8]) {
-        FfiConverterData.write(value.provingKey, into: &buf)
-    }
-}
-
-
-public func FfiConverterTypeSetupResult_lift(_ buf: RustBuffer) throws -> SetupResult {
-    return try FfiConverterTypeSetupResult.lift(buf)
-}
-
-public func FfiConverterTypeSetupResult_lower(_ value: SetupResult) -> RustBuffer {
-    return FfiConverterTypeSetupResult.lower(value)
 }
 
 public enum MoproError {
@@ -1094,7 +1037,7 @@ private var initializationResult: InitializationResult {
     if (uniffi_mopro_ffi_checksum_method_moprocircom_generate_proof() != 64602) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_ffi_checksum_method_moprocircom_setup() != 57700) {
+    if (uniffi_mopro_ffi_checksum_method_moprocircom_initialize() != 36559) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_method_moprocircom_verify_proof() != 61522) {

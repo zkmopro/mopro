@@ -1,12 +1,11 @@
 import uniffi.mopro.*;
 
 var wasmPath = "../mopro-core/examples/circom/rsa/target/main_js/main.wasm"
-var r1csPath = "../mopro-core/examples/circom/rsa/target/main.r1cs"
+var arkzkeyPath = "../mopro-core/examples/circom/rsa/target/main_final.arkzkey"
 
 try {
     var moproCircom = MoproCircom()
-    var setupResult = moproCircom.setup(wasmPath, r1csPath)
-    assert(setupResult.provingKey.size > 0) { "Proving key should not be empty"}
+    moproCircom.initialize(arkzkeyPath, wasmPath)
 
     val inputs = mutableMapOf<String, List<String>>()
     inputs["signature"] = listOf("3582320600048169363",

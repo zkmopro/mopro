@@ -2,13 +2,12 @@ import uniffi.mopro.*
 
 var wasmPath =
         "../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm"
-var r1csPath = "../mopro-core/examples/circom/keccak256/target/keccak256_256_test.r1cs"
+var arkzkeyPath = "../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.arkzkey"
 
 try {
     var moproCircom = MoproCircom()
-    var setupResult = moproCircom.setup(wasmPath, r1csPath)
-    assert(setupResult.provingKey.size > 0) { "Proving key should not be empty" }
-
+    moproCircom.initialize(arkzkeyPath, wasmPath)
+    
     val inputs = mutableMapOf<String, List<String>>()
     inputs["in"] =
             listOf(

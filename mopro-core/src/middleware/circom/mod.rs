@@ -1,6 +1,6 @@
 use self::{
-    serialization::{SerializableInputs, SerializableProof, SerializableProvingKey},
-    utils::{assert_paths_exists, bytes_to_bits},
+    serialization::{SerializableInputs, SerializableProof},
+    utils::bytes_to_bits,
 };
 use crate::MoproError;
 
@@ -11,9 +11,6 @@ use std::time::Instant;
 
 use ark_bn254::{Bn254, Fr};
 use ark_circom::{
-    CircomBuilder,
-    CircomCircuit,
-    CircomConfig,
     CircomReduction,
     WitnessCalculator, //read_zkey,
 };
@@ -30,7 +27,7 @@ use once_cell::sync::{Lazy, OnceCell};
 
 use wasmer::{Module, Store};
 
-use ark_zkey::read_arkzkey_from_bytes; //SerializableConstraintMatrices
+use ark_zkey::{read_arkzkey, read_arkzkey_from_bytes}; //SerializableConstraintMatrices
 
 #[cfg(feature = "dylib")]
 use {
@@ -48,9 +45,8 @@ type CircuitInputs = HashMap<String, Vec<BigInt>>;
 // TODO: Split up this namespace a bit, right now quite a lot of things going on
 
 pub struct CircomState {
-    builder: Option<CircomBuilder<Bn254>>,
-    circuit: Option<CircomCircuit<Bn254>>,
-    params: Option<ProvingKey<Bn254>>,
+    arkzkey: Option<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)>,
+    wtns: Option<WitnessCalculator>,
 }
 
 impl Default for CircomState {
@@ -234,84 +230,69 @@ pub fn verify_proof2(
 impl CircomState {
     pub fn new() -> Self {
         Self {
-            builder: None,
-            circuit: None,
-            params: None,
+            arkzkey: None,
+            wtns: None,
         }
     }
 
-    pub fn setup(
-        &mut self,
-        wasm_path: &str,
-        r1cs_path: &str,
-    ) -> Result<SerializableProvingKey, MoproError> {
-        assert_paths_exists(wasm_path, r1cs_path)?;
-        println!("Setup");
-        let start = Instant::now();
+    pub fn initialize(&mut self, arkzkey_path: &str, wasm_path: &str) -> Result<(), MoproError> {
+        let arkzkey =
+            read_arkzkey(arkzkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        self.arkzkey = Some(arkzkey);
 
-        // Load the WASM and R1CS for witness and proof generation
-        let cfg = self.load_config(wasm_path, r1cs_path)?;
+        let wtns = WitnessCalculator::new(wasm_path)
+            .map_err(|e| MoproError::CircomError(e.to_string()))
+            .unwrap();
+        self.wtns = Some(wtns);
 
-        // Create an empty instance for setup
-        self.builder = Some(CircomBuilder::new(cfg));
-
-        // Run a trusted setup using the rng in the state
-        let params = self.run_trusted_setup()?;
-
-        self.params = Some(params.clone());
-
-        let setup_duration = start.elapsed();
-        println!("Setup time: {:?}", setup_duration);
-
-        Ok(SerializableProvingKey(params))
+        Ok(())
     }
 
-    // NOTE: Consider generate_proof<T: Into<BigInt>> API
-    // XXX: BigInt might present problems for UniFFI
     pub fn generate_proof(
         &mut self,
         inputs: CircuitInputs,
     ) -> Result<(SerializableProof, SerializableInputs), MoproError> {
-        let start = Instant::now();
+        let mut rng = thread_rng();
+        let rng = &mut rng;
+
+        let r = ark_bn254::Fr::rand(rng);
+        let s = ark_bn254::Fr::rand(rng);
+
         println!("Generating proof");
 
-        let mut rng = thread_rng();
-
-        let builder = self.builder.as_mut().ok_or(MoproError::CircomError(
-            "Builder has not been set up".to_string(),
-        ))?;
-
-        // Insert our inputs as key value pairs
-        for (key, values) in &inputs {
-            for value in values {
-                builder.push_input(&key, value.clone());
-            }
-        }
-
-        // Clone the builder, then build the circuit
-        let circom = builder
+        let now = std::time::Instant::now();
+        let full_assignment = self
+            .wtns
             .clone()
-            .build()
+            .unwrap()
+            .calculate_witness_element::<Bn254, _>(inputs, false)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
-        // Update the circuit in self
-        self.circuit = Some(circom.clone());
+        println!("Witness generation took: {:.2?}", now.elapsed());
 
-        let params = self.params.as_ref().ok_or(MoproError::CircomError(
-            "Parameters have not been set up".to_string(),
+        let now = std::time::Instant::now();
+        let zkey = self.arkzkey.as_ref().ok_or(MoproError::CircomError(
+            "Zkey has not been set up".to_string(),
         ))?;
+        println!("Loading arkzkey took: {:.2?}", now.elapsed());
 
-        let inputs = circom.get_public_inputs().ok_or(MoproError::CircomError(
-            "Failed to get public inputs".to_string(),
-        ))?;
+        let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
 
-        let proof = GrothBn::prove(params, circom.clone(), &mut rng)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let now = std::time::Instant::now();
+        let ark_proof = Groth16::<_, CircomReduction>::create_proof_with_reduction_and_matrices(
+            &zkey.0,
+            r,
+            s,
+            &zkey.1,
+            zkey.1.num_instance_variables,
+            zkey.1.num_constraints,
+            full_assignment.as_slice(),
+        );
 
-        let proof_duration = start.elapsed();
-        println!("Proof generation time: {:?}", proof_duration);
+        let proof = ark_proof.map_err(|e| MoproError::CircomError(e.to_string()))?;
 
-        Ok((SerializableProof(proof), SerializableInputs(inputs)))
+        println!("proof generation took: {:.2?}", now.elapsed());
+        Ok((SerializableProof(proof), SerializableInputs(public_inputs)))
     }
 
     pub fn verify_proof(
@@ -320,15 +301,10 @@ impl CircomState {
         serialized_inputs: SerializableInputs,
     ) -> Result<bool, MoproError> {
         let start = Instant::now();
-
-        println!("Verifying proof");
-
-        let params = self.params.as_ref().ok_or(MoproError::CircomError(
-            "Parameters have not been set up".to_string(),
+        let zkey = self.arkzkey.as_ref().ok_or(MoproError::CircomError(
+            "Zkey has not been set up".to_string(),
         ))?;
-
-        let pvk =
-            GrothBn::process_vk(&params.vk).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let pvk = prepare_verifying_key(&zkey.0.vk);
 
         let proof_verified =
             GrothBn::verify_with_processed_vk(&pvk, &serialized_inputs.0, &serialized_proof.0)
@@ -337,30 +313,6 @@ impl CircomState {
         let verification_duration = start.elapsed();
         println!("Verification time: {:?}", verification_duration);
         Ok(proof_verified)
-    }
-
-    fn load_config(
-        &self,
-        wasm_path: &str,
-        r1cs_path: &str,
-    ) -> Result<CircomConfig<Bn254>, MoproError> {
-        CircomConfig::<Bn254>::new(wasm_path, r1cs_path)
-            .map_err(|e| MoproError::CircomError(e.to_string()))
-    }
-
-    fn run_trusted_setup(&mut self) -> Result<ProvingKey<Bn254>, MoproError> {
-        let circom_setup = self
-            .builder
-            .as_mut()
-            .ok_or(MoproError::CircomError(
-                "Builder has not been set up".to_string(),
-            ))?
-            .setup();
-
-        let mut rng = thread_rng();
-
-        GrothBn::generate_random_parameters_with_reduction(circom_setup, &mut rng)
-            .map_err(|e| MoproError::CircomError(e.to_string()))
     }
 }
 
@@ -396,18 +348,15 @@ mod tests {
     #[test]
     fn test_setup_prove_verify_simple() {
         let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
-        let r1cs_path = "./examples/circom/multiplier2/target/multiplier2.r1cs";
-
+        let arkzkey_path = "./examples/circom/multiplier2/target/multiplier2_final.arkzkey";
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.setup(wasm_path, r1cs_path);
+        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();
-
-        // Deserialize the proving key and inputs if necessary
 
         // Prepare inputs
         let mut inputs = HashMap::new();
@@ -445,18 +394,15 @@ mod tests {
     fn test_setup_prove_verify_keccak() {
         let wasm_path =
             "./examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
-        let r1cs_path = "./examples/circom/keccak256/target/keccak256_256_test.r1cs";
-
+        let arkzkey_path = "./examples/circom/keccak256/target/keccak256_256_test_final.arkzkey";
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.setup(wasm_path, r1cs_path);
+        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();
-
-        // Deserialize the proving key and inputs if necessary
 
         // Prepare inputs
         let input_vec = vec![
@@ -501,10 +447,10 @@ mod tests {
         let mut circom_state = CircomState::new();
 
         let wasm_path = "badpath/multiplier2.wasm";
-        let r1cs_path = "badpath/multiplier2.r1cs";
+        let arkzkey_path = "badpath/multiplier2.arkzkey";
 
         // Act: Call the setup method
-        let result = circom_state.setup(wasm_path, r1cs_path);
+        let result = circom_state.initialize(arkzkey_path, wasm_path);
 
         // Assert: Check that the method returns an error
         assert!(result.is_err());
@@ -574,13 +520,13 @@ mod tests {
     #[test]
     fn test_setup_prove_rsa() {
         let wasm_path = "./examples/circom/rsa/target/main_js/main.wasm";
-        let r1cs_path = "./examples/circom/rsa/target/main.r1cs";
+        let arkzkey_path = "./examples/circom/rsa/target/main_final.arkzkey";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.setup(wasm_path, r1cs_path);
+        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();
@@ -685,13 +631,13 @@ mod tests {
     fn test_setup_prove_anon_aadhaar() {
         let wasm_path =
             "./examples/circom/anonAadhaar/target/aadhaar-verifier_js/aadhaar-verifier.wasm";
-        let r1cs_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier.r1cs";
+        let arkzkey_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier_final.arkzkey";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.setup(wasm_path, r1cs_path);
+        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();

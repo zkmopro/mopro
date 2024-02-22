@@ -17,7 +17,6 @@ class KeccakSetupViewController: UIViewController {
     var textView = UITextView()
 
     let moproCircom = MoproKit.MoproCircom()
-    var setupResult: SetupResult?
     var generatedProof: Data?
     var publicInputs: Data?
 
@@ -80,16 +79,26 @@ class KeccakSetupViewController: UIViewController {
 
     @objc func runSetupAction() {
         // Logic for setup
-        if let wasmPath = Bundle.main.path(forResource: "keccak256_256_test", ofType: "wasm"),
-            let r1csPath = Bundle.main.path(forResource: "keccak256_256_test", ofType: "r1cs") {
+        if let arkzkeyPath = Bundle.main.path(forResource: "keccak256_256_test_final", ofType: "arkzkey"),
+            let wasmPath = Bundle.main.path(forResource: "keccak256_256_test", ofType: "wasm") {
 
        // Multiplier example
        // if let wasmPath = Bundle.main.path(forResource: "multiplier2", ofType: "wasm"),
        //    let r1csPath = Bundle.main.path(forResource: "multiplier2", ofType: "r1cs") {
 
            do {
-               setupResult = try moproCircom.setup(wasmPath: wasmPath, r1csPath: r1csPath)
-               proveButton.isEnabled = true // Enable the Prove button upon successful setup
+            textView.text += "Initializing library\n"
+            // Record start time
+            let start = CFAbsoluteTimeGetCurrent()
+
+            try moproCircom.initialize(arkzkeyPath: arkzkeyPath, wasmPath: wasmPath)
+            proveButton.isEnabled = true // Enable the Prove button upon successful setup
+
+            // Record end time and compute duration
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+
+            textView.text += "Initializing arkzkey and wasm took \(timeTaken) seconds.\n"
            } catch let error as MoproError {
                print("MoproError: \(error)")
            } catch {
@@ -102,7 +111,7 @@ class KeccakSetupViewController: UIViewController {
 
     @objc func runProveAction() {
         // Logic for prove
-       guard let setupResult = setupResult else {
+        guard proveButton.isEnabled else {
            print("Setup is not completed yet.")
            return
         }
@@ -149,8 +158,7 @@ class KeccakSetupViewController: UIViewController {
 
     @objc func runVerifyAction() {
         // Logic for verify
-        guard let setupResult = setupResult,
-                let proof = generatedProof,
+        guard let proof = generatedProof,
                 let publicInputs = publicInputs else {
             print("Setup is not completed or proof has not been generated yet.")
             return
