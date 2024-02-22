@@ -24,10 +24,8 @@ jobs:
     # TODO: We should be able to cache this
       - name: Install circom
         run: |
-          git clone https://github.com/iden3/circom.git
-          cd circom
-          cargo build --release
-          cargo install --path circom
+          sudo wget -O /Users/runner/.cargo/bin/circom https://github.com/iden3/circom/releases/download/v2.1.8/circom-macos-amd64
+          sudo chmod +x /Users/runner/.cargo/bin/circom
       - uses: actions/checkout@v3
       - name: Prepare CI for iOS
         run: ./scripts/prepare_ci.sh
@@ -43,10 +41,8 @@ jobs:
     steps:
       - name: Install circom
         run: |
-          git clone https://github.com/iden3/circom.git
-          cd circom
-          cargo build --release
-          cargo install --path circom
+          sudo wget -O /usr/bin/circom https://github.com/iden3/circom/releases/download/v2.1.8/circom-linux-amd64
+          sudo chmod +x /usr/bin/circom
       - uses: actions/checkout@v3
       - name: Prepare CI for Core and FFI
         run: ./scripts/prepare_ci.sh
