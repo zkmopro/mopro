@@ -1,0 +1,2 @@
+[workspace]
+members = ["mopro-core", "mopro-ffi", "mopro-cli"]
