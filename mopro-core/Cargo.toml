@@ -5,14 +5,9 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[patch.crates-io]
-# NOTE: Forked wasmer to work around memory limits
-# See https://github.com/wasmerio/wasmer/commit/09c7070
-wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
-
 [features]
 default = ["wasmer/dylib"]
-dylib = []                                        # NOTE: can probably remove this if we use env config instead
+dylib = []                 # NOTE: can probably remove this if we use env config instead
 gpu-benchmarks = []
 
 [dependencies]
