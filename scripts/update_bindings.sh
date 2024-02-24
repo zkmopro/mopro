@@ -133,7 +133,7 @@ elif [[ "$DEVICE_TYPE" == "device" ]]; then
     print_warning "This only works on iOS devices (ARM64)"
 fi
 
-cp ${PROJECT_DIR}/mopro-ffi/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a ${TARGET_DIR}/
+cp ${PROJECT_DIR}/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a ${TARGET_DIR}/
 
 print_action "Copying Swift bindings and static library to MoproKit..."
 cp ${TARGET_DIR}/SwiftBindings/moproFFI.h ${MOPROKIT_DIR}/Include/
@@ -145,7 +145,7 @@ cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
 # Dylib assets
 if [[ "$USE_DYLIB" == true ]]; then
     print_action "Copying dynamic library asset (${DYLIB_NAME})..."
-    cp "${PROJECT_DIR}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}" "${TARGET_DIR}/"
+    cp "${PROJECT_DIR}/target/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}" "${TARGET_DIR}/"
     cp "${TARGET_DIR}/${DYLIB_NAME}" "${MOPROKIT_DIR}/Libs/"
     # Fix dynamic lib install paths
     # NOTE: Xcode might already do this for us; verify this
