@@ -28,14 +28,7 @@ jobs:
         with:
           path: /Users/runner/.cargo/bin/toml
           key: ${{ runner.os }}-toml-0.2.3 # version of toml-cli 0.2.3
-      - name: Cache circom
-        uses: actions/cache@v4
-        id: circom-macos-restore
-        with:
-            path: /Users/runner/.cargo/bin/circom
-            key: ${{ runner.os }}-circom-2.1.8 # version of circom 2.1.8
       - name: Install circom
-        if: steps.circom-macos-restore.outputs.cache-hit != 'true'
         run: |
           sudo wget -O /Users/runner/.cargo/bin/circom https://github.com/iden3/circom/releases/download/v2.1.8/circom-macos-amd64
           sudo chmod +x /Users/runner/.cargo/bin/circom
@@ -77,14 +70,7 @@ jobs:
         with:
           path: /home/runner/.cargo/bin/toml
           key: ${{ runner.os }}-toml-0.2.3 # version of toml-cli 0.2.3
-      - name: Restore circom
-        uses: actions/cache@v4
-        id: circom-linux-restore
-        with:
-          path: /usr/bin/circom
-          key: ${{ runner.os }}-circom-2.1.8
       - name: Install circom
-        if: steps.circom-linux-restore.outputs.cache-hit != 'true'
         run: |
           sudo wget -O /usr/bin/circom https://github.com/iden3/circom/releases/download/v2.1.8/circom-linux-amd64
           sudo chmod +x /usr/bin/circom
