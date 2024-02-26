@@ -77,12 +77,15 @@ PROJECT_DIR=$(pwd)
 
 cd ${PROJECT_DIR}/mopro-ffi
 
+print_action "[android] Install cargo-ndk"
+cargo install cargo-ndk
+
 # Print appropriate message based on device type
 print_action "Using $ARCHITECTURE libmopro_ffi.a ($LIB_DIR) static library..."
 print_warning "This only works on $FOLDER devices!"
 
 print_action "[android] Build target in $BUILD_MODE mode"
-cargo build --lib ${COMMAND} --target ${ARCHITECTURE}
+cargo ndk -t ${ARCHITECTURE} build --lib ${COMMAND} 
 
 print_action "[android] Copy files in mopro-android/Example/jniLibs/"
 for binary in target/*/*/libmopro_ffi.so; do file $binary; done

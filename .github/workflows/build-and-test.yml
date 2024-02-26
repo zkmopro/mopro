@@ -21,12 +21,35 @@ jobs:
   test-ios:
     runs-on: macos-latest
     steps:
-    # TODO: We should be able to cache this
+      - uses: actions/checkout@v3
+      - name: Cache toml
+        uses: actions/cache@v4
+        id: toml-macos-restore
+        with:
+          path: /Users/runner/.cargo/bin/toml
+          key: ${{ runner.os }}-toml-0.2.3 # version of toml-cli 0.2.3
+      - name: Cache circom
+        uses: actions/cache@v4
+        id: circom-macos-restore
+        with:
+            path: /Users/runner/.cargo/bin/circom
+            key: ${{ runner.os }}-circom-2.1.8 # version of circom 2.1.8
       - name: Install circom
+        if: steps.circom-macos-restore.outputs.cache-hit != 'true'
         run: |
           sudo wget -O /Users/runner/.cargo/bin/circom https://github.com/iden3/circom/releases/download/v2.1.8/circom-macos-amd64
           sudo chmod +x /Users/runner/.cargo/bin/circom
-      - uses: actions/checkout@v3
+      - name: Get uniffi-version
+        if: steps.toml-macos-restore.outputs.cache-hit == 'true'
+        id: extract-version
+        run: UNIFFI_VERSION=$(toml get mopro-ffi/Cargo.toml dependencies.uniffi.version -r)
+      - name: Cache uniffi-bindgen
+        uses: actions/cache@v4
+        if: steps.toml-macos-restore.outputs.cache-hit == 'true'
+        id: uniffi-bindgen-macos-restore
+        with:
+            path: /Users/runner/.cargo/bin/uniffi-bindgen
+            key: ${{ runner.os }}-uniffi-bindgen-${{ steps.extract-version.outputs.UNIFFI_VERSION }}
       - name: Prepare CI for iOS
         run: ./scripts/prepare_ci.sh
       - name: Build for iOS
@@ -35,15 +58,49 @@ jobs:
         run: |
           cd mopro-ios/MoproKit/Example
           xcodebuild test -scheme MoproKit-Example -workspace MoproKit.xcworkspace -destination "platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro"
+      - name: Get uniffi-version
+        if: steps.uniffi-bindgen-macos-restore.outputs.cache-hit != 'true'
+        id: post-extract-version
+        run: UNIFFI_VERSION=$(toml get mopro-ffi/Cargo.toml dependencies.uniffi.version -r)
+      - name: Save uniffi-bindgen cache
+        if: steps.uniffi-bindgen-macos-restore.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
+        with:
+            path: /Users/runner/.cargo/bin/uniffi-bindgen
+            key: ${{ runner.os }}-uniffi-bindgen-${{ steps.post-extract-version.outputs.UNIFFI_VERSION }}
 
   test-android:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - name: Restore toml
+        uses: actions/cache@v4
+        id: toml-linux-restore
+        with:
+          path: /home/runner/.cargo/bin/toml
+          key: ${{ runner.os }}-toml-0.2.3 # version of toml-cli 0.2.3
+      - name: Restore circom
+        uses: actions/cache@v4
+        id: circom-linux-restore
+        with:
+          path: /usr/bin/circom
+          key: ${{ runner.os }}-circom-2.1.8
       - name: Install circom
+        if: steps.circom-linux-restore.outputs.cache-hit != 'true'
         run: |
           sudo wget -O /usr/bin/circom https://github.com/iden3/circom/releases/download/v2.1.8/circom-linux-amd64
           sudo chmod +x /usr/bin/circom
-      - uses: actions/checkout@v3
+      - name: Get uniffi-version
+        id: extract-version
+        if: steps.toml-linux-restore.outputs.cache-hit == 'true'
+        run: UNIFFI_VERSION=$(toml get mopro-ffi/Cargo.toml dependencies.uniffi.version -r)
+      - name: Restore uniffi-bindgen
+        uses: actions/cache@v4
+        if: steps.toml-linux-restore.outputs.cache-hit == 'true'
+        id: uniffi-bindgen-linux-restore
+        with:
+            path: /home/runner/.cargo/bin/uniffi-bindgen
+            key: ${{ runner.os }}-uniffi-bindgen-${{ steps.extract-version.outputs.UNIFFI_VERSION }}
       - name: Prepare CI for Core and FFI
         run: ./scripts/prepare_ci.sh
       - name: Build for Android
@@ -56,3 +113,13 @@ jobs:
           cd mopro-ffi/
           curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o target/jna-5.13.0.jar
           CLASSPATH=target/jna-5.13.0.jar cargo test -- --nocapture
+      - name: Get uniffi-version
+        if: steps.uniffi-bindgen-linux-restore.outputs.cache-hit != 'true'
+        id: post-extract-version
+        run: UNIFFI_VERSION=$(toml get mopro-ffi/Cargo.toml dependencies.uniffi.version -r)
+      - name: Save uniffi-bindgen
+        uses: actions/cache@v4
+        if: steps.uniffi-bindgen-linux-restore.outputs.cache-hit != 'true'
+        with:
+            path: /home/runner/.cargo/bin/uniffi-bindgen
+            key: ${{ runner.os }}-uniffi-bindgen-${{ steps.post-extract-version.outputs.UNIFFI_VERSION }}
