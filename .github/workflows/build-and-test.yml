@@ -111,8 +111,8 @@ jobs:
       # TODO: Fix this custom jar thing
         run: |
           cd mopro-ffi/
-          curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o target/jna-5.13.0.jar
-          CLASSPATH=target/jna-5.13.0.jar cargo test -- --nocapture
+          curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
+          CLASSPATH=jna-5.13.0.jar cargo test -- --nocapture
       - name: Get uniffi-version
         if: steps.uniffi-bindgen-linux-restore.outputs.cache-hit != 'true'
         id: post-extract-version
