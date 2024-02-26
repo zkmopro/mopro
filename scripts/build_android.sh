@@ -88,10 +88,10 @@ print_action "[android] Build target in $BUILD_MODE mode"
 cargo ndk -t ${ARCHITECTURE} build --lib ${COMMAND} 
 
 print_action "[android] Copy files in mopro-android/Example/jniLibs/"
-for binary in target/*/*/libmopro_ffi.so; do file $binary; done
+for binary in ${PROJECT_DIR}/target/*/*/libmopro_ffi.so; do file $binary; done
 
 mkdir -p jniLibs/${FOLDER}/ && \
-cp target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.so jniLibs/${FOLDER}/libuniffi_mopro.so
+cp ${PROJECT_DIR}/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.so jniLibs/${FOLDER}/libuniffi_mopro.so
 
 print_action "[android] Generating Kotlin bindings in $BUILD_MODE mode..."
 cargo run --features=uniffi/cli ${COMMAND} \
