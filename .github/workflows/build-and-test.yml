@@ -104,7 +104,7 @@ jobs:
       - name: Prepare CI for Core and FFI
         run: ./scripts/prepare_ci.sh
       - name: Build for Android
-        run: ./scripts/build_android.sh config-example-android.toml
+        run: ./scripts/build_android.sh config-android-ci.toml
       - name: Run core tests
         run: cd mopro-core && cargo test -- --nocapture
       - name: Run FFI tests
