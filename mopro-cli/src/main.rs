@@ -14,10 +14,11 @@ struct Cli {
 enum Commands {
     /// Initializes a new project
     Init {
-        #[arg(long)]
+        #[arg(long, default_value = "circom")]
         adapter: String,
-        #[arg(long)]
+        #[arg(long, default_value = "desktop")]
         platform: String,
+        #[arg(default_value = "mopro-cli-example")]
         project_name: String,
     },
     /// Builds the project for specified platforms
