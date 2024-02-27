@@ -1,6 +1,6 @@
 use color_eyre::eyre::Result;
 use serde::Deserialize;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::{env, fs};
 use toml;
 
@@ -8,6 +8,9 @@ use toml;
 struct Config {
     circuit: CircuitConfig,
     dylib: Option<DylibConfig>,
+    // This field does not need to be deserialized from TOML, so it's not included in the original definition
+    #[serde(skip)]
+    expanded_circuit_dir: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -22,8 +25,16 @@ struct DylibConfig {
     name: String,
 }
 
+/// Resolve a potentially relative path against a base directory.
+fn resolve_path(base_dir: &Path, relative_path: &str) -> String {
+    let path = Path::new(relative_path);
+    if path.is_absolute() {
+        relative_path.to_owned()
+    } else {
+        base_dir.join(path).to_string_lossy().into_owned()
+    }
+}
 fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
-    use std::path::Path;
     use std::str::FromStr;
 
     use color_eyre::eyre::eyre;
@@ -75,22 +86,35 @@ fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
 }
 
 fn build_circuit(config: &Config) -> Result<()> {
-    let project_dir = env::var("CARGO_MANIFEST_DIR")?;
-    let circuit_dir = &config.circuit.dir;
+    // XXX: This is really hacky, but it gets the job done
+    // Check if the current package is mopro-core
+    let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
+    let base_dir = if pkg_name == "mopro-core" {
+        // If mopro-core, use CARGO_MANIFEST_DIR as base directory
+        env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set")
+    } else {
+        // Default to current directory
+        ".".to_string()
+    };
+
+    // Use the expanded circuit directory if available, otherwise fallback to the original directory
+    let circuit_dir = config
+        .expanded_circuit_dir
+        .as_ref()
+        .unwrap_or(&config.circuit.dir);
     let circuit_name = &config.circuit.name;
 
-    let zkey_path = PathBuf::from(&project_dir).join(format!(
-        "{}/target/{}_final.zkey",
-        circuit_dir, circuit_name
-    ));
-    let wasm_path = PathBuf::from(&project_dir).join(format!(
-        "{}/target/{}_js/{}.wasm",
-        circuit_dir, circuit_name, circuit_name
-    ));
-    let arkzkey_path = PathBuf::from(&project_dir).join(format!(
-        "{}/target/{}_final.arkzkey",
-        circuit_dir, circuit_name
-    ));
+    // Resolve the circuit directory to an absolute path based on the conditionally set base_dir
+    let circuit_dir_path = Path::new(&base_dir).join(circuit_dir);
+
+    println!("cargo:warning=Circuit directory: {}", circuit_dir);
+
+    let zkey_path =
+        PathBuf::from(circuit_dir_path.clone()).join(format!("target/{}_final.zkey", circuit_name));
+    let wasm_path = PathBuf::from(circuit_dir_path.clone())
+        .join(format!("target/{}_js/{}.wasm", circuit_name, circuit_name));
+    let arkzkey_path = PathBuf::from(circuit_dir_path.clone())
+        .join(format!("target/{}_final.arkzkey", circuit_name));
 
     // TODO: Improve this to be more user-friendly
     assert!(
@@ -121,26 +145,48 @@ fn build_circuit(config: &Config) -> Result<()> {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config_str = match env::var("BUILD_CONFIG_PATH") {
         Ok(config_path) => {
-            println!("cargo:warning=config: {}", config_path);
+            println!("cargo:warning=Config: {}", config_path);
+            let config_path = PathBuf::from(config_path);
+
+            // Ensure the config path is absolute or resolve it based on current dir
+            let config_path = if config_path.is_absolute() {
+                config_path
+            } else {
+                env::current_dir()?.join(config_path)
+            };
+
+            // Read the configuration file
             fs::read_to_string(config_path)?
         }
         Err(_) => {
             println!("cargo:warning=BUILD_CONFIG_PATH not set. Using default configuration.");
             // Default configuration
             let default_config = r#"
-                    [circuit]
-                    dir = "examples/circom/keccak256"
-                    name = "keccak256_256_test"
-    
-                    #[dylib]
-                    use_dlib = false
-                    #name = "keccak256.dylib"
-                "#;
+                [build]
+                device_type = "simulator"
+                build_mode = "release"
+
+                [circuit]
+                dir = "examples/circom/keccak256"
+                name = "keccak256_256_test"
+
+                [dylib]
+                use_dylib = false
+                name = "keccak256.dylib"
+            "#;
             default_config.to_string()
         }
     };
 
-    let config: Config = toml::from_str(&config_str)?;
+    let mut config: Config = toml::from_str(&config_str)?;
+
+    // NOTE: Resolve paths relative to the config file or default path
+    let config_dir = PathBuf::from(env::var("BUILD_CONFIG_PATH").unwrap_or_else(|_| ".".into()));
+    let config_dir = config_dir.parent().unwrap_or_else(|| Path::new("."));
+
+    let resolved_circuit_dir = resolve_path(config_dir, &config.circuit.dir);
+
+    config.expanded_circuit_dir = Some(resolved_circuit_dir.clone());
 
     // Build circuit
     build_circuit(&config)?;
