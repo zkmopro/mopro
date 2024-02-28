@@ -12,8 +12,6 @@ build_mode = "release" # Options: debug, release
 [circuit]
 dir = "circuits/multiplier2"
 name = "multiplier2"
-#dir = "examples/circom/keccak256" # Directory of the circuit
-#name = "keccak256_256_test"       # Name of the circuit
 
 [dylib]
 # NOTE: Dylib support is experimental and requires some fiddling in iOS
