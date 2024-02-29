@@ -1,55 +1,62 @@
+use fs_extra::dir::{self, CopyOptions};
+use std::env;
 use std::fs;
-use std::io::Write;
-use std::path::Path;
+use std::path::PathBuf;
+use std::process;
 
-// TODO: Remove/revamp this, legacy now with template folder
+pub fn init_project(adapter: &str, platform: &str, project_name: &str) {
+    println!(
+        "Init project for platform {}: {} and name {}",
+        platform, adapter, project_name
+    );
 
-// TODO: Add error handling
-pub fn create_project_structure(project_name: &str) {
-    // Create the base project directory
-    let base_dir = Path::new(project_name);
+    let mopro_root = env::var("MOPRO_ROOT").expect("MOPRO_ROOT environment variable is not set");
+    let source_path = PathBuf::from(mopro_root).join("mopro-cli-example");
+    let current_dir = env::current_dir().expect("Failed to get current directory");
+    let destination_path = current_dir.join(project_name);
 
-    // Check if directory exists and is not empty
-    if base_dir.exists()
-        && base_dir
-            .read_dir()
-            .expect("Failed to read directory")
-            .next()
-            .is_some()
-    {
-        println!(
-            "Error: Directory '{}' is not empty. Aborting initialization.",
+    // Create the project directory
+    if destination_path.exists() {
+        eprintln!(
+            "A directory with the name '{}' already exists.",
             project_name
         );
-        return;
+        process::exit(1);
+    } else {
+        fs::create_dir(&destination_path).expect("Failed to create project directory");
     }
 
-    if !base_dir.exists() {
-        fs::create_dir(base_dir).expect("Failed to create project directory");
+    let mut options = CopyOptions::new();
+    options.overwrite = true;
+    options.copy_inside = true;
+
+    // List of directories and files to copy
+    let entries_to_copy = fs::read_dir(&source_path)
+        .expect("Failed to read source directory")
+        .filter_map(|entry| {
+            let entry = entry.expect("Failed to read directory entry");
+            let path = entry.path();
+            let file_name = path.file_name().unwrap().to_str().unwrap();
+            // Exclude the `ptau` and `target` directories
+            if file_name != "ptau" && file_name != "target" {
+                Some(path)
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<PathBuf>>();
+
+    // Perform the copy operation for each entry
+    for entry in entries_to_copy {
+        if entry.is_dir() {
+            // Copy directory
+            dir::copy(entry, &destination_path, &options).expect("Failed to copy directory");
+        } else {
+            // Copy file
+            let file_name = entry.file_name().unwrap();
+            fs::copy(&entry, destination_path.join(file_name)).expect("Failed to copy file");
+        }
     }
 
-    // Create subdirectories
-    let subdirs = ["circuits", "src", "test"];
-    for subdir in subdirs.iter() {
-        let dir_path = base_dir.join(subdir);
-        fs::create_dir_all(&dir_path).expect("Failed to create subdirectory");
-    }
-
-    // Create files in their respective directories
-    let file_contents = [
-        ("circuits/hello.circom", "template content for hello.circom"),
-        ("src/core.rs", "// Core module content"),
-        ("test/hello-world.rs", "// Test cases for hello world"),
-    ];
-
-    for (file_path, content) in file_contents.iter() {
-        let full_path = base_dir.join(file_path);
-        let mut file = fs::File::create(&full_path).expect("Failed to create file");
-        writeln!(file, "{}", content).expect("Failed to write to file");
-    }
-
-    // Create README.md
-    let readme_path = base_dir.join("README.md");
-    let mut readme = fs::File::create(readme_path).expect("Failed to create README.md");
-    writeln!(readme, "# Project: {}", project_name).expect("Failed to write to README.md");
+    println!("Project '{}' initialized successfully.", project_name);
 }
