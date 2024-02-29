@@ -41,12 +41,12 @@ enum Commands {
     },
     /// Runs tests for the specified platform and test cases
     Test {
-        #[arg(long)]
+        #[arg(long, default_value = "circom")]
         adapter: String,
-        #[arg(long)]
+        #[arg(long, default_value = "desktop")]
         platform: String,
         #[arg(long)]
-        test_case: String,
+        test_case: Option<String>,
     },
 }
 
@@ -129,11 +129,28 @@ fn main() {
             test_case,
         } => {
             println!(
-                "Testing project on platform {} with test {}: {}",
-                platform, test_case, adapter
+                "Testing project on platform {} with adapter {}",
+                platform, adapter
             );
-            // Implement test logic here
-            println!("Not yet implemented")
+
+            // Start building the command
+            let mut command = Command::new("cargo");
+            command.arg("test");
+
+            // If a test case is provided, pass it to `cargo test`
+            if let Some(case) = test_case {
+                command.arg(case);
+            }
+
+            // Execute `cargo test`, allowing output to be printed directly to the terminal
+            let status = command.status().expect("Failed to execute cargo test");
+
+            if status.success() {
+                println!("Tests completed successfully.");
+            } else {
+                eprintln!("Tests failed.");
+                std::process::exit(1);
+            }
         }
     }
 }
