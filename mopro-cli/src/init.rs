@@ -2,6 +2,8 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
+// TODO: Remove/revamp this, legacy now with template folder
+
 // TODO: Add error handling
 pub fn create_project_structure(project_name: &str) {
     // Create the base project directory
