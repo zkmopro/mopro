@@ -7,10 +7,15 @@ edition = "2021"
 
 
 [dependencies]
+num-bigint = { version = "=0.4.3", default-features = false, features = [
+    "rand",
+] }
+ark-bn254 = { version = "=0.4.0" }
+
 # FIXME: This doesn't work due to custom build command in mopro-core
 #mopro = { git = "https://github.com/oskarth/mopro.git", package = "mopro-core" }
 
-# NOTE: This works
+# NOTE: This works, set it to MOPRO_ROOT/mopro-core
 mopro-core = { path = "../mopro-core", package = "mopro-core" }
 
 # NOTE: For this to work we need dedicated package, not just workspace
