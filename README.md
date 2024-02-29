@@ -165,6 +165,10 @@ name = "keccak256_256_test"       # Name of the circuit
 [dylib]
 use_dylib = false         # Options: true, false
 name = "keccak256.dylib" # Name of the dylib file, only used if use_dylib is true
+
+# Experimental
+[witness]
+use_witness = false       # Options: true, false
 ```
 
 ## Community and Talks

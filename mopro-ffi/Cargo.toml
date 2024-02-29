@@ -16,10 +16,12 @@ path = "uniffi-bindgen.rs"
 [features]
 default = []
 # default = ["gpu-benchmarks"]
+# default = ["calc-witness"]
 
 # If we enable them here, they should be enabled in mopro-core as well
 dylib = ["mopro-core/dylib"]
 gpu-benchmarks = ["mopro-core/gpu-benchmarks"]
+calc-witness = ["mopro-core/calc-witness"]
 
 [dependencies]
 mopro-core = { path = "../mopro-core" }
