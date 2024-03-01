@@ -3,6 +3,7 @@ use std::env;
 use std::fs;
 use std::path::PathBuf;
 use std::process;
+use std::process::exit;
 
 pub fn init_project(adapter: &str, platform: &str, project_name: &str) {
     println!(
@@ -10,7 +11,17 @@ pub fn init_project(adapter: &str, platform: &str, project_name: &str) {
         platform, adapter, project_name
     );
 
-    let mopro_root = env::var("MOPRO_ROOT").expect("MOPRO_ROOT environment variable is not set");
+    let mopro_root = match env::var("MOPRO_ROOT") {
+        Ok(root) => root,
+        Err(_) => {
+            eprintln!("Error: MOPRO_ROOT environment variable is not set.");
+            eprintln!("Please set MOPRO_ROOT to point to the local checkout of mopro.");
+            eprintln!("For example: export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro");
+            eprintln!("Git repository: https://github.com/oskarth/mopro");
+            exit(1);
+        }
+    };
+
     let source_path = PathBuf::from(mopro_root).join("mopro-cli-example");
     let current_dir = env::current_dir().expect("Failed to get current directory");
     let destination_path = current_dir.join(project_name);
