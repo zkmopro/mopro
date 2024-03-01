@@ -29,11 +29,13 @@ fi
 # Read the path to the TOML configuration file from the first argument
 CONFIG_FILE="$1"
 
+# XXX: This isn't necessarily propagated to `cargo build` build process,
+# so we pass it explicitly. Consider using `source` instead of `export`.
 # Export the configuration file path as an environment variable
 export BUILD_CONFIG_PATH="$(pwd)/$CONFIG_FILE"
 
 # Print which configuration file is being used
-echo "Using configuration file: $CONFIG_FILE"
+echo "Using build configuration file: $BUILD_CONFIG_PATH"
 
 # Read configurations from TOML file within [build] block
 DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
@@ -70,12 +72,13 @@ case $BUILD_MODE in
         ;;
 esac
 
+# XXX: This is currently not used, need to pass it to `cargo build` explicitly.
 PROJECT_DIR=$(pwd)
 
 # Build circom circuits in mopro-core
 cd "${MOPRO_ROOT}/mopro-core"
 if [[ "$BUILD_MODE" == "debug" ]]; then
-    cargo build
+    env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build
     elif [[ "$BUILD_MODE" == "release" ]]; then
-    cargo build --release
+    env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --release
 fi
