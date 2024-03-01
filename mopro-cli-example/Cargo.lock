@@ -260,6 +260,7 @@ dependencies = [
 [[package]]
 name = "ark-zkey"
 version = "0.1.0"
+source = "git+https://github.com/oskarth/mopro.git#ce48f44dcb2e93f20fa678940e04d67564fcf71c"
 dependencies = [
  "ark-bn254",
  "ark-circom",
@@ -1410,6 +1411,7 @@ dependencies = [
 [[package]]
 name = "mopro-core"
 version = "0.1.0"
+source = "git+https://github.com/oskarth/mopro.git#ce48f44dcb2e93f20fa678940e04d67564fcf71c"
 dependencies = [
  "ark-bn254",
  "ark-circom",
