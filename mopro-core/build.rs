@@ -143,6 +143,8 @@ fn build_circuit(config: &Config) -> Result<()> {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("cargo:rerun-if-env-changed=BUILD_CONFIG_PATH");
+
     let config_str = match env::var("BUILD_CONFIG_PATH") {
         Ok(config_path) => {
             println!("cargo:rerun-if-changed={}", config_path);
