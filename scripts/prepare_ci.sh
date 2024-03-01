@@ -70,6 +70,15 @@ download_files() {
     fi
     
 }
+# TODO: merge this to download_files after completing the graph
+build_witness() {
+    local circuit_dir=$1
+    local circuit_file=$2
+
+    print_action "[core/circom] Compiling $circuit_file example circuit and build witness graph..."
+    WITNESS_CPP="$CIRCOM_DIR/$circuit_dir/$circuit_file" cargo run --package witness --bin generate-witness --release --features=build-witness
+}
+
 
 # TODO: Comment out compile_circuit stuff again once zkey is integrated and we don't need r1cs file anymore
 
@@ -106,6 +115,7 @@ download_files "multiplier2" "multiplier2"
 
 print_action "[core/circom] Downloading artifacts for keccak256..."
 download_files "keccak256" "keccak256_256_test"
+build_witness "keccak256" "keccak256_256_test.circom"
 
 print_action "[core/circom] Downloading artifacts for rsa..."
 download_files "rsa" "main"
