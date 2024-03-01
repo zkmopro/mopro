@@ -29,12 +29,7 @@ use once_cell::sync::{Lazy, OnceCell};
 use wasmer::{Module, Store};
 
 use ark_zkey::{read_arkzkey, read_arkzkey_from_bytes}; //SerializableConstraintMatrices
-                                                       // use witness::Graph;
-use witness::{init_graph, Graph};
-
-const GRAPH_BYTES: &[u8] = include_bytes!("../../../graph.bin");
-static WITNESS_GRAPH: Lazy<Graph> =
-    Lazy::new(|| init_graph(&GRAPH_BYTES).expect("Failed to initialize Graph"));
+use witness::{init_graph, Graph}; // use witness::Graph;
 
 #[cfg(feature = "dylib")]
 use {
