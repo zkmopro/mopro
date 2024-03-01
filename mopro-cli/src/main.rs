@@ -25,7 +25,6 @@ enum Commands {
     /// Builds the project for specified platforms
     Build {
         #[arg(long, default_value = "mopro-config.toml")]
-        #[arg(long)]
         config: String,
         #[arg(long, default_value = "circom")]
         adapter: String,
@@ -41,6 +40,8 @@ enum Commands {
     },
     /// Runs tests for the specified platform and test cases
     Test {
+        #[arg(long, default_value = "mopro-config.toml")]
+        config: String,
         #[arg(long, default_value = "circom")]
         adapter: String,
         #[arg(long, default_value = "desktop")]
@@ -70,9 +71,10 @@ fn main() {
             println!("Not yet implemented")
         }
         Commands::Test {
+            config,
             adapter,
             platform,
             test_case,
-        } => test::test_project(adapter, platform, test_case),
+        } => test::test_project(config, adapter, platform, test_case),
     }
 }
