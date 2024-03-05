@@ -8,7 +8,7 @@ Think of it as Foundry for client-side proving.
 
 To use `mopro`, you need to have Rust and Cargo installed on your system. You can install them from [the official Rust website](https://www.rust-lang.org/learn/get-started).
 
-Run `cargo install --path .` to install `mopro`.
+Run `cargo install --path .` to install the `mopro` CLI util.
 
 ## Usage
 
@@ -21,9 +21,35 @@ Here are the basic commands of `mopro`:
 
 ### Example
 
-For example, to create a hello world with Rust bindings, run:
+Here's a basic example with Rust bindings:
 
-`mopro init --adapter circom --platform core hello-world`
+```
+# Set MOPRO_ROOT
+export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro
+
+# Default to circom adapter and core Rust bindings
+mopro init
+
+# Go to the newly created directory
+cd mopro-example-app
+
+# Build the project, including preparing circuit artifacts
+mopro build
+
+# Run end-to-end-test
+mopro test
+```
+
+For iOS:
+
+```
+mopro init --platforms ios
+mopro build --platforms ios
+
+# Currently testing only available for Rust bindings,
+# Can run iOS tests from newly created Xcode project
+mopro test
+```
 
 ## Contributing
 
