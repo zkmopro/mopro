@@ -1,5 +1,8 @@
 use clap::{Parser, Subcommand};
+use std::path::PathBuf;
+
 mod build;
+mod export;
 mod init;
 mod test;
 
@@ -49,6 +52,11 @@ enum Commands {
         #[arg(long)]
         test_case: Option<String>,
     },
+    /// Exports platform bindings to some other directory
+    ExportBindings {
+        #[arg(short, long)]
+        destination: PathBuf,
+    },
 }
 
 fn main() {
@@ -79,5 +87,6 @@ fn main() {
             platforms,
             test_case,
         } => test::test_project(config, adapter, platforms, test_case),
+        Commands::ExportBindings { destination } => export::export_bindings(destination),
     }
 }

@@ -18,10 +18,13 @@ Here are the basic commands of `mopro`:
 - `mopro build`: Build the project for specified platforms.
 - `mopro update`: Update bindings with new API for specified platforms.
 - `mopro test`: Run tests for specific platform and test cases.
+- `mopro export-bindings`: Export platform bindings to some other directory.
 
-### Example
+## Examples
 
-Here's a basic example with Rust bindings:
+### Basic example
+
+Initialize, build and test a circuit with Rust bindings:
 
 ```
 # Set MOPRO_ROOT
@@ -40,7 +43,9 @@ mopro build
 mopro test
 ```
 
-For iOS:
+### iOS
+
+Initialize and build an app with iOS support.
 
 ```
 mopro init --platforms ios
@@ -49,6 +54,22 @@ mopro build --platforms ios
 # Currently testing only available for Rust bindings,
 # Can run iOS tests from newly created Xcode project
 mopro test
+```
+
+### Exporting bindings
+
+To export bindings to a different directory:
+
+`mopro export-bindings --destination <DESTINATION_DIR>`
+
+This will the following files, assuming they've been built, to the destination directory:
+
+```
+├── SwiftBindings
+│   ├── mopro.swift
+│   ├── moproFFI.h
+│   └── moproFFI.modulemap
+└── libmopro_ffi.a
 ```
 
 ## Contributing
