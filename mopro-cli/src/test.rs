@@ -15,6 +15,7 @@ pub fn test_project(
     println!("NOTE: Testing on iOS is not yet available.");
 
     let current_dir = env::current_dir().expect("Failed to get current directory");
+    let core_dir_path = current_dir.join("core");
     let config_file_path = current_dir.join(config);
     let config_file_path_str = config_file_path
         .to_str()
@@ -24,6 +25,7 @@ pub fn test_project(
     let mut command = Command::new("cargo");
     command.arg("test");
     command.env("BUILD_CONFIG_PATH", config_file_path_str);
+    command.current_dir(core_dir_path);
 
     if let Some(case) = test_case {
         command.arg(case);
