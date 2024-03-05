@@ -1,5 +1,5 @@
 [package]
-name = "mopro-cli-example"
+name = "mopro-example-app"
 version = "0.1.0"
 edition = "2021"
 
