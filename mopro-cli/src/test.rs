@@ -1,11 +1,18 @@
 use std::env;
 use std::process::{exit, Command};
 
-pub fn test_project(config: &str, adapter: &str, platform: &str, test_case: &Option<String>) {
+pub fn test_project(
+    config: &str,
+    adapter: &str,
+    platforms: &Vec<String>,
+    test_case: &Option<String>,
+) {
     println!(
-        "Testing project on platform {} with adapter {} and config {}",
-        platform, adapter, config
+        "Testing project on platform {:?} with adapter {} and config {}",
+        platforms, adapter, config
     );
+
+    println!("NOTE: Testing on iOS is not yet available.");
 
     let current_dir = env::current_dir().expect("Failed to get current directory");
     let config_file_path = current_dir.join(config);
