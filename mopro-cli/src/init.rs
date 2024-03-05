@@ -5,10 +5,10 @@ use std::path::PathBuf;
 use std::process;
 use std::process::exit;
 
-pub fn init_project(adapter: &str, platform: &str, project_name: &str) {
+pub fn init_project(adapter: &str, platforms: &Vec<String>, project_name: &str) {
     println!(
-        "Init project for platform {}: {} and name {}",
-        platform, adapter, project_name
+        "Initializing project for platforms {:?}: {} with name {}",
+        platforms, adapter, project_name
     );
 
     let mopro_root = match env::var("MOPRO_ROOT") {
@@ -22,7 +22,7 @@ pub fn init_project(adapter: &str, platform: &str, project_name: &str) {
         }
     };
 
-    let source_path = PathBuf::from(mopro_root).join("mopro-cli-example");
+    let source_path = PathBuf::from(mopro_root).join("mopro-example-app");
     let current_dir = env::current_dir().expect("Failed to get current directory");
     let destination_path = current_dir.join(project_name);
 
@@ -41,27 +41,22 @@ pub fn init_project(adapter: &str, platform: &str, project_name: &str) {
     options.overwrite = true;
     options.copy_inside = true;
 
-    // List of directories and files to copy
-    let entries_to_copy = fs::read_dir(&source_path)
-        .expect("Failed to read source directory")
-        .filter_map(|entry| {
-            let entry = entry.expect("Failed to read directory entry");
-            let path = entry.path();
-            let file_name = path.file_name().unwrap().to_str().unwrap();
-            // Exclude the `ptau` and `target` directories
-            if file_name != "ptau" && file_name != "target" {
-                Some(path)
-            } else {
-                None
-            }
-        })
-        .collect::<Vec<PathBuf>>();
+    // Determine which directories to copy based on the enabled platforms
+    let mut entries_to_copy = Vec::new();
+    if platforms.contains(&"core".to_string()) {
+        entries_to_copy.push(source_path.join("core"));
+        entries_to_copy.push(source_path.join("mopro-config.toml"));
+        entries_to_copy.push(source_path.join("README.md"));
+    }
+    if platforms.contains(&"ios".to_string()) {
+        entries_to_copy.push(source_path.join("ios"));
+    }
 
     // Perform the copy operation for each entry
     for entry in entries_to_copy {
         if entry.is_dir() {
             // Copy directory
-            dir::copy(entry, &destination_path, &options).expect("Failed to copy directory");
+            dir::copy(&entry, &destination_path, &options).expect("Failed to copy directory");
         } else {
             // Copy file
             let file_name = entry.file_name().unwrap();

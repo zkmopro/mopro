@@ -17,9 +17,9 @@ enum Commands {
     Init {
         #[arg(long, default_value = "circom")]
         adapter: String,
-        #[arg(long, default_value = "core")]
-        platform: String,
-        #[arg(default_value = "mopro-cli-example")]
+        #[arg(long, num_args = 1.., default_value = "core")]
+        platforms: Vec<String>,
+        #[arg(long, default_value = "mopro-example-app")]
         project_name: String,
     },
     /// Builds the project for specified platforms
@@ -28,15 +28,15 @@ enum Commands {
         config: String,
         #[arg(long, default_value = "circom")]
         adapter: String,
-        #[arg(long, default_value = "core")]
-        platform: String,
+        #[arg(long, num_args = 1.., default_value = "core")]
+        platforms: Vec<String>,
     },
     /// Updates bindings for the specified platforms
     Update {
         #[arg(long)]
         adapter: String,
-        #[arg(long)]
-        platform: String,
+        #[arg(long, num_args = 1.., default_value = "core")]
+        platforms: Vec<String>,
     },
     /// Runs tests for the specified platform and test cases
     Test {
@@ -44,8 +44,8 @@ enum Commands {
         config: String,
         #[arg(long, default_value = "circom")]
         adapter: String,
-        #[arg(long, default_value = "core")]
-        platform: String,
+        #[arg(long, num_args = 1.., default_value = "core")]
+        platforms: Vec<String>,
         #[arg(long)]
         test_case: Option<String>,
     },
@@ -57,24 +57,27 @@ fn main() {
     match &cli.command {
         Commands::Init {
             adapter,
-            platform,
+            platforms,
             project_name,
-        } => init::init_project(adapter, platform, project_name),
+        } => init::init_project(adapter, platforms, project_name),
         Commands::Build {
             config,
             adapter,
-            platform,
-        } => build::build_project(config, adapter, platform),
-        Commands::Update { adapter, platform } => {
-            println!("Updating project for platform {}: {}", platform, adapter);
+            platforms,
+        } => build::build_project(config, adapter, platforms),
+        Commands::Update { adapter, platforms } => {
+            println!(
+                "Updating project for platforms {:?}: {}",
+                platforms, adapter
+            );
             // Implement update logic here
             println!("Not yet implemented")
         }
         Commands::Test {
             config,
             adapter,
-            platform,
+            platforms,
             test_case,
-        } => test::test_project(config, adapter, platform, test_case),
+        } => test::test_project(config, adapter, platforms, test_case),
     }
 }
