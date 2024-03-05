@@ -51,6 +51,9 @@ Initialize and build an app with iOS support.
 mopro init --platforms ios
 mopro build --platforms ios
 
+# Update platform bindings
+mopro update --platforms ios
+
 # Currently testing only available for Rust bindings,
 # Can run iOS tests from newly created Xcode project
 mopro test

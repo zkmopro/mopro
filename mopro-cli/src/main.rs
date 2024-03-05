@@ -5,6 +5,7 @@ mod build;
 mod export;
 mod init;
 mod test;
+mod update;
 
 /// CLI for multi-platform project management
 #[derive(Parser, Debug)]
@@ -36,7 +37,9 @@ enum Commands {
     },
     /// Updates bindings for the specified platforms
     Update {
-        #[arg(long)]
+        #[arg(long, default_value = "mopro-config.toml")]
+        config: String,
+        #[arg(long, default_value = "circom")]
         adapter: String,
         #[arg(long, num_args = 1.., default_value = "core")]
         platforms: Vec<String>,
@@ -73,14 +76,11 @@ fn main() {
             adapter,
             platforms,
         } => build::build_project(config, adapter, platforms),
-        Commands::Update { adapter, platforms } => {
-            println!(
-                "Updating project for platforms {:?}: {}",
-                platforms, adapter
-            );
-            // Implement update logic here
-            println!("Not yet implemented")
-        }
+        Commands::Update {
+            config,
+            adapter,
+            platforms,
+        } => update::update_project(config, adapter, platforms),
         Commands::Test {
             config,
             adapter,
