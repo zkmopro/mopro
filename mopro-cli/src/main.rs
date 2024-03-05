@@ -17,7 +17,7 @@ enum Commands {
     Init {
         #[arg(long, default_value = "circom")]
         adapter: String,
-        #[arg(long, default_value = "desktop")]
+        #[arg(long, default_value = "core")]
         platform: String,
         #[arg(default_value = "mopro-cli-example")]
         project_name: String,
@@ -28,7 +28,7 @@ enum Commands {
         config: String,
         #[arg(long, default_value = "circom")]
         adapter: String,
-        #[arg(long, default_value = "desktop")]
+        #[arg(long, default_value = "core")]
         platform: String,
     },
     /// Updates bindings for the specified platforms
@@ -44,7 +44,7 @@ enum Commands {
         config: String,
         #[arg(long, default_value = "circom")]
         adapter: String,
-        #[arg(long, default_value = "desktop")]
+        #[arg(long, default_value = "core")]
         platform: String,
         #[arg(long)]
         test_case: Option<String>,

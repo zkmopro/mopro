@@ -21,9 +21,9 @@ Here are the basic commands of `mopro`:
 
 ### Example
 
-For example, to create a hello world with desktop bindings (Rust), run:
+For example, to create a hello world with Rust bindings, run:
 
-`mopro init --adapter circom --platform desktop hello-world`
+`mopro init --adapter circom --platform core hello-world`
 
 ## Contributing
 
