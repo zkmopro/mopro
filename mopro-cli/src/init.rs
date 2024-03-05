@@ -22,7 +22,9 @@ pub fn init_project(adapter: &str, platforms: &Vec<String>, project_name: &str) 
         }
     };
 
-    let source_path = PathBuf::from(mopro_root).join("mopro-example-app");
+    let source_path = PathBuf::from(mopro_root)
+        .join("templates")
+        .join("mopro-example-app");
     let current_dir = env::current_dir().expect("Failed to get current directory");
     let destination_path = current_dir.join(project_name);
 
@@ -43,11 +45,12 @@ pub fn init_project(adapter: &str, platforms: &Vec<String>, project_name: &str) 
 
     // Determine which directories to copy based on the enabled platforms
     let mut entries_to_copy = Vec::new();
-    if platforms.contains(&"core".to_string()) {
-        entries_to_copy.push(source_path.join("core"));
-        entries_to_copy.push(source_path.join("mopro-config.toml"));
-        entries_to_copy.push(source_path.join("README.md"));
-    }
+
+    // Always copy core platform
+    entries_to_copy.push(source_path.join("core"));
+    entries_to_copy.push(source_path.join("mopro-config.toml"));
+    entries_to_copy.push(source_path.join("README.md"));
+
     if platforms.contains(&"ios".to_string()) {
         entries_to_copy.push(source_path.join("ios"));
     }
