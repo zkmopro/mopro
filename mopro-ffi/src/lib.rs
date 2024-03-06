@@ -6,7 +6,7 @@ use mopro_core::middleware::gpu_explorations::{self, BenchmarkResult};
 
 use num_bigint::BigInt;
 use std::collections::HashMap;
-use std::path::Path;
+
 use std::str::FromStr;
 use std::sync::RwLock;
 
@@ -90,7 +90,7 @@ pub fn initialize_mopro_dylib(dylib_path: String) -> Result<(), MoproError> {
 }
 
 #[cfg(not(feature = "dylib"))]
-pub fn initialize_mopro_dylib(dylib_path: String) -> Result<(), MoproError> {
+pub fn initialize_mopro_dylib(_dylib_path: String) -> Result<(), MoproError> {
     println!("dylib feature not enabled!");
     panic!("dylib feature not enabled!");
 }
