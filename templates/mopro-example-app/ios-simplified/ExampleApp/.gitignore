@@ -33,3 +33,8 @@ Pods
 # Ignore static libs
 *.a
 *.dylib
+
+# Ignore framework
+*.xcframework/
+
+#libmopro_ffi.a
