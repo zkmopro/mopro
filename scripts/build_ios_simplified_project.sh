@@ -149,6 +149,13 @@ generate_swift_bindings() {
         echo -e "${RED}Failed to rename modulemap to module.modulemap.${DEFAULT}"
         exit 1
     fi
+
+    # Copy the mopro.swift file to the Bindings directory
+    cp "${TARGET_DIR}/SwiftBindings/mopro.swift" "${IOS_APP_DIR}/Bindings/mopro.swift"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to copy mopro.swift to Bindings directory.${DEFAULT}"
+        exit 1
+    fi
 }
 
 create_xcframework() {
