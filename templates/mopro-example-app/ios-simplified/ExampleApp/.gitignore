@@ -37,4 +37,5 @@ Pods
 # Ignore framework
 *.xcframework/
 
-#libmopro_ffi.a
+# Don't ignore podspec for installing MoproBindings
+!Frameworks/MoproBindings.podspec
