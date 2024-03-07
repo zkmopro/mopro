@@ -142,6 +142,13 @@ generate_swift_bindings() {
         echo -e "${RED}Failed to generate Swift bindings.${DEFAULT}"
         exit 1
     fi
+
+    # Rename modulemap to module.modulemap
+    mv "${TARGET_DIR}/SwiftBindings/moproFFI.modulemap" "${TARGET_DIR}/SwiftBindings/module.modulemap"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to rename modulemap to module.modulemap.${DEFAULT}"
+        exit 1
+    fi
 }
 
 create_xcframework() {
