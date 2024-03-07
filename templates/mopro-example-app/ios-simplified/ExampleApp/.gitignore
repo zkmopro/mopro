@@ -4,7 +4,7 @@
 #
 /.build
 /Packages
-/*.xcodeproj
+#/*.xcodeproj
 xcuserdata/
 DerivedData/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
@@ -28,7 +28,7 @@ DerivedData
 # CocoaPods
 Podfile.lock
 Pods
-*.xcworkspace
+#*.xcworkspace
 
 # Ignore static libs
 *.a
