@@ -15,4 +15,8 @@ struct ExampleAppApp: App {
             ContentView()
         }
     }
+
+    let moproCircom = MoproCircom()
+    //let generateProofResult = try generateProof2()
+
 }
