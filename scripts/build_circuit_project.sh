@@ -19,6 +19,11 @@ initialize_environment() {
         exit 1
     fi
 
+    if ! command -v arkzkey-util &> /dev/null; then
+        echo "Error: arkzkey-util command is not available."
+        exit 1
+    fi
+
     if [ "$#" -ne 1 ]; then
         echo -e "\n${RED}Usage: $0 path/to/config.toml${DEFAULT}"
         exit 1
@@ -60,6 +65,8 @@ read_configuration() {
     CIRCUIT_DIR=$(read_toml "$CONFIG_FILE" "circuit.dir")
     CIRCUIT_NAME=$(read_toml "$CONFIG_FILE" "circuit.name")
     CIRCUIT_PTAU=$(read_toml "$CONFIG_FILE" "circuit.ptau")
+
+    OUTPUT_DIR="${CIRCUIT_DIR}/target"
 }
 
 # Function to read value from TOML file and remove quotes
@@ -77,14 +84,13 @@ read_toml() {
 # Compile the circuit
 compile_circuit() {
     print_action "Compiling circuit $CIRCUIT_NAME..."
-
     local circuit_file_path="${CIRCUIT_DIR}/${CIRCUIT_NAME}.circom"
-    local output_dir="${CIRCUIT_DIR}/target"
 
-    mkdir -p "$output_dir"
+    # Ensure output dir exists
+    mkdir -p "$OUTPUT_DIR"
 
     # Compile the circuit using circom
-    circom "$circuit_file_path" --r1cs --wasm --sym --output "$output_dir"
+    circom "$circuit_file_path" --r1cs --wasm --sym --output "$OUTPUT_DIR"
 }
 
 # Trusted setup for the circuit
@@ -95,8 +101,7 @@ trusted_setup() {
     local ptau_dir="ptau"
     local ptau="${CIRCUIT_PTAU}"
     local ptau_path="${ptau_dir}/powersOfTau28_hez_final_${ptau}.ptau"
-    local output_dir="${CIRCUIT_DIR}/target"
-    local zkey_output="${output_dir}/${CIRCUIT_NAME}_final.zkey"
+    local zkey_output="${OUTPUT_DIR}/${CIRCUIT_NAME}_final.zkey"
 
     # Ensure the ptau directory exists
     mkdir -p "$ptau_dir"
@@ -119,8 +124,8 @@ trusted_setup() {
 
     echo "Generate zkey file for ${CIRCUIT_NAME}..."
     if [ ! -f "$zkey_output" ]; then
-        snarkjs groth16 setup "${output_dir}/${CIRCUIT_NAME}.r1cs" "$ptau_path" "${output_dir}/${CIRCUIT_NAME}_0000.zkey"
-        snarkjs zkey contribute "${output_dir}/${CIRCUIT_NAME}_0000.zkey" "$zkey_output" \
+        snarkjs groth16 setup "${OUTPUT_DIR}/${CIRCUIT_NAME}.r1cs" "$ptau_path" "${output_dir}/${CIRCUIT_NAME}_0000.zkey"
+        snarkjs zkey contribute "${OUTPUT_DIR}/${CIRCUIT_NAME}_0000.zkey" "$zkey_output" \
         --name="Demo contributor" -v -e="0xdeadbeef"
     else
         echo "File $zkey_output already exists, skipping."
@@ -129,12 +134,32 @@ trusted_setup() {
     echo "Trusted setup done, zkey file is in $zkey_output"
 }
 
+# Generate arkzkey for the circuit
+generate_arkzkey() {
+    local ZKEY_PATH="${OUTPUT_DIR}/${CIRCUIT_NAME}_final.zkey"
+    local ARKZKEY_PATH="${OUTPUT_DIR}/${CIRCUIT_NAME}_final.arkzkey"
+
+    print_action "Generating arkzkey for $CIRCUIT_NAME..."
+
+
+    echo "Generate arkzkey file for ${CIRCUIT_NAME}..."
+    if [ ! -f "$ZKEY_PATH" ]; then
+        arkzkey-util "${ZKEY_PATH}" > "$ARKZKEY_PATH"
+    else
+        echo "File $ZKEY_PATH already exists, skipping."
+    fi
+
+    echo "Arkzkey generation done, arkzkey file is in $ARKZKEY_PATH"
+}
+
+
 # Main function to orchestrate the script
 main() {
     initialize_environment "$@"
     read_configuration "$1"
     compile_circuit
     trusted_setup
+    generate_arkzkey
     print_action "Circuit and its artifacts built successfully."
 }
 
