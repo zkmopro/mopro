@@ -1,4 +1,4 @@
-# config-example.toml
+# mopro-config.toml
 
 [build]
 # For iOS device_type can be x86_64, simulator, device
@@ -10,8 +10,15 @@ device_type = "simulator" # Options: x86_64, simulator, device, arm, arm64
 build_mode = "release" # Options: debug, release
 
 [circuit]
+# multiplier2
 dir = "core/circuits/multiplier2"
 name = "multiplier2"
+ptau = "02"                       # ptau to use for trusted setup of circuit, "01" to "27"
+
+# keccak256
+#dir = "core/circuits/keccak256"
+#name = "keccak256_256_test"
+#ptau = "19"
 
 [dylib]
 # NOTE: Dylib support is experimental and requires some fiddling in iOS
