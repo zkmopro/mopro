@@ -1,3 +1,4 @@
+
 //
 //  ExampleAppApp.swift
 //  ExampleApp
@@ -6,17 +7,12 @@
 //
 
 import SwiftUI
-import moproFFI
 
 @main
 struct ExampleAppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            CircuitView()
         }
     }
-
-    let moproCircom = MoproCircom()
-    //let generateProofResult = try generateProof2()
-
 }

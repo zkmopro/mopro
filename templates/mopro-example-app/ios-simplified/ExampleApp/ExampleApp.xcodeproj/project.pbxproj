@@ -13,6 +13,7 @@
 		CE259EC92B99CCB60035CC36 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE259EC82B99CCB60035CC36 /* mopro.swift */; };
 		CE259ECB2B99DF5D0035CC36 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE259EC82B99CCB60035CC36 /* mopro.swift */; };
 		CE259ECC2B99DF5E0035CC36 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE259EC82B99CCB60035CC36 /* mopro.swift */; };
+		CEBBB4052B9AC5B0007305CF /* CircuitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBBB4042B9AC5B0007305CF /* CircuitView.swift */; };
 		CEF891252B9834BB0033AE93 /* ExampleAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF891242B9834BB0033AE93 /* ExampleAppApp.swift */; };
 		CEF891272B9834BB0033AE93 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF891262B9834BB0033AE93 /* ContentView.swift */; };
 		CEF891292B9834BC0033AE93 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEF891282B9834BC0033AE93 /* Assets.xcassets */; };
@@ -50,6 +51,7 @@
 		C54051D9C0E3A7517C109F23 /* Pods-ExampleApp-ExampleAppUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExampleApp-ExampleAppUITests.debug.xcconfig"; path = "Target Support Files/Pods-ExampleApp-ExampleAppUITests/Pods-ExampleApp-ExampleAppUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		CE259EC32B99C4000035CC36 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MoproBindings.xcframework; path = Frameworks/MoproBindings.xcframework; sourceTree = "<group>"; };
 		CE259EC82B99CCB60035CC36 /* mopro.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = mopro.swift; path = Bindings/mopro.swift; sourceTree = SOURCE_ROOT; };
+		CEBBB4042B9AC5B0007305CF /* CircuitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircuitView.swift; sourceTree = "<group>"; };
 		CEF891212B9834BB0033AE93 /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEF891242B9834BB0033AE93 /* ExampleAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppApp.swift; sourceTree = "<group>"; };
 		CEF891262B9834BB0033AE93 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				CEF891242B9834BB0033AE93 /* ExampleAppApp.swift */,
+				CEBBB4042B9AC5B0007305CF /* CircuitView.swift */,
 				CEF891262B9834BB0033AE93 /* ContentView.swift */,
 				CEF891282B9834BC0033AE93 /* Assets.xcassets */,
 				CEF8912A2B9834BC0033AE93 /* Preview Content */,
@@ -386,6 +389,7 @@
 			files = (
 				CE259EC92B99CCB60035CC36 /* mopro.swift in Sources */,
 				CEF891272B9834BB0033AE93 /* ContentView.swift in Sources */,
+				CEBBB4052B9AC5B0007305CF /* CircuitView.swift in Sources */,
 				CEF891252B9834BB0033AE93 /* ExampleAppApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
