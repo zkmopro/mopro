@@ -27,11 +27,31 @@ initialize_environment() {
     source "${MOPRO_ROOT}/scripts/_prelude.sh"
 }
 
+# Function to validate TOML syntax and structure
+validate_toml() {
+    local toml_file="$1"
+    if ! command -v toml >/dev/null; then
+        echo -e "${RED}'toml' (toml-cli) command not found. Please install it to continue.${DEFAULT}"
+        exit 1
+    fi
+
+    local error_file=$(mktemp)
+    if ! toml get "$toml_file" "build" > /dev/null 2> "$error_file"; then
+        local error_message=$(<"$error_file")
+        echo -e "${RED}TOML parse error in $toml_file:${DEFAULT}\n$error_message"
+        rm "$error_file"
+        exit 1
+    fi
+    rm "$error_file"
+}
+
 # Read configuration from TOML file
 read_configuration() {
     CONFIG_FILE="$1"
     export BUILD_CONFIG_PATH="$PWD/$CONFIG_FILE"
     print_action "Using build configuration file: $BUILD_CONFIG_PATH"
+
+    validate_toml "$CONFIG_FILE"
 
     DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
     BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
@@ -39,11 +59,19 @@ read_configuration() {
     DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")
     CIRCUIT_DIR=$(read_toml "$CONFIG_FILE" "circuit.dir")
     CIRCUIT_NAME=$(read_toml "$CONFIG_FILE" "circuit.name")
+    CIRCUIT_PTAU=$(read_toml "$CONFIG_FILE" "circuit.ptau")
 }
 
 # Function to read value from TOML file and remove quotes
 read_toml() {
-    toml get "$1" "$2" | tr -d '"'
+    local value=$(toml get "$1" "$2" 2>/dev/null || true)
+
+    if [ -z "$value" ]; then
+        echo -e "${RED}Error: Key '$2' not found in $1${DEFAULT}" >&2
+        exit 1
+    fi
+
+    echo "$value" | tr -d '"'
 }
 
 # Compile the circuit
@@ -59,12 +87,55 @@ compile_circuit() {
     circom "$circuit_file_path" --r1cs --wasm --sym --output "$output_dir"
 }
 
+# Trusted setup for the circuit
+trusted_setup() {
+    print_action "Running trusted setup for $CIRCUIT_NAME..."
+
+    # Change this is if you keep your Powers of Tau files elsewhere
+    local ptau_dir="ptau"
+    local ptau="${CIRCUIT_PTAU}"
+    local ptau_path="${ptau_dir}/powersOfTau28_hez_final_${ptau}.ptau"
+    local output_dir="${CIRCUIT_DIR}/target"
+    local zkey_output="${output_dir}/${CIRCUIT_NAME}_final.zkey"
+
+    # Ensure the ptau directory exists
+    mkdir -p "$ptau_dir"
+
+    # Phase 1 - Perpetual Powers of Tau
+    # From https://github.com/iden3/snarkjs
+
+    # Download the Powers of Tau file if it doesn't exist
+    if [ ! -f "$ptau_path" ]; then
+        echo "Downloading Powers of Tau file..."
+        wget -P "$ptau_dir" "https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_${ptau}.ptau"
+    else
+        echo "File $ptau_path already exists, skipping download."
+    fi
+
+    # Phase 2 - Circuit specific setup
+    # Toy example, not for production use
+    # For a real deployment with Groth16 use a tool like p0tion for phase 2 trusted setup
+    # See https://github.com/privacy-scaling-explorations/p0tion
+
+    echo "Generate zkey file for ${CIRCUIT_NAME}..."
+    if [ ! -f "$zkey_output" ]; then
+        snarkjs groth16 setup "${output_dir}/${CIRCUIT_NAME}.r1cs" "$ptau_path" "${output_dir}/${CIRCUIT_NAME}_0000.zkey"
+        snarkjs zkey contribute "${output_dir}/${CIRCUIT_NAME}_0000.zkey" "$zkey_output" \
+        --name="Demo contributor" -v -e="0xdeadbeef"
+    else
+        echo "File $zkey_output already exists, skipping."
+    fi
+
+    echo "Trusted setup done, zkey file is in $zkey_output"
+}
+
 # Main function to orchestrate the script
 main() {
     initialize_environment "$@"
     read_configuration "$1"
     compile_circuit
-    print_action "Circuit compilation completed successfully."
+    trusted_setup
+    print_action "Circuit and its artifacts built successfully."
 }
 
 main "$@"
