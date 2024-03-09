@@ -6,6 +6,7 @@ mod export;
 mod init;
 mod test;
 mod update;
+mod utils;
 
 /// CLI for multi-platform project management
 #[derive(Parser, Debug)]
