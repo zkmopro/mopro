@@ -141,10 +141,9 @@ generate_arkzkey() {
 
     print_action "Generating arkzkey for $CIRCUIT_NAME..."
 
-
     echo "Generate arkzkey file for ${CIRCUIT_NAME}..."
-    if [ ! -f "$ZKEY_PATH" ]; then
-        arkzkey-util "${ZKEY_PATH}" > "$ARKZKEY_PATH"
+    if [ ! -f "$ARKZKEY_PATH" ]; then
+        arkzkey-util "${ZKEY_PATH}"
     else
         echo "File $ZKEY_PATH already exists, skipping."
     fi
