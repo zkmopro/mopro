@@ -1,9 +1,9 @@
+use crate::utils::get_mopro_root;
 use fs_extra::dir::{self, CopyOptions};
 use std::env;
 use std::fs;
 use std::path::PathBuf;
 use std::process;
-use std::process::exit;
 
 pub fn init_project(adapter: &str, platforms: &Vec<String>, project_name: &str) {
     println!(
@@ -11,16 +11,7 @@ pub fn init_project(adapter: &str, platforms: &Vec<String>, project_name: &str) 
         platforms, adapter, project_name
     );
 
-    let mopro_root = match env::var("MOPRO_ROOT") {
-        Ok(root) => root,
-        Err(_) => {
-            eprintln!("Error: MOPRO_ROOT environment variable is not set.");
-            eprintln!("Please set MOPRO_ROOT to point to the local checkout of mopro.");
-            eprintln!("For example: export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro");
-            eprintln!("Git repository: https://github.com/oskarth/mopro");
-            exit(1);
-        }
-    };
+    let mopro_root = get_mopro_root();
 
     let source_path = PathBuf::from(mopro_root)
         .join("templates")
