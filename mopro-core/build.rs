@@ -119,13 +119,13 @@ fn build_circuit(config: &Config) -> Result<()> {
     // TODO: Improve this to be more user-friendly
     assert!(
         zkey_path.exists(),
-        "Make sure the zkey file exists. Did you forget to run a trusted setup? Adjust prepare.sh if necessary."
+        "Make sure the zkey file exists. Did you forget to run a trusted setup? Adjust prepare.sh if necessary.\nIf you are working within a mopro-cli project, run 'mopro prepare' first."
     );
     assert!(
         wasm_path.exists(),
-        "Make sure the wasm file exists. Did you forget to compile the circuit to wasm? Adjust prepare.sh if necessary."
+        "Make sure the wasm file exists. Did you forget to compile the circuit to wasm? Adjust prepare.sh if necessary.\nIf you are working within a mopro-cli project, run 'mopro prepare' first."
     );
-    assert!(arkzkey_path.exists(), "Make sure the arkzkey file exists. Did you forget to generate the arkzkey? Adjust prepare.sh if necessary.");
+    assert!(arkzkey_path.exists(), "Make sure the arkzkey file exists. Did you forget to generate the arkzkey?\nAdjust prepare.sh if necessary. If you are working within a mopro-cli project, run 'mopro prepare' first.");
 
     println!("cargo:warning=zkey_file: {}", zkey_path.display());
     println!("cargo:warning=wasm_file: {}", wasm_path.display());
