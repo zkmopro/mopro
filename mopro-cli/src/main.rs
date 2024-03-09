@@ -2,6 +2,7 @@ use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
 mod build;
+mod deps;
 mod export;
 mod init;
 mod prepare;
@@ -19,6 +20,8 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Install required dependencies
+    Deps {},
     /// Initializes a new project
     Init {
         #[arg(long, default_value = "circom")]
@@ -28,7 +31,7 @@ enum Commands {
         #[arg(long, default_value = "mopro-example-app")]
         project_name: String,
     },
-    /// Prepare and build circuit and its artifacts
+    /// Prepare and build circuit artifacts
     Prepare {
         #[arg(long, default_value = "mopro-config.toml")]
         config: String,
@@ -43,7 +46,7 @@ enum Commands {
         platforms: Vec<String>,
     },
     // TODO: Update this when it does something useful over just `build`
-    /// Updates bindings for the specified platforms
+    // Updates bindings for the specified platforms
     // Update {
     //     #[arg(long, default_value = "mopro-config.toml")]
     //     config: String,
@@ -74,6 +77,7 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
+        Commands::Deps {} => deps::install_deps(),
         Commands::Init {
             adapter,
             platforms,
