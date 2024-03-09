@@ -13,7 +13,9 @@
 		CE259EC92B99CCB60035CC36 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE259EC82B99CCB60035CC36 /* mopro.swift */; };
 		CE259ECB2B99DF5D0035CC36 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE259EC82B99CCB60035CC36 /* mopro.swift */; };
 		CE259ECC2B99DF5E0035CC36 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE259EC82B99CCB60035CC36 /* mopro.swift */; };
-		CEBBB4052B9AC5B0007305CF /* CircuitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBBB4042B9AC5B0007305CF /* CircuitView.swift */; };
+		CEBBB4072B9C1974007305CF /* MultiplierCircuitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBBB4062B9C1974007305CF /* MultiplierCircuitView.swift */; };
+		CEBBB4092B9C1A36007305CF /* KeccakCircuitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBBB4082B9C1A36007305CF /* KeccakCircuitView.swift */; };
+		CEBBB40B2B9C1BE5007305CF /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBBB40A2B9C1BE5007305CF /* Utils.swift */; };
 		CEF891252B9834BB0033AE93 /* ExampleAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF891242B9834BB0033AE93 /* ExampleAppApp.swift */; };
 		CEF891292B9834BC0033AE93 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEF891282B9834BC0033AE93 /* Assets.xcassets */; };
 		CEF8912C2B9834BC0033AE93 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEF8912B2B9834BC0033AE93 /* Preview Assets.xcassets */; };
@@ -50,7 +52,9 @@
 		C54051D9C0E3A7517C109F23 /* Pods-ExampleApp-ExampleAppUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExampleApp-ExampleAppUITests.debug.xcconfig"; path = "Target Support Files/Pods-ExampleApp-ExampleAppUITests/Pods-ExampleApp-ExampleAppUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		CE259EC32B99C4000035CC36 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MoproBindings.xcframework; path = Frameworks/MoproBindings.xcframework; sourceTree = "<group>"; };
 		CE259EC82B99CCB60035CC36 /* mopro.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = mopro.swift; path = Bindings/mopro.swift; sourceTree = SOURCE_ROOT; };
-		CEBBB4042B9AC5B0007305CF /* CircuitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircuitView.swift; sourceTree = "<group>"; };
+		CEBBB4062B9C1974007305CF /* MultiplierCircuitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiplierCircuitView.swift; sourceTree = "<group>"; };
+		CEBBB4082B9C1A36007305CF /* KeccakCircuitView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeccakCircuitView.swift; sourceTree = "<group>"; };
+		CEBBB40A2B9C1BE5007305CF /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		CEF891212B9834BB0033AE93 /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEF891242B9834BB0033AE93 /* ExampleAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppApp.swift; sourceTree = "<group>"; };
 		CEF891282B9834BC0033AE93 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -138,10 +142,12 @@
 		CEF891232B9834BB0033AE93 /* ExampleApp */ = {
 			isa = PBXGroup;
 			children = (
+				CEBBB4062B9C1974007305CF /* MultiplierCircuitView.swift */,
 				CEF891242B9834BB0033AE93 /* ExampleAppApp.swift */,
-				CEBBB4042B9AC5B0007305CF /* CircuitView.swift */,
+				CEBBB4082B9C1A36007305CF /* KeccakCircuitView.swift */,
 				CEF891282B9834BC0033AE93 /* Assets.xcassets */,
 				CEF8912A2B9834BC0033AE93 /* Preview Content */,
+				CEBBB40A2B9C1BE5007305CF /* Utils.swift */,
 			);
 			path = ExampleApp;
 			sourceTree = "<group>";
@@ -384,9 +390,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEBBB40B2B9C1BE5007305CF /* Utils.swift in Sources */,
 				CE259EC92B99CCB60035CC36 /* mopro.swift in Sources */,
-				CEBBB4052B9AC5B0007305CF /* CircuitView.swift in Sources */,
 				CEF891252B9834BB0033AE93 /* ExampleAppApp.swift in Sources */,
+				CEBBB4072B9C1974007305CF /* MultiplierCircuitView.swift in Sources */,
+				CEBBB4092B9C1A36007305CF /* KeccakCircuitView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

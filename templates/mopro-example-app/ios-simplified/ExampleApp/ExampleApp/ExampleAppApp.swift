@@ -12,7 +12,9 @@ import SwiftUI
 struct ExampleAppApp: App {
     var body: some Scene {
         WindowGroup {
-            CircuitView()
+            // Enable the view you want
+            MultiplierCircuitView()
+            //KeccakCircuitView()
         }
     }
 }
