@@ -14,8 +14,8 @@ pub fn update_project(config: &str, adapter: &str, platforms: &Vec<String>) {
         let mopro_root = get_mopro_root();
 
         // Determine the script based on the platform
-        let script_name = "update_bindings_project.sh";
-        let script_path = format!("{}/scripts/{}", mopro_root, script_name);
+        let script_name = "update.sh";
+        let script_path = format!("{}/scripts/cli/{}", mopro_root, script_name);
 
         let status = Command::new("sh")
             .arg(script_path)
