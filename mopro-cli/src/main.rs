@@ -27,6 +27,11 @@ enum Commands {
         #[arg(long, default_value = "mopro-example-app")]
         project_name: String,
     },
+    /// Prepare and build circuit and its artifacts
+    BuildCircuit {
+        #[arg(long, default_value = "mopro-config.toml")]
+        config: String,
+    },
     /// Builds the project for specified platforms
     Build {
         #[arg(long, default_value = "mopro-config.toml")]
@@ -72,6 +77,7 @@ fn main() {
             platforms,
             project_name,
         } => init::init_project(adapter, platforms, project_name),
+        Commands::BuildCircuit { config } => build::build_circuit(config),
         Commands::Build {
             config,
             adapter,
