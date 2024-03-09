@@ -77,15 +77,15 @@ extension KeccakCircuitView {
                      37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
                      212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
                  ]
-                 let _: [String] = bytesToBits(bytes: outputVec) // outputBits currently not used
-                 // let expectedOutput: [UInt8] = serializeOutputs(outputBits)
+                 let outputBits: [String] = bytesToBits(bytes: outputVec)
+                 let expectedOutput: [UInt8] = serializeOutputs(outputBits)
 
                  let start = CFAbsoluteTimeGetCurrent()
 
                  // Generate Proof
                  let generateProofResult = try generateProof2(circuitInputs: inputs)
                  assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
-                 //assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
+                 assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
 
                  let end = CFAbsoluteTimeGetCurrent()
                  let timeTaken = end - start
