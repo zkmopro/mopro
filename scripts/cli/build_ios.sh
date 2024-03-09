@@ -187,16 +187,12 @@ update_cocoapods() {
 main() {
     PROJECT_DIR=$(pwd)
     TARGET_DIR=${PROJECT_DIR}/target
-    IOS_APP_DIR=${PROJECT_DIR}/ios-simplified/ExampleApp
+    IOS_APP_DIR=${PROJECT_DIR}/ios/ExampleApp
 
     initialize_environment "$@"
     read_configuration "$1"
     determine_architecture
     determine_build_directory
-
-    # XXX: Consider removing this, we already build mopro-core,
-    # NOTE: Possible gotcha with order of operations (compiling circuits)
-    # build_mopro_core
 
     if [[ "$USE_DYLIB" == true ]]; then
         build_mopro_ffi_dylib
@@ -209,6 +205,7 @@ main() {
     update_cocoapods
 
     print_action "Done! Please re-build your project in Xcode."
+    print_action "Run \`open ios/ExampleApp/ExampleApp.xcworkspace\` to do so."
 }
 
 main "$@"
