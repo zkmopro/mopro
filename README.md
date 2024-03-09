@@ -24,6 +24,8 @@ Zooming in a bit:
 
 ## How to use
 
+NOTE: A lot of below is superseded with the use of `mopro-cli`.
+
 ### Prepare circuits
 
 -   Install [circom](https://docs.circom.io/) and [snarkjs](https://github.com/iden3/snarkjs)

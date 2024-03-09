@@ -15,6 +15,7 @@ Run `cargo install --path .` to install the `mopro` CLI util.
 Here are the basic commands of `mopro`:
 
 - `mopro init`: Initialize a new project with support for multiple platforms.
+- `mopro deps`: Install required dependencies.
 - `mopro prepare`: Prepare and build circuit and its artifacts.
 - `mopro build`: Build the project for specified platforms.
 - `mopro test`: Run tests for specific platform and test cases.
@@ -31,6 +32,9 @@ Initialize, build and test a circuit with Rust bindings:
 ```
 # Set MOPRO_ROOT
 export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro
+
+# Install dependencies
+mopro deps
 
 # Default to circom adapter and core Rust bindings
 mopro init
