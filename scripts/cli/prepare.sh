@@ -124,7 +124,7 @@ trusted_setup() {
 
     echo "Generate zkey file for ${CIRCUIT_NAME}..."
     if [ ! -f "$zkey_output" ]; then
-        snarkjs groth16 setup "${OUTPUT_DIR}/${CIRCUIT_NAME}.r1cs" "$ptau_path" "${output_dir}/${CIRCUIT_NAME}_0000.zkey"
+        snarkjs groth16 setup "${OUTPUT_DIR}/${CIRCUIT_NAME}.r1cs" "$ptau_path" "${OUTPUT_DIR}/${CIRCUIT_NAME}_0000.zkey"
         snarkjs zkey contribute "${OUTPUT_DIR}/${CIRCUIT_NAME}_0000.zkey" "$zkey_output" \
         --name="Demo contributor" -v -e="0xdeadbeef"
     else
