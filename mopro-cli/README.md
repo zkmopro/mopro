@@ -15,10 +15,12 @@ Run `cargo install --path .` to install the `mopro` CLI util.
 Here are the basic commands of `mopro`:
 
 - `mopro init`: Initialize a new project with support for multiple platforms.
+- `mopro prepare`: Prepare and build circuit and its artifacts.
 - `mopro build`: Build the project for specified platforms.
-- `mopro update`: Update bindings with new API for specified platforms.
 - `mopro test`: Run tests for specific platform and test cases.
 - `mopro export-bindings`: Export platform bindings to some other directory.
+
+(May be added soon: `mopro update`: Update bindings with new API for specified platforms.)
 
 ## Examples
 
@@ -36,7 +38,10 @@ mopro init
 # Go to the newly created directory
 cd mopro-example-app
 
-# Build the project, including preparing circuit artifacts
+# Prepare circuit artifacts
+mopro prepare
+
+# Build the project
 mopro build
 
 # Run end-to-end-test
@@ -49,10 +54,8 @@ Initialize and build an app with iOS support.
 
 ```
 mopro init --platforms ios
+mopro prepare
 mopro build --platforms ios
-
-# Update platform bindings
-mopro update --platforms ios
 
 # Currently testing only available for Rust bindings,
 # Can run iOS tests from newly created Xcode project
