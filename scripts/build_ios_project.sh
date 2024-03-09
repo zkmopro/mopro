@@ -1,114 +1,214 @@
 #!/bin/bash
 
-# NOTE: Like build_ios.sh but for initializing a project
-# At some point these scripts will be consolidated
+# Script for initializing and updating an iOS (simplified) project with Rust bindings.
 
-# Check if MOPRO_ROOT is set
-if [ -z "$MOPRO_ROOT" ]; then
-    echo "MOPRO_ROOT is not set. Please set it to your local mopro repository."
-    exit 1
-fi
+# NOTE: Some improvements to be made
+# - USE_DYLIB integration (see build_ios_project.sh)
 
-# Source the script prelude
-source "${MOPRO_ROOT}/scripts/_prelude.sh"
+# Prelude
+#----------------------------------------------------------------------------
+initialize_environment() {
+    if [ -z "$MOPRO_ROOT" ]; then
+        echo "MOPRO_ROOT is not set. Please set it to your local mopro repository."
+        exit 1
+    fi
 
-# Check if toml-cli is installed
-if ! command -v toml &> /dev/null; then
-    echo -e "${RED}toml (toml-cli) is not installed. Please install it to continue.${DEFAULT}"
-    exit 1
-fi
+    if ! command -v toml &> /dev/null; then
+        echo -e "${RED}toml (toml-cli) is not installed. Please install it to continue.${DEFAULT}"
+        exit 1
+    fi
+
+    if [ "$#" -ne 1 ]; then
+        echo -e "\n${RED}Usage: $0 path/to/config.toml${DEFAULT}"
+        exit 1
+    fi
+
+    source "${MOPRO_ROOT}/scripts/_prelude.sh"
+}
+
+read_configuration() {
+    CONFIG_FILE="$1"
+    export BUILD_CONFIG_PATH="$PROJECT_DIR/$CONFIG_FILE"
+    print_action "Using build configuration file: $BUILD_CONFIG_PATH"
+
+    DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
+    BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
+    USE_DYLIB=$(read_toml "$CONFIG_FILE" "dylib.use_dylib")
+    DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")
+}
 
 # Function to read value from TOML file and remove quotes
 read_toml() {
     toml get "$1" "$2" | tr -d '"'
 }
 
-# Check if a configuration file was passed as an argument
-if [ "$#" -ne 1 ]; then
-    echo -e "\n${RED}Usage: $0 path/to/config.toml${DEFAULT}"
-    exit 1
-fi
-
-# Read the path to the TOML configuration file from the first argument
-CONFIG_FILE="$1"
-
-# XXX: This isn't necessarily propagated to `cargo build` build process,
-# so we pass it explicitly. Consider using `source` instead of `export`.
-# Export the configuration file path as an environment variable
-export BUILD_CONFIG_PATH="$(pwd)/$CONFIG_FILE"
-
-# Print which configuration file is being used
-echo "Using build configuration file: $BUILD_CONFIG_PATH"
-
-# Read configurations from TOML file within [build] block
-DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
-BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
-
 # Determine the architecture based on device type
-case $DEVICE_TYPE in
-    "x86_64")
-        ARCHITECTURE="x86_64-apple-ios"
-        ;;
-    "simulator")
-        ARCHITECTURE="aarch64-apple-ios-sim"
-        ;;
-    "device")
-        ARCHITECTURE="aarch64-apple-ios"
-        ;;
-    *)
-        echo -e "\n${RED}Error: Invalid device type specified in config: $DEVICE_TYPE${DEFAULT}"
-        exit 1
-        ;;
-esac
+determine_architecture() {
+    case $DEVICE_TYPE in
+        "x86_64")
+            ARCHITECTURE="x86_64-apple-ios"
+            ;;
+        "simulator")
+            ARCHITECTURE="aarch64-apple-ios-sim"
+            ;;
+        "device")
+            ARCHITECTURE="aarch64-apple-ios"
+            ;;
+        *)
+            echo -e "\n${RED}Error: Invalid device type specified in config: $DEVICE_TYPE${DEFAULT}"
+            exit 1
+            ;;
+    esac
+}
 
 # Determine the library directory based on build mode
-case $BUILD_MODE in
-    "debug")
-        LIB_DIR="debug"
-        ;;
-    "release")
-        LIB_DIR="release"
-        ;;
-    *)
-        echo -e "\n${RED}Error: Invalid build mode specified in config: $BUILD_MODE${DEFAULT}"
+determine_build_directory() {
+    case $BUILD_MODE in
+        "debug")
+            LIB_DIR="debug"
+            ;;
+        "release")
+            LIB_DIR="release"
+            ;;
+        *)
+            echo -e "\n${RED}Error: Invalid build mode specified in config: $BUILD_MODE${DEFAULT}"
+            exit 1
+            ;;
+    esac
+}
+
+# Build process
+#----------------------------------------------------------------------------
+
+# Build process for mopro_core
+build_mopro_core() {
+    cd "${MOPRO_ROOT}/mopro-core" || exit
+    print_action "Building mopro-core ($BUILD_MODE)..."
+    if [[ "$BUILD_MODE" == "release" ]]; then
+        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --release
+    else
+        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE"
+    fi
+}
+
+build_mopro_ffi_static() {
+    cd "${MOPRO_ROOT}/mopro-ffi" || exit
+    print_action "Building mopro-ffi as a static library ($BUILD_MODE)..."
+    if [[ "$BUILD_MODE" == "release" ]]; then
+        cargo build --release --target "$ARCHITECTURE"
+    else
+        cargo build --target "$ARCHITECTURE"
+    fi
+
+    # Ensure the target directory exists
+    mkdir -p "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}"
+
+    # Copy the static library to the target directory
+    print_action "Copying static library to target directory..."
+    cp "${MOPRO_ROOT}/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a" \
+        "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to copy static library.${DEFAULT}"
         exit 1
-        ;;
-esac
+    fi
+}
 
-PROJECT_DIR=$(pwd)
+build_mopro_ffi_dylib() {
+    cd "${MOPRO_ROOT}/mopro-ffi" || exit
+    print_action "Building mopro-ffi as a dynamic library ($BUILD_MODE)..."
+    if [[ "$BUILD_MODE" == "release" ]]; then
+        cargo build --release --target "$ARCHITECTURE" --features dylib
+    else
+        cargo build --target "$ARCHITECTURE" --features dylib
+    fi
 
-# Build circom circuits in mopro-core
-cd "${MOPRO_ROOT}/mopro-core"
-if [[ "$BUILD_MODE" == "debug" ]]; then
-    env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build
-    elif [[ "$BUILD_MODE" == "release" ]]; then
-    env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --release
-fi
+    # Ensure the target directory exists
+    mkdir -p "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}"
 
-# Build MoproKit pods
-# NOTE: Example should probably be in ios dir as opposed to nested
-cd "${PROJECT_DIR}/ios/MoproKit/Example"
-pod install
+    # Copy the dynamic library to the target directory
+    print_action "Copying dynamic library to target directory..."
+    cp "${MOPRO_ROOT}/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.dylib" \
+        "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.dylib"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to copy dynamic library.${DEFAULT}"
+        exit 1
+    fi
+}
 
-# TODO: Here at the moment
+generate_swift_bindings() {
+    print_action "Generating Swift bindings..."
+    uniffi-bindgen generate "${MOPRO_ROOT}/mopro-ffi/src/mopro.udl" --language swift --out-dir "${TARGET_DIR}/SwiftBindings"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to generate Swift bindings.${DEFAULT}"
+        exit 1
+    fi
 
-# Update bindings
-cd "${PROJECT_DIR}"
-$MOPRO_ROOT/scripts/update_bindings_project.sh $CONFIG_FILE
+    # Rename modulemap to module.modulemap
+    mv "${TARGET_DIR}/SwiftBindings/moproFFI.modulemap" "${TARGET_DIR}/SwiftBindings/module.modulemap"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to rename modulemap to module.modulemap.${DEFAULT}"
+        exit 1
+    fi
 
-# Update xcconfig
-MODES="debug release"
-XCCONFIG_PATH=ios/MoproKit/Example/Pods/Target\ Support\ Files/MoproKit
-CONFIGS="
-LIBRARY_SEARCH_PATHS=\${SRCROOT}/../../Libs
-OTHER_LDFLAGS=-lmopro_ffi
-USER_HEADER_SEARCH_PATHS=\${SRCROOT}/../../include
-"
-for mode in $MODES; do
-    FILE_NAME="${PROJECT_DIR}/${XCCONFIG_PATH}/MoproKit.${mode}.xcconfig"
-    for config in $CONFIGS; do
-        if ! grep -q "${config}" "${FILE_NAME}"; then
-            echo "${config}" >> "${FILE_NAME}"
-        fi
-    done
-done
+    # Copy the mopro.swift file to the Bindings directory
+    cp "${TARGET_DIR}/SwiftBindings/mopro.swift" "${IOS_APP_DIR}/Bindings/mopro.swift"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to copy mopro.swift to Bindings directory.${DEFAULT}"
+        exit 1
+    fi
+}
+
+create_xcframework() {
+    print_action "Cleaning up existing XCFramework..."
+    XCFRAMEWORK_PATH="${IOS_APP_DIR}/Frameworks/MoproBindings.xcframework"
+    if [ -d "$XCFRAMEWORK_PATH" ]; then
+        rm -rf "$XCFRAMEWORK_PATH"
+    fi
+
+    print_action "Creating XCFramework..."
+    xcodebuild -create-xcframework \
+        -library "${TARGET_DIR}/${ARCHITECTURE}/release/libmopro_ffi.a" \
+        -headers "${TARGET_DIR}/SwiftBindings" \
+        -output "$XCFRAMEWORK_PATH"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to create XCFramework.${DEFAULT}"
+        exit 1
+    fi
+}
+
+
+update_cocoapods() {
+    cd ${IOS_APP_DIR}
+    pod install
+}
+
+# Main
+#----------------------------------------------------------------------------
+main() {
+    PROJECT_DIR=$(pwd)
+    TARGET_DIR=${PROJECT_DIR}/target
+    IOS_APP_DIR=${PROJECT_DIR}/ios-simplified/ExampleApp
+
+    initialize_environment "$@"
+    read_configuration "$1"
+    determine_architecture
+    determine_build_directory
+
+    # XXX: Consider removing this, we already build mopro-core,
+    # NOTE: Possible gotcha with order of operations (compiling circuits)
+    # build_mopro_core
+
+    if [[ "$USE_DYLIB" == true ]]; then
+        build_mopro_ffi_dylib
+    else
+        build_mopro_ffi_static
+    fi
+
+    generate_swift_bindings
+    create_xcframework
+    update_cocoapods
+
+    print_action "Done! Please re-build your project in Xcode."
+}
+
+main "$@"
