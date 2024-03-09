@@ -1,7 +1,8 @@
 use crate::utils::get_mopro_root;
 use std::process::{exit, Command};
 
-pub fn update_project(config: &str, adapter: &str, platforms: &Vec<String>) {
+// TODO: Update this script, not currently super useful
+pub fn _update_project(config: &str, adapter: &str, platforms: &Vec<String>) {
     for platform in platforms.iter() {
         // Skip the update process for the 'core' platform
         if platform == "core" {

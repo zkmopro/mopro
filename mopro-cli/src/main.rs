@@ -42,15 +42,16 @@ enum Commands {
         #[arg(long, num_args = 1.., default_value = "core")]
         platforms: Vec<String>,
     },
+    // TODO: Update this when it does something useful over just `build`
     /// Updates bindings for the specified platforms
-    Update {
-        #[arg(long, default_value = "mopro-config.toml")]
-        config: String,
-        #[arg(long, default_value = "circom")]
-        adapter: String,
-        #[arg(long, num_args = 1.., default_value = "core")]
-        platforms: Vec<String>,
-    },
+    // Update {
+    //     #[arg(long, default_value = "mopro-config.toml")]
+    //     config: String,
+    //     #[arg(long, default_value = "circom")]
+    //     adapter: String,
+    //     #[arg(long, num_args = 1.., default_value = "core")]
+    //     platforms: Vec<String>,
+    // },
     /// Runs tests for the specified platform and test cases
     Test {
         #[arg(long, default_value = "mopro-config.toml")]
@@ -84,11 +85,11 @@ fn main() {
             adapter,
             platforms,
         } => build::build_project(config, adapter, platforms),
-        Commands::Update {
-            config,
-            adapter,
-            platforms,
-        } => update::update_project(config, adapter, platforms),
+        // Commands::Update {
+        //     config,
+        //     adapter,
+        //     platforms,
+        // } => update::update_project(config, adapter, platforms),
         Commands::Test {
             config,
             adapter,
