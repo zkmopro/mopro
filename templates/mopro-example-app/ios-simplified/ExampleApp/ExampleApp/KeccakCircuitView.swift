@@ -1,5 +1,5 @@
 //
-//  CircuitView.swift
+//  KeccakCircuitView.swift
 //  ExampleApp
 //
 //  Created by User Name on 3/8/24.
@@ -8,7 +8,7 @@
 import SwiftUI
 import moproFFI
 
-struct CircuitView: View {
+struct KeccakCircuitView: View {
     @State private var textViewText = ""
     @State private var isProveButtonEnabled = true
     @State private var isVerifyButtonEnabled = false
@@ -33,8 +33,8 @@ struct CircuitView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack {
-                        Text("Circuit Example").font(.headline)
-                        Text("Circom").font(.subheadline)
+                        Text("Keccak Example").font(.headline)
+                        Text("Circom Circuit").font(.subheadline)
                     }
                 }
             }
@@ -42,7 +42,7 @@ struct CircuitView: View {
     }
 }
 
-extension CircuitView {
+extension KeccakCircuitView {
     func runInitAction() {
         textViewText += "Initializing library... "
         Task {
@@ -138,15 +138,3 @@ extension CircuitView {
 //#Preview {
 //    CircuitView()
 //}
-
-// Util function
-func bytesToBits(bytes: [UInt8]) -> [String] {
-    var bits = [String]()
-    for byte in bytes {
-        for j in 0..<8 {
-            let bit = (byte >> j) & 1
-            bits.append(String(bit))
-        }
-    }
-    return bits
-}
