@@ -4,6 +4,7 @@ use std::path::PathBuf;
 mod build;
 mod export;
 mod init;
+mod prepare;
 mod test;
 mod update;
 mod utils;
@@ -28,7 +29,7 @@ enum Commands {
         project_name: String,
     },
     /// Prepare and build circuit and its artifacts
-    BuildCircuit {
+    Prepare {
         #[arg(long, default_value = "mopro-config.toml")]
         config: String,
     },
@@ -77,7 +78,7 @@ fn main() {
             platforms,
             project_name,
         } => init::init_project(adapter, platforms, project_name),
-        Commands::BuildCircuit { config } => build::build_circuit(config),
+        Commands::Prepare { config } => prepare::prepare_circuit(config),
         Commands::Build {
             config,
             adapter,
