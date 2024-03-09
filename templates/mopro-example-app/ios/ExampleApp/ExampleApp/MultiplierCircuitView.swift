@@ -34,7 +34,7 @@ struct MultiplierCircuitView: View {
                 ToolbarItem(placement: .principal) {
                     VStack {
                         Text("Multiplier Example").font(.headline)
-                        Text("Circum Circom").font(.subheadline)
+                        Text("Circom Circuit").font(.subheadline)
                     }
                 }
             }
