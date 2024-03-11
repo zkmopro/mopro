@@ -30,7 +30,7 @@ export BUILD_CONFIG_PATH="$(pwd)/$CONFIG_FILE"
 echo "Using configuration file: $CONFIG_FILE"
 
 # Read configurations from TOML file within [build] block
-DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
+DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.ios_device_type")
 BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
 
 # Determine the architecture based on device type

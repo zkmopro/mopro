@@ -58,7 +58,6 @@ read_configuration() {
 
     validate_toml "$CONFIG_FILE"
 
-    DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
     BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
     USE_DYLIB=$(read_toml "$CONFIG_FILE" "dylib.use_dylib")
     DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")
