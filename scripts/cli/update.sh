@@ -46,7 +46,7 @@ export BUILD_CONFIG_PATH="$(pwd)/$CONFIG_FILE"
 echo "Using build configuration file: $BUILD_CONFIG_PATH"
 
 # Read configurations from TOML file
-DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
+DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.ios_device_type")
 BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
 USE_DYLIB=$(read_toml "$CONFIG_FILE" "dylib.use_dylib")
 DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")

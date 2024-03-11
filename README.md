@@ -42,8 +42,9 @@ By creating a `toml` configuration file you can specify what build settings you 
 
 [build]
 # For iOS device_type can be x86_64, simulator, device
-# For Android device_type can be x86_64, arm, arm64
-device_type = "simulator" # Options: x86_64, simulator, device, arm, arm64
+ios_device_type = "simulator" # Options: x86_64, simulator, device
+# For Android device_type can be x86_64, x86, arm, arm64
+android_device_type = "arm64" # Options: x86_64, x86, arm, arm64
 
 # debug is for Rust library to be in debug mode and release for release mode
 # We recommend release mode by default for performance

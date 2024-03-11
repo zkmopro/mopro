@@ -58,12 +58,25 @@ Initialize and build an app with iOS support.
 
 ```
 mopro init --platforms ios
+cd mopro-example-app
 mopro prepare
 mopro build --platforms ios
 
 # Currently testing only available for Rust bindings,
 # Can run iOS tests from newly created Xcode project
 mopro test
+```
+
+### Android
+
+Initialize and build an app with Android support.
+> Currently support [Android Studio](https://developer.android.com/studio)
+
+```
+mopro init --platforms android
+cd mopro-example-app
+mopro prepare
+mopro build --platforms android
 ```
 
 ### Exporting bindings
