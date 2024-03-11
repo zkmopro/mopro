@@ -29,7 +29,7 @@ Here are the basic commands of `mopro`:
 
 Initialize, build and test a circuit with Rust bindings:
 
-```
+```sh
 # Set MOPRO_ROOT
 export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro
 
@@ -56,11 +56,14 @@ mopro test
 
 Initialize and build an app with iOS support.
 
-```
+```sh
 mopro init --platforms ios
 cd mopro-example-app
 mopro prepare
 mopro build --platforms ios
+
+# Open project in XCode
+open ios/ExampleApp/ExampleApp.xcworkspace
 
 # Currently testing only available for Rust bindings,
 # Can run iOS tests from newly created Xcode project
@@ -72,18 +75,21 @@ mopro test
 Initialize and build an app with Android support.
 > Currently support [Android Studio](https://developer.android.com/studio)
 
-```
+```sh
 mopro init --platforms android
 cd mopro-example-app
 mopro prepare
 mopro build --platforms android
+
+# Open android project in Android Studio
+open android -a Android\ Studio
 ```
 
 ### Exporting bindings
 
 To export bindings to a different directory:
 
-`mopro export-bindings --destination <DESTINATION_DIR> --platforms <IOS_OR_ANDROID>`
+`mopro export-bindings --destination <DESTINATION_DIR> --platforms <IOS_AND_OR_ANDROID>`
 
 This will the following files, assuming they've been built, to the destination directory:
 
@@ -98,9 +104,9 @@ This will the following files, assuming they've been built, to the destination d
 ```
 ├── KotlinBindings
 │   └── mopro.kt
-├── JniLibs
-│   └── <ARCHITECTURE>
-│       └── libuniffi_mopro.so
+└── JniLibs
+    └── <ARCHITECTURE>
+       └── libuniffi_mopro.so
 ```
 
 ## Contributing
