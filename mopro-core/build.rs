@@ -34,26 +34,108 @@ fn resolve_path(base_dir: &Path, relative_path: &str) -> String {
         base_dir.join(path).to_string_lossy().into_owned()
     }
 }
-fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
-    use std::str::FromStr;
 
+// fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
+//     use std::str::FromStr;
+
+//     use color_eyre::eyre::eyre;
+//     use enumset::enum_set;
+//     use enumset::EnumSet;
+
+//     use wasmer::Cranelift;
+//     use wasmer::Dylib;
+//     use wasmer::Target;
+//     use wasmer::{Module, Store, Triple};
+
+//     let out_dir = env::var("OUT_DIR")?;
+//     let project_dir = env::var("CARGO_MANIFEST_DIR")?;
+//     let build_mode = env::var("PROFILE")?;
+//     let target_arch = env::var("TARGET")?;
+
+//     let out_dir = Path::new(&out_dir).to_path_buf();
+//     let wasm_file = Path::new(&wasm_path).to_path_buf();
+//     let dylib_file = out_dir.join(&dylib_name);
+//     let final_dir = PathBuf::from(&project_dir)
+//         .join("target")
+//         .join(&target_arch)
+//         .join(build_mode);
+
+//     // if dylib_file.exists() {
+//     //     return Ok(());
+//     // }
+
+//     // Create a WASM engine for the target that can compile
+//     let triple = Triple::from_str(&target_arch).map_err(|e| eyre!(e))?;
+//     let cpu_features = enum_set!();
+//     let target = Target::new(triple, cpu_features);
+//     let engine = Dylib::new(Cranelift::default()).target(target).engine();
+//     println!("cargo:warning=Building dylib for {}", target_arch);
+
+//     // Compile the WASM module
+//     println!(
+//         "cargo:warning=Compiling WASM module, for wasm file: {}",
+//         wasm_file.display()
+//     );
+//     let store = Store::new(&engine);
+//     let module = Module::from_file(&store, &wasm_file).unwrap();
+//     module.serialize_to_file(&dylib_file).unwrap();
+//     assert!(dylib_file.exists());
+
+//     // Copy dylib to a more predictable path
+//     fs::create_dir_all(&final_dir)?;
+//     let final_path = final_dir.join(dylib_name);
+//     fs::copy(&dylib_file, &final_path)?;
+//     println!("cargo:warning=Dylib location: {}", final_path.display());
+
+//     Ok(())
+// }
+
+fn build_dylib(config: &Config) -> Result<()> {
     use color_eyre::eyre::eyre;
     use enumset::enum_set;
     use enumset::EnumSet;
-
+    use std::str::FromStr;
     use wasmer::Cranelift;
     use wasmer::Dylib;
     use wasmer::Target;
     use wasmer::{Module, Store, Triple};
+
+    let dylib_config = &config.dylib.as_ref().unwrap();
+
+    // XXX: This is really hacky, but it gets the job done
+    // Check if the current package is mopro-core
+    let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
+    let base_dir = if pkg_name == "mopro-core" {
+        // If mopro-core, use CARGO_MANIFEST_DIR as base directory
+        env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set")
+    } else {
+        // Default to current directory
+        ".".to_string()
+    };
+
+    // Use the expanded circuit directory if available, otherwise fallback to the original directory
+    let circuit_dir = config
+        .expanded_circuit_dir
+        .as_ref()
+        .unwrap_or(&config.circuit.dir);
+    let circuit_name = &config.circuit.name;
+
+    // Resolve the circuit directory to an absolute path based on the conditionally set base_dir
+    let circuit_dir_path = Path::new(&base_dir).join(circuit_dir);
 
     let out_dir = env::var("OUT_DIR")?;
     let project_dir = env::var("CARGO_MANIFEST_DIR")?;
     let build_mode = env::var("PROFILE")?;
     let target_arch = env::var("TARGET")?;
 
+    let dylib_name = dylib_config.name.clone();
+
+    let wasm_path = PathBuf::from(circuit_dir_path.clone())
+        .join(format!("target/{}_js/{}.wasm", circuit_name, circuit_name));
+
     let out_dir = Path::new(&out_dir).to_path_buf();
     let wasm_file = Path::new(&wasm_path).to_path_buf();
-    let dylib_file = out_dir.join(&dylib_name);
+    let dylib_file = out_dir.join(dylib_name.clone());
     let final_dir = PathBuf::from(&project_dir)
         .join("target")
         .join(&target_arch)
@@ -71,6 +153,10 @@ fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
     println!("cargo:warning=Building dylib for {}", target_arch);
 
     // Compile the WASM module
+    println!(
+        "cargo:warning=Compiling WASM module, for wasm file: {}",
+        wasm_file.display()
+    );
     let store = Store::new(&engine);
     let module = Module::from_file(&store, &wasm_file).unwrap();
     module.serialize_to_file(&dylib_file).unwrap();
@@ -195,18 +281,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     build_circuit(&config)?;
 
     // Build dylib if enabled
+    // Only do this for iOS platform
     if let Some(dylib_config) = &config.dylib {
         if dylib_config.use_dylib {
             println!("cargo:warning=Building dylib: {}", dylib_config.name);
-            build_dylib(
-                config.circuit.dir.clone()
-                    + "/target/"
-                    + &config.circuit.name
-                    + "_js/"
-                    + &config.circuit.name
-                    + ".wasm",
-                dylib_config.name.clone(),
-            )?;
+            build_dylib(&config)?;
+            // build_dylib(
+            //     config.circuit.dir.clone()
+            //         + "/target/"
+            //         + &config.circuit.name
+            //         + "_js/"
+            //         + &config.circuit.name
+            //         + ".wasm",
+            //     dylib_config.name.clone(),
+            // )?;
         } else {
             println!("cargo:warning=Dylib usage is disabled in the config.");
         }
