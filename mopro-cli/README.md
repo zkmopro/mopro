@@ -83,7 +83,7 @@ mopro build --platforms android
 
 To export bindings to a different directory:
 
-`mopro export-bindings --destination <DESTINATION_DIR>`
+`mopro export-bindings --destination <DESTINATION_DIR> --platforms <IOS_OR_ANDROID>`
 
 This will the following files, assuming they've been built, to the destination directory:
 
@@ -93,6 +93,14 @@ This will the following files, assuming they've been built, to the destination d
 │   ├── moproFFI.h
 │   └── moproFFI.modulemap
 └── libmopro_ffi.a
+```
+
+```
+├── KotlinBindings
+│   └── mopro.kt
+├── JniLibs
+│   └── <ARCHITECTURE>
+│       └── libuniffi_mopro.so
 ```
 
 ## Contributing

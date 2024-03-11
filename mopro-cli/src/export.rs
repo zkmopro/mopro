@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::{env, fs};
 
-pub fn export_bindings(destination: &PathBuf) {
+fn export_ios_bindings(destination: &PathBuf) {
     let current_dir = env::current_dir().expect("Failed to get current directory");
     let target_dir = current_dir.join("target");
 
@@ -26,4 +26,52 @@ pub fn export_bindings(destination: &PathBuf) {
         .expect("Failed to copy libmopro_ffi.a file");
 
     println!("Exported Swift bindings to {:?}", destination);
+}
+
+fn export_android_bindings(destination: &PathBuf) {
+    let current_dir = env::current_dir().expect("Failed to get current directory");
+    let target_dir = current_dir.join("target");
+
+    // Define the paths to the source files and directories
+    let jni_bindings_dir = target_dir.join("jniLibs");
+    let kotlin_bindings_file = target_dir
+        .join("KotlinBindings/uniffi/mopro")
+        .join("mopro.kt");
+
+    // Define the destination paths
+    let _destination_jni_bindings_dir = destination.join("jniLibs");
+    let destination_kotlin_bindings_file = destination.join("KotlinBindings").join("mopro.kt");
+
+    // Create KotlinBindings directory if it does not exist
+    fs::create_dir_all(destination.join("KotlinBindings"))
+        .expect("Failed to create KotlinBindings directory");
+
+    // Copy jniLibs directory
+    fs_extra::dir::copy(
+        jni_bindings_dir,
+        destination,
+        &fs_extra::dir::CopyOptions::new(),
+    )
+    .expect("Failed to copy jniLibs directory");
+
+    // Copy Kotlin bindings file
+    fs::copy(kotlin_bindings_file, destination_kotlin_bindings_file)
+        .expect("Failed to copy Kotlin bindings file");
+
+    println!("Exported Kotlin bindings to {:?}", destination);
+}
+
+pub fn export_bindings(platforms: &Vec<String>, destination: &PathBuf) {
+    for platform in platforms.iter() {
+        if platform == "ios" {
+            export_ios_bindings(destination);
+        } else if platform == "android" {
+            export_android_bindings(destination);
+        } else {
+            panic!(
+                "Unsupported platform: {}, now mopro only supports ios and android",
+                platform
+            );
+        }
+    }
 }
