@@ -13,6 +13,8 @@ pub fn build_project(config: &str, adapter: &str, platforms: &Vec<String>) {
         // Determine the script based on the platform
         let script_name = if platform == "ios" {
             "build_ios.sh"
+        } else if platform == "android" {
+            "build_android.sh"
         } else {
             "build_core.sh"
         };
