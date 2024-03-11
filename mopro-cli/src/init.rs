@@ -41,9 +41,10 @@ pub fn init_project(adapter: &str, platforms: &Vec<String>, project_name: &str) 
     entries_to_copy.push(source_path.join("core"));
     entries_to_copy.push(source_path.join("mopro-config.toml"));
     entries_to_copy.push(source_path.join("README.md"));
-
     if platforms.contains(&"ios".to_string()) {
         entries_to_copy.push(source_path.join("ios"));
+    } else if platforms.contains(&"android".to_string()) {
+        entries_to_copy.push(source_path.join("android"));
     }
 
     // Perform the copy operation for each entry
