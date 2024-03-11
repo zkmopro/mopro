@@ -155,6 +155,7 @@ main() {
     generate_kotlin_bindings
     
     print_action "Done! Please re-build your project in Android Studio."
+    print_action "Run \`open android -a Android\ Studio\` to do so."
 }
 
 main "$@"
