@@ -68,7 +68,7 @@ enum Commands {
     },
     /// Exports platform bindings to some other directory
     ExportBindings {
-        #[arg(long, num_args = 1.., default_value = "core")]
+        #[arg(long, num_args = 1.., default_value = "ios")]
         platforms: Vec<String>,
         #[arg(short, long)]
         destination: PathBuf,
