@@ -68,6 +68,8 @@ enum Commands {
     },
     /// Exports platform bindings to some other directory
     ExportBindings {
+        #[arg(long, num_args = 1.., default_value = "core")]
+        platforms: Vec<String>,
         #[arg(short, long)]
         destination: PathBuf,
     },
@@ -100,6 +102,9 @@ fn main() {
             platforms,
             test_case,
         } => test::test_project(config, adapter, platforms, test_case),
-        Commands::ExportBindings { destination } => export::export_bindings(destination),
+        Commands::ExportBindings {
+            platforms,
+            destination,
+        } => export::export_bindings(platforms, destination),
     }
 }
