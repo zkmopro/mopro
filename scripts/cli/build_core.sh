@@ -38,11 +38,12 @@ export BUILD_CONFIG_PATH="$(pwd)/$CONFIG_FILE"
 echo "Using build configuration file: $BUILD_CONFIG_PATH"
 
 # Read configurations from TOML file within [build] block
-DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
+IOS_DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.ios_device_type")
+ANDROID_DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.android_device_type")
 BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
 
 # Determine the architecture based on device type
-case $DEVICE_TYPE in
+case $IOS_DEVICE_TYPE in
     "x86_64")
         ARCHITECTURE="x86_64-apple-ios"
         ;;
@@ -54,6 +55,29 @@ case $DEVICE_TYPE in
         ;;
     *)
         echo -e "\n${RED}Error: Invalid device type specified in config: $DEVICE_TYPE${DEFAULT}"
+        exit 1
+        ;;
+esac
+
+case $ANDROID_DEVICE_TYPE in
+    "x86_64")
+        ARCHITECTURE="x86_64-linux-android"
+        FOLDER="x86_64"
+        ;;
+    "x86")
+        ARCHITECTURE="i686-linux-android"
+        FOLDER="x86"
+        ;;
+    "arm")
+        ARCHITECTURE="armv7-linux-androideabi"
+        FOLDER="armeabi-v7a"
+        ;;
+    "arm64")
+        ARCHITECTURE="aarch64-linux-android"
+        FOLDER="arm64-v8a"
+        ;;
+    *)
+        echo -e "${RED}Error: Invalid device type specified in config: $DEVICE_TYPE${DEFAULT}"
         exit 1
         ;;
 esac

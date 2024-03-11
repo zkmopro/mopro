@@ -31,7 +31,7 @@ read_configuration() {
     export BUILD_CONFIG_PATH="$PROJECT_DIR/$CONFIG_FILE"
     print_action "Using build configuration file: $BUILD_CONFIG_PATH"
 
-    DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.device_type")
+    DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.ios_device_type")
     BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
     USE_DYLIB=$(read_toml "$CONFIG_FILE" "dylib.use_dylib")
     DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")
