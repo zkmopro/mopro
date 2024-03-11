@@ -1,14 +1,18 @@
+use color_eyre::eyre::eyre;
 use color_eyre::eyre::Result;
+use enumset::enum_set;
+use enumset::EnumSet;
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 use std::{env, fs};
 use toml;
+use wasmer::{Cranelift, Dylib, Module, Store, Target, Triple};
 
 #[derive(Deserialize)]
 struct Config {
     circuit: CircuitConfig,
     dylib: Option<DylibConfig>,
-    // This field does not need to be deserialized from TOML, so it's not included in the original definition
     #[serde(skip)]
     expanded_circuit_dir: Option<String>,
 }
@@ -35,206 +39,22 @@ fn resolve_path(base_dir: &Path, relative_path: &str) -> String {
     }
 }
 
-// fn build_dylib(wasm_path: String, dylib_name: String) -> Result<()> {
-//     use std::str::FromStr;
-
-//     use color_eyre::eyre::eyre;
-//     use enumset::enum_set;
-//     use enumset::EnumSet;
-
-//     use wasmer::Cranelift;
-//     use wasmer::Dylib;
-//     use wasmer::Target;
-//     use wasmer::{Module, Store, Triple};
-
-//     let out_dir = env::var("OUT_DIR")?;
-//     let project_dir = env::var("CARGO_MANIFEST_DIR")?;
-//     let build_mode = env::var("PROFILE")?;
-//     let target_arch = env::var("TARGET")?;
-
-//     let out_dir = Path::new(&out_dir).to_path_buf();
-//     let wasm_file = Path::new(&wasm_path).to_path_buf();
-//     let dylib_file = out_dir.join(&dylib_name);
-//     let final_dir = PathBuf::from(&project_dir)
-//         .join("target")
-//         .join(&target_arch)
-//         .join(build_mode);
-
-//     // if dylib_file.exists() {
-//     //     return Ok(());
-//     // }
-
-//     // Create a WASM engine for the target that can compile
-//     let triple = Triple::from_str(&target_arch).map_err(|e| eyre!(e))?;
-//     let cpu_features = enum_set!();
-//     let target = Target::new(triple, cpu_features);
-//     let engine = Dylib::new(Cranelift::default()).target(target).engine();
-//     println!("cargo:warning=Building dylib for {}", target_arch);
-
-//     // Compile the WASM module
-//     println!(
-//         "cargo:warning=Compiling WASM module, for wasm file: {}",
-//         wasm_file.display()
-//     );
-//     let store = Store::new(&engine);
-//     let module = Module::from_file(&store, &wasm_file).unwrap();
-//     module.serialize_to_file(&dylib_file).unwrap();
-//     assert!(dylib_file.exists());
-
-//     // Copy dylib to a more predictable path
-//     fs::create_dir_all(&final_dir)?;
-//     let final_path = final_dir.join(dylib_name);
-//     fs::copy(&dylib_file, &final_path)?;
-//     println!("cargo:warning=Dylib location: {}", final_path.display());
-
-//     Ok(())
-// }
-
-fn build_dylib(config: &Config) -> Result<()> {
-    use color_eyre::eyre::eyre;
-    use enumset::enum_set;
-    use enumset::EnumSet;
-    use std::str::FromStr;
-    use wasmer::Cranelift;
-    use wasmer::Dylib;
-    use wasmer::Target;
-    use wasmer::{Module, Store, Triple};
-
-    let dylib_config = &config.dylib.as_ref().unwrap();
-
-    // XXX: This is really hacky, but it gets the job done
-    // Check if the current package is mopro-core
-    let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
-    let base_dir = if pkg_name == "mopro-core" {
-        // If mopro-core, use CARGO_MANIFEST_DIR as base directory
-        env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set")
-    } else {
-        // Default to current directory
-        ".".to_string()
-    };
-
-    // Use the expanded circuit directory if available, otherwise fallback to the original directory
-    let circuit_dir = config
-        .expanded_circuit_dir
-        .as_ref()
-        .unwrap_or(&config.circuit.dir);
-    let circuit_name = &config.circuit.name;
-
-    // Resolve the circuit directory to an absolute path based on the conditionally set base_dir
-    let circuit_dir_path = Path::new(&base_dir).join(circuit_dir);
-
-    let out_dir = env::var("OUT_DIR")?;
-    let project_dir = env::var("CARGO_MANIFEST_DIR")?;
-    let build_mode = env::var("PROFILE")?;
-    let target_arch = env::var("TARGET")?;
-
-    let dylib_name = dylib_config.name.clone();
-
-    let wasm_path = PathBuf::from(circuit_dir_path.clone())
-        .join(format!("target/{}_js/{}.wasm", circuit_name, circuit_name));
-
-    let out_dir = Path::new(&out_dir).to_path_buf();
-    let wasm_file = Path::new(&wasm_path).to_path_buf();
-    let dylib_file = out_dir.join(dylib_name.clone());
-    let final_dir = PathBuf::from(&project_dir)
-        .join("target")
-        .join(&target_arch)
-        .join(build_mode);
-
-    // if dylib_file.exists() {
-    //     return Ok(());
-    // }
-
-    // Create a WASM engine for the target that can compile
-    let triple = Triple::from_str(&target_arch).map_err(|e| eyre!(e))?;
-    let cpu_features = enum_set!();
-    let target = Target::new(triple, cpu_features);
-    let engine = Dylib::new(Cranelift::default()).target(target).engine();
-    println!("cargo:warning=Building dylib for {}", target_arch);
-
-    // Compile the WASM module
-    println!(
-        "cargo:warning=Compiling WASM module, for wasm file: {}",
-        wasm_file.display()
-    );
-    let store = Store::new(&engine);
-    let module = Module::from_file(&store, &wasm_file).unwrap();
-    module.serialize_to_file(&dylib_file).unwrap();
-    assert!(dylib_file.exists());
-
-    // Copy dylib to a more predictable path
-    fs::create_dir_all(&final_dir)?;
-    let final_path = final_dir.join(dylib_name);
-    fs::copy(&dylib_file, &final_path)?;
-    println!("cargo:warning=Dylib location: {}", final_path.display());
-
-    Ok(())
+impl Config {
+    fn resolve_circuit_dir(&self) -> PathBuf {
+        let base_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".to_string());
+        let circuit_dir = self
+            .expanded_circuit_dir
+            .as_ref()
+            .unwrap_or(&self.circuit.dir);
+        Path::new(&base_dir).join(circuit_dir)
+    }
 }
 
-fn build_circuit(config: &Config) -> Result<()> {
-    // XXX: This is really hacky, but it gets the job done
-    // Check if the current package is mopro-core
-    let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
-    let base_dir = if pkg_name == "mopro-core" {
-        // If mopro-core, use CARGO_MANIFEST_DIR as base directory
-        env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set")
-    } else {
-        // Default to current directory
-        ".".to_string()
-    };
-
-    // Use the expanded circuit directory if available, otherwise fallback to the original directory
-    let circuit_dir = config
-        .expanded_circuit_dir
-        .as_ref()
-        .unwrap_or(&config.circuit.dir);
-    let circuit_name = &config.circuit.name;
-
-    // Resolve the circuit directory to an absolute path based on the conditionally set base_dir
-    let circuit_dir_path = Path::new(&base_dir).join(circuit_dir);
-
-    println!("cargo:warning=Circuit directory: {}", circuit_dir);
-
-    let zkey_path =
-        PathBuf::from(circuit_dir_path.clone()).join(format!("target/{}_final.zkey", circuit_name));
-    let wasm_path = PathBuf::from(circuit_dir_path.clone())
-        .join(format!("target/{}_js/{}.wasm", circuit_name, circuit_name));
-    let arkzkey_path = PathBuf::from(circuit_dir_path.clone())
-        .join(format!("target/{}_final.arkzkey", circuit_name));
-
-    // TODO: Improve this to be more user-friendly
-    assert!(
-        zkey_path.exists(),
-        "Make sure the zkey file exists. Did you forget to run a trusted setup? Adjust prepare.sh if necessary.\nIf you are working within a mopro-cli project, run 'mopro prepare' first."
-    );
-    assert!(
-        wasm_path.exists(),
-        "Make sure the wasm file exists. Did you forget to compile the circuit to wasm? Adjust prepare.sh if necessary.\nIf you are working within a mopro-cli project, run 'mopro prepare' first."
-    );
-    assert!(arkzkey_path.exists(), "Make sure the arkzkey file exists. Did you forget to generate the arkzkey?\nAdjust prepare.sh if necessary. If you are working within a mopro-cli project, run 'mopro prepare' first.");
-
-    println!("cargo:warning=zkey_file: {}", zkey_path.display());
-    println!("cargo:warning=wasm_file: {}", wasm_path.display());
-    println!("cargo:warning=arkzkey_file: {}", arkzkey_path.display());
-
-    // Set BUILD_RS_* environment variables
-    println!("cargo:rustc-env=BUILD_RS_ZKEY_FILE={}", zkey_path.display());
-    println!("cargo:rustc-env=BUILD_RS_WASM_FILE={}", wasm_path.display());
-    println!(
-        "cargo:rustc-env=BUILD_RS_ARKZKEY_FILE={}",
-        arkzkey_path.display()
-    );
-
-    Ok(())
-}
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("cargo:rerun-if-env-changed=BUILD_CONFIG_PATH");
-
+fn read_config() -> Result<Config> {
     let config_str = match env::var("BUILD_CONFIG_PATH") {
         Ok(config_path) => {
             println!("cargo:rerun-if-changed={}", config_path);
-            println!("cargo:warning=Config: {}", config_path);
+            println!("cargo:warning=BUILD_CONFIG_PATH={}", config_path);
             let config_path = PathBuf::from(config_path);
 
             // Ensure the config path is absolute or resolve it based on current dir
@@ -249,12 +69,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Err(_) => {
             println!("cargo:warning=BUILD_CONFIG_PATH not set. Using default configuration.");
-            // Default configuration
             let default_config = r#"
-                [build]
-                device_type = "simulator"
-                build_mode = "release"
-
                 [circuit]
                 dir = "examples/circom/keccak256"
                 name = "keccak256_256_test"
@@ -269,7 +84,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut config: Config = toml::from_str(&config_str)?;
 
-    // NOTE: Resolve paths relative to the config file or default path
+    // Resolve paths relative to the config file or default path
     let config_dir = PathBuf::from(env::var("BUILD_CONFIG_PATH").unwrap_or_else(|_| ".".into()));
     let config_dir = config_dir.parent().unwrap_or_else(|| Path::new("."));
 
@@ -277,28 +92,124 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     config.expanded_circuit_dir = Some(resolved_circuit_dir.clone());
 
-    // Build circuit
-    build_circuit(&config)?;
+    Ok(config)
+}
 
-    // Build dylib if enabled
-    // Only do this for iOS platform
+fn build_dylib(config: &Config) -> Result<()> {
     if let Some(dylib_config) = &config.dylib {
         if dylib_config.use_dylib {
-            println!("cargo:warning=Building dylib: {}", dylib_config.name);
-            build_dylib(&config)?;
-            // build_dylib(
-            //     config.circuit.dir.clone()
-            //         + "/target/"
-            //         + &config.circuit.name
-            //         + "_js/"
-            //         + &config.circuit.name
-            //         + ".wasm",
-            //     dylib_config.name.clone(),
-            // )?;
+            let project_dir = env::var("CARGO_MANIFEST_DIR")?;
+            let out_dir = env::var("OUT_DIR")?;
+            let build_mode = env::var("PROFILE")?;
+            let target_arch = env::var("TARGET")?;
+            let dylib_name = &dylib_config.name;
+            let wasm_path = config.resolve_circuit_dir().join(format!(
+                "target/{}_js/{}.wasm",
+                config.circuit.name, config.circuit.name
+            ));
+
+            let out_dir_path = PathBuf::from(out_dir);
+            let wasm_file_path = PathBuf::from(wasm_path);
+            let dylib_file_path = out_dir_path.join(dylib_name);
+            let final_dir_path = PathBuf::from(&project_dir)
+                .join("target")
+                .join(&target_arch)
+                .join(build_mode);
+
+            // Create a WASM engine for the target that can compile
+            let triple = Triple::from_str(&target_arch).map_err(|e| eyre!(e))?;
+            let cpu_features = enum_set!();
+            let target = Target::new(triple, cpu_features);
+            let engine = Dylib::new(Cranelift::default()).target(target).engine();
+
+            // Compile the WASM module
+            let store = Store::new(&engine);
+            let module = Module::from_file(&store, &wasm_file_path)?;
+
+            // Serialize the compiled module to a dylib file
+            module.serialize_to_file(&dylib_file_path)?;
+
+            // Ensure the dylib file exists
+            assert!(dylib_file_path.exists());
+
+            // Copy dylib to a more predictable path
+            fs::create_dir_all(&final_dir_path)?;
+            let final_dylib_path = final_dir_path.join(dylib_name);
+            fs::copy(&dylib_file_path, &final_dylib_path)?;
+
+            println!(
+                "cargo:warning=Dylib location: {}",
+                final_dylib_path.display()
+            );
         } else {
             println!("cargo:warning=Dylib usage is disabled in the config.");
         }
     }
+    Ok(())
+}
 
+/// Builds the circuit based on the provided configuration.
+///
+/// This function assumes that the necessary steps to build the circuit
+/// involve checking for the existence of certain files and setting environment variables.
+fn build_circuit(config: &Config) -> Result<()> {
+    // Check if the current package is mopro-core
+    let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
+    let base_dir = if pkg_name == "mopro-core" {
+        // If mopro-core, use CARGO_MANIFEST_DIR as base directory
+        env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set")
+    } else {
+        // Default to current directory
+        ".".to_string()
+    };
+
+    // Use the expanded circuit directory if available, otherwise fallback to the original directory
+    let circuit_dir = config
+        .expanded_circuit_dir
+        .as_ref()
+        .unwrap_or(&config.circuit.dir);
+    let circuit_name = &config.circuit.name;
+
+    // Resolve the circuit dictory to an absolute path based on the conditionally set base_dir
+    let circuit_dir_path = PathBuf::from(base_dir).join(circuit_dir);
+
+    // Check for the existence of required files
+    let zkey_path = circuit_dir_path.join(format!("target/{}_final.zkey", circuit_name));
+    let wasm_path =
+        circuit_dir_path.join(format!("target/{}_js/{}.wasm", circuit_name, circuit_name));
+    let arkzkey_path = circuit_dir_path.join(format!("target/{}_final.arkzkey", circuit_name));
+
+    // Ensure the required files exist
+    if !zkey_path.exists() || !wasm_path.exists() || !arkzkey_path.exists() {
+        return Err(color_eyre::eyre::eyre!(
+            "Required files for building the circuit are missing. Did you run `mopro prepare`?"
+        ));
+    }
+
+    println!("cargo:warning=BUILD_RS_ZKEY_FILE: {}", zkey_path.display());
+    println!("cargo:warning=BUILD_RS_WASM_FILE: {}", wasm_path.display());
+    println!(
+        "cargo:warning=BUILD_RS_ARKZKEY_FILE: {}",
+        arkzkey_path.display()
+    );
+
+    // Set BUILD_RS_* environment variables
+    println!("cargo:rustc-env=BUILD_RS_ZKEY_FILE={}", zkey_path.display());
+    println!("cargo:rustc-env=BUILD_RS_WASM_FILE={}", wasm_path.display());
+    println!(
+        "cargo:rustc-env=BUILD_RS_ARKZKEY_FILE={}",
+        arkzkey_path.display()
+    );
+    Ok(())
+}
+
+fn main() -> color_eyre::eyre::Result<()> {
+    println!("cargo:rerun-if-env-changed=BUILD_CONFIG_PATH");
+    println!("cargo:warning=Preparing circuits...");
+
+    let config = read_config()?;
+    build_circuit(&config)?;
+    build_dylib(&config)?;
+    println!("cargo:warning=Successfully prepared circuits.");
     Ok(())
 }
