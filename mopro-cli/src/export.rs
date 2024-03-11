@@ -62,16 +62,11 @@ fn export_android_bindings(destination: &PathBuf) {
 }
 
 pub fn export_bindings(platforms: &Vec<String>, destination: &PathBuf) {
-    for platform in platforms.iter() {
-        if platform == "ios" {
-            export_ios_bindings(destination);
-        } else if platform == "android" {
-            export_android_bindings(destination);
-        } else {
-            panic!(
-                "Unsupported platform: {}, now mopro only supports ios and android",
-                platform
-            );
-        }
+    fs::create_dir_all(destination).expect("Failed to create destination directory");
+    if platforms.contains(&"ios".to_string()) {
+        export_ios_bindings(destination);
+    }
+    if platforms.contains(&"android".to_string()) {
+        export_android_bindings(destination);
     }
 }
