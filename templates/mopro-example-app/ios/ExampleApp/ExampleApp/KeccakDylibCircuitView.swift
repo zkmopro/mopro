@@ -15,8 +15,6 @@ struct KeccakDylibCircuitView: View {
     @State private var generatedProof: Data?
     @State private var publicInputs: Data?
 
-    //let moproCircom = MoproCircom()
-
     var body: some View {
         NavigationView {
             VStack(spacing: 10) {
@@ -44,17 +42,30 @@ struct KeccakDylibCircuitView: View {
 
 extension KeccakDylibCircuitView {
     func runInitAction() {
-        textViewText += "Initializing library... "
-        Task {
-            do {
-                let start = CFAbsoluteTimeGetCurrent()
-                try initializeMopro()
-                let end = CFAbsoluteTimeGetCurrent()
-                let timeTaken = end - start
-                textViewText += "\(String(format: "%.3f", timeTaken))s\n"
-                isProveButtonEnabled = true
-            } catch {
-                textViewText += "\nInitialization failed: \(error.localizedDescription)\n"
+        if let frameworksPath = Bundle.main.privateFrameworksPath {
+            textViewText += "Initializing library... "
+            Task {
+                do {
+                    let start = CFAbsoluteTimeGetCurrent()
+
+                    // Use Bundle.main to locate the dynamic library within the app bundle
+                    guard let dylibPath =
+                      Bundle.main.path(forResource: "keccak256", ofType: "dylib", inDirectory: "Frameworks")  else {
+                        throw NSError(domain: "com.example.error", code: 1,
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to find keccak256.dylib in app bundle"])
+                    }
+
+                    // For debugging
+                    // textViewText += "dylibPath: \(dylibPath)\n"
+
+                    try initializeMoproDylib(dylibPath: dylibPath)
+                    let end = CFAbsoluteTimeGetCurrent()
+                    let timeTaken = end - start
+                    textViewText += "\(String(format: "%.3f", timeTaken))s\n"
+                    isProveButtonEnabled = true
+                } catch {
+                    textViewText += "\nInitialization failed: \(error.localizedDescription)\n"
+                }
             }
         }
     }
