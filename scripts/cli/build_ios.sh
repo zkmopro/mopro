@@ -2,9 +2,6 @@
 
 # Script for initializing and updating an iOS (simplified) project with Rust bindings.
 
-# NOTE: Some improvements to be made
-# - USE_DYLIB integration (see build_ios_project.sh)
-
 # Prelude
 #----------------------------------------------------------------------------
 initialize_environment() {
@@ -113,9 +110,10 @@ build_mopro_ffi_static() {
     fi
 }
 
-build_mopro_ffi_dylib() {
+build_mopro_ffi_with_dylib_circuit() {
     cd "${MOPRO_ROOT}/mopro-ffi" || exit
-    print_action "Building mopro-ffi as a dynamic library ($BUILD_MODE)..."
+    print_action "Building mopro-ffi with dylib circuit ($BUILD_MODE)..."
+
     if [[ "$BUILD_MODE" == "release" ]]; then
         cargo build --release --target "$ARCHITECTURE" --features dylib
     else
@@ -125,14 +123,28 @@ build_mopro_ffi_dylib() {
     # Ensure the target directory exists
     mkdir -p "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}"
 
-    # Copy the dynamic library to the target directory
-    print_action "Copying dynamic library to target directory..."
-    cp "${MOPRO_ROOT}/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.dylib" \
-        "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.dylib"
+    # Copy the static library to the target directory
+    print_action "Copying static library to target directory..."
+    cp "${MOPRO_ROOT}/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a" \
+        "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a"
     if [ $? -ne 0 ]; then
-        echo -e "${RED}Failed to copy dynamic library.${DEFAULT}"
+        echo -e "${RED}Failed to copy static library.${DEFAULT}"
         exit 1
     fi
+
+    # NOTE: Doesn't seem like we need this
+    # # Copy the dynamic library to the target directory
+    # print_action "Copying dynamic library to target directory..."
+    # cp "${MOPRO_ROOT}/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.dylib" \
+    #     "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.dylib"
+    # if [ $? -ne 0 ]; then
+    #     echo -e "${RED}Failed to copy dynamic library.${DEFAULT}"
+    #     exit 1
+    # fi
+
+    print_action "Copying dylib circuit to target directory..."
+    cp "${MOPRO_ROOT}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}.dylib" \
+        "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}.dylib"
 }
 
 generate_swift_bindings() {
@@ -158,28 +170,65 @@ generate_swift_bindings() {
     fi
 }
 
-create_xcframework() {
-    print_action "Cleaning up existing XCFramework..."
-    XCFRAMEWORK_PATH="${IOS_APP_DIR}/Frameworks/MoproBindings.xcframework"
-    if [ -d "$XCFRAMEWORK_PATH" ]; then
-        rm -rf "$XCFRAMEWORK_PATH"
+create_xcframework_mopro() {
+    print_action "Cleaning up existing MoproBindings XCFramework..."
+    MOPRO_XCFRAMEWORK_PATH="${IOS_APP_DIR}/Frameworks/MoproBindings.xcframework"
+
+    # Clean up any existing MoproBindings XCFramework
+    if [ -d "$MOPRO_XCFRAMEWORK_PATH" ]; then
+        rm -rf "$MOPRO_XCFRAMEWORK_PATH"
     fi
 
-    print_action "Creating XCFramework..."
+    print_action "Creating XCFramework for MoproBindings... (${ARCHITECTURE})"
     xcodebuild -create-xcframework \
         -library "${TARGET_DIR}/${ARCHITECTURE}/release/libmopro_ffi.a" \
         -headers "${TARGET_DIR}/SwiftBindings" \
-        -output "$XCFRAMEWORK_PATH"
+        -output "$MOPRO_XCFRAMEWORK_PATH"
     if [ $? -ne 0 ]; then
-        echo -e "${RED}Failed to create XCFramework.${DEFAULT}"
+        echo -e "${RED}Failed to create MoproBindings XCFramework.${DEFAULT}"
         exit 1
     fi
+
+    print_action "MoproBindings XCFramework created successfully"
 }
 
+# NOTE: Earlier in the build process we converted .wasm to .dylib.
+# This is done to comply with Apple's requirements for iOS apps.
+# This currently only works on real devices.
+create_xcframework_circuit() {
+    print_action "Cleaning up existing CircuitBindings XCFramework..."
+    CIRCUIT_XCFRAMEWORK_PATH="${IOS_APP_DIR}/Frameworks/CircuitBindings.xcframework"
+
+    # Clean up any existing CircuitBindings XCFramework
+    if [ -d "$CIRCUIT_XCFRAMEWORK_PATH" ]; then
+        rm -rf "$CIRCUIT_XCFRAMEWORK_PATH"
+    fi
+
+    print_action "Creating XCFramework for CircuitBindings dylib... (${ARCHITECTURE})"
+    xcodebuild -create-xcframework \
+        -library "${TARGET_DIR}/${ARCHITECTURE}/release/${DYLIB_NAME}.dylib" \
+        -output "$CIRCUIT_XCFRAMEWORK_PATH"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to create CircuitBindings XCFramework.${DEFAULT}"
+        exit 1
+    fi
+
+    print_action "CircuitBindings XCFramework created successfully"
+}
 
 update_cocoapods() {
     cd ${IOS_APP_DIR}
     pod install
+}
+
+print_dylib_instructions() {
+    print_action "Instructions for how to embed the dylib framework into your iOS application:"
+    echo "
+- Go to ExampleApp -> Build Phases -> Embed Framework and add it there
+- You may have to add the framework manually for it to show up
+- The dylib should not be linked under Link Binary with Libraries
+- Make sure code signing is on
+- The dylib should be available inside your app bundle under the Frameworks folder\n"
 }
 
 # Main
@@ -195,13 +244,19 @@ main() {
     determine_build_directory
 
     if [[ "$USE_DYLIB" == true ]]; then
-        build_mopro_ffi_dylib
+        build_mopro_ffi_with_dylib_circuit
     else
         build_mopro_ffi_static
     fi
 
     generate_swift_bindings
-    create_xcframework
+    create_xcframework_mopro
+
+    if [[ "$USE_DYLIB" == true ]]; then
+        create_xcframework_circuit
+        print_dylib_instructions
+    fi
+
     update_cocoapods
 
     print_action "Done! Please re-build your project in Xcode."
