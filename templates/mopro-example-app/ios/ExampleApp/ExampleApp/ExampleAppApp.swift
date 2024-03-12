@@ -15,6 +15,7 @@ struct ExampleAppApp: App {
             // Enable the view you want
             MultiplierCircuitView()
             //KeccakCircuitView()
+            //KeccakDylibCircuitView()
         }
     }
 }

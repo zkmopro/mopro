@@ -22,6 +22,7 @@
 		CEF891362B9834BC0033AE93 /* ExampleAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF891352B9834BC0033AE93 /* ExampleAppTests.swift */; };
 		CEF891402B9834BC0033AE93 /* ExampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF8913F2B9834BC0033AE93 /* ExampleAppUITests.swift */; };
 		CEF891422B9834BC0033AE93 /* ExampleAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF891412B9834BC0033AE93 /* ExampleAppUITestsLaunchTests.swift */; };
+		CEFE53D22BA0009D00C62826 /* KeccakDylibCircuitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEFE53D12BA0009D00C62826 /* KeccakDylibCircuitView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +65,7 @@
 		CEF8913B2B9834BC0033AE93 /* ExampleAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExampleAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEF8913F2B9834BC0033AE93 /* ExampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppUITests.swift; sourceTree = "<group>"; };
 		CEF891412B9834BC0033AE93 /* ExampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		CEFE53D12BA0009D00C62826 /* KeccakDylibCircuitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeccakDylibCircuitView.swift; sourceTree = "<group>"; };
 		F80B6518EE5CB44358676AD9 /* Pods-ExampleApp-ExampleAppUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExampleApp-ExampleAppUITests.release.xcconfig"; path = "Target Support Files/Pods-ExampleApp-ExampleAppUITests/Pods-ExampleApp-ExampleAppUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -143,6 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				CEBBB4062B9C1974007305CF /* MultiplierCircuitView.swift */,
+				CEFE53D12BA0009D00C62826 /* KeccakDylibCircuitView.swift */,
 				CEF891242B9834BB0033AE93 /* ExampleAppApp.swift */,
 				CEBBB4082B9C1A36007305CF /* KeccakCircuitView.swift */,
 				CEF891282B9834BC0033AE93 /* Assets.xcassets */,
@@ -391,6 +394,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEBBB40B2B9C1BE5007305CF /* Utils.swift in Sources */,
+				CEFE53D22BA0009D00C62826 /* KeccakDylibCircuitView.swift in Sources */,
 				CE259EC92B99CCB60035CC36 /* mopro.swift in Sources */,
 				CEF891252B9834BB0033AE93 /* ExampleAppApp.swift in Sources */,
 				CEBBB4072B9C1974007305CF /* MultiplierCircuitView.swift in Sources */,
