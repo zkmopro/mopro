@@ -10,6 +10,9 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::RwLock;
 
+#[cfg(feature = "dylib")]
+use std::path::Path;
+
 #[derive(Debug)]
 pub enum FFIError {
     MoproError(mopro_core::MoproError),
