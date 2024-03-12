@@ -138,7 +138,12 @@ fn build_dylib(config: &Config) -> Result<()> {
             fs::copy(&dylib_file_path, &final_dylib_path)?;
 
             println!(
-                "cargo:warning=Dylib location: {}",
+                "cargo:rustc-env=BUILD_RS_DYLIB_FILE={}",
+                final_dylib_path.display()
+            );
+
+            println!(
+                "cargo:warning=BUILD_RS_DYLIB_FILE={}",
                 final_dylib_path.display()
             );
         } else {
@@ -186,13 +191,6 @@ fn build_circuit(config: &Config) -> Result<()> {
         ));
     }
 
-    println!("cargo:warning=BUILD_RS_ZKEY_FILE: {}", zkey_path.display());
-    println!("cargo:warning=BUILD_RS_WASM_FILE: {}", wasm_path.display());
-    println!(
-        "cargo:warning=BUILD_RS_ARKZKEY_FILE: {}",
-        arkzkey_path.display()
-    );
-
     // Set BUILD_RS_* environment variables
     println!("cargo:rustc-env=BUILD_RS_ZKEY_FILE={}", zkey_path.display());
     println!("cargo:rustc-env=BUILD_RS_WASM_FILE={}", wasm_path.display());
@@ -200,6 +198,14 @@ fn build_circuit(config: &Config) -> Result<()> {
         "cargo:rustc-env=BUILD_RS_ARKZKEY_FILE={}",
         arkzkey_path.display()
     );
+
+    println!("cargo:warning=BUILD_RS_ZKEY_FILE={}", zkey_path.display());
+    println!("cargo:warning=BUILD_RS_WASM_FILE={}", wasm_path.display());
+    println!(
+        "cargo:warning=BUILD_RS_ARKZKEY_FILE={}",
+        arkzkey_path.display()
+    );
+
     Ok(())
 }
 
