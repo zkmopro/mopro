@@ -134,7 +134,7 @@ fn build_dylib(config: &Config) -> Result<()> {
 
             // Copy dylib to a more predictable path
             fs::create_dir_all(&final_dir_path)?;
-            let final_dylib_path = final_dir_path.join(dylib_name);
+            let final_dylib_path = final_dir_path.join(format!("{}.dylib", dylib_name));
             fs::copy(&dylib_file_path, &final_dylib_path)?;
 
             println!(
