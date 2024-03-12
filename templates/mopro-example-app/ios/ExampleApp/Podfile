@@ -5,6 +5,7 @@ target 'ExampleApp' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
   pod 'MoproBindings', :path => 'Frameworks/MoproBindings.podspec'
+  pod 'CircuitBindings', :path => 'Frameworks/CircuitBindings.podspec'
 
   # Pods for ExampleApp
 
