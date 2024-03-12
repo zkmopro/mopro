@@ -74,6 +74,7 @@ static ARKZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(||
     read_arkzkey_from_bytes(ARKZKEY_BYTES).expect("Failed to read arkzkey")
 });
 
+#[cfg(not(feature = "dylib"))]
 const WASM: &[u8] = include_bytes!(env!("BUILD_RS_WASM_FILE"));
 
 /// `WITNESS_CALCULATOR` is a lazily initialized, thread-safe singleton of type `WitnessCalculator`.
