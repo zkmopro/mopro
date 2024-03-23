@@ -15,11 +15,11 @@ First, make sure you've installed the [prerequisites](https://github.com/oskarth
 Then, run the following commands:
 
 ```sh
-# Install mopro-cli locally
-cd mopro-cli && cargo install --path .
-
 # Clone the mopro repo
 git clone git@github.com:oskarth/mopro.git
+
+# Install mopro-cli locally
+cd mopro-cli && cargo install --path .
 
 # Set `MOPRO_ROOT` (replace with path to your git checkout of mopro)
 # For example: `export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro`
@@ -46,7 +46,7 @@ cd mopro-example-app
 
 ### Configure mopro settings
 
-You may adapt `mopro-config.toml` to your needs. For example, if you already have a Circom project.
+You may adapt `mopro-config.toml` to your needs. For example, if you already have a Circom project you can use that.
 
 Prepare your circuit artifacts:
 
@@ -89,10 +89,12 @@ mopro consists of a set of libraries and utilities. Here's a list of the various
 - `mopro-cli` - core Rust CLI util.
 - `mopro-core` - core mobile Rust library.
 - `mopro-ffi` - wraps `mopro-core` and exposes UniFFI bindings.
-- `templates/mopro-example-app` - example iOS app using `mopro-ios`.
+- `templates/mopro-example-app` - example multi-platform app template.
 - `ark-zkey` - helper utility to make zkey more usable and faster in arkworks.
 - `mopro-ios` - iOS CocoaPod library exposing native Swift bindings. (will be deprecated)
 - `mopro-android` - Android library exposing native Kotlin bindings. (will be deprecated)
+- `webprover` - Prove example circuits through a browser, used for benchmarking.
+- `scripts` - various helper scripts for `mopro-cli` and testing.
 
 ## Architecture
 
@@ -104,12 +106,17 @@ The following illustration shows how mopro and its components fit together into 
 
 Depending on what platforms and adapters you use, there are several prerequisites to install before getting started.
 
-- General: [Rust and Cargo](https://www.rust-lang.org/learn/get-started)
-- Circom: [circom](https://docs.circom.io/)
-- Circom: [snarkjs](https://github.com/iden3/snarkjs)
-- iOS: [Xcode](https://developer.apple.com/xcode/)
-- iOS: [CocoaPods](https://cocoapods.org/)
-- Android: [Android Studio](https://developer.android.com/studio) (also see configuration below)
+- General
+    - [Rust](https://www.rust-lang.org/learn/get-started)
+- Circom
+    - [circom](https://docs.circom.io/)
+    - [snarkjs](https://github.com/iden3/snarkjs)
+- iOS
+    - [Xcode](https://developer.apple.com/xcode/)
+    - [CocoaPods](https://cocoapods.org/)
+- Android
+    - [Android Studio](https://developer.android.com/studio)
+    - Also see configuration below
 
 ### Android configuration
 
@@ -132,7 +139,7 @@ NDK_PATH=$ANDROID_HOME/ndk/26.1.10909125
 
 (Reference: [Running Rust on Android with UniFFI](https://sal.dev/android/intro-rust-android-uniffi/)).
 
-### mopro configuration
+## mopro configuration
 
 This config file is best used together with `mopro-cli`.
 
