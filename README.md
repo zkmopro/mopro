@@ -1,12 +1,76 @@
 # mopro
 
-Mopro is a toolkit for ZK app development.
-
-Making client-side proving on mobile simple.
+Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple.
 
 ## Getting started
 
-See [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) for how to get started.
+We recommend you use [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) to create and maintain your application. Here's how you can get started with your example in a few minutes.
+
+If you prefer to watch a demo, you can find a <5m tutorial [here](https://www.loom.com/share/6ff382b0497c47aea9d0ef8b6e790dd8).
+
+### Install dependencies
+
+- Install prerequisites listed [here](https://github.com/oskarth/mopro?tab=readme-ov-file#prerequisites).
+
+- Install mopro-cli locally:
+  ```sh
+  cd mopro-cli && cargo install --path .
+  ```
+- Set `MOPRO_ROOT` (replace user with your username):
+  ```sh
+  export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro
+  ```
+- Install `mopro` dependencies:
+  ```sh
+  mopro deps
+  ```
+
+### Create a project
+
+- Create a working directory:
+ ```sh
+ mkdir ~/my-zk-app && cd my-zk-app
+ ```
+
+- Initialize a project:
+  ```sh
+  mopro init --platforms ios, android
+  ```
+- Go to your project folder:
+  ```
+  cd mopro-example-app
+  ```
+
+### Configure mopro settings
+
+- Adapt `mopro-config.toml` to your needs
+- Prepare circuit artifacts:
+  ```sh
+  mopro prepare
+  ```
+
+### Build, test and run your  project
+
+- Build the project:
+  ```sh
+  mopro build
+  ```
+- Run end-to-end-test (in Rust only):
+  ```sh
+  mopro test
+  ```
+- Build the project for iOS:
+  ```sh
+  mopro build --platforms ios
+  open ios/ExampleApp/ExampleApp.xcworkspace
+  ```
+- Build the project for Android:
+  ```sh
+  mopro build --platforms android
+  open android -a Android\ Studio
+  ```
+
+See [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) for more details on usage.
 
 ## Overview
 
@@ -30,22 +94,18 @@ The following illustration shows how mopro and its components fit together into 
 
 Depending on what platforms and adapters you use, there are several prerequisites to install before getting started.
 
-### Circom
+- General: [Rust and Cargo](https://www.rust-lang.org/learn/get-started)
+- Circom: [circom](https://docs.circom.io/)
+- Circom: [snarkjs](https://github.com/iden3/snarkjs)
+- iOS: [Xcode](https://developer.apple.com/xcode/)
+- iOS: [CocoaPods](https://cocoapods.org/)
+- Android: [Android Studio](https://developer.android.com/studio) (also see configuration below)
 
-Install:
-- [circom](https://docs.circom.io/)
-- [snarkjs](https://github.com/iden3/snarkjs)
+### Android configuration
 
-### iOS
+Some additional configuration is required for Android.
 
-Install:
-- [Xcode](https://developer.apple.com/xcode/)
-- [CocoaPods](https://cocoapods.org/)
-
-### Android
-
-Install:
-- [Android Studio](https://developer.android.com/studio)
+Install latest SDK: 
 - In Android Studio, go to `SDK Manager > SDK Tools`  and install `NDK (Side by Side)` (see [Android Developer site](https://developer.android.com/studio/projects/install-ndk#default-version))
 
 Configure environment variables:
@@ -65,7 +125,7 @@ Configure environment variables:
 
 Reference: [Running Rust on Android with UniFFI](https://sal.dev/android/intro-rust-android-uniffi/)
 
-### Configuration
+### mopro configuration
 
 This config file is best used together with `mopro-cli`.
 
