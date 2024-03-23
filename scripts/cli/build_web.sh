@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script for initializing and updating an Android (simplified) project with Rust bindings.
+# Script for initializing and updating a web prover project.
 
 # Prelude
 #----------------------------------------------------------------------------
@@ -48,6 +48,12 @@ copy_circuit_files() {
     fi
 }
 
+npm_install() {
+    cd "${WEB_APP_DIR}" || exit
+    npm install
+    cd "${PROJECT_DIR}" || exit
+}
+
 # Main
 #----------------------------------------------------------------------------
 main() {
@@ -59,8 +65,9 @@ main() {
     read_configuration "$1"
     
     copy_circuit_files
+    npm_install
     
-    print_action "Done! Please open the web app with \`cd web && npm install && npm run dev\`"
+    print_action "Done! Please open the web app with \`cd web && npm run dev\`"
 }
 
 main "$@"
