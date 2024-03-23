@@ -15,6 +15,8 @@ pub fn build_project(config: &str, adapter: &str, platforms: &Vec<String>) {
             "build_ios.sh"
         } else if platform == "android" {
             "build_android.sh"
+        } else if platform == "web" {
+            "build_web.sh"
         } else {
             "build_core.sh"
         };
