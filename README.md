@@ -4,85 +4,95 @@ Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side pro
 
 ## Getting started
 
-We recommend you use [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) to create and maintain your application. Here's how you can get started with your example in a few minutes.
+We recommend you use [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) to create and maintain your application. Here's how you can get started with your example app in a few minutes.
 
-If you prefer to watch a demo, you can find a <5m tutorial [here](https://www.loom.com/share/6ff382b0497c47aea9d0ef8b6e790dd8).
+You can also watch this short (<5m) [tutorial](https://www.loom.com/share/6ff382b0497c47aea9d0ef8b6e790dd8).
 
 ### Install dependencies
 
-- Install prerequisites listed [here](https://github.com/oskarth/mopro?tab=readme-ov-file#prerequisites).
+First, make sure you've installed the [prerequisites](https://github.com/oskarth/mopro?tab=readme-ov-file#prerequisites).
 
-- Install mopro-cli locally:
-  ```sh
-  cd mopro-cli && cargo install --path .
-  ```
-- Set `MOPRO_ROOT` (replace user with your username):
-  ```sh
-  export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro
-  ```
-- Install `mopro` dependencies:
-  ```sh
-  mopro deps
-  ```
+Then, run the following commands:
+
+```sh
+# Install mopro-cli locally
+cd mopro-cli && cargo install --path .
+
+# Clone the mopro repo
+git clone git@github.com:oskarth/mopro.git
+
+# Set `MOPRO_ROOT` (replace with path to your git checkout of mopro)
+# For example: `export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro`
+export MOPRO_ROOT=$(PWD)
+
+# Install `mopro` dependencies
+mopro deps
+```
 
 ### Create a project
 
-- Create a working directory:
- ```sh
- mkdir ~/my-zk-app && cd my-zk-app
- ```
+Create and initialize a project:
 
-- Initialize a project:
-  ```sh
-  mopro init --platforms ios, android
-  ```
-- Go to your project folder:
-  ```
-  cd mopro-example-app
-  ```
+```sh
+# Create a working directory
+mkdir ~/my-zk-app && cd my-zk-app
+
+# Initialize a project
+mopro init --platforms ios android
+
+# Go to your project folder
+cd mopro-example-app
+```
 
 ### Configure mopro settings
 
-- Adapt `mopro-config.toml` to your needs
-- Prepare circuit artifacts:
-  ```sh
-  mopro prepare
-  ```
+You may adapt `mopro-config.toml` to your needs. For example, if you already have a Circom project.
 
-### Build, test and run your  project
+Prepare your circuit artifacts:
 
-- Build the project:
-  ```sh
-  mopro build
-  ```
-- Run end-to-end-test (in Rust only):
-  ```sh
-  mopro test
-  ```
-- Build the project for iOS:
-  ```sh
-  mopro build --platforms ios
-  open ios/ExampleApp/ExampleApp.xcworkspace
-  ```
-- Build the project for Android:
-  ```sh
-  mopro build --platforms android
-  open android -a Android\ Studio
-  ```
+```sh
+mopro prepare
+```
+
+This only has to be done once when changing the circuit.
+
+### Build, test and run your project
+
+Depending on what platforms you are targetting, you can run the following commands:
+
+```sh
+# Build the project
+mopro build
+
+# Run end-to-end test (in Rust only)
+mopro test
+
+# Build the project for iOS
+mopro build --platforms ios
+
+# Open in Xcode to run on simulator/device
+open ios/ExampleApp/ExampleApp.xcworkspace
+
+# Build the project for Android
+mopro build --platforms android
+
+# Open in Android Studio to run on simulator/device
+open android -a Android\ Studio
+```
 
 See [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) for more details on usage.
 
 ## Overview
 
-Set of libraries and utilities:
+mopro consists of a set of libraries and utilities. Here's a list of the various subprojects:
 
 - `mopro-cli` - core Rust CLI util.
 - `mopro-core` - core mobile Rust library.
 - `mopro-ffi` - wraps `mopro-core` and exposes UniFFI bindings.
-- `mopro-ios` - iOS CocoaPod library exposing native Swift bindings.
-- `mopro-android` - Android library exposing native Kotlin bindings.
-- `mopro-example-app` - example iOS app using `mopro-ios`.
+- `templates/mopro-example-app` - example iOS app using `mopro-ios`.
 - `ark-zkey` - helper utility to make zkey more usable and faster in arkworks.
+- `mopro-ios` - iOS CocoaPod library exposing native Swift bindings. (will be deprecated)
+- `mopro-android` - Android library exposing native Kotlin bindings. (will be deprecated)
 
 ## Architecture
 
@@ -105,25 +115,22 @@ Depending on what platforms and adapters you use, there are several prerequisite
 
 Some additional configuration is required for Android.
 
-Install latest SDK: 
-- In Android Studio, go to `SDK Manager > SDK Tools`  and install `NDK (Side by Side)` (see [Android Developer site](https://developer.android.com/studio/projects/install-ndk#default-version))
+First, install the latest SDK. In Android Studio, go to `SDK Manager > SDK Tools`  and install `NDK (Side by Side)` (see [Android Developer site](https://developer.android.com/studio/projects/install-ndk#default-version)).
 
-Configure environment variables:
-- Export `$ANDROID_HOME` and change `{USER_NAME}` to your username
-    ```sh
-    export ANDROID_HOME="/Users/{USER_NAME}/Library/Android/sdk"
-    ```
--  Locate which NDK version you have by
-    ```sh
-    ls $ANDROID_HOME/ndk
-    # 26.1.10909125
-    ```
-    and set it to your `NDK_PATH` environment variable. e.g.
-    ```sh
-    NDK_PATH=$ANDROID_HOME/ndk/26.1.10909125
-    ```
+After that, set the following  environment variables:
 
-Reference: [Running Rust on Android with UniFFI](https://sal.dev/android/intro-rust-android-uniffi/)
+```sh
+# Export `$ANDROID_HOME` and change `{USER_NAME}` to your username
+export ANDROID_HOME="/Users/{USER_NAME}/Library/Android/sdk"
+
+# Locate which NDK version you have
+ls $ANDROID_HOME/ndk # => 26.1.10909125
+
+# Set it to your `NDK_PATH` environment variable
+NDK_PATH=$ANDROID_HOME/ndk/26.1.10909125
+```
+
+(Reference: [Running Rust on Android with UniFFI](https://sal.dev/android/intro-rust-android-uniffi/)).
 
 ### mopro configuration
 
@@ -131,7 +138,7 @@ This config file is best used together with `mopro-cli`.
 
 By creating a `toml` configuration file you can specify what build settings you want to use. Example is provided in `config-example.toml`:
 
-```
+```toml
 # config-example.toml
 
 [build]
@@ -177,7 +184,7 @@ Preliminary benchmarks on an iPhone 14 Max Pro:
     - ~x10 faster vs browser on phone
 - Bottlenecks: loading zkey and wasm witness generation
 
-See https://hackmd.io/5ItB2D50QcavF18cWIrmfQ?view= for more benchmarks.
+See [Project MoPerf results](https://hackmd.io/5ItB2D50QcavF18cWIrmfQ?view=#tip1) for more benchmarks.
 
 ## Acknowledgements
 
