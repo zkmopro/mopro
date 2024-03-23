@@ -47,6 +47,9 @@ pub fn init_project(adapter: &str, platforms: &Vec<String>, project_name: &str) 
     if platforms.contains(&"android".to_string()) {
         entries_to_copy.push(source_path.join("android"));
     }
+    if platforms.contains(&"web".to_string()) {
+        entries_to_copy.push(source_path.join("web"));
+    }
 
     // Perform the copy operation for each entry
     for entry in entries_to_copy {

@@ -88,6 +88,25 @@ mopro build --platforms android
 open android -a Android\ Studio
 ```
 
+### Web
+
+Initialize and build a web app.
+
+```sh
+mopro init --platforms web
+cd mopro-example-app
+mopro prepare
+mopro build --paltforms web
+```
+
+Open web project directory and run frontend locally.
+
+```sh
+cd web
+npm install
+npm run dev
+```
+
 ### Exporting bindings
 
 To export bindings to a different directory:
