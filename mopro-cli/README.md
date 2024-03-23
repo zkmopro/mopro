@@ -96,7 +96,7 @@ Initialize and build a web app.
 mopro init --platforms web
 cd mopro-example-app
 mopro prepare
-mopro build --paltforms web
+mopro build --platforms web
 ```
 
 Open web project directory and run frontend locally.

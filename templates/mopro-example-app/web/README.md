@@ -3,11 +3,6 @@
 This is used to benchmark proving time in browser with `snarkjs`.
 See: https://mopro-webprover.pages.dev/
 
-Current proofs:
-- multiplier2
-- keccak256
-- RSA
-
 ## Install
 
 ```bash
