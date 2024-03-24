@@ -1,14 +1,14 @@
-use ark_ff_3::prelude::*;
-use ark_std_3::vec::Vec;
-use ark_ff_3::ToBytes;
-use ark_ff_3::FromBytes;
-use ark_serialize_3::Read;
-use ark_std_3::One;
-use std::str::FromStr;
 use ark_bls12_377 as bls377;
+use ark_bls12_377::Fq;
+use ark_ff_3::prelude::*;
+use ark_ff_3::FromBytes;
+use ark_ff_3::ToBytes;
+use ark_serialize_3::Read;
 use ark_serialize_3::Write;
+use ark_std_3::vec::Vec;
+use ark_std_3::One;
 use lazy_static::*;
-use ark_bls12_377::{Fq};
+use std::str::FromStr;
 
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
@@ -26,7 +26,6 @@ lazy_static! {
     pub static ref ED_COEFF_SQRT_NEG_A: Fq = Fq::from_str("237258690121739794091542072758217926613126300728951001700615245829450947395696022962309165363059235018940120114447").unwrap();
     pub static ref ED_COEFF_SQRT_NEG_A_INV: Fq = Fq::from_str("85493388116597753391764605746615521878764370024930535315959456146985744891605502660739892967955718798310698221510").unwrap();
 }
-
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(C)]
@@ -143,7 +142,6 @@ fn get_dd_k() -> (Fq, Fq) {
     (*ED_COEFF_DD, *ED_COEFF_K)
 }
 
-
 #[inline]
 fn get_sqrt_neg_a() -> (Fq, Fq) {
     (*ED_COEFF_SQRT_NEG_A, *ED_COEFF_SQRT_NEG_A_INV)
@@ -182,7 +180,11 @@ pub fn sw_to_edwards(g: EdwardsAffine) -> ExEdwardsAffine {
     let (alpha, beta) = get_alpha_beta();
 
     if g.x == Fq::zero() && g.y == Fq::zero() {
-        return ExEdwardsAffine { x: Fq::zero(), y: Fq::one(), t: Fq::zero() };
+        return ExEdwardsAffine {
+            x: Fq::zero(),
+            y: Fq::one(),
+            t: Fq::zero(),
+        };
     }
 
     // first convert sw to montgomery form
@@ -193,7 +195,11 @@ pub fn sw_to_edwards(g: EdwardsAffine) -> ExEdwardsAffine {
     let one = Fq::one();
 
     if mont_y == Fq::zero() || (mont_x + one == Fq::zero()) {
-        return ExEdwardsAffine { x: Fq::zero(), y: Fq::one(), t: Fq::zero() };
+        return ExEdwardsAffine {
+            x: Fq::zero(),
+            y: Fq::one(),
+            t: Fq::zero(),
+        };
     }
 
     let ed_x = mont_x / mont_y;
@@ -213,7 +219,10 @@ pub fn edwards_to_sw(ed: ExEdwardsAffine) -> EdwardsAffine {
 
     // if it is infinity point on Twisted Edwards, just return infinity point on Short Weierstrass Curve
     if ed.y == Fq::one() || ed.x == Fq::zero() {
-        return EdwardsAffine { x: Fq::zero(), y: Fq::zero() };
+        return EdwardsAffine {
+            x: Fq::zero(),
+            y: Fq::zero(),
+        };
     }
 
     // first convert ed form to mont form
@@ -234,7 +243,11 @@ pub fn edwards_to_sw_proj(ed: ExEdwardsAffine) -> EdwardsProjective {
 
     // if it is infinity point on Twisted Edwards, just return infinity point on Short Weierstrass Curve
     if ed.y == Fq::one() || ed.x == Fq::zero() {
-        return EdwardsProjective { x: Fq::zero(), y: Fq::one(), z: Fq::zero() };
+        return EdwardsProjective {
+            x: Fq::zero(),
+            y: Fq::one(),
+            z: Fq::zero(),
+        };
     }
 
     // first convert ed form to mont form
@@ -253,7 +266,6 @@ pub fn edwards_to_sw_proj(ed: ExEdwardsAffine) -> EdwardsProjective {
     }
 }
 
-
 #[allow(unused)]
 fn edwards_affine_to_proj(ed: ExEdwardsAffine) -> ExEdwardsProjective {
     ExEdwardsProjective {
@@ -266,9 +278,12 @@ fn edwards_affine_to_proj(ed: ExEdwardsAffine) -> ExEdwardsProjective {
 
 #[allow(unused)]
 pub fn edwards_proj_to_affine(ed: ExEdwardsProjective) -> ExEdwardsAffine {
-
     if ed.z == Fq::zero() {
-        return ExEdwardsAffine { x: Fq::zero(), y: Fq::one(), t: Fq::zero() };
+        return ExEdwardsAffine {
+            x: Fq::zero(),
+            y: Fq::one(),
+            t: Fq::zero(),
+        };
     }
 
     let x = ed.x / ed.z;
@@ -278,8 +293,11 @@ pub fn edwards_proj_to_affine(ed: ExEdwardsProjective) -> ExEdwardsAffine {
 }
 
 #[allow(non_snake_case)]
-pub fn edwards_add_projective(ed1: ExEdwardsProjective, ed2: ExEdwardsProjective) -> ExEdwardsProjective {
-    let (_, k) = get_dd_k();  //get_d_k
+pub fn edwards_add_projective(
+    ed1: ExEdwardsProjective,
+    ed2: ExEdwardsProjective,
+) -> ExEdwardsProjective {
+    let (_, k) = get_dd_k(); //get_d_k
 
     let x1 = ed1.x;
     let x2 = ed2.x;
@@ -344,7 +362,8 @@ pub fn edwards_add_mix_a(ed1: ExEdwardsProjective, ed2: ExEdwardsAffine) -> ExEd
     let B = (y1 + &x1) * (y2 - &x2);
 
     let F = B - &A;
-    if F.is_zero() { // use double
+    if F.is_zero() {
+        // use double
         return edwards_double(ed1);
     }
 
@@ -455,7 +474,8 @@ pub fn multi_scalar_mul(
                     // bucket.
                     // (Recall that `buckets` doesn't have a zero bucket.)
                     if scalar != 0 {
-                        buckets[(scalar - 1) as usize] = edwards_add_mix_a(buckets[(scalar - 1) as usize], base.clone());
+                        buckets[(scalar - 1) as usize] =
+                            edwards_add_mix_a(buckets[(scalar - 1) as usize], base.clone());
                     }
                 }
             });
@@ -502,4 +522,3 @@ pub fn multi_scalar_mul(
     let ret = edwards_add_projective(lowest, end);
     ret
 }
-

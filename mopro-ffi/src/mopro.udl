@@ -15,7 +15,7 @@ namespace mopro {
   boolean verify_proof2(bytes proof, bytes public_input);
 
   [Throws=MoproError]
-  BenchmarkResult run_msm_benchmark(u32? num_msm);
+  BenchmarkResult arkworks_pippenger(u32? num_msm);
   
   ProofCalldata to_ethereum_proof(bytes proof);
   sequence<string> to_ethereum_inputs(bytes inputs);

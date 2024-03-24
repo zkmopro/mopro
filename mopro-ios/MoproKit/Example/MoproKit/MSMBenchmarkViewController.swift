@@ -30,7 +30,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     
     // update the mapping with function in the future
     let msmBenchmarkMapping: [String: (UInt32?) throws -> BenchmarkResult] = [
-        "Arkwork (Baseline)": runMsmBenchmark,
+        "Arkwork (Baseline)": arkworksPippenger,
         // "Example Algo 1": ,
         // "Example Algo 2": ,
     ]

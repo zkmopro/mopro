@@ -1,6 +1,7 @@
 mod local_msm;
 
 use ark_bls12_377 as bls377;
+use ark_ec_3::AffineCurve;
 use ark_ff_3::fields::Field;
 use ark_ff_3::PrimeField;
 use ark_serialize_3::CanonicalDeserialize;
@@ -11,9 +12,13 @@ use ark_std_3::rand::Rng;
 use ark_std_3::{One, Zero};
 use bls377::G1Affine;
 use duration_string::DurationString;
+use local_msm::{
+    edwards_from_neg_one_a, edwards_proj_to_affine, edwards_to_neg_one_a, edwards_to_sw,
+    multi_scalar_mul, sw_to_edwards, EdwardsAffine, ExEdwardsAffine,
+};
+use rand::thread_rng;
 use rand::RngCore;
 use rand::SeedableRng;
-use rand::thread_rng;
 use rand_chacha::ChaCha20Rng;
 use std::cmp;
 use std::collections::VecDeque;
@@ -21,8 +26,6 @@ use std::fs::File;
 use std::time::Duration;
 use std::time::Instant;
 use thiserror::Error;
-use local_msm::{EdwardsAffine, ExEdwardsAffine, sw_to_edwards, edwards_to_neg_one_a, multi_scalar_mul, edwards_from_neg_one_a, edwards_proj_to_affine, edwards_to_sw};
-use ark_ec_3::AffineCurve;
 
 #[derive(Debug, Error)]
 pub enum HarnessError {
@@ -552,7 +555,7 @@ mod tests {
                 }
                 println!("Generated elements");
             }
-        } 
+        }
 
         println!("Running benchmark for baseline result");
         let input_iter = FileInputIterator::open(&dir).unwrap();

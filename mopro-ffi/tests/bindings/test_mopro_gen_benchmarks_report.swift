@@ -12,7 +12,7 @@ for each in trials {
     do {
         // for tracking the progress
         print("Running benchmark with \(each) MSMs...")
-        let benchData: BenchmarkResult = try runMsmBenchmark(numMsm: each)
+        let benchData: BenchmarkResult = try arkworksPippenger(numMsm: each)
         fileContent += "\(benchData.numMsm),\(benchData.avgProcessingTime),\(benchData.totalProcessingTime)\n"
     } catch let error as MoproError{
         print("Error running benchmark: \(error)")

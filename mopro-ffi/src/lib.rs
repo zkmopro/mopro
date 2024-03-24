@@ -2,7 +2,7 @@ use mopro_core::middleware::circom;
 use mopro_core::MoproError;
 
 #[cfg(feature = "gpu-benchmarks")]
-use mopro_core::middleware::gpu_explorations::{self, BenchmarkResult};
+use mopro_core::middleware::gpu_explorations::{self, arkworks_pippenger::BenchmarkResult};
 
 use num_bigint::BigInt;
 use std::collections::HashMap;
@@ -213,15 +213,15 @@ impl MoproCircom {
 }
 
 #[cfg(feature = "gpu-benchmarks")]
-pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
-    let benchmarks = gpu_explorations::run_msm_benchmark(num_msm).unwrap();
+pub fn arkworks_pippenger(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
+    let benchmarks = gpu_explorations::arkworks_pippenger::run_msm_benchmark(num_msm).unwrap();
     Ok(benchmarks)
 }
 
 #[cfg(not(feature = "gpu-benchmarks"))]
-pub fn run_msm_benchmark(_num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
+pub fn arkworks_pippenger(_num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
     println!("gpu-benchmarks feature not enabled!");
-    panic!("gpu-benchmarks feature not enabled!");
+    // panic!("gpu-benchmarks feature not enabled!");
 }
 
 fn add(a: u32, b: u32) -> u32 {
@@ -377,8 +377,8 @@ mod tests {
 
     #[test]
     #[cfg(feature = "gpu-benchmarks")]
-    fn test_run_msm_benchmark() -> Result<(), MoproError> {
-        let benchmarks = run_msm_benchmark(None).unwrap();
+    fn test_arkworks_pippenger() -> Result<(), MoproError> {
+        let benchmarks = arkworks_pippenger(None).unwrap();
         println!("\nBenchmarking {:?} msm on BN254 curve", benchmarks.num_msm);
         println!(
             "└─ Average msm time: {:.5} ms\n└─ Overall processing time: {:.5} ms",
