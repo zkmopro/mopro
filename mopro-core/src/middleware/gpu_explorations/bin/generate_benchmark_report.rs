@@ -2,12 +2,14 @@
 
 #[cfg(feature = "gpu-benchmarks")]
 use {
-    mopro_core::middleware::gpu_explorations::run_msm_benchmark,
+    mopro_core::middleware::gpu_explorations::arkworks_pippenger,
     std::{cmp, env, fs::File, io::Write},
 };
 
 #[cfg(feature = "gpu-benchmarks")]
 fn main() {
+    use mopro_core::middleware::gpu_explorations::arkworks_pippenger;
+
     let path = env::current_dir()
         .unwrap()
         .join("benchmarks/gpu_explorations/msm_bench_rust_laptop.csv");
@@ -20,7 +22,7 @@ fn main() {
     // generate trials = [1, 500, 1_000, 1_500, ..., 10_000]
     let trials: Vec<u32> = (0..21).map(|i| cmp::max(i * 500, 1)).collect();
     for each in trials {
-        let bench_data = run_msm_benchmark(Some(each)).unwrap();
+        let bench_data = arkworks_pippenger::run_msm_benchmark(Some(each)).unwrap();
         writeln!(
             file,
             "{},{},{}",

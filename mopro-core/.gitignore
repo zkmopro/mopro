@@ -12,3 +12,6 @@ Cargo.lock
 
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
+
+# GPU exploration - preprocessed vectors
+src/middleware/gpu_explorations/trapdoortech_zprize_msm/vectors

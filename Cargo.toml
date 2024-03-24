@@ -7,3 +7,9 @@ exclude = ["mopro-cli-example"]
 # NOTE: Forked wasmer to work around memory limits
 # See https://github.com/wasmerio/wasmer/commit/09c7070
 wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
+
+# NOTE: For gpu exploration on zprize works
+ark-ec-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ec', tag = 'v0.3.0', features = ["parallel"] }
+ark-ff-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ff', tag = 'v0.3.0', features = ["parallel"] }
+ark-serialize-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-serialize', tag = 'v0.3.0' }
+ark-std-3 = { git = 'https://github.com/arkworks-rs/std.git', package = 'ark-std', tag = 'v0.3.0' }
