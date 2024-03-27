@@ -1,4 +1,4 @@
 .vscode
 .DS_Store
 target/
-mopro-example-app
+mopro-cli/mopro-example-app
