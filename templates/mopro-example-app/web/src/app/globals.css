@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    background: white;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        background: black;
+    }
+}
+
+body {
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(
+            to bottom,
+            transparent,
+            rgb(var(--background-end-rgb))
+        )
+        rgb(var(--background-start-rgb));
+}
+
+button {
+    background: rgb(var(--background-start-rgb));
+    color: rgb(var(--foreground-rgb));
+    border: 1px solid rgb(var(--foreground-rgb));
+}

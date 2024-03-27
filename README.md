@@ -1,43 +1,151 @@
 # mopro
 
-Making client-side proving on mobile simple (and fast).
+Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple.
+
+## Getting started
+
+We recommend you use [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) to create and maintain your application. Here's how you can get started with your example app in a few minutes.
+
+You can also watch this short (<5m) [tutorial](https://www.loom.com/share/6ff382b0497c47aea9d0ef8b6e790dd8).
+
+### Install dependencies
+
+First, make sure you've installed the [prerequisites](https://github.com/oskarth/mopro?tab=readme-ov-file#prerequisites).
+
+Then, run the following commands:
+
+```sh
+# Clone the mopro repo
+git clone git@github.com:oskarth/mopro.git
+
+# Install mopro-cli locally
+cd mopro-cli && cargo install --path .
+
+# Set `MOPRO_ROOT` (replace with path to your git checkout of mopro)
+# For example: `export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro`
+export MOPRO_ROOT=$(PWD)
+
+# Install `mopro` dependencies
+mopro deps
+```
+
+### Create a project
+
+Create and initialize a project:
+
+```sh
+# Create a working directory
+mkdir ~/my-zk-app && cd my-zk-app
+
+# Initialize a project
+mopro init --platforms ios android
+
+# Go to your project folder
+cd mopro-example-app
+```
+
+### Configure mopro settings
+
+You may adapt `mopro-config.toml` to your needs. For example, if you already have a Circom project you can use that.
+
+Prepare your circuit artifacts:
+
+```sh
+mopro prepare
+```
+
+This only has to be done once when changing the circuit.
+
+### Build, test and run your project
+
+Depending on what platforms you are targetting, you can run the following commands:
+
+```sh
+# Build the project
+mopro build
+
+# Run end-to-end test (in Rust only)
+mopro test
+
+# Build the project for iOS
+mopro build --platforms ios
+
+# Open in Xcode to run on simulator/device
+open ios/ExampleApp/ExampleApp.xcworkspace
+
+# Build the project for Android
+mopro build --platforms android
+
+# Open in Android Studio to run on simulator/device
+open android -a Android\ Studio
+```
+
+See [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) for more details on usage.
 
 ## Overview
+
+mopro consists of a set of libraries and utilities. Here's a list of the various subprojects:
 
 - `mopro-cli` - core Rust CLI util.
 - `mopro-core` - core mobile Rust library.
 - `mopro-ffi` - wraps `mopro-core` and exposes UniFFI bindings.
-- `mopro-ios` - iOS CocoaPod library exposing native Swift bindings.
-- `mopro-android` - Android library exposing native Kotlin bindings.
-- `mopro-example-app` - example iOS app using `mopro-ios`.
+- `templates/mopro-example-app` - example multi-platform app template.
 - `ark-zkey` - helper utility to make zkey more usable and faster in arkworks.
+- `mopro-ios` - iOS CocoaPod library exposing native Swift bindings. (will be deprecated)
+- `mopro-android` - Android library exposing native Kotlin bindings. (will be deprecated)
+- `webprover` - Prove example circuits through a browser, used for benchmarking.
+- `scripts` - various helper scripts for `mopro-cli` and testing.
 
 ## Architecture
 
 The following illustration shows how mopro and its components fit together into the wider ZKP ecosystem:
 
-![mopro architecture (full)](images/mopro_architecture2_full.png)
-
-Zooming in a bit:
-
 ![mopro architecture](images/mopro_architecture2.png)
 
-## How to use
+## Prerequisites
 
-NOTE: A lot of below is superseded with the use of `mopro-cli`.
+Depending on what platforms and adapters you use, there are several prerequisites to install before getting started.
 
-### Prepare circuits
+- General
+    - [Rust](https://www.rust-lang.org/learn/get-started)
+- Circom
+    - [circom](https://docs.circom.io/)
+    - [snarkjs](https://github.com/iden3/snarkjs)
+- iOS
+    - [Xcode](https://developer.apple.com/xcode/)
+    - [CocoaPods](https://cocoapods.org/)
+- Android
+    - [Android Studio](https://developer.android.com/studio)
+    - Also see configuration below
 
--   Install [circom](https://docs.circom.io/) and [snarkjs](https://github.com/iden3/snarkjs)
--   Run `./scripts/prepare.sh` to check all prerequisites are set.
+### Android configuration
 
-(Note that we require `uniffi-bindgen` to be `0.25`, if you have an older version you might need to remove this to re-install the latest).
+Some additional configuration is required for Android.
 
-### Configure settings
+First, install the latest SDK. In Android Studio, go to `SDK Manager > SDK Tools`  and install `NDK (Side by Side)` (see [Android Developer site](https://developer.android.com/studio/projects/install-ndk#default-version)).
+
+After that, set the following  environment variables:
+
+```sh
+# Export `$ANDROID_HOME` and change `{USER_NAME}` to your username
+export ANDROID_HOME="/Users/{USER_NAME}/Library/Android/sdk"
+
+# Locate which NDK version you have
+ls $ANDROID_HOME/ndk # => 26.1.10909125
+
+# Set it to your `NDK_PATH` environment variable
+NDK_PATH=$ANDROID_HOME/ndk/26.1.10909125
+```
+
+(Reference: [Running Rust on Android with UniFFI](https://sal.dev/android/intro-rust-android-uniffi/)).
+
+## mopro configuration
+
+This config file is best used together with `mopro-cli`.
 
 By creating a `toml` configuration file you can specify what build settings you want to use. Example is provided in `config-example.toml`:
 
-```
+```toml
 # config-example.toml
 
 [build]
@@ -59,65 +167,17 @@ use_dylib = false         # Options: true, false
 name = "keccak256.dylib" # Name of the dylib file, only used if use_dylib is true
 ```
 
-### iOS
-
-#### Prepare
-
--   Install [cocoapods](https://cocoapods.org/)
-
-#### Build Bindings
-
-To build bindings for iOS, adjust settings in your config file (we recommend starting with `simulator` and `release`) and run:
-
-```sh
-./scripts/build_ios.sh config-example.toml
-```
-
-Open the `mopro-ios/MoproKit/Example/MoproKit.xcworkspace` in Xcode.
-
-#### Update Bindings
-
-To update bindings, run `./scripts/update_bindings.sh config-example`.
-
-### Android
-
-#### Prepare
-
--   Install [Android Studio](https://developer.android.com/studio)
--   Open Android Studio, and navigate to SDK Manager > SDK Tools > NDK (Side by Side) as laid out on the [Android Developer site](https://developer.android.com/studio/projects/install-ndk#default-version).
--   Export `$ANDROID_HOME` and change `{USER_NAME}` to your username
-    ```sh
-    export ANDROID_HOME="/Users/{USER_NAME}/Library/Android/sdk"
-    ```
--   Locate which NDK version you have by
-    ```sh
-    ls $ANDROID_HOME/ndk
-    # 26.1.10909125
-    ```
-    and set it to your `NDK_PATH` environment variable. e.g.
-    ```sh
-    NDK_PATH=$ANDROID_HOME/ndk/26.1.10909125
-    ```
-    > Reference: [Running Rust on Android with UniFFI](https://sal.dev/android/intro-rust-android-uniffi/)
-
-#### Build and Update Bindings
-
-To build bindings for android simulator debug mode, run
-
-```sh
-./scripts/build_android.sh config-example.toml
-```
-
-- **Device types:** `x86_64`, `x86`, `arm`, `arm64`
-  Check your device architecture here: https://doc.e.foundation/devices
-  For Android Studio simulator (Pixel series), choose `arm64`
-- **Mode:** `debug`, `release`
-
 ## Community and Talks
 
 Join the Telegram group [here](https://t.me/zkmopro).
 
-Talk by @oskarth at ProgCrypto/Devconnect (Istanbul, November 2023): [Slides](https://docs.google.com/presentation/d/1afIEgm8oYRvteWxUd04CcMOxChAiHaD55d5AKd0RkvY/edit#slide=id.g284ac8f47d5_2_24) (video pending)
+Talk by @oskarth at ProgCrypto/Devconnect (Istanbul, November 2023): [Slides](https://docs.google.com/presentation/d/1afIEgm8oYRvteWxUd04CcMOxChAiHaD55d5AKd0RkvY/edit#slide=id.g284ac8f47d5_2_24) (no video)
+
+Talk by @oskarth at ETHTaipei (Taipei, March 2024): [Slides](https://hackmd.io/@oskarth/S1yGjF8C6#), [Video](https://www.youtube.com/live/JB6zP9enkbc?si=04xz9XRLkChNiupw&t=14708)
+
+## Contribute
+
+Contributions of all kinds welcome! Please see open GH issues. Also feel free to join the Telegram chat.
 
 ## Performance
 
@@ -130,6 +190,8 @@ Preliminary benchmarks on an iPhone 14 Max Pro:
     - 80% of time on witness generation
     - ~x10 faster vs browser on phone
 - Bottlenecks: loading zkey and wasm witness generation
+
+See [Project MoPerf results](https://hackmd.io/5ItB2D50QcavF18cWIrmfQ?view=#tip1) for more benchmarks.
 
 ## Acknowledgements
 

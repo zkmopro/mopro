@@ -23,6 +23,10 @@ Here are the basic commands of `mopro`:
 
 (May be added soon: `mopro update`: Update bindings with new API for specified platforms.)
 
+## Prerequisites
+
+To use `mopro-cli`, make sure you have installed the [prerequisites](https://github.com/oskarth/mopro/?tab=readme-ov-file#Prerequisites).
+
 ## Examples
 
 ### Basic example
@@ -73,7 +77,6 @@ mopro test
 ### Android
 
 Initialize and build an app with Android support.
-> Currently support [Android Studio](https://developer.android.com/studio)
 
 ```sh
 mopro init --platforms android
@@ -83,6 +86,25 @@ mopro build --platforms android
 
 # Open android project in Android Studio
 open android -a Android\ Studio
+```
+
+### Web
+
+Initialize and build a web app.
+
+```sh
+mopro init --platforms web
+cd mopro-example-app
+mopro prepare
+mopro build --platforms web
+```
+
+Open web project directory and run frontend locally.
+
+```sh
+cd web
+npm install
+npm run dev
 ```
 
 ### Exporting bindings
