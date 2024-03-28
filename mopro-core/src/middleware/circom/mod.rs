@@ -646,7 +646,8 @@ mod tests {
         // Prepare inputs
         #[derive(serde::Deserialize)]
         struct InputData {
-            aadhaar_data: Vec<String>,
+            qr_data_padded: Vec<String>,
+            delimiter_indices: Vec<String>,
             signature: Vec<String>,
             pub_key: Vec<String>,
         }
@@ -658,10 +659,15 @@ mod tests {
 
         let mut inputs: CircuitInputs = HashMap::new();
         inputs.insert(
-            "aadhaarData".to_string(),
-            strings_to_circuit_inputs(data.aadhaar_data),
+            "qrDataPadded".to_string(),
+            strings_to_circuit_inputs(data.qr_data_padded),
         );
-        inputs.insert("aadhaarDataLength".to_string(), vec![BigInt::from(64)]);
+        inputs.insert("qrDataPaddedLength".to_string(), vec![BigInt::from(1152)]);
+        inputs.insert("nonPaddedDataLength".to_string(), vec![BigInt::from(1137)]);
+        inputs.insert(
+            "delimiterIndices".to_string(),
+            strings_to_circuit_inputs(data.delimiter_indices),
+        );
         inputs.insert(
             "signature".to_string(),
             strings_to_circuit_inputs(data.signature),
@@ -670,7 +676,12 @@ mod tests {
             "pubKey".to_string(),
             strings_to_circuit_inputs(data.pub_key),
         );
+        inputs.insert("nullifierSeed".to_string(), vec![BigInt::from(12345678)]);
         inputs.insert("signalHash".to_string(), vec![BigInt::from(1)]);
+        inputs.insert("revealGender".to_string(), vec![BigInt::from(0)]);
+        inputs.insert("revealAgeAbove18".to_string(), vec![BigInt::from(0)]);
+        inputs.insert("revealState".to_string(), vec![BigInt::from(0)]);
+        inputs.insert("revealPinCode".to_string(), vec![BigInt::from(0)]);
         // Proof generation
         let generate_proof_res = circom_state.generate_proof(inputs);
 

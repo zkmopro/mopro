@@ -1,9 +1,8 @@
-pragma circom 2.1.5;
+pragma circom 2.1.6;
 
-include "../node_modules/circomlib/circuits/comparators.circom";
-include "../node_modules/circomlib/circuits/bitify.circom";
-include "../node_modules/circomlib/circuits/gates.circom";
-
+include "../../node_modules/circomlib/circuits/comparators.circom";
+include "../../node_modules/circomlib/circuits/bitify.circom";
+include "../../node_modules/circomlib/circuits/gates.circom";
 include "bigint_func.circom";
 
 // addition mod 2**n with carry bit

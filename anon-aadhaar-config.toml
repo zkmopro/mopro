@@ -2,7 +2,7 @@
 
 [build]
 # For iOS device_type can be x86_64, simulator, device
-ios_device_type = "x86_64" # Options: x86_64, simulator, device
+ios_device_type = "device" # Options: x86_64, simulator, device
 # For Android device_type can be x86_64, x86, arm, arm64
 android_device_type = "x86_64" # Options: x86_64, x86, arm, arm64
 
@@ -18,4 +18,4 @@ name = "aadhaar-verifier"                      # Name of the circuit
 # NOTE: Dylib support is experimental and requires some fiddling in iOS
 # See https://github.com/oskarth/mopro/pull/37 and https://github.com/oskarth/mopro/pull/38
 use_dylib = false          # Options: true, false
-name = "anonAadhaar.dylib" # Name of the dylib file, only used if use_dylib is true
+name = "anonAadhaar" # Name of the dylib file, only used if use_dylib is true

@@ -99,7 +99,7 @@ print_action "[core/circom] Generating arkzkey for rsa..."
 
 # Run trusted setup for anonAadhaar
 print_action "[core/circom] Running trusted setup for anonAadhaar..."
-./scripts/trusted_setup.sh anonAadhaar 21 aadhaar-verifier
+./scripts/trusted_setup.sh anonAadhaar 20 aadhaar-verifier
 
 # Generate arkzkey for anonAadhaar
 print_action "[core/circom] Generating arkzkey for anonAadhaar..."
