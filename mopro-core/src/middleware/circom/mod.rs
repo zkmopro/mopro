@@ -16,7 +16,6 @@ use ark_circom::{
 };
 use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey};
-use ark_std::str::FromStr;
 use ark_std::UniformRand;
 
 use ark_relations::r1cs::ConstraintMatrices;
@@ -29,7 +28,6 @@ use once_cell::sync::{Lazy, OnceCell};
 use wasmer::{Module, Store};
 
 use ark_zkey::{read_arkzkey, read_arkzkey_from_bytes}; //SerializableConstraintMatrices
-use witness::{init_graph, Graph}; // use witness::Graph;
 
 #[cfg(feature = "dylib")]
 use {
@@ -37,7 +35,7 @@ use {
     wasmer::Dylib,
 };
 
-#[cfg(feature = "calc-witness")]
+#[cfg(feature = "calc-native-witness")]
 use {
     ark_std::str::FromStr,
     ruint::aliases::U256,
@@ -91,12 +89,12 @@ const WASM: &[u8] = include_bytes!(env!("BUILD_RS_WASM_FILE"));
 /// access from multiple threads.
 static WITNESS_CALCULATOR: OnceCell<Mutex<WitnessCalculator>> = OnceCell::new();
 
-#[cfg(feature = "calc-witness")]
+#[cfg(feature = "calc-native-witness")]
 const GRAPH_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_GRAPH_FILE"));
-#[cfg(feature = "calc-witness")]
+#[cfg(feature = "calc-native-witness")]
 static WITNESS_GRAPH: Lazy<Graph> =
     Lazy::new(|| init_graph(&GRAPH_BYTES).expect("Failed to initialize Graph"));
-#[cfg(feature = "calc-witness")]
+#[cfg(feature = "calc-native-witness")]
 fn calculate_witness_with_graph(inputs: CircuitInputs) -> Vec<Fr> {
     let inputs_u256: HashMap<String, Vec<U256>> = inputs
         .into_iter()
@@ -213,13 +211,13 @@ pub fn generate_proof2(
     println!("Generating proof 2");
 
     let now = std::time::Instant::now();
-    #[cfg(not(feature = "calc-witness"))]
+    #[cfg(not(feature = "calc-native-witness"))]
     let full_assignment = witness_calculator()
         .lock()
         .expect("Failed to lock witness calculator")
         .calculate_witness_element::<Bn254, _>(inputs, false)
         .map_err(|e| MoproError::CircomError(e.to_string()))?;
-    #[cfg(feature = "calc-witness")]
+    #[cfg(feature = "calc-native-witness")]
     let full_assignment = calculate_witness_with_graph(inputs);
 
     println!("Witness generation took: {:.2?}", now.elapsed());

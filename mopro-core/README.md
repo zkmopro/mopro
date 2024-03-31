@@ -57,14 +57,14 @@ The report will be in `mopro-core/benchmarks/gpu_explorations/msm_bench_rust_lap
 - Set
   ```toml
   [witness]
-  use_witness = true
+  use_native_witness_generation = true
   ```
   in `config.toml` file
 - Or build witness with
   ```sh
-  WITNESS_CPP=<CIRCOM_PATH> cargo build --features build-witness --release
+  WITNESS_CPP=<CIRCOM_PATH> cargo build --features build-native-witness --release
   ```
   Test with
   ```sh
-  cargo test --features calc-witness
+  cargo test --features calc-native-witness
   ```

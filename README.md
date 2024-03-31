@@ -166,9 +166,11 @@ name = "keccak256_256_test"       # Name of the circuit
 use_dylib = false         # Options: true, false
 name = "keccak256.dylib" # Name of the dylib file, only used if use_dylib is true
 
-# Experimental
+# Note: circom-witness-rs is experimental
+# See https://github.com/oskarth/mopro/issues/32 for updates
+# Only works for keccak256_256_test circuit now
 [witness]
-use_witness = false       # Options: true, false
+use_native_witness_generation = false       # Options: true, false
 ```
 
 ## Community and Talks
