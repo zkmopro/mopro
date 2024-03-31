@@ -1,0 +1,20 @@
+iteration 1: 462.112167ms
+Mean across all iterations: 462.112167ms
+iteration 1: 463.482791ms
+Mean across all iterations: 463.482791ms
+iteration 1: 463.153875ms
+Mean across all iterations: 463.153875ms
+iteration 1: 465.940167ms
+Mean across all iterations: 465.940167ms
+iteration 1: 462.94025ms
+Mean across all iterations: 462.94025ms
+iteration 1: 463.012167ms
+Mean across all iterations: 463.012167ms
+iteration 1: 463.061ms
+Mean across all iterations: 463.061ms
+iteration 1: 462.847333ms
+Mean across all iterations: 462.847333ms
+iteration 1: 462.625ms
+Mean across all iterations: 462.625ms
+iteration 1: 463.046709ms
+Mean across all iterations: 463.046709ms
