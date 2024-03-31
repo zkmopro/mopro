@@ -1935,6 +1935,7 @@ dependencies = [
  "ark-ed-on-bls12-377",
  "ark-ed-on-bls12-381",
  "ark-ff 0.3.0",
+ "ark-ff 0.4.1",
  "ark-groth16",
  "ark-relations",
  "ark-serialize 0.4.1",
