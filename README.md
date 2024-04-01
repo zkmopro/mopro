@@ -18,8 +18,11 @@ Then, run the following commands:
 # Clone the mopro repo
 git clone git@github.com:oskarth/mopro.git
 
+# Go to your newly cloned checkout
+cd mopro
+
 # Install mopro-cli locally
-cd mopro-cli && cargo install --path .
+(cd mopro-cli && cargo install --path .)
 
 # Set `MOPRO_ROOT` (replace with path to your git checkout of mopro)
 # For example: `export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro`

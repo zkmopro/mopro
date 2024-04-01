@@ -37,6 +37,43 @@ add_target_support() {
     done
 }
 
+# Download circuit artifacts
+#----------------------------------------------------------------------------
+
+# XXX: This is a bit of a hack, just to get mopro-core to compile
+# This happens when we run mopro deps. We can probably improve on this.
+download_files() {
+    local url="https://mopro.vivianjeng.xyz"
+    local dir=$1
+    local circuit=$2
+    local circuit_dir="${MOPRO_ROOT}/mopro-core/examples/circom"
+    local target_dir="${circuit_dir}/${dir}/target"
+    local js_target_dir="${target_dir}/${circuit}_js"
+
+    # Create directories if they don't exist
+    mkdir -p "$target_dir" "$js_target_dir"
+
+    # Check if file exists
+    # Download files to the specified directories
+    if ! [ -f "${target_dir}/${circuit}_final.arkzkey" ]; then
+        wget -P "$target_dir" "${url}/${circuit}_final.arkzkey"
+    else
+        echo "File ${circuit}_final.arkzkey already exists, skipping download."
+    fi
+
+    if ! [ -f "${target_dir}/${circuit}_final.zkey" ]; then
+        wget -P "$target_dir" "${url}/${circuit}_final.zkey"
+    else
+        echo "File ${circuit}_final.zkey already exists, skipping download."
+    fi
+
+    if ! [ -f "${js_target_dir}/${circuit}.wasm" ]; then
+        wget -P "$js_target_dir" "${url}/${circuit}.wasm"
+    else
+        echo "File ${circuit}.wasm already exists, skipping download."
+    fi
+}
+
 # Check uniffi-bindgen version
 #----------------------------------------------------------------------------
 check_uniffi_bindgen_version() {
@@ -87,6 +124,7 @@ main() {
 
     add_target_support
     install_binary "${MOPRO_ROOT}/ark-zkey" "arkzkey-util" "."
+    download_files "multiplier2" "multiplier2"
     install_binary "${MOPRO_ROOT}/mopro-ffi" "uniffi-bindgen" "."
     install_remote_binary "toml" "toml-cli"
     check_uniffi_bindgen_version
