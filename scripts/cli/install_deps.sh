@@ -125,6 +125,7 @@ main() {
     add_target_support
     install_binary "${MOPRO_ROOT}/ark-zkey" "arkzkey-util" "."
     download_files "multiplier2" "multiplier2"
+    download_files "keccak256" "keccak256_256_test"
     install_binary "${MOPRO_ROOT}/mopro-ffi" "uniffi-bindgen" "."
     install_remote_binary "toml" "toml-cli"
     check_uniffi_bindgen_version

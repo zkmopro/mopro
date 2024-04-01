@@ -71,12 +71,12 @@ fn read_config() -> Result<Config> {
             println!("cargo:warning=BUILD_CONFIG_PATH not set. Using default configuration.");
             let default_config = r#"
                 [circuit]
-                dir = "examples/circom/multiplier2"
-                name = "multiplier2"
+                dir = "examples/circom/keccak256"
+                name = "keccak256_256_test"
 
                 [dylib]
                 use_dylib = false
-                name = "multiplier2.dylib"
+                name = "keccak256.dylib"
             "#;
             default_config.to_string()
         }
