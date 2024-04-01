@@ -80,6 +80,14 @@ read_toml() {
     echo "$value" | tr -d '"'
 }
 
+# Install npm dependencies
+npm_install() {
+    if [[ ! -d "${CIRCUIT_DIR}/node_modules" ]]; then
+        echo "Installing npm dependencies for $CIRCUIT_DIR..."
+        (cd $CIRCUIT_DIR && npm install)
+    fi
+}
+
 # Compile the circuit
 compile_circuit() {
     print_action "Compiling circuit $CIRCUIT_NAME..."
@@ -155,6 +163,7 @@ generate_arkzkey() {
 main() {
     initialize_environment "$@"
     read_configuration "$1"
+    npm_install
     compile_circuit
     trusted_setup
     generate_arkzkey
