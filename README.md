@@ -37,10 +37,8 @@ mopro deps
 Create and initialize a project:
 
 ```sh
-# Create a working directory
-mkdir ~/my-zk-app && cd my-zk-app
-
 # Initialize a project
+# This will create a new project in your current directory
 mopro init --platforms ios android
 
 # Go to your project folder
