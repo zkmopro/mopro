@@ -152,7 +152,7 @@ cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
 # Dylib assets
 if [[ "$USE_DYLIB" == true ]]; then
     print_action "Copying dynamic library asset (${DYLIB_NAME})..."
-    cp "${PROJECT_DIR}/target/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}" "${TARGET_DIR}/"
+    cp "${PROJECT_DIR}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}" "${TARGET_DIR}/"
     cp "${TARGET_DIR}/${DYLIB_NAME}" "${MOPROKIT_DIR}/Libs/"
     # Fix dynamic lib install paths
     # NOTE: Xcode might already do this for us; verify this
