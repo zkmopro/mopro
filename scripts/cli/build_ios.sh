@@ -143,8 +143,8 @@ build_mopro_ffi_with_dylib_circuit() {
     # fi
 
     print_action "Copying dylib circuit to target directory..."
-    cp "${MOPRO_ROOT}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}.dylib" \
-        "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}.dylib"
+    cp "${MOPRO_ROOT}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}" \
+        "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}"
 }
 
 generate_swift_bindings() {
@@ -206,7 +206,7 @@ create_xcframework_circuit() {
 
     print_action "Creating XCFramework for CircuitBindings dylib... (${ARCHITECTURE})"
     xcodebuild -create-xcframework \
-        -library "${TARGET_DIR}/${ARCHITECTURE}/release/${DYLIB_NAME}.dylib" \
+        -library "${TARGET_DIR}/${ARCHITECTURE}/release/${DYLIB_NAME}" \
         -output "$CIRCUIT_XCFRAMEWORK_PATH"
     if [ $? -ne 0 ]; then
         echo -e "${RED}Failed to create CircuitBindings XCFramework.${DEFAULT}"
