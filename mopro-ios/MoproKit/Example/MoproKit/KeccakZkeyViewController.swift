@@ -131,9 +131,7 @@ class KeccakZkeyViewController: UIViewController {
             publicInputs = generateProofResult.inputs
 
             textView.text += "Proof generation took \(timeTaken) seconds.\n"
-            // TODO: Enable verify
-            verifyButton.isEnabled = false
-            //verifyButton.isEnabled = true // Enable the Verify button once proof has been generated
+            verifyButton.isEnabled = true // Enable the Verify button once proof has been generated
         } catch let error as MoproError {
             print("MoproError: \(error)")
         } catch {
@@ -142,6 +140,22 @@ class KeccakZkeyViewController: UIViewController {
     }
 
     @objc func runVerifyAction() {
-        // Logic for verify
+        guard let proof = generatedProof,
+          let publicInputs = publicInputs
+        else {
+          print("Setup is not completed or proof has not been generated yet.")
+          return
+        }
+        do {
+          // Verify Proof
+          let isValid = try verifyProof2(proof: proof, publicInput: publicInputs)
+          assert(isValid, "Proof verification should succeed")
+
+          textView.text += "Proof verification succeeded.\n"
+        } catch let error as MoproError {
+          print("MoproError: \(error)")
+        } catch {
+          print("Unexpected error: \(error)")
+        }
     }
 }
