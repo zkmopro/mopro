@@ -82,7 +82,7 @@ read_toml() {
 
 # Install npm dependencies
 npm_install() {
-    if [[ ! -d "${CIRCUIT_DIR}/node_modules" ]]; then
+    if [[ -f "${CIRCUIT_DIR}/package.json" && ! -d "${CIRCUIT_DIR}/node_modules" ]]; then
         echo "Installing npm dependencies for $CIRCUIT_DIR..."
         (cd $CIRCUIT_DIR && npm install)
     fi
