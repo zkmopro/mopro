@@ -145,6 +145,15 @@ build_mopro_ffi_with_dylib_circuit() {
     print_action "Copying dylib circuit to target directory..."
     cp "${MOPRO_ROOT}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}" \
         "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}"
+
+    if [ -z "${APPLE_SIGNING_IDENTITY+x}" ]; then
+        echo "${RED}APPLE_SIGNING_IDENTITY is not set.${DEFAULT}"
+        echo "${RED}Please set APPLE_SIGNING_IDENTITY to one of these identities.${DEFAULT}"
+        echo "${RED}`security find-identity -v -p codesigning`${DEFAULT}"
+        exit 1
+    fi
+    install_name_tool -id "@rpath/${DYLIB_NAME}" "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}"
+    codesign -f -s "${APPLE_SIGNING_IDENTITY}" "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}"
 }
 
 generate_swift_bindings() {
