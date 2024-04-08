@@ -116,12 +116,22 @@ checksum = "5ad32ce52e4161730f7098c077cd2ed6229b5804ccf99e5366be1ab72a98b4e1"
 [[package]]
 name = "ark-bls12-377"
 version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc41c02c0d18a226947ee9ee023b1d957bdb6a68fc22ac296722935a9fef423c"
+source = "git+https://github.com/arkworks-rs/curves.git?tag=v0.3.0#d2c998736e4aefdadd8e5cf115fc42012daaf125"
 dependencies = [
  "ark-ec 0.3.0",
  "ark-ff 0.3.0",
  "ark-std 0.3.0",
+]
+
+[[package]]
+name = "ark-bls12-377"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb00293ba84f51ce3bd026bd0de55899c4e68f0a39a5728cebae3a73ffdc0a4f"
+dependencies = [
+ "ark-ec 0.4.1",
+ "ark-ff 0.4.1",
+ "ark-std 0.4.0",
 ]
 
 [[package]]
@@ -1925,7 +1935,8 @@ dependencies = [
 name = "mopro-core"
 version = "0.1.0"
 dependencies = [
- "ark-bls12-377",
+ "ark-bls12-377 0.3.0",
+ "ark-bls12-377 0.4.0",
  "ark-bls12-381",
  "ark-bn254",
  "ark-circom",

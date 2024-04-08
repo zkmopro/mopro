@@ -1,4 +1,4 @@
-use ark_bls12_377;
+use ark_bls12_377_3;
 use ark_ff_3::{fields::Field, PrimeField};
 use ark_serialize_3::{CanonicalDeserialize, CanonicalSerialize, SerializationError};
 use ark_std::{
@@ -33,8 +33,8 @@ pub struct FileInputIterator {
     cached: Option<Instance>,
 }
 
-pub type Point = ark_bls12_377::G1Affine;
-pub type Scalar = <ark_bls12_377::Fr as PrimeField>::BigInt;
+pub type Point = ark_bls12_377_3::G1Affine;
+pub type Scalar = <ark_bls12_377_3::Fr as PrimeField>::BigInt;
 pub type Instance = (Vec<Point>, Vec<Scalar>);
 
 const INSTANCE_SIZE: usize = 16;
@@ -138,7 +138,7 @@ impl From<(Vec<Vec<Point>>, Vec<Vec<Scalar>>)> for VectorInputIterator {
 }
 
 fn gen_random_vectors<R: RngCore>(n: usize, rng: &mut R) -> Instance {
-    let num_bytes = ark_bls12_377::Fr::zero();
+    let num_bytes = ark_bls12_377_3::Fr::zero();
     let mut points = Vec::<Point>::new();
     let mut scalars = Vec::<Scalar>::new();
     let mut bytes = vec![0; n];
@@ -146,14 +146,14 @@ fn gen_random_vectors<R: RngCore>(n: usize, rng: &mut R) -> Instance {
     for _i in 0..n {
         loop {
             rng.fill_bytes(&mut bytes[..]);
-            scalar = ark_bls12_377::Fr::from_random_bytes(&bytes);
+            scalar = ark_bls12_377_3::Fr::from_random_bytes(&bytes);
             if scalar.is_some() {
                 break;
             }
         }
         scalars.push(scalar.unwrap().into_repr());
 
-        let point: ark_bls12_377::G1Projective = rng.gen();
+        let point: ark_bls12_377_3::G1Projective = rng.gen();
         points.push(point.into());
     }
     (points, scalars)

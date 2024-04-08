@@ -1,6 +1,6 @@
 mod local_msm;
 
-use ark_bls12_377::G1Affine;
+use ark_bls12_377_3::G1Affine;
 use ark_ec_3::AffineCurve;
 use ark_serialize_3::Write;
 use ark_std::{One, Zero};
@@ -20,14 +20,14 @@ const UTILSPATH: &str = "src/middleware/gpu_explorations/utils";
 const BENCHMARKSPATH: &str = "benchmarks/gpu_explorations";
 
 pub fn benchmark_msm<I>(
-    output_dir: &str,
+    benchmark_dir: &str,
     instances: I,
     iterations: u32,
 ) -> Result<Vec<Duration>, preprocess::HarnessError>
 where
     I: Iterator<Item = preprocess::Instance>,
 {
-    let output_path = format!("{}{}", output_dir, "/trapdoor_benchmark_time.txt");
+    let output_path = format!("{}{}", benchmark_dir, "/trapdoor_benchmark_time.txt");
     let mut output_file = File::create(output_path).expect("output file creation failed");
     let mut result_vec = Vec::new();
 
@@ -70,23 +70,27 @@ where
             writeln!(output_file, "iteration {}: {:?}", i + 1, time)?;
             total_duration += time;
         }
-        let mean = total_duration / iterations;
-        writeln!(output_file, "Mean across all iterations: {:?}", mean)?;
+        let avg_duration = total_duration / iterations;
+        writeln!(
+            output_file,
+            "Average duration across all iterations: {:?}",
+            avg_duration
+        )?;
         println!(
             "Average time to execute MSM with {} points and {} scalars and {} iterations is: {:?}",
             points.len(),
             scalars.len(),
             iterations,
-            mean
+            avg_duration
         );
-        result_vec.push(mean);
+        result_vec.push(avg_duration);
     }
     Ok(result_vec)
 }
 
 pub fn run_benchmark(dir: &str) {
-    let input_iter = preprocess::FileInputIterator::open(dir).unwrap();
-    let result = benchmark_msm(dir, input_iter, 1);
+    let benchmark_data = preprocess::FileInputIterator::open(dir).unwrap();
+    let result = benchmark_msm(dir, benchmark_data, 1);
     println!("Done running benchmark: {:?}", result);
 }
 
@@ -110,8 +114,8 @@ mod tests {
         }
 
         println!("Running benchmark for baseline result");
-        let input_iter = preprocess::FileInputIterator::open(&dir).unwrap();
-        let result = benchmark_msm(&BENCHMARKSPATH, input_iter, 1);
+        let benchmark_data = preprocess::FileInputIterator::open(&dir).unwrap();
+        let result = benchmark_msm(&BENCHMARKSPATH, benchmark_data, 1);
         println!("Done running benchmark: {:?}", result);
     }
 }

@@ -1,5 +1,5 @@
-use ark_bls12_377 as bls377;
-use ark_bls12_377::Fq;
+use ark_bls12_377_3 as bls377;
+use ark_bls12_377_3::Fq;
 use ark_ff_3::prelude::*;
 use ark_ff_3::FromBytes;
 use ark_ff_3::ToBytes;
