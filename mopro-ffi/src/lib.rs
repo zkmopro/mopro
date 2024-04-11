@@ -231,6 +231,11 @@ pub fn arkworks_pippenger(
     .unwrap();
     Ok(benchmarks)
 }
+#[cfg(feature = "gpu-benchmarks")]
+pub fn trapdoortech_zprize_msm(dir: String ) -> Result<(), MoproError> {
+    let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(&dir);
+    Ok(benchmarks)
+}
 
 #[cfg(not(feature = "gpu-benchmarks"))]
 pub fn arkworks_pippenger(
