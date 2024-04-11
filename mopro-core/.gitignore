@@ -14,4 +14,4 @@ Cargo.lock
 *.pdb
 
 # GPU exploration - preprocessed vectors
-src/middleware/gpu_explorations/trapdoortech_zprize_msm/vectors
+src/middleware/gpu_explorations/utils/vectors

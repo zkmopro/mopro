@@ -1,5 +1,5 @@
 use ark_bls12_377_3;
-use ark_ff_3::{fields::Field, PrimeField};
+use ark_ff_3::{fields::Field, BigInteger, PrimeField};
 use ark_serialize_3::{CanonicalDeserialize, CanonicalSerialize, SerializationError};
 use ark_std::{
     rand::{Rng, RngCore},
@@ -37,8 +37,8 @@ pub type Point = ark_bls12_377_3::G1Affine;
 pub type Scalar = <ark_bls12_377_3::Fr as PrimeField>::BigInt;
 pub type Instance = (Vec<Point>, Vec<Scalar>);
 
-const INSTANCE_SIZE: usize = 16;
-const NUM_INSTANCES: usize = 10;
+const INSTANCE_SIZE: u32 = 16;
+const NUM_INSTANCE: u32 = 10;
 const PATH: &str = "src/middleware/gpu_explorations/utils";
 
 impl FileInputIterator {
@@ -137,13 +137,15 @@ impl From<(Vec<Vec<Point>>, Vec<Vec<Scalar>>)> for VectorInputIterator {
     }
 }
 
-fn gen_random_vectors<R: RngCore>(n: usize, rng: &mut R) -> Instance {
+fn gen_random_vectors<R: RngCore>(instance_size: u32, rng: &mut R) -> Instance {
     let num_bytes = ark_bls12_377_3::Fr::zero();
     let mut points = Vec::<Point>::new();
     let mut scalars = Vec::<Scalar>::new();
-    let mut bytes = vec![0; n];
+    let mut bytes = vec![0; instance_size as usize];
     let mut scalar;
-    for _i in 0..n {
+
+    // Generate instances with each having instance_size points and scalars
+    for _i in 0..instance_size {
         loop {
             rng.fill_bytes(&mut bytes[..]);
             scalar = ark_bls12_377_3::Fr::from_random_bytes(&bytes);
@@ -159,12 +161,12 @@ fn gen_random_vectors<R: RngCore>(n: usize, rng: &mut R) -> Instance {
     (points, scalars)
 }
 
-pub fn gen_vectors(dir: &str) {
+pub fn gen_vectors(instance_size: u32, num_instance: u32, dir: &str) {
     let mut rng = ark_std::rand::thread_rng();
     println!("Generating elements");
-    let n_elems = 1 << INSTANCE_SIZE;
-    for i in 0..NUM_INSTANCES {
-        let (points, scalars) = gen_random_vectors(n_elems, &mut rng);
+    let instance_size = 1 << instance_size;
+    for i in 0..num_instance {
+        let (points, scalars) = gen_random_vectors(instance_size, &mut rng);
         serialize_input(dir, &points, &scalars, i != 0).unwrap();
     }
     println!("Generated elements");
@@ -241,15 +243,17 @@ mod tests {
     #[test]
     fn test_gen_random_vector() {
         let mut rng = ark_std::rand::thread_rng();
-        let n_elems = 1 << INSTANCE_SIZE;
-        let (points, scalars) = gen_random_vectors(n_elems, &mut rng);
-        assert_eq!(points.len(), n_elems);
-        assert_eq!(scalars.len(), n_elems);
+        let instance_size = 1 << INSTANCE_SIZE;
+        let (points, scalars) = gen_random_vectors(instance_size, &mut rng);
+
+        assert_eq!(points.len() as u32, instance_size);
+        assert_eq!(scalars.len() as u32, instance_size);
+        // assert_eq!(scalars[0], NUM_INSTANCE);
     }
 
     #[test]
     fn test_gen_vectors() {
-        let dir = format!("{}/vectors/{}x{}", PATH, NUM_INSTANCES, INSTANCE_SIZE);
-        gen_vectors(&dir);
+        let dir = format!("{}/vectors/{}x{}", PATH, INSTANCE_SIZE, NUM_INSTANCE);
+        gen_vectors(INSTANCE_SIZE, NUM_INSTANCE, &dir);
     }
 }
