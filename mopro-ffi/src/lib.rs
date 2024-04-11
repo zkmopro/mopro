@@ -413,4 +413,17 @@ mod tests {
         println!("Benchmark result: {:#?}", result);
         Ok(())
     }
+    
+    #[test]
+    #[cfg(feature = "gpu-benchmarks")]
+    fn test_trapdoortech_zprize_msm() -> Result<(), MoproError> {
+        const INSTANCE_SIZE: usize = 16;
+        const NUM_INSTANCES: usize = 10;
+        const UTILSPATH: &str = "../mopro-core/src/middleware/gpu_explorations/utils";
+
+        let dir = format!("{}/vectors/{}x{}", UTILSPATH, NUM_INSTANCES, INSTANCE_SIZE);
+        let benchmarks = trapdoortech_zprize_msm(dir).unwrap();
+        println!("{:?}", benchmarks);
+        Ok(())
+    }
 }
