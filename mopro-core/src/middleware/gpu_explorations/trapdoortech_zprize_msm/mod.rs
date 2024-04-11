@@ -62,7 +62,6 @@ where
         println!(
             "Average time to execute MSM with {} points and {} scalars in {} iterations is: {:?}",
             points.len(),
-            scalars.len(),
             iterations,
             avg_duration
         );
