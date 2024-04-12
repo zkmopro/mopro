@@ -241,8 +241,18 @@ pub fn trapdoortech_zprize_msm(
     Ok(benchmarks)
 }
 #[cfg(feature = "gpu-benchmarks")]
-pub fn trapdoortech_zprize_msm(dir: String ) -> Result<(), MoproError> {
-    let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(&dir);
+pub fn trapdoortech_zprize_msm(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+    benchmark_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
+    let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(
+        instance_size,
+        num_instance,
+        &utils_dir,
+        &benchmark_dir,
+    ).unwrap();
     Ok(benchmarks)
 }
 
@@ -437,17 +447,6 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    #[cfg(feature = "gpu-benchmarks")]
-    fn test_trapdoortech_zprize_msm() -> Result<(), MoproError> {
-        let instance_size = 16;
-        let num_instance = 10;
-        let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils/vectors/16x10";
-        let result = trapdoortech_zprize_msm(instance_size, num_instance, utils_dir);
-        println!("Benchmark result: {:#?}", result);
-        Ok(())
-    }
-    
     #[test]
     #[cfg(feature = "gpu-benchmarks")]
     fn test_trapdoortech_zprize_msm() -> Result<(), MoproError> {
