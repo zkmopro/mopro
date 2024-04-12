@@ -17,6 +17,9 @@ namespace mopro {
   [Throws=MoproError]
   BenchmarkResult arkworks_pippenger(u32 instance_size, u32 num_instance, [ByRef] string utils_dir, [ByRef] string benchmark_dir);
   
+  [Throws=MoproError]
+  BenchmarkResult trapdoortech_zprize_msm(u32 instance_size, u32 num_instance, [ByRef] string utils_dir, [ByRef] string benchmark_dir);
+
   ProofCalldata to_ethereum_proof(bytes proof);
   sequence<string> to_ethereum_inputs(bytes inputs);
 };
