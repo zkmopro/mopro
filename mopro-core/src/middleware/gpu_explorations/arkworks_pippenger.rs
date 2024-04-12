@@ -87,7 +87,7 @@ pub fn run_benchmark(
         / instance_durations.len() as f64;
 
     println!(
-        "Done running benchmark. Check the result at: mopro-core/{:?}",
+        "Done running benchmark. Check the result at: {:?}",
         benchmark_dir
     );
     Ok(BenchmarkResult {
@@ -103,8 +103,8 @@ mod tests {
 
     const INSTANCE_SIZE: u32 = 16;
     const NUM_INSTANCE: u32 = 10;
-    const UTILSPATH: &str = "src/middleware/gpu_explorations/utils";
-    const BENCHMARKSPATH: &str = "benchmarks/gpu_explorations";
+    const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils";
+    const BENCHMARKSPATH: &str = "mopro-core/benchmarks/gpu_explorations";
 
     #[test]
     fn test_benchmark_msm() {

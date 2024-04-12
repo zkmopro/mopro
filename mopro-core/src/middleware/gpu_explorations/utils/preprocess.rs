@@ -39,7 +39,7 @@ pub type Instance = (Vec<Point>, Vec<Scalar>);
 
 const INSTANCE_SIZE: u32 = 16;
 const NUM_INSTANCE: u32 = 10;
-const PATH: &str = "src/middleware/gpu_explorations/utils";
+const PATH: &str = "mopro-core/src/middleware/gpu_explorations/utils";
 
 impl FileInputIterator {
     pub fn open(dir: &str) -> Result<Self, HarnessError> {
