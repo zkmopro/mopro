@@ -1,10 +1,9 @@
 use mopro_core::middleware::circom;
 use mopro_core::MoproError;
 
-// #[cfg(feature = "gpu-benchmarks")]
+#[cfg(feature = "gpu-benchmarks")]
 use mopro_core::middleware::gpu_explorations::{
-    self, arkworks_pippenger,
-    utils::benchmark::BenchmarkResult,
+    self, utils::benchmark::BenchmarkResult,
 };
 
 use num_bigint::BigInt;
@@ -232,8 +231,18 @@ pub fn arkworks_pippenger(
     Ok(benchmarks)
 }
 #[cfg(feature = "gpu-benchmarks")]
-pub fn trapdoortech_zprize_msm(dir: String ) -> Result<(), MoproError> {
-    let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(&dir);
+pub fn trapdoortech_zprize_msm(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+    benchmark_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
+    let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(
+        instance_size,
+        num_instance,
+        &utils_dir,
+        &benchmark_dir,
+    ).unwrap();
     Ok(benchmarks)
 }
 
@@ -413,17 +422,16 @@ mod tests {
         println!("Benchmark result: {:#?}", result);
         Ok(())
     }
-    
+
     #[test]
     #[cfg(feature = "gpu-benchmarks")]
     fn test_trapdoortech_zprize_msm() -> Result<(), MoproError> {
-        const INSTANCE_SIZE: usize = 16;
-        const NUM_INSTANCES: usize = 10;
-        const UTILSPATH: &str = "../mopro-core/src/middleware/gpu_explorations/utils";
-
-        let dir = format!("{}/vectors/{}x{}", UTILSPATH, NUM_INSTANCES, INSTANCE_SIZE);
-        let benchmarks = trapdoortech_zprize_msm(dir).unwrap();
-        println!("{:?}", benchmarks);
+        let instance_size = 16;
+        let num_instance = 10;
+        let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils";
+        let benchmark_dir = "../mopro-core/benchmarks/gpu_explorations";
+        let result = trapdoortech_zprize_msm(instance_size, num_instance, utils_dir, benchmark_dir);
+        println!("Benchmark result: {:#?}", result);
         Ok(())
     }
 }
