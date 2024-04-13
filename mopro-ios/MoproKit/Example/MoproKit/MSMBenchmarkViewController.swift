@@ -21,7 +21,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     var resultsTableView: UITableView!
     var submitButton: UIButton!
 
-    let algorithms = ["Arkwork (Baseline)", "Example Algo 1", "Example Algo 2"]
+    let algorithms = ["Arkwork (Baseline)", "TrapdoorTech Zprize", "Example Algo 2"]
     var selectedAlgorithms: Set<Int> = [0]  // Default to select the baseline MSM algorithm
 
     var benchmarkResults: [AlgorithmBenchmark] = []
@@ -29,9 +29,15 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     typealias BenchmarkClosure = () throws -> BenchmarkResult
     
     // update the mapping with function in the future
-    let msmBenchmarkMapping: [String: (UInt32?) throws -> BenchmarkResult] = [
+    let msmBenchmarkMapping:
+    [String: (
+        UInt32,
+        UInt32,
+        String,
+        String
+    ) throws -> BenchmarkResult] = [
         "Arkwork (Baseline)": arkworksPippenger,
-        // "Example Algo 1": ,
+        "TrapdoorTech Zprize": trapdoortechZprizeMsm,
         // "Example Algo 2": ,
     ]
 
@@ -263,8 +269,18 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
 
                 if let benchmarkFunction = self.msmBenchmarkMapping[algorithm] {
                     do {
+                        let instanceSize: UInt32 = 16;
+                        let numInstance: UInt32 = 10;
+                        let utilsDir = "../mopro-core/src/middleware/gpu_explorations/utils";
+                        let benchmarkDir = "../mopro-core/benchmarks/gpu_explorations";
                         print("Running MSM in algorithm: \(algorithm)...")
-                        let benchData: BenchmarkResult = try benchmarkFunction(10000)
+                        let benchData: BenchmarkResult = 
+                            try benchmarkFunction(
+                                instanceSize,
+                                numInstance,
+                                utilsDir,
+                                benchmarkDir
+                            )
                         if algorithm == "Arkwork (Baseline)" {
                             baselineTiming = benchData.avgProcessingTime
                         }
