@@ -271,6 +271,8 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
                     do {
                         let instanceSize: UInt32 = 16;
                         let numInstance: UInt32 = 10;
+                        // TODO: modify this to make mobile read the vectors
+                        // for simulators, send the absolute path works
                         let utilsDir = "../mopro-core/src/middleware/gpu_explorations/utils";
                         let benchmarkDir = "../mopro-core/benchmarks/gpu_explorations";
                         print("Running MSM in algorithm: \(algorithm)...")
@@ -289,7 +291,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
                             algorithm: algorithm,
                             avgMsmTime: benchData.avgProcessingTime,
                             // Calculate the percentage difference with baseline
-                            diffWithBaseline: (benchData.avgProcessingTime - baselineTiming) / baselineTiming * 100
+                            diffWithBaseline: (baselineTiming - benchData.avgProcessingTime) / baselineTiming * 100
                         )
                         tempResults.append(algorithmBenchmark)
                         print("Result of \(algorithmBenchmark.algorithm): \(algorithmBenchmark.avgMsmTime) ms (diff: \(algorithmBenchmark.diffWithBaseline) %)")
