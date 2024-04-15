@@ -2,9 +2,7 @@ use mopro_core::middleware::circom;
 use mopro_core::MoproError;
 
 #[cfg(feature = "gpu-benchmarks")]
-use mopro_core::middleware::gpu_explorations::{
-    self, utils::benchmark::BenchmarkResult,
-};
+use mopro_core::middleware::gpu_explorations::{self, utils::benchmark::BenchmarkResult};
 
 use num_bigint::BigInt;
 use std::collections::HashMap;
@@ -232,13 +230,14 @@ pub fn arkworks_pippenger(
 pub fn trapdoortech_zprize_msm(
     instance_size: u32,
     num_instance: u32,
-    utils_dir: &str
+    utils_dir: &str,
 ) -> Result<BenchmarkResult, MoproError> {
     let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(
         instance_size,
         num_instance,
         &utils_dir,
-    ).unwrap();
+    )
+    .unwrap();
     Ok(benchmarks)
 }
 
@@ -412,8 +411,7 @@ mod tests {
         let instance_size = 16;
         let num_instance = 10;
         let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils/vectors/16x10";
-        let result =
-            arkworks_pippenger(instance_size, num_instance, &utils_dir).unwrap();
+        let result = arkworks_pippenger(instance_size, num_instance, &utils_dir).unwrap();
         println!("Benchmark result: {:#?}", result);
         Ok(())
     }

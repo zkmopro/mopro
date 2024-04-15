@@ -77,7 +77,7 @@ where
 pub fn run_benchmark(
     instance_size: u32,
     num_instance: u32,
-    utils_dir: &str
+    utils_dir: &str,
 ) -> Result<BenchmarkResult, preprocess::HarnessError> {
     // Check if the vectors have been generated
     match preprocess::FileInputIterator::open(&utils_dir) {
@@ -137,8 +137,7 @@ mod tests {
     #[test]
     fn test_run_benchmark() {
         let utils_path = format!("{}/{}x{}", UTILSPATH, INSTANCE_SIZE, NUM_INSTANCE);
-        let result =
-            run_benchmark(INSTANCE_SIZE, NUM_INSTANCE, &utils_path).unwrap();
+        let result = run_benchmark(INSTANCE_SIZE, NUM_INSTANCE, &utils_path).unwrap();
         println!("Benchmark result: {:#?}", result);
     }
 

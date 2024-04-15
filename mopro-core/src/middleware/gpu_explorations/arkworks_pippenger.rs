@@ -114,15 +114,14 @@ mod tests {
         }
 
         let benchmark_data = preprocess::FileInputIterator::open(&dir).unwrap();
-        let result = benchmark_msm( benchmark_data, 1);
+        let result = benchmark_msm(benchmark_data, 1);
         println!("Done running benchmark: {:?}", result);
     }
 
     #[test]
     fn test_run_benchmark() {
         let utils_path = format!("{}/{}x{}", &UTILSPATH, INSTANCE_SIZE, NUM_INSTANCE);
-        let result =
-            run_benchmark(INSTANCE_SIZE, NUM_INSTANCE, &utils_path).unwrap();
+        let result = run_benchmark(INSTANCE_SIZE, NUM_INSTANCE, &utils_path).unwrap();
         println!("Benchmark result: {:#?}", result);
     }
 
