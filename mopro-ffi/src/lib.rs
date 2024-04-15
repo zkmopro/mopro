@@ -244,14 +244,12 @@ pub fn trapdoortech_zprize_msm(
 pub fn trapdoortech_zprize_msm(
     instance_size: u32,
     num_instance: u32,
-    utils_dir: &str,
-    benchmark_dir: &str,
+    utils_dir: &str
 ) -> Result<BenchmarkResult, MoproError> {
     let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(
         instance_size,
         num_instance,
         &utils_dir,
-        &benchmark_dir,
     ).unwrap();
     Ok(benchmarks)
 }
