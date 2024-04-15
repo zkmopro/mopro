@@ -226,6 +226,7 @@ pub fn arkworks_pippenger(
     .unwrap();
     Ok(benchmarks)
 }
+
 #[cfg(feature = "gpu-benchmarks")]
 pub fn trapdoortech_zprize_msm(
     instance_size: u32,
@@ -240,17 +241,19 @@ pub fn trapdoortech_zprize_msm(
     .unwrap();
     Ok(benchmarks)
 }
+
 #[cfg(feature = "gpu-benchmarks")]
 pub fn trapdoortech_zprize_msm(
     instance_size: u32,
     num_instance: u32,
-    utils_dir: &str
+    utils_dir: &str,
 ) -> Result<BenchmarkResult, MoproError> {
     let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(
         instance_size,
         num_instance,
         &utils_dir,
-    ).unwrap();
+    )
+    .unwrap();
     Ok(benchmarks)
 }
 
