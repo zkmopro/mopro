@@ -10,7 +10,26 @@ import UIKit
 import MoproKit
 
 class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    let pointUrl = URL(string: "https://mopro-msm.s3.eu-north-1.amazonaws.com/vectors/16x10/points")
+    let scalarUrl = URL(string: "https://mopro-msm.s3.eu-north-1.amazonaws.com/vectors/16x10/scalars")
+    func runDownloadAction() {
+      let pointStart = CFAbsoluteTimeGetCurrent()
+      FileDownloader.loadFileAsync(url: self.pointUrl!) { (path, error) in
+        print("Points File downloaded to : \(path!)")
+        let pointEnd = CFAbsoluteTimeGetCurrent()
+        print("Download points took:", pointEnd - pointStart, "s")
+      }
 
+      let scalarStart = CFAbsoluteTimeGetCurrent()
+      FileDownloader.loadFileAsync(url: self.scalarUrl!) { (path, error) in
+        print("Scalars File downloaded to : \(path!)")
+        let scalarEnd = CFAbsoluteTimeGetCurrent()
+        print("Download scalars took:", scalarEnd - scalarStart, "s")
+      }
+
+    }
+    
     struct AlgorithmBenchmark {
         var algorithm: String
         var avgMsmTime: Double
@@ -21,7 +40,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     var resultsTableView: UITableView!
     var submitButton: UIButton!
 
-    let algorithms = ["Arkwork (Baseline)", "TrapdoorTech Zprize", "Example Algo 2"]
+    let algorithms = ["Arkwork (Baseline)", "TrapdoorTech Zprize"]
     var selectedAlgorithms: Set<Int> = [0]  // Default to select the baseline MSM algorithm
 
     var benchmarkResults: [AlgorithmBenchmark] = []
@@ -38,7 +57,6 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     ) throws -> BenchmarkResult] = [
         "Arkwork (Baseline)": arkworksPippenger,
         "TrapdoorTech Zprize": trapdoortechZprizeMsm,
-        // "Example Algo 2": ,
     ]
 
     override func viewDidLoad() {
@@ -256,7 +274,9 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
 
     @objc func submitAction() {
         print("Selected algorithms: \(selectedAlgorithms.map { algorithms[$0] })")
-
+        print("Downloading Scalars and Points...")
+        self.runDownloadAction();
+        
         // offload heavy computation of benchmarking in background
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self = self else { return }
@@ -269,18 +289,19 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
 
                 if let benchmarkFunction = self.msmBenchmarkMapping[algorithm] {
                     do {
+                        let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                        let pointPath = documentsUrl.appendingPathComponent((pointUrl!).lastPathComponent)
+                        let scalarPath = documentsUrl.appendingPathComponent((scalarUrl!).lastPathComponent)
+                        let documentsPath = documentsUrl.path
                         let instanceSize: UInt32 = 16;
                         let numInstance: UInt32 = 10;
-                        // TODO: modify this to make mobile read the vectors
-                        // for simulators, send the absolute path works
-                        let utilsDir = "../mopro-core/src/middleware/gpu_explorations/utils";
-                        let benchmarkDir = "../mopro-core/benchmarks/gpu_explorations";
+                        let benchmarkDir = "../mopro-core/benchmarks/gpu_explorations"; // temperary hardcoded
                         print("Running MSM in algorithm: \(algorithm)...")
                         let benchData: BenchmarkResult = 
                             try benchmarkFunction(
                                 instanceSize,
                                 numInstance,
-                                utilsDir,
+                                documentsPath,
                                 benchmarkDir
                             )
                         if algorithm == "Arkwork (Baseline)" {
