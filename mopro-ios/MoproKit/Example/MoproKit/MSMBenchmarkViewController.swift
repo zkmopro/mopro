@@ -52,7 +52,6 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     [String: (
         UInt32,
         UInt32,
-        String,
         String
     ) throws -> BenchmarkResult] = [
         "Arkwork (Baseline)": arkworksPippenger,
@@ -275,7 +274,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     @objc func submitAction() {
         print("Selected algorithms: \(selectedAlgorithms.map { algorithms[$0] })")
         print("Downloading Scalars and Points...")
-        self.runDownloadAction();
+        // self.runDownloadAction(); // no need to download for now
         
         // offload heavy computation of benchmarking in background
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -301,8 +300,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
                             try benchmarkFunction(
                                 instanceSize,
                                 numInstance,
-                                documentsPath,
-                                benchmarkDir
+                                documentsPath
                             )
                         if algorithm == "Arkwork (Baseline)" {
                             baselineTiming = benchData.avgProcessingTime
