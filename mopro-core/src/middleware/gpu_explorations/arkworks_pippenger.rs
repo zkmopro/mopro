@@ -10,7 +10,6 @@ use std::fs::File;
 use std::time::{Duration, Instant};
 
 pub fn benchmark_msm<I>(
-    benchmark_dir: &str,
     instances: I,
     iterations: u32,
 ) -> Result<Vec<Duration>, preprocess::HarnessError>
@@ -65,20 +64,18 @@ pub fn run_benchmark(
     utils_dir: &str,
     benchmark_dir: &str,
 ) -> Result<BenchmarkResult, preprocess::HarnessError> {
-    let benchmark_data_dir = format!("{}/vectors/{}x{}", &utils_dir, instance_size, num_instance);
-
     // Check if the vectors have been generated
-    match preprocess::FileInputIterator::open(&benchmark_data_dir) {
+    match preprocess::FileInputIterator::open(&utils_dir) {
         Ok(_) => {
             println!("Vectors already generated");
         }
         Err(_) => {
-            preprocess::gen_vectors(instance_size, num_instance, &benchmark_data_dir);
+            preprocess::gen_vectors(instance_size, num_instance, &utils_dir);
         }
     }
 
-    let benchmark_data = preprocess::FileInputIterator::open(&benchmark_data_dir).unwrap();
-    let instance_durations = benchmark_msm(benchmark_dir, benchmark_data, 1).unwrap();
+    let benchmark_data = preprocess::FileInputIterator::open(&utils_dir).unwrap();
+    let instance_durations = benchmark_msm(benchmark_data, 1).unwrap();
     // in milliseconds
     let avg_processing_time: f64 = instance_durations
         .iter()
@@ -86,10 +83,7 @@ pub fn run_benchmark(
         .sum::<f64>()
         / instance_durations.len() as f64;
 
-    println!(
-        "Done running benchmark. Check the result at: {:?}",
-        benchmark_dir
-    );
+    println!("Done running benchmark.");
     Ok(BenchmarkResult {
         instance_size: instance_size,
         num_instance: num_instance,
@@ -103,12 +97,12 @@ mod tests {
 
     const INSTANCE_SIZE: u32 = 16;
     const NUM_INSTANCE: u32 = 10;
-    const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils";
-    const BENCHMARKSPATH: &str = "mopro-core/benchmarks/gpu_explorations";
+    const UTILSPATH: &str = "../mopro-core/src/middleware/gpu_explorations/utils/vectors";
+    const BENCHMARKSPATH: &str = "../mopro-core/benchmarks/gpu_explorations";
 
     #[test]
     fn test_benchmark_msm() {
-        let dir = format!("{}/vectors/{}x{}", UTILSPATH, INSTANCE_SIZE, NUM_INSTANCE);
+        let dir = format!("{}/{}x{}", UTILSPATH, INSTANCE_SIZE, NUM_INSTANCE);
 
         // Check if the vectors have been generated
         match preprocess::FileInputIterator::open(&dir) {
@@ -121,14 +115,15 @@ mod tests {
         }
 
         let benchmark_data = preprocess::FileInputIterator::open(&dir).unwrap();
-        let result = benchmark_msm(&BENCHMARKSPATH, benchmark_data, 1);
+        let result = benchmark_msm( benchmark_data, 1);
         println!("Done running benchmark: {:?}", result);
     }
 
     #[test]
     fn test_run_benchmark() {
+        let utils_path = format!("{}/{}x{}", &UTILSPATH, INSTANCE_SIZE, NUM_INSTANCE);
         let result =
-            run_benchmark(INSTANCE_SIZE, NUM_INSTANCE, &UTILSPATH, &BENCHMARKSPATH).unwrap();
+            run_benchmark(INSTANCE_SIZE, NUM_INSTANCE, &utils_path, &BENCHMARKSPATH).unwrap();
         println!("Benchmark result: {:#?}", result);
     }
 
@@ -137,11 +132,12 @@ mod tests {
         let output_path = format!("{}/{}_benchmark.txt", &BENCHMARKSPATH, "arkworks_pippenger");
         let mut output_file = File::create(output_path).expect("output file creation failed");
         writeln!(output_file, "msm_size,num_msm,avg_processing_time(ms)");
-        let instance_size = vec![1, 4, 8, 12, 16];
-        let num_instance = vec![1, 5, 10];
+        let instance_size = vec![8, 12, 16, 18];
+        let num_instance = vec![5, 10];
         for size in &instance_size {
             for num in &num_instance {
-                let result = run_benchmark(*size, *num, &UTILSPATH, &BENCHMARKSPATH).unwrap();
+                let utils_path = format!("{}/{}x{}", &UTILSPATH, *size, *num);
+                let result = run_benchmark(*size, *num, &utils_path, &BENCHMARKSPATH).unwrap();
                 println!("{}x{} result: {:#?}", *size, *num, result);
                 writeln!(
                     output_file,
