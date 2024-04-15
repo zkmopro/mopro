@@ -219,13 +219,11 @@ pub fn arkworks_pippenger(
     instance_size: u32,
     num_instance: u32,
     utils_dir: &str,
-    benchmark_dir: &str,
 ) -> Result<BenchmarkResult, MoproError> {
     let benchmarks = gpu_explorations::arkworks_pippenger::run_benchmark(
         instance_size,
         num_instance,
         &utils_dir,
-        &benchmark_dir,
     )
     .unwrap();
     Ok(benchmarks)
@@ -234,14 +232,12 @@ pub fn arkworks_pippenger(
 pub fn trapdoortech_zprize_msm(
     instance_size: u32,
     num_instance: u32,
-    utils_dir: &str,
-    benchmark_dir: &str,
+    utils_dir: &str
 ) -> Result<BenchmarkResult, MoproError> {
     let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(
         instance_size,
         num_instance,
         &utils_dir,
-        &benchmark_dir,
     ).unwrap();
     Ok(benchmarks)
 }
@@ -415,10 +411,9 @@ mod tests {
     fn test_arkworks_pippenger() -> Result<(), MoproError> {
         let instance_size = 16;
         let num_instance = 10;
-        let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils";
-        let benchmark_dir = "../mopro-core/benchmarks/gpu_explorations";
+        let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils/vectors/16x10";
         let result =
-            arkworks_pippenger(instance_size, num_instance, &utils_dir, &benchmark_dir).unwrap();
+            arkworks_pippenger(instance_size, num_instance, &utils_dir).unwrap();
         println!("Benchmark result: {:#?}", result);
         Ok(())
     }
@@ -428,9 +423,8 @@ mod tests {
     fn test_trapdoortech_zprize_msm() -> Result<(), MoproError> {
         let instance_size = 16;
         let num_instance = 10;
-        let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils";
-        let benchmark_dir = "../mopro-core/benchmarks/gpu_explorations";
-        let result = trapdoortech_zprize_msm(instance_size, num_instance, utils_dir, benchmark_dir);
+        let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils/vectors/16x10";
+        let result = trapdoortech_zprize_msm(instance_size, num_instance, utils_dir);
         println!("Benchmark result: {:#?}", result);
         Ok(())
     }
