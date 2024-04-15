@@ -167,6 +167,7 @@ pub fn gen_vectors(instance_size: u32, num_instance: u32, dir: &str) {
     let instance_size = 1 << instance_size;
     for i in 0..num_instance {
         let (points, scalars) = gen_random_vectors(instance_size, &mut rng);
+        println!("Generated {}th instance", i);
         serialize_input(dir, &points, &scalars, i != 0).unwrap();
     }
     println!("Generated elements");
