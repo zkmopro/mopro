@@ -112,7 +112,7 @@ mod tests {
     const INSTANCE_SIZE: u32 = 16;
     const NUM_INSTANCE: u32 = 10;
     const UTILSPATH: &str = "../mopro-core/src/middleware/gpu_explorations/utils/vectors";
-    const BENCHMARKSPATH: &str = "../mopro-core/benchmarks/gpu_explorations";
+    const BENCHMARKSPATH: &str = "../mopro-core/gpu_explorations/benchmarks";
 
     #[test]
     fn test_benchmark_msm() {
