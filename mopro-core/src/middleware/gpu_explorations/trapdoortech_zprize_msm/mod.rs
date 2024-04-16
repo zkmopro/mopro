@@ -2,16 +2,12 @@ mod local_msm;
 
 use ark_bls12_377_3::G1Affine;
 use ark_ec_3::AffineCurve;
-use ark_ff::BigInt;
-use ark_serialize_3::Write;
 use ark_std::{One, Zero};
 use local_msm::{
     edwards_from_neg_one_a, edwards_proj_to_affine, edwards_to_neg_one_a, edwards_to_sw,
     multi_scalar_mul, sw_to_edwards, EdwardsAffine, ExEdwardsAffine,
 };
-use std::fs::File;
 use std::time::{Duration, Instant};
-use thiserror::Error;
 
 use crate::middleware::gpu_explorations::utils::{benchmark::BenchmarkResult, preprocess};
 
@@ -45,13 +41,13 @@ where
         let scalars = &instance.1;
 
         let mut total_duration = Duration::ZERO;
-        for i in 0..iterations {
+        for _i in 0..iterations {
             let start = Instant::now();
             let result = multi_scalar_mul(&points[..], &scalars[..]);
             let result = edwards_from_neg_one_a(edwards_proj_to_affine(result));
             let result = edwards_to_sw(result);
 
-            let result = if result.x == <G1Affine as AffineCurve>::BaseField::zero()
+            let _result = if result.x == <G1Affine as AffineCurve>::BaseField::zero()
                 && result.y == <G1Affine as AffineCurve>::BaseField::one()
             {
                 G1Affine::new(result.x, result.y, true)
@@ -110,6 +106,9 @@ pub fn run_benchmark(
 mod tests {
     use super::*;
 
+    use ark_serialize_3::Write;
+    use std::fs::File;
+
     const INSTANCE_SIZE: u32 = 16;
     const NUM_INSTANCE: u32 = 10;
     const UTILSPATH: &str = "../mopro-core/src/middleware/gpu_explorations/utils/vectors";
@@ -146,7 +145,8 @@ mod tests {
         let output_path = format!("{}/{}_benchmark.txt", &BENCHMARKSPATH, "trapdoor");
         let mut output_file = File::create(output_path).expect("output file creation failed");
         writeln!(output_file, "msm_size,num_msm,avg_processing_time(ms)");
-        let instance_size = vec![8, 12, 16, 18];
+
+        let instance_size = vec![8, 12, 16, 18, 20];
         let num_instance = vec![5, 10];
         for size in &instance_size {
             for num in &num_instance {

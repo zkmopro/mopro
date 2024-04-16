@@ -1,10 +1,7 @@
 use ark_bls12_377_3;
-use ark_ff_3::{fields::Field, BigInteger, PrimeField};
+use ark_ff_3::{fields::Field, PrimeField};
 use ark_serialize_3::{CanonicalDeserialize, CanonicalSerialize, SerializationError};
-use ark_std::{
-    rand::{Rng, RngCore},
-    Zero,
-};
+use ark_std::rand::{Rng, RngCore};
 use std::collections::VecDeque;
 use std::fs::File;
 use thiserror::Error;
@@ -138,10 +135,9 @@ impl From<(Vec<Vec<Point>>, Vec<Vec<Scalar>>)> for VectorInputIterator {
 }
 
 fn gen_random_vectors<R: RngCore>(instance_size: u32, rng: &mut R) -> Instance {
-    let num_bytes = ark_bls12_377_3::Fr::zero();
     let mut points = Vec::<Point>::new();
     let mut scalars = Vec::<Scalar>::new();
-    let mut bytes = vec![0; instance_size as usize];
+    let mut bytes = vec![0; 32]; // the size of scalar is at most 32 Bytes
     let mut scalar;
 
     // Generate instances with each having instance_size points and scalars

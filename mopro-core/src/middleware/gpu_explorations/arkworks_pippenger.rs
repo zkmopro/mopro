@@ -1,13 +1,10 @@
 use ark_bls12_377::{Fr as ScalarField, G1Affine, G1Projective};
 // use ark_bn254::{Fr as ScalarField, FrConfig, G1Affine as GAffine, G1Projective as G};
-use ark_ec::{AffineRepr, VariableBaseMSM};
-use ark_ff::{BigInt, Field, FpConfig};
-use ark_serialize::Write;
+use ark_ec::VariableBaseMSM;
+use ark_ff::BigInt;
+use std::time::{Duration, Instant};
 
 use crate::middleware::gpu_explorations::utils::{benchmark::BenchmarkResult, preprocess};
-
-use std::fs::File;
-use std::time::{Duration, Instant};
 
 pub fn benchmark_msm<I>(
     instances: I,
@@ -37,9 +34,9 @@ where
         }
 
         let mut instance_total_duration = Duration::ZERO;
-        for i in 0..iterations {
+        for _i in 0..iterations {
             let start = Instant::now();
-            let result =
+            let _result =
                 <G1Projective as VariableBaseMSM>::msm(&parsed_points[..], &parsed_scalars[..])
                     .unwrap();
 
@@ -94,6 +91,9 @@ pub fn run_benchmark(
 mod tests {
     use super::*;
 
+    use ark_serialize::Write;
+    use std::fs::File;
+
     const INSTANCE_SIZE: u32 = 16;
     const NUM_INSTANCE: u32 = 10;
     const UTILSPATH: &str = "../mopro-core/src/middleware/gpu_explorations/utils/vectors";
@@ -130,7 +130,8 @@ mod tests {
         let output_path = format!("{}/{}_benchmark.txt", &BENCHMARKSPATH, "arkworks_pippenger");
         let mut output_file = File::create(output_path).expect("output file creation failed");
         writeln!(output_file, "msm_size,num_msm,avg_processing_time(ms)");
-        let instance_size = vec![8, 12, 16, 18];
+
+        let instance_size = vec![8, 12, 16, 18, 20];
         let num_instance = vec![5, 10];
         for size in &instance_size {
             for num in &num_instance {
