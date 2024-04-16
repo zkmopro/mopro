@@ -246,10 +246,27 @@ pub fn arkworks_pippenger(
     instance_size: u32,
     num_instance: u32,
     utils_dir: &str,
-    benchmark_dir: &str,
 ) -> Result<BenchmarkResult, MoproError> {
     println!("gpu-benchmarks feature not enabled!");
-    Ok(())
+    Ok(BenchmarkResult {
+        instance_size,
+        num_instance,
+        avg_processing_time: 0.0,
+    })
+}
+
+#[cfg(not(feature = "gpu-benchmarks"))]
+pub fn trapdoortech_zprize_msm(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
+    println!("gpu-benchmarks feature not enabled!");
+    Ok(BenchmarkResult {
+        instance_size,
+        num_instance,
+        avg_processing_time: 0.0,
+    })
 }
 
 fn add(a: u32, b: u32) -> u32 {
