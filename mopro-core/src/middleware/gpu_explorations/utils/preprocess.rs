@@ -1,5 +1,5 @@
 use ark_bls12_377_3;
-use ark_ff_3::{fields::Field, BigInteger, PrimeField};
+use ark_ff_3::{fields::Field, PrimeField};
 use ark_serialize_3::{CanonicalDeserialize, CanonicalSerialize, SerializationError};
 use ark_std::rand::{Rng, RngCore};
 use std::collections::VecDeque;
