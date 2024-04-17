@@ -49,13 +49,3 @@ There are two ways to run tests for the example app:
     ```sh
     xcodebuild -showdestinations -workspace MoproKit.xcworkspace -scheme MoproKit-Example
     ```
-
-## Run MSM Benchmark
-
-1. `cd mopro-ffi/` and convert `default=[]` into `default=["gpu-benchmarks"]` to enable `gpu-benchmarks` feature flag
-2. run `make` to build the mopro-ffi library
-3. `cd mopro/` and run `./scripts/build_ios.sh config-example.toml` to build IOS app and link
-   * remember to alter the `ios_device_type` in `config-example.toml`
-   * `simulator`: running on the simulator (default)
-   * `device`: running on a real IOS device
-4. Open `MoproKit/Example/MoproKit.xcworkspace` in Xcode and `cmd + R` for building
