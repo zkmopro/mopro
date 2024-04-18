@@ -11,24 +11,24 @@ import MoproKit
 
 class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    let pointUrl = URL(string: "https://mopro-msm.s3.eu-north-1.amazonaws.com/vectors/16x10/points")
-    let scalarUrl = URL(string: "https://mopro-msm.s3.eu-north-1.amazonaws.com/vectors/16x10/scalars")
-    func runDownloadAction() {
-      let pointStart = CFAbsoluteTimeGetCurrent()
-      FileDownloader.loadFileAsync(url: self.pointUrl!) { (path, error) in
-        print("Points File downloaded to : \(path!)")
-        let pointEnd = CFAbsoluteTimeGetCurrent()
-        print("Download points took:", pointEnd - pointStart, "s")
-      }
+    // let pointUrl = URL(string: "https://mopro-msm.s3.eu-north-1.amazonaws.com/vectors/16x10/points")
+    // let scalarUrl = URL(string: "https://mopro-msm.s3.eu-north-1.amazonaws.com/vectors/16x10/scalars")
+    // func runDownloadAction() {
+    //   let pointStart = CFAbsoluteTimeGetCurrent()
+    //   FileDownloader.loadFileAsync(url: self.pointUrl!) { (path, error) in
+    //     print("Points File downloaded to : \(path!)")
+    //     let pointEnd = CFAbsoluteTimeGetCurrent()
+    //     print("Download points took:", pointEnd - pointStart, "s")
+    //   }
 
-      let scalarStart = CFAbsoluteTimeGetCurrent()
-      FileDownloader.loadFileAsync(url: self.scalarUrl!) { (path, error) in
-        print("Scalars File downloaded to : \(path!)")
-        let scalarEnd = CFAbsoluteTimeGetCurrent()
-        print("Download scalars took:", scalarEnd - scalarStart, "s")
-      }
+    //   let scalarStart = CFAbsoluteTimeGetCurrent()
+    //   FileDownloader.loadFileAsync(url: self.scalarUrl!) { (path, error) in
+    //     print("Scalars File downloaded to : \(path!)")
+    //     let scalarEnd = CFAbsoluteTimeGetCurrent()
+    //     print("Download scalars took:", scalarEnd - scalarStart, "s")
+    //   }
 
-    }
+    // }
     
     struct AlgorithmBenchmark {
         var algorithm: String
@@ -289,8 +289,8 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
                 if let benchmarkFunction = self.msmBenchmarkMapping[algorithm] {
                     do {
                         let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-                        let pointPath = documentsUrl.appendingPathComponent((pointUrl!).lastPathComponent)
-                        let scalarPath = documentsUrl.appendingPathComponent((scalarUrl!).lastPathComponent)
+                        // let pointPath = documentsUrl.appendingPathComponent((pointUrl!).lastPathComponent)
+                        // let scalarPath = documentsUrl.appendingPathComponent((scalarUrl!).lastPathComponent)
                         let documentsPath = documentsUrl.path
                         let instanceSize: UInt32 = 16;
                         let numInstance: UInt32 = 10;
