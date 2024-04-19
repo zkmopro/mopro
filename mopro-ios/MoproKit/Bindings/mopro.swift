@@ -921,6 +921,15 @@ public func add(a: UInt32, b: UInt32)  -> UInt32 {
     )
 }
 
+public func arkworksPippenger(numMsm: UInt32?) throws -> BenchmarkResult {
+    return try  FfiConverterTypeBenchmarkResult.lift(
+        try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_ffi_fn_func_arkworks_pippenger(
+        FfiConverterOptionUInt32.lower(numMsm),$0)
+}
+    )
+}
+
 public func generateProof2(circuitInputs: [String: [String]]) throws -> GenerateProofResult {
     return try  FfiConverterTypeGenerateProofResult.lift(
         try rustCallWithError(FfiConverterTypeMoproError.lift) {
@@ -954,15 +963,6 @@ public func initializeMoproDylib(dylibPath: String) throws {
 }
 
 
-
-public func runMsmBenchmark(numMsm: UInt32?) throws -> BenchmarkResult {
-    return try  FfiConverterTypeBenchmarkResult.lift(
-        try rustCallWithError(FfiConverterTypeMoproError.lift) {
-    uniffi_mopro_ffi_fn_func_run_msm_benchmark(
-        FfiConverterOptionUInt32.lower(numMsm),$0)
-}
-    )
-}
 
 public func toEthereumInputs(inputs: Data)  -> [String] {
     return try!  FfiConverterSequenceString.lift(
@@ -1010,6 +1010,9 @@ private var initializationResult: InitializationResult {
     if (uniffi_mopro_ffi_checksum_func_add() != 8411) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_mopro_ffi_checksum_func_arkworks_pippenger() != 29839) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_mopro_ffi_checksum_func_generate_proof2() != 40187) {
         return InitializationResult.apiChecksumMismatch
     }
@@ -1020,9 +1023,6 @@ private var initializationResult: InitializationResult {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_func_initialize_mopro_dylib() != 64476) {
-        return InitializationResult.apiChecksumMismatch
-    }
-    if (uniffi_mopro_ffi_checksum_func_run_msm_benchmark() != 7930) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_func_to_ethereum_inputs() != 30405) {

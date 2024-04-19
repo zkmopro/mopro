@@ -2,7 +2,7 @@ use mopro_core::middleware::circom;
 use mopro_core::MoproError;
 
 #[cfg(feature = "gpu-benchmarks")]
-use mopro_core::middleware::gpu_explorations::{self, BenchmarkResult};
+use mopro_core::middleware::gpu_explorations::{self, utils::benchmark::BenchmarkResult};
 
 use num_bigint::BigInt;
 use std::collections::HashMap;
@@ -48,9 +48,9 @@ pub struct ProofCalldata {
 #[derive(Debug, Clone)]
 #[cfg(not(feature = "gpu-benchmarks"))]
 pub struct BenchmarkResult {
-    pub num_msm: u32,
+    pub instance_size: u32,
+    pub num_instance: u32,
     pub avg_processing_time: f64,
-    pub total_processing_time: f64,
 }
 
 //     pub inputs: Vec<u8>,
@@ -213,15 +213,60 @@ impl MoproCircom {
 }
 
 #[cfg(feature = "gpu-benchmarks")]
-pub fn run_msm_benchmark(num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
-    let benchmarks = gpu_explorations::run_msm_benchmark(num_msm).unwrap();
+pub fn arkworks_pippenger(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
+    let benchmarks = gpu_explorations::arkworks_pippenger::run_benchmark(
+        instance_size,
+        num_instance,
+        &utils_dir,
+    )
+    .unwrap();
+    Ok(benchmarks)
+}
+#[cfg(feature = "gpu-benchmarks")]
+pub fn trapdoortech_zprize_msm(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
+    let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(
+        instance_size,
+        num_instance,
+        &utils_dir,
+    )
+    .unwrap();
     Ok(benchmarks)
 }
 
 #[cfg(not(feature = "gpu-benchmarks"))]
-pub fn run_msm_benchmark(_num_msm: Option<u32>) -> Result<BenchmarkResult, MoproError> {
+pub fn arkworks_pippenger(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
     println!("gpu-benchmarks feature not enabled!");
-    panic!("gpu-benchmarks feature not enabled!");
+    Ok(BenchmarkResult {
+        instance_size,
+        num_instance,
+        avg_processing_time: 0.0,
+    })
+}
+
+#[cfg(not(feature = "gpu-benchmarks"))]
+pub fn trapdoortech_zprize_msm(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
+    println!("gpu-benchmarks feature not enabled!");
+    Ok(BenchmarkResult {
+        instance_size,
+        num_instance,
+        avg_processing_time: 0.0,
+    })
 }
 
 fn add(a: u32, b: u32) -> u32 {
@@ -243,6 +288,8 @@ uniffi::include_scaffolding!("mopro");
 
 #[cfg(test)]
 mod tests {
+    use core::num;
+
     use super::*;
     use ark_bn254::Fr;
     use num_bigint::BigUint;
@@ -377,13 +424,23 @@ mod tests {
 
     #[test]
     #[cfg(feature = "gpu-benchmarks")]
-    fn test_run_msm_benchmark() -> Result<(), MoproError> {
-        let benchmarks = run_msm_benchmark(None).unwrap();
-        println!("\nBenchmarking {:?} msm on BN254 curve", benchmarks.num_msm);
-        println!(
-            "└─ Average msm time: {:.5} ms\n└─ Overall processing time: {:.5} ms",
-            benchmarks.avg_processing_time, benchmarks.total_processing_time
-        );
+    fn test_arkworks_pippenger() -> Result<(), MoproError> {
+        let instance_size = 16;
+        let num_instance = 10;
+        let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils/vectors/16x10";
+        let result = arkworks_pippenger(instance_size, num_instance, &utils_dir).unwrap();
+        println!("Benchmark result: {:#?}", result);
+        Ok(())
+    }
+
+    #[test]
+    #[cfg(feature = "gpu-benchmarks")]
+    fn test_trapdoortech_zprize_msm() -> Result<(), MoproError> {
+        let instance_size = 16;
+        let num_instance = 10;
+        let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils/vectors/16x10";
+        let result = trapdoortech_zprize_msm(instance_size, num_instance, utils_dir);
+        println!("Benchmark result: {:#?}", result);
         Ok(())
     }
 }
