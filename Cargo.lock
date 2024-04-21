@@ -114,38 +114,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5ad32ce52e4161730f7098c077cd2ed6229b5804ccf99e5366be1ab72a98b4e1"
 
 [[package]]
-name = "ark-bls12-377"
-version = "0.3.0"
-source = "git+https://github.com/arkworks-rs/curves.git?tag=v0.3.0#d2c998736e4aefdadd8e5cf115fc42012daaf125"
-dependencies = [
- "ark-ec 0.3.0",
- "ark-ff 0.3.0",
- "ark-std 0.3.0",
-]
-
-[[package]]
-name = "ark-bls12-377"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fb00293ba84f51ce3bd026bd0de55899c4e68f0a39a5728cebae3a73ffdc0a4f"
-dependencies = [
- "ark-ec 0.4.1",
- "ark-ff 0.4.1",
- "ark-std 0.4.0",
-]
-
-[[package]]
-name = "ark-bls12-381"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "65be532f9dd1e98ad0150b037276cde464c6f371059e6dd02c0222395761f6aa"
-dependencies = [
- "ark-ec 0.3.0",
- "ark-ff 0.3.0",
- "ark-std 0.3.0",
-]
-
-[[package]]
 name = "ark-bn254"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -206,7 +174,8 @@ dependencies = [
 [[package]]
 name = "ark-ec"
 version = "0.3.0"
-source = "git+https://github.com/arkworks-rs/algebra.git?tag=v0.3.0#3b589fe211683dfb64ef73cd987fab1ba6676ae5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dea978406c4b1ca13c2db2373b05cc55429c3575b8b21f1b9ee859aa5b03dd42"
 dependencies = [
  "ark-ff 0.3.0",
  "ark-serialize 0.3.0",
@@ -236,33 +205,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "ark-ed-on-bls12-377"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "143ee71ec22aaca67a094bb678b398589fb4589cc4883d8ecfc4536f0e62cc28"
-dependencies = [
- "ark-bls12-377 0.3.0",
- "ark-ec 0.3.0",
- "ark-ff 0.3.0",
- "ark-std 0.3.0",
-]
-
-[[package]]
-name = "ark-ed-on-bls12-381"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43b7ada17db3854f5994e74e60b18e10e818594935ee7e1d329800c117b32970"
-dependencies = [
- "ark-bls12-381",
- "ark-ec 0.3.0",
- "ark-ff 0.3.0",
- "ark-std 0.3.0",
-]
-
-[[package]]
 name = "ark-ff"
 version = "0.3.0"
-source = "git+https://github.com/arkworks-rs/algebra.git?tag=v0.3.0#3b589fe211683dfb64ef73cd987fab1ba6676ae5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6b3235cc41ee7a12aaaf2c575a2ad7b46713a8a50bda2fc3b003a04845c05dd6"
 dependencies = [
  "ark-ff-asm 0.3.0",
  "ark-ff-macros 0.3.0",
@@ -301,7 +247,8 @@ dependencies = [
 [[package]]
 name = "ark-ff-asm"
 version = "0.3.0"
-source = "git+https://github.com/arkworks-rs/algebra.git?tag=v0.3.0#3b589fe211683dfb64ef73cd987fab1ba6676ae5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db02d390bf6643fb404d3d22d31aee1c4bc4459600aef9113833d17e786c6e44"
 dependencies = [
  "quote",
  "syn 1.0.109",
@@ -320,7 +267,8 @@ dependencies = [
 [[package]]
 name = "ark-ff-macros"
 version = "0.3.0"
-source = "git+https://github.com/arkworks-rs/algebra.git?tag=v0.3.0#3b589fe211683dfb64ef73cd987fab1ba6676ae5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db2fd794a08ccb318058009eefdf15bcaaaaf6f8161eb3345f907222bac38b20"
 dependencies = [
  "num-bigint",
  "num-traits",
@@ -465,7 +413,8 @@ dependencies = [
 [[package]]
 name = "ark-serialize"
 version = "0.3.0"
-source = "git+https://github.com/arkworks-rs/algebra.git?tag=v0.3.0#3b589fe211683dfb64ef73cd987fab1ba6676ae5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d6c2b318ee6e10f8c2853e73a83adc0ccb88995aa978d8a3408d492ab2ee671"
 dependencies = [
  "ark-serialize-derive 0.3.0",
  "ark-std 0.3.0",
@@ -487,7 +436,8 @@ dependencies = [
 [[package]]
 name = "ark-serialize-derive"
 version = "0.3.0"
-source = "git+https://github.com/arkworks-rs/algebra.git?tag=v0.3.0#3b589fe211683dfb64ef73cd987fab1ba6676ae5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8dd4e5f0bf8285d5ed538d27fab7411f3e297908fd93c62195de8bee3f199e82"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -539,7 +489,8 @@ dependencies = [
 [[package]]
 name = "ark-std"
 version = "0.3.0"
-source = "git+https://github.com/arkworks-rs/std.git?tag=v0.3.0#2b3568f4da4bf1ab03406eb67e0a1b06ec53b059"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1df2c09229cbc5a028b1d70e00fdb2acee28b1055dfb5ca73eea49c5a25c4e7c"
 dependencies = [
  "num-traits",
  "rand",
@@ -2008,26 +1959,17 @@ dependencies = [
 name = "mopro-core"
 version = "0.1.0"
 dependencies = [
- "ark-bls12-377 0.3.0",
- "ark-bls12-377 0.4.0",
- "ark-bls12-381",
  "ark-bn254",
  "ark-circom",
  "ark-crypto-primitives",
- "ark-ec 0.3.0",
  "ark-ec 0.4.1",
- "ark-ed-on-bls12-377",
- "ark-ed-on-bls12-381",
- "ark-ff 0.3.0",
  "ark-ff 0.4.1",
  "ark-groth16",
  "ark-poly 0.3.0",
  "ark-poly-commit",
  "ark-relations 0.4.0",
- "ark-serialize 0.3.0",
  "ark-serialize 0.4.1",
  "ark-sponge",
- "ark-std 0.3.0",
  "ark-std 0.4.0",
  "ark-zkey",
  "color-eyre",
@@ -2039,7 +1981,6 @@ dependencies = [
  "num-bigint",
  "once_cell",
  "rand",
- "rand_chacha",
  "rayon",
  "ruint",
  "serde",

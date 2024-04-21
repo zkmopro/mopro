@@ -9,8 +9,8 @@ exclude = ["mopro-example-app"]
 wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 
 # NOTE: For gpu exploration on zprize works, will only compile when `gpu-benchmarks` feature is enabled
-ark-bls12-377-3 = { git = 'https://github.com/arkworks-rs/curves.git', package = 'ark-bls12-377', tag = 'v0.3.0', optional = true}
-ark-ec-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ec', tag = 'v0.3.0', features = ["parallel"], optional = true }
-ark-ff-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ff', tag = 'v0.3.0', features = ["parallel"], optional = true }
-ark-serialize-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-serialize', tag = 'v0.3.0', optional = true }
-ark-std-3 = { git = 'https://github.com/arkworks-rs/std.git', package = 'ark-std', tag = 'v0.3.0', optional = true }
+# ark-bls12-377-3 = { git = 'https://github.com/arkworks-rs/curves.git', package = 'ark-bls12-377', tag = 'v0.3.0', optional = true}
+# ark-ec-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ec', tag = 'v0.3.0', features = ["parallel"], optional = true }
+# ark-ff-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ff', tag = 'v0.3.0', features = ["parallel"], optional = true }
+# ark-serialize-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-serialize', tag = 'v0.3.0', optional = true }
+# ark-std-3 = { git = 'https://github.com/arkworks-rs/std.git', package = 'ark-std', tag = 'v0.3.0', optional = true }

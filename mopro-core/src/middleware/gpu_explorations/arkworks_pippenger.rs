@@ -1,7 +1,8 @@
-use ark_bls12_377::{Fr as ScalarField, G1Affine, G1Projective};
-// use ark_bn254::{Fr as ScalarField, FrConfig, G1Affine as GAffine, G1Projective as G};
-use ark_ec::VariableBaseMSM;
+// use ark_bls12_377::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
+use ark_bn254::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
+use ark_ec::{AffineRepr, VariableBaseMSM};
 use ark_ff::BigInt;
+use ark_serialize::CanonicalDeserialize;
 use std::time::{Duration, Instant};
 
 use crate::middleware::gpu_explorations::utils::{benchmark::BenchmarkResult, preprocess};
@@ -17,11 +18,14 @@ where
 
     for instance in instances {
         let points = &instance.0;
-        let scalars = &instance.1;
-        let mut parsed_points = Vec::<G1Affine>::new();
-        let mut parsed_scalars = Vec::<ScalarField>::new();
+        // map each scalar to a ScalarField
+        let scalars = &instance
+            .1
+            .iter()
+            .map(|s| ScalarField::new(*s))
+            .collect::<Vec<ScalarField>>();
 
-        // parse points and scalars from arkworks 0.3 compatible format to 0.4 compatible
+        /* for bls12_377 curve, parse points and scalars from arkworks 0.3 compatible format to 0.4 compatible
         for p in points {
             let new_p =
                 G1Affine::new_unchecked(BigInt::new(p.x.0 .0).into(), BigInt::new(p.y.0 .0).into());
@@ -32,13 +36,12 @@ where
             let new_s = ScalarField::new(BigInt::new(s.0));
             parsed_scalars.push(new_s);
         }
+        */
 
         let mut instance_total_duration = Duration::ZERO;
         for _i in 0..iterations {
             let start = Instant::now();
-            let _result =
-                <G1Projective as VariableBaseMSM>::msm(&parsed_points[..], &parsed_scalars[..])
-                    .unwrap();
+            let _result = <G as VariableBaseMSM>::msm(&points[..], &scalars[..]).unwrap();
 
             instance_total_duration += start.elapsed();
         }
@@ -97,12 +100,18 @@ mod tests {
 
     const INSTANCE_SIZE: u32 = 16;
     const NUM_INSTANCE: u32 = 10;
-    const UTILSPATH: &str = "../mopro-core/src/middleware/gpu_explorations/utils/vectors";
-    const BENCHMARKSPATH: &str = "../mopro-core/gpu_explorations/benchmarks";
+    const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils/vectors";
+    const BENCHMARKSPATH: &str = "mopro-core/gpu_explorations/benchmarks";
 
     #[test]
     fn test_benchmark_msm() {
-        let dir = format!("{}/{}x{}", UTILSPATH, INSTANCE_SIZE, NUM_INSTANCE);
+        let dir = format!(
+            "{}/{}/{}x{}",
+            preprocess::get_root_path(),
+            UTILSPATH,
+            INSTANCE_SIZE,
+            NUM_INSTANCE
+        );
 
         // Check if the vectors have been generated
         match preprocess::FileInputIterator::open(&dir) {
@@ -121,14 +130,25 @@ mod tests {
 
     #[test]
     fn test_run_benchmark() {
-        let utils_path = format!("{}/{}x{}", &UTILSPATH, INSTANCE_SIZE, NUM_INSTANCE);
+        let utils_path = format!(
+            "{}/{}/{}x{}",
+            preprocess::get_root_path(),
+            &UTILSPATH,
+            INSTANCE_SIZE,
+            NUM_INSTANCE
+        );
         let result = run_benchmark(INSTANCE_SIZE, NUM_INSTANCE, &utils_path).unwrap();
         println!("Benchmark result: {:#?}", result);
     }
 
     #[test]
     fn test_run_multi_benchmarks() {
-        let output_path = format!("{}/{}_benchmark.txt", &BENCHMARKSPATH, "arkworks_pippenger");
+        let output_path = format!(
+            "{}/{}/{}_benchmark.txt",
+            preprocess::get_root_path(),
+            &BENCHMARKSPATH,
+            "arkworks_pippenger"
+        );
         let mut output_file = File::create(output_path).expect("output file creation failed");
         writeln!(output_file, "msm_size,num_msm,avg_processing_time(ms)");
 
