@@ -4,13 +4,14 @@ use self::{
 };
 use crate::MoproError;
 
-use std::collections::HashMap;
-//use std::io::Cursor;
+use std::io::Cursor;
 use std::sync::Mutex;
 use std::time::Instant;
+use std::{collections::HashMap, fs::File, io::BufReader};
 
 use ark_bn254::{Bn254, Fr};
 use ark_circom::{
+    read_zkey,
     CircomReduction,
     WitnessCalculator, //read_zkey,
 };
@@ -52,7 +53,7 @@ type CircuitInputs = HashMap<String, Vec<BigInt>>;
 // TODO: Split up this namespace a bit, right now quite a lot of things going on
 
 pub struct CircomState {
-    arkzkey: Option<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)>,
+    zkey: Option<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)>,
     wtns: Option<WitnessCalculator>,
 }
 
@@ -66,20 +67,20 @@ impl Default for CircomState {
 
 // TODO: Replace printlns with logging
 
-//const ZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ZKEY_FILE"));
+const ZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ZKEY_FILE"));
 
-const ARKZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ARKZKEY_FILE"));
+// const ARKZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ARKZKEY_FILE"));
 
-// static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
-//     let mut reader = Cursor::new(ZKEY_BYTES);
-//     read_zkey(&mut reader).expect("Failed to read zkey")
-// });
-
-static ARKZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
-    //let mut reader = Cursor::new(ARKZKEY_BYTES);
-    // TODO: Use reader? More flexible; unclear if perf diff
-    read_arkzkey_from_bytes(ARKZKEY_BYTES).expect("Failed to read arkzkey")
+static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
+    let mut reader = Cursor::new(ZKEY_BYTES);
+    read_zkey(&mut reader).expect("Failed to read zkey")
 });
+
+// static ARKZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
+//     //let mut reader = Cursor::new(ARKZKEY_BYTES);
+//     // TODO: Use reader? More flexible; unclear if perf diff
+//     read_arkzkey_from_bytes(ARKZKEY_BYTES).expect("Failed to read arkzkey")
+// });
 
 #[cfg(not(feature = "dylib"))]
 const WASM: &[u8] = include_bytes!(env!("BUILD_RS_WASM_FILE"));
@@ -140,7 +141,8 @@ pub fn initialize() {
     // Initialize ARKZKEY
     // TODO: Speed this up even more!
     let now = std::time::Instant::now();
-    Lazy::force(&ARKZKEY);
+    Lazy::force(&ZKEY);
+    // Lazy::force(&ARKZKEY);
     println!("Initializing arkzkey took: {:.2?}", now.elapsed());
 }
 
@@ -157,16 +159,16 @@ fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
     Mutex::new(result)
 }
 
-// #[must_use]
-// pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
-//     &ZKEY
-// }
+#[must_use]
+pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
+    &ZKEY
+}
 
 // Experimental
-#[must_use]
-pub fn arkzkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
-    &ARKZKEY
-}
+// #[must_use]
+// pub fn arkzkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
+//     &ARKZKEY
+// }
 
 /// Provides access to the `WITNESS_CALCULATOR` singleton, initializing it if necessary.
 /// It expects the path to the dylib file to be set in the `CIRCUIT_WASM_DYLIB` environment variable.
@@ -223,8 +225,8 @@ pub fn generate_proof2(
     println!("Witness generation took: {:.2?}", now.elapsed());
 
     let now = std::time::Instant::now();
-    //let zkey = zkey();
-    let zkey = arkzkey();
+    let zkey = zkey();
+    // let zkey = arkzkey();
     println!("Loading arkzkey took: {:.2?}", now.elapsed());
 
     let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
@@ -253,7 +255,8 @@ pub fn verify_proof2(
     serialized_inputs: SerializableInputs,
 ) -> Result<bool, MoproError> {
     let start = Instant::now();
-    let zkey = arkzkey();
+    let zkey = zkey();
+    // let zkey = arkzkey();
     let pvk = prepare_verifying_key(&zkey.0.vk);
 
     let proof_verified =
@@ -268,15 +271,18 @@ pub fn verify_proof2(
 impl CircomState {
     pub fn new() -> Self {
         Self {
-            arkzkey: None,
+            zkey: None,
+            // arkzkey: None,
             wtns: None,
         }
     }
 
-    pub fn initialize(&mut self, arkzkey_path: &str, wasm_path: &str) -> Result<(), MoproError> {
-        let arkzkey =
-            read_arkzkey(arkzkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
-        self.arkzkey = Some(arkzkey);
+    pub fn initialize(&mut self, zkey_path: &str, wasm_path: &str) -> Result<(), MoproError> {
+        let mut file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let zkey = read_zkey(&mut file).map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+        // read_arkzkey(arkzkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        self.zkey = Some(zkey);
 
         let wtns = WitnessCalculator::new(wasm_path)
             .map_err(|e| MoproError::CircomError(e.to_string()))
@@ -309,7 +315,7 @@ impl CircomState {
         println!("Witness generation took: {:.2?}", now.elapsed());
 
         let now = std::time::Instant::now();
-        let zkey = self.arkzkey.as_ref().ok_or(MoproError::CircomError(
+        let zkey = self.zkey.as_ref().ok_or(MoproError::CircomError(
             "Zkey has not been set up".to_string(),
         ))?;
         println!("Loading arkzkey took: {:.2?}", now.elapsed());
@@ -339,7 +345,7 @@ impl CircomState {
         serialized_inputs: SerializableInputs,
     ) -> Result<bool, MoproError> {
         let start = Instant::now();
-        let zkey = self.arkzkey.as_ref().ok_or(MoproError::CircomError(
+        let zkey = self.zkey.as_ref().ok_or(MoproError::CircomError(
             "Zkey has not been set up".to_string(),
         ))?;
         let pvk = prepare_verifying_key(&zkey.0.vk);
@@ -386,7 +392,7 @@ mod tests {
     #[test]
     fn test_setup_prove_verify_simple() {
         let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
-        let arkzkey_path = "./examples/circom/multiplier2/target/multiplier2_final.arkzkey";
+        let arkzkey_path = "./examples/circom/multiplier2/target/multiplier2_final.zkey";
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
@@ -432,7 +438,7 @@ mod tests {
     fn test_setup_prove_verify_keccak() {
         let wasm_path =
             "./examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
-        let arkzkey_path = "./examples/circom/keccak256/target/keccak256_256_test_final.arkzkey";
+        let arkzkey_path = "./examples/circom/keccak256/target/keccak256_256_test_final.zkey";
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
@@ -485,7 +491,7 @@ mod tests {
         let mut circom_state = CircomState::new();
 
         let wasm_path = "badpath/multiplier2.wasm";
-        let arkzkey_path = "badpath/multiplier2.arkzkey";
+        let arkzkey_path = "badpath/multiplier2.zkey";
 
         // Act: Call the setup method
         let result = circom_state.initialize(arkzkey_path, wasm_path);
@@ -558,7 +564,7 @@ mod tests {
     #[test]
     fn test_setup_prove_rsa() {
         let wasm_path = "./examples/circom/rsa/target/main_js/main.wasm";
-        let arkzkey_path = "./examples/circom/rsa/target/main_final.arkzkey";
+        let arkzkey_path = "./examples/circom/rsa/target/main_final.zkey";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
@@ -669,7 +675,7 @@ mod tests {
     fn test_setup_prove_anon_aadhaar() {
         let wasm_path =
             "./examples/circom/anonAadhaar/target/aadhaar-verifier_js/aadhaar-verifier.wasm";
-        let arkzkey_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier_final.arkzkey";
+        let arkzkey_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier_final.zkey";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();

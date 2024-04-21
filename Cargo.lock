@@ -185,6 +185,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "ark-circom"
+version = "0.1.0"
+source = "git+https://github.com/vimwitch/circom-compat.git#21c6d43132c062364c270147e876dbc00d505a1c"
+dependencies = [
+ "ark-bn254",
+ "ark-crypto-primitives",
+ "ark-ec 0.4.1",
+ "ark-ff 0.4.1",
+ "ark-groth16",
+ "ark-poly 0.4.1",
+ "ark-relations 0.4.0",
+ "ark-serialize 0.4.1",
+ "ark-std 0.4.0",
+ "byteorder",
+ "cfg-if",
+ "color-eyre",
+ "criterion",
+ "ethers-core",
+ "fnv",
+ "hex",
+ "num",
+ "num-bigint",
+ "num-traits",
+ "thiserror",
+ "wasmer",
+]
+
+[[package]]
 name = "ark-crypto-primitives"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -562,7 +590,7 @@ name = "ark-zkey"
 version = "0.1.0"
 dependencies = [
  "ark-bn254",
- "ark-circom",
+ "ark-circom 0.1.0 (git+https://github.com/arkworks-rs/circom-compat.git)",
  "ark-ec 0.4.1",
  "ark-ff 0.4.1",
  "ark-groth16",
@@ -2012,7 +2040,7 @@ dependencies = [
  "ark-bls12-377 0.4.0",
  "ark-bls12-381",
  "ark-bn254",
- "ark-circom",
+ "ark-circom 0.1.0 (git+https://github.com/vimwitch/circom-compat.git)",
  "ark-crypto-primitives",
  "ark-ec 0.3.0",
  "ark-ec 0.4.1",
