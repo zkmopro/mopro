@@ -159,34 +159,6 @@ dependencies = [
 [[package]]
 name = "ark-circom"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/circom-compat.git#170b10fc9ed182b5f72ecf379033dda023d0bf07"
-dependencies = [
- "ark-bn254",
- "ark-crypto-primitives",
- "ark-ec 0.4.1",
- "ark-ff 0.4.1",
- "ark-groth16",
- "ark-poly 0.4.1",
- "ark-relations 0.4.0",
- "ark-serialize 0.4.1",
- "ark-std 0.4.0",
- "byteorder",
- "cfg-if",
- "color-eyre",
- "criterion",
- "ethers-core",
- "fnv",
- "hex",
- "num",
- "num-bigint",
- "num-traits",
- "thiserror",
- "wasmer",
-]
-
-[[package]]
-name = "ark-circom"
-version = "0.1.0"
 source = "git+https://github.com/vimwitch/circom-compat.git#21c6d43132c062364c270147e876dbc00d505a1c"
 dependencies = [
  "ark-bn254",
@@ -590,7 +562,7 @@ name = "ark-zkey"
 version = "0.1.0"
 dependencies = [
  "ark-bn254",
- "ark-circom 0.1.0 (git+https://github.com/arkworks-rs/circom-compat.git)",
+ "ark-circom",
  "ark-ec 0.4.1",
  "ark-ff 0.4.1",
  "ark-groth16",
@@ -600,6 +572,7 @@ dependencies = [
  "flame",
  "flamer",
  "memmap2 0.9.4",
+ "num-traits",
 ]
 
 [[package]]
@@ -2040,7 +2013,7 @@ dependencies = [
  "ark-bls12-377 0.4.0",
  "ark-bls12-381",
  "ark-bn254",
- "ark-circom 0.1.0 (git+https://github.com/vimwitch/circom-compat.git)",
+ "ark-circom",
  "ark-crypto-primitives",
  "ark-ec 0.3.0",
  "ark-ec 0.4.1",

@@ -86,7 +86,7 @@ class KeccakZkeyViewController: UIViewController {
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
 
-            textView.text += "Initializing arkzkey took \(timeTaken) seconds.\n"
+            textView.text += "Initializing zkey took \(timeTaken) seconds.\n"
         } catch let error as MoproError {
             print("MoproError: \(error)")
         } catch {

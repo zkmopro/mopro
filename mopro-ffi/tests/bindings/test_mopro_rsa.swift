@@ -4,7 +4,7 @@ import Foundation
 let moproCircom = MoproCircom()
 
 let wasmPath = "./../../../../mopro-core/examples/circom/rsa/target/main_js/main.wasm"
-let arkzkeyPath = "./../../../../mopro-core/examples/circom/rsa/target/main_final.arkzkey"
+let zkeyPath = "./../../../../mopro-core/examples/circom/rsa/target/main_final.zkey"
 
 // Helper function to convert bytes to bits
 func bytesToBits(bytes: [UInt8]) -> [String] {
@@ -45,7 +45,7 @@ func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
 
 do {
     // Setup
-    try moproCircom.initialize(arkzkeyPath: arkzkeyPath ,wasmPath: wasmPath)
+    try moproCircom.initialize(zkeyPath: zkeyPath ,wasmPath: wasmPath)
 
     // Prepare inputs
     let signature: [String] = [

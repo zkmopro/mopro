@@ -392,12 +392,12 @@ mod tests {
     #[test]
     fn test_setup_prove_verify_simple() {
         let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
-        let arkzkey_path = "./examples/circom/multiplier2/target/multiplier2_final.zkey";
+        let zkey_path = "./examples/circom/multiplier2/target/multiplier2_final.zkey";
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
+        let setup_res = circom_state.initialize(zkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();
@@ -438,12 +438,12 @@ mod tests {
     fn test_setup_prove_verify_keccak() {
         let wasm_path =
             "./examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
-        let arkzkey_path = "./examples/circom/keccak256/target/keccak256_256_test_final.zkey";
+        let zkey_path = "./examples/circom/keccak256/target/keccak256_256_test_final.zkey";
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
+        let setup_res = circom_state.initialize(zkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();
@@ -491,10 +491,10 @@ mod tests {
         let mut circom_state = CircomState::new();
 
         let wasm_path = "badpath/multiplier2.wasm";
-        let arkzkey_path = "badpath/multiplier2.zkey";
+        let zkey_path = "badpath/multiplier2.zkey";
 
         // Act: Call the setup method
-        let result = circom_state.initialize(arkzkey_path, wasm_path);
+        let result = circom_state.initialize(zkey_path, wasm_path);
 
         // Assert: Check that the method returns an error
         assert!(result.is_err());
@@ -564,13 +564,13 @@ mod tests {
     #[test]
     fn test_setup_prove_rsa() {
         let wasm_path = "./examples/circom/rsa/target/main_js/main.wasm";
-        let arkzkey_path = "./examples/circom/rsa/target/main_final.zkey";
+        let zkey_path = "./examples/circom/rsa/target/main_final.zkey";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
+        let setup_res = circom_state.initialize(zkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();
@@ -675,13 +675,13 @@ mod tests {
     fn test_setup_prove_anon_aadhaar() {
         let wasm_path =
             "./examples/circom/anonAadhaar/target/aadhaar-verifier_js/aadhaar-verifier.wasm";
-        let arkzkey_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier_final.zkey";
+        let zkey_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier_final.zkey";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
+        let setup_res = circom_state.initialize(zkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();

@@ -2,11 +2,11 @@ import uniffi.mopro.*
 
 var wasmPath =
         "../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm"
-var arkzkeyPath = "../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.arkzkey"
+var zkeyPath = "../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.zkey"
 
 try {
     var moproCircom = MoproCircom()
-    moproCircom.initialize(arkzkeyPath, wasmPath)
+    moproCircom.initialize(zkeyPath, wasmPath)
     
     val inputs = mutableMapOf<String, List<String>>()
     inputs["in"] =

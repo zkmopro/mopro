@@ -400,7 +400,7 @@ fileprivate struct FfiConverterData: FfiConverterRustBuffer {
 
 public protocol MoproCircomProtocol {
     func generateProof(circuitInputs: [String: [String]])  throws -> GenerateProofResult
-    func initialize(arkzkeyPath: String, wasmPath: String)  throws
+    func initialize(zkeyPath: String, wasmPath: String)  throws
     func verifyProof(proof: Data, publicInput: Data)  throws -> Bool
     
 }
@@ -440,11 +440,11 @@ public class MoproCircom: MoproCircomProtocol {
         )
     }
 
-    public func initialize(arkzkeyPath: String, wasmPath: String) throws {
+    public func initialize(zkeyPath: String, wasmPath: String) throws {
         try 
     rustCallWithError(FfiConverterTypeMoproError.lift) {
     uniffi_mopro_ffi_fn_method_moprocircom_initialize(self.pointer, 
-        FfiConverterString.lower(arkzkeyPath),
+        FfiConverterString.lower(zkeyPath),
         FfiConverterString.lower(wasmPath),$0
     )
 }
@@ -504,38 +504,38 @@ public func FfiConverterTypeMoproCircom_lower(_ value: MoproCircom) -> UnsafeMut
 
 
 public struct BenchmarkResult {
-    public var numMsm: UInt32
+    public var instanceSize: UInt32
+    public var numInstance: UInt32
     public var avgProcessingTime: Double
-    public var totalProcessingTime: Double
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(numMsm: UInt32, avgProcessingTime: Double, totalProcessingTime: Double) {
-        self.numMsm = numMsm
+    public init(instanceSize: UInt32, numInstance: UInt32, avgProcessingTime: Double) {
+        self.instanceSize = instanceSize
+        self.numInstance = numInstance
         self.avgProcessingTime = avgProcessingTime
-        self.totalProcessingTime = totalProcessingTime
     }
 }
 
 
 extension BenchmarkResult: Equatable, Hashable {
     public static func ==(lhs: BenchmarkResult, rhs: BenchmarkResult) -> Bool {
-        if lhs.numMsm != rhs.numMsm {
+        if lhs.instanceSize != rhs.instanceSize {
+            return false
+        }
+        if lhs.numInstance != rhs.numInstance {
             return false
         }
         if lhs.avgProcessingTime != rhs.avgProcessingTime {
-            return false
-        }
-        if lhs.totalProcessingTime != rhs.totalProcessingTime {
             return false
         }
         return true
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(numMsm)
+        hasher.combine(instanceSize)
+        hasher.combine(numInstance)
         hasher.combine(avgProcessingTime)
-        hasher.combine(totalProcessingTime)
     }
 }
 
@@ -543,16 +543,16 @@ extension BenchmarkResult: Equatable, Hashable {
 public struct FfiConverterTypeBenchmarkResult: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> BenchmarkResult {
         return try BenchmarkResult(
-            numMsm: FfiConverterUInt32.read(from: &buf), 
-            avgProcessingTime: FfiConverterDouble.read(from: &buf), 
-            totalProcessingTime: FfiConverterDouble.read(from: &buf)
+            instanceSize: FfiConverterUInt32.read(from: &buf), 
+            numInstance: FfiConverterUInt32.read(from: &buf), 
+            avgProcessingTime: FfiConverterDouble.read(from: &buf)
         )
     }
 
     public static func write(_ value: BenchmarkResult, into buf: inout [UInt8]) {
-        FfiConverterUInt32.write(value.numMsm, into: &buf)
+        FfiConverterUInt32.write(value.instanceSize, into: &buf)
+        FfiConverterUInt32.write(value.numInstance, into: &buf)
         FfiConverterDouble.write(value.avgProcessingTime, into: &buf)
-        FfiConverterDouble.write(value.totalProcessingTime, into: &buf)
     }
 }
 
@@ -845,27 +845,6 @@ extension MoproError: Equatable, Hashable {}
 
 extension MoproError: Error { }
 
-fileprivate struct FfiConverterOptionUInt32: FfiConverterRustBuffer {
-    typealias SwiftType = UInt32?
-
-    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
-        guard let value = value else {
-            writeInt(&buf, Int8(0))
-            return
-        }
-        writeInt(&buf, Int8(1))
-        FfiConverterUInt32.write(value, into: &buf)
-    }
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
-        switch try readInt(&buf) as Int8 {
-        case 0: return nil
-        case 1: return try FfiConverterUInt32.read(from: &buf)
-        default: throw UniffiInternalError.unexpectedOptionalTag
-        }
-    }
-}
-
 fileprivate struct FfiConverterSequenceString: FfiConverterRustBuffer {
     typealias SwiftType = [String]
 
@@ -921,11 +900,13 @@ public func add(a: UInt32, b: UInt32)  -> UInt32 {
     )
 }
 
-public func arkworksPippenger(numMsm: UInt32?) throws -> BenchmarkResult {
+public func arkworksPippenger(instanceSize: UInt32, numInstance: UInt32, utilsDir: String) throws -> BenchmarkResult {
     return try  FfiConverterTypeBenchmarkResult.lift(
         try rustCallWithError(FfiConverterTypeMoproError.lift) {
     uniffi_mopro_ffi_fn_func_arkworks_pippenger(
-        FfiConverterOptionUInt32.lower(numMsm),$0)
+        FfiConverterUInt32.lower(instanceSize),
+        FfiConverterUInt32.lower(numInstance),
+        FfiConverterString.lower(utilsDir),$0)
 }
     )
 }
@@ -982,6 +963,17 @@ public func toEthereumProof(proof: Data)  -> ProofCalldata {
     )
 }
 
+public func trapdoortechZprizeMsm(instanceSize: UInt32, numInstance: UInt32, utilsDir: String) throws -> BenchmarkResult {
+    return try  FfiConverterTypeBenchmarkResult.lift(
+        try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_ffi_fn_func_trapdoortech_zprize_msm(
+        FfiConverterUInt32.lower(instanceSize),
+        FfiConverterUInt32.lower(numInstance),
+        FfiConverterString.lower(utilsDir),$0)
+}
+    )
+}
+
 public func verifyProof2(proof: Data, publicInput: Data) throws -> Bool {
     return try  FfiConverterBool.lift(
         try rustCallWithError(FfiConverterTypeMoproError.lift) {
@@ -1010,7 +1002,7 @@ private var initializationResult: InitializationResult {
     if (uniffi_mopro_ffi_checksum_func_add() != 8411) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_ffi_checksum_func_arkworks_pippenger() != 29839) {
+    if (uniffi_mopro_ffi_checksum_func_arkworks_pippenger() != 50067) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_func_generate_proof2() != 40187) {
@@ -1031,13 +1023,16 @@ private var initializationResult: InitializationResult {
     if (uniffi_mopro_ffi_checksum_func_to_ethereum_proof() != 60110) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_mopro_ffi_checksum_func_trapdoortech_zprize_msm() != 64807) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_mopro_ffi_checksum_func_verify_proof2() != 37192) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_method_moprocircom_generate_proof() != 64602) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_mopro_ffi_checksum_method_moprocircom_initialize() != 36559) {
+    if (uniffi_mopro_ffi_checksum_method_moprocircom_initialize() != 50370) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_mopro_ffi_checksum_method_moprocircom_verify_proof() != 61522) {

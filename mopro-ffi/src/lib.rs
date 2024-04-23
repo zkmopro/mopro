@@ -168,9 +168,9 @@ impl MoproCircom {
         }
     }
 
-    pub fn initialize(&self, arkzkey_path: String, wasm_path: String) -> Result<(), MoproError> {
+    pub fn initialize(&self, zkey_path: String, wasm_path: String) -> Result<(), MoproError> {
         let mut state_guard = self.state.write().unwrap();
-        state_guard.initialize(arkzkey_path.as_str(), wasm_path.as_str())?;
+        state_guard.initialize(zkey_path.as_str(), wasm_path.as_str())?;
         Ok(())
     }
 
@@ -320,17 +320,16 @@ mod tests {
 
     #[test]
     fn test_end_to_end() -> Result<(), MoproError> {
-        // Paths to your wasm and arkzkey files
+        // Paths to your wasm and zkey files
         let wasm_path =
             "./../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
-        let arkzkey_path =
-            "./../mopro-core/examples/circom/multiplier2/target/multiplier2_final.arkzkey";
+        let zkey_path = "./../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey";
 
         // Create a new MoproCircom instance
         let mopro_circom = MoproCircom::new();
 
         // Step 1: Initialize
-        let init_result = mopro_circom.initialize(arkzkey_path.to_string(), wasm_path.to_string());
+        let init_result = mopro_circom.initialize(zkey_path.to_string(), wasm_path.to_string());
         assert!(init_result.is_ok());
 
         let mut inputs = HashMap::new();
@@ -374,14 +373,14 @@ mod tests {
         // Paths to your wasm and r1cs files
         let wasm_path =
             "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
-        let arkzkey_path =
-            "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.arkzkey";
+        let zkey_path =
+            "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.zkey";
 
         // Create a new MoproCircom instance
         let mopro_circom = MoproCircom::new();
 
         // Step 1: Setup
-        let setup_result = mopro_circom.initialize(arkzkey_path.to_string(), wasm_path.to_string());
+        let setup_result = mopro_circom.initialize(zkey_path.to_string(), wasm_path.to_string());
         assert!(setup_result.is_ok());
 
         // Prepare inputs

@@ -61,7 +61,7 @@ interface MoproCircom {
   constructor();
 
   [Throws=MoproError]
-  void initialize(string arkzkey_path, string wasm_path);
+  void initialize(string zkey_path, string wasm_path);
 
   [Throws=MoproError]
   GenerateProofResult generate_proof(record<string, sequence<string>> circuit_inputs);
