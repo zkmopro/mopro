@@ -8,7 +8,7 @@ edition = "2021"
 [features]
 default = ["wasmer/dylib"]
 dylib = []                  # NOTE: can probably remove this if we use env config instead
-gpu-benchmarks = ["ark-poly", "ark-poly-commit", "ark-sponge", "duration-string", "rand", "lazy_static"]
+gpu-benchmarks = ["halo2curves", "group", "ff", "rayon", "ark-poly", "ark-poly-commit", "ark-sponge", "duration-string", "rand", "lazy_static"]
 calc-native-witness = ["witness"] # experimental feature to calculate witness with witness graph
 build-native-witness = ["witness/build-witness"] # only enable build-native-witness feature when building the witness graph
 parallel = ["rayon", "ark-std/parallel"]
@@ -48,6 +48,10 @@ color-eyre = "=0.6.2"
 criterion = "=0.3.6"
 
 # GPU explorations
+halo2curves ={ version = "0.6", optional = true }
+group = { version = "0.13.0", optional = true }
+ff = { version = "0.13.0", default-features = false, features = ["std"], optional = true }
+rayon = { version = "1.8", optional = true }
 # ark-bls12-377 = { version = "0.4", optional = true }
 # ark-bls12-381 = { version = "0.3", optional = true }
 # ark-ed-on-bls12-377 = { version = "0.3", optional = true }
