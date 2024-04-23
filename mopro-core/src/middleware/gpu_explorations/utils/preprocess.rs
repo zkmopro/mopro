@@ -142,11 +142,11 @@ fn gen_random_vectors<R: RngCore>(instance_size: u32, rng: &mut R) -> Instance {
 
     // Generate instances with each having instance_size points and scalars
     for _i in 0..instance_size {
-        let scalar = ScalarField::rand(rng); // the size of scalar is at most 32 Bytes
-        scalars.push(scalar.into());
+        let scalar = ScalarField::rand(rng).into(); // the size of scalar is at most 32 Bytes
+        scalars.push(scalar);
 
-        let point = GAffine::rand(rng);
-        points.push(point.into());
+        let point = GAffine::rand(rng).into();
+        points.push(point);
     }
     (points, scalars)
 }
