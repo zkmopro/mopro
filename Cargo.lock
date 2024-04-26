@@ -159,7 +159,7 @@ dependencies = [
 [[package]]
 name = "ark-circom"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/circom-compat.git#170b10fc9ed182b5f72ecf379033dda023d0bf07"
+source = "git+https://github.com/vimwitch/circom-compat.git#21c6d43132c062364c270147e876dbc00d505a1c"
 dependencies = [
  "ark-bn254",
  "ark-crypto-primitives",
@@ -572,6 +572,7 @@ dependencies = [
  "flame",
  "flamer",
  "memmap2 0.9.4",
+ "num-traits",
 ]
 
 [[package]]

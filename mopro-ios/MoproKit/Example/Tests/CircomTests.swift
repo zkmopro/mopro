@@ -6,9 +6,9 @@ final class CircomTests: XCTestCase {
     let moproCircom = MoproKit.MoproCircom()
     
     func testMultiplier() {
-        let arkzkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "arkzkey")!
+        let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
         let wasmPath = Bundle.main.path(forResource: "multiplier2", ofType: "wasm")!
-        XCTAssertNoThrow(try moproCircom.initialize(arkzkeyPath: arkzkeyPath, wasmPath: wasmPath), "Mopro circom setup failed")
+        XCTAssertNoThrow(try moproCircom.initialize(zkeyPath: zkeyPath, wasmPath: wasmPath), "Mopro circom setup failed")
         
         do {
             var inputs = [String: [String]]()
@@ -35,9 +35,9 @@ final class CircomTests: XCTestCase {
     }
     
     func testKeccak256() {
-        let arkzkeyPath = Bundle.main.path(forResource: "keccak256_256_test_final", ofType: "arkzkey")!
+        let zkeyPath = Bundle.main.path(forResource: "keccak256_256_test_final", ofType: "zkey")!
         let wasmPath = Bundle.main.path(forResource: "keccak256_256_test", ofType: "wasm")!
-        XCTAssertNoThrow(try moproCircom.initialize(arkzkeyPath: arkzkeyPath, wasmPath: wasmPath), "Mopro circom setup failed")
+        XCTAssertNoThrow(try moproCircom.initialize(zkeyPath: zkeyPath, wasmPath: wasmPath), "Mopro circom setup failed")
         
         do {
             // Prepare inputs

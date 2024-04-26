@@ -400,7 +400,7 @@ private struct FfiConverterData: FfiConverterRustBuffer {
 
 public protocol MoproCircomProtocol {
     func generateProof(circuitInputs: [String: [String]]) throws -> GenerateProofResult
-    func initialize(arkzkeyPath: String, wasmPath: String) throws
+    func initialize(zkeyPath: String, wasmPath: String) throws
     func verifyProof(proof: Data, publicInput: Data) throws -> Bool
 }
 

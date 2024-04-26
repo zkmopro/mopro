@@ -1,12 +1,12 @@
 import uniffi.mopro.*
 
 var wasmPath = "../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm"
-var arkzkeyPath = "../mopro-core/examples/circom/multiplier2/target/multiplier2_final.arkzkey"
+var zkeyPath = "../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey"
 
 try {
     // Setup
     var moproCircom = MoproCircom()
-    moproCircom.initialize(arkzkeyPath, wasmPath)
+    moproCircom.initialize(zkeyPath, wasmPath)
 
     // Prepare inputs
     val inputs = mutableMapOf<String, List<String>>()

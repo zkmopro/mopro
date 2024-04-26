@@ -11,13 +11,13 @@ mod tests {
     #[test]
     fn test_prove_verify_simple() {
         let wasm_path = "./circuits/multiplier2/target/multiplier2_js/multiplier2.wasm";
-        let arkzkey_path = "./circuits/multiplier2/target/multiplier2_final.arkzkey";
+        let zkey_path = "./circuits/multiplier2/target/multiplier2_final.zkey";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Initialize
-        let init_res = circom_state.initialize(arkzkey_path, wasm_path);
+        let init_res = circom_state.initialize(zkey_path, wasm_path);
         assert!(init_res.is_ok());
 
         let _serialized_pk = init_res.unwrap();

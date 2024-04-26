@@ -11,7 +11,7 @@ import UIKit
 
 class KeccakSetupViewController: UIViewController {
 
-  let arkzkeyUrl = URL(string: "https://mopro.vivianjeng.xyz/keccak256_256_test_final.arkzkey")
+  let zkeyUrl = URL(string: "https://mopro.vivianjeng.xyz/keccak256_256_test_final.zkey")
   let wasmUrl = URL(string: "https://mopro.vivianjeng.xyz/keccak256_256_test.wasm")
 
   var downloadButton = UIButton(type: .system)
@@ -87,11 +87,11 @@ class KeccakSetupViewController: UIViewController {
   }
 
   @objc func runDownloadAction() {
-    let arkzkeyStart = CFAbsoluteTimeGetCurrent()
-    FileDownloader.loadFileAsync(url: self.arkzkeyUrl!) { (path, error) in
-      print("Ark zkey File downloaded to : \(path!)")
-      let arkzkeyEnd = CFAbsoluteTimeGetCurrent()
-      print("Download ark key took:", arkzkeyEnd - arkzkeyStart)
+    let zkeyStart = CFAbsoluteTimeGetCurrent()
+    FileDownloader.loadFileAsync(url: self.zkeyUrl!) { (path, error) in
+      print("Zkey File downloaded to : \(path!)")
+      let zkeyEnd = CFAbsoluteTimeGetCurrent()
+      print("Download ark key took:", zkeyEnd - zkeyStart)
     }
 
     let wasmStart = CFAbsoluteTimeGetCurrent()
@@ -109,7 +109,7 @@ class KeccakSetupViewController: UIViewController {
       .first
     {
 
-      let arkzkeyPath = documentsUrl.appendingPathComponent((arkzkeyUrl!).lastPathComponent)
+      let zkeyPath = documentsUrl.appendingPathComponent((zkeyUrl!).lastPathComponent)
       let wasmPath = documentsUrl.appendingPathComponent((wasmUrl!).lastPathComponent)
 
       // Multiplier example
@@ -121,14 +121,14 @@ class KeccakSetupViewController: UIViewController {
         // Record start time
         let start = CFAbsoluteTimeGetCurrent()
 
-        try moproCircom.initialize(arkzkeyPath: arkzkeyPath.path, wasmPath: wasmPath.path)
+        try moproCircom.initialize(zkeyPath: zkeyPath.path, wasmPath: wasmPath.path)
         proveButton.isEnabled = true  // Enable the Prove button upon successful setup
 
         // Record end time and compute duration
         let end = CFAbsoluteTimeGetCurrent()
         let timeTaken = end - start
 
-        textView.text += "Initializing arkzkey and wasm took \(timeTaken) seconds.\n"
+        textView.text += "Initializing zkey and wasm took \(timeTaken) seconds.\n"
       } catch let error as MoproError {
         print("MoproError: \(error)")
       } catch {

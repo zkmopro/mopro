@@ -70,13 +70,13 @@ void*_Nonnull uniffi_mopro_ffi_fn_constructor_moprocircom_new(RustCallStatus *_N
 );
 RustBuffer uniffi_mopro_ffi_fn_method_moprocircom_generate_proof(void*_Nonnull ptr, RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
 );
-void uniffi_mopro_ffi_fn_method_moprocircom_initialize(void*_Nonnull ptr, RustBuffer arkzkey_path, RustBuffer wasm_path, RustCallStatus *_Nonnull out_status
+void uniffi_mopro_ffi_fn_method_moprocircom_initialize(void*_Nonnull ptr, RustBuffer zkey_path, RustBuffer wasm_path, RustCallStatus *_Nonnull out_status
 );
 int8_t uniffi_mopro_ffi_fn_method_moprocircom_verify_proof(void*_Nonnull ptr, RustBuffer proof, RustBuffer public_input, RustCallStatus *_Nonnull out_status
 );
 uint32_t uniffi_mopro_ffi_fn_func_add(uint32_t a, uint32_t b, RustCallStatus *_Nonnull out_status
 );
-RustBuffer uniffi_mopro_ffi_fn_func_arkworks_pippenger(RustBuffer num_msm, RustCallStatus *_Nonnull out_status
+RustBuffer uniffi_mopro_ffi_fn_func_arkworks_pippenger(uint32_t instance_size, uint32_t num_instance, RustBuffer utils_dir, RustCallStatus *_Nonnull out_status
 );
 RustBuffer uniffi_mopro_ffi_fn_func_generate_proof2(RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
 );
@@ -91,6 +91,8 @@ void uniffi_mopro_ffi_fn_func_initialize_mopro_dylib(RustBuffer dylib_path, Rust
 RustBuffer uniffi_mopro_ffi_fn_func_to_ethereum_inputs(RustBuffer inputs, RustCallStatus *_Nonnull out_status
 );
 RustBuffer uniffi_mopro_ffi_fn_func_to_ethereum_proof(RustBuffer proof, RustCallStatus *_Nonnull out_status
+);
+RustBuffer uniffi_mopro_ffi_fn_func_trapdoortech_zprize_msm(uint32_t instance_size, uint32_t num_instance, RustBuffer utils_dir, RustCallStatus *_Nonnull out_status
 );
 int8_t uniffi_mopro_ffi_fn_func_verify_proof2(RustBuffer proof, RustBuffer public_input, RustCallStatus *_Nonnull out_status
 );
@@ -230,6 +232,9 @@ uint16_t uniffi_mopro_ffi_checksum_func_to_ethereum_inputs(void
     
 );
 uint16_t uniffi_mopro_ffi_checksum_func_to_ethereum_proof(void
+    
+);
+uint16_t uniffi_mopro_ffi_checksum_func_trapdoortech_zprize_msm(void
     
 );
 uint16_t uniffi_mopro_ffi_checksum_func_verify_proof2(void
