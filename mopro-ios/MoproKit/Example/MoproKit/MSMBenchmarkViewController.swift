@@ -40,7 +40,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     var resultsTableView: UITableView!
     var submitButton: UIButton!
 
-    let algorithms = ["Arkwork (Baseline)", "TrapdoorTech Zprize"]
+    let algorithms = ["Arkwork (Baseline)"]
     var selectedAlgorithms: Set<Int> = [0]  // Default to select the baseline MSM algorithm
 
     var benchmarkResults: [AlgorithmBenchmark] = []
@@ -55,7 +55,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
         String
     ) throws -> BenchmarkResult] = [
         "Arkwork (Baseline)": arkworksPippenger,
-        "TrapdoorTech Zprize": trapdoortechZprizeMsm,
+        // "TrapdoorTech Zprize": trapdoortechZprizeMsm,
     ]
 
     override func viewDidLoad() {

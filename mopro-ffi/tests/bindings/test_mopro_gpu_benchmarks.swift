@@ -18,13 +18,13 @@ do {
 }
 
 // test with trapdoor zprize msm
-do {
-    let result = try trapdoortechZprizeMsm(
-        instanceSize: instanceSize, 
-        numInstance: numInstance, 
-        utilsDir: utilsDir
-    );
-    print("Benchmark result: \(result)");
-} catch let error as MoproError{
-    print("Error running benchmark: \(error)")
-}
+// do {
+//     let result = try trapdoortechZprizeMsm(
+//         instanceSize: instanceSize, 
+//         numInstance: numInstance, 
+//         utilsDir: utilsDir
+//     );
+//     print("Benchmark result: \(result)");
+// } catch let error as MoproError{
+//     print("Error running benchmark: \(error)")
+// }

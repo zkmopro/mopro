@@ -226,36 +226,20 @@ pub fn arkworks_pippenger(
     .unwrap();
     Ok(benchmarks)
 }
-
-#[cfg(feature = "gpu-benchmarks")]
-pub fn trapdoortech_zprize_msm(
-    instance_size: u32,
-    num_instance: u32,
-    utils_dir: &str,
-) -> Result<BenchmarkResult, MoproError> {
-    let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(
-        instance_size,
-        num_instance,
-        &utils_dir,
-    )
-    .unwrap();
-    Ok(benchmarks)
-}
-
-#[cfg(feature = "gpu-benchmarks")]
-pub fn trapdoortech_zprize_msm(
-    instance_size: u32,
-    num_instance: u32,
-    utils_dir: &str,
-) -> Result<BenchmarkResult, MoproError> {
-    let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(
-        instance_size,
-        num_instance,
-        &utils_dir,
-    )
-    .unwrap();
-    Ok(benchmarks)
-}
+// #[cfg(feature = "gpu-benchmarks")]
+// pub fn trapdoortech_zprize_msm(
+//     instance_size: u32,
+//     num_instance: u32,
+//     utils_dir: &str,
+// ) -> Result<BenchmarkResult, MoproError> {
+//     let benchmarks = gpu_explorations::trapdoortech_zprize_msm::run_benchmark(
+//         instance_size,
+//         num_instance,
+//         &utils_dir,
+//     )
+//     .unwrap();
+//     Ok(benchmarks)
+// }
 
 #[cfg(not(feature = "gpu-benchmarks"))]
 pub fn arkworks_pippenger(
@@ -271,19 +255,19 @@ pub fn arkworks_pippenger(
     })
 }
 
-#[cfg(not(feature = "gpu-benchmarks"))]
-pub fn trapdoortech_zprize_msm(
-    instance_size: u32,
-    num_instance: u32,
-    utils_dir: &str,
-) -> Result<BenchmarkResult, MoproError> {
-    println!("gpu-benchmarks feature not enabled!");
-    Ok(BenchmarkResult {
-        instance_size,
-        num_instance,
-        avg_processing_time: 0.0,
-    })
-}
+// #[cfg(not(feature = "gpu-benchmarks"))]
+// pub fn trapdoortech_zprize_msm(
+//     instance_size: u32,
+//     num_instance: u32,
+//     utils_dir: &str,
+// ) -> Result<BenchmarkResult, MoproError> {
+//     println!("gpu-benchmarks feature not enabled!");
+//     Ok(BenchmarkResult {
+//         instance_size,
+//         num_instance,
+//         avg_processing_time: 0.0,
+//     })
+// }
 
 fn add(a: u32, b: u32) -> u32 {
     a + b

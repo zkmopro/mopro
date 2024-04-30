@@ -1,4 +1,3 @@
-// use ark_bls12_377_3;
 use ark_bn254::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
 use ark_ff::{Field, PrimeField};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize, SerializationError};

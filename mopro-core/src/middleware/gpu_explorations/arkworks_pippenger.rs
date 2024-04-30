@@ -1,4 +1,3 @@
-// use ark_bls12_377::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
 use ark_bn254::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
 use ark_ec::{AffineRepr, VariableBaseMSM};
 use ark_ff::BigInt;
