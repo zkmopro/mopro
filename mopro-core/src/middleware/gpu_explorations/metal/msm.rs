@@ -1,182 +1,178 @@
-use ark_bls12_381::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
+use ark_bn254::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
 use ark_ec::{AffineRepr, VariableBaseMSM};
-use ark_ff::{BigInt, PrimeField, UniformRand};
-
-use lambdaworks_math::{
-    cyclic_group::IsGroup,
-    elliptic_curve::short_weierstrass::{
-        curves::bls12_381::curve::BLS12381Curve, point::ShortWeierstrassProjectivePoint,
-    },
-    unsigned_integer::{element::U384, traits::U32Limbs},
-};
+use ark_ff::{BigInteger, PrimeField, UniformRand};
+use ark_std::{borrow::Borrow, cfg_into_iter, iterable::Iterable, rand, vec::Vec, One, Zero};
 
 use crate::middleware::gpu_explorations::metal::abstraction::{errors::MetalError, state::*};
 
-use metal::MTLSize;
+use metal::*;
 use objc::{rc::autoreleasepool, runtime::YES};
 
-type Point = GAffine;
-type Scalar = <ScalarField as PrimeField>::BigInt;
+#[cfg(feature = "parallel")]
+use rayon::prelude::*;
 
-const NUM_LIMBS: usize = 6;
+// Helper function for getting the windows size
+fn ln_without_floats(a: usize) -> usize {
+    // log2(a) * ln(2)
+    (ark_std::log2(a) * 69 / 100) as usize
+}
 
-/// Computes the multiscalar multiplication (MSM), using Pippenger's algorithm parallelized in
-/// Metal.
-pub fn pippenger(
-    cs: &[U384],
-    hidings: &[Point],
+/// Optimized implementation of multi-scalar multiplication.
+fn metal_msm<V: VariableBaseMSM>(
+    bases: &[V::MulBase],
+    _scalars: &[V::ScalarField],
     window_size: usize,
     state: &MetalState,
-) -> Result<Point, MetalError> {
-    if cs.len() != hidings.len() {
-        return Err(MetalError::InputError(format!(
-            "cs's length ({}) and hidings length ({}) need to match.",
-            cs.len(),
-            hidings.len(),
-        )));
-    }
+) -> Result<V, MetalError> {
+    let bigints = cfg_into_iter!(_scalars)
+        .map(|s| s.into_bigint())
+        .collect::<Vec<_>>();
+    let size = ark_std::cmp::min(bases.len(), bigints.len());
+    let scalars = &bigints[..size];
+    let bases = &bases[..size];
+    let scalars_and_bases_iter = scalars.iter().zip(bases).filter(|(s, _)| !s.is_zero());
 
-    if cs.is_empty() {
-        // return Ok(Point::neutral_element());
-        return Ok(Point::identity());
-    }
-
-    let point_len = cs.len(); // == hidings.len();
-
-    let n_bits = 64 * NUM_LIMBS;
-    let num_windows = (n_bits - 1) / window_size + 1;
-    let buckets_len = (1 << window_size) - 1;
-
-    let buckets_matrix_limbs = {
-        let matrix = vec![Point::rand(); buckets_len * point_len];
-        Point::to_flat_u32_limbs(&matrix)
+    let c = if size < 32 {
+        3
+    } else {
+        ln_without_floats(size) + 2
     };
-    let k_limbs = U384::to_flat_u32_limbs(cs);
-    let p_limbs = Point::to_flat_u32_limbs(hidings);
 
-    let k_buffer = state.alloc_buffer_data(&k_limbs);
-    let p_buffer = state.alloc_buffer_data(&p_limbs);
-    let wsize_buffer = state.alloc_buffer_data(&[window_size as u32]);
+    let num_bits = V::ScalarField::MODULUS_BIT_SIZE as usize;
+    let one = V::ScalarField::one().into_bigint();
 
-    let calc_buckets_pipe = state.setup_pipeline("calculate_buckets")?;
-    Ok((0..num_windows)
-        .rev()
-        .map(|window_idx| {
-            let buckets_matrix_buffer = state.alloc_buffer_data(&buckets_matrix_limbs);
+    let zero = V::zero();
+    let window_starts: Vec<_> = (0..num_bits).step_by(c).collect();
 
-            objc::rc::autoreleasepool(|| {
-                let (command_buffer, command_encoder) = state.setup_command(
-                    &calc_buckets_pipe,
-                    Some(&[
-                        (1, &wsize_buffer),
-                        (2, &k_buffer),
-                        (3, &p_buffer),
-                        (4, &buckets_matrix_buffer),
-                    ]),
-                );
+    // flatten scalar and base to Vec<u32>
+    // let scalars = scalars.iter().map(|s| s.as_ref().to_vec()).flatten().collect::<Vec<_>>();
+    // let bases = bases.iter().map(|b| b..into_uncompressed().to_vec()).flatten().collect::<Vec<_>>();
+    // println!("scalars: {:?}", scalars);
 
-                MetalState::set_bytes(0, &[window_idx], command_encoder);
+    // store params to GPU shared memory
+    let scalar_buffer = state.alloc_buffer_data(&scalars);
+    let base_buffer = state.alloc_buffer_data(&bases);
+    let window_size_buffer = state.alloc_buffer_data(&window_starts);
 
-                command_encoder.dispatch_thread_groups(
-                    MTLSize::new(1, 1, 1),
-                    MTLSize::new(point_len as u64, 1, 1),
-                );
-                command_encoder.end_encoding();
-                command_buffer.commit();
-                command_buffer.wait_until_completed();
+    let calc_bucket_pipe = state.setup_pipeline("calculate_buckets")?;
+
+    // TODO: integrate `calculate_buckets` functionality into parallel part of pippenger
+
+    /* Part to add wrapper logic of metal shader */
+
+    // Each window is of size `c`.
+    // We divide up the bits 0..num_bits into windows of size `c`, and
+    // in parallel process each such window.
+    let window_sums: Vec<_> = ark_std::cfg_into_iter!(window_starts)
+        .map(|w_start| {
+            let mut res = zero;
+            // We don't need the "zero" bucket, so we only have 2^c - 1 buckets.
+            let mut buckets = vec![zero; (1 << c) - 1];
+            // This clone is cheap, because the iterator contains just a
+            // pointer and an index into the original vectors.
+            scalars_and_bases_iter.clone().for_each(|(&scalar, base)| {
+                if scalar == one {
+                    // We only process unit scalars once in the first window.
+                    if w_start == 0 {
+                        res += base;
+                    }
+                } else {
+                    let mut scalar = scalar;
+
+                    // We right-shift by w_start, thus getting rid of the
+                    // lower bits.
+                    scalar.divn(w_start as u32);
+
+                    // We mod the remaining bits by 2^{window size}, thus taking `c` bits.
+                    let scalar = scalar.as_ref()[0] % (1 << c);
+
+                    // If the scalar is non-zero, we update the corresponding
+                    // bucket.
+                    // (Recall that `buckets` doesn't have a zero bucket.)
+                    if scalar != 0 {
+                        buckets[(scalar - 1) as usize] += base;
+                    }
+                }
             });
 
-            let buckets_matrix = {
-                let limbs = MetalState::retrieve_contents(&buckets_matrix_buffer);
-                Point::from_flat_u32_limbs(&limbs)
-            };
+            // Compute sum_{i in 0..num_buckets} (sum_{j in i..num_buckets} bucket[j])
+            // This is computed below for b buckets, using 2b curve additions.
+            //
+            // We could first normalize `buckets` and then use mixed-addition
+            // here, but that's slower for the kinds of groups we care about
+            // (Short Weierstrass curves and Twisted Edwards curves).
+            // In the case of Short Weierstrass curves,
+            // mixed addition saves ~4 field multiplications per addition.
+            // However normalization (with the inversion batched) takes ~6
+            // field multiplications per element,
+            // hence batch normalization is a slowdown.
 
-            let mut buckets = Vec::with_capacity(buckets_len);
-
-            // TODO: use iterators
-            for i in 0..buckets_len {
-                let mut partial_sum = buckets_matrix[i].clone();
-
-                for j in 1..point_len {
-                    partial_sum = partial_sum.operate_with(&buckets_matrix[i + j * buckets_len]);
-                }
-                buckets.push(partial_sum);
-            }
-
-            buckets
-                .iter_mut()
-                .rev()
-                .scan(Point::neutral_element(), |m, b| {
-                    *m = m.operate_with(b); // Reduction step.
-
-                    // TODO: Should cleanup the buffer in the position of b
-                    Some(m.clone())
-                })
-                .reduce(|g, m| g.operate_with(&m))
-                .unwrap_or_else(Point::neutral_element)
+            // `running_sum` = sum_{j in i..num_buckets} bucket[j],
+            // where we iterate backward from i = num_buckets to 0.
+            let mut running_sum = V::zero();
+            buckets.into_iter().rev().for_each(|b| {
+                running_sum += &b;
+                res += &running_sum;
+            });
+            res
         })
-        .reduce(|t, g| t.operate_with_self(1_u64 << window_size).operate_with(&g))
-        .unwrap_or_else(Point::neutral_element))
+        .collect();
+
+    // We store the sum for the lowest window.
+    let lowest = *window_sums.first().unwrap();
+
+    // We're traversing windows from high to low.
+    Ok(lowest
+        + &window_sums[1..]
+            .iter()
+            .rev()
+            .fold(zero, |mut total, sum_i| {
+                total += sum_i;
+                for _ in 0..c {
+                    total.double_in_place();
+                }
+                total
+            }))
 }
 
 #[cfg(test)]
 mod tests {
-    use lambdaworks_math::{
-        cyclic_group::IsGroup,
-        elliptic_curve::{
-            short_weierstrass::curves::bls12_381::curve::BLS12381Curve, traits::IsEllipticCurve,
-        },
-        msm::pippenger,
-        unsigned_integer::element::UnsignedInteger,
-    };
-    use proptest::{collection, prelude::*, prop_assert_eq, prop_compose, proptest};
+    use ark_bn254::Config;
+    use ark_ec::{short_weierstrass::Projective, CurveGroup, Group};
 
-    use crate::metal::abstractions::state::MetalState;
+    use super::*;
 
-    const _CASES: u32 = 1;
-    const _MAX_WSIZE: usize = 4;
-    const _MAX_LEN: usize = 30;
+    #[test]
+    fn test_msm_bigint() {
+        let state = MetalState::new(None).unwrap();
 
-    prop_compose! {
-        fn unsigned_integer()(limbs: [u64; 6]) -> UnsignedInteger<6> {
-            UnsignedInteger::from_limbs(limbs)
-        }
-    }
+        let num_points = 1000;
+        let window_size = 4;
+        let num_bits = ScalarField::MODULUS_BIT_SIZE as usize;
+        let num_scalars = 1000;
 
-    prop_compose! {
-        fn unsigned_integer_vec()(vec in collection::vec(unsigned_integer(), 0.._MAX_LEN)) -> Vec<UnsignedInteger<6>> {
-            vec
-        }
-    }
+        let mut rng = rand::thread_rng();
+        let points: Vec<GAffine> = (0..num_points)
+            .map(|_| G::rand(&mut rng).into_affine())
+            .collect();
 
-    prop_compose! {
-        fn point()(power: u128) -> <BLS12381Curve as IsEllipticCurve>::PointRepresentation {
-            BLS12381Curve::generator().operate_with_self(power)
-        }
-    }
+        let scalars: Vec<ScalarField> = (0..num_scalars)
+            .map(|_| ScalarField::rand(&mut rng))
+            .collect();
 
-    prop_compose! {
-        fn points_vec()(vec in collection::vec(point(), 0.._MAX_LEN)) -> Vec<<BLS12381Curve as IsEllipticCurve>::PointRepresentation> {
-            vec
-        }
-    }
+        let msm = <G as VariableBaseMSM>::msm(&points, &scalars).unwrap();
+        let msm_bigint = metal_msm::<G>(&points, &scalars, window_size, &state).unwrap();
 
-    proptest! {
-        #![proptest_config(ProptestConfig {
-            cases: _CASES, .. ProptestConfig::default()
-          })]
-        // Property-based test that ensures the metal implementation matches the CPU one.
-        #[test]
-        fn test_metal_pippenger_matches_cpu(window_size in 1.._MAX_WSIZE, cs in unsigned_integer_vec(), hidings in points_vec()) {
-            let state = MetalState::new(None).unwrap();
-            let min_len = cs.len().min(hidings.len());
-            let cs = cs[..min_len].to_vec();
-            let hidings = hidings[..min_len].to_vec();
+        // println!("msm: {:?}", msm);
+        // println!("msm_bigint: {:?}", msm_bigint);
 
-            let cpu_result = pippenger::msm_with(&cs, &hidings, window_size);
-            let metal_result = super::pippenger(&cs, &hidings, window_size, &state).unwrap();
+        // if (msm - msm_bigint).is_zero() {
+        //     println!("msm and msm_bigint are equal");
+        // }
+        // else {
+        //     println!("msm and msm_bigint are not equal");
+        // }
 
-            prop_assert_eq!(metal_result, cpu_result);
-        }
+        assert_eq!(msm, msm_bigint);
     }
 }
