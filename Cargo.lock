@@ -572,7 +572,6 @@ dependencies = [
  "flame",
  "flamer",
  "memmap2 0.9.4",
- "num-traits",
 ]
 
 [[package]]
