@@ -45,7 +45,7 @@ jobs:
       - name: Run iOS tests
         run: |
           cd mopro-ios/MoproKit/Example
-          xcodebuild test -scheme MoproKit-Example -workspace MoproKit.xcworkspace -destination "platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro"
+          xcodebuild test -scheme MoproKit-Example -workspace MoproKit.xcworkspace -destination "platform=iOS Simulator,OS=17.5,name=iPhone 15 Pro"
       - name: Get uniffi-version
         if: steps.uniffi-bindgen-macos-restore.outputs.cache-hit != 'true'
         run: echo "UNIFFI_VERSION=$(toml get mopro-ffi/Cargo.toml dependencies.uniffi.version -r)" >> $GITHUB_ENV

@@ -2,7 +2,7 @@
 
 [build]
 # For iOS device_type can be x86_64, simulator, device
-ios_device_type = "x86_64" # Options: x86_64, simulator, device
+ios_device_type = "simulator" # Options: x86_64, simulator, device
 # For Android device_type can be x86_64, x86, arm, arm64
 android_device_type = "x86_64" # Options: x86_64, x86, arm, arm64
 
