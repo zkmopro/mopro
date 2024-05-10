@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@types/snarkjs": "^0.7.7",
-    "next": "14.0.3",
+    "next": "14.1.1",
     "react": "^18",
     "react-dom": "^18",
     "snarkjs": "^0.7.2"
