@@ -2,7 +2,7 @@
 
 Library to read `zkey` faster by serializing to `arkworks` friendly format.
 
-See https://github.com/oskarth/mopro/issues/25 for context.
+See https://github.com/zkmopro/mopro/issues/25 for context.
 
 ## How to use
 

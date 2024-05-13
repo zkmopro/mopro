@@ -24,7 +24,7 @@ After that you'll see location of the dylib file:
 
 ```
 warning: Building dylib for aarch64-apple-darwin
-warning: Dylib location: /Users/user/repos/github.com/oskarth/mopro/mopro-core/target/debug/aarch64-apple-darwin/keccak256.dylib
+warning: Dylib location: /Users/user/repos/github.com/zkmopro/mopro/mopro-core/target/debug/aarch64-apple-darwin/keccak256.dylib
 ```
 
 Right now this is hardcoded for `rsa`.

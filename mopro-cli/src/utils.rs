@@ -7,8 +7,8 @@ pub fn get_mopro_root() -> String {
         Err(_) => {
             eprintln!("Error: MOPRO_ROOT environment variable is not set.");
             eprintln!("Please set MOPRO_ROOT to point to the local checkout of mopro.");
-            eprintln!("For example: export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro");
-            eprintln!("Git repository: https://github.com/oskarth/mopro");
+            eprintln!("For example: export MOPRO_ROOT=/Users/user/repos/github.com/zkmopro/mopro");
+            eprintln!("Git repository: https://github.com/zkmopro/mopro");
             exit(1);
         }
     }

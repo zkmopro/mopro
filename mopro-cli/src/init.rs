@@ -40,6 +40,8 @@ pub fn init_project(adapter: &str, platforms: &Vec<String>, project_name: &str) 
     // Always copy core platform
     entries_to_copy.push(source_path.join("core"));
     entries_to_copy.push(source_path.join("mopro-config.toml"));
+    entries_to_copy.push(source_path.join("Cargo.toml"));
+    entries_to_copy.push(source_path.join(".gitignore"));
     entries_to_copy.push(source_path.join("README.md"));
     if platforms.contains(&"ios".to_string()) {
         entries_to_copy.push(source_path.join("ios"));
