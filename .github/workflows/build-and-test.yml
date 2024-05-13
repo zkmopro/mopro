@@ -13,6 +13,26 @@ jobs:
       - uses: actions/checkout@v3
       - name: Check formatting
         run: cargo fmt --all -- --check
+  
+  test-cli:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install mopro-cli
+        run: (cd mopro-cli && cargo install --path .)
+      - name: Use mopro-cli
+        run: |
+          export MOPRO_ROOT=$(PWD) # Export MOPRO_ROOT path
+          mopro deps # Install mopro dependencies
+          mopro init --platforms ios android # Initialize mopro-example-app
+          cd mopro-example-app 
+          mopro prepare # Prepare your circuit artifacts
+          mopro build --platforms ios android # Build the project
+          mopro test #  Run end-to-end test (in Rust only)
+      - name: Test the project for iOS
+        run: |
+          cd mopro-example-app/ios/ExampleApp
+          xcodebuild test -scheme ExampleApp -workspace ExampleApp.xcworkspace -destination "platform=iOS Simulator,OS=17.5,name=iPhone 15 Pro"
 
   test-ios:
     runs-on: macos-latest
@@ -26,7 +46,7 @@ jobs:
           key: ${{ runner.os }}-toml-0.2.3 # version of toml-cli 0.2.3
       - name: Install circom
         run: |
-          sudo wget -O /Users/runner/.cargo/bin/circom https://github.com/iden3/circom/releases/download/v2.1.8/circom-macos-amd64
+          sudo wget -O /Users/runner/.cargo/bin/circom https://github.com/iden3/circom/releases/download/v2.1.9/circom-macos-amd64
           sudo chmod +x /Users/runner/.cargo/bin/circom
       - name: Get uniffi-version
         if: steps.toml-macos-restore.outputs.cache-hit == 'true'
@@ -56,7 +76,7 @@ jobs:
             path: /Users/runner/.cargo/bin/uniffi-bindgen
             key: ${{ runner.os }}-uniffi-bindgen-${{ env.UNIFFI_VERSION }}
 
-  test-android:
+  test-android-and-core:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -68,7 +88,7 @@ jobs:
           key: ${{ runner.os }}-toml-0.2.3 # version of toml-cli 0.2.3
       - name: Install circom
         run: |
-          sudo wget -O /usr/bin/circom https://github.com/iden3/circom/releases/download/v2.1.8/circom-linux-amd64
+          sudo wget -O /usr/bin/circom https://github.com/iden3/circom/releases/download/v2.1.9/circom-linux-amd64
           sudo chmod +x /usr/bin/circom
       - name: Get uniffi-version
         if: steps.toml-linux-restore.outputs.cache-hit == 'true'
