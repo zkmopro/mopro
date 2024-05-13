@@ -127,23 +127,22 @@ pub fn initialize(dylib_path: &Path) {
         .set(from_dylib(dylib_path))
         .expect("Failed to set WITNESS_CALCULATOR");
 
-    // Initialize ARKZKEY
-    // TODO: Speed this up even more
+    // Initialize ZKEY
     let now = std::time::Instant::now();
-    Lazy::force(&ARKZKEY);
-    println!("Initializing arkzkey took: {:.2?}", now.elapsed());
+    Lazy::force(&ZKEY);
+    // Lazy::force(&ARKZKEY);
+    println!("Initializing zkey took: {:.2?}", now.elapsed());
 }
 
 #[cfg(not(feature = "dylib"))]
 pub fn initialize() {
-    println!("Initializing library with arkzkey");
+    println!("Initializing library with zkey");
 
-    // Initialize ARKZKEY
-    // TODO: Speed this up even more!
+    // Initialize ZKEY
     let now = std::time::Instant::now();
     Lazy::force(&ZKEY);
     // Lazy::force(&ARKZKEY);
-    println!("Initializing arkzkey took: {:.2?}", now.elapsed());
+    println!("Initializing zkey took: {:.2?}", now.elapsed());
 }
 
 /// Creates a `WitnessCalculator` instance from a dylib file.
@@ -227,7 +226,7 @@ pub fn generate_proof2(
     let now = std::time::Instant::now();
     let zkey = zkey();
     // let zkey = arkzkey();
-    println!("Loading arkzkey took: {:.2?}", now.elapsed());
+    println!("Loading zkey took: {:.2?}", now.elapsed());
 
     let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
 
@@ -318,7 +317,7 @@ impl CircomState {
         let zkey = self.zkey.as_ref().ok_or(MoproError::CircomError(
             "Zkey has not been set up".to_string(),
         ))?;
-        println!("Loading arkzkey took: {:.2?}", now.elapsed());
+        println!("Loading zkey took: {:.2?}", now.elapsed());
 
         let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
 

@@ -2,4 +2,5 @@
 .DS_Store
 target/
 mopro-cli/mopro-example-app
+mopro-example-app
 graph.bin

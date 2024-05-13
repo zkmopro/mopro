@@ -1,7 +1,7 @@
 [workspace]
 members = ["mopro-core", "mopro-ffi", "mopro-cli", "ark-zkey"]
 resolver = "2"
-exclude = ["mopro-cli-example"]
+exclude = ["mopro-example-app"]
 
 [patch.crates-io]
 # NOTE: Forked wasmer to work around memory limits
