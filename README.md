@@ -4,19 +4,19 @@ Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side pro
 
 ## Getting started
 
-We recommend you use [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) to create and maintain your application. Here's how you can get started with your example app in a few minutes.
+We recommend you use [mopro-cli](https://github.com/zkmopro/mopro/tree/main/mopro-cli#mopro-cli) to create and maintain your application. Here's how you can get started with your example app in a few minutes.
 
 You can also watch this short (<5m) [tutorial](https://www.loom.com/share/6ff382b0497c47aea9d0ef8b6e790dd8).
 
 ### Install dependencies
 
-First, make sure you've installed the [prerequisites](https://github.com/oskarth/mopro?tab=readme-ov-file#prerequisites).
+First, make sure you've installed the [prerequisites](https://github.com/zkmopro/mopro?tab=readme-ov-file#prerequisites).
 
 Then, run the following commands:
 
 ```sh
 # Clone the mopro repo
-git clone git@github.com:oskarth/mopro.git
+git clone https://github.com/zkmopro/mopro.git
 
 # Go to your newly cloned checkout
 cd mopro
@@ -25,7 +25,7 @@ cd mopro
 (cd mopro-cli && cargo install --path .)
 
 # Set `MOPRO_ROOT` (replace with path to your git checkout of mopro)
-# For example: `export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro`
+# For example: `export MOPRO_ROOT=/Users/user/repos/github.com/zkmopro/mopro`
 export MOPRO_ROOT=$(PWD)
 
 # Install `mopro` dependencies
@@ -61,41 +61,62 @@ This only has to be done once when changing the circuit.
 
 Depending on what platforms you are targetting, you can run the following commands:
 
-```sh
-# Build the project
-mopro build
+-   Build the project
 
-# Run end-to-end test (in Rust only)
-mopro test
+    ```sh
+    mopro build
+    ```
 
-# Build the project for iOS
-mopro build --platforms ios
+-   Run end-to-end test (in Rust only)
 
-# Open in Xcode to run on simulator/device
-open ios/ExampleApp/ExampleApp.xcworkspace
+    ```sh
+    mopro test
+    ```
 
-# Build the project for Android
-mopro build --platforms android
+-   Build the project for iOS
 
-# Open in Android Studio to run on simulator/device
-open android -a Android\ Studio
-```
+    ```sh
+    mopro build --platforms ios
+    ```
 
-See [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) for more details on usage.
+-   Open in Xcode to run on simulator
+
+    ```sh
+    open ios/ExampleApp/ExampleApp.xcworkspace
+    ```
+
+    Use `command`+`U` to run tests.
+
+-   Build the project for Android
+
+    ```sh
+    mopro build --platforms android
+    ```
+
+-   Open in Android Studio to run on simulator
+
+    ```sh
+    open android -a Android\ Studio
+    ```
+
+    Use `^R` (`control`+`R`) to execute a simulator.
+
+> See [mopro-cli](https://github.com/zkmopro/mopro/tree/main/mopro-cli#mopro-cli) for more details on usage.
+> Edit [mopro configuration](#mopro-configuration) to build for device or build for other circuits.
 
 ## Overview
 
 mopro consists of a set of libraries and utilities. Here's a list of the various subprojects:
 
-- `mopro-cli` - core Rust CLI util.
-- `mopro-core` - core mobile Rust library.
-- `mopro-ffi` - wraps `mopro-core` and exposes UniFFI bindings.
-- `templates/mopro-example-app` - example multi-platform app template.
-- `ark-zkey` - helper utility to make zkey more usable and faster in arkworks.
-- `mopro-ios` - iOS CocoaPod library exposing native Swift bindings. (will be deprecated)
-- `mopro-android` - Android library exposing native Kotlin bindings. (will be deprecated)
-- `webprover` - Prove example circuits through a browser, used for benchmarking.
-- `scripts` - various helper scripts for `mopro-cli` and testing.
+-   `mopro-cli` - core Rust CLI util.
+-   `mopro-core` - core mobile Rust library.
+-   `mopro-ffi` - wraps `mopro-core` and exposes UniFFI bindings.
+-   `templates/mopro-example-app` - example multi-platform app template.
+-   `ark-zkey` - helper utility to make zkey more usable and faster in arkworks.
+-   `mopro-ios` - iOS CocoaPod library exposing native Swift bindings. (will be deprecated)
+-   `mopro-android` - Android library exposing native Kotlin bindings. (will be deprecated)
+-   `web-prover` - Prove example circuits through a browser, used for benchmarking.
+-   `scripts` - various helper scripts for `mopro-cli` and testing.
 
 ## Architecture
 
@@ -107,25 +128,25 @@ The following illustration shows how mopro and its components fit together into 
 
 Depending on what platforms and adapters you use, there are several prerequisites to install before getting started.
 
-- General
-    - [Rust](https://www.rust-lang.org/learn/get-started)
-- Circom
-    - [circom](https://docs.circom.io/)
-    - [snarkjs](https://github.com/iden3/snarkjs)
-- iOS
-    - [Xcode](https://developer.apple.com/xcode/)
-    - [CocoaPods](https://cocoapods.org/)
-- Android
-    - [Android Studio](https://developer.android.com/studio)
-    - Also see configuration below
+-   General
+    -   [Rust](https://www.rust-lang.org/learn/get-started)
+-   Circom
+    -   [circom](https://docs.circom.io/)
+    -   [snarkjs](https://github.com/iden3/snarkjs)
+-   iOS
+    -   [Xcode](https://developer.apple.com/xcode/)
+    -   [CocoaPods](https://cocoapods.org/)
+-   Android
+    -   [Android Studio](https://developer.android.com/studio)
+    -   Also see configuration below
 
 ### Android configuration
 
 Some additional configuration is required for Android.
 
-First, install the latest SDK. In Android Studio, go to `SDK Manager > SDK Tools`  and install `NDK (Side by Side)` (see [Android Developer site](https://developer.android.com/studio/projects/install-ndk#default-version)).
+First, install the latest SDK. In Android Studio, go to `SDK Manager > SDK Tools` and install `NDK (Side by Side)` (see [Android Developer site](https://developer.android.com/studio/projects/install-ndk#default-version)).
 
-After that, set the following  environment variables:
+After that, set the following environment variables:
 
 ```sh
 # Export `$ANDROID_HOME` and change `{USER_NAME}` to your username
@@ -168,7 +189,7 @@ use_dylib = false         # Options: true, false
 name = "keccak256.dylib" # Name of the dylib file, only used if use_dylib is true
 
 # Note: circom-witness-rs is experimental
-# See https://github.com/oskarth/mopro/issues/32 for updates
+# See https://github.com/zkmopro/mopro/issues/32 for updates
 # Only works for keccak256_256_test circuit now
 [witness]
 use_native_witness_generation = false       # Options: true, false
@@ -190,13 +211,13 @@ Contributions of all kinds welcome! Please see open GH issues. Also feel free to
 
 Preliminary benchmarks on an iPhone 14 Max Pro:
 
-- Keccak256 (150k constraints): 1.5s
-    - ~x10-20 faster vs comparable circuit in browser
-- anon-aadhaar / RSA Verify: ~6.5s
-    - ~5s for witness generation (still in WASM), ~2s prover time
-    - 80% of time on witness generation
-    - ~x10 faster vs browser on phone
-- Bottlenecks: loading zkey and wasm witness generation
+-   Keccak256 (150k constraints): 1.5s
+    -   ~x10-20 faster vs comparable circuit in browser
+-   anon-aadhaar / RSA Verify: ~6.5s
+    -   ~5s for witness generation (still in WASM), ~2s prover time
+    -   80% of time on witness generation
+    -   ~x10 faster vs browser on phone
+-   Bottlenecks: wasm witness generation
 
 See [Project MoPerf results](https://hackmd.io/5ItB2D50QcavF18cWIrmfQ?view=#tip1) for more benchmarks.
 

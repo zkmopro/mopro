@@ -4,13 +4,14 @@ use self::{
 };
 use crate::MoproError;
 
-use std::collections::HashMap;
-//use std::io::Cursor;
+use std::io::Cursor;
 use std::sync::Mutex;
 use std::time::Instant;
+use std::{collections::HashMap, fs::File, io::BufReader};
 
 use ark_bn254::{Bn254, Fr};
 use ark_circom::{
+    read_zkey,
     CircomReduction,
     WitnessCalculator, //read_zkey,
 };
@@ -52,8 +53,8 @@ type CircuitInputs = HashMap<String, Vec<BigInt>>;
 // TODO: Split up this namespace a bit, right now quite a lot of things going on
 
 pub struct CircomState {
-    arkzkey: Option<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)>,
     wasm_bytes: Option<Vec<u8>>,
+    zkey: Option<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)>,
 }
 
 impl Default for CircomState {
@@ -66,20 +67,20 @@ impl Default for CircomState {
 
 // TODO: Replace printlns with logging
 
-//const ZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ZKEY_FILE"));
+const ZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ZKEY_FILE"));
 
-const ARKZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ARKZKEY_FILE"));
+// const ARKZKEY_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_ARKZKEY_FILE"));
 
-// static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
-//     let mut reader = Cursor::new(ZKEY_BYTES);
-//     read_zkey(&mut reader).expect("Failed to read zkey")
-// });
-
-static ARKZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
-    //let mut reader = Cursor::new(ARKZKEY_BYTES);
-    // TODO: Use reader? More flexible; unclear if perf diff
-    read_arkzkey_from_bytes(ARKZKEY_BYTES).expect("Failed to read arkzkey")
+static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
+    let mut reader = Cursor::new(ZKEY_BYTES);
+    read_zkey(&mut reader).expect("Failed to read zkey")
 });
+
+// static ARKZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
+//     //let mut reader = Cursor::new(ARKZKEY_BYTES);
+//     // TODO: Use reader? More flexible; unclear if perf diff
+//     read_arkzkey_from_bytes(ARKZKEY_BYTES).expect("Failed to read arkzkey")
+// });
 
 #[cfg(not(feature = "dylib"))]
 const WASM: &[u8] = include_bytes!(env!("BUILD_RS_WASM_FILE"));
@@ -126,22 +127,22 @@ pub fn initialize(dylib_path: &Path) {
         .set(from_dylib(dylib_path))
         .expect("Failed to set WITNESS_CALCULATOR");
 
-    // Initialize ARKZKEY
-    // TODO: Speed this up even more
+    // Initialize ZKEY
     let now = std::time::Instant::now();
-    Lazy::force(&ARKZKEY);
-    println!("Initializing arkzkey took: {:.2?}", now.elapsed());
+    Lazy::force(&ZKEY);
+    // Lazy::force(&ARKZKEY);
+    println!("Initializing zkey took: {:.2?}", now.elapsed());
 }
 
 #[cfg(not(feature = "dylib"))]
 pub fn initialize() {
-    println!("Initializing library with arkzkey");
+    println!("Initializing library with zkey");
 
-    // Initialize ARKZKEY
-    // TODO: Speed this up even more!
+    // Initialize ZKEY
     let now = std::time::Instant::now();
-    Lazy::force(&ARKZKEY);
-    println!("Initializing arkzkey took: {:.2?}", now.elapsed());
+    Lazy::force(&ZKEY);
+    // Lazy::force(&ARKZKEY);
+    println!("Initializing zkey took: {:.2?}", now.elapsed());
 }
 
 /// Creates a `WitnessCalculator` instance from a dylib file.
@@ -157,16 +158,16 @@ fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
     Mutex::new(result)
 }
 
-// #[must_use]
-// pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
-//     &ZKEY
-// }
+#[must_use]
+pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
+    &ZKEY
+}
 
 // Experimental
-#[must_use]
-pub fn arkzkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
-    &ARKZKEY
-}
+// #[must_use]
+// pub fn arkzkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
+//     &ARKZKEY
+// }
 
 /// Provides access to the `WITNESS_CALCULATOR` singleton, initializing it if necessary.
 /// It expects the path to the dylib file to be set in the `CIRCUIT_WASM_DYLIB` environment variable.
@@ -224,9 +225,9 @@ pub fn generate_proof2(
     println!("Witness generation took: {:.2?}", now.elapsed());
 
     let now = std::time::Instant::now();
-    //let zkey = zkey();
-    let zkey = arkzkey();
-    println!("Loading arkzkey took: {:.2?}", now.elapsed());
+    let zkey = zkey();
+    // let zkey = arkzkey();
+    println!("Loading zkey took: {:.2?}", now.elapsed());
 
     let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
 
@@ -254,7 +255,8 @@ pub fn verify_proof2(
     serialized_inputs: SerializableInputs,
 ) -> Result<bool, MoproError> {
     let start = Instant::now();
-    let zkey = arkzkey();
+    let zkey = zkey();
+    // let zkey = arkzkey();
     let pvk = prepare_verifying_key(&zkey.0.vk);
 
     let proof_verified =
@@ -269,15 +271,18 @@ pub fn verify_proof2(
 impl CircomState {
     pub fn new() -> Self {
         Self {
-            arkzkey: None,
             wasm_bytes: None,
+            zkey: None,
+            // arkzkey: None,
         }
     }
 
-    pub fn initialize(&mut self, arkzkey_path: &str, wasm_path: &str) -> Result<(), MoproError> {
-        let arkzkey =
-            read_arkzkey(arkzkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
-        self.arkzkey = Some(arkzkey);
+    pub fn initialize(&mut self, zkey_path: &str, wasm_path: &str) -> Result<(), MoproError> {
+        let mut file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let zkey = read_zkey(&mut file).map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+        // read_arkzkey(arkzkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        self.zkey = Some(zkey);
 
         let wasm_bytes =
             std::fs::read(wasm_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
@@ -310,10 +315,10 @@ impl CircomState {
         println!("Witness generation took: {:.2?}", now.elapsed());
 
         let now = std::time::Instant::now();
-        let zkey = self.arkzkey.as_ref().ok_or(MoproError::CircomError(
+        let zkey = self.zkey.as_ref().ok_or(MoproError::CircomError(
             "Zkey has not been set up".to_string(),
         ))?;
-        println!("Loading arkzkey took: {:.2?}", now.elapsed());
+        println!("Loading zkey took: {:.2?}", now.elapsed());
 
         let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
 
@@ -340,7 +345,7 @@ impl CircomState {
         serialized_inputs: SerializableInputs,
     ) -> Result<bool, MoproError> {
         let start = Instant::now();
-        let zkey = self.arkzkey.as_ref().ok_or(MoproError::CircomError(
+        let zkey = self.zkey.as_ref().ok_or(MoproError::CircomError(
             "Zkey has not been set up".to_string(),
         ))?;
         let pvk = prepare_verifying_key(&zkey.0.vk);
@@ -387,12 +392,12 @@ mod tests {
     #[test]
     fn test_setup_prove_verify_simple() {
         let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
-        let arkzkey_path = "./examples/circom/multiplier2/target/multiplier2_final.arkzkey";
+        let zkey_path = "./examples/circom/multiplier2/target/multiplier2_final.zkey";
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
+        let setup_res = circom_state.initialize(zkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();
@@ -433,12 +438,12 @@ mod tests {
     fn test_setup_prove_verify_keccak() {
         let wasm_path =
             "./examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
-        let arkzkey_path = "./examples/circom/keccak256/target/keccak256_256_test_final.arkzkey";
+        let zkey_path = "./examples/circom/keccak256/target/keccak256_256_test_final.zkey";
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
+        let setup_res = circom_state.initialize(zkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();
@@ -486,10 +491,10 @@ mod tests {
         let mut circom_state = CircomState::new();
 
         let wasm_path = "badpath/multiplier2.wasm";
-        let arkzkey_path = "badpath/multiplier2.arkzkey";
+        let zkey_path = "badpath/multiplier2.zkey";
 
         // Act: Call the setup method
-        let result = circom_state.initialize(arkzkey_path, wasm_path);
+        let result = circom_state.initialize(zkey_path, wasm_path);
 
         // Assert: Check that the method returns an error
         assert!(result.is_err());
@@ -559,13 +564,13 @@ mod tests {
     #[test]
     fn test_setup_prove_rsa() {
         let wasm_path = "./examples/circom/rsa/target/main_js/main.wasm";
-        let arkzkey_path = "./examples/circom/rsa/target/main_final.arkzkey";
+        let zkey_path = "./examples/circom/rsa/target/main_final.zkey";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
+        let setup_res = circom_state.initialize(zkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();
@@ -670,13 +675,13 @@ mod tests {
     fn test_setup_prove_anon_aadhaar() {
         let wasm_path =
             "./examples/circom/anonAadhaar/target/aadhaar-verifier_js/aadhaar-verifier.wasm";
-        let arkzkey_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier_final.arkzkey";
+        let zkey_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier_final.zkey";
 
         // Instantiate CircomState
         let mut circom_state = CircomState::new();
 
         // Setup
-        let setup_res = circom_state.initialize(arkzkey_path, wasm_path);
+        let setup_res = circom_state.initialize(zkey_path, wasm_path);
         assert!(setup_res.is_ok());
 
         let _serialized_pk = setup_res.unwrap();

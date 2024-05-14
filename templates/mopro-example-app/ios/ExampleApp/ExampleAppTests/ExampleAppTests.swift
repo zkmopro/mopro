@@ -6,31 +6,55 @@
 //
 
 import XCTest
+
 @testable import ExampleApp
 
 final class ExampleAppTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
+  override func setUpWithError() throws {
+    // Put setup code here. This method is called before the invocation of each test method in the class.
+  }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+  override func tearDownWithError() throws {
+    // Put teardown code here. This method is called after the invocation of each test method in the class.
+  }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
+  func testCircomMultiplier() throws {
+    do {
+      var inputs = [String: [String]]()
+      let a = 3
+      let b = 5
+      let c = a * b
+      inputs["a"] = [String(a)]
+      inputs["b"] = [String(b)]
+      let outputs: [String] = [String(c), String(a)]
+      let expectedOutput: [UInt8] = serializeOutputs(outputs)
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+      // Generate Proof
+      guard
+        let generateProofResult = try generateProof2(circuitInputs: inputs) as GenerateProofResult?
+      else { print("error") }
+      XCTAssertFalse(generateProofResult.proof.isEmpty, "Proof should not be empty")
+      XCTAssertEqual(
+        Data(expectedOutput), generateProofResult.inputs,
+        "Circuit outputs mismatch the expected outputs")
+
+      guard
+        let isValid = try verifyProof2(
+          proof: generateProofResult.proof, publicInput: generateProofResult.inputs) as Bool?
+      else { print("error") }
+      XCTAssertTrue(isValid, "Proof verification should succeed")
+    } catch let error as MoproError {
+      print("MoproError: \(error)")
+    } catch {
+      print("Unexpected error: \(error)")
     }
+  }
+  func testPerformanceExample() throws {
+    // This is an example of a performance test case.
+    self.measure {
+      // Put the code you want to measure the time of here.
+    }
+  }
 
 }

@@ -8,13 +8,13 @@ edition = "2021"
 [features]
 default = ["wasmer/dylib"]
 dylib = [] # NOTE: can probably remove this if we use env config instead
-gpu-benchmarks = []
 calc-native-witness = [
     "witness",
 ] # experimental feature to calculate witness with witness graph
 build-native-witness = [
     "witness/build-witness",
 ] # only enable build-native-witness feature when building the witness graph
+gpu-benchmarks = ["ark-bls12-377", "ark-bls12-381", "ark-ed-on-bls12-377", "ark-ed-on-bls12-381", "ark-poly", "ark-poly-commit", "ark-sponge", "duration-string", "rand", "rand_chacha", "lazy_static", "ark-ec-3", "ark-ff-3", "ark-serialize-3", "ark-std-3", "ark-bls12-377-3"]
 
 [dependencies]
 ark-circom = { git = "https://github.com/vivianjeng/circom-compat-wasm3.git" }
@@ -49,6 +49,29 @@ witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 criterion = "=0.3.6"
+
+# GPU explorations
+ark-bls12-377 = { version = "0.4", optional = true }
+ark-bls12-381 = { version = "0.3", optional = true }
+ark-ed-on-bls12-377 = { version = "0.3", optional = true }
+ark-ed-on-bls12-381 = { version = "0.3", optional = true }
+ark-poly = { version = "0.3", optional = true }
+ark-poly-commit = { version = "0.3", optional = true }
+ark-sponge = { version = "0.3", optional = true }
+duration-string = { version = "0.0.6", optional = true }
+rand = { version = "0.8.0", optional = true }
+rand_chacha = { version = "0.3.1", optional = true }
+lazy_static = { version = "1.4.0", optional = true }
+ark-ff = { version = "=0.4.1", default-features = false, features = [
+    "parallel",
+] }
+
+# GPU explorations from mopro/Cargo.toml patch
+ark-bls12-377-3 = { git = 'https://github.com/arkworks-rs/curves.git', package = 'ark-bls12-377', tag = 'v0.3.0', optional = true}
+ark-ec-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ec', tag = 'v0.3.0', features = ["parallel"], optional = true}
+ark-ff-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ff', tag = 'v0.3.0', features = ["parallel"], optional = true }
+ark-serialize-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-serialize', tag = 'v0.3.0', optional = true }
+ark-std-3 = { git = 'https://github.com/arkworks-rs/std.git', package = 'ark-std', tag = 'v0.3.0', optional = true }
 
 [build-dependencies]
 color-eyre = "0.6"

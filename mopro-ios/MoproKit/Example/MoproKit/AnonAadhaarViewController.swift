@@ -81,7 +81,7 @@ class AnonAadhaarViewController: UIViewController, WKScriptMessageHandler, WKNav
 
                 // Again, update the UI on the main thread
                 DispatchQueue.main.async {
-                    self.textView.text += "Initializing arkzkey took \(timeTaken) seconds.\n"
+                    self.textView.text += "Initializing zkey took \(timeTaken) seconds.\n"
                 }
             } catch {
                 // Handle errors - update UI on main thread

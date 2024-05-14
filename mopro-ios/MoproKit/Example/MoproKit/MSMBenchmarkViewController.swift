@@ -10,7 +10,26 @@ import UIKit
 import MoproKit
 
 class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    // let pointUrl = URL(string: "https://mopro-msm.s3.eu-north-1.amazonaws.com/vectors/16x10/points")
+    // let scalarUrl = URL(string: "https://mopro-msm.s3.eu-north-1.amazonaws.com/vectors/16x10/scalars")
+    // func runDownloadAction() {
+    //   let pointStart = CFAbsoluteTimeGetCurrent()
+    //   FileDownloader.loadFileAsync(url: self.pointUrl!) { (path, error) in
+    //     print("Points File downloaded to : \(path!)")
+    //     let pointEnd = CFAbsoluteTimeGetCurrent()
+    //     print("Download points took:", pointEnd - pointStart, "s")
+    //   }
 
+    //   let scalarStart = CFAbsoluteTimeGetCurrent()
+    //   FileDownloader.loadFileAsync(url: self.scalarUrl!) { (path, error) in
+    //     print("Scalars File downloaded to : \(path!)")
+    //     let scalarEnd = CFAbsoluteTimeGetCurrent()
+    //     print("Download scalars took:", scalarEnd - scalarStart, "s")
+    //   }
+
+    // }
+    
     struct AlgorithmBenchmark {
         var algorithm: String
         var avgMsmTime: Double
@@ -21,7 +40,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     var resultsTableView: UITableView!
     var submitButton: UIButton!
 
-    let algorithms = ["Arkwork (Baseline)", "Example Algo 1", "Example Algo 2"]
+    let algorithms = ["Arkwork (Baseline)", "TrapdoorTech Zprize"]
     var selectedAlgorithms: Set<Int> = [0]  // Default to select the baseline MSM algorithm
 
     var benchmarkResults: [AlgorithmBenchmark] = []
@@ -29,10 +48,14 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
     typealias BenchmarkClosure = () throws -> BenchmarkResult
     
     // update the mapping with function in the future
-    let msmBenchmarkMapping: [String: (UInt32?) throws -> BenchmarkResult] = [
-        "Arkwork (Baseline)": runMsmBenchmark,
-        // "Example Algo 1": ,
-        // "Example Algo 2": ,
+    let msmBenchmarkMapping:
+    [String: (
+        UInt32,
+        UInt32,
+        String
+    ) throws -> BenchmarkResult] = [
+        "Arkwork (Baseline)": arkworksPippenger,
+        "TrapdoorTech Zprize": trapdoortechZprizeMsm,
     ]
 
     override func viewDidLoad() {
@@ -250,7 +273,9 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
 
     @objc func submitAction() {
         print("Selected algorithms: \(selectedAlgorithms.map { algorithms[$0] })")
-
+        print("Downloading Scalars and Points...")
+        // self.runDownloadAction(); // no need to download for now
+        
         // offload heavy computation of benchmarking in background
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self = self else { return }
@@ -263,8 +288,20 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
 
                 if let benchmarkFunction = self.msmBenchmarkMapping[algorithm] {
                     do {
+                        let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                        // let pointPath = documentsUrl.appendingPathComponent((pointUrl!).lastPathComponent)
+                        // let scalarPath = documentsUrl.appendingPathComponent((scalarUrl!).lastPathComponent)
+                        let documentsPath = documentsUrl.path
+                        let instanceSize: UInt32 = 16;
+                        let numInstance: UInt32 = 10;
+                        let benchmarkDir = "../mopro-core/benchmarks/gpu_explorations"; // temperary hardcoded
                         print("Running MSM in algorithm: \(algorithm)...")
-                        let benchData: BenchmarkResult = try benchmarkFunction(10000)
+                        let benchData: BenchmarkResult = 
+                            try benchmarkFunction(
+                                instanceSize,
+                                numInstance,
+                                documentsPath
+                            )
                         if algorithm == "Arkwork (Baseline)" {
                             baselineTiming = benchData.avgProcessingTime
                         }
@@ -273,7 +310,7 @@ class MSMBenchmarkViewController: UIViewController, UITableViewDelegate, UITable
                             algorithm: algorithm,
                             avgMsmTime: benchData.avgProcessingTime,
                             // Calculate the percentage difference with baseline
-                            diffWithBaseline: (benchData.avgProcessingTime - baselineTiming) / baselineTiming * 100
+                            diffWithBaseline: (baselineTiming - benchData.avgProcessingTime) / baselineTiming * 100
                         )
                         tempResults.append(algorithmBenchmark)
                         print("Result of \(algorithmBenchmark.algorithm): \(algorithmBenchmark.avgMsmTime) ms (diff: \(algorithmBenchmark.diffWithBaseline) %)")

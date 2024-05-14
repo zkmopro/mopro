@@ -1,11 +1,11 @@
 import uniffi.mopro.*;
 
 var wasmPath = "../mopro-core/examples/circom/rsa/target/main_js/main.wasm"
-var arkzkeyPath = "../mopro-core/examples/circom/rsa/target/main_final.arkzkey"
+var zkeyPath = "../mopro-core/examples/circom/rsa/target/main_final.zkey"
 
 try {
     var moproCircom = MoproCircom()
-    moproCircom.initialize(arkzkeyPath, wasmPath)
+    moproCircom.initialize(zkeyPath, wasmPath)
 
     val inputs = mutableMapOf<String, List<String>>()
     inputs["signature"] = listOf("3582320600048169363",

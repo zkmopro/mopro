@@ -4,11 +4,16 @@
 
 <!--TODO: If the monorepo is seperated, update this-->
 
-Check the [Prepare](../README.md#prepare-1) and [Build and Update Bindings](../README.md#build-and-update-bindings) steps in the root directory.
+Check the [Prerequisites](../README.md#prerequisites) and [Android configuration](../README.md#android-configuration) steps in the root directory.
 
 ## Execute
 
 Open the `Example/` in Android Studio.
+
+```sh
+open Example -a Android\ Studio
+```
+
 Use `^R` (`control`+`R`) to execute a simulator.
 
 <!--TODO: Update android studio tests and cli tests-->>

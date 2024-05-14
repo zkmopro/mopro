@@ -98,8 +98,10 @@ build_mopro_core() {
 build_mopro_ffi_static() {
     cd "${MOPRO_ROOT}/mopro-ffi" || exit
     print_action "Building mopro-ffi as a static library ($BUILD_MODE)..."
+    print_action "[android] Install cargo-ndk"
+    cargo install cargo-ndk
     if [[ "$BUILD_MODE" == "release" ]]; then
-        cargo ndk --target "$ARCHITECTURE" build --lib --release 
+        cargo ndk --target "$ARCHITECTURE" build --lib --release
     else
         cargo ndk --target "$ARCHITECTURE" build --lib
     fi
@@ -124,7 +126,7 @@ generate_kotlin_bindings() {
         echo -e "${RED}Failed to generate Kotlin bindings.${DEFAULT}"
         exit 1
     fi
-
+    
     # Copy the mopro.swift file to the Bindings directory
     cp -r "${TARGET_DIR}/jniLibs/" "${ANDROID_APP_DIR}/app/src/main/jniLibs/"
     cp -r "${TARGET_DIR}/KotlinBindings/uniffi/" "${ANDROID_APP_DIR}/app/src/main/java/uniffi/"

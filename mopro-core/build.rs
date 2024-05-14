@@ -197,7 +197,7 @@ fn build_circuit(config: &Config) -> Result<()> {
     let zkey_path = circuit_dir_path.join(format!("target/{}_final.zkey", circuit_name));
     let wasm_path =
         circuit_dir_path.join(format!("target/{}_js/{}.wasm", circuit_name, circuit_name));
-    let arkzkey_path = circuit_dir_path.join(format!("target/{}_final.arkzkey", circuit_name));
+    // let arkzkey_path = circuit_dir_path.join(format!("target/{}_final.arkzkey", circuit_name));
     #[cfg(feature = "calc-native-witness")]
     {
         let graph_path = circuit_dir_path.join(format!("target/{}.bin", circuit_name));
@@ -213,7 +213,7 @@ fn build_circuit(config: &Config) -> Result<()> {
     }
 
     // Ensure the required files exist
-    if !zkey_path.exists() || !wasm_path.exists() || !arkzkey_path.exists() {
+    if !zkey_path.exists() || !wasm_path.exists() {
         return Err(color_eyre::eyre::eyre!(
             "Required files for building the circuit are missing. Did you run `mopro prepare`?"
         ));
@@ -222,17 +222,17 @@ fn build_circuit(config: &Config) -> Result<()> {
     // Set BUILD_RS_* environment variables
     println!("cargo:rustc-env=BUILD_RS_ZKEY_FILE={}", zkey_path.display());
     println!("cargo:rustc-env=BUILD_RS_WASM_FILE={}", wasm_path.display());
-    println!(
-        "cargo:rustc-env=BUILD_RS_ARKZKEY_FILE={}",
-        arkzkey_path.display()
-    );
+    // println!(
+    //     "cargo:rustc-env=BUILD_RS_ARKZKEY_FILE={}",
+    //     arkzkey_path.display()
+    // );
 
     println!("cargo:warning=BUILD_RS_ZKEY_FILE={}", zkey_path.display());
     println!("cargo:warning=BUILD_RS_WASM_FILE={}", wasm_path.display());
-    println!(
-        "cargo:warning=BUILD_RS_ARKZKEY_FILE={}",
-        arkzkey_path.display()
-    );
+    // println!(
+    //     "cargo:warning=BUILD_RS_ARKZKEY_FILE={}",
+    //     arkzkey_path.display()
+    // );
 
     Ok(())
 }

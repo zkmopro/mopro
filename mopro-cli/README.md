@@ -14,18 +14,51 @@ Run `cargo install --path .` to install the `mopro` CLI util.
 
 Here are the basic commands of `mopro`:
 
-- `mopro init`: Initialize a new project with support for multiple platforms.
-- `mopro deps`: Install required dependencies.
-- `mopro prepare`: Prepare and build circuit and its artifacts.
-- `mopro build`: Build the project for specified platforms.
-- `mopro test`: Run tests for specific platform and test cases.
-- `mopro export-bindings`: Export platform bindings to some other directory.
+-   `mopro init`: Initialize a new project with support for multiple platforms.
+
+    -   options:
+        ```sh
+            --adapter <ADAPTER>            [default: circom]
+            --platforms <PLATFORMS>...     [default: core]
+            --project-name <PROJECT_NAME>  [default: mopro-example-app]
+        ```
+
+-   `mopro deps`: Install required dependencies.
+-   `mopro prepare`: Prepare and build circuit and its artifacts.
+    -   options:
+        ```sh
+            --config <CONFIG>  [default: mopro-config.toml]
+        ```
+-   `mopro build`: Build the project for specified platforms.
+
+    -   options:
+        ```sh
+            --config <CONFIG>           [default: mopro-config.toml]
+            --adapter <ADAPTER>         [default: circom]
+            --platforms <PLATFORMS>...  [default: core]
+        ```
+
+-   `mopro test`: Run tests for specific platform and test cases.
+    -   options:
+        ```sh
+            --config <CONFIG>           [default: mopro-config.toml]
+            --adapter <ADAPTER>         [default: circom]
+            --platforms <PLATFORMS>...  [default: core]
+            --test-case <TEST_CASE>
+        ```
+-   `mopro export-bindings`: Export platform bindings to some other directory.
+
+    -   options:
+        ```sh
+            --platforms <PLATFORMS>...   [default: ios]
+            -d, --destination <DESTINATION>
+        ```
 
 (May be added soon: `mopro update`: Update bindings with new API for specified platforms.)
 
 ## Prerequisites
 
-To use `mopro-cli`, make sure you have installed the [prerequisites](https://github.com/oskarth/mopro/?tab=readme-ov-file#Prerequisites).
+To use `mopro-cli`, make sure you have installed the [prerequisites](https://github.com/zkmopro/mopro/?tab=readme-ov-file#Prerequisites).
 
 ## Examples
 
@@ -33,28 +66,47 @@ To use `mopro-cli`, make sure you have installed the [prerequisites](https://git
 
 Initialize, build and test a circuit with Rust bindings:
 
-```sh
-# Set MOPRO_ROOT
-export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro
+-   Set `MOPRO_ROOT`
 
-# Install dependencies
-mopro deps
+    ```sh
+    export MOPRO_ROOT=/Users/user/repos/github.com/zkmopro/mopro
+    ```
 
-# Default to circom adapter and core Rust bindings
-mopro init
+-   Install dependencies
 
-# Go to the newly created directory
-cd mopro-example-app
+    ```sh
+    mopro deps
+    ```
 
-# Prepare circuit artifacts
-mopro prepare
+-   Default to circom adapter and core Rust bindings
 
-# Build the project
-mopro build
+    ```sh
+    mopro init
+    ```
 
-# Run end-to-end-test
-mopro test
-```
+-   Go to the newly created directory
+
+    ```sh
+    cd mopro-example-app
+    ```
+
+-   Prepare circuit artifacts
+
+    ```sh
+    mopro prepare
+    ```
+
+-   Build the project
+
+    ```sh
+    mopro build
+    ```
+
+-   Run end-to-end-test
+
+    ```sh
+    mopro test
+    ```
 
 ### iOS
 
@@ -116,20 +168,68 @@ To export bindings to a different directory:
 This will the following files, assuming they've been built, to the destination directory:
 
 ```
-├── SwiftBindings
-│   ├── mopro.swift
-│   ├── moproFFI.h
-│   └── moproFFI.modulemap
-└── libmopro_ffi.a
+├── android
+│   ├── jniLibs
+│   │   └── arm64-v8a
+│   │       └── libuniffi_mopro.so
+│   └── uniffi
+│       └── mopro
+│           └── mopro.kt
+└── ios
+    ├── Bindings
+    │   ├── module.modulemap
+    │   ├── mopro.swift
+    │   └── moproFFI.h
+    └── aarch64-apple-ios-sim
+        └── release
+            └── libmopro_ffi.a
 ```
 
-```
-├── KotlinBindings
-│   └── mopro.kt
-└── JniLibs
-    └── <ARCHITECTURE>
-       └── libuniffi_mopro.so
-```
+#### Use the bindings in iOS
+
+-   Create a XCFramework with `xcodebuild`
+    ```sh
+    xcodebuild -create-xcframework \
+    -library <DESTINATION_DIR>/ios/aarch64-apple-ios-sim/release/libmopro_ffi.a \
+    -headers <DESTINATION_DIR>/ios/Bindings \
+    -output "<DESTINATION_DIR>/ios/Mopro.xcframework"
+    ```
+-   Import both the XCFramework `Mopro.xcframework` and the Swift file bindings `Bindings/mopro.swift` files into your project (drag and drop should work).
+-   Use moproFFI in swift like
+
+    ```swift
+    import moproFFI
+
+    ...
+    try initializeMopro()
+    ...
+    ```
+
+> Reference: https://forgen.tech/en/blog/post/building-an-ios-app-with-rust-using-uniffi
+
+#### Use the bindings in Android
+
+-   Add dependency in `<ANDROID_APP_DIR>/app/build.gradle.kts`
+    ```kts
+     dependencies {
+     ...
+     implementation("net.java.dev.jna:jna:5.13.0@aar")
+     ...
+    }
+    ```
+-   Sync gradle
+-   Move the `<DESTINATION_DIR>/android/jniLibs/` folder to `app/src/main/`
+-   Move the `<DESTINATION_DIR>/android/uniffi/` folder to `app/src/main/java/`
+-   Use moproFFI in kotlin like
+
+    ```kotlin
+      import uniffi.mopro.initializeMopro
+
+      ...
+      initializeMopro()
+      ...
+    ```
+> Reference: https://sal.dev/android/intro-rust-android-uniffi/
 
 ## Contributing
 

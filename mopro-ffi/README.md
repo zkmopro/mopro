@@ -51,7 +51,7 @@ To test bindings in release mode without warning:
 
 1. Comment `default=[]` and uncomment `default=["gpu-benchmarks"]` to enable `gpu-benchmarks` feature flag
 2. run `RUSTFLAGS="-C opt-level=3" cargo test --test test_generated_bindings --release`
-3. The report will be generated at `mopro-core/benchmarks/gpu_explorations/msm_bench_swift_laptop.csv`
+3. The benchmark result will be shown in the console log
 
 ![msm benchmarks of time (rust vs. swift)](https://hackmd.io/_uploads/BkxRMMtca.png)
 
