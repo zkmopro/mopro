@@ -4,26 +4,45 @@ use std::{env, fs};
 fn export_ios_bindings(destination: &PathBuf) {
     let current_dir = env::current_dir().expect("Failed to get current directory");
     let target_dir = current_dir.join("target");
+    let ios_output_dir = &destination.join("ios");
+
+    // Create ios output directory if it does not exist
+    fs::create_dir_all(ios_output_dir).expect("Failed to create ios output directory");
 
     // Define the paths to the source files and directories
     let swift_bindings_dir = target_dir.join("SwiftBindings");
-    let libmopro_ffi_file = target_dir.join("libmopro_ffi.a");
-
-    // Define the destination paths
-    let _destination_swift_bindings_dir = destination.join("SwiftBindings");
-    let destination_libmopro_ffi_file = destination.join("libmopro_ffi.a");
+    for library in [
+        "x86_64-apple-ios",
+        "aarch64-apple-ios-sim",
+        "aarch64-apple-ios",
+    ] {
+        for build_mode in ["release", "debug"] {
+            let library_dir = target_dir.join(library);
+            let library_file = library_dir.join(build_mode).join("libmopro_ffi.a");
+            if library_file.exists() {
+                fs_extra::dir::copy(
+                    library_dir,
+                    ios_output_dir,
+                    &fs_extra::dir::CopyOptions::new(),
+                )
+                .expect("Failed to copy SwiftBindings directory");
+            }
+        }
+    }
 
     // Copy SwiftBindings directory
     fs_extra::dir::copy(
         swift_bindings_dir,
-        destination,
+        ios_output_dir,
         &fs_extra::dir::CopyOptions::new(),
     )
     .expect("Failed to copy SwiftBindings directory");
 
-    // Copy libmopro_ffi.a file
-    fs::copy(libmopro_ffi_file, destination_libmopro_ffi_file)
-        .expect("Failed to copy libmopro_ffi.a file");
+    fs::rename(
+        ios_output_dir.join("SwiftBindings"),
+        ios_output_dir.join("Bindings"),
+    )
+    .expect("Failed to rename SwiftBindings directory");
 
     println!("Exported Swift bindings to {:?}", destination);
 }
@@ -31,6 +50,10 @@ fn export_ios_bindings(destination: &PathBuf) {
 fn export_android_bindings(destination: &PathBuf) {
     let current_dir = env::current_dir().expect("Failed to get current directory");
     let target_dir = current_dir.join("target");
+    let android_output_dir = &destination.join("android");
+
+    // Create android output directory if it does not exist
+    fs::create_dir_all(android_output_dir).expect("Failed to create android output directory");
 
     // Define the paths to the source files and directories
     let jni_bindings_dir = target_dir.join("jniLibs");
@@ -39,17 +62,20 @@ fn export_android_bindings(destination: &PathBuf) {
         .join("mopro.kt");
 
     // Define the destination paths
-    let _destination_jni_bindings_dir = destination.join("jniLibs");
-    let destination_kotlin_bindings_file = destination.join("KotlinBindings").join("mopro.kt");
+    let _destination_jni_bindings_dir = android_output_dir.join("jniLibs");
+    let destination_kotlin_bindings_file = android_output_dir
+        .join("uniffi")
+        .join("mopro")
+        .join("mopro.kt");
 
     // Create KotlinBindings directory if it does not exist
-    fs::create_dir_all(destination.join("KotlinBindings"))
+    fs::create_dir_all(android_output_dir.join("uniffi").join("mopro"))
         .expect("Failed to create KotlinBindings directory");
 
     // Copy jniLibs directory
     fs_extra::dir::copy(
         jni_bindings_dir,
-        destination,
+        android_output_dir,
         &fs_extra::dir::CopyOptions::new(),
     )
     .expect("Failed to copy jniLibs directory");
