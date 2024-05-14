@@ -82,6 +82,6 @@ serde = "1.0"
 serde_derive = "1.0"
 witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true }
 
-[[bin]]
-name = "generate_benchmark_report"
-path = "src/middleware/gpu_explorations/bin/generate_benchmark_report.rs"
+# [[bin]]
+# name = "generate_benchmark_report"
+# path = "src/middleware/gpu_explorations/bin/generate_benchmark_report.rs"
