@@ -168,20 +168,68 @@ To export bindings to a different directory:
 This will the following files, assuming they've been built, to the destination directory:
 
 ```
-├── SwiftBindings
-│   ├── mopro.swift
-│   ├── moproFFI.h
-│   └── moproFFI.modulemap
-└── libmopro_ffi.a
+├── android
+│   ├── jniLibs
+│   │   └── arm64-v8a
+│   │       └── libuniffi_mopro.so
+│   └── uniffi
+│       └── mopro
+│           └── mopro.kt
+└── ios
+    ├── Bindings
+    │   ├── module.modulemap
+    │   ├── mopro.swift
+    │   └── moproFFI.h
+    └── aarch64-apple-ios-sim
+        └── release
+            └── libmopro_ffi.a
 ```
 
-```
-├── KotlinBindings
-│   └── mopro.kt
-└── JniLibs
-    └── <ARCHITECTURE>
-       └── libuniffi_mopro.so
-```
+#### Use the bindings in iOS
+
+-   Create a XCFramework with `xcodebuild`
+    ```sh
+    xcodebuild -create-xcframework \
+    -library <DESTINATION_DIR>/ios/aarch64-apple-ios-sim/release/libmopro_ffi.a \
+    -headers <DESTINATION_DIR>/ios/Bindings \
+    -output "<DESTINATION_DIR>/ios/Mopro.xcframework"
+    ```
+-   Import both the XCFramework `Mopro.xcframework` and the Swift file bindings `Bindings/mopro.swift` files into your project (drag and drop should work).
+-   Use moproFFI in swift like
+
+    ```swift
+    import moproFFI
+
+    ...
+    try initializeMopro()
+    ...
+    ```
+
+> Reference: https://forgen.tech/en/blog/post/building-an-ios-app-with-rust-using-uniffi
+
+#### Use the bindings in Android
+
+-   Add dependency in `<ANDROID_APP_DIR>/app/build.gradle.kts`
+    ```kts
+     dependencies {
+     ...
+     implementation("net.java.dev.jna:jna:5.13.0@aar")
+     ...
+    }
+    ```
+-   Sync gradle
+-   Move the `<DESTINATION_DIR>/android/jniLibs/` folder to `app/src/main/`
+-   Move the `<DESTINATION_DIR>/android/uniffi/` folder to `app/src/main/java/`
+-   Use moproFFI in kotlin like
+
+    ```kotlin
+      import uniffi.mopro.initializeMopro
+
+      ...
+      initializeMopro()
+      ...
+    ```
+> Reference: https://sal.dev/android/intro-rust-android-uniffi/
 
 ## Contributing
 
