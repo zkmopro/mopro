@@ -1,6 +1,6 @@
 use ark_bn254::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
-use ark_ec::{AffineRepr, VariableBaseMSM};
-use ark_ff::{BigInteger, PrimeField, UniformRand};
+use ark_ec::{AffineRepr, CurveGroup, Group, VariableBaseMSM};
+use ark_ff::{BigInteger, Field, PrimeField, UniformRand};
 use ark_std::{borrow::Borrow, cfg_into_iter, iterable::Iterable, rand, vec::Vec, One, Zero};
 
 use crate::middleware::gpu_explorations::metal::abstraction::{errors::MetalError, state::*};
@@ -23,7 +23,7 @@ fn metal_msm<V: VariableBaseMSM>(
     _scalars: &[V::ScalarField],
     window_size: usize,
     state: &MetalState,
-) -> Result<V, MetalError> {
+) -> Result<G, MetalError> {
     let bigints = cfg_into_iter!(_scalars)
         .map(|s| s.into_bigint())
         .collect::<Vec<_>>();
@@ -41,7 +41,7 @@ fn metal_msm<V: VariableBaseMSM>(
     let num_bits = V::ScalarField::MODULUS_BIT_SIZE as usize;
     let one = V::ScalarField::one().into_bigint();
 
-    let zero = V::zero();
+    let zero = GAffine::zero().into_group();
     let window_starts: Vec<_> = (0..num_bits).step_by(c).collect();
 
     // flatten scalar and base to Vec<u32>
@@ -57,66 +57,50 @@ fn metal_msm<V: VariableBaseMSM>(
     let calc_bucket_pipe = state.setup_pipeline("calculate_buckets")?;
 
     // TODO: integrate `calculate_buckets` functionality into parallel part of pippenger
-
-    /* Part to add wrapper logic of metal shader */
-
-    // Each window is of size `c`.
-    // We divide up the bits 0..num_bits into windows of size `c`, and
-    // in parallel process each such window.
-    let window_sums: Vec<_> = ark_std::cfg_into_iter!(window_starts)
+    let window_sums: Vec<_> = (0..window_starts.len())
+        .step_by(c)
         .map(|w_start| {
             let mut res = zero;
-            // We don't need the "zero" bucket, so we only have 2^c - 1 buckets.
             let mut buckets = vec![zero; (1 << c) - 1];
-            // This clone is cheap, because the iterator contains just a
-            // pointer and an index into the original vectors.
-            scalars_and_bases_iter.clone().for_each(|(&scalar, base)| {
-                if scalar == one {
-                    // We only process unit scalars once in the first window.
-                    if w_start == 0 {
-                        res += base;
-                    }
-                } else {
-                    let mut scalar = scalar;
 
-                    // We right-shift by w_start, thus getting rid of the
-                    // lower bits.
-                    scalar.divn(w_start as u32);
+            let buckets_buffer = state.alloc_buffer_data(&buckets);
+            objc::rc::autoreleasepool(|| {
+                let (command_buffer, command_encoder) = state.setup_command(
+                    &calc_bucket_pipe,
+                    Some(&[
+                        (0, &window_size_buffer),
+                        (1, &scalar_buffer),
+                        (2, &base_buffer),
+                        (3, &buckets_buffer),
+                    ]),
+                );
 
-                    // We mod the remaining bits by 2^{window size}, thus taking `c` bits.
-                    let scalar = scalar.as_ref()[0] % (1 << c);
+                MetalState::set_bytes(0, &[w_start], command_encoder);
 
-                    // If the scalar is non-zero, we update the corresponding
-                    // bucket.
-                    // (Recall that `buckets` doesn't have a zero bucket.)
-                    if scalar != 0 {
-                        buckets[(scalar - 1) as usize] += base;
-                    }
-                }
+                command_encoder
+                    .dispatch_thread_groups(MTLSize::new(1, 1, 1), MTLSize::new(size as u64, 1, 1));
+                command_encoder.end_encoding();
+                command_buffer.commit();
+                command_buffer.wait_until_completed();
             });
 
-            // Compute sum_{i in 0..num_buckets} (sum_{j in i..num_buckets} bucket[j])
-            // This is computed below for b buckets, using 2b curve additions.
-            //
-            // We could first normalize `buckets` and then use mixed-addition
-            // here, but that's slower for the kinds of groups we care about
-            // (Short Weierstrass curves and Twisted Edwards curves).
-            // In the case of Short Weierstrass curves,
-            // mixed addition saves ~4 field multiplications per addition.
-            // However normalization (with the inversion batched) takes ~6
-            // field multiplications per element,
-            // hence batch normalization is a slowdown.
+            let buckets_matrix: Vec<GAffine> = MetalState::retrieve_contents(&buckets_buffer);
 
-            // `running_sum` = sum_{j in i..num_buckets} bucket[j],
-            // where we iterate backward from i = num_buckets to 0.
-            let mut running_sum = V::zero();
-            buckets.into_iter().rev().for_each(|b| {
+            let mut running_sum = GAffine::zero().into_group();
+            buckets_matrix.into_iter().rev().for_each(|b| {
+                println!("running_sum: {:?}", running_sum);
+                println!("res: {:?}", res);
                 running_sum += &b;
                 res += &running_sum;
             });
+
+            println!("res: {:?}", res);
+
             res
         })
         .collect();
+
+    println!("window_sums: {:?}", window_sums);
 
     // We store the sum for the lowest window.
     let lowest = *window_sums.first().unwrap();
@@ -163,16 +147,7 @@ mod tests {
         let msm = <G as VariableBaseMSM>::msm(&points, &scalars).unwrap();
         let msm_bigint = metal_msm::<G>(&points, &scalars, window_size, &state).unwrap();
 
-        // println!("msm: {:?}", msm);
-        // println!("msm_bigint: {:?}", msm_bigint);
-
-        // if (msm - msm_bigint).is_zero() {
-        //     println!("msm and msm_bigint are equal");
-        // }
-        // else {
-        //     println!("msm and msm_bigint are not equal");
-        // }
-
+        // now will fail, since msm shader is not implemented in BN254
         assert_eq!(msm, msm_bigint);
     }
 }
