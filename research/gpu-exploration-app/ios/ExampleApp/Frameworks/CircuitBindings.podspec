@@ -2,7 +2,7 @@ Pod::Spec.new do |spec|
     spec.name         = 'CircuitBindings'
     spec.version      = '0.1.0'
     spec.summary      = 'CircuitBindings XCFramework'
-    spec.homepage     = 'https://github.com/oskarth/mopro'
+    spec.homepage     = 'https://github.com/zkmopro/mopro'
     spec.license      = { :type => 'MIT/Apache-2.0', :file => 'LICENSE' }
     spec.author       = { 'Mopro' => 'mopro@dev.null' }
     spec.platform     = :ios, '13.0'
