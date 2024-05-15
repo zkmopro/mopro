@@ -7,34 +7,23 @@ namespace {
     typedef UnsignedInteger<12> u384;
 }
 
-// taken from the Rust implementation
-// reference: https://github.com/arkworks-rs/algebra/blob/065cd24fc5ae17e024c892cee126ad3bd885f01c/curves/bls12_381/src/fields/fq.rs#L4C14-L4C129
-constexpr static const constant u384 N = {
-    0x1a0111ea,0x397fe69a,
-    0x4b1ba7b6,0x434bacd7,
-    0x64774b84,0xf38512bf,
-    0x6730d2a0,0xf6b0f624,
-    0x1eabfffe,0xb153ffff,
-    0xb9feffff,0xffffaaab
+/* For bn254, the modulus is "21888242871839275222246405745257275088696311157297823662689037894645226208583" [1]
+ * the field type arkworks using is Fp256 using 64*4 bits[2]
+ * [1] Reference: https://github.com/arkworks-rs/algebra/blob/065cd24fc5ae17e024c892cee126ad3bd885f01c/curves/bn254/src/fields/fq.rs#L4C14-L4C91
+ * [2] https://github.com/arkworks-rs/algebra/blob/master/ff/src/fields/models/fp/mod.rs 
+ */
+constexpr static const constant u256 N = {
+    30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD47
 };
 
-constexpr static const constant u384 R_SQUARED = {
-    0x11988fe5,0x92cae3aa,
-    0x9a793e85,0xb519952d,
-    0x67eb88a9,0x939d83c0,
-    0x8de5476c,0x4c95b6d5,
-    0x0a76e6a6,0x09d104f1,
-    0xf4df1f34,0x1c341746
+// don't know this for now
+constexpr static const constant u256 R_SQUARED = {
+     //
 };
 
-// Equates to `(1 << 384) - N`
-constexpr static const constant u384 R_SUB_N = {
-    0xe5feee15,0xc6801965,
-    0xb4e45849,0xbcb45328,
-    0x9b88b47b,0x0c7aed40,
-    0x98cf2d5f,0x094f09db,
-    0xe1540001,0x4eac0000,
-    0x46010000,0x00005555
+// Equates to `(1 << 256) - N`
+constexpr static const constant u256 R_SUB_N = {
+    //
 };
 
 // MU = -N^{-1} mod (2^32)
