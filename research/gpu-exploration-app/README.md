@@ -16,7 +16,7 @@ See [here](https://github.com/zkmopro/mopro/blob/main/mopro-core/gpu_exploration
 
 ### Build
 
-`mopro build --platform ios`
+`mopro build --platforms ios`
 
 ### Test
 
