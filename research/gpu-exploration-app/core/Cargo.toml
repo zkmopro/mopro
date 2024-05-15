@@ -3,6 +3,8 @@ name = "example-gpu-exploration"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 
@@ -28,8 +30,8 @@ mopro-core = { git = "https://github.com/zkmopro/mopro.git", package = "mopro-co
 wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 
 # NOTE: For patching the version 0.3 and 0.4 for arkworks
-ark-bls12-377 = { git = 'https://github.com/arkworks-rs/curves.git', package = 'ark-bls12-377', tag = 'v0.3.0', optional = true}
-ark-ec = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ec', tag = 'v0.3.0', features = ["parallel"], optional = true }
-ark-ff = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ff', tag = 'v0.3.0', features = ["parallel"], optional = true }
-ark-serialize = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-serialize', tag = 'v0.3.0', optional = true }
-ark-std = { git = 'https://github.com/arkworks-rs/std.git', package = 'ark-std', tag = 'v0.3.0', optional = true }
+ark-bls12-377-3 = { git = 'https://github.com/arkworks-rs/curves.git', package = 'ark-bls12-377', tag = 'v0.3.0', optional = true}
+ark-ec-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ec', tag = 'v0.3.0', features = ["parallel"], optional = true }
+ark-ff-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ff', tag = 'v0.3.0', features = ["parallel"], optional = true }
+ark-serialize-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-serialize', tag = 'v0.3.0', optional = true }
+ark-std-3 = { git = 'https://github.com/arkworks-rs/std.git', package = 'ark-std', tag = 'v0.3.0', optional = true }
