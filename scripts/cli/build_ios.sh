@@ -226,7 +226,7 @@ create_xcframework_circuit() {
 }
 
 update_cocoapods() {
-    cd ${IOS_APP_DIR}
+    cd "${IOS_APP_DIR}"
     pod install
 }
 
