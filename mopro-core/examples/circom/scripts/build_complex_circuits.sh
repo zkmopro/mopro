@@ -61,7 +61,7 @@ compile_circuit() {
 
 # Build Circom circuits in mopro-core and run trusted setup
 print_action "[core/circom] Compiling complex-circuit..."
-cd $CIRCOM_DIR
+cd "${CIRCOM_DIR}"
 
 # Compile complex-circuits
 compile_circuit complex-circuit complex-circuit-100k-100k.circom
