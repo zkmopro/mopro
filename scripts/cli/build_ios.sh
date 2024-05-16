@@ -190,7 +190,7 @@ create_xcframework_mopro() {
 
     print_action "Creating XCFramework for MoproBindings... (${ARCHITECTURE})"
     xcodebuild -create-xcframework \
-        -library "${TARGET_DIR}/${ARCHITECTURE}/release/libmopro_ffi.a" \
+        -library "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a" \
         -headers "${TARGET_DIR}/SwiftBindings" \
         -output "$MOPRO_XCFRAMEWORK_PATH"
     if [ $? -ne 0 ]; then
@@ -215,7 +215,7 @@ create_xcframework_circuit() {
 
     print_action "Creating XCFramework for CircuitBindings dylib... (${ARCHITECTURE})"
     xcodebuild -create-xcframework \
-        -library "${TARGET_DIR}/${ARCHITECTURE}/release/${DYLIB_NAME}" \
+        -library "${TARGET_DIR}/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}" \
         -output "$CIRCUIT_XCFRAMEWORK_PATH"
     if [ $? -ne 0 ]; then
         echo -e "${RED}Failed to create CircuitBindings XCFramework.${DEFAULT}"
