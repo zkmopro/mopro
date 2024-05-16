@@ -130,7 +130,7 @@ main() {
     install_remote_binary "toml" "toml-cli"
     check_uniffi_bindgen_version
 
-    print_warning "There here are more platform-specific dependencies to be installed."
+    print_warning "There are more platform-specific dependencies to be installed."
     print_warning "See mopro README.md for details."
     print_action "Done! You may now initialize or build your project."
 }
