@@ -2,6 +2,11 @@
 name = "ark-zkey"
 version = "0.1.0"
 edition = "2021"
+description = "Library to read zkey faster by serializing to arkworks friendly format."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zkmopro/mopro"
+documentation = "https://zkmopro.org/"
+homepage = "https://zkmopro.org/"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -18,7 +23,7 @@ flamer = "0.5"
 ark-serialize = { version = "=0.4.1", features = ["derive"] }
 ark-bn254 = { version = "=0.4.0" }
 ark-groth16 = { version = "=0.4.0" }
-ark-circom = { git = "https://github.com/vimwitch/circom-compat.git" }
+ark-circom = { git = "https://github.com/vimwitch/circom-compat.git", version = "0.1.0" }
 ark-relations = { version = "=0.4.0" }
 ark-ff = { version = "=0.4.1" }
 ark-ec = { version = "=0.4.1" }
