@@ -237,6 +237,31 @@ fn build_circuit(config: &Config) -> Result<()> {
     Ok(())
 }
 
+fn build_halo2_circuit() -> Result<()> {
+
+        // Check if the current package is mopro-core
+    let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
+    let base_dir = if pkg_name == "mopro-core" {
+        // If mopro-core, use CARGO_MANIFEST_DIR as base directory
+        env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set")
+    } else {
+        // Default to current directory
+        ".".to_string()
+    };
+
+    let compiled_circuit_dir = "examples/halo2/out";
+
+    let srs_path = Path::new(&base_dir).join(compiled_circuit_dir).join("fib_srs");
+    let pk_path = Path::new(&base_dir).join(compiled_circuit_dir).join("fib_pk");
+    let vk_path = Path::new(&base_dir).join(compiled_circuit_dir).join("fib_vk");
+
+
+    println!("cargo:rustc-env=BUILD_SRS_FILE={}", srs_path.display());
+    println!("cargo:rustc-env=BUILD_PK_FILE={}", pk_path.display());
+    println!("cargo:rustc-env=BUILD_VK_FILE={}", vk_path.display());
+    Ok(())
+}
+
 fn main() -> color_eyre::eyre::Result<()> {
     println!("cargo:rerun-if-env-changed=BUILD_CONFIG_PATH");
     println!("cargo:warning=Preparing circuits...");
@@ -245,6 +270,8 @@ fn main() -> color_eyre::eyre::Result<()> {
     #[cfg(feature = "build-native-witness")]
     build_witness_graph()?;
     build_circuit(&config)?;
+    #[cfg(feature = "halo2")]
+    build_halo2_circuit()?;
     build_dylib(&config)?;
     println!("cargo:warning=Successfully prepared circuits.");
     Ok(())
