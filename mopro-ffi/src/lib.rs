@@ -1,4 +1,4 @@
-use mopro_core::middleware::circom;
+use mopro_core::middleware::{circom, halo2};
 use mopro_core::MoproError;
 
 #[cfg(feature = "gpu-benchmarks")]
@@ -96,6 +96,32 @@ pub fn initialize_mopro_dylib(dylib_path: String) -> Result<(), MoproError> {
 pub fn initialize_mopro_dylib(_dylib_path: String) -> Result<(), MoproError> {
     println!("dylib feature not enabled!");
     panic!("dylib feature not enabled!");
+}
+
+pub fn generate_halo2_proof2(
+    input: String
+) -> Result<GenerateProofResult, MoproError> {
+    // Convert input to u64
+    let bigint_inputs: u64 = u64::from_str(&input).unwrap();
+
+    let (proof, inputs) = halo2::generate_halo2_proof2(bigint_inputs).unwrap();
+
+
+
+    let serialized_proof = bincode::serialize(&proof).map_err(|e| MoproError::Halo2Error(e.to_string()))?;
+    let serialized_inputs = bincode::serialize(&inputs).expect("Serialization of Inputs failed");
+
+    Ok(GenerateProofResult {
+        proof: serialized_proof,
+        inputs: serialized_inputs,
+    })
+}
+
+pub fn verify_halo2_proof2(proof: Vec<u8>, inputs: Vec<u8>) -> Result<bool, MoproError> {
+    let deserialized_proof: halo2::SerializableProof = bincode::deserialize(&proof).map_err(|e| MoproError::Halo2Error(e.to_string()))?;
+    let deserialized_inputs: halo2::SerializableInputs = bincode::deserialize(&inputs).map_err(|e| MoproError::Halo2Error(e.to_string()))?;
+    let is_valid = halo2::verify_halo2_proof2(deserialized_proof, deserialized_inputs).unwrap();
+    Ok(is_valid)
 }
 
 pub fn generate_proof2(
