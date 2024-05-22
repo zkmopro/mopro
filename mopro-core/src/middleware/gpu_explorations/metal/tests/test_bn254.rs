@@ -128,6 +128,7 @@ mod tests {
             command_buffer.wait_until_completed();
 
             let limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
+            println!(">>> limbs: {:?}", limbs);
             BigInteger256::from_u32_limbs(&limbs)
         }
 
@@ -151,38 +152,62 @@ mod tests {
 
                 // BigInt form
                 // [low, high, 0, 0]
-                // let mut tmp_a: BigInt<4> = BigInt!("1");
-                // let mut tmp_b: BigInt<4> = BigInt!("100000000000000000000000000000000000000000000000000000000000000");
+                // 2^64 - 1:  18446744073709551615
+                // 2^128 - 1: 340282366920938463463374607431768211455
+                let mut tmp_a: BigInt<4> = BigInt!("18446744073709551615");
+                let mut tmp_b: BigInt<4> = BigInt!("1");
 
-                // println!("tmp_a: {:?}", tmp_a);
-                // println!("tmp_b: {:?}", tmp_b);
-                // objc::rc::autoreleasepool(|| {
-                //     result = execute_kernel("test_uint_add", (tmp_a, Big(tmp_b)));
-                // });
-                // tmp_a.add_with_carry(&tmp_b);
-                // println!("tmp_a: {:?}", tmp_a);
-                // println!("result: {:?}", result);
-                // prop_assert_eq!(result, tmp_a);
-
-                println!("a: {:?}", a);
-                println!("b: {:?}", b);
-                                
+                println!("tmp_a: {:?}", tmp_a);
+                println!("tmp_b: {:?}", tmp_b);
                 objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("test_uint_add", (a, Big(b)));
+                    result = execute_kernel("test_uint_add", (tmp_a, Big(tmp_b)));
                 });
-                let mut tmp = a;
-                let carry = tmp.add_with_carry(&b);
-
-                if tmp == result {
+                // use ark_ff::biginteger::arithmetic::adc_for_add_with_carry as adc;
+                // let mut carry = 0;
+                // for i in 0..4 {
+                //     carry += adc(&mut tmp_a.clone().0[i] , tmp_b.clone().0[i], carry);
+                // }
+                // println!("carry: {:?}", carry);
+                tmp_a.add_with_carry(&tmp_b);
+                if tmp_a == result {
+                    println!("result: {:?}", result);
                     println!("ok\n");
                 } else {
                     // show the difference between tmp and result
-                    let mut diff = tmp.clone();
+                    let mut diff = tmp_a.clone();
                     diff.sub_with_borrow(&result);
-                    println!("tmp   : {:?}", tmp);
+                    println!("tmp   : {:?}", tmp_a);
                     println!("result: {:?}", result);
                     println!("diff: {:?}\n", diff);
                 }
+                // prop_assert_eq!(result, tmp_a);
+                // a: BigInt([18020593341677359069, 14413279390197625029, 0, 0])
+                // b: BigInt([10781091185169145405, 3104228427255190839, 0, 0])
+
+                // println!("a: {:?}", a);
+                // println!("b: {:?}", b);
+                                
+                // objc::rc::autoreleasepool(|| {
+                //     result = execute_kernel("test_uint_add", (a, Big(b)));
+                // });
+                // let mut tmp = a;
+                // use ark_ff::biginteger::arithmetic::adc_for_add_with_carry as adc;
+                // let mut carry = 0;
+                // for i in 0..4 {
+                //     carry += adc(&mut tmp.0[i] , b.0[i], carry);
+                // }
+                // println!("carry: {:?}", carry);
+
+                // if tmp == result {
+                //     println!("ok\n");
+                // } else {
+                //     // show the difference between tmp and result
+                //     let mut diff = tmp.clone();
+                //     diff.sub_with_borrow(&result);
+                //     println!("tmp   : {:?}", tmp);
+                //     println!("result: {:?}", result);
+                //     println!("diff: {:?}\n", diff);
+                // }
 
                 // prop_assert_eq!(result, tmp);
             }
