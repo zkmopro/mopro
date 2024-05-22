@@ -1,9 +1,9 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'MoPro',
+  title: 'Mopro',
   tagline: 'Making client-side proving on mobile simple.',
   favicon: 'img/favicon.ico',
 
@@ -58,9 +58,9 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'MoPro',
+      title: 'Mopro',
       logo: {
-        alt: 'MoPro Logo',
+        alt: 'Mopro Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -70,7 +70,7 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        { to: '/blog', label: 'Blog', position: 'left' },
         {
           href: 'https://github.com/zkmopro/mopro',
           label: 'GitHub',
@@ -117,7 +117,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} MoPro. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Mopro. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
