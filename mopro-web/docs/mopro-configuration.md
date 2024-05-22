@@ -2,7 +2,7 @@
 sidebar_position: 3
 ---
 
-# MoPro Configuration
+# Mopro Configuration
 
 This config file is best used together with `mopro-cli`.
 
