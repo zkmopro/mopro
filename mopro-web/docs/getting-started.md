@@ -10,7 +10,7 @@ You can also watch this short (~5m) [tutorial](https://www.loom.com/share/6ff382
 
 ## Install dependencies
 
-First, make sure you've installed the [prerequisites](https://github.com/zkmopro/mopro?tab=readme-ov-file#prerequisites).
+First, make sure you've installed the [prerequisites](/docs/prerequisites).
 
 Then, run the following commands:
 
