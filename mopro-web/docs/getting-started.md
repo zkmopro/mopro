@@ -4,56 +4,19 @@ sidebar_position: 2
 
 # Getting Started
 
-We recommend you use [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) to create and maintain your application. Here's how you can get started with your example app in a few minutes.
+We recommend you use [mopro-cli](https://github.com/zkmopro/mopro/tree/main/mopro-cli#mopro-cli) to create and maintain your application. Here's how you can get started with your example app in a few minutes.
 
-You can also watch this short [tutorial](https://www.loom.com/share/6ff382b0497c47aea9d0ef8b6e790dd8).
-
-## Prerequisites
-
-Depending on what platforms and adapters you use, there are several prerequisites to install before getting started.
-
-- General
-    - [Rust](https://www.rust-lang.org/learn/get-started)
-- Circom
-    - [circom](https://docs.circom.io/)
-    - [snarkjs](https://github.com/iden3/snarkjs)
-- iOS
-    - [Xcode](https://developer.apple.com/xcode/)
-    - [CocoaPods](https://cocoapods.org/)
-- Android
-    - [Android Studio](https://developer.android.com/studio)
-    - Also see configuration below
-
-### Android configuration
-
-Some additional configuration is required for Android.
-
-First, install the latest SDK. In Android Studio, go to `SDK Manager > SDK Tools`  and install `NDK (Side by Side)` (see [Android Developer site](https://developer.android.com/studio/projects/install-ndk#default-version)).
-
-After that, set the following  environment variables:
-
-```sh
-# Export `$ANDROID_HOME` and change `{USER_NAME}` to your username
-export ANDROID_HOME="/Users/{USER_NAME}/Library/Android/sdk"
-
-# Locate which NDK version you have
-ls $ANDROID_HOME/ndk # => 26.1.10909125
-
-# Set it to your `NDK_PATH` environment variable
-NDK_PATH=$ANDROID_HOME/ndk/26.1.10909125
-```
-
-(Reference: [Running Rust on Android with UniFFI](https://sal.dev/android/intro-rust-android-uniffi/)).
+You can also watch this short (~5m) [tutorial](https://www.loom.com/share/6ff382b0497c47aea9d0ef8b6e790dd8).
 
 ## Install dependencies
 
-First, make sure you've installed the prerequisites above.
+First, make sure you've installed the [prerequisites](https://github.com/zkmopro/mopro?tab=readme-ov-file#prerequisites).
 
 Then, run the following commands:
 
 ```sh
 # Clone the mopro repo
-git clone git@github.com:oskarth/mopro.git
+git clone https://github.com/zkmopro/mopro.git
 
 # Go to your newly cloned checkout
 cd mopro
@@ -62,7 +25,7 @@ cd mopro
 (cd mopro-cli && cargo install --path .)
 
 # Set `MOPRO_ROOT` (replace with path to your git checkout of mopro)
-# For example: `export MOPRO_ROOT=/Users/user/repos/github.com/oskarth/mopro`
+# For example: `export MOPRO_ROOT=/Users/user/repos/github.com/zkmopro/mopro`
 export MOPRO_ROOT=$(PWD)
 
 # Install `mopro` dependencies
@@ -98,24 +61,45 @@ This only has to be done once when changing the circuit.
 
 Depending on what platforms you are targetting, you can run the following commands:
 
-```sh
-# Build the project
-mopro build
+-   Build the project
 
-# Run end-to-end test (in Rust only)
-mopro test
+    ```sh
+    mopro build
+    ```
 
-# Build the project for iOS
-mopro build --platforms ios
+-   Run end-to-end test (in Rust only)
 
-# Open in Xcode to run on simulator/device
-open ios/ExampleApp/ExampleApp.xcworkspace
+    ```sh
+    mopro test
+    ```
 
-# Build the project for Android
-mopro build --platforms android
+-   Build the project for iOS
 
-# Open in Android Studio to run on simulator/device
-open android -a Android\ Studio
-```
+    ```sh
+    mopro build --platforms ios
+    ```
 
-See [mopro-cli](https://github.com/oskarth/mopro/tree/main/mopro-cli#mopro-cli) for more details on usage.
+-   Open in Xcode to run on simulator
+
+    ```sh
+    open ios/ExampleApp/ExampleApp.xcworkspace
+    ```
+
+    Use `command`+`U` to run tests.
+
+-   Build the project for Android
+
+    ```sh
+    mopro build --platforms android
+    ```
+
+-   Open in Android Studio to run on simulator
+
+    ```sh
+    open android -a Android\ Studio
+    ```
+
+    Use `^R` (`control`+`R`) to execute a simulator.
+
+> See [mopro-cli](https://github.com/zkmopro/mopro/tree/main/mopro-cli#mopro-cli) for more details on usage.
+> Edit [mopro configuration](/docs/mopro-configuration) to build for device or build for other circuits.
