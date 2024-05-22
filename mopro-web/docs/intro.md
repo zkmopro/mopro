@@ -4,7 +4,13 @@ sidebar_position: 1
 
 # Introduction
 
-Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple.
+Mopro makes client-side proving simple. You can think of it as a toolkit for ZK app development. It primarily focuses on running natively mobile, but it works for any platform.
+
+How? Mopro connects different adapters with different platforms. You can think of an adapter as a way to use a library with some proof system and performance profile. Because Mopro takes care of hooking up your circuit to some library, and generating bindings for use on multiple platforms, you can focus on what you do best: ZK app development.
+
+![mopro adapters and platforms](/img/mopro_adapters_platforms.png).
+
+Note that above is a work in progress, and the dashed lines indicate things that are still experimental and/or in an an early stage.
 
 If you just want to get started using mopro, see [getting started](/getting-started).
 
