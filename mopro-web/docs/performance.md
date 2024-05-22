@@ -2,7 +2,7 @@
 sidebar_position: 5
 ---
 
-# Performance
+# Performance and Benchmarks
 
 Preliminary benchmarks on an iPhone 14 Max Pro:
 
