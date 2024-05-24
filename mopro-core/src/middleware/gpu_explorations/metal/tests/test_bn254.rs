@@ -98,6 +98,8 @@ mod tests {
 
             let result_buffer = state.alloc_buffer::<BigInteger256>(1);
 
+            let debug_buffer = state.alloc_buffer::<u32>(24);
+
             let (command_buffer, command_encoder) = match b {
                 BigOrSmallInt::Big(b) => {
                     let b = b.to_u32_limbs();
@@ -105,7 +107,7 @@ mod tests {
                     let b_buffer = state.alloc_buffer_data(&b);
                     state.setup_command(
                         &pipeline,
-                        Some(&[(0, &a_buffer), (1, &b_buffer), (2, &result_buffer)]),
+                        Some(&[(0, &a_buffer), (1, &b_buffer), (2, &result_buffer), (3, &debug_buffer)]),
                     )
                 }
                 BigOrSmallInt::Small(b) => {
@@ -113,7 +115,7 @@ mod tests {
                     let b_buffer = state.alloc_buffer_data(&[b]);
                     state.setup_command(
                         &pipeline,
-                        Some(&[(0, &a_buffer), (1, &b_buffer), (2, &result_buffer)]),
+                        Some(&[(0, &a_buffer), (1, &b_buffer), (2, &result_buffer), (3, &debug_buffer)]),
                     )
                 }
             };
@@ -128,6 +130,24 @@ mod tests {
             command_buffer.wait_until_completed();
 
             let limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
+
+            // Read the debug information
+            let debug_data = MetalState::retrieve_contents::<u32>(&debug_buffer);
+
+            // Print the values of a and b
+            println!("Value of a:");
+            for i in 0..8 {
+                println!("Limb {}: 0x{:08X}", i, debug_data[i]);
+            }
+
+            println!("Value of b:");
+            for i in 0..8 {
+                println!("Limb {}: 0x{:08X}", i, debug_data[i + 8]);
+            }
+            println!("Value of result:");
+            for i in 0..8 {
+                println!("Limb {}: 0x{:08X}", i, debug_data[i + 16]);
+            }
             println!(">>> limbs: {:?}", limbs);
             BigInteger256::from_u32_limbs(&limbs)
         }
@@ -159,6 +179,7 @@ mod tests {
 
                 println!("tmp_a: {:?}", tmp_a);
                 println!("tmp_b: {:?}", tmp_b);
+                
                 objc::rc::autoreleasepool(|| {
                     result = execute_kernel("test_uint_add", (tmp_a, Big(tmp_b)));
                 });

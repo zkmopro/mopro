@@ -1,8 +1,8 @@
 #pragma once
 
-#include "fp_bn254.h.metal"
+// #include "../fields/fp_bn254.h.metal"
 
-using namespace metal;
+// using namespace metal;
 
 template<typename BN254>
 [[kernel]] void test_addition(device uint* out [[buffer(0)]]) {

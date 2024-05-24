@@ -4,7 +4,7 @@
 // TODO: Investigate this issue, having .metal sources would be better
 // than headers and a unique source.
 
-#include "fields/bls12381.h.metal"
-#include "tests/test_bls12381.h.metal"
+#include "fields/fp_bn254.h.metal"
+#include "tests/test_bn254.h.metal"
 #include "tests/test_unsigned_integer.h.metal"
-#include "msm.h.metal"
+// #include "msm.h.metal"
