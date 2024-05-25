@@ -26,7 +26,6 @@ mod tests {
         // implement to_u32_limbs and from_u32_limbs for BigInt<4>
         trait ToLimbs {
             fn to_u32_limbs(&self) -> Vec<u32>;
-            fn to_u32(&self) -> u32;
         }
 
         trait FromLimbs {
@@ -35,56 +34,39 @@ mod tests {
             fn from_u32(num: u32) -> Self;
         }
 
+        // convert from little endian to big endian
         impl ToLimbs for BigInteger256 {
             fn to_u32_limbs(&self) -> Vec<u32> {
-                let mut limbs = Vec::new();
-
-                self.to_bytes_be().chunks(8).rev().for_each(|chunk| {
+                let mut limbs = Vec::new();                
+                self.to_bytes_be().chunks(8).for_each(|chunk| {
                     let high = u32::from_be_bytes(chunk[0..4].try_into().unwrap());
                     let low = u32::from_be_bytes(chunk[4..8].try_into().unwrap());
-                    limbs.push(low);
                     limbs.push(high);
+                    limbs.push(low);
                 });
-
-                /*  restore the limbs to BigInt<4>
-                // let mut big_int = [0u64; 4];
-                // for (i, limb) in limbs.chunks(2).enumerate() {
-                //     let low = u64::from(limb[0]);
-                //     let high = u64::from(limb[1]);
-                //     big_int[i] = (low << 32) | high;
-                // }
-                // let restored_bigint = BigInt(big_int);
-                // println!("restored_bigint: {:?}", restored_bigint);
-                // println!("self: {:?}", self);
-                // assert!(restored_bigint == *self);
-                */
                 limbs
-            }
-            fn to_u32(&self) -> u32 {
-                let byte = self.0[3].to_be_bytes(); // last limb
-                u32::from_be_bytes(byte[4..8].try_into().unwrap())
             }
         }
 
         impl FromLimbs for BigInteger256 {
+            // convert from big endian to little endian for metal
             fn from_u32_limbs(limbs: &[u32]) -> Self {
                 let mut big_int = [0u64; 4];
-                for (i, limb) in limbs.chunks(2).enumerate() {
-                    let low = u64::from(limb[0]);
-                    let high = u64::from(limb[1]);
-                    big_int[i] = low | (high << 32);
-                    println!("low: {:x}, high: {:x}, big_int[{}]: {:x}", low, high, i, big_int[i]);
+                for (i, limb) in limbs.chunks(2).rev().enumerate() {
+                    let high = u64::from(limb[0]);
+                    let low = u64::from(limb[1]);
+                    big_int[i] = (high << 32) | low;
                 }
                 BigInt(big_int)
             }
+            // provide little endian u128 since arkworks use this value as well
             fn from_u128(num: u128) -> Self {
                 let high = (num >> 64) as u64;
                 let low = num as u64;
-                // BigInt([0, 0, high, low])
                 BigInt([low, high, 0, 0])
             }
+            // provide little endian u32 since arkworks use this value as well
             fn from_u32(num: u32) -> Self {
-                // BigInt([0, 0, 0, num as u64])
                 BigInt([num as u64, 0, 0, 0])
             }
         }
@@ -104,8 +86,6 @@ mod tests {
             let (command_buffer, command_encoder) = match b {
                 BigOrSmallInt::Big(b) => {
                     let b = b.to_u32_limbs();
-                    println!("a: {:?}", a);
-                    println!("b: {:?}", b);
                     let a_buffer = state.alloc_buffer_data(&a);
                     let b_buffer = state.alloc_buffer_data(&b);
                     state.setup_command(
@@ -134,24 +114,24 @@ mod tests {
 
             let limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
 
-            // Read the debug information
-            let debug_data = MetalState::retrieve_contents::<u32>(&debug_buffer);
+            // // Read the debug information
+            // let debug_data = MetalState::retrieve_contents::<u32>(&debug_buffer);
 
-            // Print the values of a and b
-            println!("Value of a:");
-            for i in 0..8 {
-                println!("Limb {}: 0x{:08X}", i, debug_data[i]);
-            }
+            // // Print the values of a and b
+            // println!("Value of a:");
+            // for i in 0..8 {
+            //     println!("Limb {}: 0x{:08X}", i, debug_data[i]);
+            // }
 
-            println!("Value of b:");
-            for i in 0..8 {
-                println!("Limb {}: 0x{:08X}", i, debug_data[i + 8]);
-            }
-            println!("Value of result:");
-            for i in 0..8 {
-                println!("Limb {}: 0x{:08X}", i, debug_data[i + 16]);
-            }
-            println!(">>> limbs: {:?}", limbs);
+            // println!("Value of b:");
+            // for i in 0..8 {
+            //     println!("Limb {}: 0x{:08X}", i, debug_data[i + 8]);
+            // }
+            // println!("Value of result:");
+            // for i in 0..8 {
+            //     println!("Limb {}: 0x{:08X}", i, debug_data[i + 16]);
+            // }
+            // println!(">>> limbs: {:?}", limbs);
             BigInteger256::from_u32_limbs(&limbs)
         }
 
@@ -162,9 +142,8 @@ mod tests {
             fn rand_u32()(n in any::<u32>()) -> BigInteger256 { BigInteger256::from_u32(n) }
         }
 
-        use ark_ff::BigInteger;
-        use num_bigint::ToBigUint;
-        // use ark_ff::{BigInt, BigInteger};
+        use ark_ff::biginteger::{BigInteger,BigInteger256};
+        use num_bigint::BigUint;
         // use lambdaworks_math::unsigned_integer::traits::U32Limbs;
         use BigOrSmallInt::{Big, Small};
 
@@ -172,103 +151,64 @@ mod tests {
             #[test]
             fn add(a in rand_u128(), b in rand_u128()) {
                 let mut result = BigInteger256::default();
-
-                // // BigInt form
-                // // [low, high, 0, 0]
-                // // 2^64 - 1:  18446744073709551615
-                // // 2^128 - 1: 340282366920938463463374607431768211455
-                // let mut tmp_a: BigInt<4> = BigInt!("340282366920938463463374607431768211455");
-                // let mut tmp_b: BigInt<4> = BigInt!("1");
-
-                // println!("tmp_a: {:?}", tmp_a);
-                // println!("tmp_b: {:?}", tmp_b);
-                
-                // objc::rc::autoreleasepool(|| {
-                //     result = execute_kernel("test_uint_add", (tmp_a, Big(tmp_b)));
-                // });
-            
-                // tmp_a.add_with_carry(&tmp_b);
-                // if tmp_a == result {
-                //     println!("result: {:?}", result);
-                //     println!("ok\n");
-                // } else {
-                //     // show the difference between tmp and result
-                //     let mut diff = tmp_a.clone();
-                //     diff.sub_with_borrow(&result);
-                //     println!("tmp   : {:?}", tmp_a);
-                //     println!("result: {:?}", result);
-                //     println!("diff: {:?}\n", diff);
-                // }
-
-                println!("a: {:?}", a);
-                println!("b: {:?}", b);
-                                
                 objc::rc::autoreleasepool(|| {
                     result = execute_kernel("test_uint_add", (a, Big(b)));
                 });
-
-                let mut tmp = a.clone();
-                tmp.add_with_carry(&b);
-
-
-                if tmp == result {
-                    println!("ok\n");
-                } else {
-                    // show the difference between tmp and result
-                    let mut diff = tmp.clone();
-                    diff.sub_with_borrow(&result);
-                    println!("tmp   : {:?}", tmp);
-                    println!("result: {:?}", result);
-                    println!("diff: {:?}\n", diff);
-                }
-
-                prop_assert_eq!(result, tmp);
+                let mut local_add = a;
+                local_add.add_with_carry(&b);
+                prop_assert_eq!(result, local_add);
             }
 
             #[test]
             fn sub(a in rand_u128(), b in rand_u128()) {
                 let mut result = BigInteger256::default();
+                let (a, b) = if a < b { (b, a) } else { (a, b) };
                 objc::rc::autoreleasepool(|| {
-                    let a = std::cmp::max(a, b);
-                    let b = std::cmp::min(a, b);
-
-                    let result = execute_kernel("test_uint_sub", (a, Big(b)));
+                    result = execute_kernel("test_uint_sub", (a, Big(b)));
                 });
-                let mut tmp = a;
-                tmp.sub_with_borrow(&b);
-                prop_assert_eq!(result, tmp);
+                let mut local_sub = a;
+                local_sub.sub_with_borrow(&b);
+                prop_assert_eq!(result, local_sub);
             }
 
             #[test]
             fn prod(a in rand_u128(), b in rand_u32()) {
                 let mut result = BigInteger256::default();
                 objc::rc::autoreleasepool(|| {
-                    let result = execute_kernel("test_uint_prod", (a, Big(b)));
+                    result = execute_kernel("test_uint_prod", (a, Big(b)));
                 });
-                let mut tmp = a;
-                tmp.muln(b.to_u32());
-                prop_assert_eq!(result, tmp);
+                let local_prod = BigUint::from(a) * BigUint::from(b);
+                let mut base_bigint: [u64; 4] = [0; 4];
+                for (i, limb) in local_prod.to_u64_digits().iter().enumerate() {
+                    base_bigint[i] = *limb;
+                }
+                let local_prod: BigInt<4> = BigInt(base_bigint);
+                prop_assert_eq!(result, local_prod);
             }
 
-            // #[test]
-            // fn shl(a in rand_u128(), b in any::<usize>()) {
-            //     objc::rc::autoreleasepool(|| {
-            //         let b = b % 256; // so it doesn't overflow
-            //         let result = execute_kernel("test_uint_shl", (a, Small(b)));
-            //         prop_assert_eq!(result, a << b);
-            //         Ok(())
-            //     }).unwrap();
-            // }
+            #[test]
+            fn shl(a in rand_u128(), b in any::<usize>()) {
+                let mut result = BigInteger256::default();
+                let b = b % 256; // so it doesn't overflow
+                objc::rc::autoreleasepool(|| {
+                    result = execute_kernel("test_uint_shl", (a, Small(b)));
+                });
+                let mut local_shl = a;
+                local_shl.muln(b as u32);
+                prop_assert_eq!(result, local_shl);
+            }
 
-            // #[test]
-            // fn shr(a in rand_u128(), b in any::<usize>()) {
-            //     objc::rc::autoreleasepool(|| {
-            //         let b = b % 256; // so it doesn't overflow
-            //         let result = execute_kernel("test_uint_shr", (a, Small(b)));
-            //         prop_assert_eq!(result, a >> b);
-            //         Ok(())
-            //     }).unwrap();
-            // }
+            #[test]
+            fn shr(a in rand_u128(), b in any::<usize>()) {
+                let mut result = BigInteger256::default();
+                let b = b % 256; // so it doesn't overflow
+                objc::rc::autoreleasepool(|| {
+                    result = execute_kernel("test_uint_shr", (a, Small(b)));
+                });
+                let mut local_shr = a;
+                local_shr.divn(b as u32);
+                prop_assert_eq!(result, local_shr);
+            }
         }
     }
 
