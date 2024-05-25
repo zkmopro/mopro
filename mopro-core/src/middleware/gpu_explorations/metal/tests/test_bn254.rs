@@ -254,21 +254,21 @@ mod tests {
         */
         #[test]
         fn add() {
-            let mut result = [0u32; 1];
+            let mut result = [0u32; 8];
             execute_kernel("test_bn254_add", &mut result);
             // assert_eq!(result[0], 8)
         }
 
         #[test]
         fn sub() {
-            let mut result = [0u32; 1];
+            let mut result = [0u32; 8];
             execute_kernel("test_bn254_sub", &mut result);
             // assert_eq!(result[0], 4)
         }
 
         #[test]
         fn mul() {
-            let mut result = [0u32; 1];
+            let mut result = [0u32; 8];
             execute_kernel("test_bn254_mul", &mut result);
             // assert_eq!(result[0], 55)
         }
@@ -289,27 +289,27 @@ mod tests {
 
         #[test]
         fn mont_reduction() {
-            let mut result = [0u32; 1];
+            let mut result = [0u32; 8];
             execute_kernel("test_bn254_mont_reduction", &mut result);
             // assert_eq!(result[0], 3)
         }
 
         #[test]
         fn exp() {
-            let mut result = [0u32; 1];
+            let mut result = [0u32; 8];
             execute_kernel("test_bn254_exp", &mut result);
             // assert_eq!(result[0], 125)
         }
         
         #[test]
         fn eq() {
-            let mut result = [0u32; 1];
+            let mut result = [0u32; 8];
             execute_kernel("test_bn254_eq", &mut result);
             // assert_eq!(result[0], 1)
         }
         #[test]
         fn ineq() {
-            let mut result = [0u32; 1];
+            let mut result = [0u32; 8];
             execute_kernel("test_bn254_ineq", &mut result);
             // assert_eq!(result[0], 1)
         }

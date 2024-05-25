@@ -33,7 +33,7 @@ using namespace metal;
 }
 
 [[kernel]] void test_bn254_neg(device uint* out [[buffer(0)]]) {
-    FpBN254 a = FpBN254(0);
+    FpBN254 a = FpBN254(3);
     FpBN254 neg_result = a.neg(); // Should be 0 - 0 = 0
     out[0] = static_cast<uint32_t>(neg_result); // Expect 0
 }
