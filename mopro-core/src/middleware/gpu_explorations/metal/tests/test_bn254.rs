@@ -275,14 +275,14 @@ mod tests {
 
         #[test]
         fn inversion() {
-            let mut result = [0u32; 1];
+            let mut result = [0u32; 8];
             execute_kernel("test_bn254_inversion", &mut result);
             // assert_eq!(result[0], 1)
         }
 
         #[test]
         fn neg() {
-            let mut result = [0u32; 1];
+            let mut result = [0u32; 8];
             execute_kernel("test_bn254_neg", &mut result);
             // assert_eq!(result[0], 0)
         }
