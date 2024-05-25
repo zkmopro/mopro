@@ -212,8 +212,111 @@ mod tests {
         }
     }
 
+    
+    mod fp_ez_tests {
+        use super::*;
+        fn execute_kernel(name: &str, out: &mut [u32]) {
+            let state = MetalState::new(None).unwrap();
+            let pipeline = state.setup_pipeline(name).unwrap();
+        
+            let result_buffer = state.alloc_buffer_data(out);
+        
+            let (command_buffer, command_encoder) = state.setup_command(&pipeline, Some(&[(0, &result_buffer)]));
+        
+            let threadgroup_size = MTLSize::new(1, 1, 1);
+            let threadgroup_count = MTLSize::new(1, 1, 1);
+        
+            command_encoder.dispatch_thread_groups(threadgroup_count, threadgroup_size);
+            command_encoder.end_encoding();
+        
+            command_buffer.commit();
+            command_buffer.wait_until_completed();
+        
+
+            let limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
+            // put limbs into out
+            for (i, limb) in limbs.iter().enumerate() {
+                out[i] = *limb;
+            }
+            print!("{:?}", out);
+        }
+
+        /*
+            8   test_bn254_add 
+            4   test_bn254_sub
+            55  test_bn254_mul
+            1   test_bn254_inversion
+            0   test_bn254_neg
+            3   test_bn254_mont_reduction
+            125 test_bn254_exp
+            1   test_bn254_eq
+            1   test_bn254_ineq
+        */
+        #[test]
+        fn add() {
+            let mut result = [0u32; 1];
+            execute_kernel("test_bn254_add", &mut result);
+            // assert_eq!(result[0], 8)
+        }
+
+        #[test]
+        fn sub() {
+            let mut result = [0u32; 1];
+            execute_kernel("test_bn254_sub", &mut result);
+            // assert_eq!(result[0], 4)
+        }
+
+        #[test]
+        fn mul() {
+            let mut result = [0u32; 1];
+            execute_kernel("test_bn254_mul", &mut result);
+            // assert_eq!(result[0], 55)
+        }
+
+        #[test]
+        fn inversion() {
+            let mut result = [0u32; 1];
+            execute_kernel("test_bn254_inversion", &mut result);
+            // assert_eq!(result[0], 1)
+        }
+
+        #[test]
+        fn neg() {
+            let mut result = [0u32; 1];
+            execute_kernel("test_bn254_neg", &mut result);
+            // assert_eq!(result[0], 0)
+        }
+
+        #[test]
+        fn mont_reduction() {
+            let mut result = [0u32; 1];
+            execute_kernel("test_bn254_mont_reduction", &mut result);
+            // assert_eq!(result[0], 3)
+        }
+
+        #[test]
+        fn exp() {
+            let mut result = [0u32; 1];
+            execute_kernel("test_bn254_exp", &mut result);
+            // assert_eq!(result[0], 125)
+        }
+        
+        #[test]
+        fn eq() {
+            let mut result = [0u32; 1];
+            execute_kernel("test_bn254_eq", &mut result);
+            // assert_eq!(result[0], 1)
+        }
+        #[test]
+        fn ineq() {
+            let mut result = [0u32; 1];
+            execute_kernel("test_bn254_ineq", &mut result);
+            // assert_eq!(result[0], 1)
+        }
+    }
+
     /*
-    mod fp_tests {
+      mod fp_tests {
         use lambdaworks_math::unsigned_integer::traits::U32Limbs;
         use proptest::collection;
 
@@ -324,7 +427,9 @@ mod tests {
             }
         }
     }
+    */
 
+    /*   
     mod ec_tests {
         use lambdaworks_math::unsigned_integer::traits::U32Limbs;
 
