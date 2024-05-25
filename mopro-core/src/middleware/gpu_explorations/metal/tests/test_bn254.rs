@@ -40,8 +40,8 @@ mod tests {
                 let mut limbs = Vec::new();
 
                 self.to_bytes_be().chunks(8).rev().for_each(|chunk| {
-                    let low = u32::from_be_bytes(chunk[0..4].try_into().unwrap());
-                    let high = u32::from_be_bytes(chunk[4..8].try_into().unwrap());
+                    let high = u32::from_be_bytes(chunk[0..4].try_into().unwrap());
+                    let low = u32::from_be_bytes(chunk[4..8].try_into().unwrap());
                     limbs.push(low);
                     limbs.push(high);
                 });
@@ -72,7 +72,8 @@ mod tests {
                 for (i, limb) in limbs.chunks(2).enumerate() {
                     let low = u64::from(limb[0]);
                     let high = u64::from(limb[1]);
-                    big_int[i] = (low << 32) | high;
+                    big_int[i] = low | (high << 32);
+                    println!("low: {:x}, high: {:x}, big_int[{}]: {:x}", low, high, i, big_int[i]);
                 }
                 BigInt(big_int)
             }
@@ -95,14 +96,16 @@ mod tests {
             let (a, b) = params;
 
             let a = a.to_u32_limbs();
-
+            
             let result_buffer = state.alloc_buffer::<BigInteger256>(1);
-
+            
             let debug_buffer = state.alloc_buffer::<u32>(24);
-
+            
             let (command_buffer, command_encoder) = match b {
                 BigOrSmallInt::Big(b) => {
                     let b = b.to_u32_limbs();
+                    println!("a: {:?}", a);
+                    println!("b: {:?}", b);
                     let a_buffer = state.alloc_buffer_data(&a);
                     let b_buffer = state.alloc_buffer_data(&b);
                     state.setup_command(
@@ -170,67 +173,56 @@ mod tests {
             fn add(a in rand_u128(), b in rand_u128()) {
                 let mut result = BigInteger256::default();
 
-                // BigInt form
-                // [low, high, 0, 0]
-                // 2^64 - 1:  18446744073709551615
-                // 2^128 - 1: 340282366920938463463374607431768211455
-                let mut tmp_a: BigInt<4> = BigInt!("18446744073709551615");
-                let mut tmp_b: BigInt<4> = BigInt!("1");
+                // // BigInt form
+                // // [low, high, 0, 0]
+                // // 2^64 - 1:  18446744073709551615
+                // // 2^128 - 1: 340282366920938463463374607431768211455
+                // let mut tmp_a: BigInt<4> = BigInt!("340282366920938463463374607431768211455");
+                // let mut tmp_b: BigInt<4> = BigInt!("1");
 
-                println!("tmp_a: {:?}", tmp_a);
-                println!("tmp_b: {:?}", tmp_b);
+                // println!("tmp_a: {:?}", tmp_a);
+                // println!("tmp_b: {:?}", tmp_b);
                 
-                objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("test_uint_add", (tmp_a, Big(tmp_b)));
-                });
-                // use ark_ff::biginteger::arithmetic::adc_for_add_with_carry as adc;
-                // let mut carry = 0;
-                // for i in 0..4 {
-                //     carry += adc(&mut tmp_a.clone().0[i] , tmp_b.clone().0[i], carry);
-                // }
-                // println!("carry: {:?}", carry);
-                tmp_a.add_with_carry(&tmp_b);
-                if tmp_a == result {
-                    println!("result: {:?}", result);
-                    println!("ok\n");
-                } else {
-                    // show the difference between tmp and result
-                    let mut diff = tmp_a.clone();
-                    diff.sub_with_borrow(&result);
-                    println!("tmp   : {:?}", tmp_a);
-                    println!("result: {:?}", result);
-                    println!("diff: {:?}\n", diff);
-                }
-                // prop_assert_eq!(result, tmp_a);
-                // a: BigInt([18020593341677359069, 14413279390197625029, 0, 0])
-                // b: BigInt([10781091185169145405, 3104228427255190839, 0, 0])
-
-                // println!("a: {:?}", a);
-                // println!("b: {:?}", b);
-                                
                 // objc::rc::autoreleasepool(|| {
-                //     result = execute_kernel("test_uint_add", (a, Big(b)));
+                //     result = execute_kernel("test_uint_add", (tmp_a, Big(tmp_b)));
                 // });
-                // let mut tmp = a;
-                // use ark_ff::biginteger::arithmetic::adc_for_add_with_carry as adc;
-                // let mut carry = 0;
-                // for i in 0..4 {
-                //     carry += adc(&mut tmp.0[i] , b.0[i], carry);
-                // }
-                // println!("carry: {:?}", carry);
-
-                // if tmp == result {
+            
+                // tmp_a.add_with_carry(&tmp_b);
+                // if tmp_a == result {
+                //     println!("result: {:?}", result);
                 //     println!("ok\n");
                 // } else {
                 //     // show the difference between tmp and result
-                //     let mut diff = tmp.clone();
+                //     let mut diff = tmp_a.clone();
                 //     diff.sub_with_borrow(&result);
-                //     println!("tmp   : {:?}", tmp);
+                //     println!("tmp   : {:?}", tmp_a);
                 //     println!("result: {:?}", result);
                 //     println!("diff: {:?}\n", diff);
                 // }
 
-                // prop_assert_eq!(result, tmp);
+                println!("a: {:?}", a);
+                println!("b: {:?}", b);
+                                
+                objc::rc::autoreleasepool(|| {
+                    result = execute_kernel("test_uint_add", (a, Big(b)));
+                });
+
+                let mut tmp = a.clone();
+                tmp.add_with_carry(&b);
+
+
+                if tmp == result {
+                    println!("ok\n");
+                } else {
+                    // show the difference between tmp and result
+                    let mut diff = tmp.clone();
+                    diff.sub_with_borrow(&result);
+                    println!("tmp   : {:?}", tmp);
+                    println!("result: {:?}", result);
+                    println!("diff: {:?}\n", diff);
+                }
+
+                prop_assert_eq!(result, tmp);
             }
 
             #[test]

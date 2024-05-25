@@ -20,14 +20,6 @@ void test_uint_add(
     // so that the most significant limb is at the start of the buffer
     // and the least significant limb is at the end of the buffer
 
-    uint32_t tmp = 0;
-
-    for (int i = 0; i < 8; i+=2) {
-        tmp = uint32_t(a.m_limbs[i]);
-        a.m_limbs[i] = a.m_limbs[i+1];
-        a.m_limbs[i+1] = tmp;
-    }
-
     result = a + b;
 
     // Write the values of a and b to the debug buffer
