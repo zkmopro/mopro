@@ -3,11 +3,12 @@ mod tests {
     use crate::middleware::gpu_explorations::metal::abstraction::state::MetalState;
     use ark_bn254::{Fq, Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
     use ark_ec::AffineRepr;
-    use ark_ff::{Field, PrimeField, biginteger::BigInteger256, BigInt};
+    use ark_ff::{Field, PrimeField, biginteger::{BigInteger,BigInteger256}, BigInt};
 
     use metal::MTLSize;
     use proptest::prelude::*;
 
+    pub type FE = Fq;   // Field Element
     pub type Point = GAffine;
     pub type Scalar = <ScalarField as PrimeField>::BigInt;
 
@@ -15,60 +16,60 @@ mod tests {
     // pub type FE = FieldElement<F>;
     // pub type U = U256; // F::BaseType
 
+    // implement to_u32_limbs and from_u32_limbs for BigInt<4>
+    trait ToLimbs {
+        fn to_u32_limbs(&self) -> Vec<u32>;
+    }
+
+    trait FromLimbs {
+        fn from_u32_limbs(limbs: &[u32]) -> Self;
+        fn from_u128(num: u128) -> Self;
+        fn from_u32(num: u32) -> Self;
+    }
+
+    // convert from little endian to big endian
+    impl ToLimbs for BigInteger256 {
+        fn to_u32_limbs(&self) -> Vec<u32> {
+            let mut limbs = Vec::new();                
+            self.to_bytes_be().chunks(8).for_each(|chunk| {
+                let high = u32::from_be_bytes(chunk[0..4].try_into().unwrap());
+                let low = u32::from_be_bytes(chunk[4..8].try_into().unwrap());
+                limbs.push(high);
+                limbs.push(low);
+            });
+            limbs
+        }
+    }
+
+    impl FromLimbs for BigInteger256 {
+        // convert from big endian to little endian for metal
+        fn from_u32_limbs(limbs: &[u32]) -> Self {
+            let mut big_int = [0u64; 4];
+            for (i, limb) in limbs.chunks(2).rev().enumerate() {
+                let high = u64::from(limb[0]);
+                let low = u64::from(limb[1]);
+                big_int[i] = (high << 32) | low;
+            }
+            BigInt(big_int)
+        }
+        // provide little endian u128 since arkworks use this value as well
+        fn from_u128(num: u128) -> Self {
+            let high = (num >> 64) as u64;
+            let low = num as u64;
+            BigInt([low, high, 0, 0])
+        }
+        // provide little endian u32 since arkworks use this value as well
+        fn from_u32(num: u32) -> Self {
+            BigInt([num as u64, 0, 0, 0])
+        }
+    }
+
     mod unsigned_int_tests {
         use super::*;
 
         enum BigOrSmallInt {
             Big(BigInteger256),
             Small(usize),
-        }
-
-        // implement to_u32_limbs and from_u32_limbs for BigInt<4>
-        trait ToLimbs {
-            fn to_u32_limbs(&self) -> Vec<u32>;
-        }
-
-        trait FromLimbs {
-            fn from_u32_limbs(limbs: &[u32]) -> Self;
-            fn from_u128(num: u128) -> Self;
-            fn from_u32(num: u32) -> Self;
-        }
-
-        // convert from little endian to big endian
-        impl ToLimbs for BigInteger256 {
-            fn to_u32_limbs(&self) -> Vec<u32> {
-                let mut limbs = Vec::new();                
-                self.to_bytes_be().chunks(8).for_each(|chunk| {
-                    let high = u32::from_be_bytes(chunk[0..4].try_into().unwrap());
-                    let low = u32::from_be_bytes(chunk[4..8].try_into().unwrap());
-                    limbs.push(high);
-                    limbs.push(low);
-                });
-                limbs
-            }
-        }
-
-        impl FromLimbs for BigInteger256 {
-            // convert from big endian to little endian for metal
-            fn from_u32_limbs(limbs: &[u32]) -> Self {
-                let mut big_int = [0u64; 4];
-                for (i, limb) in limbs.chunks(2).rev().enumerate() {
-                    let high = u64::from(limb[0]);
-                    let low = u64::from(limb[1]);
-                    big_int[i] = (high << 32) | low;
-                }
-                BigInt(big_int)
-            }
-            // provide little endian u128 since arkworks use this value as well
-            fn from_u128(num: u128) -> Self {
-                let high = (num >> 64) as u64;
-                let low = num as u64;
-                BigInt([low, high, 0, 0])
-            }
-            // provide little endian u32 since arkworks use this value as well
-            fn from_u32(num: u32) -> Self {
-                BigInt([num as u64, 0, 0, 0])
-            }
         }
 
         fn execute_kernel(name: &str, params: (BigInteger256, BigOrSmallInt)) -> BigInteger256 {
@@ -315,12 +316,10 @@ mod tests {
         }
     }
 
-    /*
-      mod fp_tests {
-        use lambdaworks_math::unsigned_integer::traits::U32Limbs;
-        use proptest::collection;
-
+    mod fp_tests {
         use super::*;
+
+        use proptest::collection;
 
         enum FEOrInt {
             Elem(FE),
@@ -333,12 +332,13 @@ mod tests {
 
             // conversion needed because of possible difference of endianess between host and
             // device (Metal's UnsignedInteger has 32bit limbs).
-            let a = a.value().to_u32_limbs();
+            
+            let a = a.0.to_u32_limbs(); // alternative a.into_bigint().to_u32_limbs();
             let result_buffer = state.alloc_buffer::<u32>(8);
 
             let (command_buffer, command_encoder) = match b {
                 FEOrInt::Elem(b) => {
-                    let b = b.value().to_u32_limbs();
+                    let b = b.0.to_u32_limbs();
                     let a_buffer = state.alloc_buffer_data(&a);
                     let b_buffer = state.alloc_buffer_data(&b);
 
@@ -368,7 +368,7 @@ mod tests {
             command_buffer.wait_until_completed();
 
             let limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
-            FE::from_raw(&U::from_u32_limbs(&limbs))
+            FE::new(BigInteger256::from_u32_limbs(&limbs))
         }
 
         prop_compose! {
@@ -382,8 +382,8 @@ mod tests {
         }
 
         prop_compose! {
-            fn rand_felt()(limbs in rand_limbs()) -> FE {
-                FE::from(&U256::from_u32_limbs(&limbs))
+            fn rand_field_element()(limbs in rand_limbs()) -> FE {
+                FE::new(BigInteger256::from_u32_limbs(&limbs))
             }
         }
 
@@ -391,43 +391,70 @@ mod tests {
 
         proptest! {
             #[test]
-            fn add(a in rand_felt(), b in rand_felt()) {
-                objc::rc::autoreleasepool(|| {
-                    let result = execute_kernel("test_fpbn254_add", &a, Elem(b.clone()));
-                    prop_assert_eq!(result, a + b);
-                    Ok(())
-                }).unwrap();
+            fn foo(a in rand_u32(), b in rand_u32()) {
+                let p = Fq::from(9);
+                let q = Fq::from(10);
+                let result = p + q;
+                // let q = Fq::from(10).inverse().unwrap().into_bigint().to_u32_limbs();
+                println!("P: {:?}", p.0.to_u32_limbs());
+                println!("Q: {:?}", q.0.to_u32_limbs());
+                println!("P bg: {:?}", p.into_bigint().to_u32_limbs());
+                println!("Q bg: {:?}", q.into_bigint().to_u32_limbs());
+                println!("P + Q: {:?}", result.0.to_u32_limbs());
+                println!("P + Q 000: {:?}", result.0);
+                println!("P + Q bg: {:?}", result.into_bigint().to_u32_limbs());
+                // println!("{:?}", p + q);
             }
 
             #[test]
-            fn sub(a in rand_felt(), b in rand_felt()) {
+            fn add(a in rand_field_element(), b in rand_field_element()) {
+                let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    let result = execute_kernel("test_fpbn254_sub", &a, Elem(b.clone()));
-                    prop_assert_eq!(result, a - b);
-                    Ok(())
-                }).unwrap();
+                    // Note: the result is in montgomery form
+                    result = execute_kernel("test_bn254_add", &a, Elem(b.clone()));
+                });
+                let local_add = a + b;
+                // println!("(Mont) a + b: {:?}", local_add.0);
+                // println!("(Bigint) a + b: {:?}", local_add.into_bigint());
+                // println!("Result: {:?}", result);
+                prop_assert_eq!(result.into_bigint(), local_add.0);
             }
 
             #[test]
-            fn mul(a in rand_felt(), b in rand_felt()) {
+            fn sub(a in rand_field_element(), b in rand_field_element()) {
+                let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    let result = execute_kernel("test_fpbn254_mul", &a, Elem(b.clone()));
-                    prop_assert_eq!(result, a * b);
-                    Ok(())
-                }).unwrap();
+                    result = execute_kernel("test_bn254_sub", &a, Elem(b.clone()));
+                });
+                let local_sub = a - b;
+                prop_assert_eq!(result.into_bigint(), local_sub.0);
             }
 
             #[test]
-            fn pow(a in rand_felt(), b in rand_u32()) {
+            fn mul(a in rand_field_element(), b in rand_field_element()) {
+                let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    let result = execute_kernel("test_fpbn254_pow", &a, Int(b));
-                    prop_assert_eq!(result, a.pow(b));
-                    Ok(())
-                }).unwrap();
+                    result = execute_kernel("test_bn254_mul", &a, Elem(b.clone()));
+                });
+                let local_mul = a * b;
+                println!("a: {:?}, b: {:?}", a, b);
+                println!("(Bigint)local a * b: {:?}", local_mul);
+                println!("(Mont)local a * b: {:?}", local_mul.0);
+                println!("result: {:?}", result);
+                prop_assert_eq!(result.into_bigint(), local_mul.0);
             }
+
+            // #[test]
+            // fn pow(a in rand_field_element(), b in rand_u32()) {
+            //     objc::rc::autoreleasepool(|| {
+            //         let result = execute_kernel("test_fpbn254_pow", &a, Int(b));
+            //         prop_assert_eq!(result, a.pow(b));
+            //         Ok(())
+            //     }).unwrap();
+            // }
         }
     }
-    */
+
 
     /*   
     mod ec_tests {
