@@ -68,10 +68,10 @@ fn metal_msm<V: VariableBaseMSM>(
                 let (command_buffer, command_encoder) = state.setup_command(
                     &calc_bucket_pipe,
                     Some(&[
-                        (0, &window_size_buffer),
-                        (1, &scalar_buffer),
-                        (2, &base_buffer),
-                        (3, &buckets_buffer),
+                        (1, &window_size_buffer),
+                        (2, &scalar_buffer),
+                        (3, &base_buffer),
+                        (4, &buckets_buffer),
                     ]),
                 );
 
@@ -88,13 +88,13 @@ fn metal_msm<V: VariableBaseMSM>(
 
             let mut running_sum = GAffine::zero().into_group();
             buckets_matrix.into_iter().rev().for_each(|b| {
-                println!("running_sum: {:?}", running_sum);
-                println!("res: {:?}", res);
+                // println!("running_sum: {:?}", running_sum);
+                // println!("res: {:?}", res);
                 running_sum += &b;
                 res += &running_sum;
             });
 
-            println!("res: {:?}", res);
+            // println!("res: {:?}", res);
 
             res
         })
