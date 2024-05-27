@@ -3,12 +3,15 @@ mod tests {
     use crate::middleware::gpu_explorations::metal::abstraction::state::MetalState;
     use ark_bn254::{Fq, Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
     use ark_ec::AffineRepr;
-    use ark_ff::{Field, PrimeField, biginteger::{BigInteger,BigInteger256}, BigInt};
+    use ark_ff::{
+        biginteger::{BigInteger, BigInteger256},
+        BigInt, Field, PrimeField,
+    };
 
     use metal::MTLSize;
     use proptest::prelude::*;
 
-    pub type FE = Fq;   // Field Element
+    pub type FE = Fq; // Field Element
     pub type Point = GAffine;
     pub type Scalar = <ScalarField as PrimeField>::BigInt;
 
@@ -30,7 +33,7 @@ mod tests {
     // convert from little endian to big endian
     impl ToLimbs for BigInteger256 {
         fn to_u32_limbs(&self) -> Vec<u32> {
-            let mut limbs = Vec::new();                
+            let mut limbs = Vec::new();
             self.to_bytes_be().chunks(8).for_each(|chunk| {
                 let high = u32::from_be_bytes(chunk[0..4].try_into().unwrap());
                 let low = u32::from_be_bytes(chunk[4..8].try_into().unwrap());
@@ -79,11 +82,11 @@ mod tests {
             let (a, b) = params;
 
             let a = a.to_u32_limbs();
-            
+
             let result_buffer = state.alloc_buffer::<BigInteger256>(1);
-            
+
             let debug_buffer = state.alloc_buffer::<u32>(24);
-            
+
             let (command_buffer, command_encoder) = match b {
                 BigOrSmallInt::Big(b) => {
                     let b = b.to_u32_limbs();
@@ -91,7 +94,12 @@ mod tests {
                     let b_buffer = state.alloc_buffer_data(&b);
                     state.setup_command(
                         &pipeline,
-                        Some(&[(0, &a_buffer), (1, &b_buffer), (2, &result_buffer), (3, &debug_buffer)]),
+                        Some(&[
+                            (0, &a_buffer),
+                            (1, &b_buffer),
+                            (2, &result_buffer),
+                            (3, &debug_buffer),
+                        ]),
                     )
                 }
                 BigOrSmallInt::Small(b) => {
@@ -99,7 +107,12 @@ mod tests {
                     let b_buffer = state.alloc_buffer_data(&[b]);
                     state.setup_command(
                         &pipeline,
-                        Some(&[(0, &a_buffer), (1, &b_buffer), (2, &result_buffer), (3, &debug_buffer)]),
+                        Some(&[
+                            (0, &a_buffer),
+                            (1, &b_buffer),
+                            (2, &result_buffer),
+                            (3, &debug_buffer),
+                        ]),
                     )
                 }
             };
@@ -143,7 +156,7 @@ mod tests {
             fn rand_u32()(n in any::<u32>()) -> BigInteger256 { BigInteger256::from_u32(n) }
         }
 
-        use ark_ff::biginteger::{BigInteger,BigInteger256};
+        use ark_ff::biginteger::{BigInteger, BigInteger256};
         use num_bigint::BigUint;
         // use lambdaworks_math::unsigned_integer::traits::U32Limbs;
         use BigOrSmallInt::{Big, Small};
@@ -213,26 +226,25 @@ mod tests {
         }
     }
 
-    
     mod fp_ez_tests {
         use super::*;
         fn execute_kernel(name: &str, out: &mut [u32]) {
             let state = MetalState::new(None).unwrap();
             let pipeline = state.setup_pipeline(name).unwrap();
-        
+
             let result_buffer = state.alloc_buffer_data(out);
-        
-            let (command_buffer, command_encoder) = state.setup_command(&pipeline, Some(&[(0, &result_buffer)]));
-        
+
+            let (command_buffer, command_encoder) =
+                state.setup_command(&pipeline, Some(&[(0, &result_buffer)]));
+
             let threadgroup_size = MTLSize::new(1, 1, 1);
             let threadgroup_count = MTLSize::new(1, 1, 1);
-        
+
             command_encoder.dispatch_thread_groups(threadgroup_count, threadgroup_size);
             command_encoder.end_encoding();
-        
+
             command_buffer.commit();
             command_buffer.wait_until_completed();
-        
 
             let limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
             // put limbs into out
@@ -243,7 +255,7 @@ mod tests {
         }
 
         /*
-            8   test_bn254_add 
+            8   test_bn254_add
             4   test_bn254_sub
             55  test_bn254_mul
             1   test_bn254_inversion
@@ -301,7 +313,7 @@ mod tests {
             execute_kernel("test_bn254_exp", &mut result);
             // assert_eq!(result[0], 125)
         }
-        
+
         #[test]
         fn eq() {
             let mut result = [0u32; 8];
@@ -332,7 +344,7 @@ mod tests {
 
             // conversion needed because of possible difference of endianess between host and
             // device (Metal's UnsignedInteger has 32bit limbs).
-            
+
             let a = a.0.to_u32_limbs(); // alternative a.into_bigint().to_u32_limbs();
             let result_buffer = state.alloc_buffer::<u32>(8);
 
@@ -444,19 +456,42 @@ mod tests {
                 prop_assert_eq!(result.into_bigint(), local_mul.0);
             }
 
-            // #[test]
-            // fn pow(a in rand_field_element(), b in rand_u32()) {
-            //     objc::rc::autoreleasepool(|| {
-            //         let result = execute_kernel("test_fpbn254_pow", &a, Int(b));
-            //         prop_assert_eq!(result, a.pow(b));
-            //         Ok(())
-            //     }).unwrap();
-            // }
+            #[test]
+            fn pow(a in rand_field_element(), b in rand_u32()) {
+                let mut result = Fq::default();
+                objc::rc::autoreleasepool(|| {
+                    result = execute_kernel("test_bn254_pow", &a, Int(b));
+                });
+                let local_pow = a.pow(&[b as u64]);
+                prop_assert_eq!(result.into_bigint(), local_pow.0);
+            }
+
+            #[test]
+            fn neg(a in rand_field_element()) {
+                let mut result = Fq::default();
+                objc::rc::autoreleasepool(|| {
+                    result = execute_kernel("test_bn254_neg", &a, Int(0));
+                });
+                let local_neg = -a;
+                prop_assert_eq!(result.into_bigint(), local_neg.0);
+            }
+
+            #[test]
+            fn inv(a in rand_field_element()) {
+                let mut result = Fq::default();
+                objc::rc::autoreleasepool(|| {
+                    result = execute_kernel("test_bn254_inv", &a, Int(0));
+                });
+                let local_inv = a.inverse().unwrap();
+                println!("a: {:?}", a.0);
+                println!("a inv: {:?}", local_inv.0);
+                println!("result: {:?}", result);
+                prop_assert_eq!(result.into_bigint(), local_inv.0);
+            }
         }
     }
 
-
-    /*   
+    /*
     mod ec_tests {
         use lambdaworks_math::unsigned_integer::traits::U32Limbs;
 
