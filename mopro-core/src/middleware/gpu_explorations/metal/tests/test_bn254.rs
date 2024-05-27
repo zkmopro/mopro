@@ -437,10 +437,10 @@ mod tests {
                     result = execute_kernel("test_bn254_mul", &a, Elem(b.clone()));
                 });
                 let local_mul = a * b;
-                println!("a: {:?}, b: {:?}", a, b);
-                println!("(Bigint)local a * b: {:?}", local_mul);
-                println!("(Mont)local a * b: {:?}", local_mul.0);
-                println!("result: {:?}", result);
+                // println!("a: {:?}, b: {:?}", a, b);
+                // println!("(Bigint)local a * b: {:?}", local_mul);
+                // println!("(Mont)local a * b: {:?}", local_mul.0);
+                // println!("result: {:?}", result);
                 prop_assert_eq!(result.into_bigint(), local_mul.0);
             }
 

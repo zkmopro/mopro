@@ -17,7 +17,7 @@ if N_inv is not None:
 # Step 3: Make sure N_inv is computed correctly
 if N_inv is not None:
     # compute N * -N^-1 mod 2^32 = -1
-    print("N * N^-1 mod 2^32:", (N * result) % mod)
+    print("Check that N * N^-1 mod 2^32:", (N * result) % mod)
     assert (N * result) % mod == mod - 1
 
 # Step 4: Convert the result to a hexadecimal string
@@ -31,5 +31,5 @@ if len(hex_str) % 8 != 0:
 limbs = [hex_str[i:i+8].upper() for i in range(0, len(hex_str), 8)]
 
 # Print the results in Big Endian order
-print(f"Hexadecimal String: 0x{hex_str.upper()}FFFFFFFF")
-print("32-bit unsigned integer limbs in hex format (Big Endian):")
+print(f"Result in Hexadecimal: 0x{hex_str.upper()}FFFFFFFF")
+print(f"Result in Decimal: {result}")

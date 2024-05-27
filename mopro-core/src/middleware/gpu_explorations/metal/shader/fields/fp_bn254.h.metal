@@ -43,7 +43,7 @@ constexpr static const constant u256 R_SUB_N = {
     0xC3DF73E9, 0x278302B9
 };
 
-constexpr static const constant uint64_t MU = 0xE4866389FFFFFFFF;
+constexpr static const constant uint64_t MU = 3834012553;
 
 class FpBN254 {
 public:
@@ -233,6 +233,7 @@ private:
         return add(lhs, ((u256)N) - rhs);
     }
 
+    // Compute multiplication by performing single round of Montgomery reduction
     constexpr static u256 mul(const u256 a, const u256 b) {
         constexpr uint64_t NUM_LIMBS = 8;
         metal::array<uint32_t, NUM_LIMBS> t = {};
