@@ -7,5 +7,4 @@
 #include "fields/fp_bn254.h.metal"
 #include "tests/test_bn254.h.metal"
 #include "tests/test_unsigned_integer.h.metal"
-// #include "tests/test_u256.h.metal"
-// #include "msm.h.metal"
+#include "msm.h.metal"

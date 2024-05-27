@@ -226,108 +226,6 @@ mod tests {
         }
     }
 
-    mod fp_ez_tests {
-        use super::*;
-        fn execute_kernel(name: &str, out: &mut [u32]) {
-            let state = MetalState::new(None).unwrap();
-            let pipeline = state.setup_pipeline(name).unwrap();
-
-            let result_buffer = state.alloc_buffer_data(out);
-
-            let (command_buffer, command_encoder) =
-                state.setup_command(&pipeline, Some(&[(0, &result_buffer)]));
-
-            let threadgroup_size = MTLSize::new(1, 1, 1);
-            let threadgroup_count = MTLSize::new(1, 1, 1);
-
-            command_encoder.dispatch_thread_groups(threadgroup_count, threadgroup_size);
-            command_encoder.end_encoding();
-
-            command_buffer.commit();
-            command_buffer.wait_until_completed();
-
-            let limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
-            // put limbs into out
-            for (i, limb) in limbs.iter().enumerate() {
-                out[i] = *limb;
-            }
-            print!("{:?}", out);
-        }
-
-        /*
-            8   test_bn254_add
-            4   test_bn254_sub
-            55  test_bn254_mul
-            1   test_bn254_inversion
-            0   test_bn254_neg
-            3   test_bn254_mont_reduction
-            125 test_bn254_exp
-            1   test_bn254_eq
-            1   test_bn254_ineq
-        */
-        #[test]
-        fn add() {
-            let mut result = [0u32; 8];
-            execute_kernel("test_bn254_add", &mut result);
-            // assert_eq!(result[0], 8)
-        }
-
-        #[test]
-        fn sub() {
-            let mut result = [0u32; 8];
-            execute_kernel("test_bn254_sub", &mut result);
-            // assert_eq!(result[0], 4)
-        }
-
-        #[test]
-        fn mul() {
-            let mut result = [0u32; 8];
-            execute_kernel("test_bn254_mul", &mut result);
-            // assert_eq!(result[0], 55)
-        }
-
-        #[test]
-        fn inversion() {
-            let mut result = [0u32; 8];
-            execute_kernel("test_bn254_inversion", &mut result);
-            // assert_eq!(result[0], 1)
-        }
-
-        #[test]
-        fn neg() {
-            let mut result = [0u32; 8];
-            execute_kernel("test_bn254_neg", &mut result);
-            // assert_eq!(result[0], 0)
-        }
-
-        #[test]
-        fn mont_reduction() {
-            let mut result = [0u32; 8];
-            execute_kernel("test_bn254_mont_reduction", &mut result);
-            // assert_eq!(result[0], 3)
-        }
-
-        #[test]
-        fn exp() {
-            let mut result = [0u32; 8];
-            execute_kernel("test_bn254_exp", &mut result);
-            // assert_eq!(result[0], 125)
-        }
-
-        #[test]
-        fn eq() {
-            let mut result = [0u32; 8];
-            execute_kernel("test_bn254_eq", &mut result);
-            // assert_eq!(result[0], 1)
-        }
-        #[test]
-        fn ineq() {
-            let mut result = [0u32; 8];
-            execute_kernel("test_bn254_ineq", &mut result);
-            // assert_eq!(result[0], 1)
-        }
-    }
-
     mod fp_tests {
         use super::*;
 
@@ -403,32 +301,13 @@ mod tests {
 
         proptest! {
             #[test]
-            fn foo(a in rand_u32(), b in rand_u32()) {
-                let p = Fq::from(9);
-                let q = Fq::from(10);
-                let result = p + q;
-                // let q = Fq::from(10).inverse().unwrap().into_bigint().to_u32_limbs();
-                println!("P: {:?}", p.0.to_u32_limbs());
-                println!("Q: {:?}", q.0.to_u32_limbs());
-                println!("P bg: {:?}", p.into_bigint().to_u32_limbs());
-                println!("Q bg: {:?}", q.into_bigint().to_u32_limbs());
-                println!("P + Q: {:?}", result.0.to_u32_limbs());
-                println!("P + Q 000: {:?}", result.0);
-                println!("P + Q bg: {:?}", result.into_bigint().to_u32_limbs());
-                // println!("{:?}", p + q);
-            }
-
-            #[test]
             fn add(a in rand_field_element(), b in rand_field_element()) {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
                     // Note: the result is in montgomery form
-                    result = execute_kernel("test_bn254_add", &a, Elem(b.clone()));
+                    result = execute_kernel("bn254_add", &a, Elem(b.clone()));
                 });
                 let local_add = a + b;
-                // println!("(Mont) a + b: {:?}", local_add.0);
-                // println!("(Bigint) a + b: {:?}", local_add.into_bigint());
-                // println!("Result: {:?}", result);
                 prop_assert_eq!(result.into_bigint(), local_add.0);
             }
 
@@ -436,7 +315,7 @@ mod tests {
             fn sub(a in rand_field_element(), b in rand_field_element()) {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("test_bn254_sub", &a, Elem(b.clone()));
+                    result = execute_kernel("bn254_sub", &a, Elem(b.clone()));
                 });
                 let local_sub = a - b;
                 prop_assert_eq!(result.into_bigint(), local_sub.0);
@@ -446,13 +325,9 @@ mod tests {
             fn mul(a in rand_field_element(), b in rand_field_element()) {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("test_bn254_mul", &a, Elem(b.clone()));
+                    result = execute_kernel("bn254_mul", &a, Elem(b.clone()));
                 });
                 let local_mul = a * b;
-                // println!("a: {:?}, b: {:?}", a, b);
-                // println!("(Bigint)local a * b: {:?}", local_mul);
-                // println!("(Mont)local a * b: {:?}", local_mul.0);
-                // println!("result: {:?}", result);
                 prop_assert_eq!(result.into_bigint(), local_mul.0);
             }
 
@@ -460,7 +335,7 @@ mod tests {
             fn pow(a in rand_field_element(), b in rand_u32()) {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("test_bn254_pow", &a, Int(b));
+                    result = execute_kernel("bn254_pow", &a, Int(b));
                 });
                 let local_pow = a.pow(&[b as u64]);
                 prop_assert_eq!(result.into_bigint(), local_pow.0);
@@ -470,24 +345,25 @@ mod tests {
             fn neg(a in rand_field_element()) {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("test_bn254_neg", &a, Int(0));
+                    result = execute_kernel("bn254_neg", &a, Int(0));
                 });
                 let local_neg = -a;
                 prop_assert_eq!(result.into_bigint(), local_neg.0);
             }
 
-            #[test]
-            fn inv(a in rand_field_element()) {
-                let mut result = Fq::default();
-                objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("test_bn254_inv", &a, Int(0));
-                });
-                let local_inv = a.inverse().unwrap();
-                println!("a: {:?}", a.0);
-                println!("a inv: {:?}", local_inv.0);
-                println!("result: {:?}", result);
-                prop_assert_eq!(result.into_bigint(), local_inv.0);
-            }
+            // // TODO: Implement inverse if needed in the future
+            // #[test]
+            // fn inv(a in rand_field_element()) {
+            //     let mut result = Fq::default();
+            //     objc::rc::autoreleasepool(|| {
+            //         result = execute_kernel("test_bn254_inv", &a, Int(0));
+            //     });
+            //     let local_inv = a.inverse().unwrap();
+            //     println!("a: {:?}", a.0);
+            //     println!("a inv: {:?}", local_inv.0);
+            //     println!("result: {:?}", result);
+            //     prop_assert_eq!(result.into_bigint(), local_inv.0);
+            // }
         }
     }
 
