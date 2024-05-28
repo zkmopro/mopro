@@ -36,3 +36,10 @@ template [[ host_name("fp_bn254_pow") ]]
     constant uint32_t&,
     device FpBN254&
 );
+
+template [[ host_name("fp_bn254_neg") ]]
+[[kernel]] void bn254_neg<FpBN254>(
+    constant FpBN254&,
+    constant uint32_t&,
+    device FpBN254&
+);

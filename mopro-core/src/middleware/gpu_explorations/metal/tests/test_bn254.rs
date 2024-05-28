@@ -1,6 +1,6 @@
 #[cfg(all(test))]
 mod tests {
-    use crate::middleware::gpu_explorations::metal::abstraction::state::MetalState;
+    use crate::middleware::gpu_explorations::metal::abstraction::{state::MetalState, utils::*};
     use ark_bn254::{Fq, Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
     use ark_ec::AffineRepr;
     use ark_ff::{
@@ -18,54 +18,6 @@ mod tests {
     // pub type F = BN254PrimeField;
     // pub type FE = FieldElement<F>;
     // pub type U = U256; // F::BaseType
-
-    // implement to_u32_limbs and from_u32_limbs for BigInt<4>
-    trait ToLimbs {
-        fn to_u32_limbs(&self) -> Vec<u32>;
-    }
-
-    trait FromLimbs {
-        fn from_u32_limbs(limbs: &[u32]) -> Self;
-        fn from_u128(num: u128) -> Self;
-        fn from_u32(num: u32) -> Self;
-    }
-
-    // convert from little endian to big endian
-    impl ToLimbs for BigInteger256 {
-        fn to_u32_limbs(&self) -> Vec<u32> {
-            let mut limbs = Vec::new();
-            self.to_bytes_be().chunks(8).for_each(|chunk| {
-                let high = u32::from_be_bytes(chunk[0..4].try_into().unwrap());
-                let low = u32::from_be_bytes(chunk[4..8].try_into().unwrap());
-                limbs.push(high);
-                limbs.push(low);
-            });
-            limbs
-        }
-    }
-
-    impl FromLimbs for BigInteger256 {
-        // convert from big endian to little endian for metal
-        fn from_u32_limbs(limbs: &[u32]) -> Self {
-            let mut big_int = [0u64; 4];
-            for (i, limb) in limbs.chunks(2).rev().enumerate() {
-                let high = u64::from(limb[0]);
-                let low = u64::from(limb[1]);
-                big_int[i] = (high << 32) | low;
-            }
-            BigInt(big_int)
-        }
-        // provide little endian u128 since arkworks use this value as well
-        fn from_u128(num: u128) -> Self {
-            let high = (num >> 64) as u64;
-            let low = num as u64;
-            BigInt([low, high, 0, 0])
-        }
-        // provide little endian u32 since arkworks use this value as well
-        fn from_u32(num: u32) -> Self {
-            BigInt([num as u64, 0, 0, 0])
-        }
-    }
 
     mod unsigned_int_tests {
         use super::*;
@@ -305,7 +257,7 @@ mod tests {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
                     // Note: the result is in montgomery form
-                    result = execute_kernel("bn254_add", &a, Elem(b.clone()));
+                    result = execute_kernel("fp_bn254_add", &a, Elem(b.clone()));
                 });
                 let local_add = a + b;
                 prop_assert_eq!(result.into_bigint(), local_add.0);
@@ -315,7 +267,7 @@ mod tests {
             fn sub(a in rand_field_element(), b in rand_field_element()) {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("bn254_sub", &a, Elem(b.clone()));
+                    result = execute_kernel("fp_bn254_sub", &a, Elem(b.clone()));
                 });
                 let local_sub = a - b;
                 prop_assert_eq!(result.into_bigint(), local_sub.0);
@@ -325,7 +277,7 @@ mod tests {
             fn mul(a in rand_field_element(), b in rand_field_element()) {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("bn254_mul", &a, Elem(b.clone()));
+                    result = execute_kernel("fp_bn254_mul", &a, Elem(b.clone()));
                 });
                 let local_mul = a * b;
                 prop_assert_eq!(result.into_bigint(), local_mul.0);
@@ -335,7 +287,7 @@ mod tests {
             fn pow(a in rand_field_element(), b in rand_u32()) {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("bn254_pow", &a, Int(b));
+                    result = execute_kernel("fp_bn254_pow", &a, Int(b));
                 });
                 let local_pow = a.pow(&[b as u64]);
                 prop_assert_eq!(result.into_bigint(), local_pow.0);
@@ -345,7 +297,7 @@ mod tests {
             fn neg(a in rand_field_element()) {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("bn254_neg", &a, Int(0));
+                    result = execute_kernel("fp_bn254_neg", &a, Int(0));
                 });
                 let local_neg = -a;
                 prop_assert_eq!(result.into_bigint(), local_neg.0);

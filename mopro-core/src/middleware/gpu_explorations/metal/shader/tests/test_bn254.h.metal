@@ -50,7 +50,7 @@ template<typename Fp>
 template<typename Fp>
 [[kernel]] void bn254_neg(
     constant FpBN254 &_p [[ buffer(0) ]],
-    constant FpBN254 &_q [[ buffer(1) ]],
+    constant uint32_t &_a [[ buffer(1) ]],  // TODO: Remove this dummy arg
     device FpBN254 &result [[ buffer(2) ]]
 ) {
     FpBN254 p = _p;
