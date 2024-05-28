@@ -51,35 +51,69 @@ const config: Config = {
   ],
 
   themeConfig: {
+    colorMode: {
+      defaultMode: 'dark',
+      disableSwitch: true,
+      respectPrefersColorScheme: false,
+    },
     // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/logo_title.svg',
     navbar: {
-      title: 'Mopro',
+      style: 'dark',
+      // title: 'Mopro',
       logo: {
         alt: 'Mopro Logo',
-        src: 'img/logo.svg',
+        src: 'img/logo_title.svg',
+        width: '375',
+        height: '91',
       },
       items: [
         {
           type: 'docSidebar',
           sidebarId: 'docsSidebar',
-          position: 'left',
+          position: 'right',
           label: 'Docs',
         },
-        { to: '/blog', label: 'Blog', position: 'left' },
+        { to: '/blog', label: 'Blog', position: 'right' },
+        // {
+        //   href: 'https://github.com/zkmopro/mopro',
+        //   label: 'GitHub',
+        //   position: 'right',
+        // },
         {
-          href: 'https://github.com/zkmopro/mopro',
-          label: 'GitHub',
+          type: 'html',
           position: 'right',
+          value: 
+            `<div class="custom-navbar-link">
+              <a href="https://github.com/zkmopro/mopro" target="_blank">Github</a
+              ><img src="img/link_arrow.svg"/>
+            </div>`
+
         },
       ],
     },
     footer: {
-      style: 'dark',
+      // style: 'dark',
+
       links: [
         {
-          title: 'Docs',
+          title: 'Resources',
           items: [
+            {
+              html: 
+                `<div class="custom-footer-link">
+                    <a href="https://github.com/zkmopro/mopro" target="_blank">Github</a>
+                    <img src="img/link_arrow.svg"/>
+                  </div>`
+            },
+            // {
+            //   label: 'GitHub',
+            //   href: 'https://github.com/zkmopro/mopro',
+            // },
+            {
+              label: 'Blog',
+              to: '/blog',
+            },
             {
               label: 'Documentation',
               to: '/docs/intro',
@@ -90,35 +124,42 @@ const config: Config = {
           title: 'Community',
           items: [
             {
-              label: 'Telegram',
-              href: 'https://t.me/zkmopro',
+              html: 
+                `<div class="custom-footer-link">
+                    <a href="https://t.me/zkmopro" target="_blank">Telegram</a>
+                    <img src="img/link_arrow.svg"/>
+                  </div>`
             },
             {
-              label: 'Twitter',
-              href: 'https://twitter.com/zkmopro',
+              html: 
+                `<div class="custom-footer-link">
+                    <a href="https://twitter.com/zkmopro" target="_blank">Twitter</a>
+                    <img src="img/link_arrow.svg"/>
+                  </div>`
             },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'Blog',
-              to: '/blog',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/zkmopro/mopro',
-            },
+            // {
+            //   label: 'Telegram',
+            //   href: 'https://t.me/zkmopro',
+            // },
+            // {
+            //   label: 'Twitter',
+            //   href: 'https://twitter.com/zkmopro',
+            // },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Mopro. Built with Docusaurus.`,
+      logo: {
+        alt: 'Mopro Logo',
+        src: 'img/logo_lg.svg',
+        // width: 1056,
+        // height: 290,
+      },
+      copyright: `Copyright © ${new Date().getFullYear()} Mopro`,
     },
-    prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
-    },
+    // prism: {
+    //   theme: prismThemes.github,
+    //   darkTheme: prismThemes.dracula,
+    // },
   } satisfies Preset.ThemeConfig,
 };
 
