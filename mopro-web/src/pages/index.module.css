@@ -20,39 +20,22 @@ h1 {
   padding-bottom: 5%;
  }
 
- .introParagraph {
+.introParagraph {
   font-size: 18px;
   font-weight: 500;
   width: 40%;
   align-self: center;
- }
+}
 
- .separator {
+.separator {
   display: flex;
   justify-content: center;
   padding: 8% 0;
- }
-
- .featuresContainer {
-  display: flex;
-  flex-wrap: wrap;
- }
-
-/* .heroBanner {
-  padding: 4rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
 }
 
-@media screen and (max-width: 996px) {
+/* @media screen and (max-width: 996px) {
   .heroBanner {
     padding: 2rem;
   }
-}
-
-.buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 } */
+
