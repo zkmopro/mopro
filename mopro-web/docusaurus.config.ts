@@ -1,11 +1,11 @@
-import { themes as prismThemes } from 'prism-react-renderer';
+// import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'Mopro',
   tagline: 'Making client-side proving on mobile simple.',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/logo_sm.svg',
 
   // Set the production url of your site here
   url: 'https://zkmopro.org',
@@ -64,8 +64,8 @@ const config: Config = {
       logo: {
         alt: 'Mopro Logo',
         src: 'img/logo_title.svg',
-        width: '375',
-        height: '91',
+        width: '325',
+        height: '80',
       },
       items: [
         {
@@ -93,8 +93,6 @@ const config: Config = {
       ],
     },
     footer: {
-      // style: 'dark',
-
       links: [
         {
           title: 'Resources',
@@ -151,8 +149,6 @@ const config: Config = {
       logo: {
         alt: 'Mopro Logo',
         src: 'img/logo_lg.svg',
-        // width: 1056,
-        // height: 290,
       },
       copyright: `Copyright © ${new Date().getFullYear()} Mopro`,
     },
