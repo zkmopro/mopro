@@ -10,7 +10,7 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
+    title: 'Ease of use',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
@@ -19,7 +19,7 @@ const FeatureList: FeatureItem[] = [
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Performance',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
@@ -28,7 +28,25 @@ const FeatureList: FeatureItem[] = [
     ),
   },
   {
-    title: 'Powered by Mopro',
+    title: 'Security',
+    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    description: (
+      <>
+        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      </>
+    ),
+  },
+  {
+    title: 'X-platform compatibility',
+    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    description: (
+      <>
+        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      </>
+    ),
+  },
+  {
+    title: 'Scalability',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>

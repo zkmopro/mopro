@@ -1,30 +1,37 @@
-import clsx from 'clsx';
-import Link from '@docusaurus/Link';
+// import clsx from 'clsx';
+// import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
-import Heading from '@theme/Heading';
+// import Heading from '@theme/Heading';
 
 import styles from './index.module.css';
 
-function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
+function Homepage() {
   return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
-        </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/intro">
-            go to docs
-          </Link>
+    <main className={styles.mainContainer}>
+      <section>
+        <div className={styles.introContainer}>
+          <h1>Mobile proving made simple</h1>
+          <p className={styles.introParagraph}>With mopro, developers can overcome the limitations of existing tools like snarkjs, which struggles with small circuit sizes and slow performance in browsers. Our solution leverages the growing power of mobile GPUs to deliver a fast, scalable, and secure proving experience directly on client-side applications</p>
         </div>
+        <div className={styles.introContainer}>
+          <p className={styles.introParagraph}>mopro, short for Mobile Prover, redefines the landscape of mobile app development by introducing an innovative toolkit designed for zero-knowledge (zk) proofs. With mopro, developers can overcome the limitations of existing tools like snarkjs, which struggles with small circuit sizes and slow performance in browsers. Our solution leverages the growing power of mobile GPUs to deliver a fast, scalable, and secure proving experience directly on client-side applications.</p>
+          <img src='img/mobile.svg' alt='abstract mobile illustration'/>
+        </div>
+      </section>
+
+      <div className={styles.separator}>
+        <img src='img/separator.svg' alt='separating line'/>
       </div>
-    </header>
+
+      <section className={styles.featuesContainer}>
+        <h1>Developer Capabilities</h1>
+        <div>
+
+        </div>
+      </section>
+    </main>
   );
 }
 
@@ -33,10 +40,10 @@ export default function Home(): JSX.Element {
   return (
     <Layout
       title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
-      <HomepageHeader />
+      description="Mobile proving made simple.">
+      <Homepage />
       <main>
-        <HomepageFeatures />
+        {/* <HomepageFeatures /> */}
       </main>
     </Layout>
   );
