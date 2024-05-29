@@ -43,7 +43,7 @@ export default function Home(): JSX.Element {
       description="Mobile proving made simple.">
       <Homepage />
       <main>
-        {/* <HomepageFeatures /> */}
+        <HomepageFeatures />
       </main>
     </Layout>
   );
