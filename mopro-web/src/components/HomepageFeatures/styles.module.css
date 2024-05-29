@@ -1,11 +1,31 @@
-.features {
+h2 {
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.featuresContainer {
   display: flex;
-  align-items: center;
-  padding: 2rem 0;
-  width: 100%;
+  flex-wrap: wrap;
+  gap: 10%;
+  background-color: #000;
+  padding: 10% 18% 0%
+ }
+
+ .feature {
+  display: flex;
+  /* align-items: baseline; */
+  gap: 20px;
+  width: 45%;
+ }
+
+.separator {
+  display: flex;
+  justify-content: center;
+  padding: 8% 0;
+  background-color: #000;
 }
 
 .featureSvg {
-  height: 200px;
-  width: 200px;
+  height: 125px;
+  width: 115px;
 }

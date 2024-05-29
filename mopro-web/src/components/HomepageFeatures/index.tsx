@@ -1,5 +1,3 @@
-import clsx from 'clsx';
-import Heading from '@theme/Heading';
 import styles from './styles.module.css';
 
 type FeatureItem = {
@@ -58,12 +56,10 @@ const FeatureList: FeatureItem[] = [
 
 function Feature({ title, Svg, description }: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <Heading as="h3">{title}</Heading>
+    <div className={styles.feature}>
+      <Svg className={styles.featureSvg} role="img" />
+      <div className=''>
+        <h2>{title}</h2>
         <p>{description}</p>
       </div>
     </div>
@@ -72,14 +68,16 @@ function Feature({ title, Svg, description }: FeatureItem) {
 
 export default function HomepageFeatures(): JSX.Element {
   return (
-    <section className={styles.features}>
-      <div className="container">
-        <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
-          ))}
-        </div>
+    <div>
+      <div className={styles.featuresContainer}>
+        {FeatureList.map((props, idx) => (
+          <Feature key={idx} {...props} />
+        ))}
       </div>
-    </section>
+
+      <div className={styles.separator}>
+        <img src='img/separator.svg' alt='separating line'/>
+      </div>
+    </div>
   );
 }
