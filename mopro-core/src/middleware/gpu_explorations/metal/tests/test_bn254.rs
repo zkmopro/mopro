@@ -7,6 +7,7 @@ mod tests {
         biginteger::{BigInteger, BigInteger256},
         BigInt, Field, PrimeField,
     };
+    use ark_std::Zero;
 
     use metal::MTLSize;
     use proptest::prelude::*;
@@ -319,32 +320,31 @@ mod tests {
         }
     }
 
-    /*
     mod ec_tests {
-        use lambdaworks_math::unsigned_integer::traits::U32Limbs;
+        use ark_ec::Group;
+        use ark_ff::UniformRand;
+        use ark_std::rand::thread_rng;
 
         use super::*;
 
-        pub type P = ShortWeierstrassProjectivePoint<BN254Curve>;
+        fn point_to_u32_limbs(p: &G) -> Vec<u32> {
+            p.x.0
+                .to_u32_limbs()
+                .into_iter()
+                .chain(p.y.0.to_u32_limbs())
+                .chain(p.z.0.to_u32_limbs())
+                .collect()
+        }
 
-        fn execute_kernel(name: &str, p: &P, q: &P) -> Vec<u32> {
+        fn execute_kernel(name: &str, p: &G, q: &G) -> Vec<u32> {
             let state = MetalState::new(None).unwrap();
             let pipeline = state.setup_pipeline(name).unwrap();
 
             // conversion needed because of possible difference of endianess between host and
             // device (Metal's UnsignedInteger has 32bit limbs).
-            let p_coordinates: Vec<u32> = p
-                .coordinates()
-                .into_iter()
-                .map(|felt| felt.value().to_u32_limbs())
-                .flatten()
-                .collect();
-            let q_coordinates: Vec<u32> = q
-                .coordinates()
-                .into_iter()
-                .map(|felt| felt.value().to_u32_limbs())
-                .flatten()
-                .collect();
+            let p_coordinates: Vec<u32> = point_to_u32_limbs(p);
+            let q_coordinates: Vec<u32> = point_to_u32_limbs(q);
+
             let p_buffer = state.alloc_buffer_data(&p_coordinates);
             let q_buffer = state.alloc_buffer_data(&q_coordinates);
             let result_buffer = state.alloc_buffer::<u32>(24);
@@ -371,70 +371,62 @@ mod tests {
         }
 
         prop_compose! {
-            fn rand_point()(n in rand_u128()) -> P {
-                BN254Curve::generator().operate_with_self(n)
+            fn rand_point()(n in any::<u8>()) -> G {
+                let rng = &mut thread_rng();
+                G::rand(rng)
             }
         }
 
         proptest! {
             #[test]
             fn add(p in rand_point(), q in rand_point()) {
+                let mut result = vec![];
                 objc::rc::autoreleasepool(|| {
-                    let result = execute_kernel("bn254_add", &p, &q);
-                    let cpu_result = p
-                        .operate_with(&q)
-                        .to_u32_limbs();
-                    prop_assert_eq!(result, cpu_result);
-                    Ok(())
-                }).unwrap();
+                    result = execute_kernel("bn254_add", &p, &q);
+                });
+                let cpu_result = point_to_u32_limbs(&(p + q));
+                prop_assert_eq!(result, cpu_result);
             }
 
             #[test]
             fn add_with_self(p in rand_point()) {
+                let mut result = vec![];
                 objc::rc::autoreleasepool(|| {
-                    let result = execute_kernel("bn254_add", &p, &p);
-                    let cpu_result: Vec<u32> = p
-                        .operate_with_self(2_u64)
-                        .to_u32_limbs();
-                    prop_assert_eq!(result, cpu_result);
-                    Ok(())
-                }).unwrap();
+                    result = execute_kernel("bn254_add", &p, &p);
+                });
+                let cpu_result: Vec<u32> = point_to_u32_limbs(&(p + p));
+                prop_assert_eq!(result, cpu_result);
             }
 
             #[test]
             fn add_with_infinity_rhs(p in rand_point()) {
+                let mut result = vec![];
+                let infinity = G::zero();
                 objc::rc::autoreleasepool(|| {
-                    let infinity = p.operate_with_self(0_u64);
-                    let result = execute_kernel("bn254_add", &p, &infinity);
-                    let cpu_result: Vec<u32> = p
-                        .operate_with(&infinity)
-                        .to_u32_limbs();
-                    prop_assert_eq!(result, cpu_result);
-                    Ok(())
-                }).unwrap();
+                    result = execute_kernel("bn254_add", &p, &infinity);
+                });
+                let cpu_result: Vec<u32> = point_to_u32_limbs(&(p + infinity));
+                prop_assert_eq!(result, cpu_result);
             }
 
             #[test]
             fn add_with_infinity_lhs(p in rand_point()) {
+                let mut result = vec![];
+                let infinity = G::zero();
                 objc::rc::autoreleasepool(|| {
-                    let infinity = p.operate_with_self(0_u64);
-                    let result = execute_kernel("bn254_add", &infinity, &p);
-                    let cpu_result: Vec<u32> = infinity
-                        .operate_with(&p)
-                        .to_u32_limbs();
-                    prop_assert_eq!(result, cpu_result);
-                    Ok(())
-                }).unwrap();
+                    result = execute_kernel("bn254_add", &infinity, &p);
+                });
+                let cpu_result: Vec<u32> = point_to_u32_limbs(&(infinity + p));
+                prop_assert_eq!(result, cpu_result);
             }
         }
 
         #[test]
         fn infinity_plus_infinity_should_equal_infinity() {
-            let infinity = BN254Curve::generator().operate_with_self(0_u64);
+            let infinity = G::zero();
             let result = execute_kernel("bn254_add", &infinity, &infinity);
-            let cpu_result: Vec<u32> = infinity.operate_with(&infinity).to_u32_limbs();
+            let cpu_result: Vec<u32> = point_to_u32_limbs(&(infinity + infinity));
             assert_eq!(result, cpu_result);
         }
     }
-    */
 }

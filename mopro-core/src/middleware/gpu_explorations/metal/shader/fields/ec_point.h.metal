@@ -3,7 +3,6 @@
 template<typename Fp, const uint64_t A_CURVE>
 class ECPoint {
 public:
-
     Fp x;
     Fp y;
     Fp z;
@@ -11,8 +10,7 @@ public:
     constexpr ECPoint() : ECPoint(ECPoint::neutral_element()) {}
     constexpr ECPoint(Fp _x, Fp _y, Fp _z) : x(_x), y(_y), z(_z) {}
 
-    constexpr ECPoint operator+(const ECPoint other) const
-    {
+    constexpr ECPoint operator+(const ECPoint other) const {
         if (is_neutral_element(*this)) {
             return other;
         }
@@ -20,57 +18,65 @@ public:
             return *this;
         }
 
-        Fp u1 = other.y * z;
-        Fp u2 = y * other.z;
-        Fp v1 = other.x * z;
-        Fp v2 = x * other.z;
+        // Z1Z1 = Z1^2
+        Fp z1z1 = z * z;
 
-        Fp two    = Fp(2).to_montgomery();
-        Fp three  = Fp(3).to_montgomery();
-        Fp four   = Fp(4).to_montgomery();
-        Fp eight  = Fp(8).to_montgomery();
+        // Z2Z2 = Z2^2
+        Fp z2z2 = other.z * other.z;
 
-        if (v1 == v2) {
-            if (u1 != u2 || y == Fp(0)) {
-                return neutral_element();
-            }
+        // U1 = X1 * Z2Z2
+        Fp u1 = x * z2z2;
 
-            Fp a_fp = Fp(A_CURVE).to_montgomery();
+        // U2 = X2 * Z1Z1
+        Fp u2 = other.x * z1z1;
 
-            Fp w = a_fp * z*z + three * x*x;
-            Fp s = y * z;
-            Fp b = x * y * s;
-            Fp h = w * w - eight * b;
-            Fp xp = two * h * s;
-            Fp yp = w * (four * b - h) - eight * y*y * s*s;
-            Fp zp = eight * s*s*s;
+        // S1 = Y1 * Z2 * Z2Z2
+        Fp s1 = y * other.z * z2z2;
 
-            return ECPoint(xp, yp, zp);
+        // S2 = Y2 * Z1 * Z1Z1
+        Fp s2 = other.y * z * z1z1;
+
+        if (u1 == u2 && s1 == s2) {
+            // The points are equal, so we double
+            return double_in_place();
         }
 
-        Fp u = u1 - u2;
-        Fp v = v1 - v2;
-        Fp w = z * other.z;
-        Fp a = u * u * w - v * v * v - two * v*v * v2;
-        Fp xp = v * a;
-        Fp yp = u * (v*v * v2 - a) - v *v*v * u2;
-        Fp zp = v*v*v * w;
+        // H = U2 - U1
+        Fp h = u2 - u1;
 
-        return ECPoint(xp, yp, zp);
+        // I = (2 * H)^2
+        Fp i = (h + h) * (h + h);
+
+        // J = H * I
+        Fp j = h * i;
+
+        // r = 2 * (S2 - S1)
+        Fp r = (s2 - s1) + (s2 - s1);
+
+        // V = U1 * I
+        Fp v = u1 * i;
+
+        // X3 = r^2 - J - 2 * V
+        Fp x3 = r * r - j - (v + v);
+
+        // Y3 = r * (V - X3) - 2 * S1 * J
+        Fp y3 = r * (v - x3) - (s1 + s1) * j;
+
+        // Z3 = (Z1 + Z2)^2 - Z1Z1 - Z2Z2) * H
+        Fp z3 = ((z + other.z) * (z + other.z) - z1z1 - z2z2) * h;
+
+        return ECPoint(x3, y3, z3);
     }
 
-    void operator+=(const ECPoint other)
-    {
+    void operator+=(const ECPoint other) {
         *this = *this + other;
     }
 
-    ECPoint neutral_element() const
-    {
-        return ECPoint(Fp(0), Fp().one(), Fp(0));
+    ECPoint neutral_element() const {
+        return ECPoint(Fp(1), Fp(1), Fp(0)); // Updated to new neutral element (1, 1, 0)
     }
 
-    ECPoint operate_with_self(uint64_t exponent) const
-    {
+    ECPoint operate_with_self(uint64_t exponent) const {
         ECPoint result = neutral_element();
         ECPoint base = ECPoint(x, y, z);
 
@@ -85,23 +91,43 @@ public:
         return result;
     }
 
-    constexpr ECPoint operator*(uint64_t exponent) const
-    {
-        return (*this).operate_with_self(exponent);
+    constexpr ECPoint operator*(uint64_t exponent) const {
+        return operate_with_self(exponent);
     }
 
-    constexpr void operator*=(uint64_t exponent)
-    {
-        *this = (*this).operate_with_self(exponent);
+    constexpr void operator*=(uint64_t exponent) {
+        *this = operate_with_self(exponent);
     }
 
-    constexpr ECPoint neg()
-    {
+    constexpr ECPoint neg() const {
         return ECPoint(x, y.neg(), z);
     }
 
-    constexpr bool is_neutral_element(const ECPoint a_point) const
-    {
-        return a_point.x == Fp(0) && a_point.y == Fp().one() && a_point.z == Fp(0);
+    constexpr bool is_neutral_element(const ECPoint a_point) const {
+        return a_point.x == Fp(1) && a_point.y == Fp(1) && a_point.z == Fp(0); // Updated to check for (1, 1, 0)
+    }
+
+private:
+    constexpr ECPoint double_in_place() const {
+        if (is_neutral_element(*this)) {
+            return *this;
+        }
+
+        // Doubling formulas
+        Fp a_fp = Fp(A_CURVE).to_montgomery();
+        Fp two = Fp(2).to_montgomery();
+        Fp three = Fp(3).to_montgomery();
+        Fp four = Fp(4).to_montgomery();
+        Fp eight = Fp(8).to_montgomery();
+
+        Fp w = a_fp * z * z + three * x * x;
+        Fp s = y * z;
+        Fp b = x * y * s;
+        Fp h = w * w - eight * b;
+        Fp x3 = two * h * s;
+        Fp y3 = w * (four * b - h) - eight * y * y * s * s;
+        Fp z3 = eight * s * s * s;
+
+        return ECPoint(x3, y3, z3);
     }
 };

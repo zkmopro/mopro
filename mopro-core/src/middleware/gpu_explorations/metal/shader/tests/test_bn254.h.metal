@@ -4,8 +4,24 @@
 
 using namespace metal;
 
-template<typename Fp>
+template<typename BN254, typename Fp>
 [[kernel]] void bn254_add(
+    constant Fp* p [[ buffer(0) ]],
+    constant Fp* q [[ buffer(1) ]],
+    device Fp* result [[ buffer(2) ]]
+)
+{
+    BN254 P = BN254(p[0], p[1], p[2]);
+    BN254 Q = BN254(q[0], q[1], q[2]);
+    BN254 res = P + Q;
+
+    result[0] = res.x;
+    result[1] = res.y;
+    result[2] = res.z;
+}
+
+template<typename Fp>
+[[kernel]] void fp_bn254_add(
     constant FpBN254& _p [[ buffer(0) ]],
     constant FpBN254& _q [[ buffer(1) ]],
     device FpBN254& result [[ buffer(2) ]]
@@ -16,7 +32,7 @@ template<typename Fp>
 }
 
 template<typename Fp>
-[[kernel]] void bn254_sub(
+[[kernel]] void fp_bn254_sub(
     constant FpBN254 &_p [[ buffer(0) ]],
     constant FpBN254 &_q [[ buffer(1) ]],
     device FpBN254 &result [[ buffer(2) ]]
@@ -27,7 +43,7 @@ template<typename Fp>
 }
 
 template<typename Fp>
-[[kernel]] void bn254_mul(
+[[kernel]] void fp_bn254_mul(
     constant FpBN254 &_p [[ buffer(0) ]],
     constant FpBN254 &_q [[ buffer(1) ]],
     device FpBN254 &result [[ buffer(2) ]]
@@ -38,7 +54,7 @@ template<typename Fp>
 }
 
 template<typename Fp>
-[[kernel]] void bn254_pow(
+[[kernel]] void fp_bn254_pow(
     constant FpBN254 &_p [[ buffer(0) ]],
     constant uint32_t &_a [[ buffer(1) ]],
     device FpBN254 &result [[ buffer(2) ]]
@@ -48,7 +64,7 @@ template<typename Fp>
 }
 
 template<typename Fp>
-[[kernel]] void bn254_neg(
+[[kernel]] void fp_bn254_neg(
     constant FpBN254 &_p [[ buffer(0) ]],
     constant uint32_t &_a [[ buffer(1) ]],  // TODO: Remove this dummy arg
     device FpBN254 &result [[ buffer(2) ]]
@@ -58,7 +74,7 @@ template<typename Fp>
 }
 
 // // TODO: Implement inverse if needed in the future
-// [[kernel]] void bn254_inv(
+// [[kernel]] void fp_bn254_inv(
 //     constant FpBN254 &_p [[ buffer(0) ]],
 //     constant FpBN254 &_q [[ buffer(1) ]],
 //     device FpBN254 &result [[ buffer(2) ]]
