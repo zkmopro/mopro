@@ -19,6 +19,7 @@ default = []
 # default = ["calc-native-witness"]
 
 # If we enable them here, they should be enabled in mopro-core as well
+halo2 = ["mopro-core/halo2"]
 dylib = ["mopro-core/dylib"]
 gpu-benchmarks = ["mopro-core/gpu-benchmarks"]
 calc-native-witness = ["mopro-core/calc-native-witness"]
