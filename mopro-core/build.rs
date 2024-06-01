@@ -259,6 +259,11 @@ fn build_halo2_circuit(circuit_dir_path: &PathBuf) -> Result<()> {
     println!("cargo:rustc-env=BUILD_SRS_FILE={}", srs_path.display());
     println!("cargo:rustc-env=BUILD_PK_FILE={}", pk_path.display());
     println!("cargo:rustc-env=BUILD_VK_FILE={}", vk_path.display());
+
+    println!("cargo:warning=BUILD_SRS_FILE={}", srs_path.display());
+    println!("cargo:warning=BUILD_PK_FILE={}", pk_path.display());
+    println!("cargo:warning=BUILD_VK_FILE={}", vk_path.display());
+
     Ok(())
 }
 
