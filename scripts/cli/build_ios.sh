@@ -28,6 +28,8 @@ read_configuration() {
     export BUILD_CONFIG_PATH="$PROJECT_DIR/$CONFIG_FILE"
     print_action "Using build configuration file: $BUILD_CONFIG_PATH"
 
+    CIRCUIT_TYPE=$(read_toml "$CONFIG_FILE" "circuit.kind")
+
     DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.ios_device_type")
     BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
     USE_DYLIB=$(read_toml "$CONFIG_FILE" "dylib.use_dylib")
@@ -74,6 +76,22 @@ determine_build_directory() {
     esac
 }
 
+# Select build features based on circuit type
+select_features() {
+    case $CIRCUIT_TYPE in
+        "circom")
+            CARGO_FEATURES=""
+            ;;
+        "halo2")
+            CARGO_FEATURES="halo2"
+            ;;
+        *)
+            echo -e "\n${RED}Error: Invalid circuit type specified in config: $CIRCUIT_TYPE${DEFAULT}"
+            exit 1
+            ;;
+    esac
+}
+
 # Build process
 #----------------------------------------------------------------------------
 
@@ -82,9 +100,9 @@ build_mopro_core() {
     cd "${MOPRO_ROOT}/mopro-core" || exit
     print_action "Building mopro-core ($BUILD_MODE)..."
     if [[ "$BUILD_MODE" == "release" ]]; then
-        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --release
+        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --release --features "$CARGO_FEATURES"
     else
-        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE"
+        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --features "$CARGO_FEATURES"
     fi
 }
 
@@ -92,9 +110,9 @@ build_mopro_ffi_static() {
     cd "${MOPRO_ROOT}/mopro-ffi" || exit
     print_action "Building mopro-ffi as a static library ($BUILD_MODE)..."
     if [[ "$BUILD_MODE" == "release" ]]; then
-        cargo build --release --target "$ARCHITECTURE"
+        cargo build --release --target "$ARCHITECTURE" --features "$CARGO_FEATURES"
     else
-        cargo build --target "$ARCHITECTURE"
+        cargo build --target "$ARCHITECTURE" --features "$CARGO_FEATURES"
     fi
 
     # Ensure the target directory exists
@@ -251,6 +269,7 @@ main() {
     read_configuration "$1"
     determine_architecture
     determine_build_directory
+    select_features
 
     if [[ "$USE_DYLIB" == true ]]; then
         build_mopro_ffi_with_dylib_circuit
