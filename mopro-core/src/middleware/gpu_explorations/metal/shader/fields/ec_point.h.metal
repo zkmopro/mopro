@@ -104,7 +104,7 @@ public:
     }
 
     constexpr bool is_neutral_element(const ECPoint a_point) const {
-        return a_point.x == Fp(1) && a_point.y == Fp(1) && a_point.z == Fp(0); // Updated to check for (1, 1, 0)
+        return a_point.z == Fp(0); // Updated to check for (1, 1, 0)
     }
 
 private:
@@ -117,16 +117,29 @@ private:
         Fp a_fp = Fp(A_CURVE).to_montgomery();
         Fp two = Fp(2).to_montgomery();
         Fp three = Fp(3).to_montgomery();
-        Fp four = Fp(4).to_montgomery();
+
         Fp eight = Fp(8).to_montgomery();
 
-        Fp w = a_fp * z * z + three * x * x;
-        Fp s = y * z;
-        Fp b = x * y * s;
-        Fp h = w * w - eight * b;
-        Fp x3 = two * h * s;
-        Fp y3 = w * (four * b - h) - eight * y * y * s * s;
-        Fp z3 = eight * s * s * s;
+        Fp xx = x * x; // x^2
+        Fp yy = y * y; // y^2
+        Fp yyyy = yy * yy; // y^4
+        Fp zz = z * z; // z^2
+
+        // S = 2 * ((X1 + YY)^2 - XX - YYYY)
+        Fp s = two * (((x + yy) * (x + yy)) - xx - yyyy);
+
+        // M = 3 * XX + a * ZZ ^ 2
+        Fp m = (three * xx) + (a_fp * (zz * zz));
+
+        // X3 = T = M^2 - 2*S
+        Fp x3 = (m * m) - (two * s);
+
+        // Z3 = (Y + Z) ^ 2 - YY - ZZ
+        // or Z3 = 2 * Y * Z
+        Fp z3 = two * y * z;
+
+        // Y3 = M*(S-X3)-8*YYYY
+        Fp y3 = m * (s - x3) - eight * yyyy;
 
         return ECPoint(x3, y3, z3);
     }
