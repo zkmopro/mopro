@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["halo2", "wasmer/dylib"] # TODO - roll back to default = ["wasmer/dylib"] once we have env config
-halo2 = ["halo2_proofs", "fibonacci"]
+default = ["wasmer/dylib"]
+halo2 = ["halo2_proofs", "halo2-example"]
 dylib = []                  # NOTE: can probably remove this if we use env config instead
 gpu-benchmarks = ["ark-ff", "metal", "objc", "proptest", "parallel"]
 calc-native-witness = ["witness"] # experimental feature to calculate witness with witness graph
@@ -23,7 +23,7 @@ halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", 
 ], optional = true }
 
 # Temporary dependency on a example Halo2 circuit
-fibonacci = { path = "examples/halo2", optional = true }
+halo2-example = { path = "examples/halo2", optional = true }
 ### Halo2 dependencies end
 
 
