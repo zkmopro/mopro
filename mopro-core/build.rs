@@ -262,7 +262,6 @@ fn build_halo2_circuit(circuit_dir_path: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-#[cfg(feature="halo2")]
 fn update_halo2_cargo_config(circuit_dir_path: &PathBuf) {
     let base_dir = get_base_dir();
     let config_path = Path::new(&base_dir).join(".cargo/config.toml");
