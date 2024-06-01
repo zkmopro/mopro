@@ -12,6 +12,7 @@ build_mode = "release" # Options: debug, release
 
 [circuit]
 # multiplier2
+kind = "circom"
 dir = "core/circuits/multiplier2"
 name = "multiplier2"
 ptau = "02"                       # ptau to use for trusted setup of circuit, "01" to "27"
