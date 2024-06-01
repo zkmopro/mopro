@@ -1,6 +1,10 @@
 #[cfg(all(test))]
 mod tests {
-    use crate::middleware::gpu_explorations::metal::abstraction::{state::MetalState, utils::*};
+    use crate::middleware::gpu_explorations::metal::abstraction::{
+        limbs_conversion::{FromLimbs, ToLimbs},
+        state::MetalState,
+    };
+
     use ark_bn254::{Fq, Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
     use ark_ec::AffineRepr;
     use ark_ff::{

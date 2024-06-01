@@ -1,4 +1,4 @@
-use ark_bn254::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
+use ark_bn254::{Fq, Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
 use ark_ec::{AffineRepr, CurveGroup, Group, VariableBaseMSM};
 use ark_ff::{
     biginteger::{BigInteger, BigInteger256},
@@ -7,7 +7,9 @@ use ark_ff::{
 use ark_std::{borrow::Borrow, cfg_into_iter, iterable::Iterable, rand, vec::Vec, One, Zero};
 
 use crate::middleware::gpu_explorations::metal::abstraction::{
-    errors::MetalError, state::*, utils::*,
+    errors::MetalError,
+    limbs_conversion::{FromLimbs, ToLimbs},
+    state::*,
 };
 
 use metal::*;
@@ -49,9 +51,8 @@ fn metal_msm(
     let buckets_size = (1 << c) - 1;
 
     let num_bits = ScalarField::MODULUS_BIT_SIZE as usize;
-    // let one = ScalarField::one().into_bigint();
 
-    let zero = GAffine::zero().into_group(); // In group form, [x, y, z] = [1, 1, 0]
+    let zero = G::zero(); // In group form, [x, y, z] = [1, 1, 0]
     let window_starts: Vec<_> = (0..num_bits).step_by(c).collect();
 
     // flatten scalar and base to Vec<u32>
@@ -71,29 +72,44 @@ fn metal_msm(
         })
         .flatten()
         .collect::<Vec<u32>>();
+    let bucket_matrix_limbs = {
+        let matrix = vec![zero; buckets_size * instances_size];
+        println!("(metal) bucket_size: {:?}", buckets_size);
+        println!("(metal) instances_size: {:?}", instances_size);
+        println!("(metal) matrix len: {:?}", matrix.len());
+        cfg_into_iter!(matrix)
+            .map(|b| {
+                b.x.0
+                    .to_u32_limbs()
+                    .into_iter()
+                    .chain(b.y.0.to_u32_limbs())
+                    .chain(b.z.0.to_u32_limbs())
+                    .collect::<Vec<_>>()
+            })
+            .flatten()
+            .collect::<Vec<u32>>()
+    };
 
     // store params to GPU shared memory
     let window_size_buffer = state.alloc_buffer_data(&[c as u32]);
     let scalar_buffer = state.alloc_buffer_data(&scalars);
     let base_buffer = state.alloc_buffer_data(&bases);
-    let buckets_buffer = state.alloc_buffer::<u32>(buckets_size * instances_size * 3 * 8); // x, y, z coordinates each has 8 limbs
 
     let calc_bucket_pipe = state.setup_pipeline("calculate_buckets")?;
 
-    // TODO: integrate `calculate_buckets` functionality into parallel part of pippenger
+    println!("(metal) window_starts: {:?}", window_starts.len());
     let window_sums: Vec<_> = (0..window_starts.len())
-        .step_by(c)
         .map(|w_start| {
-            let window_idx_buffer = state.alloc_buffer_data(&[w_start as u32]);
+            let buckets_matrix_buffer = state.alloc_buffer_data(&bucket_matrix_limbs);
+
             objc::rc::autoreleasepool(|| {
                 let (command_buffer, command_encoder) = state.setup_command(
                     &calc_bucket_pipe,
                     Some(&[
-                        (0, &window_idx_buffer),
                         (1, &window_size_buffer),
                         (2, &scalar_buffer),
                         (3, &base_buffer),
-                        (4, &buckets_buffer),
+                        (4, &buckets_matrix_buffer),
                     ]),
                 );
 
@@ -109,24 +125,65 @@ fn metal_msm(
             });
 
             // recover the points from the buckets
+            let mut counter = 0;
             let buckets_matrix = {
-                let raw_limbs = MetalState::retrieve_contents::<u32>(&buckets_buffer);
+                let raw_limbs = MetalState::retrieve_contents::<u32>(&buckets_matrix_buffer);
                 let limbs = raw_limbs
                     .chunks(8)
-                    .map(BigInteger256::from_u32_limbs)
+                    .map(|x| {
+                        if counter < 10 {
+                            println!("(metal) raw_limbs: {:?}", x);
+                            counter += 1;
+                        }
+                        BigInteger256::from_u32_limbs(&x)
+                    })
                     .collect::<Vec<_>>();
                 limbs
                     .chunks(3)
-                    .map(|chunk| GAffine::new_unchecked(chunk[0].into(), chunk[1].into()))
+                    .map(|chunk| {
+                        let x = <Fq as PrimeField>::from_bigint(chunk[0]).unwrap();
+                        let y = <Fq as PrimeField>::from_bigint(chunk[1]).unwrap();
+                        let z = <Fq as PrimeField>::from_bigint(chunk[2]).unwrap();
+
+                        // if counter < 10 {
+                        //     println!("(metal) x: {:?}", x);
+                        //     println!("(metal) y: {:?}", y);
+                        //     println!("(metal) z: {:?}", z);
+                        //     counter += 1;
+                        // }
+                        G::new_unchecked(x, y, z)
+                    })
                     .collect::<Vec<_>>()
             };
-            // println!("buckets_matrix: {:?}", buckets_matrix);
+            // println!("(metal) buckets_matrix: {:?}", buckets_matrix.len());
+
+            // from matrix to bucket
+            let mut buckets = Vec::with_capacity(buckets_size);
+            // let mut buckets = Vec::with_capacity(buckets_size);
+            for i in 0..buckets_size {
+                let mut partial_sum = buckets_matrix[i].clone();
+
+                for j in 1..instances_size {
+                    partial_sum += &buckets_matrix[i + j * buckets_size];
+                    // partial_sum = partial_sum.operate_with(&buckets_matrix[i + j * buckets_size]);
+                }
+                buckets.push(partial_sum);
+            }
+            println!("(metal) buckets: {:?}", buckets.len());
+            // print the first 10 buckets
+            for i in 0..10 {
+                println!("(metal) bucket[{}]: {:?}", i, buckets[i]);
+            }
 
             let mut res = zero;
             let mut running_sum = zero;
-            buckets_matrix.into_iter().rev().for_each(|b| {
-                // println!("running_sum: {:?}", running_sum);
-                // println!("res: {:?}", res);
+            let mut flag = 0;
+            buckets.into_iter().rev().for_each(|b| {
+                if flag < 10 {
+                    println!("(metal) running_sum: {:?}", running_sum);
+                    println!("(metal) res: {:?}", res);
+                    flag += 1;
+                }
                 running_sum += &b;
                 res += &running_sum;
             });
@@ -134,7 +191,7 @@ fn metal_msm(
         })
         .collect();
 
-    println!("window_sums: {:?}", window_sums);
+    // println!("window_sums[{:?}]: {:?}", window_sums.len(), window_sums);
 
     // We store the sum for the lowest window.
     let lowest = *window_sums.first().unwrap();
@@ -179,10 +236,125 @@ mod tests {
             .map(|_| ScalarField::rand(&mut rng))
             .collect();
 
-        let msm = <G as VariableBaseMSM>::msm(&points, &scalars).unwrap();
         let msm_bigint = metal_msm(&points, &scalars, window_size, &state).unwrap();
+        // let msm = <G as VariableBaseMSM>::msm(&points, &scalars).unwrap();
 
-        // now will fail, since msm shader is not implemented in BN254
-        assert_eq!(msm, msm_bigint);
+        // manual test for comparison between arkworks msm_bigint
+        let bigints = cfg_into_iter!(scalars)
+            .map(|s| s.into_bigint())
+            .collect::<Vec<_>>();
+
+        let size = ark_std::cmp::min(points.len(), bigints.len());
+        let scalars = &bigints[..size];
+        let bases = &points[..size];
+        let scalars_and_bases_iter = scalars.iter().zip(bases).filter(|(s, _)| !s.is_zero());
+
+        let c = if size < 32 {
+            3
+        } else {
+            super::ln_without_floats(size) + 2
+        };
+
+        let num_bits = ScalarField::MODULUS_BIT_SIZE as usize;
+        let one = ScalarField::one().into_bigint();
+
+        let zero = G::zero();
+        let window_starts: Vec<_> = (0..num_bits).step_by(c).collect();
+
+        // Each window is of size `c`.
+        // We divide up the bits 0..num_bits into windows of size `c`, and
+        // in parallel process each such window.
+
+        println!("(arkworks) window_starts: {:?}", window_starts.len());
+        let window_sums: Vec<_> = ark_std::cfg_into_iter!(window_starts)
+            .map(|w_start| {
+                let mut res = zero;
+                // We don't need the "zero" bucket, so we only have 2^c - 1 buckets.
+                let mut buckets = vec![zero; (1 << c) - 1];
+                // This clone is cheap, because the iterator contains just a
+                // pointer and an index into the original vectors.
+                scalars_and_bases_iter.clone().for_each(|(&scalar, base)| {
+                    if scalar == one {
+                        // We only process unit scalars once in the first window.
+                        if w_start == 0 {
+                            res += base;
+                        }
+                    } else {
+                        let mut scalar = scalar;
+
+                        // We right-shift by w_start, thus getting rid of the
+                        // lower bits.
+                        scalar.divn(w_start as u32);
+
+                        // We mod the remaining bits by 2^{window size}, thus taking `c` bits.
+                        // let mut counter = 0;
+                        // if counter < 10 {
+                        //     println!("(arkworks) scalar: {:?}", scalar.as_ref());
+                        //     counter += 1;
+                        // }
+                        let scalar = scalar.as_ref()[0] % (1 << c);
+
+                        // If the scalar is non-zero, we update the corresponding
+                        // bucket.
+                        // (Recall that `buckets` doesn't have a zero bucket.)
+                        if scalar != 0 {
+                            buckets[(scalar - 1) as usize] += base;
+                        }
+                    }
+                });
+
+                println!("(arkworks) buckets: {:?}", buckets.len());
+                // print the first 10 buckets
+                for i in 0..10 {
+                    println!("(arkworks) bucket[{}]: {:?}", i, buckets[i]);
+                }
+
+                // Compute sum_{i in 0..num_buckets} (sum_{j in i..num_buckets} bucket[j])
+                // This is computed below for b buckets, using 2b curve additions.
+                //
+                // We could first normalize `buckets` and then use mixed-addition
+                // here, but that's slower for the kinds of groups we care about
+                // (Short Weierstrass curves and Twisted Edwards curves).
+                // In the case of Short Weierstrass curves,
+                // mixed addition saves ~4 field multiplications per addition.
+                // However normalization (with the inversion batched) takes ~6
+                // field multiplications per element,
+                // hence batch normalization is a slowdown.
+
+                // `running_sum` = sum_{j in i..num_buckets} bucket[j],
+                // where we iterate backward from i = num_buckets to 0.
+
+                let mut flag = 0;
+                let mut running_sum = G::zero();
+                buckets.into_iter().rev().for_each(|b| {
+                    if flag < 10 {
+                        println!("(arkworks) running_sum: {:?}", running_sum);
+                        println!("(arkworks) res: {:?}", res);
+                        flag += 1;
+                    }
+                    running_sum += &b;
+                    res += &running_sum;
+                });
+                res
+            })
+            .collect();
+
+        // We store the sum for the lowest window.
+        let lowest = *window_sums.first().unwrap();
+
+        // We're traversing windows from high to low.
+        let arkworks_result = lowest
+            + &window_sums[1..]
+                .iter()
+                .rev()
+                .fold(zero, |mut total, sum_i| {
+                    total += sum_i;
+                    for _ in 0..c {
+                        total.double_in_place();
+                    }
+                    total
+                });
+
+        assert_eq!(arkworks_result, msm_bigint);
     }
 }
