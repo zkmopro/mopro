@@ -61,6 +61,7 @@ read_configuration() {
     BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
     USE_DYLIB=$(read_toml "$CONFIG_FILE" "dylib.use_dylib")
     DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")
+    CIRCUIT_TYPE=$(read_toml "$CONFIG_FILE" "circuit.type")
     CIRCUIT_DIR=$(read_toml "$CONFIG_FILE" "circuit.dir")
     CIRCUIT_NAME=$(read_toml "$CONFIG_FILE" "circuit.name")
     CIRCUIT_PTAU=$(read_toml "$CONFIG_FILE" "circuit.ptau")
@@ -158,9 +159,32 @@ generate_arkzkey() {
     echo "Arkzkey generation done, arkzkey file is in $ARKZKEY_PATH"
 }
 
+# Generate keys for Halo2 circuit
+generate_arkzkey_halo2() {
+  # Execute the cargo run command to generate the keys for the circuit
+  # The project is in the CIRCUIT_DIR and the executable is CIRCUIT_NAME
+
+  # Change to the circuit directory, first check if the directory exists
+  if [ ! -d "$CIRCUIT_DIR" ]; then
+    echo "Error: Circuit directory $CIRCUIT_DIR does not exist."
+    exit 1
+  fi
+
+  cd $CIRCUIT_DIR
+
+  # Generate the keys running the cargo command on the circuit binary
+  cargo run --release --bin $CIRCUIT_NAME
+
+
+  # Generate the keys
+  cargo run --release --bin generate_keys -- --output $OUTPUT_DIR
+}
+
+
 
 # Main function to orchestrate the script
 main() {
+
     initialize_environment "$@"
     read_configuration "$1"
     npm_install
