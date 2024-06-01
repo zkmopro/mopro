@@ -1749,15 +1749,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fibonacci"
-version = "0.1.0"
-dependencies = [
- "halo2_proofs",
- "plotters",
- "tabbycat",
-]
-
-[[package]]
 name = "fixed-hash"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1979,6 +1970,15 @@ name = "half"
 version = "1.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eabb4a44450da02c90444cf74558da904edde8fb4e9035a9a6a4e15445af0bd7"
+
+[[package]]
+name = "halo2-circuit"
+version = "0.1.0"
+dependencies = [
+ "halo2_proofs",
+ "plotters",
+ "tabbycat",
+]
 
 [[package]]
 name = "halo2_proofs"
@@ -2464,7 +2464,7 @@ dependencies = [
  "criterion",
  "duration-string",
  "enumset",
- "fibonacci",
+ "halo2-circuit",
  "halo2_proofs",
  "instant",
  "lazy_static 1.4.0",
