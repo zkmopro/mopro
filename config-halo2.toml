@@ -11,17 +11,9 @@ android_device_type = "arm64" # Options: x86_64, x86, arm, arm64
 build_mode = "release" # Options: debug, release
 
 [circuit]
-# multiplier2
-adapter = "circom"
-dir = "core/circuits/multiplier2"
-name = "multiplier2"
-ptau = "02"                       # ptau to use for trusted setup of circuit, "01" to "27"
-
-# keccak256
-#adapter = "circom"
-#dir = "core/circuits/keccak256"
-#name = "keccak256_256_test"
-#ptau = "19"
+kind = "halo2"                    # Proving system options: circom (default), halo2
+dir = "mopro-core/examples/halo2" # Directory of the circuit
+name = "fibonacci"                # Name of the circuit
 
 [dylib]
 # NOTE: Dylib support is experimental and requires some fiddling in iOS
