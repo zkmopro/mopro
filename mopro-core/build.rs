@@ -6,7 +6,10 @@ use serde::Deserialize;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::{env, fs};
+use std::fs::File;
+use std::io::{BufRead, BufReader, Write};
 use toml;
+use toml::Value;
 use wasmer::{Cranelift, Dylib, Module, Store, Target, Triple};
 
 #[derive(Deserialize)]
@@ -71,6 +74,7 @@ fn read_config() -> Result<Config> {
             println!("cargo:warning=BUILD_CONFIG_PATH not set. Using default configuration.");
             let default_config = r#"
                 [circuit]
+                kind = "Circom"
                 dir = "examples/circom/keccak256"
                 name = "keccak256_256_test"
 
@@ -168,11 +172,7 @@ fn build_witness_graph() -> Result<()> {
     Ok(())
 }
 
-/// Builds the circuit based on the provided configuration.
-///
-/// This function assumes that the necessary steps to build the circuit
-/// involve checking for the existence of certain files and setting environment variables.
-fn build_circuit(config: &Config) -> Result<()> {
+fn get_circuit_dir_path(config: &Config) -> PathBuf {
     // Check if the current package is mopro-core
     let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
     let base_dir = if pkg_name == "mopro-core" {
@@ -188,11 +188,16 @@ fn build_circuit(config: &Config) -> Result<()> {
         .expanded_circuit_dir
         .as_ref()
         .unwrap_or(&config.circuit.dir);
-    let circuit_name = &config.circuit.name;
 
     // Resolve the circuit dictory to an absolute path based on the conditionally set base_dir
-    let circuit_dir_path = PathBuf::from(base_dir).join(circuit_dir);
+    PathBuf::from(base_dir).join(circuit_dir)
+}
 
+/// Builds the circuit based on the provided configuration.
+///
+/// This function assumes that the necessary steps to build the circuit
+/// involve checking for the existence of certain files and setting environment variables.
+fn build_circom_circuit(circuit_dir_path: &PathBuf, circuit_name: &str) -> Result<()> {
     // Check for the existence of required files
     let zkey_path = circuit_dir_path.join(format!("target/{}_final.zkey", circuit_name));
     let wasm_path =
@@ -237,24 +242,19 @@ fn build_circuit(config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn build_halo2_circuit() -> Result<()> {
+fn build_halo2_circuit(circuit_dir_path: &PathBuf) -> Result<()> {
+    // Resolve the circuit directory to an absolute path based on the conditionally set base_dir
+    let circuit_key_path = circuit_dir_path.join("out");
 
-        // Check if the current package is mopro-core
-    let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
-    let base_dir = if pkg_name == "mopro-core" {
-        // If mopro-core, use CARGO_MANIFEST_DIR as base directory
-        env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set")
-    } else {
-        // Default to current directory
-        ".".to_string()
-    };
+    let srs_path = circuit_key_path.join("fib_srs");
+    let pk_path = circuit_key_path.join("fib_pk");
+    let vk_path = circuit_key_path.join("fib_vk");
 
-    let compiled_circuit_dir = "examples/halo2/out";
-
-    let srs_path = Path::new(&base_dir).join(compiled_circuit_dir).join("fib_srs");
-    let pk_path = Path::new(&base_dir).join(compiled_circuit_dir).join("fib_pk");
-    let vk_path = Path::new(&base_dir).join(compiled_circuit_dir).join("fib_vk");
-
+    if !srs_path.exists() || !pk_path.exists() || !vk_path.exists() {
+        return Err(color_eyre::eyre::eyre!(
+            "Required files for building the Halo2 circuit are missing. Did you run `mopro prepare`?"
+        ));
+    }
 
     println!("cargo:rustc-env=BUILD_SRS_FILE={}", srs_path.display());
     println!("cargo:rustc-env=BUILD_PK_FILE={}", pk_path.display());
@@ -262,17 +262,111 @@ fn build_halo2_circuit() -> Result<()> {
     Ok(())
 }
 
+#[cfg(feature="halo2")]
+fn update_halo2_cargo_config(circuit_dir_path: &PathBuf) {
+    let base_dir = get_base_dir();
+    let config_path = Path::new(&base_dir).join(".cargo/config.toml");
+
+    validate_halo2_project(circuit_dir_path);
+
+    ensure_cargo_directory_exists(&config_path);
+
+    if config_path.exists() {
+        println!("cargo:warning=Warning: .cargo/config.toml exists and will be replaced to include new path.");
+    }
+
+    create_new_config(&config_path, circuit_dir_path);
+
+
+
+    fn get_base_dir() -> String {
+        let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
+        if pkg_name == "mopro-core" {
+            env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set")
+        } else {
+            ".".to_string()
+        }
+    }
+
+    fn validate_halo2_project(circuit_dir_path: &PathBuf) {
+        let cargo_toml_path = circuit_dir_path.join("Cargo.toml");
+        if !cargo_toml_path.exists() {
+            panic!("The specified circuit path does not contain a Cargo.toml file: {}", circuit_dir_path.display());
+        }
+
+        let cargo_toml_content = fs::read_to_string(&cargo_toml_path)
+            .expect("Unable to read Cargo.toml file in the circuit directory");
+
+        let cargo_toml: Value = toml::from_str(&cargo_toml_content)
+            .expect("Invalid TOML format in Cargo.toml");
+
+        // Check if the [package] section exists and contains the correct name
+        if let Some(package) = cargo_toml.get("package") {
+            if let Some(name) = package.get("name") {
+                if name.as_str().unwrap() != "halo2-circuit" {
+                    panic!("The project at {} is not set up correctly. It must be a valid Cargo project with name = 'halo2-circuit'.", circuit_dir_path.display());
+                }
+            } else {
+                panic!("The [package] section in Cargo.toml does not contain a 'name' field.");
+            }
+        } else {
+            panic!("The Cargo.toml does not contain a [package] section.");
+        }
+    }
+
+    fn ensure_cargo_directory_exists(config_path: &Path) {
+        if let Some(parent) = config_path.parent() {
+            if !parent.exists() {
+                fs::create_dir_all(parent).expect(&format!("Failed to create .cargo directory in {}", parent.display()));
+            }
+        }
+    }
+
+    fn create_new_config(config_path: &Path, circuit_dir_path: &PathBuf) {
+        let circuit_path_str = circuit_dir_path.to_str().expect("Invalid circuit path");
+        let paths_line = format!("paths = [\"{}\"]\n", circuit_path_str);
+
+        let mut file = File::create(config_path).expect("Unable to create .cargo/config.toml");
+        file.write_all(paths_line.as_bytes()).expect("Unable to write data to .cargo/config.toml");
+
+        println!("cargo:warning=.cargo/config.toml has been replaced with a new version.");
+    }
+}
+
+
 fn main() -> color_eyre::eyre::Result<()> {
     println!("cargo:rerun-if-env-changed=BUILD_CONFIG_PATH");
     println!("cargo:warning=Preparing circuits...");
 
     let config = read_config()?;
-    #[cfg(feature = "build-native-witness")]
-    build_witness_graph()?;
-    build_circuit(&config)?;
-    #[cfg(feature = "halo2")]
-    build_halo2_circuit()?;
-    build_dylib(&config)?;
+
+    // Resolve the circuit dictory to an absolute path based on the conditionally set base_dir
+    let circuit_dir_path = get_circuit_dir_path(&config);
+    let circuit_name = &config.circuit.name;
+
+    if cfg!(feature = "halo2") {
+        // If Halo2 feature is enabled, build Halo2 Circuit
+        println!("cargo:warning=Building Halo2 circuit...");
+
+        // Enable Halo2 feature
+        println!("cargo:rustc-cfg=halo2");
+
+        build_halo2_circuit(&circuit_dir_path);
+
+        update_halo2_cargo_config(&circuit_dir_path);
+
+    } else {
+        // Otherwise, we default to Circom circuit
+        println!("cargo:warning=Building Circom circuit...");
+
+        build_circom_circuit(&circuit_dir_path, circuit_name);
+
+        #[cfg(feature = "build-native-witness")]
+        build_witness_graph()?;
+
+        build_dylib(&config)?;
+    }
+
     println!("cargo:warning=Successfully prepared circuits.");
     Ok(())
 }
