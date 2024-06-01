@@ -7,7 +7,7 @@ edition = "2021"
 
 [features]
 default = ["wasmer/dylib"]
-halo2 = ["halo2_proofs", "halo2-example"]
+halo2 = ["halo2_proofs", "halo2-circuit"]
 dylib = []                  # NOTE: can probably remove this if we use env config instead
 gpu-benchmarks = ["ark-bls12-377", "ark-bls12-381", "ark-ed-on-bls12-377", "ark-ed-on-bls12-381", "ark-poly", "ark-poly-commit", "ark-sponge", "duration-string", "rand", "rand_chacha", "lazy_static", "ark-ec-3", "ark-ff-3", "ark-serialize-3", "ark-std-3", "ark-bls12-377-3"]
 calc-native-witness = ["witness"] # experimental feature to calculate witness with witness graph
@@ -22,7 +22,7 @@ halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", 
 ], optional = true }
 
 # Temporary dependency on a example Halo2 circuit
-halo2-example = { path = "examples/halo2", optional = true }
+halo2-circuit = { path = "examples/halo2", optional = true }
 ### Halo2 dependencies end
 
 
