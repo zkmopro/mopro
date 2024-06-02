@@ -1,24 +1,29 @@
+use std::collections::HashMap;
 use std::io::Cursor;
+use std::ops::Deref;
+use std::str::FromStr;
 use std::time::Instant;
 
 use ark_ff::BigInteger;
-use ark_std::rand::thread_rng;
 pub(crate) use halo2_proofs::halo2curves::bn256::{Bn256, Fr as Fp, G1Affine};
-use halo2_proofs::plonk::{Circuit, create_proof, ProvingKey, verify_proof, VerifyingKey};
-use halo2_proofs::poly::commitment::{Params, ParamsProver};
-use halo2_proofs::poly::kzg::commitment::{KZGCommitmentScheme, ParamsKZG};
-use halo2_proofs::poly::kzg::multiopen::{ProverGWC, VerifierGWC};
-use halo2_proofs::poly::kzg::strategy::SingleStrategy;
+use halo2_proofs::plonk::{Circuit, ProvingKey, VerifyingKey};
+use halo2_proofs::poly::commitment::{Params};
+use halo2_proofs::poly::kzg::commitment::ParamsKZG;
 use halo2_proofs::SerdeFormat::RawBytes;
-use halo2_proofs::transcript::{Blake2bRead, Blake2bWrite, TranscriptReadBuffer, TranscriptWriterBuffer};
+use halo2_proofs::transcript::{TranscriptReadBuffer, TranscriptWriterBuffer};
+use num_bigint::BigInt;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
-use halo2_examples::FinbonaciCircuit;
+use halo2_circuit::{Circuit as TargetCircuit, prove, verify};
 
 use crate::MoproError;
 
 mod serialisation;
+
+pub use serialisation::deserialize_circuit_inputs;
+
+type CircuitInputs = HashMap<String, Vec<Fp>>;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SerializableProof(pub Vec<u8>);
@@ -43,7 +48,7 @@ const PK_BYTES: &[u8] = include_bytes!(env!("BUILD_PK_FILE"));
 
 static PK: Lazy<ProvingKey<G1Affine>> = Lazy::new(|| {
     let mut reader = Cursor::new(PK_BYTES);
-    ProvingKey::read::<_, FinbonaciCircuit<Fp>>(&mut reader, RawBytes).expect("Unable to read PK from file")
+    ProvingKey::read::<_, TargetCircuit<Fp>>(&mut reader, RawBytes).expect("Unable to read PK from file")
 });
 
 /// Read Verification Key (VK) from file
@@ -52,74 +57,35 @@ const VK_BYTES: &[u8] = include_bytes!(env!("BUILD_VK_FILE"));
 
 static VK: Lazy<VerifyingKey<G1Affine>> = Lazy::new(|| {
     let mut reader = Cursor::new(VK_BYTES);
-    VerifyingKey::read::<_, FinbonaciCircuit<Fp>>(&mut reader, RawBytes).expect("Unable to read VK from file")
+    VerifyingKey::read::<_, TargetCircuit<Fp>>(&mut reader, RawBytes).expect("Unable to read VK from file")
 });
 
 
 pub fn generate_halo2_proof2(
-    input: u64,
-) -> color_eyre::Result<(SerializableProof, SerializableInputs), MoproError> {
+    inputs: CircuitInputs,
+) -> color_eyre::Result<(SerializableProof, SerializablePublicInputs), MoproError> {
 
-        let start = Instant::now();
+    let start = Instant::now();
 
+    let (public_input, proof) = prove(inputs, &SRS, &PK).map_err(|e| MoproError::Halo2Error(e.to_string()))?;
 
-        let k = 4;
-        let circuit = FinbonaciCircuit::<Fp>::default();
+    let proving_duration = start.elapsed();
+    println!("Proving time 2: {:?}", proving_duration);
 
-        // Generate the proof - so far using dummy inputs, will be replaced with actual inputs
-
-        let a = Fp::from(1); // F[0]
-        let b = Fp::from(1); // F[1]
-        let out = Fp::from(input); // F[9]
-
-        let mut transcript = TranscriptWriterBuffer::<_, G1Affine, _>::init(Vec::new());
-
-
-        let mut public_input = vec![a, b, out];
-
-        create_proof::<
-            KZGCommitmentScheme<Bn256>,
-            ProverGWC<_>,
-            _,
-            _,
-            Blake2bWrite<_, _, _>,
-            _,
-        >(
-            &SRS,
-            &PK,
-            &[circuit],
-            vec![vec![public_input.clone().as_slice()].as_slice()].as_slice(), // TODO - this might be wrong
-            thread_rng(),
-            &mut transcript,
-        )
-        .unwrap();
-
-        let proof = transcript.finalize();
-
-        let proving_duration = start.elapsed();
-        println!("Proving time 2: {:?}", proving_duration);
-
-        Ok((SerializableProof(proof), SerializableInputs(public_input)))
+    Ok((SerializableProof(proof), SerializablePublicInputs(public_input)))
 
 }
 
 pub fn verify_halo2_proof2(
     serialized_proof: SerializableProof,
-    serialized_inputs: SerializableInputs,
+    serialized_inputs: SerializablePublicInputs,
 ) -> color_eyre::Result<bool, MoproError> {
     let start = Instant::now();
 
     let proof = serialized_proof.0;
     let inputs = serialized_inputs.0;
 
-    let mut transcript = TranscriptReadBuffer::<_, G1Affine, _>::init(proof.as_slice());
-    let proof_verified = verify_proof::<_, VerifierGWC<_>, _, Blake2bRead<_, _, _>, _>(
-        SRS.verifier_params(),
-        &VK,
-        SingleStrategy::new(&SRS),
-        &[&[inputs.as_ref()]],
-        &mut transcript,
-    ).is_ok();
+    let proof_verified = verify(proof, &inputs, &SRS, &VK).map_err(|e| MoproError::Halo2Error("Failed to verify the proof".to_string()))?;
 
     let verification_duration = start.elapsed();
     println!("Verification time 2: {:?}", verification_duration);
@@ -132,14 +98,31 @@ mod tests {
 
     #[test]
     fn test_generate_halo2_proof2() {
-        let (proof, inputs) = generate_halo2_proof2(55).unwrap();
-        assert_eq!(inputs.0[0], Fp::from(55));
+        let mut input = HashMap::new();
+        input.insert("out".to_string(), vec![Fp::from(55)]);
+
+        let (proof, inputs) = generate_halo2_proof2(input).unwrap();
+        assert_eq!(inputs.0[2], Fp::from(55));
     }
 
     #[test]
     fn test_verify_halo2_proof2() {
-        let (proof, inputs) = generate_halo2_proof2(55).unwrap();
+
+        let mut input = HashMap::new();
+        input.insert("out".to_string(), vec![Fp::from(55)]);
+
+        let (proof, inputs) = generate_halo2_proof2(input).unwrap();
         let verified = verify_halo2_proof2(proof, inputs).unwrap();
         assert!(verified);
+    }
+
+    #[test]
+    fn test_bad_proof_not_verified() {
+        let mut input = HashMap::new();
+        input.insert("out".to_string(), vec![Fp::from(56)]);
+
+        let (proof, inputs) = generate_halo2_proof2(input).unwrap();
+        let verified = verify_halo2_proof2(proof, inputs).unwrap();
+        assert!(!verified);
     }
 }
