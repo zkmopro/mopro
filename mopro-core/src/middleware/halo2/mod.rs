@@ -29,7 +29,7 @@ type CircuitInputs = HashMap<String, Vec<Fp>>;
 pub struct SerializableProof(pub Vec<u8>);
 
 #[derive(Clone, Debug)]
-pub struct SerializableInputs(pub Vec<Fp>);
+pub struct SerializablePublicInputs(pub Vec<Fp>);
 
 
 
