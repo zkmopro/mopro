@@ -1,27 +1,21 @@
 use std::collections::HashMap;
 use std::io::Cursor;
-use std::ops::Deref;
-use std::str::FromStr;
 use std::time::Instant;
 
-use ark_ff::BigInteger;
 pub(crate) use halo2_proofs::halo2curves::bn256::{Bn256, Fr as Fp, G1Affine};
-use halo2_proofs::plonk::{Circuit, ProvingKey, VerifyingKey};
-use halo2_proofs::poly::commitment::{Params};
+use halo2_proofs::plonk::{ProvingKey, VerifyingKey};
+use halo2_proofs::poly::commitment::Params;
 use halo2_proofs::poly::kzg::commitment::ParamsKZG;
 use halo2_proofs::SerdeFormat::RawBytes;
-use halo2_proofs::transcript::{TranscriptReadBuffer, TranscriptWriterBuffer};
-use num_bigint::BigInt;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
 use halo2_circuit::{Circuit as TargetCircuit, prove, verify};
+pub use serialisation::deserialize_circuit_inputs;
 
 use crate::MoproError;
 
 mod serialisation;
-
-pub use serialisation::deserialize_circuit_inputs;
 
 type CircuitInputs = HashMap<String, Vec<Fp>>;
 
@@ -85,7 +79,7 @@ pub fn verify_halo2_proof2(
     let proof = serialized_proof.0;
     let inputs = serialized_inputs.0;
 
-    let proof_verified = verify(proof, &inputs, &SRS, &VK).map_err(|e| MoproError::Halo2Error("Failed to verify the proof".to_string()))?;
+    let proof_verified = verify(proof, &inputs, &SRS, &VK).map_err(|_| MoproError::Halo2Error("Failed to verify the proof".to_string()))?;
 
     let verification_duration = start.elapsed();
     println!("Verification time 2: {:?}", verification_duration);

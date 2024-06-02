@@ -3,7 +3,6 @@ use std::fmt;
 use std::str::FromStr;
 
 use halo2_proofs::halo2curves::ff::PrimeField;
-use num_bigint::ToBigInt;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::{SeqAccess, Visitor};
 use serde::ser::SerializeSeq;
