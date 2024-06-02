@@ -89,7 +89,7 @@ impl<F: Field> Multiplier2Chip<F> {
                     || a,
                 )?;
 
-                let b_cell = region.assign_advice(
+                region.assign_advice(
                     || "b",
                     self.config.col_b,
                     0,
