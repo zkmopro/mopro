@@ -1,5 +1,6 @@
-use halo2_proofs::{circuit::*, plonk::*, poly::Rotation};
 use std::marker::PhantomData;
+
+use halo2_proofs::{circuit::*, plonk::*, poly::Rotation};
 use halo2_proofs::arithmetic::Field;
 
 #[derive(Debug, Clone)]
@@ -196,9 +197,10 @@ impl<F: Field> Circuit<F> for FinbonaciCircuit<F> {
 mod tests {
     use std::marker::PhantomData;
 
-    use super::FinbonaciCircuit;
-    use halo2_proofs::{dev::MockProver};
+    use halo2_proofs::dev::MockProver;
     use halo2_proofs::halo2curves::pasta::Fp;
+
+    use super::FinbonaciCircuit;
 
     #[test]
     fn fibonacci_example() {

@@ -23,9 +23,9 @@ ptau = "02"                       # ptau to use for trusted setup of circuit, "0
 #ptau = "19"
 
 # Halo2 Fibonacci
-#kind = "halo2"                    # Proving system options: circom (default), halo2
-#dir = "core/circuits/halo2" # Directory of the circuit
-#name = "fibonacci"                # Name of the circuit
+#kind = "halo2"                         # Proving system options: circom (default), halo2
+#dir = "core/circuits/halo2-fibonacci"  # Directory of the circuit
+#name = "fibonacci"                     # Name of the circuit
 #ptau = 4
 
 [dylib]
