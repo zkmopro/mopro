@@ -75,16 +75,20 @@ extension Halo2CircuitView {
         Task {
             do {
                 // Prepare inputs
-                let input: String = String(a)
+
+                var inputs = [String: [String]]()
+                let out = 55
+
+                inputs["out"] = [String(out)]
 
                 // Expected outputs
-                let outputs: [String] = [String(1), String(1), input]
+                let outputs: [String] = [String(1), String(1), String(out)]
                 let expectedOutput: [UInt8] = serializeOutputs(outputs)
 
                 let start = CFAbsoluteTimeGetCurrent()
 
                 // Generate Proof
-                let generateProofResult = try generateHalo2Proof2(input: input)
+                let generateProofResult = try generateHalo2Proof2(circuitInputs: inputs)
                 assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
                 assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
 
