@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::{env, fs};
 use std::fs::File;
-use std::io::{BufRead, BufReader, Write};
+use std::io::Write;
 use toml;
 use toml::Value;
 use wasmer::{Cranelift, Dylib, Module, Store, Target, Triple};
@@ -355,7 +355,7 @@ fn main() -> color_eyre::eyre::Result<()> {
         // Enable Halo2 feature
         println!("cargo:rustc-cfg=halo2");
 
-        build_halo2_circuit(&circuit_dir_path);
+        build_halo2_circuit(&circuit_dir_path)?;
 
         update_halo2_cargo_config(&circuit_dir_path);
 
@@ -363,7 +363,7 @@ fn main() -> color_eyre::eyre::Result<()> {
         // Otherwise, we default to Circom circuit
         println!("cargo:warning=Building Circom circuit...");
 
-        build_circom_circuit(&circuit_dir_path, circuit_name);
+        build_circom_circuit(&circuit_dir_path, circuit_name)?;
 
         #[cfg(feature = "build-native-witness")]
         build_witness_graph()?;
