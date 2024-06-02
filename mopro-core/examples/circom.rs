@@ -1,7 +1,11 @@
+#[cfg(not(feature = "halo2"))]
 use mopro_core::middleware::circom::CircomState;
+#[cfg(not(feature = "halo2"))]
 use num_bigint::BigInt;
+#[cfg(not(feature = "halo2"))]
 use std::collections::HashMap;
 
+#[cfg(not(feature = "halo2"))]
 fn main() {
     let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
     let zkey_path = "./examples/circom/multiplier2/target/multiplier2_final.zkey";
@@ -38,4 +42,9 @@ fn main() {
     let verify_res = circom_state.verify_proof(serialized_proof, serialized_inputs);
     assert!(verify_res.is_ok());
     assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
+}
+
+#[cfg(feature = "halo2")]
+fn main() {
+    println!("This example is only for Circom proving system. Currently, Halo2 proving system is enabled. Please disable the Halo2 feature in the Cargo.toml file.");
 }
