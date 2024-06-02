@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 #[cfg(feature = "halo2")]
 use mopro_core::middleware::halo2;
+#[cfg(feature = "halo2")]
 use mopro_core::middleware::halo2::deserialize_circuit_inputs;
 use mopro_core::MoproError;
 
