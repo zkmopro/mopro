@@ -1,5 +1,5 @@
 [workspace]
-members = ["core"]
+members = ["core", "core/circuits/halo2-fibonacci"]
 resolver = "2"
 
 [patch.crates-io]
