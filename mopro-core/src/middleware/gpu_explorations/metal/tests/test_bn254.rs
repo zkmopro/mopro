@@ -5,11 +5,10 @@ mod tests {
         state::MetalState,
     };
 
-    use ark_bn254::{Fq, Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
-    use ark_ec::AffineRepr;
+    use ark_bn254::{Fq, G1Projective as G};
     use ark_ff::{
         biginteger::{BigInteger, BigInteger256},
-        BigInt, Field, PrimeField,
+        BigInt, PrimeField,
     };
     use ark_std::Zero;
 
@@ -17,12 +16,6 @@ mod tests {
     use proptest::prelude::*;
 
     pub type FE = Fq; // Field Element
-    pub type Point = GAffine;
-    pub type Scalar = <ScalarField as PrimeField>::BigInt;
-
-    // pub type F = BN254PrimeField;
-    // pub type FE = FieldElement<F>;
-    // pub type U = U256; // F::BaseType
 
     mod unsigned_int_tests {
         use super::*;
@@ -85,24 +78,6 @@ mod tests {
 
             let limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
 
-            // // Read the debug information
-            // let debug_data = MetalState::retrieve_contents::<u32>(&debug_buffer);
-
-            // // Print the values of a and b
-            // println!("Value of a:");
-            // for i in 0..8 {
-            //     println!("Limb {}: 0x{:08X}", i, debug_data[i]);
-            // }
-
-            // println!("Value of b:");
-            // for i in 0..8 {
-            //     println!("Limb {}: 0x{:08X}", i, debug_data[i + 8]);
-            // }
-            // println!("Value of result:");
-            // for i in 0..8 {
-            //     println!("Limb {}: 0x{:08X}", i, debug_data[i + 16]);
-            // }
-            // println!(">>> limbs: {:?}", limbs);
             BigInteger256::from_u32_limbs(&limbs)
         }
 
@@ -115,7 +90,7 @@ mod tests {
 
         use ark_ff::biginteger::{BigInteger, BigInteger256};
         use num_bigint::BigUint;
-        // use lambdaworks_math::unsigned_integer::traits::U32Limbs;
+
         use BigOrSmallInt::{Big, Small};
 
         proptest! {
@@ -197,15 +172,12 @@ mod tests {
             let state = MetalState::new(None).unwrap();
             let pipeline = state.setup_pipeline(name).unwrap();
 
-            // conversion needed because of possible difference of endianess between host and
-            // device (Metal's UnsignedInteger has 32bit limbs).
-
-            let a = a.0.to_u32_limbs(); // alternative a.into_bigint().to_u32_limbs();
+            let a = a.to_u32_limbs();
             let result_buffer = state.alloc_buffer::<u32>(8);
 
             let (command_buffer, command_encoder) = match b {
                 FEOrInt::Elem(b) => {
-                    let b = b.0.to_u32_limbs();
+                    let b = b.to_u32_limbs();
                     let a_buffer = state.alloc_buffer_data(&a);
                     let b_buffer = state.alloc_buffer_data(&b);
 
@@ -235,7 +207,7 @@ mod tests {
             command_buffer.wait_until_completed();
 
             let limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
-            FE::new(BigInteger256::from_u32_limbs(&limbs))
+            FE::from_u32_limbs(&limbs)
         }
 
         prop_compose! {
@@ -250,7 +222,7 @@ mod tests {
 
         prop_compose! {
             fn rand_field_element()(limbs in rand_limbs()) -> FE {
-                FE::new(BigInteger256::from_u32_limbs(&limbs))
+                FE::from_u32_limbs(&limbs)
             }
         }
 
@@ -261,11 +233,10 @@ mod tests {
             fn add(a in rand_field_element(), b in rand_field_element()) {
                 let mut result = Fq::default();
                 objc::rc::autoreleasepool(|| {
-                    // Note: the result is in montgomery form
                     result = execute_kernel("fp_bn254_add", &a, Elem(b.clone()));
                 });
                 let local_add = a + b;
-                prop_assert_eq!(result.into_bigint(), local_add.0);
+                prop_assert_eq!(result, local_add);
             }
 
             #[test]
@@ -275,7 +246,7 @@ mod tests {
                     result = execute_kernel("fp_bn254_sub", &a, Elem(b.clone()));
                 });
                 let local_sub = a - b;
-                prop_assert_eq!(result.into_bigint(), local_sub.0);
+                prop_assert_eq!(result, local_sub);
             }
 
             #[test]
@@ -285,17 +256,7 @@ mod tests {
                     result = execute_kernel("fp_bn254_mul", &a, Elem(b.clone()));
                 });
                 let local_mul = a * b;
-                prop_assert_eq!(result.into_bigint(), local_mul.0);
-            }
-
-            #[test]
-            fn pow(a in rand_field_element(), b in rand_u32()) {
-                let mut result = Fq::default();
-                objc::rc::autoreleasepool(|| {
-                    result = execute_kernel("fp_bn254_pow", &a, Int(b));
-                });
-                let local_pow = a.pow(&[b as u64]);
-                prop_assert_eq!(result.into_bigint(), local_pow.0);
+                prop_assert_eq!(result.0, local_mul.into_bigint());
             }
 
             #[test]
@@ -305,8 +266,19 @@ mod tests {
                     result = execute_kernel("fp_bn254_neg", &a, Int(0));
                 });
                 let local_neg = -a;
-                prop_assert_eq!(result.into_bigint(), local_neg.0);
+                prop_assert_eq!(result, local_neg);
             }
+
+            // // unused
+            // #[test]
+            // fn pow(a in rand_field_element(), b in rand_u32()) {
+            //     let mut result = Fq::default();
+            //     objc::rc::autoreleasepool(|| {
+            //         result = execute_kernel("fp_bn254_pow", &a, Int(b));
+            //     });
+            //     let local_pow = a.pow(&[b as u64]);
+            //     prop_assert_eq!(result.0, local_pow.into_bigint());
+            // }
 
             // // TODO: Implement inverse if needed in the future
             // #[test]
@@ -325,7 +297,6 @@ mod tests {
     }
 
     mod ec_tests {
-        use ark_ec::Group;
         use ark_ff::UniformRand;
         use ark_std::rand::thread_rng;
 
@@ -344,8 +315,6 @@ mod tests {
             let state = MetalState::new(None).unwrap();
             let pipeline = state.setup_pipeline(name).unwrap();
 
-            // conversion needed because of possible difference of endianess between host and
-            // device (Metal's UnsignedInteger has 32bit limbs).
             let p_coordinates: Vec<u32> = point_to_u32_limbs(p);
             let q_coordinates: Vec<u32> = point_to_u32_limbs(q);
 
