@@ -24,6 +24,8 @@ pub fn test_project(
     // Set the BUILD_CONFIG_PATH environment variable for the cargo test command
     let mut command = Command::new("cargo");
     command.arg("test");
+    command.arg("--lib");
+    command.arg("mopro-example-app");
     command.env("BUILD_CONFIG_PATH", config_file_path_str);
     command.current_dir(core_dir_path);
 
