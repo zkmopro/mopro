@@ -10,7 +10,7 @@ jobs:
     lint:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - name: Check formatting
               run: cargo fmt --all -- --check
 
@@ -18,6 +18,11 @@ jobs:
         runs-on: macos-latest
         steps:
             - uses: actions/checkout@v4
+            - name: Install Rust toolchain 1.77
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: "1.77"
+                  override: true
             - name: Use Node.js
               uses: actions/setup-node@v4
               with:
@@ -77,7 +82,12 @@ jobs:
     test-core-and-ffi:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
+            - name: Install Rust toolchain 1.77
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: "1.77"
+                  override: true
             - name: Restore toml
               uses: actions/cache@v4
               id: toml-linux-restore
