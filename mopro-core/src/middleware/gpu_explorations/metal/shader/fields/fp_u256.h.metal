@@ -1,7 +1,7 @@
 #pragma once
 // https://github.com/andrewmilson/ministark/blob/main/gpu-poly/src/metal/felt_u256.h.metal
 
-#include "u256.h.metal"
+#include "../arithmetics/u256.h.metal"
 
 template <
     /* =N **/ unsigned long N_0, unsigned long N_1, unsigned long N_2, unsigned long N_3,

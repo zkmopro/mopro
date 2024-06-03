@@ -1,8 +1,8 @@
 #pragma once
 
-#include "fields/bn254.h.metal"
+#include "curves/bn254.h.metal"
 #include "fields/fp_bn254.h.metal"
-#include "fields/unsigned_int.h.metal"
+#include "arithmetics/unsigned_int.h.metal"
 
 namespace {
     typedef UnsignedInteger<8> u256;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fp_bn254.h.metal"
 #include "ec_point.h.metal"
+#include "../fields/fp_bn254.h.metal"
 #include "../tests/test_bn254.h.metal"
 
 namespace {

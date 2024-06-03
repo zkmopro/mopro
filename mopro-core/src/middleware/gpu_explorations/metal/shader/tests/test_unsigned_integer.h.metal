@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../fields/unsigned_int.h.metal"
+#include "../arithmetics/unsigned_int.h.metal"
 
 namespace {
     typedef UnsignedInteger<8> u256;
