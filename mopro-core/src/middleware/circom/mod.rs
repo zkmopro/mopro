@@ -53,8 +53,8 @@ type CircuitInputs = HashMap<String, Vec<BigInt>>;
 // TODO: Split up this namespace a bit, right now quite a lot of things going on
 
 pub struct CircomState {
+    wasm_bytes: Option<Vec<u8>>,
     zkey: Option<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)>,
-    wtns: Option<WitnessCalculator>,
 }
 
 impl Default for CircomState {
@@ -188,17 +188,17 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
     })
 }
 
-#[cfg(not(feature = "dylib"))]
-#[must_use]
-pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
-    WITNESS_CALCULATOR.get_or_init(|| {
-        let store = Store::default();
-        let module = Module::from_binary(&store, WASM).expect("WASM should be valid");
-        let result =
-            WitnessCalculator::from_module(module).expect("Failed to create WitnessCalculator");
-        Mutex::new(result)
-    })
-}
+// #[cfg(not(feature = "dylib"))]
+// #[must_use]
+// pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
+//     WITNESS_CALCULATOR.get_or_init(|| {
+//         let store = Store::default();
+//         let module = Module::from_binary(&store, WASM).expect("WASM should be valid");
+//         let result =
+//             WitnessCalculator::from_module(module).expect("Failed to create WitnessCalculator");
+//         Mutex::new(result)
+//     })
+// }
 
 pub fn generate_proof2(
     inputs: CircuitInputs,
@@ -211,11 +211,12 @@ pub fn generate_proof2(
 
     println!("Generating proof 2");
 
+    let wasm_bytes: Vec<u8> = WASM.to_vec();
     let now = std::time::Instant::now();
     #[cfg(not(feature = "calc-native-witness"))]
-    let full_assignment = witness_calculator()
-        .lock()
-        .expect("Failed to lock witness calculator")
+    let mut witness_calculator = WitnessCalculator::from_bytes(&wasm_bytes)
+        .map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let full_assignment = witness_calculator
         .calculate_witness_element::<Bn254, _>(inputs, false)
         .map_err(|e| MoproError::CircomError(e.to_string()))?;
     #[cfg(feature = "calc-native-witness")]
@@ -270,9 +271,9 @@ pub fn verify_proof2(
 impl CircomState {
     pub fn new() -> Self {
         Self {
+            wasm_bytes: None,
             zkey: None,
             // arkzkey: None,
-            wtns: None,
         }
     }
 
@@ -283,10 +284,9 @@ impl CircomState {
         // read_arkzkey(arkzkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
         self.zkey = Some(zkey);
 
-        let wtns = WitnessCalculator::new(wasm_path)
-            .map_err(|e| MoproError::CircomError(e.to_string()))
-            .unwrap();
-        self.wtns = Some(wtns);
+        let wasm_bytes =
+            std::fs::read(wasm_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        self.wasm_bytes = Some(wasm_bytes);
 
         Ok(())
     }
@@ -304,10 +304,11 @@ impl CircomState {
         println!("Generating proof");
 
         let now = std::time::Instant::now();
-        let full_assignment = self
-            .wtns
-            .clone()
-            .unwrap()
+        let mut witness_calculator =
+            WitnessCalculator::from_bytes(&(self.wasm_bytes.clone().unwrap())).map_err(|e| {
+                MoproError::CircomError(format!("Failed to create WitnessCalculator: {}", e))
+            })?;
+        let full_assignment = witness_calculator
             .calculate_witness_element::<Bn254, _>(inputs, false)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
