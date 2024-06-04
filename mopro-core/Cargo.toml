@@ -8,9 +8,10 @@ edition = "2021"
 [features]
 default = ["wasmer/dylib"]
 dylib = []                  # NOTE: can probably remove this if we use env config instead
-gpu-benchmarks = ["ark-bls12-377", "ark-bls12-381", "ark-ed-on-bls12-377", "ark-ed-on-bls12-381", "ark-poly", "ark-poly-commit", "ark-sponge", "duration-string", "rand", "rand_chacha", "lazy_static", "ark-ec-3", "ark-ff-3", "ark-serialize-3", "ark-std-3", "ark-bls12-377-3"]
+gpu-benchmarks = ["ark-bls12-377", "ark-bls12-381", "ark-ed-on-bls12-377", "ark-ed-on-bls12-381", "ark-poly", "ark-poly-commit", "ark-sponge", "duration-string", "rand", "rand_chacha", "lazy_static", "ark-ec-3", "ark-ff-3", "ark-serialize-3", "ark-std-3", "ark-bls12-377-3", "parallel"]
 calc-native-witness = ["witness"] # experimental feature to calculate witness with witness graph
 build-native-witness = ["witness/build-witness"] # only enable build-native-witness feature when building the witness graph
+parallel = ["rayon", "ark-std/parallel"]
 
 [dependencies]
 ark-circom = { git = "https://github.com/vimwitch/circom-compat.git" }
@@ -77,3 +78,7 @@ toml = "0.8"
 serde = "1.0"
 serde_derive = "1.0"
 witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true}
+
+[dependencies.rayon]
+version = "1"
+optional = true
