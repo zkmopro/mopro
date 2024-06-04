@@ -17,7 +17,7 @@ compile_circuit() {
     local circuit_dir=$1
     local circuit_file=$2
     local target_file="$circuit_dir/target/$(basename $circuit_file .circom).r1cs"
-
+    
     print_action "[core/circom] Compiling $circuit_file example circuit..."
     if [ ! -f "$target_file" ]; then
         ./scripts/compile.sh $circuit_dir $circuit_file
@@ -28,7 +28,7 @@ compile_circuit() {
 
 npm_install() {
     local circuit_dir=$1
-
+    
     if [[ ! -d "$circuit_dir/node_modules" ]]; then
         echo "Installing npm dependencies for $circuit_dir..."
         (cd $circuit_dir && npm install)
@@ -65,13 +65,13 @@ compile_circuit keccak256 keccak256_256_test.circom
 npm_install rsa
 compile_circuit rsa main.circom
 
-# Setup and compile anonAadhaar
-npm_install anonAadhaar
-compile_circuit anonAadhaar aadhaar-verifier.circom
+# # Setup and compile anonAadhaar
+# npm_install anonAadhaar
+# compile_circuit anonAadhaar aadhaar-verifier.circom
 
-# Setup and compile complex-circuit
-npm_install complex-circuit
-compile_circuit complex-circuit complex-circuit-1000k-1000k.circom
+# # Setup and compile complex-circuit
+# npm_install complex-circuit
+# compile_circuit complex-circuit complex-circuit-1000k-1000k.circom
 
 # Run trusted setup for multiplier2
 print_action "[core/circom] Running trusted setup for multiplier2..."
@@ -97,21 +97,21 @@ print_action "[core/circom] Running trusted setup for rsa..."
 print_action "[core/circom] Generating arkzkey for rsa..."
 ./scripts/generate_arkzkey.sh rsa main
 
-# Run trusted setup for anonAadhaar
-print_action "[core/circom] Running trusted setup for anonAadhaar..."
-./scripts/trusted_setup.sh anonAadhaar 20 aadhaar-verifier
+# # Run trusted setup for anonAadhaar
+# print_action "[core/circom] Running trusted setup for anonAadhaar..."
+# ./scripts/trusted_setup.sh anonAadhaar 20 aadhaar-verifier
 
-# Generate arkzkey for anonAadhaar
-print_action "[core/circom] Generating arkzkey for anonAadhaar..."
-./scripts/generate_arkzkey.sh anonAadhaar aadhaar-verifier
+# # Generate arkzkey for anonAadhaar
+# print_action "[core/circom] Generating arkzkey for anonAadhaar..."
+# ./scripts/generate_arkzkey.sh anonAadhaar aadhaar-verifier
 
-# Run trusted setup for complex circuit
-print_action "[core/circom] Running trusted setup for complex circuit..."
-./scripts/trusted_setup.sh complex-circuit 21 complex-circuit-1000k-1000k
+# # Run trusted setup for complex circuit
+# print_action "[core/circom] Running trusted setup for complex circuit..."
+# ./scripts/trusted_setup.sh complex-circuit 21 complex-circuit-1000k-1000k
 
-# Generate arkzkey for complex circuit
-print_action "[core/circom] Generating arkzkey for complex circuit..."
-./scripts/generate_arkzkey.sh complex-circuit complex-circuit-1000k-1000k
+# # Generate arkzkey for complex circuit
+# print_action "[core/circom] Generating arkzkey for complex circuit..."
+# ./scripts/generate_arkzkey.sh complex-circuit complex-circuit-1000k-1000k
 
 # Add support for target architectures
 print_action "[ffi] Adding support for target architectures..."
