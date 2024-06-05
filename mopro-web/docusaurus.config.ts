@@ -85,7 +85,7 @@ const config: Config = {
           position: 'right',
           value: 
             `<div class="custom-navbar-link">
-              <a href="https://github.com/zkmopro/mopro" target="_blank">Github</a
+              <a href="https://github.com/zkmopro/mopro" target="_blank" class="navbar__link">Github</a
               ><img src="img/link_arrow.svg"/>
             </div>`
 
@@ -100,7 +100,7 @@ const config: Config = {
             {
               html: 
                 `<div class="custom-footer-link">
-                    <a href="https://github.com/zkmopro/mopro" target="_blank">Github</a>
+                    <a href="https://github.com/zkmopro/mopro" target="_blank" class="footer__link-item">Github</a>
                     <img src="img/link_arrow.svg"/>
                   </div>`
             },
@@ -124,14 +124,14 @@ const config: Config = {
             {
               html: 
                 `<div class="custom-footer-link">
-                    <a href="https://t.me/zkmopro" target="_blank">Telegram</a>
+                    <a href="https://t.me/zkmopro" target="_blank" class="footer__link-item">Telegram</a>
                     <img src="img/link_arrow.svg"/>
                   </div>`
             },
             {
               html: 
                 `<div class="custom-footer-link">
-                    <a href="https://twitter.com/zkmopro" target="_blank">Twitter</a>
+                    <a href="https://twitter.com/zkmopro" target="_blank" class="footer__link-item">Twitter</a>
                     <img src="img/link_arrow.svg"/>
                   </div>`
             },

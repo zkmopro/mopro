@@ -9,6 +9,10 @@ h1 {
   width: 50%;
 }
 
+p {
+  color: #D6D2B9;
+}
+
 .mainContainer {
   padding: 10% 18% 0%;
   background-color: #000;

@@ -33,8 +33,16 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
-a:active, a:visited, a:hover {
+a {
+  /* color: #D6D2B9; */
+  color: #FFB546;
+  /* color: white; */
+}
+
+a:active, a:hover {
+  /* color: #FFB546; */
   color: white;
+  /* color: #D6D2B9; */
   text-decoration: none;
 }
 
@@ -57,6 +65,20 @@ a:active, a:visited, a:hover {
 .custom-navbar-link {
   display: flex;
   font-weight: 500;
+}
+
+.menu__link {
+  /* color: #FFB546; */
+  /* color: white; */
+  color: #D6D2B9;
+}
+
+.menu__link:active, .menu__link:hover {
+  color: #FFB546;
+}
+
+.pagination-nav__label {
+  color: #FFB546;
 }
 
 .footer {
