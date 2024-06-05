@@ -8,7 +8,6 @@
 
  .feature {
   display: flex;
-  /* align-items: baseline; */
   gap: 1.25rem;
   width: 45%;
  }

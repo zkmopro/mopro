@@ -1,9 +1,3 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
-
 /* You can override the default Infima variables here. */
 
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
@@ -33,17 +27,25 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
+img {
+  border-radius: .5rem;
+}
+
 a {
   /* color: #D6D2B9; */
   color: #FFB546;
   /* color: white; */
 }
 
-a:active, a:hover {
+a:hover {
   /* color: #FFB546; */
   color: white;
   /* color: #D6D2B9; */
   text-decoration: none;
+}
+
+a:active {
+  color: #FFB546;
 }
 
 .navbar {
@@ -75,6 +77,18 @@ a:active, a:hover {
 
 .menu__link:active, .menu__link:hover {
   color: #FFB546;
+}
+
+.table-of-contents__link {
+  color: #D6D2B9;
+}
+
+.table-of-contents__link:hover {
+  color: #FFB546;
+}
+
+.blogSidebar {
+  color: #D6D2B9;
 }
 
 .pagination-nav__label {
