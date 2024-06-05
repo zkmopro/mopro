@@ -132,3 +132,19 @@ a:active {
   font-size: 1rem;
   font-weight: 200;
 }
+
+@media screen and (max-width: 996px) {
+  .navbar__logo img {
+    height: 70px;
+    width: 220px
+  }
+
+  .menu__link {
+    color: white;
+    padding-left: 1rem;
+  }
+
+  .custom-navbar-link {
+    padding-left: 1rem;
+  }
+}
