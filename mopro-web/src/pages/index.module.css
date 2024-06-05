@@ -3,12 +3,6 @@
  * and scoped locally.
  */
 
-h1 {
-  font-size: 76px;
-  font-weight: 600;
-  width: 50%;
-}
-
 p {
   color: #D6D2B9;
 }
@@ -24,8 +18,16 @@ p {
   padding-bottom: 5%;
  }
 
+
+.heading {
+  font-size: 6rem;
+  line-height: 6.1rem;
+  font-weight: 600;
+  width: 50%;
+}
+
 .introParagraph {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 500;
   width: 40%;
   align-self: center;
