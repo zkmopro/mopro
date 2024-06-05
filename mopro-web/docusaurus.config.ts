@@ -75,18 +75,13 @@ const config: Config = {
           label: 'Docs',
         },
         { to: '/blog', label: 'Blog', position: 'right' },
-        // {
-        //   href: 'https://github.com/zkmopro/mopro',
-        //   label: 'GitHub',
-        //   position: 'right',
-        // },
         {
           type: 'html',
           position: 'right',
           value: 
             `<div class="custom-navbar-link">
               <a href="https://github.com/zkmopro/mopro" target="_blank" class="navbar__link">Github</a
-              ><img src="img/link_arrow.svg"/>
+              ><img src="/img/link_arrow.svg"/>
             </div>`
 
         },
@@ -101,13 +96,9 @@ const config: Config = {
               html: 
                 `<div class="custom-footer-link">
                     <a href="https://github.com/zkmopro/mopro" target="_blank" class="footer__link-item">Github</a>
-                    <img src="img/link_arrow.svg"/>
+                    <img src="/img/link_arrow.svg"/>
                   </div>`
             },
-            // {
-            //   label: 'GitHub',
-            //   href: 'https://github.com/zkmopro/mopro',
-            // },
             {
               label: 'Blog',
               to: '/blog',
@@ -125,24 +116,16 @@ const config: Config = {
               html: 
                 `<div class="custom-footer-link">
                     <a href="https://t.me/zkmopro" target="_blank" class="footer__link-item">Telegram</a>
-                    <img src="img/link_arrow.svg"/>
+                    <img src="/img/link_arrow.svg"/>
                   </div>`
             },
             {
               html: 
                 `<div class="custom-footer-link">
                     <a href="https://twitter.com/zkmopro" target="_blank" class="footer__link-item">Twitter</a>
-                    <img src="img/link_arrow.svg"/>
+                    <img src="/img/link_arrow.svg"/>
                   </div>`
             },
-            // {
-            //   label: 'Telegram',
-            //   href: 'https://t.me/zkmopro',
-            // },
-            // {
-            //   label: 'Twitter',
-            //   href: 'https://twitter.com/zkmopro',
-            // },
           ],
         },
       ],
