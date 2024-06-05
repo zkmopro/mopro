@@ -12,7 +12,7 @@ function Homepage() {
     <main className={styles.mainContainer}>
       <section>
         <div className={styles.introContainer}>
-          <h1>Mobile proving made simple</h1>
+          <div className={styles.heading}>Mobile proving made simple</div>
           <p className={styles.introParagraph}>With mopro, developers can overcome the limitations of existing tools like snarkjs, which struggles with small circuit sizes and slow performance in browsers. Our solution leverages the growing power of mobile GPUs to deliver a fast, scalable, and secure proving experience directly on client-side applications</p>
         </div>
         <div className={styles.introContainer}>
@@ -26,7 +26,7 @@ function Homepage() {
       </div>
 
       <section className={styles.featuesContainer}>
-        <h1>Developer Capabilities</h1>
+        <div className={styles.heading}>Developer Capabilities</div>
         <div>
 
         </div>

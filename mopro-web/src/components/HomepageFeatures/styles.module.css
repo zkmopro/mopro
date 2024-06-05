@@ -1,8 +1,3 @@
-h2 {
-  font-size: 40px;
-  font-weight: 600;
-}
-
 .featuresContainer {
   display: flex;
   flex-wrap: wrap;
@@ -14,7 +9,7 @@ h2 {
  .feature {
   display: flex;
   /* align-items: baseline; */
-  gap: 20px;
+  gap: 1.25rem;
   width: 45%;
  }
 
@@ -26,6 +21,11 @@ h2 {
 }
 
 .featureSvg {
-  height: 125px;
-  width: 115px;
+  height: 8rem;
+  width: 7.2rem;
+}
+
+.featureHeading {
+  font-size: 2.5rem;
+  font-weight: 600;
 }
