@@ -1,8 +1,7 @@
-use ark_bn254::Fq;
-use ark_ff::{
-    biginteger::{BigInteger, BigInteger256},
-    PrimeField,
-};
+use ark_bn254::{Fq, FqConfig};
+use ark_ff::biginteger::{BigInteger, BigInteger256};
+
+use crate::middleware::gpu_explorations::metal::abstraction::mont_reduction;
 
 // implement to_u32_limbs and from_u32_limbs for BigInt<4>
 pub trait ToLimbs {
@@ -33,15 +32,12 @@ impl ToLimbs for BigInteger256 {
 impl ToLimbs for Fq {
     fn to_u32_limbs(&self) -> Vec<u32> {
         let mut limbs = Vec::new();
-        self.into_bigint()
-            .to_bytes_be()
-            .chunks(8)
-            .for_each(|chunk| {
-                let high = u32::from_be_bytes(chunk[0..4].try_into().unwrap());
-                let low = u32::from_be_bytes(chunk[4..8].try_into().unwrap());
-                limbs.push(high);
-                limbs.push(low);
-            });
+        self.0.to_bytes_be().chunks(8).for_each(|chunk| {
+            let high = u32::from_be_bytes(chunk[0..4].try_into().unwrap());
+            let low = u32::from_be_bytes(chunk[4..8].try_into().unwrap());
+            limbs.push(high);
+            limbs.push(low);
+        });
         limbs
     }
 }
@@ -78,14 +74,18 @@ impl FromLimbs for Fq {
             let low = u64::from(limb[1]);
             big_int[i] = (high << 32) | low;
         }
-        Fq::new(BigInteger256::new(big_int))
+        Fq::new(mont_reduction::raw_reduction(BigInteger256::new(big_int)))
     }
     fn from_u128(num: u128) -> Self {
         let high = (num >> 64) as u64;
         let low = num as u64;
-        Fq::new(BigInteger256::new([low, high, 0, 0]))
+        Fq::new(mont_reduction::raw_reduction(BigInteger256::new([
+            low, high, 0, 0,
+        ])))
     }
     fn from_u32(num: u32) -> Self {
-        Fq::new(BigInteger256::new([num as u64, 0, 0, 0]))
+        Fq::new(mont_reduction::raw_reduction(BigInteger256::new([
+            num as u64, 0, 0, 0,
+        ])))
     }
 }
