@@ -8,7 +8,7 @@ mod tests {
     use ark_bn254::{Fq, G1Projective as G};
     use ark_ff::{
         biginteger::{BigInteger, BigInteger256},
-        BigInt, PrimeField,
+        BigInt, Field, PrimeField,
     };
     use ark_std::Zero;
 
@@ -256,7 +256,7 @@ mod tests {
                     result = execute_kernel("fp_bn254_mul", &a, Elem(b.clone()));
                 });
                 let local_mul = a * b;
-                prop_assert_eq!(result.0, local_mul.into_bigint());
+                prop_assert_eq!(result, local_mul);
             }
 
             #[test]
@@ -269,16 +269,15 @@ mod tests {
                 prop_assert_eq!(result, local_neg);
             }
 
-            // // unused
-            // #[test]
-            // fn pow(a in rand_field_element(), b in rand_u32()) {
-            //     let mut result = Fq::default();
-            //     objc::rc::autoreleasepool(|| {
-            //         result = execute_kernel("fp_bn254_pow", &a, Int(b));
-            //     });
-            //     let local_pow = a.pow(&[b as u64]);
-            //     prop_assert_eq!(result.0, local_pow.into_bigint());
-            // }
+            #[test]
+            fn pow(a in rand_field_element(), b in rand_u32()) {
+                let mut result = Fq::default();
+                objc::rc::autoreleasepool(|| {
+                    result = execute_kernel("fp_bn254_pow", &a, Int(b));
+                });
+                let local_pow = a.pow(&[b as u64]);
+                prop_assert_eq!(result, local_pow);
+            }
 
             // // TODO: Implement inverse if needed in the future
             // #[test]
@@ -303,11 +302,10 @@ mod tests {
         use super::*;
 
         fn point_to_u32_limbs(p: &G) -> Vec<u32> {
-            p.x.0
-                .to_u32_limbs()
+            p.x.to_u32_limbs()
                 .into_iter()
-                .chain(p.y.0.to_u32_limbs())
-                .chain(p.z.0.to_u32_limbs())
+                .chain(p.y.to_u32_limbs())
+                .chain(p.z.to_u32_limbs())
                 .collect()
         }
 
@@ -357,8 +355,13 @@ mod tests {
                 objc::rc::autoreleasepool(|| {
                     result = execute_kernel("bn254_add", &p, &q);
                 });
-                let cpu_result = point_to_u32_limbs(&(p + q));
-                prop_assert_eq!(result, cpu_result);
+                let gpu_result = G::new(
+                    Fq::from_u32_limbs(&result[0..8]),
+                    Fq::from_u32_limbs(&result[8..16]),
+                    Fq::from_u32_limbs(&result[16..24]),
+                );
+                let cpu_result = p + q;
+                prop_assert_eq!(gpu_result, cpu_result);
             }
 
             #[test]
@@ -367,8 +370,13 @@ mod tests {
                 objc::rc::autoreleasepool(|| {
                     result = execute_kernel("bn254_add", &p, &p);
                 });
-                let cpu_result: Vec<u32> = point_to_u32_limbs(&(p + p));
-                prop_assert_eq!(result, cpu_result);
+                let gpu_result = G::new(
+                    Fq::from_u32_limbs(&result[0..8]),
+                    Fq::from_u32_limbs(&result[8..16]),
+                    Fq::from_u32_limbs(&result[16..24]),
+                );
+                let cpu_result = p + p;
+                prop_assert_eq!(gpu_result, cpu_result);
             }
 
             #[test]
@@ -378,8 +386,13 @@ mod tests {
                 objc::rc::autoreleasepool(|| {
                     result = execute_kernel("bn254_add", &p, &infinity);
                 });
-                let cpu_result: Vec<u32> = point_to_u32_limbs(&(p + infinity));
-                prop_assert_eq!(result, cpu_result);
+                let gpu_result = G::new(
+                    Fq::from_u32_limbs(&result[0..8]),
+                    Fq::from_u32_limbs(&result[8..16]),
+                    Fq::from_u32_limbs(&result[16..24]),
+                );
+                let cpu_result = p + infinity;
+                prop_assert_eq!(gpu_result, cpu_result);
             }
 
             #[test]
@@ -389,8 +402,13 @@ mod tests {
                 objc::rc::autoreleasepool(|| {
                     result = execute_kernel("bn254_add", &infinity, &p);
                 });
-                let cpu_result: Vec<u32> = point_to_u32_limbs(&(infinity + p));
-                prop_assert_eq!(result, cpu_result);
+                let gpu_result = G::new(
+                    Fq::from_u32_limbs(&result[0..8]),
+                    Fq::from_u32_limbs(&result[8..16]),
+                    Fq::from_u32_limbs(&result[16..24]),
+                );
+                let cpu_result = infinity + p;
+                prop_assert_eq!(gpu_result, cpu_result);
             }
         }
 
@@ -398,8 +416,13 @@ mod tests {
         fn infinity_plus_infinity_should_equal_infinity() {
             let infinity = G::zero();
             let result = execute_kernel("bn254_add", &infinity, &infinity);
-            let cpu_result: Vec<u32> = point_to_u32_limbs(&(infinity + infinity));
-            assert_eq!(result, cpu_result);
+            let gpu_result = G::new(
+                Fq::from_u32_limbs(&result[0..8]),
+                Fq::from_u32_limbs(&result[8..16]),
+                Fq::from_u32_limbs(&result[16..24]),
+            );
+            let cpu_result = infinity + infinity;
+            assert_eq!(gpu_result, cpu_result);
         }
     }
 }
