@@ -48,7 +48,7 @@ const config: Config = {
       style: 'dark',
       logo: {
         alt: 'Mopro Logo',
-        src: 'img/logo_title.svg',
+        src: '/img/logo_title.svg',
         width: '325',
         height: '80',
       },
