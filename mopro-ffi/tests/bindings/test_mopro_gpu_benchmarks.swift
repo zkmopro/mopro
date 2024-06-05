@@ -32,9 +32,9 @@ do {
 // test with metal_msm
 do {
     let result = try metalMsm(
-        instanceSize: 10, 
+        instanceSize: 16, 
         numInstance: 10, 
-        utilsDir: "../../../mopro-core/src/middleware/gpu_explorations/utils/vectors/10x10"
+        utilsDir: "../../../mopro-core/src/middleware/gpu_explorations/utils/vectors/16x10"
     );
     print("Benchmark result: \(result)");
 } catch let error as MoproError{

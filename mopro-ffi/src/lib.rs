@@ -472,9 +472,9 @@ mod tests {
     #[test]
     #[cfg(feature = "gpu-benchmarks")]
     fn test_metal_msm() -> Result<(), MoproError> {
-        let instance_size = 10;
+        let instance_size = 16;
         let num_instance = 10;
-        let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils/vectors/10x10";
+        let utils_dir = "../mopro-core/src/middleware/gpu_explorations/utils/vectors/16x10";
         let result = metal_msm(instance_size, num_instance, utils_dir);
         println!("Benchmark result: {:#?}", result);
         Ok(())
