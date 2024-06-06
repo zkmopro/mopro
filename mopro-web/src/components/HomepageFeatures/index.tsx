@@ -26,8 +26,17 @@ const FeatureList: FeatureItem[] = [
     ),
   },
   {
-    title: 'Security',
+    title: 'Scalability',
     Svg: require('@site/static/img/blue_angle.svg').default,
+    description: (
+      <>
+        Designed to scale with your needs, mopro supports a wide range of proving systems, facilitating the development of versatile, high-performance applications.
+      </>
+    ),
+  },
+  {
+    title: 'Security',
+    Svg: require('@site/static/img/gold_leaf.svg').default,
     description: (
       <>
         Users can generate claims securely on their devices, ensuring data privacy and integrity.
@@ -43,24 +52,17 @@ const FeatureList: FeatureItem[] = [
       </>
     ),
   },
-  {
-    title: 'Scalability',
-    Svg: require('@site/static/img/gold_leaf.svg').default,
-    description: (
-      <>
-        Designed to scale with your needs, mopro supports a wide range of proving systems, facilitating the development of versatile, high-performance applications.
-      </>
-    ),
-  },
 ];
 
 function Feature({ title, Svg, description }: FeatureItem) {
   return (
     <div className={styles.feature}>
-      <Svg className={styles.featureSvg} role="img" />
+      <div className={styles.featureSvg}>
+        <Svg role="img" />
+      </div> 
       <div className=''>
         <div className={styles.featureHeading}>{title}</div>
-        <p>{description}</p>
+        <p className={styles.featureText}>{description}</p>
       </div>
     </div>
   );
@@ -68,16 +70,13 @@ function Feature({ title, Svg, description }: FeatureItem) {
 
 export default function HomepageFeatures(): JSX.Element {
   return (
-    <div>
+    <section>
+      <div className={styles.heading}>Developer Capabilities</div>
       <div className={styles.featuresContainer}>
         {FeatureList.map((props, idx) => (
           <Feature key={idx} {...props} />
         ))}
       </div>
-
-      <div className={styles.separator}>
-        <img src='img/separator.svg' alt='separating line'/>
-      </div>
-    </div>
+    </section>
   );
 }

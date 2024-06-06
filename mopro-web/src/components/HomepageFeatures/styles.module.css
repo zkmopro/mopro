@@ -1,9 +1,15 @@
+.heading {
+  font-size: 5.5rem;
+  line-height: 5.6rem;
+  font-weight: 600;
+  width: 75%;
+}
+
 .featuresContainer {
   display: flex;
   flex-wrap: wrap;
-  gap: 10%;
-  background-color: #000;
-  padding: 10% 18% 0%
+  gap: 4rem;
+  padding-top: 5rem;
  }
 
  .feature {
@@ -12,14 +18,8 @@
   width: 45%;
  }
 
-.separator {
-  display: flex;
-  justify-content: center;
-  padding: 8% 0;
-  background-color: #000;
-}
-
 .featureSvg {
+  /* width: 20%; */
   height: 8rem;
   width: 7.2rem;
 }
@@ -27,4 +27,43 @@
 .featureHeading {
   font-size: 2.5rem;
   font-weight: 600;
+  line-height: 2.6rem;
+}
+
+@media screen and (max-width: 996px) {
+  .feature {
+    width: 100%;
+  }
+
+  .heading {
+    font-size: 3.3rem;
+    line-height: 3.4rem;
+    font-weight: 500;
+    width: 100%;
+  }
+
+  .featuresContainer {
+    gap: 1rem;
+    padding-top: 3rem;
+  }
+
+  .feature {
+    width: 100%;
+   }
+  
+  .featureSvg {
+    /* width: 15%; */
+    width: 4rem;
+    height: 3rem;
+  }
+  
+  .featureHeading {
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 2.1rem;
+  }
+
+  .featureText {
+    font-size: .9rem;
+  }
 }
