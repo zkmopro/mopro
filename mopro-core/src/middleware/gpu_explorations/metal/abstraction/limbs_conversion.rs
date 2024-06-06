@@ -1,4 +1,4 @@
-use ark_bn254::{Fq, FqConfig};
+use ark_bn254::Fq;
 use ark_ff::biginteger::{BigInteger, BigInteger256};
 
 use crate::middleware::gpu_explorations::metal::abstraction::mont_reduction;

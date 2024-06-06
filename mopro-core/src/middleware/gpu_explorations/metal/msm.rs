@@ -1,13 +1,9 @@
 use ark_bn254::{Fq, Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
-use ark_ec::{AffineRepr, CurveGroup, Group, VariableBaseMSM};
-use ark_ff::{
-    biginteger::{BigInteger, BigInteger256},
-    PrimeField, UniformRand,
-};
+use ark_ec::{AffineRepr, Group, VariableBaseMSM};
+use ark_ff::PrimeField;
 use ark_std::{cfg_into_iter, vec::Vec, One, Zero};
 
 // For benchmarking
-use ark_serialize::CanonicalDeserialize;
 use std::time::{Duration, Instant};
 
 use crate::middleware::gpu_explorations::metal::abstraction::{
@@ -336,7 +332,7 @@ mod tests {
             "metal_msm"
         );
         let mut output_file = File::create(output_path).expect("output file creation failed");
-        writeln!(output_file, "msm_size,num_msm,avg_processing_time(ms)");
+        writeln!(output_file, "msm_size,num_msm,avg_processing_time(ms)").unwrap();
 
         let instance_size = vec![8, 12, 16, 18, 20, 22];
         let num_instance = vec![10];
@@ -355,7 +351,8 @@ mod tests {
                     output_file,
                     "{},{},{}",
                     result.instance_size, result.num_instance, result.avg_processing_time
-                );
+                )
+                .unwrap();
             }
         }
     }

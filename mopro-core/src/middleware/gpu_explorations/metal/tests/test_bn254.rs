@@ -6,10 +6,7 @@ mod tests {
     };
 
     use ark_bn254::{Fq, G1Projective as G};
-    use ark_ff::{
-        biginteger::{BigInteger, BigInteger256},
-        BigInt, Field, PrimeField,
-    };
+    use ark_ff::{BigInt, Field};
     use ark_std::Zero;
 
     use metal::MTLSize;
@@ -342,7 +339,7 @@ mod tests {
         }
 
         prop_compose! {
-            fn rand_point()(n in any::<u8>()) -> G {
+            fn rand_point()(_n in any::<u8>()) -> G {
                 let rng = &mut thread_rng();
                 G::rand(rng)
             }

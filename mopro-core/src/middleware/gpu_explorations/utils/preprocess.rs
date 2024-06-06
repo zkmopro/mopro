@@ -1,10 +1,7 @@
-use ark_bn254::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
-use ark_ff::{Field, PrimeField};
+use ark_bn254::{Fr as ScalarField, G1Affine as GAffine};
+use ark_ff::PrimeField;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize, SerializationError};
-use ark_std::{
-    rand::{Rng, RngCore},
-    UniformRand,
-};
+use ark_std::{rand::RngCore, UniformRand};
 use std::collections::VecDeque;
 use std::fs::File;
 use thiserror::Error;
