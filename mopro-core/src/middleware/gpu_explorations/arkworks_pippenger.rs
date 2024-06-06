@@ -23,20 +23,6 @@ where
             .iter()
             .map(|s| ScalarField::new(*s))
             .collect::<Vec<ScalarField>>();
-
-        /* for bls12_377 curve, parse points and scalars from arkworks 0.3 compatible format to 0.4 compatible
-        for p in points {
-            let new_p =
-                G1Affine::new_unchecked(BigInt::new(p.x.0 .0).into(), BigInt::new(p.y.0 .0).into());
-            parsed_points.push(new_p);
-        }
-
-        for s in scalars {
-            let new_s = ScalarField::new(BigInt::new(s.0));
-            parsed_scalars.push(new_s);
-        }
-        */
-
         let mut instance_total_duration = Duration::ZERO;
         for _i in 0..iterations {
             let start = Instant::now();
