@@ -122,7 +122,7 @@ pub fn generate_proof2(
     inputs: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
     Err(MoproError::CircomError(
-        "Project is compiled for Halo2 proving system. Use `generate_halo2_proof2` instead."
+        "Project is compiled for Halo2 proving system. Use `generate_halo2_proof` instead."
             .to_string(),
     ))
 }
@@ -138,7 +138,7 @@ pub fn verify_proof2(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, Mopr
 #[cfg(feature = "halo2")]
 pub fn verify_proof2(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
     Err(MoproError::CircomError(
-        "Project is compiled for Halo2 proving system. Use `verify_halo2_proof2` instead."
+        "Project is compiled for Halo2 proving system. Use `verify_halo2_proof` instead."
             .to_string(),
     ))
 }
