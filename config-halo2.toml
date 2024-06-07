@@ -11,7 +11,7 @@ android_device_type = "arm64" # Options: x86_64, x86, arm, arm64
 build_mode = "release" # Options: debug, release
 
 [circuit]
-kind = "halo2"                    # Proving system options: circom (default), halo2
+adapter = "halo2"                    # Proving system options: circom (default), halo2
 dir = "mopro-core/examples/halo2/halo2-fibonacci" # Directory of the circuit
 name = "fibonacci"                # Name of the circuit
 
