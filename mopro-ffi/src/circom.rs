@@ -318,6 +318,7 @@ pub fn trapdoortech_zprize_msm(
 }
 
 #[test]
+#[cfg(not(feature = "halo2"))]
 mod tests {
     use std::collections::HashMap;
     use std::str::FromStr;
