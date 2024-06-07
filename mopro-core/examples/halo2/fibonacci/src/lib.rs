@@ -1,6 +1,5 @@
 mod fibonacci;
 mod io;
-mod multiply2;
 
 pub use fibonacci::*;
 use halo2_proofs::halo2curves::bn256::{Bn256, Fr as Fp, Fr, G1Affine};
