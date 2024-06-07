@@ -22,7 +22,7 @@ halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", 
 ], optional = true }
 
 # Temporary dependency on a example Halo2 circuit
-halo2-circuit = { path = "examples/halo2/halo2-fibonacci", optional = true }
+halo2-circuit = { path = "examples/halo2/fibonacci", optional = true }
 ### Halo2 dependencies end
 
 
