@@ -1,10 +1,10 @@
 ### Halo2 configuration
 
-We currently support Halo2 circuits in an experimental stage. To use Halo2, you need to set the `kind` to `halo2` in the `mopro-config.toml` file.
+We currently support Halo2 circuits in an experimental stage. To use Halo2, you need to set the `adapter` to `halo2` in the `mopro-config.toml` file.
 
 ```toml
 [circuit]
-kind = "halo2" # Options: circom, halo2
+adapter = "halo2" # Options: circom, halo2
 dir = "mopro-core/examples/halo2/halo2-fibonacci" # Directory of the circuit
 name = "fibonacci"                # Name of the circuit
 ```

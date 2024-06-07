@@ -11,7 +11,7 @@ android_device_type = "x86_64" # Options: x86_64, x86, arm, arm64
 build_mode = "release" # Options: debug, release
 
 [circuit]
-kind = "circom"                              # Proving system options: circom (default), halo2
+adapter = "circom"                              # Proving system options: circom (default), halo2
 dir = "mopro-core/examples/circom/keccak256" # Directory of the circuit
 name = "keccak256_256_test"                  # Name of the circuit
 

@@ -11,7 +11,7 @@ android_device_type = "arm64"# Options: x86_64, x86, arm, arm64
 build_mode = "release" # Options: debug, release
 
 [circuit]
-kind = "circom"                                    # Proving system options: circom (default), halo2
+adapter = "circom"                                    # Proving system options: circom (default), halo2
 dir = "mopro-core/examples/circom/complex-circuit" # Directory of the circuit
 name = "complex-circuit-1000k-1000k"               # Name of the circuit
 
