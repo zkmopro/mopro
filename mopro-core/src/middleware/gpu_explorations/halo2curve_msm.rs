@@ -52,8 +52,9 @@ where
         let instance_avg_duration = instance_total_duration / iterations;
 
         println!(
-            "Average time to execute MSM with {} points and scalars in {} iterations is: {:?}",
+            "Average time to execute MSM with {} points and {} scalars in {} iterations is: {:?}",
             points.len(),
+            scalars.len(),
             iterations,
             instance_avg_duration,
         );

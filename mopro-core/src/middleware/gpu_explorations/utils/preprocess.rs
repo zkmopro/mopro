@@ -89,7 +89,7 @@ impl Iterator for FileInputIterator {
             Err(_) => None,
         }?;
 
-        let scalars = Vec::<Scalar>::deserialize_compressed(&self.scalars_file);
+        let scalars = Vec::<Scalar>::deserialize_compressed_unchecked(&self.scalars_file);
         let scalars = match scalars {
             Ok(x) => Some(x),
             Err(_) => None,
