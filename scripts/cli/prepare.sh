@@ -61,7 +61,7 @@ read_configuration() {
     BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
     USE_DYLIB=$(read_toml "$CONFIG_FILE" "dylib.use_dylib")
     DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")
-    CIRCUIT_TYPE=$(read_toml "$CONFIG_FILE" "circuit.kind")
+    CIRCUIT_TYPE=$(read_toml "$CONFIG_FILE" "circuit.adapter")
     CIRCUIT_DIR=$(read_toml "$CONFIG_FILE" "circuit.dir")
     CIRCUIT_NAME=$(read_toml "$CONFIG_FILE" "circuit.name")
     CIRCUIT_PTAU=$(read_toml "$CONFIG_FILE" "circuit.ptau")
