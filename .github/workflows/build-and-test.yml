@@ -1,6 +1,14 @@
 name: Build and Test
 
-on: [push, pull_request]
+
+on:
+  push:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 env:
     CARGO_TERM_COLOR: always
