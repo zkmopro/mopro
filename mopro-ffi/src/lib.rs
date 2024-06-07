@@ -1,5 +1,9 @@
-mod halo2;
+pub use circom::*;
+pub use halo2::*;
+use mopro_core::MoproError;
+
 mod circom;
+mod halo2;
 
 #[derive(Debug)]
 pub enum FFIError {
@@ -18,11 +22,6 @@ impl From<MoproError> for FFIError {
         FFIError::MoproError(error)
     }
 }
-
-pub use circom::*;
-pub use halo2::*;
-use mopro_core::MoproError;
-
 
 fn add(a: u32, b: u32) -> u32 {
     a + b
@@ -43,16 +42,11 @@ uniffi::include_scaffolding!("mopro");
 
 #[cfg(test)]
 mod tests {
-    use core::num;
-
     use super::*;
-    use ark_bn254::Fr;
-    use num_bigint::BigUint;
 
     #[test]
     fn add_works() {
         let result = add(2, 2);
         assert_eq!(result, 4);
     }
-
 }

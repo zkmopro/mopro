@@ -6,10 +6,9 @@ use halo2_proofs::plonk::{keygen_pk, keygen_vk};
 use halo2_proofs::poly::commitment::ParamsProver;
 use halo2_proofs::poly::kzg::commitment::ParamsKZG;
 
-use halo2_circuit::{FinbonaciCircuit, write_keys, write_srs};
+use halo2_circuit::{write_keys, write_srs, FinbonaciCircuit};
 
 pub fn main() {
-
     // Get the project's root directory from the `CARGO_MANIFEST_DIR` environment variable
     let project_root = env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not set");
 
@@ -21,11 +20,9 @@ pub fn main() {
         std::fs::create_dir(&out_dir).expect("Unable to create out directory");
     }
 
-
     // Set up the circuit
     let k = 4;
     let circuit = FinbonaciCircuit::<Fr>::default();
-
 
     // Generate SRS
     let srs = ParamsKZG::<Bn256>::new(k);
@@ -33,11 +30,9 @@ pub fn main() {
     let srs_path = out_dir.join("fib_srs");
     write_srs(&srs, srs_path.as_path());
 
-
-   // Generate the proving key - should be loaded from disk in production
+    // Generate the proving key - should be loaded from disk in production
     let vk = keygen_vk(&srs, &circuit).expect("keygen_vk should not fail");
     let vk_path = out_dir.join("fib_vk");
-
 
     let pk = keygen_pk(&srs, vk, &circuit).expect("keygen_pk should not fail");
     let pk_path = out_dir.join("fib_pk");

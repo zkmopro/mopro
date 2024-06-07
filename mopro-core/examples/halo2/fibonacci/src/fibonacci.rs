@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
-use halo2_proofs::{circuit::*, plonk::*, poly::Rotation};
 use halo2_proofs::arithmetic::Field;
+use halo2_proofs::{circuit::*, plonk::*, poly::Rotation};
 
 #[derive(Debug, Clone)]
 
