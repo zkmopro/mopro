@@ -53,7 +53,7 @@ static VK: Lazy<VerifyingKey<G1Affine>> = Lazy::new(|| {
         .expect("Unable to read VK from file")
 });
 
-pub fn generate_halo2_proof2(
+pub fn generate_halo2_proof(
     inputs: CircuitInputs,
 ) -> color_eyre::Result<(SerializableProof, SerializablePublicInputs), MoproError> {
     let start = Instant::now();
@@ -70,7 +70,7 @@ pub fn generate_halo2_proof2(
     ))
 }
 
-pub fn verify_halo2_proof2(
+pub fn verify_halo2_proof(
     serialized_proof: SerializableProof,
     serialized_inputs: SerializablePublicInputs,
 ) -> color_eyre::Result<bool, MoproError> {
@@ -92,21 +92,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_generate_halo2_proof2() {
+    fn test_generate_halo2_proof() {
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec![Fp::from(55)]);
 
-        let (proof, inputs) = generate_halo2_proof2(input).unwrap();
+        let (proof, inputs) = generate_halo2_proof(input).unwrap();
         assert_eq!(inputs.0[2], Fp::from(55));
     }
 
     #[test]
-    fn test_verify_halo2_proof2() {
+    fn test_verify_halo2_proof() {
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec![Fp::from(55)]);
 
-        let (proof, inputs) = generate_halo2_proof2(input).unwrap();
-        let verified = verify_halo2_proof2(proof, inputs).unwrap();
+        let (proof, inputs) = generate_halo2_proof(input).unwrap();
+        let verified = verify_halo2_proof(proof, inputs).unwrap();
         assert!(verified);
     }
 
@@ -115,8 +115,8 @@ mod tests {
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec![Fp::from(56)]);
 
-        let (proof, inputs) = generate_halo2_proof2(input).unwrap();
-        let verified = verify_halo2_proof2(proof, inputs).unwrap();
+        let (proof, inputs) = generate_halo2_proof(input).unwrap();
+        let verified = verify_halo2_proof(proof, inputs).unwrap();
         assert!(!verified);
     }
 }
