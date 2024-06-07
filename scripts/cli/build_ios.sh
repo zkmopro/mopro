@@ -28,7 +28,7 @@ read_configuration() {
     export BUILD_CONFIG_PATH="$PROJECT_DIR/$CONFIG_FILE"
     print_action "Using build configuration file: $BUILD_CONFIG_PATH"
 
-    CIRCUIT_TYPE=$(read_toml "$CONFIG_FILE" "circuit.kind")
+    CIRCUIT_TYPE=$(read_toml "$CONFIG_FILE" "circuit.adapter")
 
     DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.ios_device_type")
     BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
