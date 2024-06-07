@@ -6,9 +6,9 @@ use halo2_proofs::plonk::{keygen_pk, keygen_vk};
 use halo2_proofs::poly::commitment::ParamsProver;
 use halo2_proofs::poly::kzg::commitment::ParamsKZG;
 
-use halo2_examples::{FinbonaciCircuit, write_keys, write_srs};
+use halo2_circuit::{FinbonaciCircuit, write_keys, write_srs};
 
-fn main() {
+pub fn main() {
 
     // Get the project's root directory from the `CARGO_MANIFEST_DIR` environment variable
     let project_root = env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not set");
