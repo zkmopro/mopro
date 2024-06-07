@@ -88,7 +88,7 @@ extension Halo2CircuitView {
                 let start = CFAbsoluteTimeGetCurrent()
 
                 // Generate Proof
-                let generateProofResult = try generateHalo2Proof2(circuitInputs: inputs)
+                let generateProofResult = try generateHalo2Proof(circuitInputs: inputs)
                 assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
                 assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
 
@@ -120,7 +120,7 @@ extension Halo2CircuitView {
             do {
                 let start = CFAbsoluteTimeGetCurrent()
 
-                let isValid = try verifyHalo2Proof2(proof: proof, publicInput: inputs)
+                let isValid = try verifyHalo2Proof(proof: proof, publicInput: inputs)
                 let end = CFAbsoluteTimeGetCurrent()
                 let timeTaken = end - start
 
