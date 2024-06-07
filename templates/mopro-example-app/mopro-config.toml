@@ -12,7 +12,7 @@ build_mode = "release" # Options: debug, release
 
 [circuit]
 # multiplier2
-kind = "circom"
+adapter = "circom"
 dir = "core/circuits/multiplier2"
 name = "multiplier2"
 ptau = "02"                       # ptau to use for trusted setup of circuit, "01" to "27"
@@ -23,7 +23,7 @@ ptau = "02"                       # ptau to use for trusted setup of circuit, "0
 #ptau = "19"
 
 # Halo2 Fibonacci
-#kind = "halo2"                         # Proving system options: circom (default), halo2
+#adapter = "halo2"                         # Proving system options: circom (default), halo2
 #dir = "core/circuits/halo2-fibonacci"  # Directory of the circuit
 #name = "fibonacci"                     # Name of the circuit
 #ptau = 4
