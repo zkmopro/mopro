@@ -3,11 +3,11 @@ use color_eyre::eyre::Result;
 use enumset::enum_set;
 use enumset::EnumSet;
 use serde::Deserialize;
+use std::fs::File;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::{env, fs};
-use std::fs::File;
-use std::io::Write;
 use toml;
 use toml::Value;
 use wasmer::{Cranelift, Dylib, Module, Store, Target, Triple};
@@ -281,8 +281,6 @@ fn update_halo2_cargo_config(circuit_dir_path: &PathBuf) {
 
     create_new_config(&config_path, circuit_dir_path);
 
-
-
     fn get_base_dir() -> String {
         let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
         if pkg_name == "mopro-core" {
@@ -295,14 +293,17 @@ fn update_halo2_cargo_config(circuit_dir_path: &PathBuf) {
     fn validate_halo2_project(circuit_dir_path: &PathBuf) {
         let cargo_toml_path = circuit_dir_path.join("Cargo.toml");
         if !cargo_toml_path.exists() {
-            panic!("The specified circuit path does not contain a Cargo.toml file: {}", circuit_dir_path.display());
+            panic!(
+                "The specified circuit path does not contain a Cargo.toml file: {}",
+                circuit_dir_path.display()
+            );
         }
 
         let cargo_toml_content = fs::read_to_string(&cargo_toml_path)
             .expect("Unable to read Cargo.toml file in the circuit directory");
 
-        let cargo_toml: Value = toml::from_str(&cargo_toml_content)
-            .expect("Invalid TOML format in Cargo.toml");
+        let cargo_toml: Value =
+            toml::from_str(&cargo_toml_content).expect("Invalid TOML format in Cargo.toml");
 
         // Check if the [package] section exists and contains the correct name
         if let Some(package) = cargo_toml.get("package") {
@@ -321,7 +322,10 @@ fn update_halo2_cargo_config(circuit_dir_path: &PathBuf) {
     fn ensure_cargo_directory_exists(config_path: &Path) {
         if let Some(parent) = config_path.parent() {
             if !parent.exists() {
-                fs::create_dir_all(parent).expect(&format!("Failed to create .cargo directory in {}", parent.display()));
+                fs::create_dir_all(parent).expect(&format!(
+                    "Failed to create .cargo directory in {}",
+                    parent.display()
+                ));
             }
         }
     }
@@ -331,12 +335,12 @@ fn update_halo2_cargo_config(circuit_dir_path: &PathBuf) {
         let paths_line = format!("paths = [\"{}\"]\n", circuit_path_str);
 
         let mut file = File::create(config_path).expect("Unable to create .cargo/config.toml");
-        file.write_all(paths_line.as_bytes()).expect("Unable to write data to .cargo/config.toml");
+        file.write_all(paths_line.as_bytes())
+            .expect("Unable to write data to .cargo/config.toml");
 
         println!("cargo:warning=.cargo/config.toml has been replaced with a new version.");
     }
 }
-
 
 fn main() -> color_eyre::eyre::Result<()> {
     println!("cargo:rerun-if-env-changed=BUILD_CONFIG_PATH");
@@ -358,7 +362,6 @@ fn main() -> color_eyre::eyre::Result<()> {
         build_halo2_circuit(&circuit_dir_path)?;
 
         update_halo2_cargo_config(&circuit_dir_path);
-
     } else {
         // Otherwise, we default to Circom circuit
         println!("cargo:warning=Building Circom circuit...");
