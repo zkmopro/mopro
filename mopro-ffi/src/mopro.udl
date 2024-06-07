@@ -14,7 +14,7 @@ namespace mopro {
   [Throws=MoproError]
   boolean verify_proof2(bytes proof, bytes public_input);
 
-[Throws=MoproError]
+  [Throws=MoproError]
   GenerateProofResult generate_halo2_proof2(record<string, sequence<string>> circuit_inputs);
 
   [Throws=MoproError]
