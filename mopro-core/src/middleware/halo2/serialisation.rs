@@ -3,24 +3,29 @@ use std::fmt;
 use std::str::FromStr;
 
 use halo2_proofs::halo2curves::ff::PrimeField;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::{SeqAccess, Visitor};
 use serde::ser::SerializeSeq;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::middleware::halo2::{Fp, SerializablePublicInputs};
 
-pub fn deserialize_circuit_inputs(ser_inputs: HashMap<String, Vec<String>>) -> HashMap<String, Vec<Fp>> {
-
-    ser_inputs.iter().map(
-        |(k, v)| {
-            let fp_vec: Vec<Fp> = v.iter().map(|s| {
-                // TODO - support big integers full range, not just u128
-                let int = u128::from_str(s).unwrap();
-                Fp::from_u128(int)
-            }).collect();
+pub fn deserialize_circuit_inputs(
+    ser_inputs: HashMap<String, Vec<String>>,
+) -> HashMap<String, Vec<Fp>> {
+    ser_inputs
+        .iter()
+        .map(|(k, v)| {
+            let fp_vec: Vec<Fp> = v
+                .iter()
+                .map(|s| {
+                    // TODO - support big integers full range, not just u128
+                    let int = u128::from_str(s).unwrap();
+                    Fp::from_u128(int)
+                })
+                .collect();
             (k.clone(), fp_vec)
-        }
-    ).collect()
+        })
+        .collect()
 }
 
 impl Serialize for SerializablePublicInputs {

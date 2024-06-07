@@ -3,7 +3,6 @@
 use std::collections::HashMap;
 #[cfg(feature = "dylib")]
 use std::path::Path;
-
 #[cfg(not(feature = "halo2"))]
 use std::str::FromStr;
 #[cfg(not(feature = "halo2"))]
@@ -32,14 +31,12 @@ pub struct G2 {
     pub y: Vec<String>,
 }
 
-
 #[derive(Debug, Clone, Default)]
 pub struct ProofCalldata {
     pub a: G1,
     pub b: G2,
     pub c: G1,
 }
-
 
 // NOTE: Need to hardcode the types here, otherwise UniFFI will complain if the gpu-benchmarks feature is not enabled
 #[derive(Debug, Clone)]
@@ -69,7 +66,8 @@ pub fn initialize_mopro() -> Result<(), MoproError> {
 
 #[cfg(feature = "halo2")]
 pub fn initialize_mopro() -> Result<(), MoproError> {
-    panic!("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.") // TODO - replace with an error
+    panic!("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.")
+    // TODO - replace with an error
 }
 
 #[cfg(feature = "dylib")]
@@ -123,7 +121,10 @@ pub fn generate_proof2(
 pub fn generate_proof2(
     inputs: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
-    Err(MoproError::CircomError("Project is compiled for Halo2 proving system. Use `generate_halo2_proof2` instead.".to_string()))
+    Err(MoproError::CircomError(
+        "Project is compiled for Halo2 proving system. Use `generate_halo2_proof2` instead."
+            .to_string(),
+    ))
 }
 
 #[cfg(not(feature = "halo2"))]
@@ -136,7 +137,10 @@ pub fn verify_proof2(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, Mopr
 
 #[cfg(feature = "halo2")]
 pub fn verify_proof2(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
-    Err(MoproError::CircomError("Project is compiled for Halo2 proving system. Use `verify_halo2_proof2` instead.".to_string()))
+    Err(MoproError::CircomError(
+        "Project is compiled for Halo2 proving system. Use `verify_halo2_proof2` instead."
+            .to_string(),
+    ))
 }
 
 #[cfg(not(feature = "halo2"))]
@@ -161,7 +165,8 @@ pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
 
 #[cfg(feature = "halo2")]
 pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
-    panic!("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.") // TODO - replace with an error
+    panic!("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.")
+    // TODO - replace with an error
 }
 
 #[cfg(not(feature = "halo2"))]
@@ -177,7 +182,8 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
 
 #[cfg(feature = "halo2")]
 pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
-    panic!("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.") // TODO - replace with an error
+    panic!("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.")
+    // TODO - replace with an error
 }
 
 // TODO: Use FFIError::SerializationError instead
@@ -230,7 +236,7 @@ impl MoproCircom {
             inputs: circom::serialization::serialize_inputs(&inputs),
         })
     }
-    
+
     #[cfg(feature = "halo2")]
     pub fn generate_proof(
         &self,
@@ -247,7 +253,7 @@ impl MoproCircom {
         let is_valid = state_guard.verify_proof(deserialized_proof, deserialized_public_input)?;
         Ok(is_valid)
     }
-    
+
     #[cfg(feature = "halo2")]
     pub fn verify_proof(&self, proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
         Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
@@ -322,9 +328,8 @@ mod tests {
     use mopro_core::middleware::circom;
     use mopro_core::MoproError;
 
-    use crate::circom::{MoproCircom, to_ethereum_inputs, to_ethereum_proof};
+    use crate::circom::{to_ethereum_inputs, to_ethereum_proof, MoproCircom};
 
-    #[cfg(not(feature = "halo2"))]
     fn bytes_to_circuit_inputs(input_vec: &Vec<u8>) -> HashMap<String, Vec<String>> {
         let bits = circom::utils::bytes_to_bits(&input_vec);
         let converted_vec: Vec<String> = bits
@@ -336,15 +341,12 @@ mod tests {
         inputs
     }
 
-    #[cfg(not(feature = "halo2"))]
     fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<u8> {
         let bits = circom::utils::bytes_to_bits(bytes);
         let field_bits = bits.into_iter().map(|bit| Fr::from(bit as u8)).collect();
         let circom_outputs = circom::serialization::SerializableInputs(field_bits);
         circom::serialization::serialize_inputs(&circom_outputs)
     }
-
-
 
     #[test]
     fn test_end_to_end() -> Result<(), MoproError> {
