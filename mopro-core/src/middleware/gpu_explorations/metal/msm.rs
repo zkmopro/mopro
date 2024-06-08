@@ -55,20 +55,6 @@ pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, Metal
         })
         .flatten()
         .collect::<Vec<u32>>();
-    let buckets_matrix_limbs = {
-        // buckets_size * num_windows is for parallelism on windows (variable-based MSM)
-        let matrix = vec![zero; buckets_size * window_starts.len()];
-        cfg_into_iter!(matrix)
-            .map(|b| {
-                b.x.to_u32_limbs()
-                    .into_iter()
-                    .chain(b.y.to_u32_limbs())
-                    .chain(b.z.to_u32_limbs())
-                    .collect::<Vec<_>>()
-            })
-            .flatten()
-            .collect::<Vec<u32>>()
-    };
 
     // store params to GPU shared memory
     let state = MetalState::new(None).unwrap();
@@ -76,7 +62,8 @@ pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, Metal
     let instances_size_buffer = state.alloc_buffer_data(&[instances_size as u32]);
     let scalar_buffer = state.alloc_buffer_data(&scalars_limbs);
     let base_buffer = state.alloc_buffer_data(&bases_limbs);
-    let buckets_matrix_buffer = state.alloc_buffer_data(&buckets_matrix_limbs);
+    let buckets_matrix_buffer =
+        state.alloc_buffer::<u32>(buckets_size * window_starts.len() * 8 * 3);
     // convert window_starts to u32 to give the exact storage need for GPU
     let window_starts_buffer = state.alloc_buffer_data(
         &(window_starts
@@ -244,7 +231,7 @@ mod tests {
     use std::fs::File;
 
     const INSTANCE_SIZE: u32 = 16;
-    const NUM_INSTANCE: u32 = 10;
+    const NUM_INSTANCE: u32 = 1;
     const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils/vectors";
     const BENCHMARKSPATH: &str = "mopro-core/gpu_explorations/benchmarks";
 
