@@ -1,6 +1,16 @@
-use ark_bn254::{Fr as ScalarField, G1Projective as G};
-use ark_ec::VariableBaseMSM;
+// use ark_bn254::{Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
+use ark_ec::{AffineRepr, CurveGroup, VariableBaseMSM};
+use ark_ff::BigInt;
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use std::time::{Duration, Instant};
+
+use ff::Field;
+use group::prime::PrimeCurveAffine;
+use halo2curves::bn256::{Fr as Scalar, G1Affine as Point};
+use halo2curves::msm::{best_multiexp, multiexp_serial};
+use halo2curves::serde::SerdeObject;
+use rayon::current_thread_index;
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use crate::middleware::gpu_explorations::utils::{benchmark::BenchmarkResult, preprocess};
 
@@ -11,20 +21,31 @@ pub fn benchmark_msm<I>(
 where
     I: Iterator<Item = preprocess::Instance>,
 {
-    let mut instance_durations = Vec::new();
+    let mut instance_durations: Vec<Duration> = Vec::new();
 
     for instance in instances {
-        let points = &instance.0;
-        // map each scalar to a ScalarField
-        let scalars = &instance
-            .1
+        // parse the instance to halo2curve compatible format
+        let points: &Vec<Point> = &instance
+            .0
             .iter()
-            .map(|s| ScalarField::new(*s))
-            .collect::<Vec<ScalarField>>();
+            .map(|p| {
+                let mut bytes = Vec::new();
+                p.serialize_uncompressed(&mut bytes).unwrap();
+                Point::from_raw_bytes_unchecked(&bytes)
+            })
+            .collect();
+        let scalars: &Vec<Scalar> = &instance.1.iter().map(|s| Scalar::from(s.0)).collect();
+
         let mut instance_total_duration = Duration::ZERO;
         for _i in 0..iterations {
+            /* For single-core range */
+            // let mut acc = Point::identity().into();
+            // let start = Instant::now();
+            // let _result = multiexp_serial(&scalars[..], &points[..], &mut acc);
+
+            /* For multi-core range */
             let start = Instant::now();
-            let _result = <G as VariableBaseMSM>::msm(&points[..], &scalars[..]).unwrap();
+            let _result = best_multiexp(&scalars[..], &points[..]);
 
             instance_total_duration += start.elapsed();
         }
@@ -130,10 +151,10 @@ mod tests {
             "{}/{}/{}_benchmark.txt",
             preprocess::get_root_path(),
             &BENCHMARKSPATH,
-            "arkworks_pippenger"
+            "halo2curve_multicore_msm"
         );
         let mut output_file = File::create(output_path).expect("output file creation failed");
-        writeln!(output_file, "msm_size,num_msm,avg_processing_time(ms)").unwrap();
+        writeln!(output_file, "msm_size,num_msm,avg_processing_time(ms)");
 
         let instance_size = vec![8, 12, 16, 18, 20, 22];
         let num_instance = vec![10];
@@ -152,8 +173,7 @@ mod tests {
                     output_file,
                     "{},{},{}",
                     result.instance_size, result.num_instance, result.avg_processing_time
-                )
-                .unwrap();
+                );
             }
         }
     }

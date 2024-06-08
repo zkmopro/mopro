@@ -18,11 +18,23 @@ do {
 }
 
 // test with trapdoor zprize msm
+// do {
+//     let result = try trapdoortechZprizeMsm(
+//         instanceSize: instanceSize, 
+//         numInstance: numInstance, 
+//         utilsDir: utilsDir
+//     );
+//     print("Benchmark result: \(result)");
+// } catch let error as MoproError{
+//     print("Error running benchmark: \(error)")
+// }
+
+// test with metal_msm
 do {
-    let result = try trapdoortechZprizeMsm(
-        instanceSize: instanceSize, 
-        numInstance: numInstance, 
-        utilsDir: utilsDir
+    let result = try metalMsm(
+        instanceSize: 16, 
+        numInstance: 10, 
+        utilsDir: "../../../mopro-core/src/middleware/gpu_explorations/utils/vectors/16x10"
     );
     print("Benchmark result: \(result)");
 } catch let error as MoproError{

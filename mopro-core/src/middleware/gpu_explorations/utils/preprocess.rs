@@ -1,7 +1,7 @@
-use ark_bls12_377_3;
-use ark_ff_3::{fields::Field, PrimeField};
-use ark_serialize_3::{CanonicalDeserialize, CanonicalSerialize, SerializationError};
-use ark_std::rand::{Rng, RngCore};
+use ark_bn254::{Fr as ScalarField, G1Affine as GAffine};
+use ark_ff::PrimeField;
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize, SerializationError};
+use ark_std::{rand::RngCore, UniformRand};
 use std::collections::VecDeque;
 use std::fs::File;
 use thiserror::Error;
@@ -30,13 +30,9 @@ pub struct FileInputIterator {
     cached: Option<Instance>,
 }
 
-pub type Point = ark_bls12_377_3::G1Affine;
-pub type Scalar = <ark_bls12_377_3::Fr as PrimeField>::BigInt;
+pub type Point = GAffine;
+pub type Scalar = <ScalarField as PrimeField>::BigInt;
 pub type Instance = (Vec<Point>, Vec<Scalar>);
-
-const INSTANCE_SIZE: u32 = 16;
-const NUM_INSTANCE: u32 = 10;
-const PATH: &str = "mopro-core/src/middleware/gpu_explorations/utils";
 
 impl FileInputIterator {
     pub fn open(dir: &str) -> Result<Self, HarnessError> {
@@ -80,9 +76,11 @@ impl Iterator for FileInputIterator {
         }
 
         let points = match self.mode {
-            FileInputIteratorMode::Checked => Vec::<Point>::deserialize(&self.points_file),
+            FileInputIteratorMode::Checked => {
+                Vec::<Point>::deserialize_compressed(&self.points_file)
+            }
             FileInputIteratorMode::Unchecked => {
-                Vec::<Point>::deserialize_unchecked(&self.points_file)
+                Vec::<Point>::deserialize_compressed_unchecked(&self.points_file)
             }
         };
 
@@ -91,7 +89,7 @@ impl Iterator for FileInputIterator {
             Err(_) => None,
         }?;
 
-        let scalars = Vec::<Scalar>::deserialize(&self.scalars_file);
+        let scalars = Vec::<Scalar>::deserialize_compressed_unchecked(&self.scalars_file);
         let scalars = match scalars {
             Ok(x) => Some(x),
             Err(_) => None,
@@ -137,22 +135,14 @@ impl From<(Vec<Vec<Point>>, Vec<Vec<Scalar>>)> for VectorInputIterator {
 fn gen_random_vectors<R: RngCore>(instance_size: u32, rng: &mut R) -> Instance {
     let mut points = Vec::<Point>::new();
     let mut scalars = Vec::<Scalar>::new();
-    let mut bytes = vec![0; 32]; // the size of scalar is at most 32 Bytes
-    let mut scalar;
 
     // Generate instances with each having instance_size points and scalars
     for _i in 0..instance_size {
-        loop {
-            rng.fill_bytes(&mut bytes[..]);
-            scalar = ark_bls12_377_3::Fr::from_random_bytes(&bytes);
-            if scalar.is_some() {
-                break;
-            }
-        }
-        scalars.push(scalar.unwrap().into_repr());
+        let scalar = ScalarField::rand(rng).into(); // the size of scalar is at most 32 Bytes
+        scalars.push(scalar);
 
-        let point: ark_bls12_377_3::G1Projective = rng.gen();
-        points.push(point.into());
+        let point = GAffine::rand(rng).into();
+        points.push(point);
     }
     (points, scalars)
 }
@@ -196,8 +186,8 @@ pub fn serialize_input(
         let file2 = File::create(scalars_path)?;
         (file1, file2)
     };
-    points.serialize_unchecked(&f1).unwrap();
-    scalars.serialize_unchecked(&f2).unwrap();
+    points.serialize_compressed(&f1).unwrap();
+    scalars.serialize_compressed(&f2).unwrap();
     Ok(())
 }
 
@@ -210,8 +200,8 @@ pub fn deserialize_input(dir: &str) -> Result<(Vec<Vec<Point>>, Vec<Vec<Scalar>>
     let f2 = File::open(scalars_path)?;
 
     loop {
-        let points = Vec::<Point>::deserialize_unchecked(&f1);
-        let scalars = Vec::<Scalar>::deserialize_unchecked(&f2);
+        let points = Vec::<Point>::deserialize_compressed_unchecked(&f1);
+        let scalars = Vec::<Scalar>::deserialize_compressed_unchecked(&f2);
 
         let points = match points {
             Ok(x) => x,
@@ -234,8 +224,24 @@ pub fn deserialize_input(dir: &str) -> Result<(Vec<Vec<Point>>, Vec<Vec<Scalar>>
     Ok((points_result, scalars_result))
 }
 
+pub fn get_root_path() -> String {
+    let current_dir = std::env::current_dir().unwrap();
+    let mut current_dir = current_dir;
+    loop {
+        if current_dir.ends_with("mopro") {
+            break;
+        }
+        current_dir = current_dir.parent().unwrap().to_path_buf();
+    }
+    current_dir.display().to_string()
+}
+
 mod tests {
     use super::*;
+
+    const INSTANCE_SIZE: u32 = 16;
+    const NUM_INSTANCE: u32 = 10;
+    const PATH: &str = "mopro-core/src/middleware/gpu_explorations/utils";
 
     #[test]
     fn test_gen_random_vector() {
@@ -245,12 +251,18 @@ mod tests {
 
         assert_eq!(points.len() as u32, instance_size);
         assert_eq!(scalars.len() as u32, instance_size);
-        // assert_eq!(scalars[0], NUM_INSTANCE);
+        assert_eq!(scalars[0].compressed_size(), 32); // scalar size is 32 Bytes
     }
 
     #[test]
     fn test_gen_vectors() {
-        let dir = format!("{}/vectors/{}x{}", PATH, INSTANCE_SIZE, NUM_INSTANCE);
+        let dir = format!(
+            "{}/{}/vectors/{}x{}",
+            get_root_path(),
+            PATH,
+            INSTANCE_SIZE,
+            NUM_INSTANCE
+        );
         gen_vectors(INSTANCE_SIZE, NUM_INSTANCE, &dir);
     }
 }

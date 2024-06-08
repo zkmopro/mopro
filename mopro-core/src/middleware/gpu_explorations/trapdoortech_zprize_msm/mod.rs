@@ -18,7 +18,7 @@ pub fn benchmark_msm<I>(
 where
     I: Iterator<Item = preprocess::Instance>,
 {
-    let mut result_vec = Vec::new();
+    let mut instance_durations = Vec::new();
 
     let mut ed_instances = vec![];
     for instance in instances {
@@ -40,7 +40,7 @@ where
         let points = &instance.0;
         let scalars = &instance.1;
 
-        let mut total_duration = Duration::ZERO;
+        let mut instance_total_duration = Duration::ZERO;
         for _i in 0..iterations {
             let start = Instant::now();
             let result = multi_scalar_mul(&points[..], &scalars[..]);
@@ -55,20 +55,20 @@ where
                 G1Affine::new(result.x, result.y, false)
             };
 
-            total_duration += start.elapsed();
+            instance_total_duration += start.elapsed();
         }
-        let avg_duration = total_duration / iterations;
+        let instance_avg_duration = instance_total_duration / iterations;
 
         println!(
             "Average time to execute MSM with {} points and {} scalars in {} iterations is: {:?}",
             points.len(),
             scalars.len(),
             iterations,
-            avg_duration
+            instance_avg_duration,
         );
-        result_vec.push(avg_duration);
+        instance_durations.push(instance_avg_duration);
     }
-    Ok(result_vec)
+    Ok(instance_durations)
 }
 
 pub fn run_benchmark(
