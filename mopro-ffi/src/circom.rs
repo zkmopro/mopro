@@ -343,7 +343,7 @@ pub fn metal_msm(
     })
 }
 
-#[test]
+#[cfg(test)]
 #[cfg(not(feature = "halo2"))]
 mod tests {
     use std::collections::HashMap;
