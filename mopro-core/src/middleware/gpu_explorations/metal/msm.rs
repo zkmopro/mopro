@@ -1,8 +1,7 @@
 use ark_bn254::{Fq, Fr as ScalarField, G1Affine as GAffine, G1Projective as G};
-use ark_ec::{AffineRepr, Group, VariableBaseMSM};
+use ark_ec::AffineRepr;
 use ark_ff::PrimeField;
-use ark_std::{cfg_into_iter, vec::Vec, One, Zero};
-
+use ark_std::{cfg_into_iter, vec::Vec};
 // For benchmarking
 use std::time::{Duration, Instant};
 
@@ -27,8 +26,6 @@ fn ln_without_floats(a: usize) -> usize {
 
 pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, MetalError> {
     let modulus_bit_size = ScalarField::MODULUS_BIT_SIZE as usize;
-    let zero = G::zero();
-    let one = ScalarField::one();
 
     let instances_size = ark_std::cmp::min(points.len(), scalars.len());
     let window_size = if instances_size < 32 {
@@ -62,8 +59,11 @@ pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, Metal
     let instances_size_buffer = state.alloc_buffer_data(&[instances_size as u32]);
     let scalar_buffer = state.alloc_buffer_data(&scalars_limbs);
     let base_buffer = state.alloc_buffer_data(&bases_limbs);
+    let num_windows_buffer = state.alloc_buffer_data(&[window_starts.len() as u32]);
     let buckets_matrix_buffer =
         state.alloc_buffer::<u32>(buckets_size * window_starts.len() * 8 * 3);
+    let res_buffer = state.alloc_buffer::<u32>(window_starts.len() * 8 * 3);
+    let result_buffer = state.alloc_buffer::<u32>(8 * 3);
     // convert window_starts to u32 to give the exact storage need for GPU
     let window_starts_buffer = state.alloc_buffer_data(
         &(window_starts
@@ -72,18 +72,15 @@ pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, Metal
             .collect::<Vec<u32>>()),
     );
 
-    // do msm accumulation in windows-wise fashion all in MSL
-    let calc_bucket_pipe = state.setup_pipeline("accumulation_in_window_wise").unwrap();
+    // Init the pipleline for MSM
+    let init_buckets = state.setup_pipeline("initialize_buckets").unwrap();
     autoreleasepool(|| {
         let (command_buffer, command_encoder) = state.setup_command(
-            &calc_bucket_pipe,
+            &init_buckets,
             Some(&[
                 (0, &window_size_buffer),
-                (1, &instances_size_buffer),
-                (2, &window_starts_buffer),
-                (3, &scalar_buffer),
-                (4, &base_buffer),
-                (5, &buckets_matrix_buffer),
+                (1, &window_starts_buffer),
+                (2, &buckets_matrix_buffer),
             ]),
         );
         command_encoder.dispatch_thread_groups(
@@ -95,61 +92,62 @@ pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, Metal
         command_buffer.wait_until_completed();
     });
 
+    // Accumulate and reduction
+    let accumulation_and_reduction = state
+        .setup_pipeline("accumulation_and_reduction_phase")
+        .unwrap();
+    autoreleasepool(|| {
+        let (command_buffer, command_encoder) = state.setup_command(
+            &accumulation_and_reduction,
+            Some(&[
+                (0, &window_size_buffer),
+                (1, &instances_size_buffer),
+                (2, &window_starts_buffer),
+                (3, &scalar_buffer),
+                (4, &base_buffer),
+                (5, &buckets_matrix_buffer),
+                (6, &res_buffer),
+            ]),
+        );
+        command_encoder.dispatch_thread_groups(
+            MTLSize::new(1, 1, 1),
+            MTLSize::new(window_starts.len() as u64, 1, 1),
+        );
+        command_encoder.end_encoding();
+        command_buffer.commit();
+        command_buffer.wait_until_completed();
+    });
+
+    // Sequentially accumulate the msm results on GPU
+    let final_accumulation = state.setup_pipeline("final_accumulation").unwrap();
+    autoreleasepool(|| {
+        let (command_buffer, command_encoder) = state.setup_command(
+            &final_accumulation,
+            Some(&[
+                (0, &window_size_buffer),
+                (1, &window_starts_buffer),
+                (2, &num_windows_buffer),
+                (3, &res_buffer),
+                (4, &result_buffer),
+            ]),
+        );
+        command_encoder.dispatch_thread_groups(MTLSize::new(1, 1, 1), MTLSize::new(1, 1, 1));
+        command_encoder.end_encoding();
+        command_buffer.commit();
+        command_buffer.wait_until_completed();
+    });
+
     // retrieve and parse the result from GPU
-    let buckets_matrix = {
-        let raw_limbs = MetalState::retrieve_contents::<u32>(&buckets_matrix_buffer);
-        cfg_into_iter!(raw_limbs)
-            .chunks(24)
-            .map(|chunk| {
-                G::new_unchecked(
-                    Fq::from_u32_limbs(&chunk[0..8]),
-                    Fq::from_u32_limbs(&chunk[8..16]),
-                    Fq::from_u32_limbs(&chunk[16..24]),
-                )
-            })
-            .collect::<Vec<_>>()
+    let msm_result = {
+        let raw_limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
+        G::new_unchecked(
+            Fq::from_u32_limbs(&raw_limbs[0..8]),
+            Fq::from_u32_limbs(&raw_limbs[8..16]),
+            Fq::from_u32_limbs(&raw_limbs[16..24]),
+        )
     };
 
-    // include the last windox idx
-    let bucket_starts: Vec<usize> = (0..buckets_matrix.len() + buckets_size)
-        .step_by(buckets_size)
-        .collect();
-    let window_sums: Vec<_> = cfg_into_iter!(window_starts.clone())
-        .enumerate()
-        .map(|(idx, w_start)| {
-            // only process unit scalars once in the first window.
-            let mut res = zero;
-            if w_start == 0 {
-                for i in 0..instances_size {
-                    if scalars[i] == one {
-                        res += points[i];
-                    }
-                }
-            }
-
-            let buckets = buckets_matrix[bucket_starts[idx]..bucket_starts[idx + 1]].to_vec();
-            let mut running_sum = zero;
-            buckets.into_iter().rev().for_each(|b| {
-                running_sum += &b;
-                res += &running_sum;
-            });
-            res
-        })
-        .collect();
-
-    let lowest = *window_sums.first().unwrap();
-
-    Ok(lowest
-        + &window_sums[1..]
-            .iter()
-            .rev()
-            .fold(zero, |mut total, sum_i| {
-                total += sum_i;
-                for _ in 0..window_size {
-                    total = total.double();
-                }
-                total
-            }))
+    Ok(msm_result)
 }
 
 pub fn benchmark_msm<I>(
@@ -227,11 +225,12 @@ pub fn run_benchmark(
 mod tests {
     use super::*;
 
+    use ark_ec::VariableBaseMSM;
     use ark_serialize::Write;
     use std::fs::File;
 
     const INSTANCE_SIZE: u32 = 16;
-    const NUM_INSTANCE: u32 = 1;
+    const NUM_INSTANCE: u32 = 10;
     const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils/vectors";
     const BENCHMARKSPATH: &str = "mopro-core/gpu_explorations/benchmarks";
 
