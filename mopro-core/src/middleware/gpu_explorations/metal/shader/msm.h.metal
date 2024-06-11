@@ -142,6 +142,54 @@ constant constexpr uint32_t NUM_LIMBS = 8;  // u256
     }
 }
 
+// instance-wise parallel
+[[kernel]] void prepare_buckets_indices(
+    constant const uint32_t& _window_size       [[ buffer(0) ]],
+    constant const uint32_t* _window_starts     [[ buffer(1) ]],
+    constant const uint32_t& _num_windows       [[ buffer(2) ]],
+    constant const u256* k_buff                 [[ buffer(3) ]],
+    device uint2* buckets_indices               [[ buffer(4) ]],
+    const uint32_t thread_id                    [[ thread_position_in_grid ]],
+    const uint32_t total_threads                [[ threads_per_grid ]]
+)
+{
+    if (thread_id >= total_threads) {
+        return;
+    }
+
+    uint32_t window_size = _window_size;    // c in arkworks code
+    uint32_t num_windows = _num_windows;
+    uint32_t buckets_len = (1 << window_size) - 1;
+    u256 this_scalar = k_buff[thread_id];
+
+    // skip if the scalar is uint scalar
+    u256 one = u256::from_int((uint32_t)1);
+    if (this_scalar == one) {
+        return;
+    }
+
+    // for each window, record the corresponding bucket index and point idx
+    for (uint32_t i = 0; i < num_windows; i++) {
+        uint32_t window_idx = _window_starts[i];
+
+        uint32_t scalar_fragment = (this_scalar >> window_idx).m_limbs[NUM_LIMBS - 1];
+        uint32_t m_ij = scalar_fragment & buckets_len;
+
+        if (m_ij != 0) {
+            uint32_t bucket_idx = i * buckets_len + m_ij - 1;
+            uint32_t point_idx = thread_id;
+            buckets_indices[thread_id * num_windows + i] = uint2(bucket_idx, point_idx);
+        }
+    }
+}
+
+// TODO: sorting buckets_indices with bucket_idx as key
+
+
+
+// TODO: bucket_wise accumulation
+
+
 [[kernel]] void final_accumulation(
     constant const uint32_t& _window_size       [[ buffer(0) ]],
     constant const uint32_t* _window_starts     [[ buffer(1) ]],
