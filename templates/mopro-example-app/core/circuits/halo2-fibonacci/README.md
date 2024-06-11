@@ -1,24 +1,30 @@
 # Halo2 Examples
 
-This repo includes a few simple examples to illustrate how to write circuit in Halo2.
+This rust crate contains examples of Halo2 circuit that does Fibonacci calculation and checks if the provided number is
+a Fibonacci number.
 
 ## Instruction
 
-Compile the repo
+1. Compile the repo
 
 ```
 cargo build
 ```
 
-Run examples
+2. Run Fibonacci example
+
 ```
-cargo test -- --nocapture test_example1
-cargo test -- --nocapture test_example2
-cargo test -- --nocapture test_example3
+cargo test -- --nocapture fibonacci_example
 ```
 
-Plot the circuit layout
+3. Plot the circuit layout
+
 ```
-cargo test --all-features -- --nocapture plot_fibo1
-cargo test --all-features -- --nocapture plot_fibo2
+cargo test --all-features -- --nocapture plot_fibonacci
+```
+
+4. Write the proving and verifying keys, as well as the SRS
+
+```
+cargo run --bin fibonacci
 ```
