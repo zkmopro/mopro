@@ -11,15 +11,9 @@ android_device_type = "arm64" # Options: x86_64, x86, arm, arm64
 build_mode = "release" # Options: debug, release
 
 [circuit]
-<<<<<<<< HEAD:config-halo2.toml
 adapter = "halo2"                    # Proving system options: circom (default), halo2
 dir = "mopro-core/examples/halo2/fibonacci" # Directory of the circuit
 name = "fibonacci"                # Name of the circuit
-========
-adapter = "circom"                              # Proving system options: circom (default), halo2
-dir = "mopro-core/examples/circom/keccak256" # Directory of the circuit
-name = "keccak256_256_test"                  # Name of the circuit
->>>>>>>> mine/halo2-main:config-ci.toml
 
 [dylib]
 # NOTE: Dylib support is experimental and requires some fiddling in iOS
