@@ -221,8 +221,9 @@ mod tests {
 
         public_input[2] += Fp::one();
         let _prover = MockProver::run(k, &circuit, vec![public_input]).unwrap();
-        // uncomment the following line and the assert will fail
-        // _prover.assert_satisfied();
+        // check that the verification fails
+        let result = _prover.verify();
+        assert!(!result.is_ok());
     }
 
     #[cfg(feature = "dev-graph")]
