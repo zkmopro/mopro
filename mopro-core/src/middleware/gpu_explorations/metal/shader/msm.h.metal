@@ -64,9 +64,14 @@ constant constexpr uint32_t NUM_LIMBS = 8;  // u256
     constant const uint32_t& _window_size       [[ buffer(0) ]],
     constant const uint32_t* _window_starts     [[ buffer(1) ]],
     device Point* buckets_matrix                [[ buffer(2) ]],
-    const uint32_t thread_id                    [[ thread_position_in_grid ]]
+    const uint32_t thread_id                    [[ thread_position_in_grid ]],
+    const uint32_t total_threads                [[ threads_per_grid ]]
 )
 {
+    if (thread_id >= total_threads) {
+        return;
+    }
+
     uint32_t window_size = _window_size;    // c in arkworks code
     uint32_t window_idx = _window_starts[thread_id];
     uint32_t buckets_len = (1 << window_size) - 1;
@@ -85,9 +90,13 @@ constant constexpr uint32_t NUM_LIMBS = 8;  // u256
     device Point* buckets_matrix                [[ buffer(5) ]],
     device Point* res                           [[ buffer(6) ]],
     const uint32_t thread_id                    [[ thread_position_in_grid ]],
-    const uint32_t thread_count                 [[ threads_per_grid ]]
+    const uint32_t total_threads           [[ threads_per_grid ]]
 )
 {
+    if (thread_id >= total_threads) {
+        return;
+    }
+
     uint32_t window_size = _window_size;    // c in arkworks code
     uint32_t instances_size = _instances_size;
     uint32_t buckets_len = (1 << window_size) - 1;
