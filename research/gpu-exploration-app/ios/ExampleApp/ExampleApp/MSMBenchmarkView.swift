@@ -18,7 +18,7 @@ struct AlgorithmBenchmark {
 
 struct MSMBenchmarkView: View {
     @State private var selectedAlgorithms: Set<Int> = [0] // Default to select the baseline MSM algorithm
-    let algorithms = ["Arkwork (Baseline)", "TrapdoorTech Zprize"]
+    let algorithms = ["Arkwork (Baseline)", "Metal Msm (our work)"]
     @State private var benchmarkResults: [AlgorithmBenchmark] = []
     @State private var isSubmitting: Bool = false
     
@@ -30,7 +30,8 @@ struct MSMBenchmarkView: View {
         String
     ) throws -> BenchmarkResult] = [
         "Arkwork (Baseline)": arkworksPippenger,
-        "TrapdoorTech Zprize": trapdoortechZprizeMsm,
+        "Metal Msm (our work)": metalMsm,
+//        "TrapdoorTech Zprize": trapdoortechZprizeMsm,
     ]
 
     var body: some View {
@@ -127,12 +128,12 @@ struct MSMBenchmarkView: View {
                     do {
                         let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
                         let documentsPath = documentsUrl.path
-                        let instanceSize: UInt32 = 16;
-                        let numInstance: UInt32 = 10;
+                        let instanceSize: UInt32 = 10;
+                        let numInstance: UInt32 = 10
                         print("Running MSM in algorithm: \(algorithm)...")
                         let benchData: BenchmarkResult =
                             try benchmarkFunction(
-                                instanceSize,
+                                10,
                                 numInstance,
                                 documentsPath
                             )

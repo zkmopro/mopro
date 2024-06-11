@@ -897,6 +897,18 @@ public func initializeMoproDylib(dylibPath: String) throws {
     }
 }
 
+public func metalMsm(instanceSize: UInt32, numInstance: UInt32, utilsDir: String) throws -> BenchmarkResult {
+    return try FfiConverterTypeBenchmarkResult.lift(
+        rustCallWithError(FfiConverterTypeMoproError.lift) {
+            uniffi_mopro_ffi_fn_func_metal_msm(
+                FfiConverterUInt32.lower(instanceSize),
+                FfiConverterUInt32.lower(numInstance),
+                FfiConverterString.lower(utilsDir), $0
+            )
+        }
+    )
+}
+
 public func toEthereumInputs(inputs: Data) -> [String] {
     return try! FfiConverterSequenceString.lift(
         try! rustCall {
@@ -912,18 +924,6 @@ public func toEthereumProof(proof: Data) -> ProofCalldata {
         try! rustCall {
             uniffi_mopro_ffi_fn_func_to_ethereum_proof(
                 FfiConverterData.lower(proof), $0
-            )
-        }
-    )
-}
-
-public func trapdoortechZprizeMsm(instanceSize: UInt32, numInstance: UInt32, utilsDir: String) throws -> BenchmarkResult {
-    return try FfiConverterTypeBenchmarkResult.lift(
-        rustCallWithError(FfiConverterTypeMoproError.lift) {
-            uniffi_mopro_ffi_fn_func_trapdoortech_zprize_msm(
-                FfiConverterUInt32.lower(instanceSize),
-                FfiConverterUInt32.lower(numInstance),
-                FfiConverterString.lower(utilsDir), $0
             )
         }
     )
@@ -974,13 +974,13 @@ private var initializationResult: InitializationResult {
     if uniffi_mopro_ffi_checksum_func_initialize_mopro_dylib() != 64476 {
         return InitializationResult.apiChecksumMismatch
     }
+    if uniffi_mopro_ffi_checksum_func_metal_msm() != 57344 {
+        return InitializationResult.apiChecksumMismatch
+    }
     if uniffi_mopro_ffi_checksum_func_to_ethereum_inputs() != 30405 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_ffi_checksum_func_to_ethereum_proof() != 60110 {
-        return InitializationResult.apiChecksumMismatch
-    }
-    if uniffi_mopro_ffi_checksum_func_trapdoortech_zprize_msm() != 64807 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_ffi_checksum_func_verify_proof2() != 37192 {
