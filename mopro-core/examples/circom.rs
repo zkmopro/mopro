@@ -1,9 +1,5 @@
 #[cfg(not(feature = "halo2"))]
-use mopro_core::middleware::circom::CircomState;
-#[cfg(not(feature = "halo2"))]
-use num_bigint::BigInt;
-#[cfg(not(feature = "halo2"))]
-use std::collections::HashMap;
+use {mopro_core::middleware::circom::CircomState, num_bigint::BigInt, std::collections::HashMap};
 
 #[cfg(not(feature = "halo2"))]
 fn main() {

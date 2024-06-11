@@ -3,16 +3,10 @@
 use std::collections::HashMap;
 #[cfg(feature = "dylib")]
 use std::path::Path;
-#[cfg(not(feature = "halo2"))]
-use std::str::FromStr;
-#[cfg(not(feature = "halo2"))]
-use std::sync::RwLock;
 
 #[cfg(not(feature = "halo2"))]
-use num_bigint::BigInt;
+use {mopro_core::middleware::circom, num_bigint::BigInt, std::str::FromStr, std::sync::RwLock};
 
-#[cfg(not(feature = "halo2"))]
-use mopro_core::middleware::circom;
 #[cfg(feature = "gpu-benchmarks")]
 use mopro_core::middleware::gpu_explorations::{self, utils::benchmark::BenchmarkResult};
 use mopro_core::MoproError;
