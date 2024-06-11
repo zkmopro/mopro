@@ -72,7 +72,8 @@ pub fn setup_metal_state() -> MetalMsmConfig {
     let max_threads_per_group = accumulation_and_reduction.max_total_threads_per_threadgroup();
     let threads_per_threadgroup = MTLSize::new(
         thread_execution_width,
-        max_threads_per_group / thread_execution_width,
+        1, // temp fix for now, otherwise it would encounter the following error: validateBuiltinArguments:992: failed assertion 'component 1: 12 must be <= 1 for thread_id [[ thread_position_in_grid ]]'
+        // max_threads_per_group / thread_execution_width,
         1,
     );
 
