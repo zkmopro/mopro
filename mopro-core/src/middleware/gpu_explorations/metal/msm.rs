@@ -70,7 +70,11 @@ pub fn setup_metal_state() -> MetalMsmConfig {
 
     let thread_execution_width = accumulation_and_reduction.thread_execution_width();
     let max_threads_per_group = accumulation_and_reduction.max_total_threads_per_threadgroup();
-    let threads_per_threadgroup = MTLSize::new(thread_execution_width, max_threads_per_group / thread_execution_width, 1);
+    let threads_per_threadgroup = MTLSize::new(
+        thread_execution_width,
+        max_threads_per_group / thread_execution_width,
+        1,
+    );
 
     MetalMsmConfig {
         state,
@@ -175,8 +179,10 @@ pub fn exec_metal_commands(
                 (2, &data.buckets_matrix_buffer),
             ]),
         );
-        command_encoder
-            .dispatch_threads(MTLSize::new(params.num_window, 1, 1), config.threads_per_threadgroup);
+        command_encoder.dispatch_threads(
+            MTLSize::new(params.num_window, 1, 1),
+            config.threads_per_threadgroup,
+        );
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
@@ -198,8 +204,10 @@ pub fn exec_metal_commands(
                 (6, &data.res_buffer),
             ]),
         );
-        command_encoder
-            .dispatch_threads(MTLSize::new(params.num_window, 1, 1), config.threads_per_threadgroup);
+        command_encoder.dispatch_threads(
+            MTLSize::new(params.num_window, 1, 1),
+            config.threads_per_threadgroup,
+        );
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
