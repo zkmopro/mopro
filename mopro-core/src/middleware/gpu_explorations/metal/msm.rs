@@ -46,6 +46,7 @@ pub struct MetalMsmPipeline {
 pub struct MetalMsmConfig {
     pub state: MetalState,
     pub pipelines: MetalMsmPipeline,
+    pub threads_per_threadgroup: MTLSize,
 }
 
 pub struct MetalMsmInstance {
@@ -67,6 +68,10 @@ pub fn setup_metal_state() -> MetalMsmConfig {
         .unwrap();
     let final_accumulation = state.setup_pipeline("final_accumulation").unwrap();
 
+    let thread_execution_width = accumulation_and_reduction.thread_execution_width();
+    let max_threads_per_group = accumulation_and_reduction.max_total_threads_per_threadgroup();
+    let threads_per_threadgroup = MTLSize::new(thread_execution_width, max_threads_per_group / thread_execution_width, 1);
+
     MetalMsmConfig {
         state,
         pipelines: MetalMsmPipeline {
@@ -74,6 +79,7 @@ pub fn setup_metal_state() -> MetalMsmConfig {
             accumulation_and_reduction,
             final_accumulation,
         },
+        threads_per_threadgroup: threads_per_threadgroup,
     }
 }
 
@@ -159,6 +165,7 @@ pub fn exec_metal_commands(
     let params = instance.params;
 
     // Init the pipleline for MSM
+    let init_time = Instant::now();
     autoreleasepool(|| {
         let (command_buffer, command_encoder) = config.state.setup_command(
             &config.pipelines.init_buckets,
@@ -169,13 +176,15 @@ pub fn exec_metal_commands(
             ]),
         );
         command_encoder
-            .dispatch_thread_groups(MTLSize::new(1, 1, 1), MTLSize::new(params.num_window, 1, 1));
+            .dispatch_threads(MTLSize::new(params.num_window, 1, 1), config.threads_per_threadgroup);
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
     });
+    println!("Init buckets time: {:?}", init_time.elapsed());
 
     // Accumulate and reduction
+    let acc_time = Instant::now();
     autoreleasepool(|| {
         let (command_buffer, command_encoder) = config.state.setup_command(
             &config.pipelines.accumulation_and_reduction,
@@ -190,13 +199,15 @@ pub fn exec_metal_commands(
             ]),
         );
         command_encoder
-            .dispatch_thread_groups(MTLSize::new(1, 1, 1), MTLSize::new(params.num_window, 1, 1));
+            .dispatch_threads(MTLSize::new(params.num_window, 1, 1), config.threads_per_threadgroup);
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
     });
+    println!("Accumulation and Reduction time: {:?}", acc_time.elapsed());
 
     // Sequentially accumulate the msm results on GPU
+    let final_time = Instant::now();
     autoreleasepool(|| {
         let (command_buffer, command_encoder) = config.state.setup_command(
             &config.pipelines.final_accumulation,
@@ -208,11 +219,12 @@ pub fn exec_metal_commands(
                 (4, &data.result_buffer),
             ]),
         );
-        command_encoder.dispatch_thread_groups(MTLSize::new(1, 1, 1), MTLSize::new(1, 1, 1));
+        command_encoder.dispatch_threads(MTLSize::new(1, 1, 1), config.threads_per_threadgroup);
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
     });
+    println!("Final accumulation time: {:?}", final_time.elapsed());
 
     // retrieve and parse the result from GPU
     let msm_result = {
