@@ -18,13 +18,70 @@ use objc::rc::autoreleasepool;
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
 
+pub struct MetalMsmData {
+    pub window_size_buffer: Buffer,
+    pub instances_size_buffer: Buffer,
+    pub window_starts_buffer: Buffer,
+    pub scalar_buffer: Buffer,
+    pub base_buffer: Buffer,
+    pub num_windows_buffer: Buffer,
+    pub buckets_matrix_buffer: Buffer,
+    pub res_buffer: Buffer,
+    pub result_buffer: Buffer,
+}
+
+pub struct MetalMsmParams {
+    pub instances_size: u32,
+    pub buckets_size: u32,
+    pub window_size: u32,
+    pub num_window: u64,
+}
+
+pub struct MetalMsmPipeline {
+    pub init_buckets: ComputePipelineState,
+    pub accumulation_and_reduction: ComputePipelineState,
+    pub final_accumulation: ComputePipelineState,
+}
+
+pub struct MetalMsmConfig {
+    pub state: MetalState,
+    pub pipelines: MetalMsmPipeline,
+}
+
+pub struct MetalMsmInstance {
+    pub data: MetalMsmData,
+    pub params: MetalMsmParams,
+}
+
 // Helper function for getting the windows size
 fn ln_without_floats(a: usize) -> usize {
     // log2(a) * ln(2)
     (ark_std::log2(a) * 69 / 100) as usize
 }
 
-pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, MetalError> {
+pub fn setup_metal_state() -> MetalMsmConfig {
+    let state = MetalState::new(None).unwrap();
+    let init_buckets = state.setup_pipeline("initialize_buckets").unwrap();
+    let accumulation_and_reduction = state
+        .setup_pipeline("accumulation_and_reduction_phase")
+        .unwrap();
+    let final_accumulation = state.setup_pipeline("final_accumulation").unwrap();
+
+    MetalMsmConfig {
+        state,
+        pipelines: MetalMsmPipeline {
+            init_buckets,
+            accumulation_and_reduction,
+            final_accumulation,
+        },
+    }
+}
+
+pub fn encode_instances(
+    points: &[GAffine],
+    scalars: &[ScalarField],
+    config: &mut MetalMsmConfig,
+) -> MetalMsmInstance {
     let modulus_bit_size = ScalarField::MODULUS_BIT_SIZE as usize;
 
     let instances_size = ark_std::cmp::min(points.len(), scalars.len());
@@ -35,6 +92,7 @@ pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, Metal
     };
     let buckets_size = (1 << window_size) - 1;
     let window_starts: Vec<usize> = (0..modulus_bit_size).step_by(window_size).collect();
+    let num_windows = window_starts.len();
 
     // flatten scalar and base to Vec<u32> for GPU usage
     let scalars_limbs = cfg_into_iter!(scalars)
@@ -54,81 +112,100 @@ pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, Metal
         .collect::<Vec<u32>>();
 
     // store params to GPU shared memory
-    let state = MetalState::new(None).unwrap();
-    let window_size_buffer = state.alloc_buffer_data(&[window_size as u32]);
-    let instances_size_buffer = state.alloc_buffer_data(&[instances_size as u32]);
-    let scalar_buffer = state.alloc_buffer_data(&scalars_limbs);
-    let base_buffer = state.alloc_buffer_data(&bases_limbs);
-    let num_windows_buffer = state.alloc_buffer_data(&[window_starts.len() as u32]);
-    let buckets_matrix_buffer =
-        state.alloc_buffer::<u32>(buckets_size * window_starts.len() * 8 * 3);
-    let res_buffer = state.alloc_buffer::<u32>(window_starts.len() * 8 * 3);
-    let result_buffer = state.alloc_buffer::<u32>(8 * 3);
+    let window_size_buffer = config.state.alloc_buffer_data(&[window_size as u32]);
+    let instances_size_buffer = config.state.alloc_buffer_data(&[instances_size as u32]);
+    let scalar_buffer = config.state.alloc_buffer_data(&scalars_limbs);
+    let base_buffer = config.state.alloc_buffer_data(&bases_limbs);
+    let num_windows_buffer = config.state.alloc_buffer_data(&[num_windows as u32]);
+    let buckets_matrix_buffer = config
+        .state
+        .alloc_buffer::<u32>(buckets_size * num_windows * 8 * 3);
+    let res_buffer = config.state.alloc_buffer::<u32>(num_windows * 8 * 3);
+    let result_buffer = config.state.alloc_buffer::<u32>(8 * 3);
     // convert window_starts to u32 to give the exact storage need for GPU
-    let window_starts_buffer = state.alloc_buffer_data(
+    let window_starts_buffer = config.state.alloc_buffer_data(
         &(window_starts
             .iter()
             .map(|x| *x as u32)
             .collect::<Vec<u32>>()),
     );
 
+    MetalMsmInstance {
+        data: MetalMsmData {
+            window_size_buffer,
+            instances_size_buffer,
+            window_starts_buffer,
+            scalar_buffer,
+            base_buffer,
+            num_windows_buffer,
+            buckets_matrix_buffer,
+            res_buffer,
+            result_buffer,
+        },
+        params: MetalMsmParams {
+            instances_size: instances_size as u32,
+            buckets_size: buckets_size as u32,
+            window_size: window_size as u32,
+            num_window: num_windows as u64,
+        },
+    }
+}
+
+pub fn exec_metal_commands(
+    config: &MetalMsmConfig,
+    instance: MetalMsmInstance,
+) -> Result<G, MetalError> {
+    let data = instance.data;
+    let params = instance.params;
+
     // Init the pipleline for MSM
-    let init_buckets = state.setup_pipeline("initialize_buckets").unwrap();
     autoreleasepool(|| {
-        let (command_buffer, command_encoder) = state.setup_command(
-            &init_buckets,
+        let (command_buffer, command_encoder) = config.state.setup_command(
+            &config.pipelines.init_buckets,
             Some(&[
-                (0, &window_size_buffer),
-                (1, &window_starts_buffer),
-                (2, &buckets_matrix_buffer),
+                (0, &data.window_size_buffer),
+                (1, &data.window_starts_buffer),
+                (2, &data.buckets_matrix_buffer),
             ]),
         );
-        command_encoder.dispatch_thread_groups(
-            MTLSize::new(1, 1, 1),
-            MTLSize::new(window_starts.len() as u64, 1, 1),
-        );
+        command_encoder
+            .dispatch_thread_groups(MTLSize::new(1, 1, 1), MTLSize::new(params.num_window, 1, 1));
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
     });
 
     // Accumulate and reduction
-    let accumulation_and_reduction = state
-        .setup_pipeline("accumulation_and_reduction_phase")
-        .unwrap();
     autoreleasepool(|| {
-        let (command_buffer, command_encoder) = state.setup_command(
-            &accumulation_and_reduction,
+        let (command_buffer, command_encoder) = config.state.setup_command(
+            &config.pipelines.accumulation_and_reduction,
             Some(&[
-                (0, &window_size_buffer),
-                (1, &instances_size_buffer),
-                (2, &window_starts_buffer),
-                (3, &scalar_buffer),
-                (4, &base_buffer),
-                (5, &buckets_matrix_buffer),
-                (6, &res_buffer),
+                (0, &data.window_size_buffer),
+                (1, &data.instances_size_buffer),
+                (2, &data.window_starts_buffer),
+                (3, &data.scalar_buffer),
+                (4, &data.base_buffer),
+                (5, &data.buckets_matrix_buffer),
+                (6, &data.res_buffer),
             ]),
         );
-        command_encoder.dispatch_thread_groups(
-            MTLSize::new(1, 1, 1),
-            MTLSize::new(window_starts.len() as u64, 1, 1),
-        );
+        command_encoder
+            .dispatch_thread_groups(MTLSize::new(1, 1, 1), MTLSize::new(params.num_window, 1, 1));
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
     });
 
     // Sequentially accumulate the msm results on GPU
-    let final_accumulation = state.setup_pipeline("final_accumulation").unwrap();
     autoreleasepool(|| {
-        let (command_buffer, command_encoder) = state.setup_command(
-            &final_accumulation,
+        let (command_buffer, command_encoder) = config.state.setup_command(
+            &config.pipelines.final_accumulation,
             Some(&[
-                (0, &window_size_buffer),
-                (1, &window_starts_buffer),
-                (2, &num_windows_buffer),
-                (3, &res_buffer),
-                (4, &result_buffer),
+                (0, &data.window_size_buffer),
+                (1, &data.window_starts_buffer),
+                (2, &data.num_windows_buffer),
+                (3, &data.res_buffer),
+                (4, &data.result_buffer),
             ]),
         );
         command_encoder.dispatch_thread_groups(MTLSize::new(1, 1, 1), MTLSize::new(1, 1, 1));
@@ -139,7 +216,7 @@ pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, Metal
 
     // retrieve and parse the result from GPU
     let msm_result = {
-        let raw_limbs = MetalState::retrieve_contents::<u32>(&result_buffer);
+        let raw_limbs = MetalState::retrieve_contents::<u32>(&data.result_buffer);
         G::new_unchecked(
             Fq::from_u32_limbs(&raw_limbs[0..8]),
             Fq::from_u32_limbs(&raw_limbs[8..16]),
@@ -150,6 +227,15 @@ pub fn metal_msm(points: &[GAffine], scalars: &[ScalarField]) -> Result<G, Metal
     Ok(msm_result)
 }
 
+pub fn metal_msm(
+    points: &[GAffine],
+    scalars: &[ScalarField],
+    config: &mut MetalMsmConfig,
+) -> Result<G, MetalError> {
+    let instance = encode_instances(points, scalars, config);
+    exec_metal_commands(config, instance)
+}
+
 pub fn benchmark_msm<I>(
     instances: I,
     iterations: u32,
@@ -157,8 +243,13 @@ pub fn benchmark_msm<I>(
 where
     I: Iterator<Item = preprocess::Instance>,
 {
-    let mut instance_durations = Vec::new();
+    println!("Init metal (GPU) state...");
+    let init_start = Instant::now();
+    let mut metal_config = setup_metal_state();
+    let init_duration = init_start.elapsed();
+    println!("Done initializing metal (GPU) state in {:?}", init_duration);
 
+    let mut instance_durations = Vec::new();
     for instance in instances {
         let points = &instance.0;
         // map each scalar to a ScalarField
@@ -170,10 +261,15 @@ where
 
         let mut instance_total_duration = Duration::ZERO;
         for _i in 0..iterations {
-            let start = Instant::now();
-            let _result = metal_msm(&points[..], &scalars[..]).unwrap();
+            let encoding_data_start = Instant::now();
+            println!("Encoding instance to GPU memory...");
+            let metal_instance = encode_instances(&points[..], &scalars[..], &mut metal_config);
+            let encoding_data_duration = encoding_data_start.elapsed();
+            println!("Done encoding data in {:?}", encoding_data_duration);
 
-            instance_total_duration += start.elapsed();
+            let msm_start = Instant::now();
+            let _result = exec_metal_commands(&metal_config, metal_instance).unwrap();
+            instance_total_duration += msm_start.elapsed();
         }
         let instance_avg_duration = instance_total_duration / iterations;
 
@@ -230,7 +326,7 @@ mod tests {
     use std::fs::File;
 
     const INSTANCE_SIZE: u32 = 16;
-    const NUM_INSTANCE: u32 = 10;
+    const NUM_INSTANCE: u32 = 5;
     const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils/vectors";
     const BENCHMARKSPATH: &str = "mopro-core/gpu_explorations/benchmarks";
 
@@ -243,6 +339,8 @@ mod tests {
             INSTANCE_SIZE,
             NUM_INSTANCE
         );
+        // Init metal (GPU) state
+        let mut metal_config = setup_metal_state();
 
         // Check if the vectors have been generated
         match preprocess::FileInputIterator::open(&dir) {
@@ -264,7 +362,7 @@ mod tests {
                 .iter()
                 .map(|s| ScalarField::new(*s))
                 .collect::<Vec<ScalarField>>();
-            let metal_msm = metal_msm(&points[..], &scalars[..]).unwrap();
+            let metal_msm = metal_msm(&points[..], &scalars[..], &mut metal_config).unwrap();
             let arkworks_msm = G::msm(&points[..], &scalars[..]).unwrap();
             assert_eq!(metal_msm, arkworks_msm);
             println!("(pass) Instance {} success", i);
