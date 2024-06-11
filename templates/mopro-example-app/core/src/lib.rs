@@ -3,10 +3,10 @@
 #[cfg(test)]
 mod tests {
     use ark_bn254::Fr;
+    use mopro_core::middleware::circom::serialization::SerializableInputs;
     use mopro_core::middleware::circom::CircomState;
     use num_bigint::BigInt;
     use std::collections::HashMap;
-    use mopro_core::middleware::circom::serialization::SerializableInputs;
 
     #[test]
     fn test_prove_verify_simple() {
