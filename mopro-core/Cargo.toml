@@ -27,7 +27,7 @@ halo2-circuit = { path = "examples/halo2/fibonacci", optional = true }
 ### Halo2 dependencies end
 
 
-ark-circom = { git = "https://github.com/vimwitch/circom-compat.git", branch = "wasmer-update" }
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 ark-serialize = { version = "=0.4.1", features = ["derive"] }
