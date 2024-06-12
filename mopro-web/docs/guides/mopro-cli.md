@@ -58,7 +58,7 @@ Here are the basic commands of `mopro`:
 
 ## Prerequisites
 
-To use `mopro-cli`, make sure you have installed the [prerequisites](https://github.com/zkmopro/mopro/?tab=readme-ov-file#Prerequisites).
+To use `mopro-cli`, make sure you have installed the [prerequisites](/docs/prerequisites).
 
 ## Examples
 

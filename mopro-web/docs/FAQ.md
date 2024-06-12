@@ -19,7 +19,7 @@ Currently Circom/Groth16, but due to its modular architecture it is easy to add 
 
 There's experimental support for Kimchi, a Plonkish proof system, that was done during a hackathon in this [PR](https://github.com/zkmopro/mopro/pull/34).
 
-There's a grantee working on adding Halo2 support. Please see the [Telegram group](/docs/community) for more information.
+There's a grantee working on adding Halo2 support. Please see the [Telegram group](https://t.me/zkmopro) for more information.
 
 We welcome people to contribute support for [more proof systems](https://github.com/zkmopro/mopro/issues/15).
 

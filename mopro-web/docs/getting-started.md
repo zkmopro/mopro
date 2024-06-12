@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Getting Started
 
-We recommend you use [mopro-cli](https://github.com/zkmopro/mopro/tree/main/mopro-cli#mopro-cli) to create and maintain your application. Here's how you can get started with your example app in a few minutes.
+We recommend you use [mopro-cli](/docs/guides/mopro-cli) to create and maintain your application. Here's how you can get started with your example app in a few minutes.
 
 You can also watch this short (~5m) [tutorial](https://www.loom.com/share/6ff382b0497c47aea9d0ef8b6e790dd8).
 
@@ -101,5 +101,5 @@ Depending on what platforms you are targetting, you can run the following comman
 
     Use `^R` (`control`+`R`) to execute a simulator.
 
-> See [mopro-cli](https://github.com/zkmopro/mopro/tree/main/mopro-cli#mopro-cli) for more details on usage.
-> Edit [mopro configuration](/docs/mopro-configuration) to build for device or build for other circuits.
+> See [mopro-cli](/docs/guides/mopro-cli) for more details on usage.
+> Edit [mopro configuration](/docs/guides/mopro-configuration) to build for device or build for other circuits.
