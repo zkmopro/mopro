@@ -18,10 +18,9 @@
   width: 45%;
  }
 
-.featureSvg {
-  /* width: 20%; */
-  height: 8rem;
-  width: 7.2rem;
+.featureSvg svg {
+  width: 120;
+  height: 110px;
 }
 
 .featureHeading {
@@ -31,9 +30,6 @@
 }
 
 @media screen and (max-width: 996px) {
-  .feature {
-    width: 100%;
-  }
 
   .heading {
     font-size: 3.3rem;
@@ -49,12 +45,12 @@
 
   .feature {
     width: 100%;
+    gap: 0.75rem;
    }
   
-  .featureSvg {
-    /* width: 15%; */
-    width: 4rem;
-    height: 3rem;
+  .featureSvg svg {
+    width: 70px;
+    height: 60px
   }
   
   .featureHeading {
