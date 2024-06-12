@@ -153,10 +153,6 @@ constant constexpr uint32_t NUM_LIMBS = 8;  // u256
     const uint32_t total_threads                [[ threads_per_grid ]]
 )
 {
-    if (thread_id >= total_threads) {
-        return;
-    }
-
     uint32_t window_size = _window_size;    // c in arkworks code
     uint32_t num_windows = _num_windows;
     uint32_t buckets_len = (1 << window_size) - 1;
@@ -175,6 +171,8 @@ constant constexpr uint32_t NUM_LIMBS = 8;  // u256
         uint32_t scalar_fragment = (this_scalar >> window_idx).m_limbs[NUM_LIMBS - 1];
         uint32_t m_ij = scalar_fragment & buckets_len;
 
+        // the case (b_idx, p_idx) = (0, 0) is not possible
+        // since thread_id == 0 && i == 0 && m_ij == 1 is not possible
         if (m_ij != 0) {
             uint32_t bucket_idx = i * buckets_len + m_ij - 1;
             uint32_t point_idx = thread_id;
@@ -185,9 +183,76 @@ constant constexpr uint32_t NUM_LIMBS = 8;  // u256
 
 // TODO: sorting buckets_indices with bucket_idx as key
 
-
-
 // TODO: bucket_wise accumulation
+[[kernel]] void bucket_wise_accumulation(
+    constant const uint32_t& _instances_size    [[ buffer(0) ]],
+    constant const uint32_t& _num_windows       [[ buffer(1) ]],
+    constant const Point* p_buff                [[ buffer(2) ]],
+    device uint2* buckets_indices               [[ buffer(3) ]],
+    device Point* buckets_matrix                [[ buffer(4) ]],
+    const uint32_t thread_id                    [[ thread_position_in_grid ]],
+    const uint32_t total_threads                [[ threads_per_grid ]]
+)
+{
+    uint32_t num_windows = _num_windows;
+    uint32_t instances_size = _instances_size;
+
+    uint32_t bucket_start_idx = 0;
+    uint32_t max_idx = num_windows * instances_size;
+
+    while (thread_id != buckets_indices[bucket_start_idx].x && bucket_start_idx < max_idx) {
+        bucket_start_idx++;
+    }
+    // return if the bucket needs no accumulation
+    if (bucket_start_idx == max_idx) {
+        return;
+    }
+
+    // perform bucket-wise accumulation
+    while (thread_id == buckets_indices[bucket_start_idx].x && bucket_start_idx < max_idx) {
+        Point p = buckets_matrix[thread_id];
+        buckets_matrix[thread_id] = p + p_buff[buckets_indices[bucket_start_idx].y];
+        bucket_start_idx++;
+    }
+}
+
+// window-wise reduction
+[[kernel]] void sum_reduction(
+    constant const uint32_t& _window_size       [[ buffer(0) ]],
+    constant const u256* k_buff                 [[ buffer(1) ]],
+    constant const Point* p_buff                [[ buffer(2) ]],
+    device Point* buckets_matrix                [[ buffer(3) ]],
+    device Point* res                           [[ buffer(4) ]],
+    const uint32_t thread_id                    [[ thread_position_in_grid ]],
+    const uint32_t total_threads           [[ threads_per_grid ]]
+)
+{
+    uint32_t window_size = _window_size;    // c in arkworks code
+    uint32_t buckets_len = (1 << window_size) - 1;
+
+    u256 one = u256::from_int((uint32_t)1);
+    res[thread_id] = Point::neutral_element();
+    
+    // get the res for the first window
+    if (thread_id == 0) {
+        u256 k = k_buff[thread_id];
+        if (k == one) {
+            Point this_res = res[thread_id];
+            res[thread_id] = this_res + p_buff[thread_id];
+        }
+    }
+
+    // Perform sum reduction on buckets
+    // Get the last bucket of this window
+    uint32_t last_bucket_idx = (thread_id + 1) * buckets_len - 1;
+
+    Point running_sum = Point::neutral_element();
+    for (uint32_t i = 0; i < buckets_len; i++) {
+        running_sum = running_sum + buckets_matrix[last_bucket_idx - i];
+        Point this_res = res[thread_id];
+        res[thread_id] = this_res + running_sum;
+    }
+}
 
 
 [[kernel]] void final_accumulation(

@@ -7,4 +7,5 @@
 #include "fields/fp_bn254.h.metal"
 #include "tests/test_bn254.h.metal"
 #include "tests/test_unsigned_integer.h.metal"
+// #include "utils/parallel_radix_sort.h.metal"
 #include "msm.h.metal"
