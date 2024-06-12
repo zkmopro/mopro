@@ -10,7 +10,7 @@ use std::str::FromStr;
 use std::{env, fs};
 use toml;
 use toml::Value;
-use wasmer::{Cranelift, Dylib, Module, Store, Target, Triple};
+use wasmer::{Cranelift, sys:: { EngineBuilder }, Module, Store, Target, Triple};
 
 #[derive(Deserialize)]
 struct Config {
@@ -124,10 +124,10 @@ fn build_dylib(config: &Config) -> Result<()> {
             let triple = Triple::from_str(&target_arch).map_err(|e| eyre!(e))?;
             let cpu_features = enum_set!();
             let target = Target::new(triple, cpu_features);
-            let engine = Dylib::new(Cranelift::default()).target(target).engine();
+            let engine = EngineBuilder::new(Cranelift::default());
 
             // Compile the WASM module
-            let store = Store::new(&engine);
+            let mut store = Store::new(engine);
             let module = Module::from_file(&store, &wasm_file_path)?;
 
             // Serialize the compiled module to a dylib file

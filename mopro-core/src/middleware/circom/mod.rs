@@ -26,14 +26,11 @@ use core::include_bytes;
 use num_bigint::BigInt;
 use once_cell::sync::{Lazy, OnceCell};
 
-use wasmer::{Module, Store};
+use wasmer::{Module, Store, sys:: {EngineBuilder} };
 
 use ark_zkey::{read_arkzkey, read_arkzkey_from_bytes}; //SerializableConstraintMatrices
-
-#[cfg(feature = "dylib")]
 use {
-    std::{env, path::Path},
-    wasmer::Dylib,
+    std::{env, path::Path}
 };
 
 #[cfg(feature = "calc-native-witness")]
@@ -81,9 +78,6 @@ static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
 //     // TODO: Use reader? More flexible; unclear if perf diff
 //     read_arkzkey_from_bytes(ARKZKEY_BYTES).expect("Failed to read arkzkey")
 // });
-
-#[cfg(not(feature = "dylib"))]
-const WASM: &[u8] = include_bytes!(env!("BUILD_RS_WASM_FILE"));
 
 /// `WITNESS_CALCULATOR` is a lazily initialized, thread-safe singleton of type `WitnessCalculator`.
 /// `OnceCell` ensures that the initialization occurs exactly once, and `Mutex` allows safe shared
@@ -146,14 +140,14 @@ pub fn initialize() {
 }
 
 /// Creates a `WitnessCalculator` instance from a dylib file.
-#[cfg(feature = "dylib")]
 fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
-    let store = Store::new(&Dylib::headless().engine());
+    let engine = EngineBuilder::headless();
+    let mut store = Store::new(engine);
     let module = unsafe {
         Module::deserialize_from_file(&store, path).expect("Failed to load dylib module")
     };
     let result =
-        WitnessCalculator::from_module(module).expect("Failed to create WitnessCalculator");
+        WitnessCalculator::from_module(& mut store, module).expect("Failed to create WitnessCalculator");
 
     Mutex::new(result)
 }
@@ -171,8 +165,6 @@ pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
 
 /// Provides access to the `WITNESS_CALCULATOR` singleton, initializing it if necessary.
 /// It expects the path to the dylib file to be set in the `CIRCUIT_WASM_DYLIB` environment variable.
-#[cfg(feature = "dylib")]
-#[must_use]
 pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
     let var_name = "CIRCUIT_WASM_DYLIB";
 
@@ -188,18 +180,6 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
     })
 }
 
-#[cfg(not(feature = "dylib"))]
-#[must_use]
-pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
-    WITNESS_CALCULATOR.get_or_init(|| {
-        let store = Store::default();
-        let module = Module::from_binary(&store, WASM).expect("WASM should be valid");
-        let result =
-            WitnessCalculator::from_module(module).expect("Failed to create WitnessCalculator");
-        Mutex::new(result)
-    })
-}
-
 pub fn generate_proof2(
     inputs: CircuitInputs,
 ) -> Result<(SerializableProof, SerializableInputs), MoproError> {
@@ -212,12 +192,17 @@ pub fn generate_proof2(
     println!("Generating proof 2");
 
     let now = std::time::Instant::now();
+    let full_assignment;
     #[cfg(not(feature = "calc-native-witness"))]
-    let full_assignment = witness_calculator()
-        .lock()
-        .expect("Failed to lock witness calculator")
-        .calculate_witness_element::<Bn254, _>(inputs, false)
-        .map_err(|e| MoproError::CircomError(e.to_string()))?;
+    {
+        let engine = EngineBuilder::headless();
+        let mut store = Store::new(engine);
+        full_assignment = witness_calculator()
+            .lock()
+            .expect("Failed to lock witness calculator")
+            .calculate_witness_element::<Bn254, _>(&mut store, inputs, false)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+    }
     #[cfg(feature = "calc-native-witness")]
     let full_assignment = calculate_witness_with_graph(inputs);
 
@@ -282,8 +267,10 @@ impl CircomState {
 
         // read_arkzkey(arkzkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
         self.zkey = Some(zkey);
+        let engine = EngineBuilder::headless();
+        let mut store = Store::new(engine);
 
-        let wtns = WitnessCalculator::new(wasm_path)
+        let wtns = WitnessCalculator::new(& mut store, wasm_path)
             .map_err(|e| MoproError::CircomError(e.to_string()))
             .unwrap();
         self.wtns = Some(wtns);
@@ -303,12 +290,17 @@ impl CircomState {
 
         println!("Generating proof");
 
+        let engine = EngineBuilder::headless();
+        let mut store = Store::new(engine);
+
         let now = std::time::Instant::now();
         let full_assignment = self
             .wtns
-            .clone()
+            // .clone()
+            // I _think_ the above clone is unnecessary because this function does not modify our self.wtns
+            .as_mut()
             .unwrap()
-            .calculate_witness_element::<Bn254, _>(inputs, false)
+            .calculate_witness_element::<Bn254, _>(& mut store, inputs, false)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
         println!("Witness generation took: {:.2?}", now.elapsed());
@@ -514,11 +506,14 @@ mod tests {
         ];
 
         let inputs = bytes_to_circuit_inputs(&input_vec);
+
+        let engine = EngineBuilder::headless();
+        let mut store = Store::new(engine);
         let now = std::time::Instant::now();
         let full_assignment = witness_calculator()
             .lock()
             .expect("Failed to lock witness calculator")
-            .calculate_witness_element::<Bn254, _>(inputs, false)
+            .calculate_witness_element::<Bn254, _>(& mut store, inputs, false)
             .map_err(|e| MoproError::CircomError(e.to_string()));
 
         println!("Witness generation took: {:.2?}", now.elapsed());
