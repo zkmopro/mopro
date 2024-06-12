@@ -22,13 +22,6 @@ namespace mopro {
 
 
   [Throws=MoproError]
-  GenerateProofResult generate_halo2_proof(record<string, sequence<string>> circuit_inputs);
-
-  [Throws=MoproError]
-  boolean verify_halo2_proof(bytes proof, bytes public_input);
-
-
-  [Throws=MoproError]
   BenchmarkResult arkworks_pippenger(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
   
   // [Throws=MoproError]
