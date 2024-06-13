@@ -149,7 +149,7 @@ dependencies = [
 [[package]]
 name = "ark-circom"
 version = "0.1.0"
-source = "git+https://github.com/zkmopro/circom-compat.git#d9c3b1525567e505b1c4439c735eb80aab5cb48c"
+source = "git+https://github.com/zkmopro/circom-compat.git#fb4ebb0ab6a1e3bdeee5a30fee796d805ad586d6"
 dependencies = [
  "ark-bn254",
  "ark-crypto-primitives",
@@ -5781,8 +5781,7 @@ dependencies = [
 [[package]]
 name = "wasmer"
 version = "4.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1852ee143a2d8143265bfee017c43bf690702d6c2b45a763a2f13e669f5b7ec"
+source = "git+https://github.com/zkmopro/wasmer.git?branch=4.3.2-memory-patch#73bfccc8db8f4a9c564203601c4d5a8e2ec3cf48"
 dependencies = [
  "bytes",
  "cfg-if",
@@ -5800,7 +5799,7 @@ dependencies = [
  "wasm-bindgen",
  "wasmer-compiler",
  "wasmer-compiler-cranelift",
- "wasmer-derive",
+ "wasmer-derive 4.3.2 (git+https://github.com/zkmopro/wasmer.git?branch=4.3.2-memory-patch)",
  "wasmer-types",
  "wasmer-vm",
  "wat",
@@ -5810,8 +5809,7 @@ dependencies = [
 [[package]]
 name = "wasmer-compiler"
 version = "4.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b4f157d715f3bb60c2c9d7b9e48299a30e9209f87f4484f79f9cd586b40b6ee"
+source = "git+https://github.com/zkmopro/wasmer.git?branch=4.3.2-memory-patch#73bfccc8db8f4a9c564203601c4d5a8e2ec3cf48"
 dependencies = [
  "backtrace",
  "bytes",
@@ -5838,8 +5836,7 @@ dependencies = [
 [[package]]
 name = "wasmer-compiler-cranelift"
 version = "4.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb457e66b77ca2188fbbd6c2056ec6e8ccb4bddee73e60ba9d39733d7b2e8068"
+source = "git+https://github.com/zkmopro/wasmer.git?branch=4.3.2-memory-patch#73bfccc8db8f4a9c564203601c4d5a8e2ec3cf48"
 dependencies = [
  "cranelift-codegen",
  "cranelift-entity",
@@ -5911,6 +5908,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "wasmer-derive"
+version = "4.3.2"
+source = "git+https://github.com/zkmopro/wasmer.git?branch=4.3.2-memory-patch#73bfccc8db8f4a9c564203601c4d5a8e2ec3cf48"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "wasmer-journal"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5940,8 +5948,7 @@ dependencies = [
 [[package]]
 name = "wasmer-types"
 version = "4.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c890fd0dbda40df03977b899d1ad7113deba3c225f2cc7b88deb7633044d3e07"
+source = "git+https://github.com/zkmopro/wasmer.git?branch=4.3.2-memory-patch#73bfccc8db8f4a9c564203601c4d5a8e2ec3cf48"
 dependencies = [
  "bytecheck",
  "enum-iterator",
@@ -5962,8 +5969,7 @@ dependencies = [
 [[package]]
 name = "wasmer-vm"
 version = "4.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e0dc60ab800cf0bd44e2d35d88422d256d2470b00c72778f91bfb826c42dbd0"
+source = "git+https://github.com/zkmopro/wasmer.git?branch=4.3.2-memory-patch#73bfccc8db8f4a9c564203601c4d5a8e2ec3cf48"
 dependencies = [
  "backtrace",
  "cc",
@@ -6073,7 +6079,7 @@ dependencies = [
  "wai-bindgen-rust",
  "wai-parser",
  "wasmer",
- "wasmer-derive",
+ "wasmer-derive 4.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasmer-types",
 ]
 

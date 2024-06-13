@@ -24,11 +24,6 @@ mopro-core = { git = "https://github.com/zkmopro/mopro.git", package = "mopro-co
 # NOTE: For this to work we need dedicated package, not just workspace
 # mopro = { path = "../" }
 
-[patch.crates-io]
-# NOTE: Forked wasmer to work around memory limits
-# See https://github.com/wasmerio/wasmer/commit/09c7070
-# wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
-
 # NOTE: For patching the version 0.3 and 0.4 for arkworks
 ark-bls12-377-3 = { git = 'https://github.com/arkworks-rs/curves.git', package = 'ark-bls12-377', tag = 'v0.3.0', optional = true}
 ark-ec-3 = { git = 'https://github.com/arkworks-rs/algebra.git', package = 'ark-ec', tag = 'v0.3.0', features = ["parallel"], optional = true }
