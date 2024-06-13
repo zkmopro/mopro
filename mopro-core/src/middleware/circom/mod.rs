@@ -26,7 +26,7 @@ use core::include_bytes;
 use num_bigint::BigInt;
 use once_cell::sync::{Lazy, OnceCell};
 
-use wasmer::{Module, Store, sys:: {EngineBuilder} };
+use wasmer::{Module, Store, sys::EngineBuilder };
 
 use ark_zkey::{read_arkzkey, read_arkzkey_from_bytes}; //SerializableConstraintMatrices
 use {
@@ -78,6 +78,8 @@ static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
 //     // TODO: Use reader? More flexible; unclear if perf diff
 //     read_arkzkey_from_bytes(ARKZKEY_BYTES).expect("Failed to read arkzkey")
 // });
+
+const WASM: &[u8] = include_bytes!(env!("BUILD_RS_WASM_FILE"));
 
 /// `WITNESS_CALCULATOR` is a lazily initialized, thread-safe singleton of type `WitnessCalculator`.
 /// `OnceCell` ensures that the initialization occurs exactly once, and `Mutex` allows safe shared
@@ -165,6 +167,8 @@ pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
 
 /// Provides access to the `WITNESS_CALCULATOR` singleton, initializing it if necessary.
 /// It expects the path to the dylib file to be set in the `CIRCUIT_WASM_DYLIB` environment variable.
+#[cfg(feature = "dylib")]
+#[must_use]
 pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
     let var_name = "CIRCUIT_WASM_DYLIB";
 
@@ -177,6 +181,18 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
             )
         });
         from_dylib(Path::new(&path))
+    })
+}
+
+#[cfg(not(feature = "dylib"))]
+#[must_use]
+pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
+    WITNESS_CALCULATOR.get_or_init(|| {
+        let mut store = Store::default();
+        let module = Module::from_binary(&store, WASM).expect("WASM should be valid");
+        let result =
+            WitnessCalculator::from_module(& mut store, module).expect("Failed to create WitnessCalculator");
+        Mutex::new(result)
     })
 }
 
