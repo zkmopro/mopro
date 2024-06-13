@@ -182,7 +182,7 @@ pub fn encode_instances(
         .alloc_buffer::<u32>(instances_size * num_windows * 2);
 
     // // debug
-    // let debug_buffer = config.state.alloc_buffer::<u32>(1024);
+    // let debug_buffer = config.state.alloc_buffer::<u32>(2048);
 
     MetalMsmInstance {
         data: MetalMsmData {
@@ -290,6 +290,36 @@ pub fn exec_metal_commands(
     println!("Sort buckets indices time: {:?}", sort_start.elapsed());
 
     // accumulate the buckets_matrix using sorted bucket indices on GPU
+    let max_threads_per_group = MTLSize::new(
+        config
+            .pipelines
+            .bucket_wise_accumulation
+            .thread_execution_width(),
+        config
+            .pipelines
+            .bucket_wise_accumulation
+            .max_total_threads_per_threadgroup()
+            / config
+                .pipelines
+                .bucket_wise_accumulation
+                .thread_execution_width(),
+        1,
+    );
+    let max_thread_size = params.buckets_size as u64 * params.num_window;
+    let opt_threadgroups_amount = max_thread_size
+        / config
+            .pipelines
+            .bucket_wise_accumulation
+            .max_total_threads_per_threadgroup()
+        + 1;
+    let opt_threadgroups = MTLSize::new(opt_threadgroups_amount, 1, 1);
+    println!(
+        "(accumulation) max thread per threadgroup: {:?}",
+        max_threads_per_group
+    );
+    println!("(accumulation) opt threadgroups: {:?}", opt_threadgroups);
+
+    let max_thread_size_accu_buffer = config.state.alloc_buffer_data(&[max_thread_size as u32]);
     let bucket_wise_time = Instant::now();
     autoreleasepool(|| {
         let (command_buffer, command_encoder) = config.state.setup_command(
@@ -300,12 +330,15 @@ pub fn exec_metal_commands(
                 (2, &data.base_buffer),
                 (3, &sorted_buckets_indices_buffer),
                 (4, &data.buckets_matrix_buffer),
+                (5, &max_thread_size_accu_buffer),
+                // (6, &data.debug_buffer),
             ]),
         );
-        command_encoder.dispatch_thread_groups(
-            MTLSize::new(params.buckets_size as u64 * params.num_window, 1, 1),
-            MTLSize::new(1, 1, 1),
-        );
+        // command_encoder.dispatch_thread_groups(
+        //     MTLSize::new(params.buckets_size as u64 * params.num_window, 1, 1),
+        //     MTLSize::new(1, 1, 1),
+        // );
+        command_encoder.dispatch_thread_groups(opt_threadgroups, max_threads_per_group);
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
@@ -317,7 +350,20 @@ pub fn exec_metal_commands(
         bucket_wise_elapsed
     );
 
+    // // debug
+    // let debug_data = MetalState::retrieve_contents::<u32>(&data.debug_buffer);
+    // println!("Debug data: {:?}", debug_data);
+
     // Reduce the buckets_matrix on GPU
+    let max_thread_size = params.num_window;
+    let opt_threadgroups_amount = max_thread_size
+        / config
+            .pipelines
+            .bucket_wise_accumulation
+            .max_total_threads_per_threadgroup()
+        + 1;
+    let opt_threadgroups = MTLSize::new(opt_threadgroups_amount, 1, 1);
+    let max_thread_size_reduc_buffer = config.state.alloc_buffer_data(&[max_thread_size as u32]);
     let reduction_time = Instant::now();
     autoreleasepool(|| {
         let (command_buffer, command_encoder) = config.state.setup_command(
@@ -328,10 +374,12 @@ pub fn exec_metal_commands(
                 (2, &data.base_buffer),
                 (3, &data.buckets_matrix_buffer),
                 (4, &data.res_buffer),
+                (5, &max_thread_size_reduc_buffer),
             ]),
         );
-        command_encoder
-            .dispatch_thread_groups(MTLSize::new(params.num_window, 1, 1), MTLSize::new(1, 1, 1));
+        // command_encoder
+        //     .dispatch_thread_groups(MTLSize::new(params.num_window, 1, 1), MTLSize::new(1, 1, 1));
+        command_encoder.dispatch_thread_groups(opt_threadgroups, max_threads_per_group);
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();

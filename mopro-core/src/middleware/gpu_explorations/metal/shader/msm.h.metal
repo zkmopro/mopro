@@ -153,6 +153,10 @@ constant constexpr uint32_t NUM_LIMBS = 8;  // u256
     const uint32_t total_threads                [[ threads_per_grid ]]
 )
 {
+    if (thread_id >= total_threads) {
+        return;
+    }
+
     uint32_t window_size = _window_size;    // c in arkworks code
     uint32_t num_windows = _num_windows;
     uint32_t buckets_len = (1 << window_size) - 1;
@@ -183,17 +187,27 @@ constant constexpr uint32_t NUM_LIMBS = 8;  // u256
 
 // TODO: sorting buckets_indices with bucket_idx as key
 
-// TODO: bucket_wise accumulation
 [[kernel]] void bucket_wise_accumulation(
     constant const uint32_t& _instances_size    [[ buffer(0) ]],
     constant const uint32_t& _num_windows       [[ buffer(1) ]],
     constant const Point* p_buff                [[ buffer(2) ]],
     device uint2* buckets_indices               [[ buffer(3) ]],
     device Point* buckets_matrix                [[ buffer(4) ]],
-    const uint32_t thread_id                    [[ thread_position_in_grid ]],
-    const uint32_t total_threads                [[ threads_per_grid ]]
+    constant const uint32_t& _max_thread_size   [[ buffer(5) ]],
+    uint2 dispatch_threads_per_threadgroup      [[ dispatch_threads_per_threadgroup ]],
+    uint2 threadgroup_position_in_grid          [[ threadgroup_position_in_grid ]],
+    uint tid                                    [[ thread_index_in_threadgroup ]]
 )
 {
+    uint max_threads_per_threadgroup = dispatch_threads_per_threadgroup.x * dispatch_threads_per_threadgroup.y;
+    uint gid = threadgroup_position_in_grid.x;
+    uint thread_id = gid * max_threads_per_threadgroup + tid;
+
+    uint32_t max_thread_size = _max_thread_size;
+    if (thread_id >= max_thread_size) {
+        return;
+    }
+
     uint32_t num_windows = _num_windows;
     uint32_t instances_size = _instances_size;
 
@@ -223,10 +237,15 @@ constant constexpr uint32_t NUM_LIMBS = 8;  // u256
     constant const Point* p_buff                [[ buffer(2) ]],
     device Point* buckets_matrix                [[ buffer(3) ]],
     device Point* res                           [[ buffer(4) ]],
-    const uint32_t thread_id                    [[ thread_position_in_grid ]],
-    const uint32_t total_threads           [[ threads_per_grid ]]
+    constant const uint32_t& _max_thread_size   [[ buffer(5) ]],
+    const uint32_t thread_id                    [[ thread_index_in_threadgroup ]]
 )
 {
+    uint32_t max_thread_size = _max_thread_size;
+    if (thread_id >= max_thread_size) {
+        return;
+    }
+
     uint32_t window_size = _window_size;    // c in arkworks code
     uint32_t buckets_len = (1 << window_size) - 1;
 
