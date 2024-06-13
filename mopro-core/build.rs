@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::{env, fs};
 use toml;
 use toml::Value;
-use wasmer::{Cranelift, sys:: { EngineBuilder }, Module, Store, Target, Triple};
+use wasmer::{sys::EngineBuilder, Cranelift, Module, Store};
 
 #[derive(Deserialize)]
 struct Config {

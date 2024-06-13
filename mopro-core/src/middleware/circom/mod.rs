@@ -26,12 +26,10 @@ use core::include_bytes;
 use num_bigint::BigInt;
 use once_cell::sync::{Lazy, OnceCell};
 
-use wasmer::{Module, Store, sys::EngineBuilder };
+use wasmer::{sys::EngineBuilder, Module, Store};
 
 use ark_zkey::{read_arkzkey, read_arkzkey_from_bytes}; //SerializableConstraintMatrices
-use {
-    std::{env, path::Path}
-};
+use std::{env, path::Path};
 
 #[cfg(feature = "calc-native-witness")]
 use {
@@ -148,8 +146,8 @@ fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
     let module = unsafe {
         Module::deserialize_from_file(&store, path).expect("Failed to load dylib module")
     };
-    let result =
-        WitnessCalculator::from_module(& mut store, module).expect("Failed to create WitnessCalculator");
+    let result = WitnessCalculator::from_module(&mut store, module)
+        .expect("Failed to create WitnessCalculator");
 
     Mutex::new(result)
 }
@@ -190,8 +188,8 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
     WITNESS_CALCULATOR.get_or_init(|| {
         let mut store = Store::default();
         let module = Module::from_binary(&store, WASM).expect("WASM should be valid");
-        let result =
-            WitnessCalculator::from_module(& mut store, module).expect("Failed to create WitnessCalculator");
+        let result = WitnessCalculator::from_module(&mut store, module)
+            .expect("Failed to create WitnessCalculator");
         Mutex::new(result)
     })
 }
@@ -286,7 +284,7 @@ impl CircomState {
         let engine = EngineBuilder::headless();
         let mut store = Store::new(engine);
 
-        let wtns = WitnessCalculator::new(& mut store, wasm_path)
+        let wtns = WitnessCalculator::new(&mut store, wasm_path)
             .map_err(|e| MoproError::CircomError(e.to_string()))
             .unwrap();
         self.wtns = Some(wtns);
@@ -316,7 +314,7 @@ impl CircomState {
             // I _think_ the above clone is unnecessary because this function does not modify our self.wtns
             .as_mut()
             .unwrap()
-            .calculate_witness_element::<Bn254, _>(& mut store, inputs, false)
+            .calculate_witness_element::<Bn254, _>(&mut store, inputs, false)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
         println!("Witness generation took: {:.2?}", now.elapsed());
@@ -529,7 +527,7 @@ mod tests {
         let full_assignment = witness_calculator()
             .lock()
             .expect("Failed to lock witness calculator")
-            .calculate_witness_element::<Bn254, _>(& mut store, inputs, false)
+            .calculate_witness_element::<Bn254, _>(&mut store, inputs, false)
             .map_err(|e| MoproError::CircomError(e.to_string()));
 
         println!("Witness generation took: {:.2?}", now.elapsed());
