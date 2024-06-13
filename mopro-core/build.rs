@@ -1,12 +1,8 @@
-use color_eyre::eyre::eyre;
 use color_eyre::eyre::Result;
-use enumset::enum_set;
-use enumset::EnumSet;
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::str::FromStr;
 use std::{env, fs};
 use toml;
 use toml::Value;
@@ -121,13 +117,10 @@ fn build_dylib(config: &Config) -> Result<()> {
                 .join(build_mode);
 
             // Create a WASM engine for the target that can compile
-            let triple = Triple::from_str(&target_arch).map_err(|e| eyre!(e))?;
-            let cpu_features = enum_set!();
-            let target = Target::new(triple, cpu_features);
             let engine = EngineBuilder::new(Cranelift::default());
 
             // Compile the WASM module
-            let mut store = Store::new(engine);
+            let store = Store::new(engine);
             let module = Module::from_file(&store, &wasm_file_path)?;
 
             // Serialize the compiled module to a dylib file
