@@ -4,7 +4,7 @@
 
 <!--TODO: If the monorepo is seperated, update this-->
 
-Check the [Prepare](../README.md#prepare) and [Build Bindings](../README.md#build-bindings) steps in the root directory.
+<!-- Check the [Prepare](../README.md#prepare) and [Build Bindings](../README.md#build-bindings) steps in the root directory. -->
 
 ## Execute
 
