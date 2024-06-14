@@ -4,7 +4,7 @@
 
 <!--TODO: If the monorepo is seperated, update this-->
 
-Check the [Prerequisites](../README.md#prerequisites) and [Android configuration](../README.md#android-configuration) steps in the root directory.
+<!-- Check the [Prerequisites](../README.md#prerequisites) and [Android configuration](../README.md#android-configuration) steps in the root directory. -->
 
 ## Execute
 
