@@ -72,7 +72,7 @@ public:
         *this = *this + other;
     }
 
-    ECPoint neutral_element() const {
+    static ECPoint neutral_element() {
         return ECPoint(Fp(1), Fp(1), Fp(0)); // Updated to new neutral element (1, 1, 0)
     }
 
@@ -107,7 +107,6 @@ public:
         return a_point.z == Fp(0); // Updated to check for (1, 1, 0)
     }
 
-private:
     constexpr ECPoint double_in_place() const {
         if (is_neutral_element(*this)) {
             return *this;
