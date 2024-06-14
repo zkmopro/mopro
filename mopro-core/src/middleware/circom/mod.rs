@@ -6,6 +6,7 @@ use crate::MoproError;
 
 use std::io::Cursor;
 use std::sync::Mutex;
+
 use std::time::Instant;
 use std::{collections::HashMap, fs::File, io::BufReader};
 
@@ -26,7 +27,7 @@ use core::include_bytes;
 use num_bigint::BigInt;
 use once_cell::sync::{Lazy, OnceCell};
 
-use wasmer::{sys::EngineBuilder, Module, Store};
+use wasmer::{sys::EngineBuilder, Cranelift, Module, Store};
 
 use ark_zkey::{read_arkzkey, read_arkzkey_from_bytes}; //SerializableConstraintMatrices
 use std::{env, path::Path};
@@ -50,6 +51,7 @@ type CircuitInputs = HashMap<String, Vec<BigInt>>;
 pub struct CircomState {
     zkey: Option<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)>,
     wtns: Option<WitnessCalculator>,
+    store: Store
 }
 
 impl Default for CircomState {
@@ -77,12 +79,12 @@ static ZKEY: Lazy<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)> = Lazy::new(|| {
 //     read_arkzkey_from_bytes(ARKZKEY_BYTES).expect("Failed to read arkzkey")
 // });
 
+#[cfg(not(feature = "dylib"))]
 const WASM: &[u8] = include_bytes!(env!("BUILD_RS_WASM_FILE"));
 
 /// `WITNESS_CALCULATOR` is a lazily initialized, thread-safe singleton of type `WitnessCalculator`.
 /// `OnceCell` ensures that the initialization occurs exactly once, and `Mutex` allows safe shared
 /// access from multiple threads.
-static WITNESS_CALCULATOR: OnceCell<Mutex<WitnessCalculator>> = OnceCell::new();
 
 #[cfg(feature = "calc-native-witness")]
 const GRAPH_BYTES: &[u8] = include_bytes!(env!("BUILD_RS_GRAPH_FILE"));
@@ -140,6 +142,7 @@ pub fn initialize() {
 }
 
 /// Creates a `WitnessCalculator` instance from a dylib file.
+#[cfg(feature = "dylib")]
 fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
     let engine = EngineBuilder::headless();
     let mut store = Store::new(engine);
@@ -184,14 +187,11 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
 
 #[cfg(not(feature = "dylib"))]
 #[must_use]
-pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
-    WITNESS_CALCULATOR.get_or_init(|| {
-        let mut store = Store::default();
-        let module = Module::from_binary(&store, WASM).expect("WASM should be valid");
-        let result = WitnessCalculator::from_module(&mut store, module)
-            .expect("Failed to create WitnessCalculator");
-        Mutex::new(result)
-    })
+pub fn witness_calculator() -> (WitnessCalculator, Store) {
+    let mut store = Store::default();
+    let module = Module::from_binary(&store, WASM).expect("WASM should be valid");
+    (WitnessCalculator::from_module(& mut store, module)
+        .expect("Failed to create WitnessCalculator"), store)
 }
 
 pub fn generate_proof2(
@@ -209,12 +209,9 @@ pub fn generate_proof2(
     let full_assignment;
     #[cfg(not(feature = "calc-native-witness"))]
     {
-        let engine = EngineBuilder::headless();
-        let mut store = Store::new(engine);
-        full_assignment = witness_calculator()
-            .lock()
-            .expect("Failed to lock witness calculator")
-            .calculate_witness_element::<Bn254, _>(&mut store, inputs, false)
+        // let engine = EngineBuilder::from(Cranelift::new());
+        let (mut witness, mut store) = witness_calculator();
+        full_assignment = witness.calculate_witness_element::<Bn254, _>(& mut store, inputs, false)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
     }
     #[cfg(feature = "calc-native-witness")]
@@ -272,6 +269,7 @@ impl CircomState {
             zkey: None,
             // arkzkey: None,
             wtns: None,
+            store: Store::default()
         }
     }
 
@@ -281,10 +279,8 @@ impl CircomState {
 
         // read_arkzkey(arkzkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
         self.zkey = Some(zkey);
-        let engine = EngineBuilder::headless();
-        let mut store = Store::new(engine);
 
-        let wtns = WitnessCalculator::new(&mut store, wasm_path)
+        let wtns: WitnessCalculator = WitnessCalculator::new(&mut self.store, wasm_path)
             .map_err(|e| MoproError::CircomError(e.to_string()))
             .unwrap();
         self.wtns = Some(wtns);
@@ -304,9 +300,6 @@ impl CircomState {
 
         println!("Generating proof");
 
-        let engine = EngineBuilder::headless();
-        let mut store = Store::new(engine);
-
         let now = std::time::Instant::now();
         let full_assignment = self
             .wtns
@@ -314,7 +307,7 @@ impl CircomState {
             // I _think_ the above clone is unnecessary because this function does not modify our self.wtns
             .as_mut()
             .unwrap()
-            .calculate_witness_element::<Bn254, _>(&mut store, inputs, false)
+            .calculate_witness_element::<Bn254, _>(&mut self.store, inputs, false)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
         println!("Witness generation took: {:.2?}", now.elapsed());
@@ -394,8 +387,8 @@ pub fn bytes_to_circuit_outputs(bytes: &[u8]) -> SerializableInputs {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_setup_prove_verify_simple() {
+    #[tokio::test]
+    async fn test_setup_prove_verify_simple() {
         let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
         let zkey_path = "./examples/circom/multiplier2/target/multiplier2_final.zkey";
         // Instantiate CircomState
@@ -439,8 +432,8 @@ mod tests {
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
-    #[test]
-    fn test_setup_prove_verify_keccak() {
+    #[tokio::test]
+    async fn test_setup_prove_verify_keccak() {
         let wasm_path =
             "./examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
         let zkey_path = "./examples/circom/keccak256/target/keccak256_256_test_final.zkey";
@@ -535,8 +528,8 @@ mod tests {
         assert!(full_assignment.is_ok());
     }
 
-    #[test]
-    fn test_generate_proof2() {
+    #[tokio::test]
+    async fn test_generate_proof2() {
         // XXX: This can be done better
         #[cfg(feature = "dylib")]
         {

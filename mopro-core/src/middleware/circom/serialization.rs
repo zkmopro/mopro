@@ -92,8 +92,8 @@ mod tests {
         Ok(SerializableProvingKey(raw_params))
     }
 
-    #[test]
-    fn test_serialization_deserialization() {
+    #[tokio::test]
+    async fn test_serialization_deserialization() {
         let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
         let r1cs_path = "./examples/circom/multiplier2/target/multiplier2.r1cs";
 

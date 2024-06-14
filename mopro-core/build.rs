@@ -1,4 +1,7 @@
 use color_eyre::eyre::Result;
+use color_eyre::eyre::eyre;
+use enumset::EnumSet;
+use enumset::enum_set;
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Write;
@@ -6,7 +9,8 @@ use std::path::{Path, PathBuf};
 use std::{env, fs};
 use toml;
 use toml::Value;
-use wasmer::{sys::EngineBuilder, Cranelift, Module, Store};
+use wasmer::{sys::EngineBuilder, Cranelift, Module, Store, Target, Triple};
+use std::str::FromStr;
 
 #[derive(Deserialize)]
 struct Config {
@@ -117,7 +121,10 @@ fn build_dylib(config: &Config) -> Result<()> {
                 .join(build_mode);
 
             // Create a WASM engine for the target that can compile
-            let engine = EngineBuilder::new(Cranelift::default());
+            let triple = Triple::from_str(&target_arch).map_err(|e| eyre!(e))?;
+            let cpu_features = enum_set!();
+            let target = Target::new(triple, cpu_features);
+            let engine = EngineBuilder::new(Cranelift::default()).set_target(Some(target));
 
             // Compile the WASM module
             let store = Store::new(engine);

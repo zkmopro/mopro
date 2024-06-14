@@ -36,8 +36,7 @@ impl Default for MoproCircom {
 #[cfg(not(feature = "dylib"))]
 pub fn initialize_mopro() -> Result<(), MoproError> {
     // TODO: Error handle / panic?
-    panic!("no dylib path");
-    // circom::initialize();
+    circom::initialize();
     Ok(())
 }
 
