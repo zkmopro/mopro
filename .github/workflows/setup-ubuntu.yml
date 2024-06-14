@@ -1,0 +1,36 @@
+name: Setup env
+
+on:
+  workflow_call:
+
+jobs:
+  setup-ubuntu:
+    runs-on: ubuntu-latest
+    env:
+      SCCACHE_GHA_ENABLED: "true"
+      RUSTC_WRAPPER: "sccache"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: "1.77"
+            override: true
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.3
+      - name: Install circom
+        run: |
+            sudo wget -O ~/.cargo/bin/circom https://github.com/iden3/circom/releases/download/v2.1.9/circom-linux-amd64
+            sudo chmod +x ~/.cargo/bin/circom
+      - name: Prepare CI for Core and FFI
+        run: ./scripts/prepare_ci.sh
+      - name: Build
+        run: cargo build
+      - name: Cache build
+        uses: actions/cache/save@v4
+        with:
+          key: ${{ github.sha }}-setup-ubuntu
+          path: |
+            ~/.cargo
+            ./mopro-core/examples
+
