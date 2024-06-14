@@ -25,6 +25,7 @@ gpu-benchmarks = ["mopro-core/gpu-benchmarks"]
 calc-native-witness = ["mopro-core/calc-native-witness"]
 
 [dependencies]
+tokio = "1.0.0"
 mopro-core = { path = "../mopro-core" }
 uniffi = { version = "0.25", features = ["cli"] }
 serde = { version = "1", features = ["derive"] }

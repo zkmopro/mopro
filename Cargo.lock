@@ -3147,6 +3147,7 @@ dependencies = [
  "num-bigint",
  "serde",
  "thiserror",
+ "tokio",
  "uniffi",
 ]
 
