@@ -5,10 +5,9 @@ use self::{
 use crate::MoproError;
 
 use std::io::Cursor;
-use std::sync::Mutex;
 
 use std::time::Instant;
-use std::{collections::HashMap, fs::File, io::BufReader};
+use std::{collections::HashMap, fs::File};
 
 use ark_bn254::{Bn254, Fr};
 use ark_circom::{
@@ -25,12 +24,9 @@ use ark_std::rand::thread_rng;
 use color_eyre::Result;
 use core::include_bytes;
 use num_bigint::BigInt;
-use once_cell::sync::{Lazy, OnceCell};
+use once_cell::sync::Lazy;
 
-use wasmer::{sys::EngineBuilder, Cranelift, Module, Store};
-
-use ark_zkey::{read_arkzkey, read_arkzkey_from_bytes}; //SerializableConstraintMatrices
-use std::{env, path::Path};
+use wasmer::{Module, Store};
 
 #[cfg(feature = "calc-native-witness")]
 use {
@@ -51,7 +47,7 @@ type CircuitInputs = HashMap<String, Vec<BigInt>>;
 pub struct CircomState {
     zkey: Option<(ProvingKey<Bn254>, ConstraintMatrices<Fr>)>,
     wtns: Option<WitnessCalculator>,
-    store: Store
+    store: Store,
 }
 
 impl Default for CircomState {
@@ -190,8 +186,11 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
 pub fn witness_calculator() -> (WitnessCalculator, Store) {
     let mut store = Store::default();
     let module = Module::from_binary(&store, WASM).expect("WASM should be valid");
-    (WitnessCalculator::from_module(& mut store, module)
-        .expect("Failed to create WitnessCalculator"), store)
+    (
+        WitnessCalculator::from_module(&mut store, module)
+            .expect("Failed to create WitnessCalculator"),
+        store,
+    )
 }
 
 pub fn generate_proof2(
@@ -211,7 +210,8 @@ pub fn generate_proof2(
     {
         // let engine = EngineBuilder::from(Cranelift::new());
         let (mut witness, mut store) = witness_calculator();
-        full_assignment = witness.calculate_witness_element::<Bn254, _>(& mut store, inputs, false)
+        full_assignment = witness
+            .calculate_witness_element::<Bn254, _>(&mut store, inputs, false)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
     }
     #[cfg(feature = "calc-native-witness")]
@@ -269,7 +269,7 @@ impl CircomState {
             zkey: None,
             // arkzkey: None,
             wtns: None,
-            store: Store::default()
+            store: Store::default(),
         }
     }
 

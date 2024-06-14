@@ -1,16 +1,16 @@
-use color_eyre::eyre::Result;
 use color_eyre::eyre::eyre;
-use enumset::EnumSet;
+use color_eyre::eyre::Result;
 use enumset::enum_set;
+use enumset::EnumSet;
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 use std::{env, fs};
 use toml;
 use toml::Value;
 use wasmer::{sys::EngineBuilder, Cranelift, Module, Store, Target, Triple};
-use std::str::FromStr;
 
 #[derive(Deserialize)]
 struct Config {
