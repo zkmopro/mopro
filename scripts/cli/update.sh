@@ -117,7 +117,7 @@ print_action "Generating Swift bindings..."
 uniffi-bindgen generate ${MOPRO_ROOT}/mopro-ffi/src/mopro.udl --language swift --out-dir ${TARGET_DIR}/SwiftBindings
 
 # Build mopro-ffi
-cd ${MOPRO_ROOT}/mopro-ffi
+cd "${MOPRO_ROOT}/mopro-ffi"
 if [[ "$USE_DYLIB" == true ]]; then
     # Build dylib
     print_action "Building mopro-ffi with dylib flag ($BUILD_MODE)..."

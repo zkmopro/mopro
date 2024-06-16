@@ -30,7 +30,7 @@ npm_install() {
 
     if [[ ! -d "$circuit_dir/node_modules" ]]; then
         echo "Installing npm dependencies for $circuit_dir..."
-        (cd $circuit_dir && npm install)
+        (cd "${circuit_dir}" && npm install)
     fi
 }
 
@@ -79,7 +79,7 @@ print_action "[core/circom] Downloading artifacts for example circuits..."
 
 # Build Circom circuits in mopro-core and run trusted setup
 print_action "[core/circom] Compiling example circuits..."
-cd $CIRCOM_DIR
+cd "${CIRCOM_DIR}"
 
 # Compile multiplier2
 compile_circuit multiplier2 multiplier2.circom
@@ -111,7 +111,7 @@ download_files "rsa" "main"
 
 # Add support for target architectures
 print_action "[ffi] Adding support for target architectures..."
-cd ${PROJECT_DIR}/mopro-ffi
+cd "${PROJECT_DIR}/mopro-ffi"
 
 for target in x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android; do
     if ! check_target_support $target; then

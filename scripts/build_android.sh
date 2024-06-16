@@ -82,7 +82,7 @@ fi
 
 PROJECT_DIR=$(pwd)
 
-cd ${PROJECT_DIR}/mopro-ffi
+cd "${PROJECT_DIR}/mopro-ffi"
 
 print_action "[android] Install cargo-ndk"
 cargo install cargo-ndk

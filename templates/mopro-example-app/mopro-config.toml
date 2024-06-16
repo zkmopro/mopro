@@ -12,6 +12,7 @@ build_mode = "release" # Options: debug, release
 
 [circuit]
 # multiplier2
+adapter = "circom"
 dir = "core/circuits/multiplier2"
 name = "multiplier2"
 ptau = "02"                       # ptau to use for trusted setup of circuit, "01" to "27"
@@ -20,6 +21,12 @@ ptau = "02"                       # ptau to use for trusted setup of circuit, "0
 #dir = "core/circuits/keccak256"
 #name = "keccak256_256_test"
 #ptau = "19"
+
+# Halo2 Fibonacci
+#adapter = "halo2"                         # Proving system options: circom (default), halo2
+#dir = "core/circuits/halo2-fibonacci"  # Directory of the circuit
+#name = "fibonacci"                     # Name of the circuit
+#ptau = 4
 
 [dylib]
 # NOTE: Dylib support is experimental and requires some fiddling in iOS

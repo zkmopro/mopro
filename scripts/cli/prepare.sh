@@ -61,6 +61,7 @@ read_configuration() {
     BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
     USE_DYLIB=$(read_toml "$CONFIG_FILE" "dylib.use_dylib")
     DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")
+    CIRCUIT_TYPE=$(read_toml "$CONFIG_FILE" "circuit.adapter")
     CIRCUIT_DIR=$(read_toml "$CONFIG_FILE" "circuit.dir")
     CIRCUIT_NAME=$(read_toml "$CONFIG_FILE" "circuit.name")
     CIRCUIT_PTAU=$(read_toml "$CONFIG_FILE" "circuit.ptau")
@@ -84,12 +85,12 @@ read_toml() {
 npm_install() {
     if [[ -f "${CIRCUIT_DIR}/package.json" && ! -d "${CIRCUIT_DIR}/node_modules" ]]; then
         echo "Installing npm dependencies for $CIRCUIT_DIR..."
-        (cd $CIRCUIT_DIR && npm install)
+        (cd "${CIRCUIT_DIR}" && npm install)
     fi
 }
 
 # Compile the circuit
-compile_circuit() {
+circom_compile_circuit() {
     print_action "Compiling circuit $CIRCUIT_NAME..."
     local circuit_file_path="${CIRCUIT_DIR}/${CIRCUIT_NAME}.circom"
 
@@ -101,7 +102,7 @@ compile_circuit() {
 }
 
 # Trusted setup for the circuit
-trusted_setup() {
+circom_trusted_setup() {
     print_action "Running trusted setup for $CIRCUIT_NAME..."
 
     # Change this is if you keep your Powers of Tau files elsewhere
@@ -142,7 +143,7 @@ trusted_setup() {
 }
 
 # Generate arkzkey for the circuit
-generate_arkzkey() {
+circom_generate_arkzkey() {
     local ZKEY_PATH="${OUTPUT_DIR}/${CIRCUIT_NAME}_final.zkey"
     local ARKZKEY_PATH="${OUTPUT_DIR}/${CIRCUIT_NAME}_final.arkzkey"
 
@@ -158,15 +159,40 @@ generate_arkzkey() {
     echo "Arkzkey generation done, arkzkey file is in $ARKZKEY_PATH"
 }
 
+# Generate keys for Halo2 circuit
+halo2_generate_keys() {
+  # Execute the cargo run command to generate the keys for the circuit
+  # The project is in the CIRCUIT_DIR and the executable is CIRCUIT_NAME
+
+  # Change to the circuit directory, first check if the directory exists
+  if [ ! -d "$CIRCUIT_DIR" ]; then
+    echo "Error: Circuit directory $CIRCUIT_DIR does not exist."
+    exit 1
+  fi
+
+  cd $CIRCUIT_DIR
+
+  # Generate the keys running the cargo command on the circuit binary
+  cargo run --release --bin $CIRCUIT_NAME
+}
+
+
 
 # Main function to orchestrate the script
 main() {
+
     initialize_environment "$@"
     read_configuration "$1"
-    npm_install
-    compile_circuit
-    trusted_setup
-    generate_arkzkey
+
+    if [ "$CIRCUIT_TYPE" == "halo2" ]; then
+       halo2_generate_keys
+    else
+        npm_install
+        circom_compile_circuit
+        circom_trusted_setup
+        circom_generate_arkzkey
+    fi
+
     print_action "Circuit and its artifacts built successfully."
 }
 
