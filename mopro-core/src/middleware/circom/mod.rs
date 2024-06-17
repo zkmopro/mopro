@@ -26,6 +26,7 @@ use core::include_bytes;
 use num_bigint::BigInt;
 use once_cell::sync::Lazy;
 
+use std::env;
 use wasmer::{Module, Store};
 
 #[cfg(feature = "calc-native-witness")]
@@ -114,10 +115,7 @@ fn calculate_witness_with_graph(inputs: CircuitInputs) -> Vec<Fr> {
 #[cfg(feature = "dylib")]
 pub fn initialize(dylib_path: &Path) {
     println!("Initializing dylib: {:?}", dylib_path);
-
-    WITNESS_CALCULATOR
-        .set(from_dylib(dylib_path))
-        .expect("Failed to set WITNESS_CALCULATOR");
+    // TODO: warm the dylib or build a singleton to avoid reloading?
 
     // Initialize ZKEY
     let now = std::time::Instant::now();
@@ -139,7 +137,7 @@ pub fn initialize() {
 
 /// Creates a `WitnessCalculator` instance from a dylib file.
 #[cfg(feature = "dylib")]
-fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
+fn from_dylib(path: &Path) -> (WitnessCalculator, Store) {
     let engine = EngineBuilder::headless();
     let mut store = Store::new(engine);
     let module = unsafe {
@@ -148,7 +146,7 @@ fn from_dylib(path: &Path) -> Mutex<WitnessCalculator> {
     let result = WitnessCalculator::from_module(&mut store, module)
         .expect("Failed to create WitnessCalculator");
 
-    Mutex::new(result)
+    (result, store)
 }
 
 #[must_use]
@@ -166,19 +164,16 @@ pub fn zkey() -> &'static (ProvingKey<Bn254>, ConstraintMatrices<Fr>) {
 /// It expects the path to the dylib file to be set in the `CIRCUIT_WASM_DYLIB` environment variable.
 #[cfg(feature = "dylib")]
 #[must_use]
-pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
+pub fn witness_calculator() -> (WitnessCalculator, Store) {
     let var_name = "CIRCUIT_WASM_DYLIB";
-
-    WITNESS_CALCULATOR.get_or_init(|| {
-        let path = env::var(var_name).unwrap_or_else(|_| {
-            panic!(
-                "Mopro circuit WASM Dylib not initialized. \
-            Please set {} environment variable to the path of the dylib file",
-                var_name
-            )
-        });
-        from_dylib(Path::new(&path))
-    })
+    let path = env::var(var_name).unwrap_or_else(|_| {
+        panic!(
+            "Mopro circuit WASM Dylib not initialized. \
+        Please set {} environment variable to the path of the dylib file",
+            var_name
+        )
+    });
+    from_dylib(Path::new(&path))
 }
 
 #[cfg(not(feature = "dylib"))]
@@ -514,12 +509,9 @@ mod tests {
 
         let inputs = bytes_to_circuit_inputs(&input_vec);
 
-        let engine = EngineBuilder::headless();
-        let mut store = Store::new(engine);
+        let (mut calculator, mut store) = witness_calculator();
         let now = std::time::Instant::now();
-        let full_assignment = witness_calculator()
-            .lock()
-            .expect("Failed to lock witness calculator")
+        let full_assignment = calculator
             .calculate_witness_element::<Bn254, _>(&mut store, inputs, false)
             .map_err(|e| MoproError::CircomError(e.to_string()));
 

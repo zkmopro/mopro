@@ -369,8 +369,8 @@ mod tests {
         circom::serialization::serialize_inputs(&circom_outputs)
     }
 
-    #[test]
-    fn test_end_to_end() -> Result<(), MoproError> {
+    #[tokio::test]
+    async fn test_end_to_end() -> Result<(), MoproError> {
         // Paths to your wasm and zkey files
         let wasm_path =
             "./../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
@@ -419,8 +419,8 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn test_end_to_end_keccak() -> Result<(), MoproError> {
+    #[tokio::test]
+    async fn test_end_to_end_keccak() -> Result<(), MoproError> {
         // Paths to your wasm and r1cs files
         let wasm_path =
             "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_js/keccak256_256_test.wasm";
