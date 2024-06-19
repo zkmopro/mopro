@@ -187,11 +187,10 @@ halo2_generate_keys() {
   # Execute the cargo run command to generate the keys for the circuit
   # Handle errors if the cargo command fails
   if ! cargo run --release --bin "$CIRCUIT_NAME"; then
-      echo "Error: Failed to generate keys using the circuit binary '$CIRCUIT_NAME'."
-      echo "This step is necessary to generate the keys for the circuit."
-      echo "Consider adding the necessary code to the circuit binary to generate the keys as in the example"
+      echo "Error: Failed to generate keys using the circuit's binary '$CIRCUIT_NAME'."
+      echo "Consider either adding the necessary code to the circuit's binary to generate the keys"
       echo "or generate the keys manually and skip the `prepare` step."
-      echo "Make sure there are the following key files:"
+      echo "Make sure the following key files exist:"
       echo "  - ${CIRCUIT_DIR}/${circuit_srs_path})"
       echo "  - ${CIRCUIT_DIR}/${circuit_pk_path})"
       echo "  - ${CIRCUIT_DIR}/${circuit_vk_path})"
