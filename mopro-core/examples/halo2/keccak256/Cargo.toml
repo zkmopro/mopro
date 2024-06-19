@@ -1,0 +1,36 @@
+[workspace]
+[package]
+
+name = "keccak-test-2"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+array-init = "2.0.0"
+ethers-core = "0.17.0"
+rand = "0.8"
+itertools = "0.10.3"
+lazy_static = "1.4"
+log = "0.4"
+num-bigint = { version = "0.4" }
+halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", tag = "v2023_04_20", features = [
+    "dev-graph", "circuit-params"
+] }
+rayon = "1.6.1"
+serde = { version = "1.0.203", features = ["derive"] }
+sha3 = "0.10.8"
+
+[dev-dependencies]
+criterion = "0.3"
+ctor = "0.1.22"
+ethers-signers = "0.17.0"
+hex = "0.4.3"
+itertools = "0.10.1"
+pretty_assertions = "1.0.0"
+rand_core = "0.6.4"
+rand_xorshift = "0.3"
+env_logger = "0.10"
+test-case = "3.1.0"
+
+#[patch."https://github.com/privacy-scaling-explorations/halo2curves.git"]
+#halo2curves = { tag = "v0.6.1", git = "https://github.com/privacy-scaling-explorations/halo2curves/" }
