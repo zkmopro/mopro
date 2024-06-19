@@ -2,7 +2,7 @@ use crate::middleware::gpu_explorations::utils::preprocess::{self, Point};
 use ark_bn254::{Fr as ScalarField, G1Projective as G};
 use ark_ec::Group;
 use ark_ff::PrimeField;
-use ark_serialize::CanonicalSerialize;
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use rayon::prelude::*;
 use std::fs::File;
 use std::time::{Duration, Instant};
@@ -10,17 +10,25 @@ use std::time::{Duration, Instant};
 // ref: https://github.com/ingonyama-zk/icicle/blob/de25b6e203df0ca70b71dcb77e19da156a8b9ff1/icicle/src/msm/msm.cu#L27C1-L36C6
 fn left_shift_points(points: &mut [Point], shift: u32) {
     points.par_iter_mut().for_each(|point| {
-        // TODO: this process might be slow, we might consider using a faster method
+        // TODO: this process might be slow, we might consider using a faster method (directly shifting on GAffine)
         let mut shifted_point = G::from(*point);
         for _ in 0..shift {
             shifted_point = shifted_point.double();
         }
+
+        // let double_point = Point::from(shifted_point);
+        // // using single scalar multiplication
+        // let scalar = ScalarField::from(1u64 << shift);
+        // let mut shifted_point = G::from(*point);
+        // shifted_point *= scalar;
+        // let scalar_point = Point::from(shifted_point);
+        // assert_eq!(double_point, scalar_point);
         *point = Point::from(shifted_point);
     });
 }
 
 // ref: https://github.com/ingonyama-zk/icicle/blob/de25b6e203df0ca70b71dcb77e19da156a8b9ff1/icicle/src/msm/msm.cu#L889C1-L913C4
-fn precompute_msm_points(
+pub fn precompute_msm_points(
     points: &[Point],       // original points
     precompute_factor: u32, // number of precomputed points
     c: u32,                 // window_size
@@ -69,18 +77,18 @@ where
     for (i, instance) in instances.enumerate() {
         let points = &instance.0;
         let precomputed_points = precompute_msm_points(points, precompute_factor, c)?;
-        serialize_input(output_dir, &precomputed_points, i != 0)?;
+        serialize_precomputed_points(output_dir, &precomputed_points, i != 0)?;
         total_duration += start.elapsed();
     }
     println!("Precomputation Completed!");
     println!(
-        "Precomputation time for {} x ({} points) with precompute factor {} is: {:?}",
+        "Precomputation time for {}x({} points) with precompute_factor={} is: {:?}",
         num_instance, instance_size, precompute_factor, total_duration
     );
     Ok(())
 }
 
-pub fn serialize_input(
+pub fn serialize_precomputed_points(
     dir: &str,
     points: &[Point],
     append: bool,
@@ -99,6 +107,28 @@ pub fn serialize_input(
     };
     points.serialize_compressed(&file).unwrap();
     Ok(())
+}
+
+pub fn deserialize_precomputed_points(
+    dir: &str,
+) -> Result<Vec<Vec<Point>>, preprocess::HarnessError> {
+    let mut precomputed_points = Vec::new();
+    let precomputed_points_path = format!("{}{}", dir, "/precomputed_points");
+    let file = File::open(precomputed_points_path)?;
+
+    loop {
+        let points = Vec::<Point>::deserialize_compressed_unchecked(&file);
+
+        let points = match points {
+            Ok(x) => x,
+            _ => {
+                break;
+            }
+        };
+        precomputed_points.push(points);
+    }
+
+    Ok(precomputed_points)
 }
 
 #[cfg(test)]
@@ -137,6 +167,7 @@ mod tests {
         for instance in instances {
             let points = instance.0;
             let precomputed_points = precompute_msm_points(&points, precompute_factor, window_size);
+
             match precomputed_points {
                 Ok(precomputed_points) => {
                     assert_eq!(
@@ -177,14 +208,28 @@ mod tests {
 
         let precompute_factor = 2;
         let window_size = 4;
+        let instances_vec: Vec<_> = instances.collect();
 
         let _ = precompute_points_from_instances(
-            instances,
+            instances_vec.clone().into_iter(),
             instance_size,
             num_instance,
             precompute_factor,
             window_size,
             &dir,
         );
+
+        // test for deserialization
+        let precomputed_points = deserialize_precomputed_points(&dir).unwrap();
+        assert_eq!(precomputed_points.len(), num_instance as usize);
+        for (i, points) in precomputed_points.iter().enumerate() {
+            assert_eq!(
+                points.len(),
+                instance_size as usize * precompute_factor as usize
+            );
+            let _points = &instances_vec[i].0;
+            // check the original points are correct (in the first 0~instance_size of each extended points array)
+            assert_eq!(&points[..instance_size as usize], _points);
+        }
     }
 }
