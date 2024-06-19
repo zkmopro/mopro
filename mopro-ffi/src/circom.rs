@@ -74,7 +74,7 @@ pub fn initialize_mopro() -> Result<(), MoproError> {
 pub fn initialize_mopro_dylib(dylib_path: String) -> Result<(), MoproError> {
     // TODO: Error handle / panic?
     let dylib_path = Path::new(dylib_path.as_str());
-    crate::circom::initialize(dylib_path);
+    circom::initialize(dylib_path);
     Ok(())
 }
 
