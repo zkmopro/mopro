@@ -11,6 +11,7 @@ fi
 
 PROJECT_DIR=$(pwd)
 CIRCOM_DIR="${PROJECT_DIR}/mopro-core/examples/circom"
+HALO2_DIR="${PROJECT_DIR}/mopro-core/examples/halo2"
 ARKZKEY_DIR="${PROJECT_DIR}/ark-zkey"
 
 compile_circuit() {
@@ -38,6 +39,25 @@ npm_install() {
 # Check for target support
 check_target_support() {
     rustup target list | grep installed | grep -q "$1"
+}
+
+# Generate keys for Halo2 circuit
+halo2_generate_keys() {
+    local circuit_dir=$1
+    local circuit_name=$2
+    # Execute the cargo run command to generate the keys for the circuit
+    # The project is in the circuit_dir and the executable is circuit_name
+    
+    # Change to the circuit directory, first check if the directory exists
+    if [ ! -d "$circuit_dir" ]; then
+        echo "Error: Circuit directory $circuit_dir does not exist."
+        exit 1
+    fi
+    
+    cd $circuit_dir
+    
+    # Generate the keys running the cargo command on the circuit binary
+    cargo run --release --bin $circuit_name
 }
 
 # Install arkzkey-util binary in ark-zkey
@@ -112,6 +132,11 @@ print_action "[core/circom] Generating arkzkey for rsa..."
 # # Generate arkzkey for complex circuit
 # print_action "[core/circom] Generating arkzkey for complex circuit..."
 # ./scripts/generate_arkzkey.sh complex-circuit complex-circuit-1000k-1000k
+
+print_action "[core/halo2] Compiling example circuits...."
+cd "${HALO2_DIR}"
+print_action "[core/halo2] Compiling fibonacci circuits..."
+halo2_generate_keys fibonacci fibonacci
 
 # Add support for target architectures
 print_action "[ffi] Adding support for target architectures..."

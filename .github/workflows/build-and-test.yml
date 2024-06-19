@@ -1,13 +1,13 @@
 name: Build and Test
 
 on:
-  push:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - ready_for_review
+    push:
+    pull_request:
+        types:
+            - opened
+            - reopened
+            - synchronize
+            - ready_for_review
 
 env:
     CARGO_TERM_COLOR: always
@@ -92,8 +92,15 @@ jobs:
               run: npm install -g snarkjs
             - name: Prepare CI for Core and FFI
               run: ./scripts/prepare_ci.sh
-            - name: Run core tests
-              run: cd mopro-core && cargo test -- --nocapture
+            - name: Run circom tests
+              run: |
+                  cd mopro-core
+                  cargo test -- --nocapture
+            - name: Run halo2 tests
+              run: |
+                  export BUILD_CONFIG_PATH="$(pwd)/config-halo2.toml"
+                  cd mopro-core
+                  cargo test --features=halo2 -- --nocapture
     test-ffi:
         runs-on: ubuntu-latest
         steps:
