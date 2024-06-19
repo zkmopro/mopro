@@ -8411,7 +8411,8 @@ __metadata:
     "@docusaurus/types": 3.2.1
     "@mdx-js/react": ^3.0.0
     clsx: ^2.0.0
-    prism-react-renderer: ^2.3.0
+    prism-react-renderer: ^2.3.1
+    prismjs: ^1.29.0
     react: ^18.0.0
     react-dom: ^18.0.0
     typescript: ~5.2.2
@@ -9438,7 +9439,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prism-react-renderer@npm:^2.3.0":
+"prism-react-renderer@npm:^2.3.0, prism-react-renderer@npm:^2.3.1":
   version: 2.3.1
   resolution: "prism-react-renderer@npm:2.3.1"
   dependencies:

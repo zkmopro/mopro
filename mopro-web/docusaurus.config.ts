@@ -43,6 +43,9 @@ const config: Config = {
       disableSwitch: true,
       respectPrefersColorScheme: false,
     },
+    prism: {
+      additionalLanguages: ['powershell', 'bash', 'toml'],
+    },
     image: 'img/logo_title.svg',
     navbar: {
       style: 'dark',
@@ -63,7 +66,7 @@ const config: Config = {
         {
           type: 'html',
           position: 'right',
-          value: 
+          value:
             `<div class="custom-navbar-link">
               <a href="https://github.com/zkmopro/mopro" target="_blank" class="navbar__link">Github</a
               ><img src="/img/link_arrow.svg"/>
@@ -78,7 +81,7 @@ const config: Config = {
           title: 'Resources',
           items: [
             {
-              html: 
+              html:
                 `<div class="custom-footer-link">
                     <a href="https://github.com/zkmopro/mopro" target="_blank" class="footer__link-item">Github</a>
                     <img src="/img/link_arrow.svg"/>
@@ -98,14 +101,14 @@ const config: Config = {
           title: 'Community',
           items: [
             {
-              html: 
+              html:
                 `<div class="custom-footer-link">
                     <a href="https://t.me/zkmopro" target="_blank" class="footer__link-item">Telegram</a>
                     <img src="/img/link_arrow.svg"/>
                   </div>`
             },
             {
-              html: 
+              html:
                 `<div class="custom-footer-link">
                     <a href="https://twitter.com/zkmopro" target="_blank" class="footer__link-item">Twitter</a>
                     <img src="/img/link_arrow.svg"/>
