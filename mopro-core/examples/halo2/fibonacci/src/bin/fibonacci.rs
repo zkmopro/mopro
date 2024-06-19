@@ -22,7 +22,7 @@ pub fn main() {
     // Create the path to the `out` directory under the project's root directory
     let out_dir = Path::new(&project_root).join("out");
 
-    // Check if the `keys` directory exists, if not, create it
+    // Check if the `out` directory exists, if not, create it
     if !out_dir.exists() {
         std::fs::create_dir(&out_dir).expect("Unable to create out directory");
     }
