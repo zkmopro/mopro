@@ -4,7 +4,10 @@ use self::{
 };
 use crate::MoproError;
 
-use std::io::Cursor;
+use std::{
+    future::{self, Future},
+    io::Cursor,
+};
 
 use std::time::Instant;
 use std::{collections::HashMap, fs::File};
@@ -203,11 +206,14 @@ pub fn generate_proof2(
     let full_assignment;
     #[cfg(not(feature = "calc-native-witness"))]
     {
-        // let engine = EngineBuilder::from(Cranelift::new());
-        let (mut witness, mut store) = witness_calculator();
-        full_assignment = witness
-            .calculate_witness_element::<Bn254, _>(&mut store, inputs, false)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        full_assignment = rt.block_on(async {
+            // let engine = EngineBuilder::from(Cranelift::new());
+            let (mut witness, mut store) = witness_calculator();
+            witness
+                .calculate_witness_element::<Bn254, _>(&mut store, inputs, false)
+                .map_err(|e| MoproError::CircomError(e.to_string()))
+        })?;
     }
     #[cfg(feature = "calc-native-witness")]
     let full_assignment = calculate_witness_with_graph(inputs);
@@ -520,8 +526,8 @@ mod tests {
         assert!(full_assignment.is_ok());
     }
 
-    #[tokio::test]
-    async fn test_generate_proof2() {
+    #[test]
+    fn test_generate_proof2() {
         // XXX: This can be done better
         #[cfg(feature = "dylib")]
         {
