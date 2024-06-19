@@ -27,15 +27,15 @@ pub fn main() {
     // Generate SRS
     let srs = ParamsKZG::<Bn256>::new(k);
 
-    let srs_path = out_dir.join("fib_srs");
+    let srs_path = out_dir.join("fibonacci_srs");
     write_srs(&srs, srs_path.as_path());
 
     // Generate the proving key - should be loaded from disk in production
     let vk = keygen_vk(&srs, &circuit).expect("keygen_vk should not fail");
-    let vk_path = out_dir.join("fib_vk");
+    let vk_path = out_dir.join("fibonacci_vk");
 
     let pk = keygen_pk(&srs, vk, &circuit).expect("keygen_pk should not fail");
-    let pk_path = out_dir.join("fib_pk");
+    let pk_path = out_dir.join("fibonacci_pk");
 
     write_keys(&pk, pk_path.as_path(), vk_path.as_path());
 
