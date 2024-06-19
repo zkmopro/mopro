@@ -4,8 +4,8 @@ use ark_ec::Group;
 use ark_ff::PrimeField;
 use ark_serialize::CanonicalSerialize;
 use rayon::prelude::*;
-use std::time::{Duration, Instant};
 use std::fs::File;
+use std::time::{Duration, Instant};
 
 // ref: https://github.com/ingonyama-zk/icicle/blob/de25b6e203df0ca70b71dcb77e19da156a8b9ff1/icicle/src/msm/msm.cu#L27C1-L36C6
 fn left_shift_points(points: &mut [Point], shift: u32) {
@@ -74,8 +74,8 @@ where
     }
     println!("Precomputation Completed!");
     println!(
-        "Precomputation time for {} x ({} points) with precompute factor {} is: {:?}", num_instance,
-        instance_size, precompute_factor, total_duration
+        "Precomputation time for {} x ({} points) with precompute factor {} is: {:?}",
+        num_instance, instance_size, precompute_factor, total_duration
     );
     Ok(())
 }
@@ -130,10 +130,10 @@ mod tests {
 
         let instance_size = 1 << INSTANCE_SIZE;
         let instances = preprocess::FileInputIterator::open(&dir).unwrap();
-        
+
         let precompute_factor = 2;
         let window_size = 4;
-        
+
         for instance in instances {
             let points = instance.0;
             let precomputed_points = precompute_msm_points(&points, precompute_factor, window_size);
@@ -151,7 +151,7 @@ mod tests {
         }
     }
 
-    #[test] 
+    #[test]
     fn test_precompute_points_from_instances() {
         let dir = format!(
             "{}/{}/{}x{}",
@@ -160,7 +160,7 @@ mod tests {
             INSTANCE_SIZE,
             NUM_INSTANCE
         );
-        
+
         // Check if the vectors have been generated
         match preprocess::FileInputIterator::open(&dir) {
             Ok(_) => {
@@ -174,10 +174,17 @@ mod tests {
         let instance_size = 1 << INSTANCE_SIZE;
         let num_instance = NUM_INSTANCE;
         let instances = preprocess::FileInputIterator::open(&dir).unwrap();
-        
+
         let precompute_factor = 2;
         let window_size = 4;
-        
-        let _ = precompute_points_from_instances(instances, instance_size, num_instance, precompute_factor, window_size, &dir);
+
+        let _ = precompute_points_from_instances(
+            instances,
+            instance_size,
+            num_instance,
+            precompute_factor,
+            window_size,
+            &dir,
+        );
     }
 }

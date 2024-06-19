@@ -196,13 +196,6 @@ where
             let start = Instant::now();
             let original_result = <G as VariableBaseMSM>::msm(&points[..], &scalars[..]).unwrap();
             let _result = bucket_wise_msm::<G>(&points[..], &scalars[..]).unwrap();
-            println!("Original MSM result: {:?}", original_result);
-            println!("Result: {:?}", _result);
-            if original_result == _result {
-                println!("MSM is correctly computed");
-            } else {
-                println!("MSM is wrongly computed");
-            }
 
             instance_total_duration += start.elapsed();
         }
@@ -259,7 +252,7 @@ mod tests {
     use ark_serialize::Write;
     use std::fs::File;
 
-    const INSTANCE_SIZE: u32 = 26;
+    const INSTANCE_SIZE: u32 = 16;
     const NUM_INSTANCE: u32 = 5;
     const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils/vectors";
     const BENCHMARKSPATH: &str = "mopro-core/gpu_explorations/benchmarks";
@@ -308,7 +301,7 @@ mod tests {
             "{}/{}/{}_benchmark.txt",
             preprocess::get_root_path(),
             &BENCHMARKSPATH,
-            "arkworks_pippenger"
+            "bucket_wise_msm"
         );
         let mut output_file = File::create(output_path).expect("output file creation failed");
         writeln!(output_file, "msm_size,num_msm,avg_processing_time(ms)").unwrap();

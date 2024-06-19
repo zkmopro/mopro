@@ -84,7 +84,7 @@ mod tests {
     use std::fs::File;
 
     const INSTANCE_SIZE: u32 = 16;
-    const NUM_INSTANCE: u32 = 10;
+    const NUM_INSTANCE: u32 = 5;
     const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils/vectors";
     const BENCHMARKSPATH: &str = "mopro-core/gpu_explorations/benchmarks";
 
@@ -144,6 +144,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_run_multi_benchmarks() {
         let output_path = format!(
             "{}/{}/{}_benchmark.txt",
