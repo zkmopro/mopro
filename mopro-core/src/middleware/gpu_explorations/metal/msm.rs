@@ -341,8 +341,9 @@ pub fn run_benchmark(
 mod tests {
     use super::*;
 
-    use ark_ec::VariableBaseMSM;
+    use ark_ec::{CurveGroup, VariableBaseMSM};
     use ark_serialize::Write;
+    use ark_std::UniformRand;
     use std::fs::File;
 
     const INSTANCE_SIZE: u32 = 16;
@@ -351,14 +352,32 @@ mod tests {
     const BENCHMARKSPATH: &str = "mopro-core/gpu_explorations/benchmarks";
 
     #[test]
-    fn test_metal_msm() {
-        let dir = format!(
-            "{}/{}/{}x{}",
-            preprocess::get_root_path(),
-            UTILSPATH,
-            INSTANCE_SIZE,
-            NUM_INSTANCE
-        );
+    fn test_msm_correctness_small_sample() {
+        let mut rng = ark_std::rand::thread_rng();
+        let p1 = G::rand(&mut rng);
+        let p2 = G::rand(&mut rng);
+
+        let s1 = ScalarField::rand(&mut rng);
+        let s2 = ScalarField::rand(&mut rng);
+
+        // compare with msm correctness with arkworks ec arithmetics
+        let target_msm = p1 * s1 + p2 * s2;
+
+        // Init metal (GPU) state
+        let mut metal_config = setup_metal_state();
+        let this_msm = metal_msm(
+            &[p1.into_affine(), p2.into_affine()],
+            &[s1, s2],
+            &mut metal_config,
+        )
+        .unwrap();
+
+        assert_eq!(target_msm, this_msm, "This msm is wrongly computed");
+    }
+
+    #[test]
+    fn test_msm_correctness_medium_sample() {
+        let dir = format!("{}/{}/{}x{}", preprocess::get_root_path(), UTILSPATH, 10, 5);
         // Init metal (GPU) state
         let mut metal_config = setup_metal_state();
 
@@ -382,10 +401,13 @@ mod tests {
                 .iter()
                 .map(|s| ScalarField::new(*s))
                 .collect::<Vec<ScalarField>>();
-            let metal_msm = metal_msm(&points[..], &scalars[..], &mut metal_config).unwrap();
             let arkworks_msm = G::msm(&points[..], &scalars[..]).unwrap();
-            assert_eq!(metal_msm, arkworks_msm);
-            println!("(pass) Instance {} success", i);
+            let metal_msm = metal_msm(&points[..], &scalars[..], &mut metal_config).unwrap();
+            assert_eq!(metal_msm, arkworks_msm, "This msm is wrongly computed");
+            println!(
+                "(pass) {}th instance of size 2^{} is correctly computed",
+                i, INSTANCE_SIZE
+            );
         }
     }
 
