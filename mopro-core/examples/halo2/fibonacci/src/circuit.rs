@@ -150,6 +150,8 @@ impl<F: Field> FibonacciChip<F> {
     }
 }
 
+/// The circuit takes in the two starting elements and the 9th element of their Fibonacci sequence
+/// and checks that the 9th element is indeed the sum of the two starting elements
 #[derive(Default)]
 pub struct FinbonaciCircuit<F>(PhantomData<F>);
 

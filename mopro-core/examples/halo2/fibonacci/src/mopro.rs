@@ -23,10 +23,10 @@ pub fn prove(
 ) -> Result<(Vec<Fr>, Vec<u8>), String> {
     let circuit = FinbonaciCircuit::<Fr>::default();
 
-    // Generate the proof - so far using dummy inputs, will be replaced with actual inputs
-
+    // Fix the starting values for the Fibonacci sequence
     let a = Fr::from(1); // F[0]
     let b = Fr::from(1); // F[1]
+                         // Check that the `out` value is indeed the 9th Fibonacci number
     let out: Fr = inputs
         .get("out")
         .ok_or("`out` value not found in proof input".to_string())?
