@@ -101,6 +101,10 @@ jobs:
                   export BUILD_CONFIG_PATH="$(pwd)/config-halo2.toml"
                   cd mopro-core
                   cargo test --features=halo2 -- --nocapture
+            - name: Run GPU Benchmarks tests
+              run: |
+                  cd mopro-core
+                  cargo test --features=gpu-benchmarks --lib middleware::gpu_explorations::arkworks_pippenger::tests::test_msm_correctness_small_sample -- --nocapture && cargo test --features=gpu-benchmarks --lib middleware::gpu_explorations::metal::msm::tests::test_msm_correctness_small_sample -- --nocapture
     test-ffi:
         runs-on: ubuntu-latest
         steps:
