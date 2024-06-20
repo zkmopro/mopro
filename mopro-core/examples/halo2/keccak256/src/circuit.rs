@@ -36,12 +36,12 @@ impl<F: Field> Circuit<F> for KeccakCircuit<F> {
     type FloorPlanner = SimpleFloorPlanner;
     type Params = KeccakConfigParams;
 
-    fn params(&self) -> Self::Params {
-        self.config
-    }
-
     fn without_witnesses(&self) -> Self {
         Self::default()
+    }
+
+    fn params(&self) -> Self::Params {
+        self.config
     }
 
     fn configure_with_params(meta: &mut ConstraintSystem<F>, params: Self::Params) -> Self::Config {
@@ -324,4 +324,48 @@ pub fn pack_input_to_instance<F: PrimeField>(input: &[Vec<u8>]) -> Vec<F> {
             })
         })
         .collect()
+}
+
+/// Converts field elements to a vector of bytes.
+/// Currently converts each field element to a single byte.
+/// TODO - optimize by packing multiple bytes into field elements
+pub fn unpack_input<F: Field>(instance: &[F]) -> Vec<u8> {
+    instance
+        .iter()
+        .map(|x| x.to_bytes_le()[0])
+        .collect::<Vec<u8>>()
+}
+
+#[cfg(test)]
+mod test {
+    use crate::circuit::{pack_input_to_instance, unpack_input};
+    use halo2_proofs::halo2curves::bn256::Fr;
+    use test_case::test_case;
+
+    #[test_case(vec![0u8, 151u8, 200u8, 255u8] ; "4 Different Elements")]
+    #[test_case(vec![] ; "Empty case")]
+    fn test_unpack_input(input: Vec<u8>) {
+        // Convert the input to field elements
+        let f_input = input
+            .iter()
+            .map(|x| Fr::from(*x as u64))
+            .collect::<Vec<Fr>>();
+
+        // Convert the field elements back to bytes
+        let output = unpack_input(&f_input);
+        assert_eq!(input, output);
+    }
+
+    #[test_case(vec![0u8, 0u8, 0u8, 0u8], vec![Fr::from(0u64)] ; "Zero to Zero")]
+    #[test_case(vec![1u8, 0u8, 0u8, 0u8, 1u8, 0u8, 0u8, 0u8], vec![Fr::from(4294967297u64)] ; "Max size single element")]
+    #[test_case(vec![1u8, 0u8, 0u8, 0u8, 1u8, 0u8, 0u8, 0u8, 10u8], vec![Fr::from(4294967297u64), Fr::from(10u64)] ; "Two sized output")]
+    fn test_pack_input_to_instance(input: Vec<u8>, expected: Vec<Fr>) {
+        // Convert the input to field elements
+        let f_input = pack_input_to_instance::<Fr>(&vec![input]);
+
+        // 1u8, 0u8, 0u8, 0u8, 1u8, 0u8, 0u8, 0u8 in little endian is
+
+        // Check that the field elements match the expected values
+        assert_eq!(f_input, expected);
+    }
 }

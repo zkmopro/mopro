@@ -18,8 +18,7 @@ use halo2_proofs::transcript::{
 };
 use rand::thread_rng;
 
-use crate::circuit::{pack_input_to_instance, KeccakCircuit};
-use crate::util::prime_field::ScalarField;
+use crate::circuit::{pack_input_to_instance, unpack_input, KeccakCircuit};
 use crate::vanilla::KeccakConfigParams;
 
 pub mod circuit;
@@ -48,10 +47,7 @@ pub fn prove(
 
     // Convert the raw inputs to a vector of u8
     // TODO - can be optimized by packing multiple bytes into field elements
-    let inputs = vec![raw_inputs
-        .iter()
-        .map(|x| *x.to_bytes_le().first().unwrap())
-        .collect::<Vec<u8>>()];
+    let inputs = vec![unpack_input(raw_inputs)];
 
     let instance = pack_input_to_instance::<Fr>(&inputs);
 
@@ -112,18 +108,4 @@ pub fn verify(
     )
     .is_ok();
     Ok(proof_verified)
-}
-
-#[cfg(test)]
-#[test]
-fn test_conversion() {
-    let input = vec![0u8, 151u8, 200u8, 255u8];
-    // Convert the input to field elements
-    let f_input = input.iter().map(|x| Fr::from(*x as u64));
-
-    // Convert the field elements back to bytes
-    let output = f_input
-        .map(|x| x.to_bytes_le()[0] as u8)
-        .collect::<Vec<u8>>();
-    assert_eq!(input, output);
 }
