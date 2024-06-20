@@ -170,10 +170,33 @@ halo2_generate_keys() {
     exit 1
   fi
 
-  cd $CIRCUIT_DIR
+  cd "$CIRCUIT_DIR" || exit
 
-  # Generate the keys running the cargo command on the circuit binary
-  cargo run --release --bin $CIRCUIT_NAME
+  local circuit_srs_path="out/${CIRCUIT_NAME}_srs"
+  local circuit_pk_path="out/${CIRCUIT_NAME}_pk"
+  local circuit_vk_path="out/${CIRCUIT_NAME}_vk"
+
+  # Check if all keys already exist
+  if [ -f "$circuit_srs_path" ] && [ -f "$circuit_pk_path" ] && [ -f "$circuit_vk_path" ]; then
+    echo "Keys for the circuit $CIRCUIT_NAME already exist."
+    echo "Skipping the key generation step."
+    return
+  fi
+
+  # Check if the circuit binary exists
+  # Execute the cargo run command to generate the keys for the circuit
+  # Handle errors if the cargo command fails
+  if ! cargo run --release --bin "$CIRCUIT_NAME"; then
+      echo "Error: Failed to generate keys using the circuit's binary '$CIRCUIT_NAME'."
+      echo "Consider either adding the necessary code to the circuit's binary to generate the keys"
+      echo "or generate the keys manually and skip the `prepare` step."
+      echo "Make sure the following key files exist:"
+      echo "  - ${CIRCUIT_DIR}/${circuit_srs_path})"
+      echo "  - ${CIRCUIT_DIR}/${circuit_pk_path})"
+      echo "  - ${CIRCUIT_DIR}/${circuit_vk_path})"
+
+      exit 1
+  fi
 }
 
 

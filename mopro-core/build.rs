@@ -242,18 +242,27 @@ fn build_circom_circuit(circuit_dir_path: &PathBuf, circuit_name: &str) -> Resul
     Ok(())
 }
 
-fn build_halo2_circuit(circuit_dir_path: &PathBuf) -> Result<()> {
+fn build_halo2_circuit(circuit_dir_path: &PathBuf, circuit_name: &String) -> Result<()> {
     // Resolve the circuit directory to an absolute path based on the conditionally set base_dir
     let circuit_key_path = circuit_dir_path.join("out");
 
-    let srs_path = circuit_key_path.join("fib_srs");
-    let pk_path = circuit_key_path.join("fib_pk");
-    let vk_path = circuit_key_path.join("fib_vk");
+    let srs_path = circuit_key_path.join(format!("{}_srs", circuit_name));
+    let pk_path = circuit_key_path.join(format!("{}_pk", circuit_name));
+    let vk_path = circuit_key_path.join(format!("{}_vk", circuit_name));
 
     if !srs_path.exists() || !pk_path.exists() || !vk_path.exists() {
-        return Err(color_eyre::eyre::eyre!(
-            "Required files for building the Halo2 circuit are missing. Did you run `mopro prepare`?"
-        ));
+        let missing_files = [&srs_path, &pk_path, &vk_path]
+            .iter()
+            .filter(|path| !path.exists())
+            .map(|path| format!(" - {}", path.display()))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        return Err(eyre!(format!(
+        "Required files for building the Halo2 circuit are missing. Ensure you've run `mopro prepare` or generated the files yourself. \
+        \nMissing files:\n{}",
+            missing_files
+    )));
     }
 
     println!("cargo:rustc-env=BUILD_SRS_FILE={}", srs_path.display());
@@ -359,7 +368,7 @@ fn main() -> color_eyre::eyre::Result<()> {
         // Enable Halo2 feature
         println!("cargo:rustc-cfg=halo2");
 
-        build_halo2_circuit(&circuit_dir_path)?;
+        build_halo2_circuit(&circuit_dir_path, circuit_name)?;
 
         update_halo2_cargo_config(&circuit_dir_path);
     } else {
