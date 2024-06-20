@@ -30,14 +30,15 @@ warning: Dylib location: /Users/user/repos/github.com/zkmopro/mopro/mopro-core/t
 Right now this is hardcoded for `rsa`.
 
 Note that:
-- It has to be built for the right architecture
-- Have to run `install_name_tool` to adjust install name
-- Run `codesign` to sign dylib for use on iOS
+
+-   It has to be built for the right architecture
+-   Have to run `install_name_tool` to adjust install name
+-   Run `codesign` to sign dylib for use on iOS
 
 ### Script
 
-- Add third argument `dylib`
-- Add forth argument with name of dylib, e.g. `rsa` if you want `rsa.dylib`
+-   Add third argument `dylib`
+-   Add forth argument with name of dylib, e.g. `rsa` if you want `rsa.dylib`
 
 `./scripts/update_bindings.sh device release dylib rsa`
 
@@ -54,17 +55,18 @@ Experimental support for significantly faster zkey loading. See `../ark-zkey` RE
 The report will be in `mopro-core/benchmarks/gpu_explorations/msm_bench_rust_laptop.csv`.
 
 ## To use [circom-witness-rs](https://github.com/philsippl/circom-witness-rs) (Experimental)
-- Set
-  ```toml
-  [witness]
-  use_native_witness_generation = true
-  ```
-  in `config.toml` file
-- Or build witness with
-  ```sh
-  WITNESS_CPP=<CIRCOM_PATH> cargo build --features build-native-witness --release
-  ```
-  Test with
-  ```sh
-  cargo test --features calc-native-witness
-  ```
+
+-   Set
+    ```toml
+    [witness]
+    use_native_witness_generation = true
+    ```
+    in `config.toml` file
+-   Or build witness with
+    ```sh
+    WITNESS_CPP=<CIRCOM_PATH> cargo build --features build-native-witness --release
+    ```
+    Test with
+    ```sh
+    cargo test --features calc-native-witness
+    ```

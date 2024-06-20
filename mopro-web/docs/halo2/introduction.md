@@ -15,9 +15,9 @@ Note that currently the Halo2 circuit **must** be a cargo crate, with the packag
 This is done using the `build.rs` script in the `mopro-core` crate, which changes the path to the default `examples/halo2/fibonacci` to `$dir`. This also requires the name of the package to be `halo2-circuit` for the substitution to work.
 
 Additionally, the `halo2-circuit` crate **must** implement and expose three items, which you can see in the `mopro-core/examples/halo2/fibonacci/src/lib.rs`:
-- `Circuit` - the struct that represents the circuit
-- `prove` - the function that generates the proof
-- `verify` - the function that verifies the proof
+
+-   `Circuit` - the struct that represents the circuit
+-   `prove` - the function that generates the proof
+-   `verify` - the function that verifies the proof
 
 This is then used by the `mopro-core` crate to generate the proof and verify it.
-

@@ -14,21 +14,33 @@ First, make sure you've installed the [prerequisites](/docs/prerequisites).
 
 Then, run the following commands:
 
+1. Clone the mopro repo
+
 ```sh
-# Clone the mopro repo
 git clone https://github.com/zkmopro/mopro.git
+```
 
-# Go to your newly cloned checkout
+2. Go to your newly cloned checkout
+
+```sh
 cd mopro
+```
 
-# Install mopro-cli locally
+3. Install mopro-cli locally
+
+```sh
 (cd mopro-cli && cargo install --path .)
+```
 
-# Set `MOPRO_ROOT` (replace with path to your git checkout of mopro)
-# For example: `export MOPRO_ROOT=/Users/user/repos/github.com/zkmopro/mopro`
+4. Set `MOPRO_ROOT` (replace with path to your git checkout of mopro)
+
+```sh
 export MOPRO_ROOT=$(PWD)
+```
 
-# Install `mopro` dependencies
+5. Install `mopro` dependencies
+
+```sh
 mopro deps
 ```
 
@@ -36,18 +48,22 @@ mopro deps
 
 Create and initialize a project:
 
-```sh
-# Initialize a project
-# This will create a new project in your current directory
-mopro init --platforms ios android
+1. Initialize a project
+   This will create a new project in your current directory
 
-# Go to your project folder
+```sh
+mopro init --platforms ios android
+```
+
+2. Go to your project folder
+
+```sh
 cd mopro-example-app
 ```
 
 ## Configure mopro settings
 
-You may adapt `mopro-config.toml` to your needs. For example, if you already have a Circom project you can use that.
+You may adapt [`mopro-config.toml`](circom/configuration.md) to your needs. For example, if you already have a Circom project you can use that.
 
 Prepare your circuit artifacts:
 
@@ -73,6 +89,8 @@ Depending on what platforms you are targetting, you can run the following comman
     mopro test
     ```
 
+## iOS
+
 -   Build the project for iOS
 
     ```sh
@@ -86,6 +104,8 @@ Depending on what platforms you are targetting, you can run the following comman
     ```
 
     Use `command`+`U` to run tests.
+
+## Android
 
 -   Build the project for Android
 
