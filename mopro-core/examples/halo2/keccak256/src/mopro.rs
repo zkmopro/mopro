@@ -2,7 +2,7 @@ use crate::circuit::{pack_input_to_instance, unpack_input, KeccakCircuit};
 use crate::vanilla::KeccakConfigParams;
 use crate::{CIRCUIT_PARAMS, K, ROWS_PER_ROUND};
 use halo2_proofs::halo2curves::bn256::{Bn256, Fr, G1Affine};
-use halo2_proofs::plonk::{create_proof, verify_proof, Circuit, ProvingKey, VerifyingKey};
+use halo2_proofs::plonk::{create_proof, verify_proof, ProvingKey, VerifyingKey};
 use halo2_proofs::poly::commitment::ParamsProver;
 use halo2_proofs::poly::kzg::commitment::{KZGCommitmentScheme, ParamsKZG};
 use halo2_proofs::poly::kzg::multiopen::{ProverSHPLONK, VerifierSHPLONK};
@@ -13,9 +13,7 @@ use halo2_proofs::transcript::{
 use halo2_proofs::SerdeFormat::RawBytes;
 use rand::thread_rng;
 use std::collections::HashMap;
-use std::fs::File;
 use std::io;
-use std::io::BufReader;
 
 /// This function is picked up by the `mopro-core` when generating the proof.
 /// It should be implemented the proving logic for the circuit.
@@ -101,7 +99,7 @@ pub fn verify(
 /// It has not been implemented in the `mopro-core` because some implementations might
 /// have `halo2_proofs` `params` feature enabled, which changes the way the proving key is read,
 /// To avoid compilation errors because of feature unification we have delegated the implementation.
-pub fn read_pk<C: Circuit<Fr>>(reader: &mut BufReader<File>) -> io::Result<ProvingKey<G1Affine>> {
+pub fn read_pk<R: io::Read>(reader: &mut R) -> io::Result<ProvingKey<G1Affine>> {
     ProvingKey::read::<_, KeccakCircuit<_>>(reader, RawBytes, CIRCUIT_PARAMS)
 }
 
@@ -110,6 +108,6 @@ pub fn read_pk<C: Circuit<Fr>>(reader: &mut BufReader<File>) -> io::Result<Provi
 /// It has not been implemented in the `mopro-core` because some implementations might
 /// have `halo2_proofs` `params` feature enabled, which changes the way the proving key is read,
 /// To avoid compilation errors because of feature unification we have delegated the implementation.
-pub fn read_vk(reader: &mut BufReader<File>) -> io::Result<VerifyingKey<G1Affine>> {
+pub fn read_vk<R: io::Read>(reader: &mut R) -> io::Result<VerifyingKey<G1Affine>> {
     VerifyingKey::read::<_, KeccakCircuit<_>>(reader, RawBytes, CIRCUIT_PARAMS)
 }
