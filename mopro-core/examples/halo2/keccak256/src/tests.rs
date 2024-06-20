@@ -140,7 +140,7 @@ fn test_external_functions() {
     let mut inputs = HashMap::new();
 
     inputs.insert(
-        "input".to_string(),
+        "in".to_string(),
         input
             .iter()
             .map(|x| Fr::from(*x as u64))

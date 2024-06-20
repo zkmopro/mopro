@@ -24,8 +24,8 @@ pub fn prove(
 ) -> Result<(Vec<Fr>, Vec<u8>), String> {
     // Get inputs by name "input" from the inputs hashmap
     let raw_inputs = inputs
-        .get("input")
-        .ok_or("`input` value not found in proof input".to_string())?;
+        .get("in")
+        .ok_or("`in` value not found in proof input".to_string())?;
 
     // Convert the raw inputs to a vector of u8
     // TODO - can be optimized by packing multiple bytes into field elements
