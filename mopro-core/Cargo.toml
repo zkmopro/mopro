@@ -53,7 +53,7 @@ ark-groth16 = { version = "=0.4.0", default-features = false, features = [
 ] }
 ark-relations = { version = "0.4", default-features = false }
 ark-zkey = { path = "../ark-zkey" }
-witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true }
+witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true}
 
 # Error handling
 thiserror = "=1.0.39"
@@ -65,8 +65,8 @@ ark-ff = { version = "=0.4.1", default-features = false, optional = true, featur
     "parallel",
 ] }
 metal = { version = "=0.28.0", optional = true }
-objc = { version = "=0.2.4", optional = true }
-proptest = { version = "1.4.0", optional = true }
+objc ={ version = "=0.2.4", optional = true }
+proptest ={ version = "1.4.0", optional = true }
 
 [build-dependencies]
 color-eyre = "0.6"
@@ -75,7 +75,7 @@ wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 toml = "0.8"
 serde = "1.0"
 serde_derive = "1.0"
-witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true }
+witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true}
 
 [dependencies.rayon]
 version = "1"
