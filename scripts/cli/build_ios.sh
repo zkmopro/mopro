@@ -29,6 +29,7 @@ read_configuration() {
     print_action "Using build configuration file: $BUILD_CONFIG_PATH"
 
     CIRCUIT_TYPE=$(read_toml "$CONFIG_FILE" "circuit.adapter")
+    CIRCUIT_DIR=$(read_toml "$CONFIG_FILE" "circuit.dir")
 
     DEVICE_TYPE=$(read_toml "$CONFIG_FILE" "build.ios_device_type")
     BUILD_MODE=$(read_toml "$CONFIG_FILE" "build.build_mode")
@@ -90,6 +91,42 @@ select_features() {
             exit 1
             ;;
     esac
+}
+
+# Function to update or create config.toml file in .cargo directory of the mopro repository
+# This is necessary to specify the path to the circuit directory for the build process
+setup_circuit_path_override() {
+
+    # Convert CIRCUIT_DIR to an absolute path if it is not already
+    ABS_CIRCUIT_DIR=$(realpath "$CIRCUIT_DIR")
+
+    # Check if the config file exists
+    CONFIG_FILE="$MOPRO_ROOT/.cargo/config.toml"
+    if [ ! -f "$CONFIG_FILE" ]; then
+        # Create the necessary directories if they do not exist
+        mkdir -p "$(dirname "$CONFIG_FILE")"
+        echo "Creating a new .cargo/config.toml file in the mopro repository ($MOPRO_ROOT)"
+        echo "This file is used to override the default halo2 circuit directory path."
+    fi
+
+    # Check if 'paths' entry exists, and if not, add an empty 'paths' entry
+    if ! grep -q "^[[:space:]]*paths = \[.*\]" "$CONFIG_FILE"; then
+        echo "paths = []" >> "$CONFIG_FILE" # We will override this later
+        echo "Warning: Modifying existing 'paths' entry in $CONFIG_FILE."
+        echo "Previous paths entry is being replaced with new path: $ABS_CIRCUIT_DIR"
+    else
+        echo "No 'paths' entry found in $CONFIG_FILE. Adding a new 'paths' entry."
+    fi
+
+    # Update the config file with the circuit directory path to override the default `halo2-circuits` path
+    # TODO - once the `toml-cli` library supports adding an array element, we can simplify this to a single command
+    # toml set "$CONFIG_FILE" paths "[\"$ABS_CIRCUIT_DIR\"]" >> "$CONFIG_FILE"
+
+    # Currently, we find the right place to insert the path manually
+    echo >> "$CONFIG_FILE"
+    sed -i '' "/^[[:space:]]*paths = \[.*\]/c\\
+paths = [\"$ABS_CIRCUIT_DIR\"]
+" "$CONFIG_FILE"
 }
 
 # Build process
@@ -270,6 +307,10 @@ main() {
     determine_architecture
     determine_build_directory
     select_features
+
+    if [[ "$CIRCUIT_TYPE" == "halo2" ]]; then
+        setup_circuit_path_override
+    fi
 
     if [[ "$USE_DYLIB" == true ]]; then
         build_mopro_ffi_with_dylib_circuit
