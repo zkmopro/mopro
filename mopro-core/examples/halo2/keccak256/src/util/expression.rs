@@ -1,7 +1,6 @@
 use halo2_proofs::halo2curves::ff::PrimeField as FieldExt;
 use halo2_proofs::halo2curves::ff::PrimeField;
-use halo2_proofs::{plonk::Expression};
-
+use halo2_proofs::plonk::Expression;
 
 /// Decodes a field element from its byte representation in little endian order
 pub mod from_bytes {
@@ -38,12 +37,16 @@ pub mod sum {
 
     /// Returns an expression for the sum of the list of expressions.
     pub fn expr<F: FieldExt, E: Expr<F>, I: IntoIterator<Item = E>>(inputs: I) -> Expression<F> {
-        inputs.into_iter().fold(0.expr(), |acc, input| acc + input.expr())
+        inputs
+            .into_iter()
+            .fold(0.expr(), |acc, input| acc + input.expr())
     }
 
     /// Returns the sum of the given list of values within the field.
     pub fn value<F: FieldExt>(values: &[u8]) -> F {
-        values.iter().fold(F::ZERO, |acc, value| acc + F::from(*value as u64))
+        values
+            .iter()
+            .fold(F::ZERO, |acc, value| acc + F::from(*value as u64))
     }
 }
 
@@ -55,7 +58,9 @@ pub mod and {
     /// Returns an expression that evaluates to 1 only if all the expressions in
     /// the given list are 1, else returns 0.
     pub fn expr<F: FieldExt, E: Expr<F>, I: IntoIterator<Item = E>>(inputs: I) -> Expression<F> {
-        inputs.into_iter().fold(1.expr(), |acc, input| acc * input.expr())
+        inputs
+            .into_iter()
+            .fold(1.expr(), |acc, input| acc * input.expr())
     }
 
     /// Returns the product of all given values.
@@ -201,8 +206,7 @@ impl<F: FieldExt> Expr<F> for i32 {
     #[inline]
     fn expr(&self) -> Expression<F> {
         Expression::Constant(
-            F::from(self.unsigned_abs() as u64)
-                * if self.is_negative() { -F::ONE } else { F::ONE },
+            F::from(self.unsigned_abs() as u64) * if self.is_negative() { -F::ONE } else { F::ONE },
         )
     }
 }

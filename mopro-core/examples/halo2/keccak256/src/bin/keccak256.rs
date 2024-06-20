@@ -8,8 +8,8 @@ use halo2_proofs::poly::kzg::commitment::ParamsKZG;
 
 use keccak_test_2::circuit::KeccakCircuit;
 use keccak_test_2::io::{write_keys, write_srs};
-use keccak_test_2::{K, ROWS_PER_ROUND};
 use keccak_test_2::vanilla::KeccakConfigParams;
+use keccak_test_2::{K, ROWS_PER_ROUND};
 
 /// This binary is picked up by the `mopro prepare` command as a backup option to generate the
 /// srs, as well as proving and verification keys for the circuit when the keys are not found in the
@@ -38,11 +38,11 @@ pub fn main() {
         KeccakConfigParams {
             k: K,
             rows_per_round: ROWS_PER_ROUND,
-        },        
+        },
         Some(2usize.pow(K)),
         vec![],
         false,
-        false
+        false,
     );
     // Generate SRS
     let srs = ParamsKZG::<Bn256>::new(K);

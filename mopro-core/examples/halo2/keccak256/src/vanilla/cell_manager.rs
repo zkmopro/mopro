@@ -1,9 +1,9 @@
-use halo2_proofs::{
-        halo2curves::ff::PrimeField,
-        plonk::{Advice, Column, ConstraintSystem, Expression, VirtualCells},
-        poly::Rotation,
-    };
 use crate::util::expression::Expr;
+use halo2_proofs::{
+    halo2curves::ff::PrimeField,
+    plonk::{Advice, Column, ConstraintSystem, Expression, VirtualCells},
+    poly::Rotation,
+};
 
 use super::KeccakRegion;
 

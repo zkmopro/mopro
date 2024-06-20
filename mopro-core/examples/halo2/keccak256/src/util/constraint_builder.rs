@@ -1,7 +1,7 @@
 use super::expression::Expr;
-use halo2_proofs::{plonk::Expression};
-use halo2_proofs::halo2curves::ff::PrimeField as FieldExt;
 use crate::util::word::Word;
+use halo2_proofs::halo2curves::ff::PrimeField as FieldExt;
+use halo2_proofs::plonk::Expression;
 
 #[derive(Default)]
 pub struct BaseConstraintBuilder<F> {
@@ -12,7 +12,11 @@ pub struct BaseConstraintBuilder<F> {
 
 impl<F: FieldExt> BaseConstraintBuilder<F> {
     pub(crate) fn new(max_degree: usize) -> Self {
-        BaseConstraintBuilder { constraints: Vec::new(), max_degree, condition: None }
+        BaseConstraintBuilder {
+            constraints: Vec::new(),
+            max_degree,
+            condition: None,
+        }
     }
 
     pub(crate) fn require_zero(&mut self, name: &'static str, constraint: Expression<F>) {
@@ -27,7 +31,7 @@ impl<F: FieldExt> BaseConstraintBuilder<F> {
     ) {
         self.add_constraint(name, lhs - rhs);
     }
-    
+
     pub(crate) fn require_equal_word(
         &mut self,
         name: &'static str,
@@ -40,7 +44,6 @@ impl<F: FieldExt> BaseConstraintBuilder<F> {
         self.add_constraint(name, lhs_hi - rhs_hi);
     }
 
-
     pub(crate) fn require_boolean(&mut self, name: &'static str, value: Expression<F>) {
         self.add_constraint(name, value.clone() * (1.expr() - value));
     }
@@ -50,7 +53,10 @@ impl<F: FieldExt> BaseConstraintBuilder<F> {
         condition: Expression<F>,
         constraint: impl FnOnce(&mut Self) -> R,
     ) -> R {
-        debug_assert!(self.condition.is_none(), "Nested condition is not supported");
+        debug_assert!(
+            self.condition.is_none(),
+            "Nested condition is not supported"
+        );
         self.condition = Some(condition);
         let ret = constraint(self);
         self.condition = None;

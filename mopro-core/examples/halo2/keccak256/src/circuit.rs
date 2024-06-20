@@ -6,19 +6,18 @@ use halo2_proofs::plonk::{Circuit, Column, ConstraintSystem, Error, Instance};
 use itertools::Itertools;
 use sha3::{Digest, Keccak256};
 
-use crate::util::{SKIP_FIRST_PASS, value_to_option};
 use crate::util::eth_types::Field;
-use crate::vanilla::{KeccakAssignedRow, KeccakCircuitConfig, KeccakConfigParams};
+use crate::util::{value_to_option, SKIP_FIRST_PASS};
 use crate::vanilla::keccak_packed_multi::{get_keccak_capacity, KeccakAssignedValue};
 use crate::vanilla::param::{NUM_BYTES_PER_WORD, NUM_ROUNDS, NUM_WORDS_TO_ABSORB};
 use crate::vanilla::witness::multi_keccak;
+use crate::vanilla::{KeccakAssignedRow, KeccakCircuitConfig, KeccakConfigParams};
 
 #[derive(Clone, Debug)]
 pub struct CircuitConfig<F> {
     pub input: Column<Instance>, // TODO - make it possible to pass arbitrary amount, not 2.
     pub keccak_config: KeccakCircuitConfig<F>,
     _marker: PhantomData<F>,
-
 }
 
 /// KeccakCircuit
@@ -48,11 +47,15 @@ impl<F: Field> Circuit<F> for KeccakCircuit<F> {
     fn configure_with_params(meta: &mut ConstraintSystem<F>, params: Self::Params) -> Self::Config {
         // MockProver complains if you only have columns in SecondPhase, so let's just make an empty column in FirstPhase
         meta.advice_column();
-        
+
         let input = meta.instance_column();
         let keccak_config = KeccakCircuitConfig::new(meta, params);
-        
-        CircuitConfig {  input, keccak_config, _marker: PhantomData }
+
+        CircuitConfig {
+            input,
+            keccak_config,
+            _marker: PhantomData,
+        }
     }
 
     fn configure(_: &mut ConstraintSystem<F>) -> Self::Config {
@@ -65,7 +68,9 @@ impl<F: Field> Circuit<F> for KeccakCircuit<F> {
         mut layouter: impl Layouter<F>,
     ) -> Result<(), Error> {
         let params = config.keccak_config.parameters;
-        config.keccak_config.load_aux_tables(&mut layouter, params.k)?;
+        config
+            .keccak_config
+            .load_aux_tables(&mut layouter, params.k)?;
         let mut first_pass = SKIP_FIRST_PASS;
         let mut cache = vec![];
         layouter.assign_region(
@@ -77,7 +82,8 @@ impl<F: Field> Circuit<F> for KeccakCircuit<F> {
                 }
                 let (witness, _) = multi_keccak(
                     &self.inputs,
-                    self.num_rows.map(|nr| get_keccak_capacity(nr, params.rows_per_round)),
+                    self.num_rows
+                        .map(|nr| get_keccak_capacity(nr, params.rows_per_round)),
                     params,
                 );
                 let assigned_rows = config.keccak_config.assign(&mut region, &witness);
@@ -90,10 +96,14 @@ impl<F: Field> Circuit<F> for KeccakCircuit<F> {
                 Ok(())
             },
         )?;
-        
+
         if self.use_instance {
             for assigned_row in cache.iter() {
-                self.constraint_public_inputs(layouter.namespace(|| "public inputs"), assigned_row, &config);
+                self.constraint_public_inputs(
+                    layouter.namespace(|| "public inputs"),
+                    assigned_row,
+                    &config,
+                );
             }
         }
 
@@ -110,7 +120,14 @@ impl<F: Field> KeccakCircuit<F> {
         verify_output: bool,
         use_instance: bool,
     ) -> Self {
-        KeccakCircuit { config, inputs, num_rows, _marker: PhantomData, verify_output, use_instance }
+        KeccakCircuit {
+            config,
+            inputs,
+            num_rows,
+            _marker: PhantomData,
+            verify_output,
+            use_instance,
+        }
     }
 
     fn verify_output_witnesses(&self, assigned_rows: &[KeccakAssignedRow<F>]) {
@@ -118,10 +135,18 @@ impl<F: Field> KeccakCircuit<F> {
         // only look at last row in each round
         // first round is dummy, so ignore
         // only look at last round per absorb of RATE_IN_BITS
-        for assigned_row in
-            assigned_rows.iter().step_by(self.config.rows_per_round).step_by(NUM_ROUNDS + 1).skip(1)
+        for assigned_row in assigned_rows
+            .iter()
+            .step_by(self.config.rows_per_round)
+            .step_by(NUM_ROUNDS + 1)
+            .skip(1)
         {
-            let KeccakAssignedRow { is_final, hash_lo, hash_hi, .. } = assigned_row.clone();
+            let KeccakAssignedRow {
+                is_final,
+                hash_lo,
+                hash_hi,
+                ..
+            } = assigned_row.clone();
             let is_final_val = extract_value(is_final).ne(&F::ZERO);
             let hash_lo_val = extract_u128(hash_lo);
             let hash_hi_val = extract_u128(hash_hi);
@@ -137,23 +162,34 @@ impl<F: Field> KeccakCircuit<F> {
             }
         }
     }
-    
-    
-    fn constraint_public_inputs(&self, mut layouter: impl Layouter<F>, assigned_rows: &[KeccakAssignedRow<F>], config: &<KeccakCircuit<F> as Circuit<F>>::Config) {
+
+    fn constraint_public_inputs(
+        &self,
+        mut layouter: impl Layouter<F>,
+        assigned_rows: &[KeccakAssignedRow<F>],
+        config: &<KeccakCircuit<F> as Circuit<F>>::Config,
+    ) {
         let rows_per_round = self.config.rows_per_round;
         let mut input_offset = 0;
         let mut total_offset = 0;
         let mut input_byte_offset = 0;
-        
+
         let instance = pack_input_to_instance::<F>(&self.inputs);
 
         // first round is dummy, so ignore
-        for absorb_chunk in &assigned_rows.chunks(rows_per_round).skip(1).chunks(NUM_ROUNDS + 1) {
+        for absorb_chunk in &assigned_rows
+            .chunks(rows_per_round)
+            .skip(1)
+            .chunks(NUM_ROUNDS + 1)
+        {
             let mut absorbed = false;
             for (round_idx, assigned_rows) in absorb_chunk.enumerate() {
                 for (row_idx, assigned_row) in assigned_rows.iter().enumerate() {
-                    let KeccakAssignedRow { is_final, word_value, .. } =
-                        assigned_row.clone();
+                    let KeccakAssignedRow {
+                        is_final,
+                        word_value,
+                        ..
+                    } = assigned_row.clone();
                     let is_final_val = extract_value(is_final).ne(&F::ZERO);
                     let word_value_val = extract_u128(word_value.clone());
                     // let bytes_left_val = extract_u128(bytes_left);
@@ -164,12 +200,12 @@ impl<F: Field> KeccakCircuit<F> {
                     //     assert_eq!(bytes_left_val, 0);
                     //     continue;
                     // }
-                    
+
                     // If we reached to the end of this chunk, skip it
                     if input_offset >= self.inputs.len() {
                         continue;
                     }
-                    
+
                     let input_len = self.inputs[input_offset].len();
                     if round_idx == NUM_ROUNDS && row_idx == 0 && is_final_val {
                         absorbed = true;
@@ -177,14 +213,14 @@ impl<F: Field> KeccakCircuit<F> {
                     if row_idx == 0 {
                         // TODO - consider if it should be checked
                         // assert_eq!(bytes_left_val, input_len as u128 - input_byte_offset as u128);
-                        
+
                         // Only these rows could contain inputs.
                         let end = if round_idx < NUM_WORDS_TO_ABSORB {
                             std::cmp::min(input_byte_offset + NUM_BYTES_PER_WORD, input_len)
                         } else {
                             input_byte_offset
                         };
-                        
+
                         // let mut expected_val_le_bytes =
                         //     self.inputs[input_offset][input_byte_offset..end].to_vec().clone();
                         // expected_val_le_bytes.resize(NUM_BYTES_PER_WORD, 0);
@@ -192,19 +228,26 @@ impl<F: Field> KeccakCircuit<F> {
                         //     word_value_val,
                         //     u64::from_le_bytes(expected_val_le_bytes.try_into().unwrap()) as u128,
                         // );
-                        
+
                         // Check if the packed value is equal to the expected value
                         if F::from_u128(word_value_val) != instance[total_offset] {
                             dbg!(format!("Input offset: {:?}", input_offset));
                             dbg!(format!("Input byte offset: {:?}", input_byte_offset));
-                            dbg!(format!("Expected value: {:?}", &self.inputs[input_offset][input_byte_offset..end].to_vec().clone()));
+                            dbg!(format!(
+                                "Expected value: {:?}",
+                                &self.inputs[input_offset][input_byte_offset..end]
+                                    .to_vec()
+                                    .clone()
+                            ));
                             dbg!(format!("Word value: {:?}", word_value.clone()));
                             dbg!(format!("Total offset: {:?}", total_offset));
                             dbg!(format!("Packed value: {:?}", instance[total_offset]));
                         }
-                        
-                        layouter.constrain_instance(word_value.cell(), config.input, total_offset).unwrap();
-                        
+
+                        layouter
+                            .constrain_instance(word_value.cell(), config.input, total_offset)
+                            .unwrap();
+
                         input_byte_offset = end;
                     }
                 }
@@ -221,12 +264,20 @@ impl<F: Field> KeccakCircuit<F> {
         let mut input_offset = 0;
         let mut input_byte_offset = 0;
         // first round is dummy, so ignore
-        for absorb_chunk in &assigned_rows.chunks(rows_per_round).skip(1).chunks(NUM_ROUNDS + 1) {
+        for absorb_chunk in &assigned_rows
+            .chunks(rows_per_round)
+            .skip(1)
+            .chunks(NUM_ROUNDS + 1)
+        {
             let mut absorbed = false;
             for (round_idx, assigned_rows) in absorb_chunk.enumerate() {
                 for (row_idx, assigned_row) in assigned_rows.iter().enumerate() {
-                    let KeccakAssignedRow { is_final, word_value, bytes_left, .. } =
-                        assigned_row.clone();
+                    let KeccakAssignedRow {
+                        is_final,
+                        word_value,
+                        bytes_left,
+                        ..
+                    } = assigned_row.clone();
                     let is_final_val = extract_value(is_final).ne(&F::ZERO);
                     let word_value_val = extract_u128(word_value);
                     let bytes_left_val = extract_u128(bytes_left);
@@ -241,15 +292,20 @@ impl<F: Field> KeccakCircuit<F> {
                         absorbed = true;
                     }
                     if row_idx == 0 {
-                        assert_eq!(bytes_left_val, input_len as u128 - input_byte_offset as u128);
+                        assert_eq!(
+                            bytes_left_val,
+                            input_len as u128 - input_byte_offset as u128
+                        );
                         // Only these rows could contain inputs.
                         let end = if round_idx < NUM_WORDS_TO_ABSORB {
                             std::cmp::min(input_byte_offset + NUM_BYTES_PER_WORD, input_len)
                         } else {
                             input_byte_offset
                         };
-                        let mut expected_val_le_bytes =
-                            self.inputs[input_offset][input_byte_offset..end].to_vec().clone();
+                        let mut expected_val_le_bytes = self.inputs[input_offset]
+                            [input_byte_offset..end]
+                            .to_vec()
+                            .clone();
                         expected_val_le_bytes.resize(NUM_BYTES_PER_WORD, 0);
                         assert_eq!(
                             word_value_val,
@@ -267,7 +323,6 @@ impl<F: Field> KeccakCircuit<F> {
     }
 }
 
-
 fn extract_value<F: Field>(assigned_value: KeccakAssignedValue<F>) -> F {
     let assigned = *value_to_option(assigned_value.value()).unwrap();
     match assigned {
@@ -284,23 +339,21 @@ fn extract_u128<F: Field>(assigned_value: KeccakAssignedValue<F>) -> u128 {
     u128::from_le_bytes(le_bytes[..16].try_into().unwrap())
 }
 
-/// This function follows the packing technique done by the keccak circuit
-/// By for each high level vector, combining NUM_BYTES_PER_WORD bytes into a single field element
-/// If the vectors ends short of that, the result is resized to NUM_BYTES_PER_WORD with 0s
-/// The result is then converted to a u64 from little endian bytes
-pub fn pack_input_to_instance<F: PrimeField>(input: &Vec<Vec<u8>>) -> Vec<F> {
+/// Packs each input byte array into field elements for use in cryptographic computations,
+/// specifically mimicking the packing technique utilized in the keccak circuit.
+/// Each high-level vector's bytes are combined into a single field element up to `NUM_BYTES_PER_WORD`.
+/// Bytes arrays shorter than `NUM_BYTES_PER_WORD` are zero-padded to this length.
+/// The field element is derived from these bytes interpreted as a little-endian u64.
+pub fn pack_input_to_instance<F: PrimeField>(input: &[Vec<u8>]) -> Vec<F> {
     input
         .iter()
-        .map(|input| {
-            let mut packed = vec![];
-            for chunk in input.chunks(NUM_BYTES_PER_WORD) {
-                let mut chunk = chunk.to_vec();
-                chunk.resize(NUM_BYTES_PER_WORD, 0);
-                let val = F::from(u64::from_le_bytes(chunk.try_into().unwrap()));
-                packed.push(val);
-            }
-            packed
+        .flat_map(|input_vec| {
+            input_vec.chunks(NUM_BYTES_PER_WORD).map(|chunk| {
+                let mut buf = [0u8; NUM_BYTES_PER_WORD]; // Create a buffer initialized to zero
+                buf[..chunk.len()].copy_from_slice(chunk); // Copy bytes from the chunk
+                let val = u64::from_le_bytes(buf); // Convert little-endian bytes to u64
+                F::from(val) // Convert u64 to field element
+            })
         })
-        .flatten()
         .collect()
-    }
+}

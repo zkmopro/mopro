@@ -1,10 +1,8 @@
 use super::{param::*, util::*};
+use crate::util::eth_types::Field;
 use halo2_proofs::{
-        circuit::{Layouter, Value},
-        plonk::{Error, TableColumn},
-    };
-use crate::{
-    util::eth_types::Field,
+    circuit::{Layouter, Value},
+    plonk::{Error, TableColumn},
 };
 use itertools::Itertools;
 
@@ -31,8 +29,10 @@ pub(crate) fn load_normalize_table<F: Field>(
     layouter.assign_table(
         || format!("{name} table"),
         |mut table| {
-            for (offset, perm) in
-                (0..part_size).map(|_| 0u64..range).multi_cartesian_product().enumerate()
+            for (offset, perm) in (0..part_size)
+                .map(|_| 0u64..range)
+                .multi_cartesian_product()
+                .enumerate()
             {
                 let mut input = 0u64;
                 let mut output = 0u64;

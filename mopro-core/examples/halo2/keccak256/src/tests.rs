@@ -2,9 +2,8 @@ use std::collections::HashMap;
 
 use halo2_proofs::{
     dev::MockProver,
+    halo2curves::bn256::Fr,
     halo2curves::bn256::{Bn256, G1Affine},
-    halo2curves::bn256::Fr
-    ,
     halo2curves::ff::FromUniformBytes,
     plonk::{create_proof, keygen_pk, keygen_vk, verify_proof},
     poly::{
@@ -24,10 +23,10 @@ use rand_core::OsRng;
 use sha3::{Digest, Keccak256};
 use test_case::test_case;
 
-use crate::{K, prove, ROWS_PER_ROUND, verify};
 use crate::circuit::KeccakCircuit;
 use crate::util::eth_types::Field;
 use crate::vanilla::*;
+use crate::{prove, verify, K, ROWS_PER_ROUND};
 
 fn verify_mock<F: Field + Ord + FromUniformBytes<64>>(
     config: KeccakConfigParams,
@@ -40,7 +39,6 @@ fn verify_mock<F: Field + Ord + FromUniformBytes<64>>(
     let prover = MockProver::<F>::run(k, &circuit, vec![vec![]]).unwrap();
     prover.assert_satisfied();
 }
-
 
 #[test_case(14, 28; "k: 14, rows_per_round: 28")]
 #[test_case(12, 5; "k: 12, rows_per_round: 5")]
@@ -120,7 +118,13 @@ fn packed_multi_keccak_prover(k: u32, rows_per_round: usize) {
         Challenge255<G1Affine>,
         Blake2bRead<&[u8], G1Affine, Challenge255<G1Affine>>,
         SingleStrategy<'_, Bn256>,
-    >(&verifier_params, pk.get_vk(), strategy, &[&[]], &mut verifier_transcript)
+    >(
+        &verifier_params,
+        pk.get_vk(),
+        strategy,
+        &[&[]],
+        &mut verifier_transcript,
+    )
     .expect("failed to verify bench circuit");
 }
 
@@ -138,24 +142,26 @@ fn test_external_functions() {
         KeccakConfigParams {
             k: K,
             rows_per_round: ROWS_PER_ROUND,
-        },        
+        },
         Some(2usize.pow(K)),
         vec![],
         false,
         false,
     );
 
-
     let vk = keygen_vk(&srs, &circuit).unwrap();
     let pk = keygen_pk(&srs, vk.clone(), &circuit).unwrap();
 
-
     let start = std::time::Instant::now();
 
-    let (public_input, proof) = prove(inputs, &srs, &pk).map_err(|_| "Failed to prove").unwrap();
+    let (public_input, proof) = prove(inputs, &srs, &pk)
+        .map_err(|_| "Failed to prove")
+        .unwrap();
     dbg!(start.elapsed());
     let verifier_srs: ParamsVerifierKZG<Bn256> = srs.verifier_params().clone();
-    let result = verify(proof, &public_input, &verifier_srs, &vk).map_err(|_| "Failed to verify").unwrap();
+    let result = verify(proof, &public_input, &verifier_srs, &vk)
+        .map_err(|_| "Failed to verify")
+        .unwrap();
     assert!(result, "Proof verification failed");
 }
 
@@ -186,5 +192,12 @@ fn test_vanilla_keccak_kat_vectors() {
         assert_eq!(&output[..], &native_out[..]);
         inputs.push(input);
     }
-    verify_mock::<Fr>(KeccakConfigParams { k: 12, rows_per_round: 5 }, inputs, true);
+    verify_mock::<Fr>(
+        KeccakConfigParams {
+            k: 12,
+            rows_per_round: 5,
+        },
+        inputs,
+        true,
+    );
 }

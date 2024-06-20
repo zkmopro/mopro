@@ -1,7 +1,6 @@
-use std::hash::Hash;
 use halo2_proofs::halo2curves::ff::{FromUniformBytes, PrimeField};
 use num_bigint::BigUint;
-
+use std::hash::Hash;
 
 /// Helper trait to represent a field element that can be converted into [u64] limbs.
 ///
@@ -104,27 +103,25 @@ pub(crate) fn decompose_u64_digits_to_limbs(
         .collect()
 }
 
-    /// We do a blanket implementation in 'community-edition' to make it easier to integrate with other crates.
-    ///
-    /// ASSUMING F::Repr is little-endian
-    impl<F> ScalarField for F
-    where
-        F: PrimeField + FromUniformBytes<64> + From<bool> + Hash + Ord,
-    {
-        #[inline(always)]
-        fn to_u64_limbs(self, num_limbs: usize, bit_len: usize) -> Vec<u64> {
-            let bytes = self.to_repr();
-            let uint = BigUint::from_bytes_le(bytes.as_ref());
-            let digits = uint.iter_u64_digits();
-            decompose_u64_digits_to_limbs(digits, num_limbs, bit_len)
-        }
+/// We do a blanket implementation in 'community-edition' to make it easier to integrate with other crates.
+///
+/// ASSUMING F::Repr is little-endian
+impl<F> ScalarField for F
+where
+    F: PrimeField + FromUniformBytes<64> + From<bool> + Hash + Ord,
+{
+    #[inline(always)]
+    fn to_u64_limbs(self, num_limbs: usize, bit_len: usize) -> Vec<u64> {
+        let bytes = self.to_repr();
+        let uint = BigUint::from_bytes_le(bytes.as_ref());
+        let digits = uint.iter_u64_digits();
+        decompose_u64_digits_to_limbs(digits, num_limbs, bit_len)
     }
+}
 
 // Later: will need to separate BigPrimeField from ScalarField when Goldilocks is introduced
 
 /// [ScalarField] that is ~256 bits long
-pub trait BigPrimeField : PrimeField<Repr = [u8; 32]> + ScalarField {
-
-}
+pub trait BigPrimeField: PrimeField<Repr = [u8; 32]> + ScalarField {}
 
 impl<F> BigPrimeField for F where F: PrimeField<Repr = [u8; 32]> + ScalarField {}

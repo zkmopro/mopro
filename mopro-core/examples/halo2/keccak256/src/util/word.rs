@@ -63,7 +63,9 @@ impl<const N: usize> WordLimbs<u8, N> {
 
 impl<T: Default, const N: usize> Default for WordLimbs<T, N> {
     fn default() -> Self {
-        Self { limbs: [(); N].map(|_| T::default()) }
+        Self {
+            limbs: [(); N].map(|_| T::default()),
+        }
     }
 }
 

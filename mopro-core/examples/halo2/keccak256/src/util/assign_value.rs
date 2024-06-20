@@ -1,9 +1,9 @@
-use std::marker::PhantomData;
+use crate::util::prime_field::ScalarField;
+use crate::util::Halo2AssignedCell;
 use halo2_proofs::arithmetic::Field;
 use halo2_proofs::circuit::{Cell, Region, Value};
 use halo2_proofs::plonk::{Advice, Assigned, Column, Fixed};
-use crate::util::Halo2AssignedCell;
-use crate::util::prime_field::ScalarField;
+use std::marker::PhantomData;
 
 #[derive(Clone, Debug)]
 pub struct AssignedPrimitive<T: Into<u64> + Copy, F: ScalarField> {
@@ -16,13 +16,10 @@ pub struct AssignedPrimitive<T: Into<u64> + Copy, F: ScalarField> {
 
 #[derive(Clone, Debug, Copy)]
 pub struct AssignedValue<F: ScalarField> {
-
     pub cell: Cell,
     pub value: Value<F>,
     pub row_offset: usize,
     pub(crate) _marker: PhantomData<F>,
-
-
 }
 
 /// Assign advice to physical region.
@@ -63,9 +60,7 @@ pub fn raw_assign_fixed<F: Field>(
 }
 
 impl<'a, F: ScalarField> AssignedValue<F> {
-
     pub fn row(&self) -> usize {
-
         {
             self.row_offset
         }
@@ -76,7 +71,6 @@ impl<'a, F: ScalarField> AssignedValue<F> {
     }
 
     pub fn value(&self) -> Value<&F> {
-
         {
             self.value.as_ref()
         }
@@ -92,7 +86,9 @@ impl<'a, F: ScalarField> AssignedValue<F> {
             .assign_advice(|| "", column, offset, || self.value)
             .expect("assign copy advice should not fail")
             .cell();
-        region.constrain_equal(cell, self.cell()).expect("constrain equal should not fail");
+        region
+            .constrain_equal(cell, self.cell())
+            .expect("constrain equal should not fail");
 
         cell
     }

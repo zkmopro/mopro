@@ -2,20 +2,19 @@
 
 use std::env::var;
 
-use halo2_proofs::circuit::{Value};
-use halo2_proofs::circuit::AssignedCell;
-use halo2_proofs::plonk::Assigned;
 use eth_types::{Field, ToScalar, Word};
+use halo2_proofs::circuit::AssignedCell;
+use halo2_proofs::circuit::Value;
+use halo2_proofs::plonk::Assigned;
 
+pub mod assign_value;
 pub mod constraint_builder;
 pub mod eth_types;
 pub mod expression;
 pub mod prime_field;
-pub mod assign_value;
 pub(crate) mod word;
 
 pub type Halo2AssignedCell<'v, F> = AssignedCell<Assigned<F>, F>;
-
 
 pub const SKIP_FIRST_PASS: bool = true;
 
@@ -55,7 +54,6 @@ pub struct WordParts {
     /// The parts of the word
     pub parts: Vec<PartInfo>,
 }
-
 
 /// Wraps the internal value of `value` in an [Option].
 /// If the value is [None], then the function returns [None].
@@ -122,15 +120,16 @@ pub fn pack<F: Field>(bits: &[u8]) -> F {
 /// specified bit base
 pub fn pack_with_base<F: Field>(bits: &[u8], base: usize) -> F {
     let base = F::from(base as u64);
-    bits.iter().rev().fold(F::ZERO, |acc, &bit| acc * base + F::from(bit as u64))
+    bits.iter()
+        .rev()
+        .fold(F::ZERO, |acc, &bit| acc * base + F::from(bit as u64))
 }
 
 /// Decodes the bits using the position data found in the part info
 pub fn pack_part(bits: &[u8], info: &PartInfo) -> u64 {
-    info.bits
-        .iter()
-        .rev()
-        .fold(0u64, |acc, &bit_pos| acc * (BIT_SIZE as u64) + (bits[bit_pos] as u64))
+    info.bits.iter().rev().fold(0u64, |acc, &bit_pos| {
+        acc * (BIT_SIZE as u64) + (bits[bit_pos] as u64)
+    })
 }
 
 /// Unpack a sparse keccak word into bits in the range [0,BIT_SIZE[
@@ -147,13 +146,23 @@ pub fn unpack<F: Field>(packed: F) -> [u8; NUM_BITS_PER_WORD] {
 
 /// Pack bits stored in a u64 value into a sparse keccak word
 pub fn pack_u64<F: Field>(value: u64) -> F {
-    pack(&((0..NUM_BITS_PER_WORD).map(|i| ((value >> i) & 1) as u8).collect::<Vec<_>>()))
+    pack(
+        &((0..NUM_BITS_PER_WORD)
+            .map(|i| ((value >> i) & 1) as u8)
+            .collect::<Vec<_>>()),
+    )
 }
 
 /// Calculates a ^ b with a and b field elements
 pub fn field_xor<F: Field>(a: F, b: F) -> F {
     let mut bytes = [0u8; 32];
-    for (idx, (a, b)) in a.to_repr().as_ref().iter().zip(b.to_repr().as_ref().iter()).enumerate() {
+    for (idx, (a, b)) in a
+        .to_repr()
+        .as_ref()
+        .iter()
+        .zip(b.to_repr().as_ref().iter())
+        .enumerate()
+    {
         bytes[idx] = *a ^ *b;
     }
     F::from_repr(bytes).unwrap()

@@ -133,15 +133,16 @@ pub fn pack<F: Field>(bits: &[u8]) -> F {
 /// specified bit base
 pub fn pack_with_base<F: Field>(bits: &[u8], base: usize) -> F {
     let base = F::from(base as u64);
-    bits.iter().rev().fold(F::ZERO, |acc, &bit| acc * base + F::from(bit as u64))
+    bits.iter()
+        .rev()
+        .fold(F::ZERO, |acc, &bit| acc * base + F::from(bit as u64))
 }
 
 /// Decodes the bits using the position data found in the part info
 pub fn pack_part(bits: &[u8], info: &PartInfo) -> u64 {
-    info.bits
-        .iter()
-        .rev()
-        .fold(0u64, |acc, &bit_pos| acc * (BIT_SIZE as u64) + (bits[bit_pos] as u64))
+    info.bits.iter().rev().fold(0u64, |acc, &bit_pos| {
+        acc * (BIT_SIZE as u64) + (bits[bit_pos] as u64)
+    })
 }
 
 /// Unpack a sparse keccak word into bits in the range [0,BIT_SIZE[
@@ -158,7 +159,11 @@ pub fn unpack<F: Field>(packed: F) -> [u8; NUM_BITS_PER_WORD] {
 
 /// Pack bits stored in a u64 value into a sparse keccak word
 pub fn pack_u64<F: Field>(value: u64) -> F {
-    pack(&((0..NUM_BITS_PER_WORD).map(|i| ((value >> i) & 1) as u8).collect::<Vec<_>>()))
+    pack(
+        &((0..NUM_BITS_PER_WORD)
+            .map(|i| ((value >> i) & 1) as u8)
+            .collect::<Vec<_>>()),
+    )
 }
 
 /// Calculates a ^ b with a and b field elements
@@ -189,8 +194,8 @@ pub fn get_rotate_count(count: usize, part_size: usize) -> usize {
 
 /// Encodes the data using rlc
 pub mod compose_rlc {
-    use halo2_proofs::plonk::Expression;
     use crate::util::eth_types::Field;
+    use halo2_proofs::plonk::Expression;
 
     #[allow(dead_code)]
     pub(crate) fn expr<F: Field>(expressions: &[Expression<F>], r: F) -> Expression<F> {
@@ -242,8 +247,8 @@ pub mod to_bytes {
 /// Scatters a value into a packed word constant
 pub mod scatter {
     use super::pack;
-    use halo2_proofs::plonk::Expression;
     use crate::util::eth_types::Field;
+    use halo2_proofs::plonk::Expression;
 
     pub(crate) fn expr<F: Field>(value: u8, count: usize) -> Expression<F> {
         Expression::Constant(pack(&vec![value; count]))

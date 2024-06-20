@@ -8,31 +8,31 @@
 use std::collections::HashMap;
 
 use halo2_proofs::halo2curves::bn256::{Bn256, Fr as Fp, Fr, G1Affine};
-use halo2_proofs::plonk::{create_proof, ProvingKey, verify_proof, VerifyingKey};
+use halo2_proofs::plonk::{create_proof, verify_proof, ProvingKey, VerifyingKey};
 use halo2_proofs::poly::commitment::ParamsProver;
 use halo2_proofs::poly::kzg::commitment::{KZGCommitmentScheme, ParamsKZG};
 use halo2_proofs::poly::kzg::multiopen::{ProverSHPLONK, VerifierSHPLONK};
 use halo2_proofs::poly::kzg::strategy::SingleStrategy;
-use halo2_proofs::transcript::{Blake2bRead, Blake2bWrite, Challenge255, TranscriptReadBuffer, TranscriptWriterBuffer};
+use halo2_proofs::transcript::{
+    Blake2bRead, Blake2bWrite, Challenge255, TranscriptReadBuffer, TranscriptWriterBuffer,
+};
 use rand::thread_rng;
 
-use crate::circuit::{KeccakCircuit, pack_input_to_instance};
+use crate::circuit::{pack_input_to_instance, KeccakCircuit};
 use crate::util::prime_field::ScalarField;
 use crate::vanilla::KeccakConfigParams;
 
-/// Module for Keccak circuits in vanilla halo2.
-pub mod vanilla;
-pub mod util;
 pub mod circuit;
 pub mod io;
+pub mod util;
+/// Module for Keccak circuits in vanilla halo2.
+pub mod vanilla;
 
 #[cfg(test)]
 mod tests;
 
-
 pub const K: u32 = 13;
 pub const ROWS_PER_ROUND: usize = 25;
-
 
 /// This function is picked up by the `mopro-core` when generating the proof.
 /// It should be implemented the proving logic for the circuit.
@@ -52,7 +52,7 @@ pub fn prove(
         .iter()
         .map(|x| *x.to_bytes_le().last().unwrap())
         .collect::<Vec<u8>>()];
-    
+
     let instance = pack_input_to_instance::<Fr>(&inputs);
 
     // Set up the circuit
@@ -68,8 +68,15 @@ pub fn prove(
     );
 
     let mut transcript = Blake2bWrite::<_, G1Affine, Challenge255<_>>::init(vec![]);
-    
-    create_proof::<KZGCommitmentScheme<Bn256>, ProverSHPLONK<'_, Bn256>, Challenge255<G1Affine>, _, Blake2bWrite<Vec<u8>, G1Affine, Challenge255<G1Affine>>, _>(
+
+    create_proof::<
+        KZGCommitmentScheme<Bn256>,
+        ProverSHPLONK<'_, Bn256>,
+        Challenge255<G1Affine>,
+        _,
+        Blake2bWrite<Vec<u8>, G1Affine, Challenge255<G1Affine>>,
+        _,
+    >(
         &srs,
         &pk,
         &[circuit],
@@ -90,7 +97,13 @@ pub fn verify(
     vk: &VerifyingKey<G1Affine>,
 ) -> Result<bool, ()> {
     let mut transcript = Blake2bRead::<_, G1Affine, Challenge255<_>>::init(&proof[..]);
-    let proof_verified = verify_proof::<KZGCommitmentScheme<Bn256>, VerifierSHPLONK<'_, Bn256>, Challenge255<G1Affine>, Blake2bRead<&[u8], G1Affine, Challenge255<G1Affine>>, _>(
+    let proof_verified = verify_proof::<
+        KZGCommitmentScheme<Bn256>,
+        VerifierSHPLONK<'_, Bn256>,
+        Challenge255<G1Affine>,
+        Blake2bRead<&[u8], G1Affine, Challenge255<G1Affine>>,
+        _,
+    >(
         srs.verifier_params(),
         &vk,
         SingleStrategy::new(&srs),
@@ -109,6 +122,8 @@ fn test_conversion() {
     let f_input = input.iter().map(|x| Fr::from(*x as u64));
 
     // Convert the field elements back to bytes
-    let output = f_input.map(|x| x.to_bytes_le()[0] as u8).collect::<Vec<u8>>();
+    let output = f_input
+        .map(|x| x.to_bytes_le()[0] as u8)
+        .collect::<Vec<u8>>();
     assert_eq!(input, output);
 }

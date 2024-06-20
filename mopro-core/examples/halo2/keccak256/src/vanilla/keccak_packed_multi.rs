@@ -4,7 +4,10 @@ use halo2_proofs::{
     plonk::{Advice, Column, ConstraintSystem, Expression},
 };
 
-use crate::util::{constraint_builder::BaseConstraintBuilder, eth_types::Field, expression::Expr, Halo2AssignedCell, word::Word};
+use crate::util::{
+    constraint_builder::BaseConstraintBuilder, eth_types::Field, expression::Expr, word::Word,
+    Halo2AssignedCell,
+};
 
 use super::{cell_manager::*, param::*, table::*};
 
@@ -155,7 +158,12 @@ impl KeccakTable {
         meta.enable_equality(bytes_left);
         meta.enable_equality(hash_lo);
         meta.enable_equality(hash_hi);
-        Self { is_enabled, output: Word::new([hash_lo, hash_hi]), word_value, bytes_left }
+        Self {
+            is_enabled,
+            output: Word::new([hash_lo, hash_hi]),
+            word_value,
+            bytes_left,
+        }
     }
 }
 
@@ -189,7 +197,7 @@ pub(crate) mod split {
     use crate::util::{pack, pack_part, unpack, WordParts};
 
     use super::{
-        BaseConstraintBuilder, CellManager, decode, Expr, Field, KeccakRegion, Part, PartValue,
+        decode, BaseConstraintBuilder, CellManager, Expr, Field, KeccakRegion, Part, PartValue,
         PrimeField,
     };
 
@@ -261,10 +269,10 @@ pub(crate) mod split_uniform {
     use halo2_proofs::halo2curves::ff::PrimeField;
     use halo2_proofs::plonk::{ConstraintSystem, Expression};
 
-    use crate::util::*;
     use crate::util::constraint_builder::BaseConstraintBuilder;
     use crate::util::eth_types::Field;
     use crate::util::expression::Expr;
+    use crate::util::*;
     use crate::vanilla::cell_manager::{Cell, CellManager};
 
     use super::{decode, KeccakRegion, Part, PartValue};
@@ -433,7 +441,7 @@ pub(crate) mod transform {
     use halo2_proofs::plonk::{ConstraintSystem, TableColumn};
     use itertools::Itertools;
 
-    use super::{CellManager, Field, KeccakRegion, Part, PartValue, PrimeField, transform_to};
+    use super::{transform_to, CellManager, Field, KeccakRegion, Part, PartValue, PrimeField};
 
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn expr<F: PrimeField>(
@@ -493,8 +501,8 @@ pub(crate) mod transform_to {
     use halo2_proofs::plonk::{ConstraintSystem, TableColumn};
 
     use crate::vanilla::{
-        Cell,
-        Expr, Field, KeccakRegion, Part, PartValue, PrimeField, util::{pack, to_bytes, unpack},
+        util::{pack, to_bytes, unpack},
+        Cell, Expr, Field, KeccakRegion, Part, PartValue, PrimeField,
     };
 
     #[allow(clippy::too_many_arguments)]

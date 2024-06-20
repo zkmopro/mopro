@@ -87,7 +87,11 @@ fn keccak<F: Field>(
             let absorb = pack(&chunk[idx * 64..(idx + 1) * 64]);
             let from = s[i][j];
             s[i][j] = field_xor(s[i][j], absorb);
-            absorb_rows.push(AbsorbData { from, absorb, result: s[i][j] });
+            absorb_rows.push(AbsorbData {
+                from,
+                absorb,
+                result: s[i][j],
+            });
         }
 
         // better memory management to clear already allocated Vecs
@@ -124,8 +128,15 @@ fn keccak<F: Field>(
             cell_manager.start_region();
             let part_size = get_num_bits_per_absorb_lookup(k);
             let input = absorb_row.from + absorb_row.absorb;
-            let absorb_fat =
-                split::value(&mut cell_manager, &mut region, input, 0, part_size, false, None);
+            let absorb_fat = split::value(
+                &mut cell_manager,
+                &mut region,
+                input,
+                0,
+                part_size,
+                false,
+                None,
+            );
             cell_manager.start_region();
             let _absorb_result = transform::value(
                 &mut cell_manager,
@@ -140,14 +151,23 @@ fn keccak<F: Field>(
             cell_manager.start_region();
             // Unpack a single word into bytes (for the absorption)
             // Potential optimization: could do multiple bytes per lookup
-            let packed =
-                split::value(&mut cell_manager, &mut region, absorb_row.absorb, 0, 8, false, None);
+            let packed = split::value(
+                &mut cell_manager,
+                &mut region,
+                absorb_row.absorb,
+                0,
+                8,
+                false,
+                None,
+            );
             cell_manager.start_region();
             let input_bytes =
                 transform::value(&mut cell_manager, &mut region, packed, false, |v| *v, true);
             cell_manager.start_region();
-            let is_paddings =
-                input_bytes.iter().map(|_| cell_manager.query_cell_value()).collect::<Vec<_>>();
+            let is_paddings = input_bytes
+                .iter()
+                .map(|_| cell_manager.query_cell_value())
+                .collect::<Vec<_>>();
             debug_assert_eq!(is_paddings.len(), NUM_BYTES_PER_WORD);
             if round < NUM_WORDS_TO_ABSORB {
                 for (padding_idx, is_padding) in is_paddings.iter().enumerate() {
@@ -312,9 +332,10 @@ fn keccak<F: Field>(
                     .rev()
                     .collect::<Vec<_>>();
 
-                let word: Word<Value<F>> =
-                    Word::from(eth_types::Word::from_little_endian(hash_bytes_le.as_slice()))
-                        .map(Value::known);
+                let word: Word<Value<F>> = Word::from(eth_types::Word::from_little_endian(
+                    hash_bytes_le.as_slice(),
+                ))
+                .map(Value::known);
                 word
             } else {
                 Word::default().into_value()
@@ -371,7 +392,11 @@ fn keccak<F: Field>(
                 } else {
                     NUM_WORDS_TO_ABSORB * NUM_BYTES_PER_WORD
                 } + idx * NUM_WORDS_TO_ABSORB * NUM_BYTES_PER_WORD;
-                let bytes_left = if byte_idx >= bytes.len() { 0 } else { bytes.len() - byte_idx };
+                let bytes_left = if byte_idx >= bytes.len() {
+                    0
+                } else {
+                    bytes.len() - byte_idx
+                };
                 rows.push(KeccakRow {
                     q_enable: row_idx == 0,
                     q_round: row_idx == 0 && round < NUM_ROUNDS,
@@ -390,7 +415,12 @@ fn keccak<F: Field>(
                 {
                     let mut r = rows.last().unwrap().clone();
                     r.cell_values.clear();
-                    log::trace!("offset {:?} row idx {} row {:?}", rows.len() - 1, row_idx, r);
+                    log::trace!(
+                        "offset {:?} row idx {} row {:?}",
+                        rows.len() - 1,
+                        row_idx,
+                        r
+                    );
                 }
             }
             log::trace!(" = = = = = = round {} end", round);
