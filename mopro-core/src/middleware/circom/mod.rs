@@ -200,7 +200,7 @@ pub fn witness_calculator() -> &'static Mutex<WitnessCalculator> {
     })
 }
 
-pub fn generate_proof2(
+pub fn generate_proof_static(
     inputs: CircuitInputs,
 ) -> Result<(SerializableProof, SerializableInputs), MoproError> {
     let mut rng = thread_rng();
@@ -209,7 +209,7 @@ pub fn generate_proof2(
     let r = ark_bn254::Fr::rand(rng);
     let s = ark_bn254::Fr::rand(rng);
 
-    println!("Generating proof 2");
+    println!("Generating proof Static");
 
     let now = std::time::Instant::now();
     #[cfg(not(feature = "calc-native-witness"))]
@@ -249,7 +249,7 @@ pub fn generate_proof2(
     Ok((SerializableProof(proof), SerializableInputs(public_inputs)))
 }
 
-pub fn verify_proof2(
+pub fn verify_proof_static(
     serialized_proof: SerializableProof,
     serialized_inputs: SerializableInputs,
 ) -> Result<bool, MoproError> {
@@ -263,7 +263,7 @@ pub fn verify_proof2(
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
     let verification_duration = start.elapsed();
-    println!("Verification time 2: {:?}", verification_duration);
+    println!("Verification time static: {:?}", verification_duration);
     Ok(proof_verified)
 }
 
@@ -527,7 +527,7 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_proof2() {
+    fn test_generate_proof_static() {
         // XXX: This can be done better
         #[cfg(feature = "dylib")]
         {
@@ -549,12 +549,12 @@ mod tests {
         let inputs = bytes_to_circuit_inputs(&input_vec);
         let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
 
-        let generate_proof_res = generate_proof2(inputs);
+        let generate_proof_res = generate_proof_static(inputs);
         let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
         assert_eq!(serialized_inputs, serialized_outputs);
 
         // Proof verification
-        let verify_res = verify_proof2(serialized_proof, serialized_inputs);
+        let verify_res = verify_proof_static(serialized_proof, serialized_inputs);
         assert!(verify_res.is_ok());
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
@@ -651,7 +651,7 @@ mod tests {
         );
 
         // Proof generation
-        let generate_proof_res = generate_proof2(inputs);
+        let generate_proof_res = generate_proof_static(inputs);
 
         // Check and print the error if there is one
         if let Err(e) = &generate_proof_res {
@@ -663,7 +663,7 @@ mod tests {
         let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
 
         // Proof verification
-        let verify_res = verify_proof2(serialized_proof, serialized_inputs);
+        let verify_res = verify_proof_static(serialized_proof, serialized_inputs);
         assert!(verify_res.is_ok());
 
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
@@ -776,7 +776,7 @@ mod tests {
         inputs.insert("signalHash".to_string(), vec![BigInt::from(1)]);
 
         // Proof generation
-        let generate_proof_res = generate_proof2(inputs);
+        let generate_proof_res = generate_proof_static(inputs);
 
         // Check and print the error if there is one
         if let Err(e) = &generate_proof_res {
@@ -788,7 +788,7 @@ mod tests {
         let (serialized_proof, serialized_inputs) = generate_proof_res.unwrap();
 
         // Proof verification
-        let verify_res = verify_proof2(serialized_proof, serialized_inputs);
+        let verify_res = verify_proof_static(serialized_proof, serialized_inputs);
         assert!(verify_res.is_ok());
 
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified

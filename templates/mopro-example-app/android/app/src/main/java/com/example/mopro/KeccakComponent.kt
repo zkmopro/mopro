@@ -14,9 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import uniffi.mopro.GenerateProofResult
-import uniffi.mopro.generateProof2
+import uniffi.mopro.generateProofStatic
 import uniffi.mopro.initializeMopro
-import uniffi.mopro.verifyProof2
+import uniffi.mopro.verifyProofStatic
 
 @Composable
 fun KeccakComponent() {
@@ -314,7 +314,7 @@ fun KeccakComponent() {
                 Thread(
                     Runnable {
                         val startTime = System.currentTimeMillis()
-                        res = generateProof2(inputs)
+                        res = generateProofStatic(inputs)
                         val endTime = System.currentTimeMillis()
                         provingTime =
                             "proving time: " +
@@ -329,7 +329,7 @@ fun KeccakComponent() {
         Button(
             onClick = {
                 val startTime = System.currentTimeMillis()
-                valid = "valid: " + verifyProof2(res.proof, res.inputs).toString()
+                valid = "valid: " + verifyProofStatic(res.proof, res.inputs).toString()
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
             },

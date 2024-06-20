@@ -42,8 +42,8 @@ DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")
 USE_CIRCOM_WITNESS_RS=$(read_toml "$CONFIG_FILE" "witness.use_native_witness_generation")
 
 # Assert we're in the project root
-if [[ ! -d "mopro-ffi" || ! -d "mopro-core" || ! -d "mopro-ios" ]]; then
-    echo -e "${RED}Error: This script must be run from the project root directory that contains mopro-ffi, mopro-core, and mopro-ios folders.${DEFAULT}"
+if [[ ! -d "mopro-ffi" || ! -d "mopro-core"  ]]; then
+    echo -e "${RED}Error: This script must be run from the project root directory that contains mopro-ffi, mopro-core folders.${DEFAULT}"
     exit 1
 fi
 
@@ -96,7 +96,7 @@ print_action "Updating mopro-ffi bindings and library ($BUILD_MODE $DEVICE_TYPE)
 
 PROJECT_DIR=$(pwd)
 TARGET_DIR=${PROJECT_DIR}/target
-MOPROKIT_DIR=${PROJECT_DIR}/mopro-ios/MoproKit
+MOPROKIT_DIR=${PROJECT_DIR}/templates/mopro-example-app/ios/ExampleApp
 
 # Dylib directory and settings
 if [[ "$USE_DYLIB" == true ]]; then
@@ -143,21 +143,21 @@ fi
 cp ${PROJECT_DIR}/target/${ARCHITECTURE}/${LIB_DIR}/libmopro_ffi.a ${TARGET_DIR}/
 
 print_action "Copying Swift bindings and static library to MoproKit..."
-cp ${TARGET_DIR}/SwiftBindings/moproFFI.h ${MOPROKIT_DIR}/Include/
+# cp ${TARGET_DIR}/SwiftBindings/moproFFI.h ${MOPROKIT_DIR}/Include/
 cp ${TARGET_DIR}/SwiftBindings/mopro.swift ${MOPROKIT_DIR}/Bindings/
-cp ${TARGET_DIR}/SwiftBindings/moproFFI.modulemap ${MOPROKIT_DIR}/Resources/
-cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
+# cp ${TARGET_DIR}/SwiftBindings/moproFFI.modulemap ${MOPROKIT_DIR}/Resources/
+# cp ${TARGET_DIR}/libmopro_ffi.a ${MOPROKIT_DIR}/Libs/
 
 # TODO: Improve CLI, positional arguments a bit messy
 # Dylib assets
 if [[ "$USE_DYLIB" == true ]]; then
     print_action "Copying dynamic library asset (${DYLIB_NAME})..."
     cp "${PROJECT_DIR}/mopro-core/target/${ARCHITECTURE}/${LIB_DIR}/${DYLIB_NAME}" "${TARGET_DIR}/"
-    cp "${TARGET_DIR}/${DYLIB_NAME}" "${MOPROKIT_DIR}/Libs/"
+    # cp "${TARGET_DIR}/${DYLIB_NAME}" "${MOPROKIT_DIR}/Libs/"
     # Fix dynamic lib install paths
     # NOTE: Xcode might already do this for us; verify this
-    install_name_tool -id "@rpath/${DYLIB_NAME}" "${MOPROKIT_DIR}/Libs/${DYLIB_NAME}"
-    codesign -f -s "${APPLE_SIGNING_IDENTITY}" "${MOPROKIT_DIR}/Libs/${DYLIB_NAME}"
+    # install_name_tool -id "@rpath/${DYLIB_NAME}" "${MOPROKIT_DIR}/Libs/${DYLIB_NAME}"
+    # codesign -f -s "${APPLE_SIGNING_IDENTITY}" "${MOPROKIT_DIR}/Libs/${DYLIB_NAME}"
 fi
 
 print_action "Done! Please re-build your project in Xcode."

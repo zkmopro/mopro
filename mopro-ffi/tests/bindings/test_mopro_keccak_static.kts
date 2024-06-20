@@ -264,9 +264,9 @@ try {
                     "0"
             )
 
-    var generateProofResult = generateProof2(inputs)
+    var generateProofResult = generateProofStatic(inputs)
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
-    var isValid = verifyProof2(generateProofResult.proof, generateProofResult.inputs)
+    var isValid = verifyProofStatic(generateProofResult.proof, generateProofResult.inputs)
     assert(isValid) { "Proof is invalid" }
 } catch (e: Exception) {
     println(e)

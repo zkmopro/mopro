@@ -73,7 +73,7 @@ pub fn verify_proof(
 ) -> Result<bool, MoproError>
 ```
 
-## `generate_proof2`
+## `generate_proof_static`
 
 Generates a proof based on the provided circuit inputs.<br/>
 :::warning
@@ -83,12 +83,12 @@ You can specify the [mopro-config.toml](configuration) to build the default circ
 :::
 
 ```rust
-pub fn generate_proof2(
+pub fn generate_proof_static(
     inputs: CircuitInputs,
 ) -> Result<(SerializableProof, SerializableInputs), MoproError>
 ```
 
-## `verify_proof2`
+## `verify_proof_static`
 
 Verifies the provided proof against the given inputs.<br/>
 :::warning
@@ -98,7 +98,7 @@ You can specify the [mopro-config.toml](configuration) to build the default circ
 :::
 
 ```rust
-pub fn verify_proof2(
+pub fn verify_proof_static(
     serialized_proof: SerializableProof,
     serialized_inputs: SerializableInputs,
 ) -> Result<bool, MoproError>

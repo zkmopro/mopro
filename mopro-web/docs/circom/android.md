@@ -143,7 +143,7 @@ var isValid = moproCircom.verifyProof(
 )
 ```
 
-### `generateProof2`
+### `generateProofStatic`
 
 Generates a proof based on the provided circuit inputs.<br/>
 :::warning
@@ -154,10 +154,10 @@ You can specify the [mopro-config.toml](configuration) to build the default circ
 
 ```kotlin
 @Throws(MoproException::class)
-fun `generateProof2`(`circuitInputs`: Map<String, List<String>>): GenerateProofResult
+fun `generateProofStatic`(`circuitInputs`: Map<String, List<String>>): GenerateProofResult
 ```
 
-### `verifyProof2`
+### `verifyProofStatic`
 
 Verifies the provided proof against the given inputs.<br/>
 :::warning
@@ -168,7 +168,7 @@ You can specify the [mopro-config.toml](configuration) to build the default circ
 
 ```kotlin
 @Throws(MoproException::class)
-fun `verifyProof2`(
+fun `verifyProofStatic`(
     `proof`: ByteArray,
     `publicInput`: ByteArray,
 ): Boolean

@@ -149,7 +149,7 @@ let isValid = try moproCircom.verifyProof(
 )
 ```
 
-### `generateProof2`
+### `generateProofStatic`
 
 Generates a proof based on the provided circuit inputs.<br/>
 :::warning
@@ -159,10 +159,10 @@ You can specify the [mopro-config.toml](configuration) to build the default circ
 :::
 
 ```swift
-func generateProof2(circuitInputs: [String: [String]]) throws -> GenerateProofResult
+func generateProofStatic(circuitInputs: [String: [String]]) throws -> GenerateProofResult
 ```
 
-### `verifyProof2`
+### `verifyProofStatic`
 
 Verifies the provided proof against the given inputs.<br/>
 :::warning
@@ -172,7 +172,7 @@ You can specify the [mopro-config.toml](configuration) to build the default circ
 :::
 
 ```swift
-func verifyProof2(proof: Data, publicInput: Data) throws -> Bool
+func verifyProofStatic(proof: Data, publicInput: Data) throws -> Bool
 ```
 
 ### `toEthereumInputs`

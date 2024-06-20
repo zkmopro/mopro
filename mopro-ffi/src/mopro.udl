@@ -9,10 +9,10 @@ namespace mopro {
   void initialize_mopro_dylib(string dylib_path);
 
   [Throws=MoproError]
-  GenerateProofResult generate_proof2(record<string, sequence<string>> circuit_inputs);
+  GenerateProofResult generate_proof_static(record<string, sequence<string>> circuit_inputs);
 
   [Throws=MoproError]
-  boolean verify_proof2(bytes proof, bytes public_input);
+  boolean verify_proof_static(bytes proof, bytes public_input);
 
   [Throws=MoproError]
   GenerateProofResult generate_halo2_proof(record<string, sequence<string>> circuit_inputs);

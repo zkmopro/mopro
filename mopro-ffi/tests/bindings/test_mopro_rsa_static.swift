@@ -153,11 +153,11 @@ do {
     inputs["base_message"] = base_message;
 
     // Generate Proof
-    let generateProofResult = try generateProof2(circuitInputs: inputs)
+    let generateProofResult = try generateProofStatic(circuitInputs: inputs)
     assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
 
     // Verifying the Proof
-    let isValid = try verifyProof2(proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
+    let isValid = try verifyProofStatic(proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
     assert(isValid, "Proof verification should succeed")
 
 } catch let error as MoproError {
