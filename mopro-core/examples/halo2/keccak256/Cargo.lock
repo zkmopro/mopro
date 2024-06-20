@@ -1259,6 +1259,32 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b43ede17f21864e81be2fa654110bf1e793774238d86ef8555c37e6519c0403"
 
 [[package]]
+name = "halo2-circuit"
+version = "0.1.0"
+dependencies = [
+ "array-init",
+ "criterion",
+ "ctor",
+ "env_logger",
+ "ethers-core",
+ "ethers-signers",
+ "halo2_proofs",
+ "hex",
+ "itertools",
+ "lazy_static",
+ "log",
+ "num-bigint",
+ "pretty_assertions",
+ "rand",
+ "rand_core",
+ "rand_xorshift",
+ "rayon",
+ "serde",
+ "sha3 0.10.8",
+ "test-case",
+]
+
+[[package]]
 name = "halo2_proofs"
 version = "0.2.0"
 source = "git+https://github.com/privacy-scaling-explorations/halo2?tag=v2023_04_20#be955686f86eb618f55d2320c0e042485b313d22"
@@ -1503,32 +1529,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ecc2af9a1119c51f12a14607e783cb977bde58bc069ff0c3da1095e635d70654"
 dependencies = [
  "cpufeatures",
-]
-
-[[package]]
-name = "keccak-test-2"
-version = "0.1.0"
-dependencies = [
- "array-init",
- "criterion",
- "ctor",
- "env_logger",
- "ethers-core",
- "ethers-signers",
- "halo2_proofs",
- "hex",
- "itertools",
- "lazy_static",
- "log",
- "num-bigint",
- "pretty_assertions",
- "rand",
- "rand_core",
- "rand_xorshift",
- "rayon",
- "serde",
- "sha3 0.10.8",
- "test-case",
 ]
 
 [[package]]
