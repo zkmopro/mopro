@@ -174,8 +174,6 @@ impl<F: Field> KeccakCircuit<F> {
         let mut total_offset = 0;
         let mut input_byte_offset = 0;
 
-        let instance = pack_input_to_instance::<F>(&self.inputs);
-
         // first round is dummy, so ignore
         for absorb_chunk in &assigned_rows
             .chunks(rows_per_round)
@@ -191,15 +189,6 @@ impl<F: Field> KeccakCircuit<F> {
                         ..
                     } = assigned_row.clone();
                     let is_final_val = extract_value(is_final).ne(&F::ZERO);
-                    let word_value_val = extract_u128(word_value.clone());
-                    // let bytes_left_val = extract_u128(bytes_left);
-                    // Padded inputs - all empty.
-                    // TODO - consider if it should be checked
-                    // if input_offset >= self.inputs.len() {
-                    //     assert_eq!(word_value_val, 0);
-                    //     assert_eq!(bytes_left_val, 0);
-                    //     continue;
-                    // }
 
                     // If we reached to the end of this chunk, skip it
                     if input_offset >= self.inputs.len() {
@@ -207,13 +196,14 @@ impl<F: Field> KeccakCircuit<F> {
                     }
 
                     let input_len = self.inputs[input_offset].len();
+
+                    if input_byte_offset >= input_len {
+                        continue;
+                    }
                     if round_idx == NUM_ROUNDS && row_idx == 0 && is_final_val {
                         absorbed = true;
                     }
                     if row_idx == 0 {
-                        // TODO - consider if it should be checked
-                        // assert_eq!(bytes_left_val, input_len as u128 - input_byte_offset as u128);
-
                         // Only these rows could contain inputs.
                         let end = if round_idx < NUM_WORDS_TO_ABSORB {
                             std::cmp::min(input_byte_offset + NUM_BYTES_PER_WORD, input_len)
@@ -221,32 +211,10 @@ impl<F: Field> KeccakCircuit<F> {
                             input_byte_offset
                         };
 
-                        // let mut expected_val_le_bytes =
-                        //     self.inputs[input_offset][input_byte_offset..end].to_vec().clone();
-                        // expected_val_le_bytes.resize(NUM_BYTES_PER_WORD, 0);
-                        // assert_eq!(
-                        //     word_value_val,
-                        //     u64::from_le_bytes(expected_val_le_bytes.try_into().unwrap()) as u128,
-                        // );
-
-                        // Check if the packed value is equal to the expected value
-                        if F::from_u128(word_value_val) != instance[total_offset] {
-                            dbg!(format!("Input offset: {:?}", input_offset));
-                            dbg!(format!("Input byte offset: {:?}", input_byte_offset));
-                            dbg!(format!(
-                                "Expected value: {:?}",
-                                &self.inputs[input_offset][input_byte_offset..end]
-                                    .to_vec()
-                                    .clone()
-                            ));
-                            dbg!(format!("Word value: {:?}", word_value.clone()));
-                            dbg!(format!("Total offset: {:?}", total_offset));
-                            dbg!(format!("Packed value: {:?}", instance[total_offset]));
-                        }
-
                         layouter
                             .constrain_instance(word_value.cell(), config.input, total_offset)
                             .unwrap();
+                        total_offset += 1;
 
                         input_byte_offset = end;
                     }

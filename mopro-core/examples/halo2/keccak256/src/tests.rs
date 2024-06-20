@@ -132,10 +132,19 @@ fn packed_multi_keccak_prover(k: u32, rows_per_round: usize) {
 fn test_external_functions() {
     let _ = env_logger::builder().is_test(true).try_init();
 
+    let input = [1u8, 10u8, 100u8].repeat(10);
+
     let srs = ParamsKZG::<Bn256>::setup(K, OsRng);
 
     let mut inputs = HashMap::new();
-    inputs.insert("input".to_string(), vec![Fr::from(0u64), Fr::from(1u64), Fr::from(2u64)]);
+
+    inputs.insert(
+        "input".to_string(),
+        input
+            .iter()
+            .map(|x| Fr::from(*x as u64))
+            .collect::<Vec<_>>(),
+    );
 
     // Generate the keys
     let circuit = KeccakCircuit::new(

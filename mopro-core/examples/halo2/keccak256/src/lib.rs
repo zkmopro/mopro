@@ -31,7 +31,7 @@ pub mod vanilla;
 #[cfg(test)]
 mod tests;
 
-pub const K: u32 = 13;
+pub const K: u32 = 12;
 pub const ROWS_PER_ROUND: usize = 25;
 
 /// This function is picked up by the `mopro-core` when generating the proof.
@@ -50,7 +50,7 @@ pub fn prove(
     // TODO - can be optimized by packing multiple bytes into field elements
     let inputs = vec![raw_inputs
         .iter()
-        .map(|x| *x.to_bytes_le().last().unwrap())
+        .map(|x| *x.to_bytes_le().first().unwrap())
         .collect::<Vec<u8>>()];
 
     let instance = pack_input_to_instance::<Fr>(&inputs);
