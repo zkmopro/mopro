@@ -222,14 +222,15 @@ This will the following files, assuming they've been built, to the destination d
 -   Move the `<DESTINATION_DIR>/android/uniffi/` folder to `app/src/main/java/`
 -   Use moproFFI in kotlin like
 
-    ```kotlin
-      import uniffi.mopro.initializeMopro
+        ```kotlin
+          import uniffi.mopro.initializeMopro
 
-      ...
-      initializeMopro()
-      ...
-    ```
-> Reference: https://sal.dev/android/intro-rust-android-uniffi/
+          ...
+          initializeMopro()
+          ...
+        ```
+
+    > Reference: https://sal.dev/android/intro-rust-android-uniffi/
 
 ## Contributing
 

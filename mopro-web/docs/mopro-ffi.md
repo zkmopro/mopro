@@ -14,14 +14,14 @@ TBD.
 2. Add platform targets `rustup target add x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim`
 3. Install `uniffi-bindgen` locally with `cargo install --bin uniffi-bindgen --path .`
 4. In order to locally run the bindings tests, you will need
-    * Kotlin:
-        * `kotlinc`, the [Kotlin command-line compiler](https://kotlinlang.org/docs/command-line.html).
-        * `ktlint`, the [Kotlin linter used to format the generated bindings](https://ktlint.github.io/).
-        * The [Java Native Access](https://github.com/java-native-access/jna#download) JAR downloaded and its path
-            added to your `$CLASSPATH` environment variable.
-    * Swift:
-        * `swift` and `swiftc`, the [Swift command-line tools](https://swift.org/download/).
-        * The Swift `Foundation` package.
+    - Kotlin:
+        - `kotlinc`, the [Kotlin command-line compiler](https://kotlinlang.org/docs/command-line.html).
+        - `ktlint`, the [Kotlin linter used to format the generated bindings](https://ktlint.github.io/).
+        - The [Java Native Access](https://github.com/java-native-access/jna#download) JAR downloaded and its path
+          added to your `$CLASSPATH` environment variable.
+    - Swift:
+        - `swift` and `swiftc`, the [Swift command-line tools](https://swift.org/download/).
+        - The Swift `Foundation` package.
 
 ### Platforms supported
 
@@ -60,11 +60,12 @@ The above report was conducted on an M1 Pro MacBook Pro.
 For more information, read this report we have completed, which compares the time performance of MSM running in rust and swift.
 
 ## To use [circom-witness-rs](https://github.com/philsippl/circom-witness-rs) (Experimental)
+
 1. Comment `default=[]` and uncomment `default = ["calc-native-witness"]` to enable `calc-native-witness` feature flag
 2. Test with
-   ```sh
-   # Run all tests
-   cargo test --features calc-native-witness
-   # Run bindings tests
-   cargo test --test test_generated_bindings --features calc-native-witness
-   ```
+    ```sh
+    # Run all tests
+    cargo test --features calc-native-witness
+    # Run bindings tests
+    cargo test --test test_generated_bindings --features calc-native-witness
+    ```
