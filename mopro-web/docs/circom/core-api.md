@@ -76,7 +76,11 @@ pub fn verify_proof(
 ## `generate_proof2`
 
 Generates a proof based on the provided circuit inputs.<br/>
-The zkey and wasm are precompiled during `cargo build`. You can specify the [mopro-config.toml](configuration) to build the default circuits.
+:::warning
+**Note: The function is different from [`generate_proof`](#generate_proof).** <br/>
+In this function, the zkey and wasm are precompiled during `cargo build`. <br/>
+You can specify the [mopro-config.toml](configuration) to build the default circuits.
+:::
 
 ```rust
 pub fn generate_proof2(
@@ -87,7 +91,11 @@ pub fn generate_proof2(
 ## `verify_proof2`
 
 Verifies the provided proof against the given inputs.<br/>
-The zkey and wasm are precompiled during `cargo build`. You can specify the [mopro-config.toml](configuration) to build the default circuits.
+:::warning
+**Note: The function is different from [`verify_proof`](#verify_proof).** <br/>
+In this function, the zkey and wasm are precompiled during `cargo build`. <br/>
+You can specify the [mopro-config.toml](configuration) to build the default circuits.
+:::
 
 ```rust
 pub fn verify_proof2(

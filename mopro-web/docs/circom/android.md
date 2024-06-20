@@ -2,7 +2,7 @@
 
 ## Getting started with a new project
 
-1. Install `mopro` cli. See [Gettin Started](../getting-started#install-dependencies).
+1. Install `mopro-cli`. See [Getting Started](../getting-started#install-dependencies).
 2. Create a new project
 
 ```sh
@@ -30,7 +30,7 @@ open android -a Android\ Studio
 
 ## Getting started with exported bindings
 
-1. Install `mopro` cli. See [Gettin Started](../getting-started#install-dependencies).
+1. Install `mopro-cli`. See [Getting Started](../getting-started#install-dependencies).
 2. Prepare circuits
 
 ```sh
@@ -49,7 +49,7 @@ mopro build --platforms android
 mopro export-bindings --platforms android --destination out
 ```
 
-5. add dependencies in `app/build.gradle.kts`
+5. Add dependencies in `app/build.gradle.kts`
 
 ```kotlin
 dependencies {
@@ -64,7 +64,7 @@ dependencies {
    Move the `out/android/jniLibs/` folder into `app/src/main/jniLibs/`.<br/>
    Move the `out/android/uniffi/mopro/mopro.kts` file into `app/src/main/java/uniffi/mopro/mopro.kt`.<br/>
    ![android bindings](/img/android-bindings.png)
-8. Use `mopro` by
+8. Use the generated `mopro` library by
 
 ```kotlin
 import uniffi.mopro.initializeMopro
@@ -78,7 +78,7 @@ func initialize(){
 
 ### `MoproCircom`
 
-Initialize a circom object. <br/>
+Initialize a `MoproCircom` object. <br/>
 
 Usage:
 
@@ -146,7 +146,11 @@ var isValid = moproCircom.verifyProof(
 ### `generateProof2`
 
 Generates a proof based on the provided circuit inputs.<br/>
-The zkey and wasm are precompiled during `cargo build`. You can specify the [mopro-config.toml](configuration) to build the default circuits.
+:::warning
+**Note: The function is different from [`generateProof`](#generateproof).** <br/>
+In this function, the zkey and wasm are precompiled during `cargo build`. <br/>
+You can specify the [mopro-config.toml](configuration) to build the default circuits.
+:::
 
 ```kotlin
 @Throws(MoproException::class)
@@ -156,7 +160,11 @@ fun `generateProof2`(`circuitInputs`: Map<String, List<String>>): GenerateProofR
 ### `verifyProof2`
 
 Verifies the provided proof against the given inputs.<br/>
-The zkey and wasm are precompiled during `cargo build`. You can specify the [mopro-config.toml](configuration) to build the default circuits.
+:::warning
+**Note: The function is different from [`verifyProof`](#verifyproof).** <br/>
+In this function, the zkey and wasm are precompiled during `cargo build`. <br/>
+You can specify the [mopro-config.toml](configuration) to build the default circuits.
+:::
 
 ```kotlin
 @Throws(MoproException::class)
