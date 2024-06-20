@@ -1,7 +1,4 @@
 //! Utility traits, functions used in the crate.
-
-use std::env::var;
-
 use eth_types::{Field, ToScalar, Word};
 use halo2_proofs::circuit::AssignedCell;
 use halo2_proofs::circuit::Value;
@@ -21,17 +18,6 @@ pub const SKIP_FIRST_PASS: bool = true;
 pub const NUM_BITS_PER_BYTE: usize = 8;
 pub const NUM_BYTES_PER_WORD: usize = 8;
 pub const NUM_BITS_PER_WORD: usize = NUM_BYTES_PER_WORD * NUM_BITS_PER_BYTE;
-pub const KECCAK_WIDTH: usize = 5 * 5;
-pub const KECCAK_WIDTH_IN_BITS: usize = KECCAK_WIDTH * NUM_BITS_PER_WORD;
-pub const NUM_ROUNDS: usize = 24;
-pub const NUM_WORDS_TO_ABSORB: usize = 17;
-pub const NUM_BYTES_TO_ABSORB: usize = NUM_WORDS_TO_ABSORB * NUM_BYTES_PER_WORD;
-pub const NUM_WORDS_TO_SQUEEZE: usize = 4;
-pub const NUM_BYTES_TO_SQUEEZE: usize = NUM_WORDS_TO_SQUEEZE * NUM_BYTES_PER_WORD;
-pub const ABSORB_WIDTH_PER_ROW: usize = NUM_BITS_PER_WORD;
-pub const ABSORB_WIDTH_PER_ROW_BYTES: usize = ABSORB_WIDTH_PER_ROW / NUM_BITS_PER_BYTE;
-pub const RATE: usize = NUM_WORDS_TO_ABSORB * NUM_BYTES_PER_WORD;
-pub const RATE_IN_BITS: usize = RATE * NUM_BITS_PER_BYTE;
 
 // The number of bits used in the sparse word representation per bit
 pub const BIT_COUNT: usize = 3;
@@ -80,37 +66,6 @@ pub fn rotate_rev<T>(parts: Vec<T>, count: usize, part_size: usize) -> Vec<T> {
     rotated_parts
 }
 
-/// Rotates bits left
-pub fn rotate_left(bits: &[u8], count: usize) -> [u8; NUM_BITS_PER_WORD] {
-    let mut rotated = bits.to_vec();
-    rotated.rotate_left(count);
-    rotated.try_into().unwrap()
-}
-
-/// The words that absorb data
-pub fn get_absorb_positions() -> Vec<(usize, usize)> {
-    let mut absorb_positions = Vec::new();
-    for j in 0..5 {
-        for i in 0..5 {
-            if i + j * 5 < 17 {
-                absorb_positions.push((i, j));
-            }
-        }
-    }
-    absorb_positions
-}
-
-/// Converts bytes into bits
-pub fn into_bits(bytes: &[u8]) -> Vec<u8> {
-    let mut bits: Vec<u8> = vec![0; bytes.len() * 8];
-    for (byte_idx, byte) in bytes.iter().enumerate() {
-        for idx in 0u64..8 {
-            bits[byte_idx * 8 + (idx as usize)] = (*byte >> idx) & 1;
-        }
-    }
-    bits
-}
-
 /// Pack bits in the range [0,BIT_SIZE[ into a sparse keccak word
 pub fn pack<F: Field>(bits: &[u8]) -> F {
     pack_with_base(bits, BIT_SIZE)
@@ -142,30 +97,6 @@ pub fn unpack<F: Field>(packed: F) -> [u8; NUM_BITS_PER_WORD] {
     }
     debug_assert_eq!(pack::<F>(&bits), packed.to_scalar().unwrap());
     bits
-}
-
-/// Pack bits stored in a u64 value into a sparse keccak word
-pub fn pack_u64<F: Field>(value: u64) -> F {
-    pack(
-        &((0..NUM_BITS_PER_WORD)
-            .map(|i| ((value >> i) & 1) as u8)
-            .collect::<Vec<_>>()),
-    )
-}
-
-/// Calculates a ^ b with a and b field elements
-pub fn field_xor<F: Field>(a: F, b: F) -> F {
-    let mut bytes = [0u8; 32];
-    for (idx, (a, b)) in a
-        .to_repr()
-        .as_ref()
-        .iter()
-        .zip(b.to_repr().as_ref().iter())
-        .enumerate()
-    {
-        bytes[idx] = *a ^ *b;
-    }
-    F::from_repr(bytes).unwrap()
 }
 
 /// Returns the size (in bits) of each part size when splitting up a keccak word
@@ -246,24 +177,4 @@ impl WordParts {
 
         Self { parts }
     }
-}
-
-/// Get the degree of the circuit from the KECCAK_DEGREE env variable
-pub fn get_degree() -> usize {
-    var("KECCAK_DEGREE")
-        .expect("Need to set KECCAK_DEGREE to log_2(rows) of circuit")
-        .parse()
-        .expect("Cannot parse KECCAK_DEGREE env var as usize")
-}
-
-/// Returns how many bits we can process in a single lookup given the range of
-/// values the bit can have and the height of the circuit.
-pub fn get_num_bits_per_lookup(range: usize) -> usize {
-    let num_unusable_rows = 31;
-    let degree = get_degree() as u32;
-    let mut num_bits = 1;
-    while range.pow(num_bits + 1) + num_unusable_rows <= 2usize.pow(degree) {
-        num_bits += 1;
-    }
-    num_bits as usize
 }

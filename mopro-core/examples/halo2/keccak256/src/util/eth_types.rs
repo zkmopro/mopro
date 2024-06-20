@@ -2,11 +2,7 @@
 
 use halo2_proofs::halo2curves::group::ff::PrimeField;
 
-use ethers_core::types;
-pub use ethers_core::types::{
-    transaction::{eip2930::AccessList, response::Transaction},
-    Address, Block, Bytes, Signature, H160, H256, H64, U256, U64,
-};
+pub use ethers_core::types::{Address, H160, H256, U256};
 
 use crate::util::prime_field::BigPrimeField;
 
@@ -29,18 +25,6 @@ pub trait ToWord {
     fn to_word(&self) -> Word;
 }
 
-/// Trait used to convert a type to a [`Address`].
-pub trait ToAddress {
-    /// Convert the type to a [`Address`].
-    fn to_address(&self) -> Address;
-}
-
-/// Trait uset do convert a scalar value to a 32 byte array in big endian.
-pub trait ToBigEndian {
-    /// Convert the value to a 32 byte array in big endian.
-    fn to_be_bytes(&self) -> [u8; 32];
-}
-
 /// Trait used to convert a scalar value to a 32 byte array in little endian.
 pub trait ToLittleEndian {
     /// Convert the value to a 32 byte array in little endian.
@@ -49,15 +33,6 @@ pub trait ToLittleEndian {
 
 /// Ethereum Word (256 bits).
 pub type Word = U256;
-
-impl ToBigEndian for U256 {
-    /// Encode the value as byte array in big endian.
-    fn to_be_bytes(&self) -> [u8; 32] {
-        let mut bytes = [0u8; 32];
-        self.to_big_endian(&mut bytes);
-        bytes
-    }
-}
 
 impl ToLittleEndian for U256 {
     /// Encode the value as byte array in little endian.
@@ -76,14 +51,8 @@ impl<F: Field> ToScalar<F> for U256 {
     }
 }
 
-impl ToAddress for U256 {
-    fn to_address(&self) -> Address {
-        Address::from_slice(&self.to_be_bytes()[12..])
-    }
-}
-
 /// Ethereum Hash (256 bits).
-pub type Hash = types::H256;
+pub type Hash = H256;
 
 impl ToWord for Hash {
     fn to_word(&self) -> Word {
