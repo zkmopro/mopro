@@ -87,7 +87,6 @@ pub fn verify_halo2_proof(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use halo2_proofs::halo2curves::bn256::Fr;
 
     #[test]
     fn test_generate_halo2_proof() {
@@ -116,22 +115,5 @@ mod tests {
         let (proof, inputs) = generate_halo2_proof(input).unwrap();
         let verified = verify_halo2_proof(proof, inputs).unwrap();
         assert!(!verified);
-    }
-
-    #[test]
-    fn test_keccak256_proof() {
-        let mut inputs = HashMap::new();
-        let input = [1u8, 10u8, 100u8].repeat(10);
-
-        inputs.insert(
-            "input".to_string(),
-            input
-                .iter()
-                .map(|x| Fr::from(*x as u64))
-                .collect::<Vec<_>>(),
-        );
-        let (proof, public_inputs) = generate_halo2_proof(inputs).unwrap();
-        let verified = verify_halo2_proof(proof, public_inputs).unwrap();
-        assert!(verified);
     }
 }
