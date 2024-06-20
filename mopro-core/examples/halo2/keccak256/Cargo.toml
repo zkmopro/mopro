@@ -1,7 +1,6 @@
-[workspace]
 [package]
 
-name = "keccak-test-2"
+name = "halo2-circuit"
 version = "0.1.0"
 edition = "2021"
 

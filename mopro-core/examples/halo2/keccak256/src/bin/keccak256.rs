@@ -6,10 +6,10 @@ use halo2_proofs::plonk::{keygen_pk, keygen_vk};
 use halo2_proofs::poly::commitment::ParamsProver;
 use halo2_proofs::poly::kzg::commitment::ParamsKZG;
 
-use keccak_test_2::circuit::KeccakCircuit;
-use keccak_test_2::io::{write_keys, write_srs};
-use keccak_test_2::vanilla::KeccakConfigParams;
-use keccak_test_2::{K, ROWS_PER_ROUND};
+use halo2_circuit::circuit::KeccakCircuit;
+use halo2_circuit::io::{write_keys, write_srs};
+use halo2_circuit::vanilla::KeccakConfigParams;
+use halo2_circuit::{K, ROWS_PER_ROUND};
 
 /// This binary is picked up by the `mopro prepare` command as a backup option to generate the
 /// srs, as well as proving and verification keys for the circuit when the keys are not found in the
