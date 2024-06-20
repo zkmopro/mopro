@@ -11,12 +11,13 @@ fi
 
 PROJECT_DIR=$(pwd)
 CIRCOM_DIR="${PROJECT_DIR}/mopro-core/examples/circom"
+HALO2_DIR="${PROJECT_DIR}/mopro-core/examples/halo2"
 
 compile_circuit() {
     local circuit_dir=$1
     local circuit_file=$2
     local target_file="$circuit_dir/target/$(basename $circuit_file .circom).r1cs"
-
+    
     print_action "[core/circom] Compiling $circuit_file example circuit..."
     if [ ! -f "$target_file" ]; then
         ./scripts/compile.sh $circuit_dir $circuit_file
@@ -27,7 +28,7 @@ compile_circuit() {
 
 npm_install() {
     local circuit_dir=$1
-
+    
     if [[ ! -d "$circuit_dir/node_modules" ]]; then
         echo "Installing npm dependencies for $circuit_dir..."
         (cd "${circuit_dir}" && npm install)
@@ -45,10 +46,10 @@ download_files() {
     local circuit=$2
     local target_dir="${CIRCOM_DIR}/${dir}/target"
     local js_target_dir="${target_dir}/${circuit}_js"
-
+    
     # Create directories if they don't exist
     mkdir -p "$target_dir" "$js_target_dir"
-
+    
     # Check if file exists
     # Download files to the specified directories
     if ! [ -f "${target_dir}/${circuit}_final.arkzkey" ]; then
@@ -56,13 +57,13 @@ download_files() {
     else
         echo "File ${circuit}_final.arkzkey already exists, skipping download."
     fi
-
+    
     if ! [ -f "${target_dir}/${circuit}_final.zkey" ]; then
         wget -P "$target_dir" "${url}/${circuit}_final.zkey"
     else
         echo "File ${circuit}_final.zkey already exists, skipping download."
     fi
-
+    
     if ! [ -f "${js_target_dir}/${circuit}.wasm" ]; then
         wget -P "$js_target_dir" "${url}/${circuit}.wasm"
     else
@@ -70,6 +71,26 @@ download_files() {
     fi
     
 }
+
+# Generate keys for Halo2 circuit
+halo2_generate_keys() {
+    local circuit_dir=$1
+    local circuit_name=$2
+    # Execute the cargo run command to generate the keys for the circuit
+    # The project is in the circuit_dir and the executable is circuit_name
+    
+    # Change to the circuit directory, first check if the directory exists
+    if [ ! -d "$circuit_dir" ]; then
+        echo "Error: Circuit directory $circuit_dir does not exist."
+        exit 1
+    fi
+    
+    cd $circuit_dir
+    
+    # Generate the keys running the cargo command on the circuit binary
+    cargo run --release --bin $circuit_name
+}
+
 # TODO: Comment out compile_circuit stuff again once zkey is integrated and we don't need r1cs file anymore
 
 # NOTE: On CI instead of compiling circuits and running trusted setup
@@ -108,6 +129,11 @@ download_files "keccak256" "keccak256_256_test"
 
 print_action "[core/circom] Downloading artifacts for rsa..."
 download_files "rsa" "main"
+
+print_action "[core/halo2] Compiling example circuits...."
+cd "${HALO2_DIR}"
+print_action "[core/halo2] Compiling fibonacci circuits..."
+halo2_generate_keys fibonacci fibonacci
 
 # Add support for target architectures
 print_action "[ffi] Adding support for target architectures..."

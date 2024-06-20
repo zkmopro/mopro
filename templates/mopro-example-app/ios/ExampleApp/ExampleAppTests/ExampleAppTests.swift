@@ -32,7 +32,7 @@ final class ExampleAppTests: XCTestCase {
 
       // Generate Proof
       guard
-        let generateProofResult = try generateProof2(circuitInputs: inputs) as GenerateProofResult?
+        let generateProofResult = try generateProofStatic(circuitInputs: inputs) as GenerateProofResult?
       else { print("error") }
       XCTAssertFalse(generateProofResult.proof.isEmpty, "Proof should not be empty")
       XCTAssertEqual(
@@ -40,7 +40,7 @@ final class ExampleAppTests: XCTestCase {
         "Circuit outputs mismatch the expected outputs")
 
       guard
-        let isValid = try verifyProof2(
+        let isValid = try verifyProofStatic(
           proof: generateProofResult.proof, publicInput: generateProofResult.inputs) as Bool?
       else { print("error") }
       XCTAssertTrue(isValid, "Proof verification should succeed")

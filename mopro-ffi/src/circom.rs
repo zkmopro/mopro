@@ -74,7 +74,7 @@ pub fn initialize_mopro() -> Result<(), MoproError> {
 pub fn initialize_mopro_dylib(dylib_path: String) -> Result<(), MoproError> {
     // TODO: Error handle / panic?
     let dylib_path = Path::new(dylib_path.as_str());
-    crate::circom::initialize(dylib_path);
+    circom::initialize(dylib_path);
     Ok(())
 }
 
@@ -85,7 +85,7 @@ pub fn initialize_mopro_dylib(_dylib_path: String) -> Result<(), MoproError> {
 }
 
 #[cfg(not(feature = "halo2"))]
-pub fn generate_proof2(
+pub fn generate_proof_static(
     inputs: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
     // Convert inputs to BigInt
@@ -101,7 +101,7 @@ pub fn generate_proof2(
         })
         .collect();
 
-    let (proof, inputs) = circom::generate_proof2(bigint_inputs)?;
+    let (proof, inputs) = circom::generate_proof_static(bigint_inputs)?;
 
     let serialized_proof = circom::serialization::serialize_proof(&proof);
     let serialized_inputs = circom::serialization::serialize_inputs(&inputs);
@@ -112,7 +112,7 @@ pub fn generate_proof2(
 }
 
 #[cfg(feature = "halo2")]
-pub fn generate_proof2(
+pub fn generate_proof_static(
     inputs: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
     Err(MoproError::CircomError(
@@ -122,15 +122,15 @@ pub fn generate_proof2(
 }
 
 #[cfg(not(feature = "halo2"))]
-pub fn verify_proof2(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
+pub fn verify_proof_static(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
     let deserialized_proof = circom::serialization::deserialize_proof(proof);
     let deserialized_public_input = circom::serialization::deserialize_inputs(public_input);
-    let is_valid = circom::verify_proof2(deserialized_proof, deserialized_public_input)?;
+    let is_valid = circom::verify_proof_static(deserialized_proof, deserialized_public_input)?;
     Ok(is_valid)
 }
 
 #[cfg(feature = "halo2")]
-pub fn verify_proof2(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
+pub fn verify_proof_static(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
     Err(MoproError::CircomError(
         "Project is compiled for Halo2 proving system. Use `verify_halo2_proof` instead."
             .to_string(),

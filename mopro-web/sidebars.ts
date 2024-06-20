@@ -1,4 +1,4 @@
-import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 const sidebars: SidebarsConfig = {
   docsSidebar: [
@@ -18,38 +18,59 @@ const sidebars: SidebarsConfig = {
       id: 'getting-started',
     },
     {
+      type: 'doc',
+      label: 'Mopro Core',
+      id: 'mopro-core',
+    },
+    {
+      type: 'doc',
+      label: 'Mopro FFI',
+      id: 'mopro-ffi',
+    },
+    {
+      type: 'doc',
+      label: 'Mopro CLI',
+      id: 'mopro-cli',
+    },
+    {
       type: 'category',
-      label: 'Guides',
+      label: 'Circom',
       items: [
         {
           type: 'doc',
-          label: 'mopro-configuration',
-          id: 'guides/mopro-configuration',
+          label: 'configuration',
+          id: 'circom/configuration',
         },
         {
           type: 'doc',
-          label: 'mopro-cli',
-          id: 'guides/mopro-cli',
+          label: 'Core API',
+          id: 'circom/core-api',
         },
         {
           type: 'doc',
-          label: 'mopro-core',
-          id: 'guides/mopro-core',
+          label: 'iOS',
+          id: 'circom/ios',
         },
         {
           type: 'doc',
-          label: 'mopro-ffi',
-          id: 'guides/mopro-ffi',
+          label: 'Android',
+          id: 'circom/android',
+        },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Halo2',
+      items: [
+        {
+          type: 'doc',
+          label: 'configuration',
+          id: 'halo2/configuration',
         },
         {
           type: 'doc',
-          label: 'mopro-ios',
-          id: 'guides/mopro-ios',
-        },
-        {
-          type: 'doc',
-          label: 'mopro-android',
-          id: 'guides/mopro-android',
+          label: 'introduction',
+          id: 'halo2/introduction',
         },
       ],
     },

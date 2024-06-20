@@ -79,7 +79,7 @@ extension MultiplierCircuitView {
                  let start = CFAbsoluteTimeGetCurrent()
 
                  // Generate Proof
-                 let generateProofResult = try generateProof2(circuitInputs: inputs)
+                 let generateProofResult = try generateProofStatic(circuitInputs: inputs)
                  assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
                  assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
 
@@ -111,7 +111,7 @@ extension MultiplierCircuitView {
              do {
                  let start = CFAbsoluteTimeGetCurrent()
 
-                 let isValid = try verifyProof2(proof: proof, publicInput: inputs)
+                 let isValid = try verifyProofStatic(proof: proof, publicInput: inputs)
                  let end = CFAbsoluteTimeGetCurrent()
                  let timeTaken = end - start
 

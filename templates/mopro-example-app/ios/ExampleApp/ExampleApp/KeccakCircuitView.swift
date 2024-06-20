@@ -83,9 +83,9 @@ extension KeccakCircuitView {
                  let start = CFAbsoluteTimeGetCurrent()
 
                  // Generate Proof
-                 let generateProofResult = try generateProof2(circuitInputs: inputs)
+                 let generateProofResult = try generateProofStatic(circuitInputs: inputs)
                  assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
-                 //FIXME: Difference between moproCircom.generateProof and generateProof2
+                 //FIXME: Difference between moproCircom.generateProof and generateProofStatic
                  //assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
 
                  let end = CFAbsoluteTimeGetCurrent()
@@ -116,7 +116,7 @@ extension KeccakCircuitView {
              do {
                  let start = CFAbsoluteTimeGetCurrent()
 
-                 let isValid = try verifyProof2(proof: proof, publicInput: inputs)
+                 let isValid = try verifyProofStatic(proof: proof, publicInput: inputs)
                  let end = CFAbsoluteTimeGetCurrent()
                  let timeTaken = end - start
 
