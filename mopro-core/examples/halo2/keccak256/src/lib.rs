@@ -6,7 +6,6 @@
 //! round of the keccak_f permutation.
 
 use std::collections::HashMap;
-use std::str::FromStr;
 
 use halo2_proofs::halo2curves::bn256::{Bn256, Fr as Fp, Fr, G1Affine};
 use halo2_proofs::plonk::{create_proof, ProvingKey, verify_proof, VerifyingKey};
@@ -17,7 +16,7 @@ use halo2_proofs::poly::kzg::strategy::SingleStrategy;
 use halo2_proofs::transcript::{Blake2bRead, Blake2bWrite, Challenge255, TranscriptReadBuffer, TranscriptWriterBuffer};
 use rand::thread_rng;
 
-use crate::circuit::KeccakCircuit;
+use crate::circuit::{KeccakCircuit, pack_input_to_instance};
 use crate::util::prime_field::ScalarField;
 use crate::vanilla::KeccakConfigParams;
 
@@ -53,6 +52,8 @@ pub fn prove(
         .iter()
         .map(|x| *x.to_bytes_le().last().unwrap())
         .collect::<Vec<u8>>()];
+    
+    let instance = pack_input_to_instance::<Fr>(&inputs);
 
     // Set up the circuit
     let circuit = KeccakCircuit::new(
@@ -62,28 +63,29 @@ pub fn prove(
         },
         Some(2usize.pow(K)),
         inputs,
-        false, // Prover check to verify the circuit correctly performed the computation
+        true, // Prover side-check to verify the circuit correctly computes the hash
+        true, // Use the instance column for the input
     );
 
     let mut transcript = Blake2bWrite::<_, G1Affine, Challenge255<_>>::init(vec![]);
-
+    
     create_proof::<KZGCommitmentScheme<Bn256>, ProverSHPLONK<'_, Bn256>, Challenge255<G1Affine>, _, Blake2bWrite<Vec<u8>, G1Affine, Challenge255<G1Affine>>, _>(
         &srs,
         &pk,
         &[circuit],
-        &[&[]], // TODO - in the original code we pass the hash input as public input
+        &[&[&instance[..]]],
         thread_rng(),
         &mut transcript,
     )
     .unwrap();
 
     let proof = transcript.finalize();
-    Ok((vec![], proof))
+    Ok((instance, proof))
 }
 
 pub fn verify(
     proof: Vec<u8>,
-    _inputs: &Vec<Fr>,
+    inputs: &Vec<Fr>,
     srs: &ParamsKZG<Bn256>,
     vk: &VerifyingKey<G1Affine>,
 ) -> Result<bool, ()> {
@@ -92,7 +94,7 @@ pub fn verify(
         srs.verifier_params(),
         &vk,
         SingleStrategy::new(&srs),
-        &[&[]],
+        &[&[&inputs[..]]],
         &mut transcript,
     )
     .is_ok();

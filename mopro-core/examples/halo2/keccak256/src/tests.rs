@@ -35,9 +35,9 @@ fn verify_mock<F: Field + Ord + FromUniformBytes<64>>(
     _success: bool,
 ) {
     let k = config.k;
-    let circuit = KeccakCircuit::new(config, Some(2usize.pow(k) - 109), inputs, true);
+    let circuit = KeccakCircuit::new(config, Some(2usize.pow(k) - 109), inputs, true, false);
 
-    let prover = MockProver::<F>::run(k, &circuit, vec![]).unwrap();
+    let prover = MockProver::<F>::run(k, &circuit, vec![vec![]]).unwrap();
     prover.assert_satisfied();
 }
 
@@ -88,6 +88,7 @@ fn packed_multi_keccak_prover(k: u32, rows_per_round: usize) {
         KeccakConfigParams { k, rows_per_round },
         Some(2usize.pow(k)),
         inputs,
+        false,
         false,
     );
 
@@ -140,6 +141,7 @@ fn test_external_functions() {
         },        
         Some(2usize.pow(K)),
         vec![],
+        false,
         false,
     );
 

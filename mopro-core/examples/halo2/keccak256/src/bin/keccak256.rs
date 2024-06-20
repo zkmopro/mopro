@@ -42,6 +42,7 @@ pub fn main() {
         Some(2usize.pow(K)),
         vec![],
         false,
+        false
     );
     // Generate SRS
     let srs = ParamsKZG::<Bn256>::new(K);
