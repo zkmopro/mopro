@@ -10,6 +10,7 @@
 		56E6EC72191EAD3A5962B55A /* Pods_ExampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72C8A7A95288D49E1FC887A7 /* Pods_ExampleApp.framework */; };
 		5AFEF211D91E79BC9BA7BCBC /* Pods_ExampleApp_ExampleAppUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EEEC28F7FAAB743796D5BC0 /* Pods_ExampleApp_ExampleAppUITests.framework */; };
 		601CBA372C0BD15F008F487B /* Halo2FibonacciCircuitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 601CBA362C0BD15F008F487B /* Halo2FibonacciCircuitView.swift */; };
+		6081AE6E2C24D54D00D1DF6C /* Halo2KeccakCircuitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6081AE6D2C24D54D00D1DF6C /* Halo2KeccakCircuitView.swift */; };
 		7EC49437C8CB5BF3409BC87C /* Pods_ExampleAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B35BFA338881016EA8DD1D78 /* Pods_ExampleAppTests.framework */; };
 		CE259EC92B99CCB60035CC36 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE259EC82B99CCB60035CC36 /* mopro.swift */; };
 		CE259ECB2B99DF5D0035CC36 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE259EC82B99CCB60035CC36 /* mopro.swift */; };
@@ -48,6 +49,7 @@
 		34902FC9EAE055F0B5C523BE /* Pods-ExampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExampleApp.debug.xcconfig"; path = "Target Support Files/Pods-ExampleApp/Pods-ExampleApp.debug.xcconfig"; sourceTree = "<group>"; };
 		3EEEC28F7FAAB743796D5BC0 /* Pods_ExampleApp_ExampleAppUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ExampleApp_ExampleAppUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		601CBA362C0BD15F008F487B /* Halo2FibonacciCircuitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Halo2FibonacciCircuitView.swift; sourceTree = "<group>"; };
+		6081AE6D2C24D54D00D1DF6C /* Halo2KeccakCircuitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Halo2KeccakCircuitView.swift; sourceTree = "<group>"; };
 		62FB889F6A23D771D5DF296E /* Pods-ExampleAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExampleAppTests.debug.xcconfig"; path = "Target Support Files/Pods-ExampleAppTests/Pods-ExampleAppTests.debug.xcconfig"; sourceTree = "<group>"; };
 		72C8A7A95288D49E1FC887A7 /* Pods_ExampleApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ExampleApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		79F2CCF85316717FBA0047F7 /* Pods-ExampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExampleApp.release.xcconfig"; path = "Target Support Files/Pods-ExampleApp/Pods-ExampleApp.release.xcconfig"; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 				601CBA362C0BD15F008F487B /* Halo2FibonacciCircuitView.swift */,
 				CEFE53D12BA0009D00C62826 /* KeccakDylibCircuitView.swift */,
 				CEF891242B9834BB0033AE93 /* ExampleAppApp.swift */,
+				6081AE6D2C24D54D00D1DF6C /* Halo2KeccakCircuitView.swift */,
 				CEBBB4082B9C1A36007305CF /* KeccakCircuitView.swift */,
 				CEF891282B9834BC0033AE93 /* Assets.xcassets */,
 				CEF8912A2B9834BC0033AE93 /* Preview Content */,
@@ -401,6 +404,7 @@
 				601CBA372C0BD15F008F487B /* Halo2FibonacciCircuitView.swift in Sources */,
 				CE259EC92B99CCB60035CC36 /* mopro.swift in Sources */,
 				CEF891252B9834BB0033AE93 /* ExampleAppApp.swift in Sources */,
+				6081AE6E2C24D54D00D1DF6C /* Halo2KeccakCircuitView.swift in Sources */,
 				CEBBB4072B9C1974007305CF /* MultiplierCircuitView.swift in Sources */,
 				CEBBB4092B9C1A36007305CF /* KeccakCircuitView.swift in Sources */,
 			);
