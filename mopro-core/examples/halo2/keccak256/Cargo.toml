@@ -30,6 +30,3 @@ rand_core = "0.6.4"
 rand_xorshift = "0.3"
 env_logger = "0.10"
 test-case = "3.1.0"
-
-#[patch."https://github.com/privacy-scaling-explorations/halo2curves.git"]
-#halo2curves = { tag = "v0.6.1", git = "https://github.com/privacy-scaling-explorations/halo2curves/" }
