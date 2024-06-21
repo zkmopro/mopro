@@ -93,7 +93,7 @@ select_features() {
     esac
 }
 
-# Function to update or create config.toml file in .cargo directory of the mopro repository
+# Update or create .cargo/config.toml file in the mopro repository
 # This is necessary to specify the path to the circuit directory for the build process
 setup_circuit_path_override() {
 
@@ -127,6 +127,29 @@ setup_circuit_path_override() {
     sed -i '' "/^[[:space:]]*paths = \[.*\]/c\\
 paths = [\"$ABS_CIRCUIT_DIR\"]
 " "$CONFIG_FILE"
+}
+
+# Remove the circuit path override from the config.toml file added earlier
+remove_circuit_path_override() {
+    # Remove the circuit path override from the config file
+    if [ -f "$CONFIG_FILE" ]; then
+        echo "Removing circuit path override from $CONFIG_FILE"
+        sed -i '' '/paths = \[.*\]/d' "$CONFIG_FILE"
+
+        # Check if the file has only new line characters and if so, remove the file
+        if [ -z "$(cat "$CONFIG_FILE" | tr -d '\n')" ]; then
+            rm "$CONFIG_FILE"
+
+            # Check if `.cargo` directory is empty and if so, remove it
+              CARGO_DIR="$MOPRO_ROOT/.cargo"
+            if [ -d "$CARGO_DIR" ] && [ -z "$(ls -A "$CARGO_DIR")" ]; then
+                echo "Removing empty directory: $CARGO_DIR"
+                rm -r "$CARGO_DIR"
+            fi
+        fi
+
+
+    fi
 }
 
 # Build process
@@ -327,6 +350,10 @@ main() {
     fi
 
     update_cocoapods
+
+    if [[ "$CIRCUIT_TYPE" == "halo2" ]]; then
+        remove_circuit_path_override
+    fi
 
     print_action "Done! Please re-build your project in Xcode."
     print_action "Run \`open ios/ExampleApp/ExampleApp.xcworkspace\` to do so."
