@@ -100,7 +100,7 @@ jobs:
               run: |
                   export BUILD_CONFIG_PATH="$(pwd)/config-halo2.toml"
                   cd mopro-core
-                  cargo test --features=halo2 -- --nocapture
+                  cargo test --features=halo2  --no-default-features -- --nocapture
     test-ffi:
         runs-on: ubuntu-latest
         steps:
