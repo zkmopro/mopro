@@ -2370,6 +2370,7 @@ dependencies = [
  "bincode",
  "color-eyre",
  "criterion",
+ "halo2curves",
  "mopro-core",
  "num-bigint",
  "serde",
