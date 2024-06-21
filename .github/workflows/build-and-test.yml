@@ -136,6 +136,25 @@ jobs:
         runs-on: macos-latest
         steps:
             - uses: actions/checkout@v4
+            - name: Install Rust toolchain
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: "1.77"
+                  override: true
+            - name: Run sccache-cache
+              uses: mozilla-actions/sccache-action@v0.0.3
+            - name: Install circom
+              run: |
+                  sudo wget -O ~/.cargo/bin/circom https://github.com/iden3/circom/releases/download/v2.1.9/circom-${{runner.os}}-amd64
+                  sudo chmod +x ~/.cargo/bin/circom
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20.x"
+            - name: Install snarkjs
+              run: npm install -g snarkjs
+            - name: Prepare CI for Core and FFI
+              run: ./scripts/prepare_ci.sh
             - name: Run GPU Benchmarks tests
               run: |
                   cd mopro-core
