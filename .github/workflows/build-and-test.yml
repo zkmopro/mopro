@@ -130,3 +130,5 @@ jobs:
                   cd mopro-ffi/
                   curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
                   CLASSPATH=jna-5.13.0.jar cargo test -- --nocapture
+                  cargo test --features halo2 --no-default-features -- halo2 
+
