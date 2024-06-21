@@ -101,10 +101,7 @@ jobs:
                   export BUILD_CONFIG_PATH="$(pwd)/config-halo2.toml"
                   cd mopro-core
                   cargo test --features=halo2 -- --nocapture
-            - name: Run GPU Benchmarks tests
-              run: |
-                  cd mopro-core
-                  cargo test --features=gpu-benchmarks test_msm_correctness -- --nocapture
+
     test-ffi:
         runs-on: ubuntu-latest
         steps:
@@ -134,3 +131,12 @@ jobs:
                   cd mopro-ffi/
                   curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
                   CLASSPATH=jna-5.13.0.jar cargo test -- --nocapture
+        
+    gpu-benchmarks:
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Run GPU Benchmarks tests
+              run: |
+                  cd mopro-core
+                  cargo test --features=gpu-benchmarks test_msm_correctness -- --nocapture
