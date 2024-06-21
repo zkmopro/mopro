@@ -98,7 +98,6 @@ jobs:
                   cargo test -- --nocapture
             - name: Run halo2 tests
               run: |
-                  export BUILD_CONFIG_PATH="$(pwd)/config-halo2.toml"
                   cd mopro-core
                   cargo test --features=halo2 -- --nocapture
     test-ffi:
