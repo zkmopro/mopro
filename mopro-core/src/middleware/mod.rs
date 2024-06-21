@@ -1,7 +1,7 @@
-#[cfg(not(feature = "halo2"))]
+#[cfg(feature = "circom")]
 pub mod circom;
 
-#[cfg(all(feature = "gpu-benchmarks", not(feature = "halo2")))]
+#[cfg(feature = "gpu-benchmarks")]
 pub mod gpu_explorations;
 
 #[cfg(feature = "halo2")]
