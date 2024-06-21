@@ -74,10 +74,8 @@ impl<'de> Deserialize<'de> for SerializablePublicInputs {
 // Tests for serialization and deserialization
 #[cfg(test)]
 mod tests {
-    use ark_std::iterable::Iterable;
-    use serde_json;
-
     use super::*;
+    use serde_json;
 
     #[test]
     fn test_serialization() {
