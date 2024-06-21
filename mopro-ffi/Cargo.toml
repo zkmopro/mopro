@@ -45,4 +45,7 @@ uniffi = { version = "0.25", features = ["build"] }
 
 [dev-dependencies]
 uniffi = { version = "0.25", features = ["bindgen-tests"] }
+# Circom test dependency
 ark-bn254 = { version = "=0.4.0" }
+# Halo2 test dependency
+halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2" }

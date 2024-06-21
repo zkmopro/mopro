@@ -53,54 +53,41 @@ mod common {
     }
 
     #[cfg(test)]
-    #[test]
-    #[cfg(feature = "circom")]
-    fn test_end_to_end() -> Result<(), MoproError> {
-        // Paths to your wasm and zkey files
-        let wasm_path =
-            "./../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
-        let zkey_path = "./../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey";
+    mod test {
+        use crate::adapter::{generate_proof_static, verify_proof_static};
+        use halo2curves::bn256::Fr;
+        use mopro_core::middleware::halo2::SerializablePublicInputs;
+        use mopro_core::MoproError;
+        use std::collections::HashMap;
 
-        // Create a new MoproCircom instance
-        let mopro_circom = MoproCircom::new();
+        #[test]
+        fn test_end_to_end() -> Result<(), MoproError> {
+            // We by default compile the Fibonacci Halo2 Circuit
+            // TODO - For the future we should consider a stateful circuit to change the keys on the fly.
 
-        // Step 1: Initialize
-        let init_result = mopro_circom.initialize(zkey_path.to_string(), wasm_path.to_string());
-        assert!(init_result.is_ok());
+            let mut inputs = HashMap::new();
+            let out = 55u64;
+            inputs.insert("out".to_string(), vec![out.to_string()]);
 
-        let mut inputs = HashMap::new();
-        let a = BigUint::from_str(
-            "21888242871839275222246405745257275088548364400416034343698204186575808495616",
-        )
-        .unwrap();
-        let b = BigUint::from(1u8);
-        let c = a.clone() * b.clone();
-        inputs.insert("a".to_string(), vec![a.to_string()]);
-        inputs.insert("b".to_string(), vec![b.to_string()]);
-        // output = [public output c, public input a]
-        let expected_output = vec![Fr::from(c), Fr::from(a)];
-        let circom_outputs = circom::serialization::SerializableInputs(expected_output);
-        let serialized_outputs = circom::serialization::serialize_inputs(&circom_outputs);
+            let expected_output = vec![Fr::from(1), Fr::from(1), Fr::from(out)];
+            let expected_output_bytes =
+                bincode::serialize(&SerializablePublicInputs(expected_output))
+                    .expect("Serialization of Output Expected bytes failed");
 
-        // Step 2: Generate Proof
-        let generate_proof_result = mopro_circom.generate_proof(inputs)?;
-        let serialized_proof = generate_proof_result.proof;
-        let serialized_inputs = generate_proof_result.inputs;
+            // Step 2: Generate Proof
+            let generate_proof_result = generate_proof_static(inputs)?;
+            let serialized_proof = generate_proof_result.proof;
+            let serialized_inputs = generate_proof_result.inputs;
 
-        assert!(serialized_proof.len() > 0);
-        assert_eq!(serialized_inputs, serialized_outputs);
+            assert!(serialized_proof.len() > 0);
+            assert_eq!(serialized_inputs, expected_output_bytes);
 
-        // Step 3: Verify Proof
-        let is_valid =
-            mopro_circom.verify_proof(serialized_proof.clone(), serialized_inputs.clone())?;
-        assert!(is_valid);
+            // Step 3: Verify Proof
+            let is_valid =
+                verify_proof_static(serialized_proof.clone(), serialized_inputs.clone())?;
+            assert!(is_valid);
 
-        // Step 4: Convert Proof to Ethereum compatible proof
-        let proof_calldata = crate::adapter::to_ethereum_proof(serialized_proof);
-        let inputs_calldata = crate::adapter::to_ethereum_inputs(serialized_inputs);
-        assert!(proof_calldata.a.x.len() > 0);
-        assert!(inputs_calldata.len() > 0);
-
-        Ok(())
+            Ok(())
+        }
     }
 }
