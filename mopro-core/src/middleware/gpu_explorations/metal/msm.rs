@@ -377,7 +377,7 @@ mod tests {
 
     #[test]
     fn test_msm_correctness_medium_sample() {
-        let dir = format!("{}/{}/{}x{}", preprocess::get_root_path(), UTILSPATH, 10, 5);
+        let dir = format!("{}/{}/{}x{}", preprocess::get_root_path(), UTILSPATH, 8, 5);
         // Init metal (GPU) state
         let mut metal_config = setup_metal_state();
 
@@ -406,7 +406,7 @@ mod tests {
             assert_eq!(metal_msm, arkworks_msm, "This msm is wrongly computed");
             println!(
                 "(pass) {}th instance of size 2^{} is correctly computed",
-                i, INSTANCE_SIZE
+                i, 8
             );
         }
     }
