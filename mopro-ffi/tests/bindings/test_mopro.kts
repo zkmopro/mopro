@@ -1,12 +1,8 @@
 import uniffi.mopro.*
 
-var wasmPath = "../mopro-core/examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm"
-var zkeyPath = "../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey"
-
 try {
     // Setup
     var moproCircom = MoproCircom()
-    moproCircom.initialize(zkeyPath, wasmPath)
 
     // Prepare inputs
     val inputs = mutableMapOf<String, List<String>>()
@@ -14,11 +10,11 @@ try {
     inputs["b"] = listOf("5")
 
     // Generate proof
-    var generateProofResult = moproCircom.generateProof(inputs)
+    var generateProofResult = moproCircom.generateProof("multiplier2", inputs)
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
 
     // Verify proof
-    var isValid = moproCircom.verifyProof(generateProofResult.proof, generateProofResult.inputs)
+    var isValid = moproCircom.verifyProof("multiplier2", generateProofResult.proof, generateProofResult.inputs)
     assert(isValid) { "Proof is invalid" }
 
     // Convert proof to Ethereum compatible proof
