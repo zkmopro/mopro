@@ -431,7 +431,7 @@ mod tests {
     #[test]
     fn test_end_to_end() -> Result<(), MoproError> {
         // Create a new MoproCircom instance
-        let mut prover = MoproCircom::new();
+        let prover = MoproCircom::new();
 
         let mut inputs = HashMap::new();
         let a = BigInt::from_str(
@@ -474,11 +474,11 @@ mod tests {
 
         Ok(())
     }
-    #[ignore]
+
     #[test]
     fn test_end_to_end_keccak() -> Result<(), MoproError> {
         // Create a new MoproCircom instance
-        let mut mopro_circom = MoproCircom::new();
+        let mopro_circom = MoproCircom::new();
 
         // Prepare inputs
         let input_vec = vec![
