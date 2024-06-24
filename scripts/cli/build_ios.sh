@@ -160,9 +160,9 @@ build_mopro_core() {
     cd "${MOPRO_ROOT}/mopro-core" || exit
     print_action "Building mopro-core ($BUILD_MODE)..."
     if [[ "$BUILD_MODE" == "release" ]]; then
-        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --release --features "$CARGO_FEATURES"
+        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --release --features "$CARGO_FEATURES"  --no-default-features
     else
-        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --features "$CARGO_FEATURES"
+        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --features "$CARGO_FEATURES"  --no-default-features
     fi
 }
 
