@@ -321,7 +321,7 @@ mod tests {
         assert!(verify_res.unwrap()); // Verifying that the proof was indeed verified
     }
 
-    #[ignore = "ignore for ci"]
+    #[cfg(feature = "aadhaar-test")]
     #[test]
     fn test_setup_prove_anon_aadhaar() {
         let zkey_path = "./examples/circom/anonAadhaar/target/aadhaar-verifier_final.zkey";

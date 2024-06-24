@@ -19,12 +19,10 @@ halo2 = ["halo2_proofs", "halo2-circuit"]
 circom-default = ["wasmer/dylib", "circom"]
 # Circom dependencies
 circom = ["ark-circom", "ark-serialize", "num-bigint", "wasmer", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-zkey"]
+aadhaar-test = []
 
 # Each additional feature must also reference the circom feature to make sure the dependencies are included
-dylib = ["circom"]                  # NOTE: can probably remove this if we use env config instead
 gpu-benchmarks = ["ark-ff", "metal", "objc", "proptest", "parallel", "circom"]
-calc-native-witness = ["witness", "circom"] # experimental feature to calculate witness with witness graph
-build-native-witness = ["witness/build-witness", "circom"] # only enable build-native-witness feature when building the witness graph
 parallel = ["rayon", "ark-std/parallel", "circom"]
 
 [dependencies]
@@ -77,7 +75,6 @@ ark-groth16 = { version = "=0.4.0", default-features = false, features = [
 ], optional = true }
 ark-relations = { version = "0.4", default-features = false, optional = true }
 ark-zkey = { path = "../ark-zkey", optional = true }
-witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true }
 
 
 # GPU explorations
@@ -96,7 +93,6 @@ enumset = "1.0.8"
 toml = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"
-witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true }
 
 [dependencies.rayon]
 version = "1"
