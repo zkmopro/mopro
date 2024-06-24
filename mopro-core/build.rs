@@ -3,15 +3,9 @@ use color_eyre::eyre::Result;
 
 use serde::Deserialize;
 
-use enumset::enum_set;
-use enumset::EnumSet;
 use rust_witness::transpile::transpile_wasm;
-use serde_derive::Deserialize;
-use std::fs::File;
-use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::{env, fs};
-use toml::Value;
 
 #[derive(Deserialize)]
 struct Config {
