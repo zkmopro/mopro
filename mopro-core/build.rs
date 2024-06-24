@@ -301,6 +301,7 @@ mod halo2 {
 
         Ok(())
     }
+}
 
 fn main() -> color_eyre::eyre::Result<()> {
     println!("cargo:rerun-if-env-changed=BUILD_CONFIG_PATH");
@@ -326,8 +327,6 @@ fn main() -> color_eyre::eyre::Result<()> {
         println!("cargo:warning=Building Halo2 circuit...");
 
         halo2::build_circuit(&circuit_dir_path, circuit_name)?;
-
-        halo2::update_cargo_config(&circuit_dir_path);
     }
 
     #[cfg(feature = "circom")]
