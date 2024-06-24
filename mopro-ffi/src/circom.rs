@@ -178,24 +178,15 @@ impl MoproCircom {
 
     // This should be defined by a file that the mopro package consumer authors
     // then we reference it in our build somehow
-    pub fn circuit_data(circuit_name: &str) -> Result<(PathBuf, WtnsFn), MoproError> {
+    pub fn circuit_data(zkey_path: &str) -> Result<WtnsFn, MoproError> {
+        let name = Path::new(zkey_path).file_stem().unwrap();
         let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") else {
             return Err(MoproError::CircomError("unknown".to_string()));
         };
         let root = Path::new(manifest_dir.as_str());
-        match circuit_name {
-            "multiplier2" => Ok((
-                root.join(Path::new(
-                    "../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey",
-                )),
-                multiplier2_witness,
-            )),
-            "keccak256" => Ok((
-                root.join(Path::new(
-                    "../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.zkey",
-                )),
-                keccak256256test_witness,
-            )),
+        match name.to_str().unwrap() {
+            "multiplier2_final" => Ok(multiplier2_witness),
+            "keccak256_256_test_final" => Ok(keccak256256test_witness),
             _ => Err(MoproError::CircomError("Unknown circuit name".to_string())),
         }
     }
@@ -209,14 +200,12 @@ impl MoproCircom {
     #[cfg(feature = "circom")]
     pub fn generate_proof(
         &self,
-        circuit_name: String,
+        zkey_path: String,
         inputs: HashMap<String, Vec<String>>,
     ) -> Result<GenerateProofResult, MoproError> {
         let mut prover = CircomState::new();
-        let (zkey_path, witness_fn) = Self::circuit_data(circuit_name.as_str())?;
-        let Some(zkey_path_str) = zkey_path.to_str() else {
-            return Err(MoproError::CircomError("unknown2".to_string()));
-        };
+        let witness_fn = Self::circuit_data(zkey_path.as_str())?;
+        let zkey_path_str = zkey_path.as_str();
         prover.initialize(zkey_path_str, witness_fn)?;
         let bigint_inputs = inputs
             .into_iter()
@@ -248,15 +237,13 @@ impl MoproCircom {
     #[cfg(feature = "circom")]
     pub fn verify_proof(
         &self,
-        circuit_name: String,
+        zkey_path: String,
         proof: Vec<u8>,
         public_input: Vec<u8>,
     ) -> Result<bool, MoproError> {
         let mut prover = CircomState::new();
-        let (zkey_path, witness_fn) = Self::circuit_data(circuit_name.as_str())?;
-        let Some(zkey_path_str) = zkey_path.to_str() else {
-            return Err(MoproError::CircomError("unknown2".to_string()));
-        };
+        let witness_fn = Self::circuit_data(zkey_path.as_str())?;
+        let zkey_path_str = zkey_path.as_str();
         prover.initialize(zkey_path_str, witness_fn)?;
 
         let deserialized_proof = circom::serialization::deserialize_proof(proof);
@@ -431,6 +418,8 @@ mod tests {
     #[test]
     fn test_end_to_end() -> Result<(), MoproError> {
         // Create a new MoproCircom instance
+        let zkey_path =
+            "./../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey".to_string();
         let prover = MoproCircom::new();
 
         let mut inputs = HashMap::new();
@@ -451,7 +440,7 @@ mod tests {
         let serialized_outputs = circom::serialization::serialize_inputs(&circom_outputs);
 
         // Generate Proof
-        let p = prover.generate_proof("multiplier2".to_string(), inputs)?;
+        let p = prover.generate_proof(zkey_path.clone(), inputs)?;
         let serialized_proof = p.proof;
         let serialized_inputs = p.inputs;
 
@@ -460,7 +449,7 @@ mod tests {
 
         // Step 3: Verify Proof
         let is_valid = prover.verify_proof(
-            "multiplier2".to_string(),
+            zkey_path,
             serialized_proof.clone(),
             serialized_inputs.clone(),
         )?;
@@ -478,6 +467,9 @@ mod tests {
     #[test]
     fn test_end_to_end_keccak() -> Result<(), MoproError> {
         // Create a new MoproCircom instance
+        let zkey_path =
+            "./../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.zkey"
+                .to_string();
         let mopro_circom = MoproCircom::new();
 
         // Prepare inputs
@@ -496,7 +488,7 @@ mod tests {
         let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
 
         // Generate Proof
-        let p = mopro_circom.generate_proof("keccak256".to_string(), inputs)?;
+        let p = mopro_circom.generate_proof(zkey_path.clone(), inputs)?;
         let serialized_proof = p.proof;
         let serialized_inputs = p.inputs;
 
@@ -506,7 +498,7 @@ mod tests {
         // Verify Proof
 
         let is_valid = mopro_circom.verify_proof(
-            "keccak256".to_string(),
+            zkey_path,
             serialized_proof.clone(),
             serialized_inputs.clone(),
         )?;

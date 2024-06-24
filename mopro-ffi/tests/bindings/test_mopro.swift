@@ -29,6 +29,8 @@ func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
 }
 
 do {
+    let zkeyPath = "./../../../../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey"
+
     // Prepare inputs
     var inputs = [String: [String]]()
     let a = 3
@@ -42,13 +44,13 @@ do {
     let expectedOutput: [UInt8] = serializeOutputs(outputs)
 
     // Generate Proof
-    let generateProofResult = try moproCircom.generateProof(circuitName: "multiplier2", circuitInputs: inputs)
+    let generateProofResult = try moproCircom.generateProof(zkeyPath: zkeyPath, circuitInputs: inputs)
     assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
 
     // Verify Proof
     assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
 
-    let isValid = try moproCircom.verifyProof(circuitName: "multiplier2", proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
+    let isValid = try moproCircom.verifyProof(zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
     assert(isValid, "Proof verification should succeed")
 
     // Convert proof to Ethereum compatible proof

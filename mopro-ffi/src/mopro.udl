@@ -61,8 +61,8 @@ interface MoproCircom {
   constructor();
 
   [Throws=MoproError]
-  GenerateProofResult generate_proof(string circuit_name, record<string, sequence<string>> circuit_inputs);
+  GenerateProofResult generate_proof(string zkey_path, record<string, sequence<string>> circuit_inputs);
 
   [Throws=MoproError]
-  boolean verify_proof(string circuit_name, bytes proof, bytes public_input);
+  boolean verify_proof(string zkey_path, bytes proof, bytes public_input);
 };
