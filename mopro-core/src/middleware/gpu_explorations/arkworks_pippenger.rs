@@ -78,13 +78,32 @@ pub fn run_benchmark(
 mod tests {
     use super::*;
 
+    use ark_ec::CurveGroup;
     use ark_serialize::Write;
+    use ark_std::UniformRand;
     use std::fs::File;
 
     const INSTANCE_SIZE: u32 = 16;
     const NUM_INSTANCE: u32 = 10;
     const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils/vectors";
     const BENCHMARKSPATH: &str = "mopro-core/gpu_explorations/benchmarks";
+
+    #[test]
+    fn test_msm_correctness_small_sample() {
+        let mut rng = ark_std::rand::thread_rng();
+        let p1 = G::rand(&mut rng);
+        let p2 = G::rand(&mut rng);
+
+        let s1 = ScalarField::rand(&mut rng);
+        let s2 = ScalarField::rand(&mut rng);
+
+        // compare with msm correctness with arkworks ec arithmetics
+        let target_msm = p1 * s1 + p2 * s2;
+
+        let this_msm =
+            <G as VariableBaseMSM>::msm(&[p1.into_affine(), p2.into_affine()], &[s1, s2]).unwrap();
+        assert_eq!(target_msm, this_msm, "This msm is wrongly computed");
+    }
 
     #[test]
     fn test_benchmark_msm() {

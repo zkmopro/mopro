@@ -61,7 +61,7 @@ impl<'de> Deserialize<'de> for SerializablePublicInputs {
             {
                 let mut vec = Vec::new();
                 while let Some(bytes) = seq.next_element::<[u8; 32]>()? {
-                    vec.push(Fp::from_bytes(&bytes).expect("Invalid bytes"));
+                    vec.push(Fp::from_bytes(&bytes).unwrap());
                 }
                 Ok(SerializablePublicInputs(vec))
             }
@@ -74,10 +74,8 @@ impl<'de> Deserialize<'de> for SerializablePublicInputs {
 // Tests for serialization and deserialization
 #[cfg(test)]
 mod tests {
-    use ark_std::iterable::Iterable;
-    use serde_json;
-
     use super::*;
+    use serde_json;
 
     #[test]
     fn test_serialization() {

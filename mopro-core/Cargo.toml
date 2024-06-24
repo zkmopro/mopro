@@ -6,76 +6,97 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["wasmer/dylib"]
+default = ["circom-default"]
+
+## Halo2 features
+
+# Halo2 dependencies
 halo2 = ["halo2_proofs", "halo2-circuit"]
-dylib = []                  # NOTE: can probably remove this if we use env config instead
-gpu-benchmarks = ["ark-ff", "metal", "objc", "proptest", "parallel"]
-calc-native-witness = ["witness"] # experimental feature to calculate witness with witness graph
-build-native-witness = ["witness/build-witness"] # only enable build-native-witness feature when building the witness graph
-parallel = ["rayon", "ark-std/parallel"]
+
+## Circom features
+
+# Default features for circom
+circom-default = ["wasmer/dylib", "circom"]
+# Circom dependencies
+circom = ["ark-circom", "ark-serialize", "num-bigint", "wasmer", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-zkey"]
+
+# Each additional feature must also reference the circom feature to make sure the dependencies are included
+dylib = ["circom"]                  # NOTE: can probably remove this if we use env config instead
+gpu-benchmarks = ["ark-ff", "metal", "objc", "proptest", "parallel", "circom"]
+calc-native-witness = ["witness", "circom"] # experimental feature to calculate witness with witness graph
+build-native-witness = ["witness/build-witness", "circom"] # only enable build-native-witness feature when building the witness graph
+parallel = ["rayon", "ark-std/parallel", "circom"]
 
 [dependencies]
 
-### Halo2 dependencies
-# TODO - resutructure the file to explicitly group all proof system dependencies
-halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", tag = "v2023_04_20", features = [
-    "dev-graph",
-], optional = true }
-
-# Temporary dependency on a example Halo2 circuit
-halo2-circuit = { path = "examples/halo2/fibonacci", optional = true }
-### Halo2 dependencies end
-
-
-ark-circom = { git = "https://github.com/vimwitch/circom-compat.git" }
+## Shared dependencies
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-ark-serialize = { version = "=0.4.1", features = ["derive"] }
-num-bigint = { version = "=0.4.3", default-features = false, features = [
-    "rand",
-] }
-instant = "0.1"
-wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
-once_cell = "1.8"
-ruint = { version = "1.10.0", features = ["rand", "serde", "ark-ff-04"] }
 
-# ZKP generation
-ark-ec = { version = "=0.4.1", default-features = false, features = [
-    "parallel",
-] }
-ark-crypto-primitives = { version = "=0.4.0" }
-ark-std = { version = "=0.4.0", default-features = false, features = [
-    "parallel",
-] }
-ark-bn254 = { version = "=0.4.0" }
-ark-groth16 = { version = "=0.4.0", default-features = false, features = [
-    "parallel",
-] }
-ark-relations = { version = "0.4", default-features = false }
-ark-zkey = { path = "../ark-zkey" }
-witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true}
+once_cell = "1.8"
+instant = "0.1"
 
 # Error handling
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 criterion = "=0.3.6"
 
+
+
+## Halo2 dependencies
+halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", tag = "v2023_04_20", features = [
+    "dev-graph",
+], optional = true }
+
+# Temporary dependency on an example Halo2 circuit is overwritten by user provided circuit at build time
+halo2-circuit = { path = "examples/halo2/fibonacci", optional = true }
+
+
+## Circom dependencies
+ark-circom = { git = "https://github.com/vimwitch/circom-compat.git", optional = true }
+ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
+num-bigint = { version = "=0.4.3", default-features = false, features = [
+    "rand",
+], optional = true }
+wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070", optional = true }
+
+ruint = { version = "1.10.0", features = ["rand", "serde", "ark-ff-04"], optional = true }
+
+# ZKP generation
+ark-ec = { version = "=0.4.1", default-features = false, features = [
+    "parallel",
+], optional = true }
+ark-crypto-primitives = { version = "=0.4.0", optional = true }
+ark-std = { version = "=0.4.0", default-features = false, features = [
+    "parallel",
+], optional = true }
+ark-bn254 = { version = "=0.4.0", optional = true }
+ark-groth16 = { version = "=0.4.0", default-features = false, features = [
+    "parallel",
+], optional = true }
+ark-relations = { version = "0.4", default-features = false, optional = true }
+ark-zkey = { path = "../ark-zkey", optional = true }
+witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true }
+
+
 # GPU explorations
 ark-ff = { version = "=0.4.1", default-features = false, optional = true, features = [
     "parallel",
 ] }
 metal = { version = "=0.28.0", optional = true }
-objc ={ version = "=0.2.4", optional = true }
-proptest ={ version = "1.4.0", optional = true }
+objc = { version = "=0.2.4", optional = true }
+proptest = { version = "1.4.0", optional = true }
 
 [build-dependencies]
 color-eyre = "0.6"
 enumset = "1.0.8"
-wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070" }
 toml = "0.8"
-serde = "1.0"
+serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"
-witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true}
+
+## Circom dependencies
+wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070", optional = true }
+witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true }
 
 [dependencies.rayon]
 version = "1"
