@@ -16,9 +16,9 @@ halo2 = ["halo2_proofs", "halo2-circuit"]
 ## Circom features
 
 # Default features for circom
-circom-default = ["wasmer/dylib", "circom"]
+circom-default = ["circom"]
 # Circom dependencies
-circom = ["ark-circom", "ark-serialize", "num-bigint", "wasmer", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-zkey"]
+circom = ["ark-circom", "ark-serialize", "num-bigint", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-zkey"]
 aadhaar-test = []
 
 # Each additional feature must also reference the circom feature to make sure the dependencies are included
@@ -57,7 +57,6 @@ ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "=0.4.3", default-features = false, features = [
     "rand",
 ], optional = true }
-wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070", optional = true }
 
 ruint = { version = "1.10.0", features = ["rand", "serde", "ark-ff-04"], optional = true }
 
