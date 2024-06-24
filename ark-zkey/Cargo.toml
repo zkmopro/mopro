@@ -23,7 +23,7 @@ flamer = "0.5"
 ark-serialize = { version = "=0.4.1", features = ["derive"] }
 ark-bn254 = { version = "=0.4.0" }
 ark-groth16 = { version = "=0.4.0" }
-ark-circom = { git = "https://github.com/vimwitch/circom-compat.git", branch = "wasm-delete", version = "0.1.0" }
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", branch = "wasm-delete", version = "0.1.0" }
 ark-relations = { version = "=0.4.0" }
 ark-ff = { version = "=0.4.1" }
 ark-ec = { version = "=0.4.1" }

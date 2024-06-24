@@ -114,8 +114,8 @@ npm_install rsa
 compile_circuit rsa main_rsa.circom
 
 # # Setup and compile anonAadhaar
-npm_install anonAadhaar
-compile_circuit anonAadhaar aadhaar-verifier.circom
+# npm_install anonAadhaar
+# compile_circuit anonAadhaar aadhaar-verifier.circom
 
 # # Run trusted setup for multiplier2
 # print_action "[core/circom] Running trusted setup for multiplier2..."

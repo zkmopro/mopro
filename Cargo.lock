@@ -143,7 +143,7 @@ dependencies = [
 [[package]]
 name = "ark-circom"
 version = "0.1.0"
-source = "git+https://github.com/vimwitch/circom-compat.git?branch=wasm-delete#2651daabaa9639d944a689afbedfd0606a6876f5"
+source = "git+https://github.com/zkmopro/circom-compat.git?branch=wasm-delete#2651daabaa9639d944a689afbedfd0606a6876f5"
 dependencies = [
  "ark-bn254",
  "ark-crypto-primitives",
