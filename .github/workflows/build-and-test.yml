@@ -131,7 +131,6 @@ jobs:
                   CLASSPATH=jna-5.13.0.jar cargo test -- --nocapture
             - name: Run FFI halo2 tests
               run: |
-                  export BUILD_CONFIG_PATH="$(pwd)/config-halo2.toml"
                   cd mopro-ffi/
                   cargo test --features halo2 --no-default-features -- halo2 
 
