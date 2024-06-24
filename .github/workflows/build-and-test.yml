@@ -99,8 +99,7 @@ jobs:
             - name: Run halo2 tests
               run: |
                   cd mopro-core
-                  cargo test --features=halo2 -- --nocapture
-
+                  cargo test --features=halo2  --no-default-features -- --nocapture
     test-ffi:
         runs-on: ubuntu-latest
         steps:
