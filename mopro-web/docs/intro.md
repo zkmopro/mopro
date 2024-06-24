@@ -28,8 +28,6 @@ Primary libraries and utilities of interest:
 
 Secondary subprojects:
 
--   `mopro-ios` - iOS CocoaPod library exposing native Swift bindings. (will be deprecated)
--   `mopro-android` - Android library exposing native Kotlin bindings. (will be deprecated)
 -   `web-prover` - Prove example circuits through a browser, used for benchmarking.
 -   `scripts` - various helper scripts for `mopro-cli` and testing.
 -   `mopro-web` - Mopro website.
