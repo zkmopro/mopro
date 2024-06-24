@@ -72,11 +72,24 @@ fn read_config() -> Result<Config> {
         }
         Err(_) => {
             println!("cargo:warning=BUILD_CONFIG_PATH not set. Using default configuration.");
+            #[cfg(not(feature = "halo2"))]
             let default_config = r#"
                 [circuit]
                 adapter = "circom"
                 dir = "examples/circom/keccak256"
                 name = "keccak256_256_test"
+
+                [dylib]
+                use_dylib = false
+                name = "keccak256.dylib"
+            "#;
+
+            #[cfg(feature = "halo2")] // TODO - change sample to fibonacci
+            let default_config = r#"
+                [circuit]
+                adapter = "halo2"
+                dir = "examples/halo2/fibonacci"
+                name = "fibonacci"
 
                 [dylib]
                 use_dylib = false
