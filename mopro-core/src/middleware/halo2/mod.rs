@@ -6,11 +6,10 @@ pub(crate) use halo2_proofs::halo2curves::bn256::{Bn256, Fr as Fp, G1Affine};
 use halo2_proofs::plonk::{ProvingKey, VerifyingKey};
 use halo2_proofs::poly::commitment::Params;
 use halo2_proofs::poly::kzg::commitment::ParamsKZG;
-use halo2_proofs::SerdeFormat::RawBytes;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
-use halo2_circuit::{prove, verify, Circuit as TargetCircuit};
+use halo2_circuit::{prove, verify};
 pub use serialisation::deserialize_circuit_inputs;
 
 use crate::MoproError;
@@ -39,8 +38,7 @@ const PK_BYTES: &[u8] = include_bytes!(env!("BUILD_PK_FILE"));
 
 static PK: Lazy<ProvingKey<G1Affine>> = Lazy::new(|| {
     let mut reader = Cursor::new(PK_BYTES);
-    ProvingKey::read::<_, TargetCircuit<Fp>>(&mut reader, RawBytes)
-        .expect("Unable to read PK from file")
+    halo2_circuit::read_pk(&mut reader).expect("Unable to read PK from file")
 });
 
 /// Read Verification Key (VK) from file
@@ -49,8 +47,7 @@ const VK_BYTES: &[u8] = include_bytes!(env!("BUILD_VK_FILE"));
 
 static VK: Lazy<VerifyingKey<G1Affine>> = Lazy::new(|| {
     let mut reader = Cursor::new(VK_BYTES);
-    VerifyingKey::read::<_, TargetCircuit<Fp>>(&mut reader, RawBytes)
-        .expect("Unable to read VK from file")
+    halo2_circuit::read_vk(&mut reader).expect("Unable to read VK from file")
 });
 
 pub fn generate_halo2_proof(
@@ -96,7 +93,7 @@ mod tests {
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec![Fp::from(55)]);
 
-        let (proof, inputs) = generate_halo2_proof(input).unwrap();
+        let (_, inputs) = generate_halo2_proof(input).unwrap();
         assert_eq!(inputs.0[2], Fp::from(55));
     }
 

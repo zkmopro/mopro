@@ -6,7 +6,7 @@
 import SwiftUI
 import moproFFI
 
-struct Halo2CircuitView: View {
+struct Halo2FibonacciCircuitView: View {
     @State private var textViewText = ""
     @State private var isVerifyButtonEnabled = false
     @State private var isProveButtonEnabled = false
@@ -17,11 +17,11 @@ struct Halo2CircuitView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 10) {
-                Text("Enter a Fibonacci number:")
+                Text("Enter the 9th Fibonacci number:")
                     .font(.headline)
                     .padding(.top)
 
-                TextField("Fibonacci number", text: $fibonacciInput)
+                TextField("9th Fibonacci number", text: $fibonacciInput)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .frame(maxWidth: UIScreen.main.bounds.width * 0.5)
                     .multilineTextAlignment(.center)
@@ -64,7 +64,7 @@ struct Halo2CircuitView: View {
     }
 }
 
-extension Halo2CircuitView {
+extension Halo2FibonacciCircuitView {
     func runProveAction() {
         guard let a = Int(fibonacciInput) else {
             textViewText += "\nInvalid Fibonacci number entered.\n"
