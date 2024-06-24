@@ -26,7 +26,7 @@ gpu-benchmarks = ["mopro-core/gpu-benchmarks", "circom"]
 calc-native-witness = ["mopro-core/calc-native-witness", "circom"]
 
 [dependencies]
-mopro-core = { path = "../mopro-core" } # TODO - turn off default features
+mopro-core = { path = "../mopro-core", default-features = false }
 uniffi = { version = "0.25", features = ["cli"] }
 serde = { version = "1", features = ["derive"] }
 bincode = "1"
