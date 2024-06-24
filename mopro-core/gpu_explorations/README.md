@@ -52,13 +52,14 @@ Done running benchmark. Check the result at: "../mopro-core/benchmarks/gpu_explo
 ...
 ```
 
-### mopro-ios benchmarking
+### ios benchmarking
 
-1. cd to the `mopro/` directory.
-2. run `./scripts/build_ios.sh config-example.toml` (remember to change your ios_device_type `simulator`/`device`) to build and update the bindings.
-3. open `mopro-ios/MoproKit/Example/MoproKit.xcworkspace` in Xcode.
-4. choose your simulator/mobile device and build the project (can also use `cmd + R` as hot key).
-5. choose `MSMBenchmark` and choose the algorithms and click the button below you want to start benchmark.
+1. install `mopro-cli` (See [Getting Started](https://zkmopro.org/docs/getting-started)).
+2. cd to the `research/gpu-exploration-app` directory.
+3. run `mopro build --platforms ios` (remember to change your ios_device_type `simulator`/`device`) to build and update the bindings.
+4. open `ios/ExampleApp/ExampleApp.xcworkspace` in Xcode.
+5. choose your simulator/mobile device and build the project (can also use `cmd + R` as hot key).
+6. choose `MSMBenchmark` and choose the algorithms and click the button below you want to start benchmark.
 
 ### `ExampleGpuExploration` in templates
 

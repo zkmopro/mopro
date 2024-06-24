@@ -52,8 +52,8 @@ USE_DYLIB=$(read_toml "$CONFIG_FILE" "dylib.use_dylib")
 DYLIB_NAME=$(read_toml "$CONFIG_FILE" "dylib.name")
 
 # # Assert we're in the project root
-# if [[ ! -d "mopro-ffi" || ! -d "mopro-core" || ! -d "mopro-ios" ]]; then
-#     echo -e "${RED}Error: This script must be run from the project root directory that contains mopro-ffi, mopro-core, and mopro-ios folders.${DEFAULT}"
+# if [[ ! -d "mopro-ffi" || ! -d "mopro-core" ]]; then
+#     echo -e "${RED}Error: This script must be run from the project root directory that contains mopro-ffi and mopro-core folders.${DEFAULT}"
 #     exit 1
 # fi
 

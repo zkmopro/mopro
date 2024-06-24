@@ -98,9 +98,8 @@ jobs:
                   cargo test -- --nocapture
             - name: Run halo2 tests
               run: |
-                  export BUILD_CONFIG_PATH="$(pwd)/config-halo2.toml"
                   cd mopro-core
-                  cargo test --features=halo2 -- --nocapture
+                  cargo test --features=halo2  --no-default-features -- --nocapture
     test-ffi:
         runs-on: ubuntu-latest
         steps:
@@ -130,3 +129,31 @@ jobs:
                   cd mopro-ffi/
                   curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
                   CLASSPATH=jna-5.13.0.jar cargo test -- --nocapture
+        
+    gpu-benchmarks:
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install Rust toolchain
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: "1.77"
+                  override: true
+            - name: Run sccache-cache
+              uses: mozilla-actions/sccache-action@v0.0.3
+            - name: Install circom
+              run: |
+                  sudo wget -O ~/.cargo/bin/circom https://github.com/iden3/circom/releases/download/v2.1.9/circom-${{runner.os}}-amd64
+                  sudo chmod +x ~/.cargo/bin/circom
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20.x"
+            - name: Install snarkjs
+              run: npm install -g snarkjs
+            - name: Prepare CI for Core and FFI
+              run: ./scripts/prepare_ci.sh
+            - name: Run GPU Benchmarks tests
+              run: |
+                  cd mopro-core
+                  cargo test --features=gpu-benchmarks test_msm_correctness -- --nocapture
