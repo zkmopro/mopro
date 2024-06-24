@@ -301,84 +301,9 @@ mod halo2 {
 
         Ok(())
     }
-
-    pub(crate) fn update_cargo_config(circuit_dir_path: &PathBuf) {
-        let base_dir = get_base_dir();
-        let config_path = Path::new(&base_dir).join(".cargo/config.toml");
-
-        validate_halo2_project(circuit_dir_path);
-
-        ensure_cargo_directory_exists(&config_path);
-
-        if config_path.exists() {
-            println!("cargo:warning=Warning: .cargo/config.toml exists and will be replaced to include new path.");
-        }
-
-        create_new_config(&config_path, circuit_dir_path);
-
-        fn get_base_dir() -> String {
-            let pkg_name = env::var("CARGO_PKG_NAME").unwrap_or_default();
-            if pkg_name == "mopro-core" {
-                env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set")
-            } else {
-                ".".to_string()
-            }
-        }
-
-        fn validate_halo2_project(circuit_dir_path: &PathBuf) {
-            let cargo_toml_path = circuit_dir_path.join("Cargo.toml");
-            if !cargo_toml_path.exists() {
-                panic!(
-                    "The specified circuit path does not contain a Cargo.toml file: {}",
-                    circuit_dir_path.display()
-                );
-            }
-
-            let cargo_toml_content = fs::read_to_string(&cargo_toml_path)
-                .expect("Unable to read Cargo.toml file in the circuit directory");
-
-            let cargo_toml: Value =
-                toml::from_str(&cargo_toml_content).expect("Invalid TOML format in Cargo.toml");
-
-            // Check if the [package] section exists and contains the correct name
-            if let Some(package) = cargo_toml.get("package") {
-                if let Some(name) = package.get("name") {
-                    if name.as_str().unwrap() != "halo2-circuit" {
-                        panic!("The project at {} is not set up correctly. It must be a valid Cargo project with name = 'halo2-circuit'.", circuit_dir_path.display());
-                    }
-                } else {
-                    panic!("The [package] section in Cargo.toml does not contain a 'name' field.");
-                }
-            } else {
-                panic!("The Cargo.toml does not contain a [package] section.");
-            }
-        }
-
-        fn ensure_cargo_directory_exists(config_path: &Path) {
-            if let Some(parent) = config_path.parent() {
-                if !parent.exists() {
-                    fs::create_dir_all(parent).expect(&format!(
-                        "Failed to create .cargo directory in {}",
-                        parent.display()
-                    ));
-                }
-            }
-        }
-
-        fn create_new_config(config_path: &Path, circuit_dir_path: &PathBuf) {
-            let circuit_path_str = circuit_dir_path.to_str().expect("Invalid circuit path");
-            let paths_line = format!("paths = [\"{}\"]\n", circuit_path_str);
-
-            let mut file = File::create(config_path).expect("Unable to create .cargo/config.toml");
-            file.write_all(paths_line.as_bytes())
-                .expect("Unable to write data to .cargo/config.toml");
-
-            println!("cargo:warning=.cargo/config.toml has been replaced with a new version.");
-        }
-    }
 }
 
-fn main() -> Result<()> {
+fn main() -> color_eyre::eyre::Result<()> {
     println!("cargo:rerun-if-env-changed=BUILD_CONFIG_PATH");
     println!("cargo:warning=Preparing circuits...");
 
@@ -402,8 +327,6 @@ fn main() -> Result<()> {
         println!("cargo:warning=Building Halo2 circuit...");
 
         halo2::build_circuit(&circuit_dir_path, circuit_name)?;
-
-        halo2::update_cargo_config(&circuit_dir_path);
     }
 
     #[cfg(feature = "circom")]
