@@ -97,7 +97,6 @@ pub struct ProofCalldata {
     pub c: G1,
 }
 
-#[cfg(test)]
 uniffi::include_scaffolding!("mopro");
 
 #[macro_export]
