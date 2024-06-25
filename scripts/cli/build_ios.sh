@@ -81,7 +81,7 @@ determine_build_directory() {
 select_features() {
     case $CIRCUIT_TYPE in
         "circom")
-            CARGO_FEATURES=""
+            CARGO_FEATURES="circom"
             ;;
         "halo2")
             CARGO_FEATURES="halo2"
@@ -160,9 +160,9 @@ build_mopro_core() {
     cd "${MOPRO_ROOT}/mopro-core" || exit
     print_action "Building mopro-core ($BUILD_MODE)..."
     if [[ "$BUILD_MODE" == "release" ]]; then
-        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --release --features "$CARGO_FEATURES"
+        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --release --features "$CARGO_FEATURES"  --no-default-features
     else
-        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --features "$CARGO_FEATURES"
+        env BUILD_CONFIG_PATH="$BUILD_CONFIG_PATH" cargo build --target "$ARCHITECTURE" --features "$CARGO_FEATURES"  --no-default-features
     fi
 }
 
@@ -170,9 +170,9 @@ build_mopro_ffi_static() {
     cd "${MOPRO_ROOT}/mopro-ffi" || exit
     print_action "Building mopro-ffi as a static library ($BUILD_MODE)..."
     if [[ "$BUILD_MODE" == "release" ]]; then
-        cargo build --release --target "$ARCHITECTURE" --features "$CARGO_FEATURES"
+        cargo build --release --target "$ARCHITECTURE" --features "$CARGO_FEATURES" --no-default-features
     else
-        cargo build --target "$ARCHITECTURE" --features "$CARGO_FEATURES"
+        cargo build --target "$ARCHITECTURE" --features "$CARGO_FEATURES" --no-default-features
     fi
 
     # Ensure the target directory exists

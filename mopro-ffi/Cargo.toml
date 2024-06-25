@@ -14,18 +14,19 @@ name = "uniffi-bindgen"
 path = "uniffi-bindgen.rs"
 
 [features]
-default = []
+default = ["circom"]
 # default = ["gpu-benchmarks"]
 # default = ["calc-native-witness"]
 
 # If we enable them here, they should be enabled in mopro-core as well
 halo2 = ["mopro-core/halo2"]
-dylib = ["mopro-core/dylib"]
-gpu-benchmarks = ["mopro-core/gpu-benchmarks"]
-calc-native-witness = ["mopro-core/calc-native-witness"]
+circom = ["mopro-core/default"]
+dylib = ["mopro-core/dylib", "circom"]
+gpu-benchmarks = ["mopro-core/gpu-benchmarks", "circom"]
+calc-native-witness = ["mopro-core/calc-native-witness", "circom"]
 
 [dependencies]
-mopro-core = { path = "../mopro-core" }
+mopro-core = { path = "../mopro-core", default-features = false }
 uniffi = { version = "0.25", features = ["cli"] }
 serde = { version = "1", features = ["derive"] }
 bincode = "1"
@@ -44,4 +45,7 @@ uniffi = { version = "0.25", features = ["build"] }
 
 [dev-dependencies]
 uniffi = { version = "0.25", features = ["bindgen-tests"] }
+# Circom test dependency
 ark-bn254 = { version = "=0.4.0" }
+# Halo2 test dependency
+halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2" }
