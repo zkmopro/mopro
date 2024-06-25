@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["circom-default"]
+default = ["circom"]
 
 ## Halo2 features
 
@@ -15,21 +15,18 @@ halo2 = ["halo2_proofs", "halo2-circuit"]
 
 ## Circom features
 
-# Default features for circom
-circom-default = ["wasmer/dylib", "circom"]
 # Circom dependencies
-circom = ["ark-circom", "ark-serialize", "num-bigint", "wasmer", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-zkey"]
+circom = ["ark-circom", "ark-serialize", "num-bigint", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-zkey"]
+aadhaar-test = []
 
 # Each additional feature must also reference the circom feature to make sure the dependencies are included
-dylib = ["circom"]                  # NOTE: can probably remove this if we use env config instead
 gpu-benchmarks = ["ark-ff", "metal", "objc", "proptest", "parallel", "circom"]
-calc-native-witness = ["witness", "circom"] # experimental feature to calculate witness with witness graph
-build-native-witness = ["witness/build-witness", "circom"] # only enable build-native-witness feature when building the witness graph
 parallel = ["rayon", "ark-std/parallel", "circom"]
 
 [dependencies]
 
-## Shared dependencies
+rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
+
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
@@ -53,12 +50,11 @@ halo2-circuit = { path = "examples/halo2/fibonacci", optional = true }
 
 
 ## Circom dependencies
-ark-circom = { git = "https://github.com/vimwitch/circom-compat.git", optional = true }
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", branch = "wasm-delete", optional = true }
 ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "=0.4.3", default-features = false, features = [
     "rand",
 ], optional = true }
-wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070", optional = true }
 
 ruint = { version = "1.10.0", features = ["rand", "serde", "ark-ff-04"], optional = true }
 
@@ -76,7 +72,6 @@ ark-groth16 = { version = "=0.4.0", default-features = false, features = [
 ], optional = true }
 ark-relations = { version = "0.4", default-features = false, optional = true }
 ark-zkey = { path = "../ark-zkey", optional = true }
-witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true }
 
 
 # GPU explorations
@@ -86,17 +81,15 @@ ark-ff = { version = "=0.4.1", default-features = false, optional = true, featur
 metal = { version = "=0.28.0", optional = true }
 objc = { version = "=0.2.4", optional = true }
 proptest = { version = "1.4.0", optional = true }
+paste = "1.0.15"
 
 [build-dependencies]
+rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
 color-eyre = "0.6"
 enumset = "1.0.8"
 toml = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"
-
-## Circom dependencies
-wasmer = { git = "https://github.com/oskarth/wasmer.git", rev = "09c7070", optional = true }
-witness = { git = "https://github.com/philsippl/circom-witness-rs.git", optional = true }
 
 [dependencies.rayon]
 version = "1"

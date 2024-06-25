@@ -1,16 +1,19 @@
+use rust_witness::witness;
 #[cfg(not(feature = "halo2"))]
 use {mopro_core::middleware::circom::CircomState, num_bigint::BigInt, std::collections::HashMap};
 
 #[cfg(not(feature = "halo2"))]
+witness!(multiplier2);
+
+#[cfg(not(feature = "halo2"))]
 fn main() {
-    let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
     let zkey_path = "./examples/circom/multiplier2/target/multiplier2_final.zkey";
 
     // Instantiate CircomState
     let mut circom_state = CircomState::new();
 
     // Setup
-    let setup_res = circom_state.initialize(zkey_path, wasm_path);
+    let setup_res = circom_state.initialize(zkey_path, multiplier2_witness);
     assert!(setup_res.is_ok());
 
     let _serialized_pk = setup_res.unwrap();
