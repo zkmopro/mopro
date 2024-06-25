@@ -14,6 +14,7 @@ pub enum MoproError {
     Halo2Error(String),
 }
 
+#[cfg(feature = "circom")]
 use circom::{generate_circom_proof, to_ethereum_inputs, to_ethereum_proof, verify_circom_proof};
 
 #[cfg(feature = "halo2")]

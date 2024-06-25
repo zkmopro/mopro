@@ -11,7 +11,7 @@ name = "mopro_ffi"
 
 [[bin]]
 name = "uniffi-bindgen"
-path = "uniffi-bindgen.rs"
+path = "src/uniffi-bindgen.rs"
 
 [features]
 default = ["circom"]
