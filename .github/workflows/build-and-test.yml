@@ -36,9 +36,6 @@ jobs:
                   cd mopro-ffi/
                   curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
                   CLASSPATH=jna-5.13.0.jar cargo test -- --nocapture
-            - name: Run FFI halo2 tests
-              run: |
-                  cd mopro-ffi/
                   cargo test --features halo2 --no-default-features
 
     test-circom:
@@ -56,7 +53,3 @@ jobs:
                   cd mopro-ffi/
                   curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
                   CLASSPATH=jna-5.13.0.jar cargo test -- --nocapture
-            - name: Run FFI halo2 tests
-              run: |
-                  cd mopro-ffi/
-                  cargo test --features halo2 --no-default-features
