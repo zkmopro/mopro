@@ -5,7 +5,6 @@ use serialization::{SerializableInputs, SerializableProof};
 
 use std::collections::HashMap;
 use std::fs::File;
-use std::path::Path;
 use std::str::FromStr;
 use std::time::Instant;
 
@@ -24,31 +23,6 @@ use num_bigint::BigInt;
 
 pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 type GrothBn = Groth16<Bn254>;
-
-rust_witness::witness!(multiplier2);
-rust_witness::witness!(keccak256256test);
-
-// This should be defined by a file that the mopro package consumer authors
-// then we reference it in our build somehow
-pub fn circuit_data(zkey_path: &str) -> Result<WtnsFn, MoproError> {
-    let name = Path::new(zkey_path).file_stem().unwrap();
-    match name.to_str().unwrap() {
-        "multiplier2_final" => Ok(multiplier2_witness),
-        "keccak256_256_test_final" => Ok(keccak256256test_witness),
-        _ => Err(MoproError::CircomError("Unknown circuit name".to_string())),
-    }
-}
-
-pub fn generate_circom_proof(
-    zkey_path: String,
-    inputs: HashMap<String, Vec<String>>,
-) -> Result<GenerateProofResult, MoproError> {
-    if let Ok(witness_fn) = circuit_data(&zkey_path.as_str()) {
-        generate_circom_proof_wtns(zkey_path, inputs, witness_fn)
-    } else {
-        Err(MoproError::CircomError("Unknown ZKEY".to_string()))
-    }
-}
 
 pub fn generate_circom_proof_wtns(
     zkey_path: String,
@@ -164,13 +138,41 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use std::path::Path;
     use std::str::FromStr;
 
-    use crate::circom::{generate_circom_proof, serialization, verify_circom_proof, MoproError};
+    use crate::circom::{
+        generate_circom_proof_wtns, serialization, to_ethereum_inputs, to_ethereum_proof,
+        verify_circom_proof, WtnsFn,
+    };
+    use crate::{GenerateProofResult, MoproError};
     use ark_bn254::Fr;
     use num_bigint::BigInt;
 
-    use crate::circom::{to_ethereum_inputs, to_ethereum_proof};
+    rust_witness::witness!(multiplier2);
+    rust_witness::witness!(keccak256256test);
+
+    // This should be defined by a file that the mopro package consumer authors
+    // then we reference it in our build somehow
+    fn circuit_data(zkey_path: &str) -> Result<WtnsFn, MoproError> {
+        let name = Path::new(zkey_path).file_stem().unwrap();
+        match name.to_str().unwrap() {
+            "multiplier2_final" => Ok(multiplier2_witness),
+            "keccak256_256_test_final" => Ok(keccak256256test_witness),
+            _ => Err(MoproError::CircomError("Unknown circuit name".to_string())),
+        }
+    }
+
+    fn generate_circom_proof(
+        zkey_path: String,
+        inputs: HashMap<String, Vec<String>>,
+    ) -> Result<GenerateProofResult, MoproError> {
+        if let Ok(witness_fn) = circuit_data(&zkey_path.as_str()) {
+            generate_circom_proof_wtns(zkey_path, inputs, witness_fn)
+        } else {
+            Err(MoproError::CircomError("Unknown ZKEY".to_string()))
+        }
+    }
 
     fn bytes_to_bits(bytes: &[u8]) -> Vec<bool> {
         let mut bits = Vec::new();
@@ -202,9 +204,9 @@ mod tests {
     }
 
     #[test]
-    fn test_end_to_end() -> Result<(), MoproError> {
+    fn test_prove() -> Result<(), MoproError> {
         // Create a new MoproCircom instance
-        let zkey_path = "./test-vectors/circom/multiplier2_final.zkey".to_string();
+        let zkey_path = "../test-vectors/circom/multiplier2_final.zkey".to_string();
 
         let mut inputs = HashMap::new();
         let a = BigInt::from_str(
@@ -249,9 +251,9 @@ mod tests {
     }
 
     #[test]
-    fn test_end_to_end_keccak() -> Result<(), MoproError> {
+    fn test_prove_keccak() -> Result<(), MoproError> {
         // Create a new MoproCircom instance
-        let zkey_path = "./test-vectors/circom/keccak256_256_test_final.zkey".to_string();
+        let zkey_path = "../test-vectors/circom/keccak256_256_test_final.zkey".to_string();
         // Prepare inputs
         let input_vec = vec![
             116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

@@ -1,0 +1,25 @@
+[package]
+name = "test-e2e"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[features]
+default = ["mopro-ffi/circom"]
+
+[dependencies]
+mopro-ffi = { path = "../mopro-ffi" }
+num-bigint = "0.4.0"
+paste = "1.0.0"
+rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
+uniffi = "0.28.0"
+
+[build-dependencies]
+mopro-ffi = { path = "../mopro-ffi" }
+rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
+uniffi = { version = "0.28.0", features = ["build"] }
+
+[dev-dependencies]
+uniffi = { version = "0.28", features = ["bindgen-tests"] }

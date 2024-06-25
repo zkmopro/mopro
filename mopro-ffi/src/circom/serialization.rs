@@ -99,7 +99,7 @@ mod tests {
 
     #[test]
     fn test_serialization_deserialization() {
-        let r1cs_path = "./test-vectors/circom/multiplier2.r1cs";
+        let r1cs_path = "../test-vectors/circom/multiplier2.r1cs";
 
         // Generate a serializable proving key for testing
         let serializable_pk = generate_serializable_proving_key(r1cs_path)

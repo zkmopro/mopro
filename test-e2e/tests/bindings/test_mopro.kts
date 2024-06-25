@@ -1,7 +1,7 @@
 import uniffi.mopro.*
 
 try {
-    var zkeyPath = "./test-vectors/circom/multiplier2_final.zkey"
+    var zkeyPath = "../test-vectors/circom/multiplier2_final.zkey"
 
     // Prepare inputs
     val inputs = mutableMapOf<String, List<String>>()

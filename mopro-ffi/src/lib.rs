@@ -15,11 +15,12 @@ pub enum MoproError {
     Halo2Error(String),
 }
 
-#[cfg(feature = "circom")]
-use circom::{generate_circom_proof, to_ethereum_inputs, to_ethereum_proof, verify_circom_proof};
-
 #[cfg(feature = "halo2")]
-use halo2::{generate_halo2_proof, verify_halo2_proof};
+pub fn generate_halo2_proof(
+    in0: HashMap<String, Vec<String>>,
+) -> Result<GenerateProofResult, MoproError> {
+    halo2::generate_halo2_proof(in0)
+}
 
 #[cfg(not(feature = "halo2"))]
 pub fn generate_halo2_proof(
@@ -30,6 +31,11 @@ pub fn generate_halo2_proof(
     ))
 }
 
+#[cfg(feature = "halo2")]
+pub fn verify_halo2_proof(in0: Vec<u8>, in1: Vec<u8>) -> Result<bool, MoproError> {
+    halo2::verify_halo2_proof(in0, in1)
+}
+
 #[cfg(not(feature = "halo2"))]
 pub fn verify_halo2_proof(_: Vec<u8>, _: Vec<u8>) -> Result<bool, MoproError> {
     Err(MoproError::Halo2Error(
@@ -37,12 +43,27 @@ pub fn verify_halo2_proof(_: Vec<u8>, _: Vec<u8>) -> Result<bool, MoproError> {
     ))
 }
 
+#[cfg(feature = "circom")]
+pub fn generate_circom_proof_wtns(
+    in0: String,
+    in1: HashMap<String, Vec<String>>,
+    in2: circom::WtnsFn,
+) -> Result<GenerateProofResult, MoproError> {
+    circom::generate_circom_proof_wtns(in0, in1, in2)
+}
+
 #[cfg(not(feature = "circom"))]
-pub fn generate_circom_proof(
+pub fn generate_circom_proof_wtns(
     _: String,
     _: HashMap<String, Vec<String>>,
+    _: WtnsFn,
 ) -> Result<GenerateProofResult, MoproError> {
     Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
+}
+
+#[cfg(feature = "circom")]
+pub fn verify_circom_proof(in0: String, in1: Vec<u8>, in2: Vec<u8>) -> Result<bool, MoproError> {
+    circom::verify_circom_proof(in0, in1, in2)
 }
 
 #[cfg(not(feature = "circom"))]
@@ -50,9 +71,19 @@ pub fn verify_circom_proof(_: String, _: Vec<u8>, _: Vec<u8>) -> Result<bool, Mo
     Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
 }
 
+#[cfg(feature = "circom")]
+pub fn to_ethereum_proof(in0: Vec<u8>) -> ProofCalldata {
+    circom::to_ethereum_proof(in0)
+}
+
 #[cfg(not(feature = "circom"))]
 pub fn to_ethereum_proof(_: Vec<u8>) -> ProofCalldata {
     panic!("not built with circom");
+}
+
+#[cfg(feature = "circom")]
+pub fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
+    circom::to_ethereum_inputs(in0)
 }
 
 #[cfg(not(feature = "circom"))]
@@ -97,8 +128,6 @@ pub struct ProofCalldata {
     pub c: G1,
 }
 
-uniffi::include_scaffolding!("mopro");
-
 #[macro_export]
 macro_rules! app {
     () => {
@@ -108,42 +137,21 @@ macro_rules! app {
         fn generate_halo2_proof(
             in0: HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
-            #[cfg(feature = "halo2")]
-            {
-                mopro_ffi::halo2::generate_halo2_proof(in0)
-            }
-            #[cfg(not(feature = "halo2"))]
-            {
-                mopro_ffi::generate_halo2_proof(in0)
-            }
+            mopro_ffi::generate_halo2_proof(in0)
         }
 
         fn verify_halo2_proof(in0: Vec<u8>, in1: Vec<u8>) -> Result<bool, MoproError> {
-            #[cfg(feature = "halo2")]
-            {
-                mopro_ffi::halo2::verify_halo2_proof(in0, in1)
-            }
-            #[cfg(not(feature = "halo2"))]
-            {
-                mopro_ffi::verify_halo2_proof(in0, in1)
-            }
+            mopro_ffi::verify_halo2_proof(in0, in1)
         }
 
         fn generate_circom_proof(
             in0: String,
             in1: HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
-            #[cfg(feature = "circom")]
-            {
-                if let Ok(witness_fn) = circuit_data(&in0.as_str()) {
-                    mopro_ffi::circom::generate_circom_proof_wtns(in0, in1, witness_fn)
-                } else {
-                    Err(MoproError::CircomError("Unknown ZKEY".to_string()))
-                }
-            }
-            #[cfg(not(feature = "circom"))]
-            {
-                mopro_ffi::generate_circom_proof(in0, in1)
+            if let Ok(witness_fn) = circuit_data(&in0.as_str()) {
+                mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn)
+            } else {
+                Err(MoproError::CircomError("Unknown ZKEY".to_string()))
             }
         }
 
@@ -152,36 +160,15 @@ macro_rules! app {
             in1: Vec<u8>,
             in2: Vec<u8>,
         ) -> Result<bool, MoproError> {
-            #[cfg(feature = "circom")]
-            {
-                mopro_ffi::circom::verify_circom_proof(in0, in1, in2)
-            }
-            #[cfg(not(feature = "circom"))]
-            {
-                mopro_ffi::verify_circom_proof(in0, in1, in2)
-            }
+            mopro_ffi::verify_circom_proof(in0, in1, in2)
         }
 
         fn to_ethereum_proof(in0: Vec<u8>) -> ProofCalldata {
-            #[cfg(feature = "circom")]
-            {
-                mopro_ffi::circom::to_ethereum_proof(in0)
-            }
-            #[cfg(not(feature = "circom"))]
-            {
-                mopro_ffi::to_ethereum_proof(in0)
-            }
+            mopro_ffi::to_ethereum_proof(in0)
         }
 
         fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
-            #[cfg(feature = "circom")]
-            {
-                mopro_ffi::circom::to_ethereum_inputs(in0)
-            }
-            #[cfg(not(feature = "circom"))]
-            {
-                mopro_ffi::to_ethereum_inputs(in0)
-            }
+            mopro_ffi::to_ethereum_inputs(in0)
         }
 
         uniffi::include_scaffolding!("mopro");
