@@ -3,10 +3,16 @@ namespace mopro {
   string hello();
 
   [Throws=MoproError]
-  GenerateProofResult generate_halo2_proof(record<string, sequence<string>> circuit_inputs);
+  void initialize_mopro();
 
   [Throws=MoproError]
-  boolean verify_halo2_proof(bytes proof, bytes public_input);
+  void initialize_mopro_dylib(string dylib_path);
+
+  [Throws=MoproError]
+  GenerateProofResult generate_proof_static(record<string, sequence<string>> circuit_inputs);
+
+  [Throws=MoproError]
+  boolean verify_proof_static(bytes proof, bytes public_input);
 
   [Throws=MoproError]
   BenchmarkResult arkworks_pippenger(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
@@ -48,6 +54,7 @@ dictionary ProofCalldata {
   G1 c;
 };
 
+
 [Error]
 enum MoproError {
   "CircomError",
@@ -58,8 +65,11 @@ interface MoproCircom {
   constructor();
 
   [Throws=MoproError]
-  GenerateProofResult generate_proof(string zkey_path, record<string, sequence<string>> circuit_inputs);
+  void initialize(string zkey_path, string wasm_path);
 
   [Throws=MoproError]
-  boolean verify_proof(string zkey_path, bytes proof, bytes public_input);
+  GenerateProofResult generate_proof(record<string, sequence<string>> circuit_inputs);
+
+  [Throws=MoproError]
+  boolean verify_proof(bytes proof, bytes public_input);
 };

@@ -1,13 +1,9 @@
 use ark_bn254::Bn254;
-use ark_circom::{
-    circom::{r1cs_reader::R1CSFile, CircomCircuit},
-    ethereum,
-};
+use ark_circom::ethereum;
 use ark_ec::pairing::Pairing;
 use ark_groth16::{Proof, ProvingKey};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use color_eyre::Result;
-use std::fs::File;
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug)]
 pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
@@ -70,7 +66,7 @@ mod tests {
     use crate::middleware::circom::utils::assert_paths_exists;
     use crate::MoproError;
     use ark_bn254::Bn254;
-    use ark_ec::bn::Bn;
+    use ark_circom::{CircomBuilder, CircomConfig};
     use ark_groth16::Groth16;
     use ark_std::rand::thread_rng;
     use color_eyre::Result;
@@ -78,19 +74,16 @@ mod tests {
     type GrothBn = Groth16<Bn254>;
 
     fn generate_serializable_proving_key(
+        wasm_path: &str,
         r1cs_path: &str,
     ) -> Result<SerializableProvingKey, MoproError> {
-        assert_paths_exists(r1cs_path)?;
+        assert_paths_exists(wasm_path, r1cs_path)?;
 
-        let mut circom = CircomCircuit {
-            r1cs: R1CSFile::new(File::open(r1cs_path).unwrap())
-                .unwrap()
-                .into(),
-            witness: None,
-        } as CircomCircuit<Bn254>;
+        let cfg = CircomConfig::<Bn254>::new(wasm_path, r1cs_path)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
 
-        // Disable the wire mapping
-        circom.r1cs.wire_mapping = None;
+        let builder = CircomBuilder::new(cfg);
+        let circom = builder.setup();
 
         let mut rng = thread_rng();
         let raw_params = GrothBn::generate_random_parameters_with_reduction(circom, &mut rng)
@@ -101,10 +94,11 @@ mod tests {
 
     #[test]
     fn test_serialization_deserialization() {
+        let wasm_path = "./examples/circom/multiplier2/target/multiplier2_js/multiplier2.wasm";
         let r1cs_path = "./examples/circom/multiplier2/target/multiplier2.r1cs";
 
         // Generate a serializable proving key for testing
-        let serializable_pk = generate_serializable_proving_key(r1cs_path)
+        let serializable_pk = generate_serializable_proving_key(wasm_path, r1cs_path)
             .expect("Failed to generate serializable proving key");
 
         // Serialize

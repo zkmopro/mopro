@@ -83,7 +83,7 @@ compile_circuit keccak256 keccak256_256_test.circom
 
 # Setup and compile rsa
 npm_install rsa
-compile_circuit rsa main_rsa.circom
+compile_circuit rsa main.circom
 
 # # Setup and compile anonAadhaar
 # npm_install anonAadhaar
