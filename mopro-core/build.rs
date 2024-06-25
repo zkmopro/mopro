@@ -183,6 +183,7 @@ fn main() -> color_eyre::eyre::Result<()> {
         // If Circom feature is enabled, build Circom Circuit
         println!("cargo:warning=Building Circom circuit...");
 
+        // see here: https://github.com/zkmopro/rust-witness/?tab=readme-ov-file#rust-witness
         transpile_wasm(String::from("./examples"));
     }
 

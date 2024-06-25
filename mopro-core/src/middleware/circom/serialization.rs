@@ -82,9 +82,6 @@ mod tests {
     ) -> Result<SerializableProvingKey, MoproError> {
         assert_paths_exists(r1cs_path)?;
 
-        // TODO: cleanup the circom-compat implementation
-        // TODO: clean up error handling
-        // why do we have a MoproError type?
         let mut circom = CircomCircuit {
             r1cs: R1CSFile::new(File::open(r1cs_path).unwrap())
                 .unwrap()
