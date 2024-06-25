@@ -27,7 +27,7 @@ func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
 }
 
 do {
-    let zkeyPath = "../../../mopro-ffi/test-vectors/circom/multiplier2_final.zkey"
+    let zkeyPath = "../../../test-vectors/circom/multiplier2_final.zkey"
 
     // Prepare inputs
     var inputs = [String: [String]]()
