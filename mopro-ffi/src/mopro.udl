@@ -3,9 +3,6 @@ namespace mopro {
   string hello();
 
   [Throws=MoproError]
-  void initialize_mopro();
-
-  [Throws=MoproError]
   GenerateProofResult generate_halo2_proof(record<string, sequence<string>> circuit_inputs);
 
   [Throws=MoproError]

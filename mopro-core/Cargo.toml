@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["circom-default"]
+default = ["circom"]
 
 ## Halo2 features
 
@@ -15,8 +15,6 @@ halo2 = ["halo2_proofs", "halo2-circuit"]
 
 ## Circom features
 
-# Default features for circom
-circom-default = ["circom"]
 # Circom dependencies
 circom = ["ark-circom", "ark-serialize", "num-bigint", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-zkey"]
 aadhaar-test = []

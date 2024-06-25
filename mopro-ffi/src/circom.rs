@@ -3,83 +3,22 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
-#[cfg(feature = "circom")]
-pub(crate) use common::*;
-
 use bincode::Error;
-use mopro_core::middleware::circom;
-#[cfg(not(feature = "halo2"))]
-use {
-    mopro_core::middleware::circom::{CircomState, WtnsFn},
-    num_bigint::BigInt,
-    std::str::FromStr,
-    std::sync::RwLock,
-};
 
 #[cfg(feature = "gpu-benchmarks")]
 use mopro_core::middleware::gpu_explorations::{self, utils::benchmark::BenchmarkResult};
 use mopro_core::MoproError;
 #[cfg(feature = "circom")]
-use {mopro_core::middleware::circom, num_bigint::BigInt, std::str::FromStr, std::sync::RwLock};
+use {
+    mopro_core::middleware::circom,
+    mopro_core::middleware::circom::{CircomState, WtnsFn},
+    num_bigint::BigInt,
+    std::str::FromStr,
+};
 
 use rust_witness::witness;
 
 use crate::GenerateProofResult;
-
-/// Module that contains all the shared adapter functionality implemented for the Circom adapter.
-/// As the adapter is only used when the `circom` feature is enabled,
-/// we make the compiler avoid the shared functions of module when the feature is not enabled.
-#[cfg(feature = "circom")]
-mod common {
-    use std::collections::HashMap;
-    use std::str::FromStr;
-
-    use num_bigint::BigInt;
-
-    use mopro_core::middleware::circom;
-    use mopro_core::MoproError;
-
-    use crate::GenerateProofResult;
-
-    pub fn initialize_mopro() -> Result<(), MoproError> {
-        // TODO: Error handle / panic?
-        mopro_core::middleware::circom::initialize();
-        Ok(())
-    }
-
-    pub fn generate_proof_static(
-        inputs: HashMap<String, Vec<String>>,
-    ) -> Result<GenerateProofResult, MoproError> {
-        // Convert inputs to BigInt
-        let bigint_inputs = inputs
-            .into_iter()
-            .map(|(k, v)| {
-                (
-                    k,
-                    v.into_iter()
-                        .map(|i| BigInt::from_str(&i).unwrap())
-                        .collect(),
-                )
-            })
-            .collect();
-
-        let (proof, inputs) = circom::generate_proof_static(bigint_inputs)?;
-
-        let serialized_proof = circom::serialization::serialize_proof(&proof);
-        let serialized_inputs = circom::serialization::serialize_inputs(&inputs);
-        Ok(GenerateProofResult {
-            proof: serialized_proof,
-            inputs: serialized_inputs,
-        })
-    }
-
-    pub fn verify_proof_static(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
-        let deserialized_proof = circom::serialization::deserialize_proof(proof);
-        let deserialized_public_input = circom::serialization::deserialize_inputs(public_input);
-        let is_valid = circom::verify_proof_static(deserialized_proof, deserialized_public_input)?;
-        Ok(is_valid)
-    }
-}
 
 #[derive(Debug, Clone, Default)]
 pub struct G1 {
@@ -117,48 +56,10 @@ impl Default for MoproCircom {
     }
 }
 
-// TODO: Use FFIError::SerializationError instead
-#[cfg(feature = "halo2")]
-pub fn initialize_mopro() -> Result<(), MoproError> {
-    panic!("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.")
-    // TODO - replace with an error
-}
-
-#[cfg(not(feature = "halo2"))]
-// Convert proof to String-tuples as expected by the Solidity Groth16 Verifier
-pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
-    let deserialized_proof = circom::serialization::deserialize_proof(proof);
-    let proof = circom::serialization::to_ethereum_proof(&deserialized_proof);
-    let a = G1 {
-        x: proof.a.x.to_string(),
-        y: proof.a.y.to_string(),
-    };
-    let b = G2 {
-        x: proof.b.x.iter().map(|x| x.to_string()).collect(),
-        y: proof.b.y.iter().map(|x| x.to_string()).collect(),
-    };
-    let c = G1 {
-        x: proof.c.x.to_string(),
-        y: proof.c.y.to_string(),
-    };
-    ProofCalldata { a, b, c }
-}
-
 #[cfg(feature = "halo2")]
 pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
     panic!("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.")
     // TODO - replace with an error
-}
-
-#[cfg(not(feature = "halo2"))]
-pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
-    let deserialized_inputs = circom::serialization::deserialize_inputs(inputs);
-    let inputs = deserialized_inputs
-        .0
-        .iter()
-        .map(|x| x.to_string())
-        .collect();
-    inputs
 }
 
 #[cfg(feature = "halo2")]
@@ -195,7 +96,6 @@ impl MoproCircom {
     pub fn initialize(&self, zkey_path: String, wasm_path: String) -> Result<(), MoproError> {
         Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
     }
-
 
     #[cfg(feature = "circom")]
     pub fn generate_proof(
