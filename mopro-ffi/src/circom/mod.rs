@@ -43,7 +43,18 @@ pub fn generate_circom_proof(
     zkey_path: String,
     inputs: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
-    let witness_fn = circuit_data(zkey_path.as_str())?;
+    if let Ok(witness_fn) = circuit_data(&zkey_path.as_str()) {
+        generate_circom_proof_wtns(zkey_path, inputs, witness_fn)
+    } else {
+        Err(MoproError::CircomError("Unknown ZKEY".to_string()))
+    }
+}
+
+pub fn generate_circom_proof_wtns(
+    zkey_path: String,
+    inputs: HashMap<String, Vec<String>>,
+    witness_fn: WtnsFn,
+) -> Result<GenerateProofResult, MoproError> {
     let mut file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let zkey = read_zkey(&mut file).map_err(|e| MoproError::CircomError(e.to_string()))?;
 

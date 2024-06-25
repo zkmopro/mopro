@@ -135,7 +135,11 @@ macro_rules! app {
         ) -> Result<GenerateProofResult, MoproError> {
             #[cfg(feature = "circom")]
             {
-                mopro_ffi::circom::generate_circom_proof(in0, in1)
+                if let Ok(witness_fn) = circuit_data(&in0.as_str()) {
+                    mopro_ffi::circom::generate_circom_proof_wtns(in0, in1, witness_fn)
+                } else {
+                    Err(MoproError::CircomError("Unknown ZKEY".to_string()))
+                }
             }
             #[cfg(not(feature = "circom"))]
             {
