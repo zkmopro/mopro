@@ -1,4 +1,4 @@
 [workspace]
-members = ["mopro-ffi", "mopro-cli"]
+members = ["mopro-ffi"]
 resolver = "2"
 exclude = ["mopro-example-app"]
