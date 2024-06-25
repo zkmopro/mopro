@@ -39,7 +39,6 @@ pub fn circuit_data(zkey_path: &str) -> Result<WtnsFn, MoproError> {
     }
 }
 
-#[cfg(feature = "circom")]
 pub fn generate_circom_proof(
     zkey_path: String,
     inputs: HashMap<String, Vec<String>>,
@@ -98,7 +97,6 @@ pub fn generate_circom_proof(
     })
 }
 
-#[cfg(feature = "circom")]
 pub fn verify_circom_proof(
     zkey_path: String,
     proof: Vec<u8>,
@@ -124,7 +122,6 @@ pub fn verify_circom_proof(
 }
 
 // Convert proof to String-tuples as expected by the Solidity Groth16 Verifier
-#[cfg(feature = "circom")]
 pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
     let deserialized_proof = serialization::deserialize_proof(proof);
     let proof = serialization::to_ethereum_proof(&deserialized_proof);
@@ -143,7 +140,6 @@ pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
     ProofCalldata { a, b, c }
 }
 
-#[cfg(feature = "circom")]
 pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
     let deserialized_inputs = serialization::deserialize_inputs(inputs);
     let inputs = deserialized_inputs
@@ -155,7 +151,6 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
 }
 
 #[cfg(test)]
-#[cfg(feature = "circom")]
 mod tests {
     use std::collections::HashMap;
     use std::str::FromStr;

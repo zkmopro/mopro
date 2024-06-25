@@ -14,7 +14,6 @@ pub struct SerializableProof(pub Vec<u8>);
 #[derive(Clone, Debug)]
 pub struct SerializablePublicInputs(pub Vec<Fp>);
 
-#[cfg(feature = "halo2")]
 pub fn generate_halo2_proof(
     circuit_inputs: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
@@ -33,7 +32,6 @@ pub fn generate_halo2_proof(
     // })
 }
 
-#[cfg(feature = "halo2")]
 pub fn verify_halo2_proof(proof: Vec<u8>, public_inputs: Vec<u8>) -> Result<bool, MoproError> {
     panic!("stub implementation: TODO: copy logic from mopro-core to here");
     // let deserialized_proof: halo2::SerializableProof =
@@ -44,7 +42,6 @@ pub fn verify_halo2_proof(proof: Vec<u8>, public_inputs: Vec<u8>) -> Result<bool
     // Ok(is_valid)
 }
 
-#[cfg(feature = "halo2")]
 #[test]
 fn test_end_to_end() -> Result<(), MoproError> {
     // We by default compile the Fibonacci Halo2 Circuit
