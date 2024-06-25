@@ -25,4 +25,5 @@ try {
 
 } catch (e: Exception) {
     println(e)
+    throw e
 }
