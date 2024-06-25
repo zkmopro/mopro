@@ -1,7 +1,8 @@
+pub mod app_config;
 #[cfg(feature = "circom")]
-mod circom;
+pub mod circom;
 #[cfg(feature = "halo2")]
-mod halo2;
+pub mod halo2;
 
 use std::collections::HashMap;
 use thiserror::Error;
@@ -96,4 +97,90 @@ pub struct ProofCalldata {
     pub c: G1,
 }
 
+#[cfg(test)]
 uniffi::include_scaffolding!("mopro");
+
+#[macro_export]
+macro_rules! app {
+    () => {
+        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
+        use std::collections::HashMap;
+
+        fn generate_halo2_proof(
+            in0: HashMap<String, Vec<String>>,
+        ) -> Result<GenerateProofResult, MoproError> {
+            #[cfg(feature = "halo2")]
+            {
+                mopro_ffi::halo2::generate_halo2_proof(in0)
+            }
+            #[cfg(not(feature = "halo2"))]
+            {
+                mopro_ffi::generate_halo2_proof(in0)
+            }
+        }
+
+        fn verify_halo2_proof(in0: Vec<u8>, in1: Vec<u8>) -> Result<bool, MoproError> {
+            #[cfg(feature = "halo2")]
+            {
+                mopro_ffi::halo2::verify_halo2_proof(in0, in1)
+            }
+            #[cfg(not(feature = "halo2"))]
+            {
+                mopro_ffi::verify_halo2_proof(in0, in1)
+            }
+        }
+
+        fn generate_circom_proof(
+            in0: String,
+            in1: HashMap<String, Vec<String>>,
+        ) -> Result<GenerateProofResult, MoproError> {
+            #[cfg(feature = "circom")]
+            {
+                mopro_ffi::circom::generate_circom_proof(in0, in1)
+            }
+            #[cfg(not(feature = "circom"))]
+            {
+                mopro_ffi::generate_circom_proof(in0, in1)
+            }
+        }
+
+        fn verify_circom_proof(
+            in0: String,
+            in1: Vec<u8>,
+            in2: Vec<u8>,
+        ) -> Result<bool, MoproError> {
+            #[cfg(feature = "circom")]
+            {
+                mopro_ffi::circom::verify_circom_proof(in0, in1, in2)
+            }
+            #[cfg(not(feature = "circom"))]
+            {
+                mopro_ffi::verify_circom_proof(in0, in1, in2)
+            }
+        }
+
+        fn to_ethereum_proof(in0: Vec<u8>) -> ProofCalldata {
+            #[cfg(feature = "circom")]
+            {
+                mopro_ffi::circom::to_ethereum_proof(in0)
+            }
+            #[cfg(not(feature = "circom"))]
+            {
+                mopro_ffi::to_ethereum_proof(in0)
+            }
+        }
+
+        fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
+            #[cfg(feature = "circom")]
+            {
+                mopro_ffi::circom::to_ethereum_inputs(in0)
+            }
+            #[cfg(not(feature = "circom"))]
+            {
+                mopro_ffi::to_ethereum_inputs(in0)
+            }
+        }
+
+        uniffi::include_scaffolding!("mopro");
+    };
+}
