@@ -18,12 +18,12 @@ default = ["circom"]
 
 # If we enable them here, they should be enabled in mopro-core as well
 halo2 = ["halo2_proofs"]
-circom = ["ark-circom", "ark-serialize", "num-bigint", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-zkey"]
+circom = ["ark-circom", "ark-serialize", "num-bigint", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations"]
 # gpu-benchmarks = ["mopro-core/gpu-benchmarks", "circom"]
 
 [dependencies]
 rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
-uniffi = { version = "0.25", features = ["cli"] }
+uniffi = { version = "0.25", features = ["cli", "build"] }
 serde = { version = "1", features = ["derive"] }
 bincode = "1"
 
@@ -63,7 +63,6 @@ ark-groth16 = { version = "=0.4.0", default-features = false, features = [
     "parallel",
 ], optional = true }
 ark-relations = { version = "0.4", default-features = false, optional = true }
-ark-zkey = { path = "../ark-zkey", optional = true }
 
 [build-dependencies]
 rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
