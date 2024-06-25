@@ -56,18 +56,6 @@ impl Default for MoproCircom {
     }
 }
 
-#[cfg(feature = "halo2")]
-pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
-    panic!("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.")
-    // TODO - replace with an error
-}
-
-#[cfg(feature = "halo2")]
-pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
-    panic!("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.")
-    // TODO - replace with an error
-}
-
 witness!(multiplier2);
 witness!(keccak256256test);
 
@@ -79,6 +67,7 @@ impl MoproCircom {
 
     // This should be defined by a file that the mopro package consumer authors
     // then we reference it in our build somehow
+    #[cfg(feature = "circom")]
     pub fn circuit_data(zkey_path: &str) -> Result<WtnsFn, MoproError> {
         let name = Path::new(zkey_path).file_stem().unwrap();
         let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") else {
@@ -90,11 +79,6 @@ impl MoproCircom {
             "keccak256_256_test_final" => Ok(keccak256256test_witness),
             _ => Err(MoproError::CircomError("Unknown circuit name".to_string())),
         }
-    }
-
-    #[cfg(not(feature = "circom"))]
-    pub fn initialize(&self, zkey_path: String, wasm_path: String) -> Result<(), MoproError> {
-        Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
     }
 
     #[cfg(feature = "circom")]
@@ -129,6 +113,7 @@ impl MoproCircom {
     #[cfg(not(feature = "circom"))]
     pub fn generate_proof(
         &self,
+        zkey_path: String,
         inputs: HashMap<String, Vec<String>>,
     ) -> Result<GenerateProofResult, MoproError> {
         Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
@@ -153,7 +138,12 @@ impl MoproCircom {
     }
 
     #[cfg(not(feature = "circom"))]
-    pub fn verify_proof(&self, proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
+    pub fn verify_proof(
+        &self,
+        zkey_path: String,
+        proof: Vec<u8>,
+        public_input: Vec<u8>,
+    ) -> Result<bool, MoproError> {
         Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
     }
 }
