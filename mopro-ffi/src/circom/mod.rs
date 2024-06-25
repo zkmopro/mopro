@@ -1,30 +1,22 @@
-#![allow(unused_variables)]
-
-use std::collections::HashMap;
-use std::path::{Path, PathBuf};
-
 use crate::{MoproError, ProofCalldata, G1, G2};
 mod serialization;
-mod utils;
 
 use serialization::{SerializableInputs, SerializableProof};
+
+use std::collections::HashMap;
+use std::fs::File;
+use std::path::Path;
 use std::str::FromStr;
-
-use bincode::Error;
-use std::{fs::File, io::BufReader};
-
-use rust_witness::witness;
-
-use crate::GenerateProofResult;
-use ark_bn254::{Bn254, Fr};
-use ark_circom::{read_zkey, CircomReduction};
 use std::time::Instant;
 
+use crate::GenerateProofResult;
+use ark_bn254::Bn254;
+use ark_circom::{read_zkey, CircomReduction};
+
 use ark_crypto_primitives::snark::SNARK;
-use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey};
+use ark_groth16::{prepare_verifying_key, Groth16};
 use ark_std::UniformRand;
 
-use ark_relations::r1cs::ConstraintMatrices;
 use ark_std::rand::thread_rng;
 use color_eyre::Result;
 
@@ -33,17 +25,13 @@ use num_bigint::BigInt;
 pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 type GrothBn = Groth16<Bn254>;
 
-witness!(multiplier2);
-witness!(keccak256256test);
+rust_witness::witness!(multiplier2);
+rust_witness::witness!(keccak256256test);
 
 // This should be defined by a file that the mopro package consumer authors
 // then we reference it in our build somehow
 pub fn circuit_data(zkey_path: &str) -> Result<WtnsFn, MoproError> {
     let name = Path::new(zkey_path).file_stem().unwrap();
-    let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") else {
-        return Err(MoproError::CircomError("unknown".to_string()));
-    };
-    let root = Path::new(manifest_dir.as_str());
     match name.to_str().unwrap() {
         "multiplier2_final" => Ok(multiplier2_witness),
         "keccak256_256_test_final" => Ok(keccak256256test_witness),
@@ -57,7 +45,6 @@ pub fn generate_circom_proof(
     inputs: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
     let witness_fn = circuit_data(zkey_path.as_str())?;
-    let zkey_path_str = zkey_path.as_str();
     let mut file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let zkey = read_zkey(&mut file).map_err(|e| MoproError::CircomError(e.to_string()))?;
 
@@ -173,18 +160,25 @@ mod tests {
     use std::collections::HashMap;
     use std::str::FromStr;
 
-    use crate::circom::{
-        generate_circom_proof, serialization, utils, verify_circom_proof, MoproError,
-    };
+    use crate::circom::{generate_circom_proof, serialization, verify_circom_proof, MoproError};
     use ark_bn254::Fr;
-    use num_bigint::{BigInt, BigUint};
-
-    use rust_witness::witness;
+    use num_bigint::BigInt;
 
     use crate::circom::{to_ethereum_inputs, to_ethereum_proof};
 
+    fn bytes_to_bits(bytes: &[u8]) -> Vec<bool> {
+        let mut bits = Vec::new();
+        for &byte in bytes {
+            for j in 0..8 {
+                let bit = (byte >> j) & 1;
+                bits.push(bit == 1);
+            }
+        }
+        bits
+    }
+
     fn bytes_to_circuit_inputs(input_vec: &Vec<u8>) -> HashMap<String, Vec<String>> {
-        let bits = utils::bytes_to_bits(&input_vec);
+        let bits = bytes_to_bits(&input_vec);
         let converted_vec: Vec<String> = bits
             .into_iter()
             .map(|bit| (bit as i32).to_string())
@@ -195,7 +189,7 @@ mod tests {
     }
 
     fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<u8> {
-        let bits = utils::bytes_to_bits(bytes);
+        let bits = bytes_to_bits(bytes);
         let field_bits = bits.into_iter().map(|bit| Fr::from(bit as u8)).collect();
         let circom_outputs = serialization::SerializableInputs(field_bits);
         serialization::serialize_inputs(&circom_outputs)

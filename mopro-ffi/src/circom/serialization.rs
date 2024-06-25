@@ -1,13 +1,9 @@
 use ark_bn254::Bn254;
-use ark_circom::{
-    circom::{r1cs_reader::R1CSFile, CircomCircuit},
-    ethereum,
-};
+use ark_circom::ethereum;
 use ark_ec::pairing::Pairing;
 use ark_groth16::{Proof, ProvingKey};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use color_eyre::Result;
-use std::fs::File;
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug)]
 pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
@@ -30,18 +26,6 @@ pub fn deserialize_proof(data: Vec<u8>) -> SerializableProof {
     SerializableProof::deserialize_uncompressed(&mut &data[..]).expect("Deserialization failed")
 }
 
-pub fn serialize_proving_key(pk: &SerializableProvingKey) -> Vec<u8> {
-    let mut serialized_data = Vec::new();
-    pk.serialize_uncompressed(&mut serialized_data)
-        .expect("Serialization failed");
-    serialized_data
-}
-
-pub fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
-    SerializableProvingKey::deserialize_uncompressed(&mut &data[..])
-        .expect("Deserialization failed")
-}
-
 pub fn serialize_inputs(inputs: &SerializableInputs) -> Vec<u8> {
     let mut serialized_data = Vec::new();
     inputs
@@ -59,27 +43,42 @@ pub fn to_ethereum_proof(proof: &SerializableProof) -> ethereum::Proof {
     ethereum::Proof::from(proof.0.clone())
 }
 
-pub fn to_ethereum_inputs(inputs: &SerializableInputs) -> ethereum::Inputs {
-    ethereum::Inputs::from(&inputs.0[..])
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::circom::serialization::SerializableProvingKey;
-    use crate::circom::utils::assert_paths_exists;
     use crate::MoproError;
     use ark_bn254::Bn254;
+    use ark_circom::circom::{r1cs_reader::R1CSFile, CircomCircuit};
     use ark_groth16::Groth16;
     use ark_std::rand::thread_rng;
     use color_eyre::Result;
+    use std::{fs::File, path::Path};
 
     type GrothBn = Groth16<Bn254>;
+
+    fn serialize_proving_key(pk: &SerializableProvingKey) -> Vec<u8> {
+        let mut serialized_data = Vec::new();
+        pk.serialize_uncompressed(&mut serialized_data)
+            .expect("Serialization failed");
+        serialized_data
+    }
+
+    fn deserialize_proving_key(data: Vec<u8>) -> SerializableProvingKey {
+        SerializableProvingKey::deserialize_uncompressed(&mut &data[..])
+            .expect("Deserialization failed")
+    }
 
     fn generate_serializable_proving_key(
         r1cs_path: &str,
     ) -> Result<SerializableProvingKey, MoproError> {
-        assert_paths_exists(r1cs_path)?;
+        // Check that the files exist - ark-circom should probably do this instead and not panic
+        if !Path::new(r1cs_path).exists() {
+            return Err(MoproError::CircomError(format!(
+                "Path does not exist: {}",
+                r1cs_path
+            )));
+        }
 
         let mut circom = CircomCircuit {
             r1cs: R1CSFile::new(File::open(r1cs_path).unwrap())
