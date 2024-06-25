@@ -30,8 +30,6 @@ use color_eyre::Result;
 
 use num_bigint::BigInt;
 
-use ark_zkey::{read_arkzkey, read_arkzkey_from_bytes}; //SerializableConstraintMatrices
-
 pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 type GrothBn = Groth16<Bn254>;
 

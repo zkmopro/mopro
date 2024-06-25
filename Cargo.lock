@@ -387,23 +387,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ark-zkey"
-version = "0.1.0"
-dependencies = [
- "ark-bn254",
- "ark-circom",
- "ark-ec",
- "ark-ff 0.4.1",
- "ark-groth16",
- "ark-relations",
- "ark-serialize 0.4.1",
- "color-eyre",
- "flame",
- "flamer",
- "memmap2",
-]
-
-[[package]]
 name = "arrayref"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -879,7 +862,7 @@ dependencies = [
  "criterion-plot",
  "csv",
  "itertools",
- "lazy_static 1.5.0",
+ "lazy_static",
  "num-traits",
  "oorandom",
  "plotters",
@@ -1170,7 +1153,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "439a1c2ba5611ad3ed731280541d36d2e9c4ac5e7fb818a27b604bdc5a6aa65b"
 dependencies = [
- "lazy_static 1.5.0",
+ "lazy_static",
  "libc",
  "winapi",
  "wio",
@@ -1387,30 +1370,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "flame"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1fc2706461e1ee94f55cab2ed2e3d34ae9536cfa830358ef80acff1a3dacab30"
-dependencies = [
- "lazy_static 0.2.11",
- "serde",
- "serde_derive",
- "serde_json",
- "thread-id",
-]
-
-[[package]]
-name = "flamer"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7693d9dd1ec1c54f52195dfe255b627f7cec7da33b679cd56de949e662b3db10"
-dependencies = [
- "flame",
- "quote",
- "syn 2.0.68",
-]
-
-[[package]]
 name = "flate2"
 version = "1.0.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1447,7 +1406,7 @@ dependencies = [
  "dwrote",
  "float-ord",
  "freetype-sys",
- "lazy_static 1.5.0",
+ "lazy_static",
  "libc",
  "log",
  "pathfinder_geometry",
@@ -1622,7 +1581,7 @@ source = "git+https://github.com/privacy-scaling-explorations/halo2curves?tag=0.
 dependencies = [
  "ff",
  "group",
- "lazy_static 1.5.0",
+ "lazy_static",
  "num-bigint",
  "num-traits",
  "pasta_curves",
@@ -1860,12 +1819,6 @@ dependencies = [
 
 [[package]]
 name = "lazy_static"
-version = "0.2.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76f033c7ad61445c5b347c7382dd1237847eb1bce590fe50365dcb33d546be73"
-
-[[package]]
-name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
@@ -1924,15 +1877,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
-name = "memmap2"
-version = "0.9.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe751422e4a8caa417e13c3ea66452215d7d63e19e604f4980461212f3ae1322"
-dependencies = [
- "libc",
-]
-
-[[package]]
 name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1984,7 +1928,6 @@ dependencies = [
  "ark-relations",
  "ark-serialize 0.4.1",
  "ark-std 0.4.0",
- "ark-zkey",
  "bincode",
  "color-eyre",
  "criterion",
@@ -2210,7 +2153,7 @@ dependencies = [
  "blake2b_simd",
  "ff",
  "group",
- "lazy_static 1.5.0",
+ "lazy_static",
  "rand",
  "static_assertions",
  "subtle",
@@ -2295,7 +2238,7 @@ dependencies = [
  "chrono",
  "font-kit",
  "image",
- "lazy_static 1.5.0",
+ "lazy_static",
  "num-traits",
  "pathfinder_geometry",
  "plotters-backend",
@@ -2400,7 +2343,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4c2511913b88df1637da85cc8d96ec8e43a3f8bb8ccb71ee1ac240d6f3df58d"
 dependencies = [
  "bitflags 2.6.0",
- "lazy_static 1.5.0",
+ "lazy_static",
  "num-traits",
  "rand",
  "rand_chacha",
@@ -2482,12 +2425,6 @@ dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
 ]
-
-[[package]]
-name = "redox_syscall"
-version = "0.1.57"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41cc0f7e4d5d4544e8861606a285bb08d3e70712ccc7d2b84d7c0ccfaf4b05ce"
 
 [[package]]
 name = "redox_users"
@@ -2841,7 +2778,7 @@ version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f40ca3c46823713e0d4209592e8d6e826aa57e928f09752619fc696c499637f6"
 dependencies = [
- "lazy_static 1.5.0",
+ "lazy_static",
 ]
 
 [[package]]
@@ -3006,17 +2943,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "thread-id"
-version = "3.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7fbf4c9d56b320106cd64fd024dadfa0be7cb4706725fc44a7d7ce952d820c1"
-dependencies = [
- "libc",
- "redox_syscall",
- "winapi",
 ]
 
 [[package]]
