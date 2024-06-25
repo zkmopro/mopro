@@ -1,4 +1,4 @@
 [workspace]
-members = ["mopro-core", "mopro-ffi", "mopro-cli", "ark-zkey"]
+members = ["mopro-ffi", "mopro-cli", "ark-zkey"]
 resolver = "2"
 exclude = ["mopro-example-app"]

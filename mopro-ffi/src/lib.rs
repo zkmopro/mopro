@@ -1,34 +1,66 @@
-#[cfg(all(feature = "halo2", feature = "circom"))]
-compile_error!(
-    "Cannot enable both `halo2` and `circom` features at the same time
-Please enable only one of them"
-);
-
+#[cfg(feature = "circom")]
 mod circom;
+#[cfg(feature = "halo2")]
 mod halo2;
 
-// We require that each adapter implements the same set of default functions
-// As well as allow an adapter to export its own unique functions as long as
-// There is as default (`dummy`) implementation for when the adapter is not enabled.
-#[cfg(feature = "circom")]
-use circom as adapter;
-
-use crate::halo2::{generate_halo2_proof, verify_halo2_proof};
-
 use std::collections::HashMap;
+use thiserror::Error;
 
-use mopro_core::MoproError;
+#[derive(Debug, Error)]
+pub enum MoproError {
+    #[error("CircomError: {0}")]
+    CircomError(String),
+    #[error("Halo2Error: {0}")]
+    Halo2Error(String),
+}
 
-// A set of unique functions that each adapter can implement, which we directly re-export.
-// The adapter must provide a default (`dummy`) implementation for when the adapter is not enabled.
+use circom::{generate_circom_proof, to_ethereum_inputs, to_ethereum_proof, verify_circom_proof};
 
-pub use circom::{arkworks_pippenger, metal_msm};
-pub use circom::{to_ethereum_inputs, to_ethereum_proof};
-pub use circom::{BenchmarkResult, MoproCircom, ProofCalldata, G1, G2};
+#[cfg(feature = "halo2")]
+use halo2::{generate_halo2_proof, verify_halo2_proof};
+
+#[cfg(not(feature = "halo2"))]
+pub fn generate_halo2_proof(
+    _: HashMap<String, Vec<String>>,
+) -> Result<GenerateProofResult, MoproError> {
+    Err(MoproError::Halo2Error(
+        "Project does not have Halo2 feature enabled".to_string(),
+    ))
+}
+
+#[cfg(not(feature = "halo2"))]
+pub fn verify_halo2_proof(_: Vec<u8>, _: Vec<u8>) -> Result<bool, MoproError> {
+    Err(MoproError::Halo2Error(
+        "Project does not have Halo2 feature enabled".to_string(),
+    ))
+}
+
+#[cfg(not(feature = "circom"))]
+pub fn generate_circom_proof(
+    _: String,
+    _: HashMap<String, Vec<String>>,
+) -> Result<GenerateProofResult, MoproError> {
+    Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
+}
+
+#[cfg(not(feature = "circom"))]
+pub fn verify_circom_proof(_: String, _: Vec<u8>, _: Vec<u8>) -> Result<bool, MoproError> {
+    Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
+}
+
+#[cfg(not(feature = "circom"))]
+pub fn to_ethereum_proof(_: Vec<u8>) -> ProofCalldata {
+    panic!("not built with circom");
+}
+
+#[cfg(not(feature = "circom"))]
+pub fn to_ethereum_inputs(_: Vec<u8>) -> Vec<String> {
+    panic!("not built with circom");
+}
 
 #[derive(Debug)]
 pub enum FFIError {
-    MoproError(mopro_core::MoproError),
+    MoproError(MoproError),
     SerializationError(String),
 }
 
@@ -44,32 +76,23 @@ impl From<MoproError> for FFIError {
     }
 }
 
-// Test functions (TODO - consider removing)
-
-fn add(a: u32, b: u32) -> u32 {
-    a + b
+#[derive(Debug, Clone, Default)]
+pub struct G1 {
+    pub x: String,
+    pub y: String,
 }
 
-fn hello() -> String {
-    "Hello World from Rust".to_string()
+#[derive(Debug, Clone, Default)]
+pub struct G2 {
+    pub x: Vec<String>,
+    pub y: Vec<String>,
 }
 
-// TODO: Remove me
-// UniFFI expects String type
-// See https://mozilla.github.io/uniffi-rs/udl/builtin_types.html
-// fn run_example(wasm_path: String, r1cs_path: String) -> Result<(), MoproError> {
-//     circom::run_example(wasm_path.as_str(), r1cs_path.as_str())
-// }
+#[derive(Debug, Clone, Default)]
+pub struct ProofCalldata {
+    pub a: G1,
+    pub b: G2,
+    pub c: G1,
+}
 
 uniffi::include_scaffolding!("mopro");
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn add_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
