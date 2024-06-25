@@ -20,11 +20,15 @@ pub fn verify_halo2_proof(proof: Vec<u8>, inputs: Vec<u8>) -> Result<bool, Mopro
     ))
 }
 
+#[cfg(feature = "halo2")]
+use halo2curves::bn256::Fr;
+#[cfg(feature = "halo2")]
+use mopro_core::middleware::halo2;
 /// Module that contains all the shared adapter functionality implemented for the Halo2 adapter.
 /// As the adapter is only used when the `halo2` feature is enabled,
 /// we make the compiler avoid the shared functions of module when the feature is not enabled.
-use mopro_core::middleware::halo2;
-use mopro_core::middleware::halo2::deserialize_circuit_inputs;
+#[cfg(feature = "halo2")]
+use mopro_core::middleware::halo2::{deserialize_circuit_inputs, SerializablePublicInputs};
 
 #[cfg(feature = "halo2")]
 pub fn generate_halo2_proof(
@@ -53,9 +57,6 @@ pub fn verify_halo2_proof(proof: Vec<u8>, public_inputs: Vec<u8>) -> Result<bool
     let is_valid = halo2::verify_halo2_proof(deserialized_proof, deserialized_inputs).unwrap();
     Ok(is_valid)
 }
-
-use halo2curves::bn256::Fr;
-use mopro_core::middleware::halo2::SerializablePublicInputs;
 
 #[cfg(feature = "halo2")]
 #[test]
