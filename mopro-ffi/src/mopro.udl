@@ -1,7 +1,4 @@
 namespace mopro {
-  u32 add(u32 a, u32 b);
-  string hello();
-
   [Throws=MoproError]
   GenerateProofResult generate_halo2_proof(record<string, sequence<string>> circuit_inputs);
 
@@ -9,13 +6,19 @@ namespace mopro {
   boolean verify_halo2_proof(bytes proof, bytes public_input);
 
   [Throws=MoproError]
-  BenchmarkResult arkworks_pippenger(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
+  GenerateProofResult generate_circom_proof(string zkey_path, record<string, sequence<string>> circuit_inputs);
+
+  [Throws=MoproError]
+  boolean verify_circom_proof(string zkey_path, bytes proof, bytes public_input);
+
+  // [Throws=MoproError]
+  // BenchmarkResult arkworks_pippenger(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
   
   // [Throws=MoproError]
   // BenchmarkResult trapdoortech_zprize_msm(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
 
-  [Throws=MoproError]
-  BenchmarkResult metal_msm(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
+  // [Throws=MoproError]
+  // BenchmarkResult metal_msm(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
 
   ProofCalldata to_ethereum_proof(bytes proof);
   sequence<string> to_ethereum_inputs(bytes inputs);
@@ -26,11 +29,11 @@ dictionary GenerateProofResult {
   bytes inputs;
 };
 
-dictionary BenchmarkResult {
-  u32 instance_size;
-  u32 num_instance;
-  double avg_processing_time;
-};
+// dictionary BenchmarkResult {
+//  u32 instance_size;
+//  u32 num_instance;
+//  double avg_processing_time;
+//};
 
 dictionary G1 {
   string x;
@@ -52,14 +55,4 @@ dictionary ProofCalldata {
 enum MoproError {
   "CircomError",
   "Halo2Error",
-};
-
-interface MoproCircom {
-  constructor();
-
-  [Throws=MoproError]
-  GenerateProofResult generate_proof(string zkey_path, record<string, sequence<string>> circuit_inputs);
-
-  [Throws=MoproError]
-  boolean verify_proof(string zkey_path, bytes proof, bytes public_input);
 };

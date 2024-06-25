@@ -15,32 +15,55 @@ path = "uniffi-bindgen.rs"
 
 [features]
 default = ["circom"]
-# default = ["gpu-benchmarks"]
-# default = ["calc-native-witness"]
 
 # If we enable them here, they should be enabled in mopro-core as well
-halo2 = ["mopro-core/halo2"]
-circom = ["mopro-core/default"]
-gpu-benchmarks = ["mopro-core/gpu-benchmarks", "circom"]
+halo2 = ["halo2_proofs"]
+circom = ["ark-circom", "ark-serialize", "num-bigint", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-zkey"]
+# gpu-benchmarks = ["mopro-core/gpu-benchmarks", "circom"]
 
 [dependencies]
-mopro-core = { path = "../mopro-core", default-features = false }
-
 rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
 uniffi = { version = "0.25", features = ["cli"] }
 serde = { version = "1", features = ["derive"] }
 bincode = "1"
-ark-serialize = { version = "=0.4.1", features = ["derive"] }
-num-bigint = { version = "=0.4.3", default-features = false, features = [
-    "rand",
-] }
 
 # Error handling
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 criterion = "=0.3.6"
 paste = "1.0.15"
+
+# halo2 stuff
 halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2" }
+halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", tag = "v2023_04_20", features = [
+    "dev-graph",
+], optional = true }
+
+instant = "0.1"
+
+# circom deps
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", branch = "wasm-delete", optional = true }
+ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
+num-bigint = { version = "=0.4.3", default-features = false, features = [
+    "rand",
+], optional = true }
+
+ruint = { version = "1.10.0", features = ["rand", "serde", "ark-ff-04"], optional = true }
+
+# ZKP generation
+ark-ec = { version = "=0.4.1", default-features = false, features = [
+    "parallel",
+], optional = true }
+ark-crypto-primitives = { version = "=0.4.0", optional = true }
+ark-std = { version = "=0.4.0", default-features = false, features = [
+    "parallel",
+], optional = true }
+ark-bn254 = { version = "=0.4.0", optional = true }
+ark-groth16 = { version = "=0.4.0", default-features = false, features = [
+    "parallel",
+], optional = true }
+ark-relations = { version = "0.4", default-features = false, optional = true }
+ark-zkey = { path = "../ark-zkey", optional = true }
 
 [build-dependencies]
 rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
@@ -52,3 +75,10 @@ uniffi = { version = "0.25", features = ["bindgen-tests"] }
 ark-bn254 = { version = "=0.4.0" }
 # Halo2 test dependency
 halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2" }
+
+rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
+color-eyre = "0.6"
+enumset = "1.0.8"
+toml = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "1.0"

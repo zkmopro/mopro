@@ -250,21 +250,14 @@ mod tests {
     #[test]
     fn test_multiplier2_serialization_deserialization() -> Result<()> {
         test_circuit_serialization_deserialization(
-            "../mopro-core/examples/circom/multiplier2/target/multiplier2_final.zkey",
+            "../mopro-ffi/test-vectors/circom/multiplier2_final.zkey",
         )
     }
 
     #[test]
     fn test_keccak256_serialization_deserialization() -> Result<()> {
         test_circuit_serialization_deserialization(
-            "../mopro-core/examples/circom/keccak256/target/keccak256_256_test_final.zkey",
-        )
-    }
-
-    #[test]
-    fn test_rsa_serialization_deserialization() -> Result<()> {
-        test_circuit_serialization_deserialization(
-            "../mopro-core/examples/circom/rsa/target/main_final.zkey",
+            "../mopro-ffi/test-vectors/circom/keccak256_256_test_final.zkey",
         )
     }
 }
