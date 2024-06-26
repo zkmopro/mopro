@@ -150,7 +150,8 @@ macro_rules! app {
             in0: String,
             in1: HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
-            if let Ok(witness_fn) = circuit_data(&in0.as_str()) {
+            let name = std::path::Path::new(in0.as_str()).file_stem().unwrap();
+            if let Ok(witness_fn) = circuit_data(&name.to_str().unwrap()) {
                 mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn)
             } else {
                 Err(MoproError::CircomError("Unknown ZKEY".to_string()))
