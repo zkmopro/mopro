@@ -10,19 +10,11 @@ use std::time::{Duration, Instant};
 // ref: https://github.com/ingonyama-zk/icicle/blob/de25b6e203df0ca70b71dcb77e19da156a8b9ff1/icicle/src/msm/msm.cu#L27C1-L36C6
 fn left_shift_points(points: &mut [Point], shift: u32) {
     points.par_iter_mut().for_each(|point| {
-        // TODO: this process might be slow, we might consider using a faster method (directly shifting on GAffine)
         let mut shifted_point = G::from(*point);
+        // 2^{shift} * P_i
         for _ in 0..shift {
             shifted_point = shifted_point.double();
         }
-
-        // let double_point = Point::from(shifted_point);
-        // // using single scalar multiplication
-        // let scalar = ScalarField::from(1u64 << shift);
-        // let mut shifted_point = G::from(*point);
-        // shifted_point *= scalar;
-        // let scalar_point = Point::from(shifted_point);
-        // assert_eq!(double_point, scalar_point);
         *point = Point::from(shifted_point);
     });
 }
@@ -34,22 +26,21 @@ pub fn precompute_msm_points(
     c: u32,                 // window_size
 ) -> Result<Vec<Point>, preprocess::HarnessError> {
     let points_size = points.len();
-    let total_nof_bms = (ScalarField::MODULUS_BIT_SIZE as u32 - 1) / c + 1;
-    let shift = c * ((total_nof_bms - 1) / precompute_factor + 1);
-
+    let shift = c;
     // generating an array composed of original and extended points (size: msm_size * precompute_factor)
     // pf = precompute_factor
     //  l = shift
     // [
     //                P_1,             P_2,  ...,             P_n,
-    //         2^l  * P_1,      2^l  * P_2,  ...,      2^l  * P_n,
-    //         2^2l * P_1,      2^2l * P_2,  ...,      2^2l * P_n,
+    //         2^c  * P_1,      2^c  * P_2,  ...,      2^c  * P_n,
+    //         2^2c * P_1,      2^2c * P_2,  ...,      2^2c * P_n,
     //                ...,             ...,                   ...,
-    //    2^(pf-1)l * P_1, 2^(pf-1)l * P_2,  ..., 2^(pf-1)l * P_n,
+    //    2^(w-1)c * P_1, 2^(w-1)l * P_2,  ..., 2^(w-1)l * P_n,
     // ]
     let mut output_points = Vec::with_capacity(points_size * precompute_factor as usize);
     output_points.extend_from_slice(points);
 
+    // now we compute all the points: 2^{1c}*P_i..2^{(w-1)c}*P_i
     for i in 1..precompute_factor {
         let mut shifted_points = points.to_vec();
         left_shift_points(&mut shifted_points, shift * i);
