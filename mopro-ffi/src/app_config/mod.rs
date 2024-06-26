@@ -11,6 +11,7 @@ pub fn mktemp() -> PathBuf {
 
 // Load environment variables that are specified by by xcode
 pub fn build() {
+    install_archs();
     let work_dir = mktemp();
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let build_dir = format!("{}/build", manifest_dir);
