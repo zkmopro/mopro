@@ -17,7 +17,7 @@ path = "src/uniffi-bindgen.rs"
 default = ["circom"]
 
 # If we enable them here, they should be enabled in mopro-core as well
-halo2 = ["halo2_proofs"]
+halo2 = ["halo2_proofs", "num-bigint"]
 circom = ["ark-circom", "ark-serialize", "num-bigint", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations"]
 # gpu-benchmarks = ["mopro-core/gpu-benchmarks", "circom"]
 
