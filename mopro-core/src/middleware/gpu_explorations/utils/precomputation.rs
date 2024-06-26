@@ -74,7 +74,10 @@ where
     println!("Precomputation Completed!");
     println!(
         "Precomputation time for {}x({} points) with precompute_factor={} is: {:?}",
-        num_instance, instance_size, precompute_factor, total_duration
+        num_instance,
+        1 << instance_size,
+        precompute_factor,
+        total_duration
     );
     Ok(())
 }
