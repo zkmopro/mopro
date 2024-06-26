@@ -65,6 +65,37 @@ impl FileInputIterator {
         }
         Ok(iter)
     }
+
+    pub fn open_precomputed_point(dir: &str) -> Result<Self, HarnessError> {
+        let points_path = format!("{}{}", dir, "/precomputed_points");
+        let scalars_path = format!("{}{}", dir, "/scalars");
+
+        // Try to read an instance, first in uncheck, then check serialization modes.
+        let mut iter = Self {
+            points_file: File::open(&points_path)?,
+            scalars_file: File::open(&scalars_path)?,
+            mode: FileInputIteratorMode::Unchecked,
+            cached: None,
+        };
+
+        // Read a first value and see if we get a result.
+        iter.cached = iter.next();
+        if iter.cached.is_some() {
+            return Ok(iter);
+        }
+
+        let mut iter = Self {
+            points_file: File::open(&points_path)?,
+            scalars_file: File::open(&scalars_path)?,
+            mode: FileInputIteratorMode::Checked,
+            cached: None,
+        };
+        iter.cached = iter.next();
+        if iter.cached.is_none() {
+            return Err(HarnessError::DeserializationError);
+        }
+        Ok(iter)
+    }
 }
 
 impl Iterator for FileInputIterator {
