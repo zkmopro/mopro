@@ -23,7 +23,7 @@ circom = ["ark-circom", "ark-serialize", "num-bigint", "ruint", "ark-ec", "ark-c
 
 [dependencies]
 rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
-uniffi = { version = "0.25", features = ["cli", "build"] }
+uniffi = { version = "=0.28.0", features = ["cli", "build"] }
 serde = { version = "1", features = ["derive"] }
 bincode = "1"
 
@@ -63,13 +63,14 @@ ark-groth16 = { version = "=0.4.0", default-features = false, features = [
     "parallel",
 ], optional = true }
 ark-relations = { version = "0.4", default-features = false, optional = true }
+uuid = { version = "1.9.1", features = ["v4"] }
 
 [build-dependencies]
 rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
-uniffi = { version = "0.25", features = ["build"] }
+uniffi = { version = "=0.28.0", features = ["build"] }
 
 [dev-dependencies]
-uniffi = { version = "0.25", features = ["bindgen-tests"] }
+uniffi = { version = "=0.28.0", features = ["bindgen-tests"] }
 # Circom test dependency
 ark-bn254 = { version = "=0.4.0" }
 # Halo2 test dependency

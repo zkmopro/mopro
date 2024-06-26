@@ -4,7 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
+name = "mopro_bindings"
 crate-type = ["lib", "cdylib", "staticlib"]
+
+[[bin]]
+name = "ios"
 
 [features]
 default = ["mopro-ffi/circom"]
@@ -22,4 +26,4 @@ rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
 uniffi = { version = "0.28.0", features = ["build"] }
 
 [dev-dependencies]
-uniffi = { version = "0.28", features = ["bindgen-tests"] }
+uniffi = { version = "0.28.0", features = ["bindgen-tests"] }
