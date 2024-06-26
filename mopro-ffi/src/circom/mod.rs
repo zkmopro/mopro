@@ -23,6 +23,8 @@ use num_bigint::BigInt;
 
 type GrothBn = Groth16<Bn254>;
 
+// build a proof for a zkey using witness_fn to build
+// the witness
 pub fn generate_circom_proof_wtns(
     zkey_path: String,
     inputs: HashMap<String, Vec<String>>,
@@ -148,6 +150,8 @@ mod tests {
     use ark_bn254::Fr;
     use num_bigint::BigInt;
 
+    // Only build the witness functions for tests, don't bundle them into
+    // the final library
     rust_witness::witness!(multiplier2);
     rust_witness::witness!(keccak256256test);
 
