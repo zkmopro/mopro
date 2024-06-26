@@ -13,7 +13,9 @@ pub fn mktemp() -> PathBuf {
 pub fn build() {
     install_archs();
     let work_dir = mktemp();
-    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+    let cwd = std::env::current_dir().unwrap();
+    let manifest_dir =
+        std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
     let build_dir = format!("{}/build", manifest_dir);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
     let framework_out = work_dir.join("MoproBindings.xcframework");
