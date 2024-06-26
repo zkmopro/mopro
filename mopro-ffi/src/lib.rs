@@ -7,6 +7,8 @@ pub mod halo2;
 use std::collections::HashMap;
 use thiserror::Error;
 
+pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint::BigInt>;
+
 #[derive(Debug, Error)]
 pub enum MoproError {
     #[error("CircomError: {0}")]
@@ -47,7 +49,7 @@ pub fn verify_halo2_proof(_: Vec<u8>, _: Vec<u8>) -> Result<bool, MoproError> {
 pub fn generate_circom_proof_wtns(
     in0: String,
     in1: HashMap<String, Vec<String>>,
-    in2: circom::WtnsFn,
+    in2: WtnsFn,
 ) -> Result<GenerateProofResult, MoproError> {
     circom::generate_circom_proof_wtns(in0, in1, in2)
 }

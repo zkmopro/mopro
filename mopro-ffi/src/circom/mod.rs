@@ -1,4 +1,4 @@
-use crate::{MoproError, ProofCalldata, G1, G2};
+use crate::{MoproError, ProofCalldata, WtnsFn, G1, G2};
 mod serialization;
 
 use serialization::{SerializableInputs, SerializableProof};
@@ -21,7 +21,6 @@ use color_eyre::Result;
 
 use num_bigint::BigInt;
 
-pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 type GrothBn = Groth16<Bn254>;
 
 pub fn generate_circom_proof_wtns(

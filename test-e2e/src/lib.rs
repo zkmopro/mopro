@@ -1,5 +1,4 @@
-use mopro_ffi::app;
-use mopro_ffi::circom::WtnsFn;
+use mopro_ffi::{app, WtnsFn};
 use std::path::Path;
 
 rust_witness::witness!(multiplier2);
