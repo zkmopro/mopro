@@ -22,11 +22,6 @@ pub fn build() {
     let framework_dest = Path::new(&manifest_dir).join("MoproBindings.xcframework");
 
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
-    if let Ok(platform_name) = std::env::var("PLATFORM_NAME") {
-        if platform_name != "iphoneos" {
-            panic!("non-iphoneos target");
-        }
-    }
     let arch;
     if let Ok(target_device) = std::env::var("PLATFORM_NAME") {
         arch = match target_device.as_str() {
