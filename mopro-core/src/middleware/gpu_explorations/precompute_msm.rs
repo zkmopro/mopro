@@ -84,21 +84,6 @@ fn precompute_msm<V: VariableBaseMSM>(
 
     let total_sums = window_sums.iter().sum();
     total_sums
-    // We store the sum for the lowest window.
-    // let lowest = *window_sums.first().unwrap();
-
-    // We're traversing windows from high to low.
-    // lowest
-    //     + &window_sums[1..]
-    //         .iter()
-    //         .rev()
-    //         .fold(zero, |mut total, sum_i| {
-    //             total += sum_i;
-    //             for _ in 0..c {
-    //                 total.double_in_place();
-    //             }
-    //             total
-    // })
 }
 
 pub fn benchmark_msm<I>(
