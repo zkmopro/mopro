@@ -20,4 +20,4 @@ template ComplexCircuit(NUM_VARIABLES, NUM_CONSTRAINTS) {
     c <== b[i];
 }
 
-component main = ComplexCircuit(1200000, 1200000);
+component main = ComplexCircuit(1000000, 1000000);
