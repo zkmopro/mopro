@@ -1,8 +1,8 @@
 pub mod app_config;
 #[cfg(feature = "circom")]
-pub mod circom;
+mod circom;
 #[cfg(feature = "halo2")]
-pub mod halo2;
+mod halo2;
 
 use std::collections::HashMap;
 use thiserror::Error;
@@ -130,6 +130,14 @@ pub struct ProofCalldata {
     pub c: G1,
 }
 
+// This macro should be used in dependent crates
+//
+// This macro handles getting relevant functions into
+// scope and calling uniffi
+//
+// There should be a user defined `circuit_data` function
+// that maps zkey file stub to a witness generation function
+// see test-e2e/src/lib.rs for an example
 #[macro_export]
 macro_rules! app {
     () => {
