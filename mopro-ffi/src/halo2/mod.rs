@@ -1,5 +1,3 @@
-#![allow(unused_variables)]
-
 use crate::{GenerateProofResult, MoproError};
 use std::collections::HashMap;
 

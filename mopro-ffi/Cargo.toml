@@ -16,7 +16,7 @@ path = "src/uniffi-bindgen.rs"
 [features]
 default = []
 
-halo2 = ["halo2_proofs", "halo2curves"]
+halo2 = ["halo2_proofs", "halo2curves", "serde"]
 circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations"]
 
 [dependencies]
@@ -29,6 +29,7 @@ color-eyre = "=0.6.2"
 paste = "1.0.15"
 
 # halo2 stuff
+serde = { version = "1", features = ["derive"], optional = true }
 halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2", optional = true }
 halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", tag = "v2023_04_20", features = [
     "dev-graph",
