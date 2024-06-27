@@ -26,7 +26,6 @@ uniffi = { version = "=0.28.0", features = ["cli", "build"] }
 # Error handling
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
-paste = "1.0.15"
 
 # halo2 stuff
 serde = { version = "1", features = ["derive"], optional = true }

@@ -1767,7 +1767,6 @@ dependencies = [
  "halo2_proofs",
  "halo2curves",
  "num-bigint",
- "paste",
  "rust-witness",
  "serde",
  "serde_derive",
@@ -2288,7 +2287,7 @@ dependencies = [
 [[package]]
 name = "rust-witness"
 version = "0.1.0"
-source = "git+https://github.com/vimwitch/rust-witness.git#805a387cd6e9deff579c482db295b3e1b0c4a08d"
+source = "git+https://github.com/vimwitch/rust-witness.git#a14afd8dddf055947f3226da7e7b8615b181b3f1"
 dependencies = [
  "cc",
  "fnv",
@@ -2650,7 +2649,6 @@ version = "0.1.0"
 dependencies = [
  "mopro-ffi",
  "num-bigint",
- "paste",
  "rust-witness",
  "uniffi",
 ]
