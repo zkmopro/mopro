@@ -139,7 +139,6 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
-    use std::path::Path;
     use std::str::FromStr;
 
     use crate::circom::{
