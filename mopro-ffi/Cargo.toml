@@ -22,7 +22,7 @@ circom = ["ark-circom", "ark-serialize", "ruint", "ark-ec", "ark-crypto-primitiv
 # gpu-benchmarks = ["mopro-core/gpu-benchmarks", "circom"]
 
 [dependencies]
-rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 uniffi = { version = "=0.28.0", features = ["cli", "build"] }
 serde = { version = "1", features = ["derive"] }
 bincode = "1"
@@ -66,7 +66,7 @@ ark-relations = { version = "0.4", default-features = false, optional = true }
 uuid = { version = "1.9.1", features = ["v4"] }
 
 [build-dependencies]
-rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 uniffi = { version = "=0.28.0", features = ["build"] }
 
 [dev-dependencies]
@@ -76,7 +76,7 @@ ark-bn254 = { version = "=0.4.0" }
 # Halo2 test dependency
 halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2" }
 
-rust-witness = { git = "https://github.com/zkmopro/rust-witness.git" }
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 color-eyre = "0.6"
 enumset = "1.0.8"
 toml = "0.8"
