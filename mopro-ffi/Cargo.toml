@@ -16,25 +16,20 @@ path = "src/uniffi-bindgen.rs"
 [features]
 default = []
 
-# If we enable them here, they should be enabled in mopro-core as well
-halo2 = ["halo2_proofs"]
+halo2 = ["halo2_proofs", "halo2curves"]
 circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations"]
-# gpu-benchmarks = ["mopro-core/gpu-benchmarks", "circom"]
 
 [dependencies]
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 uniffi = { version = "=0.28.0", features = ["cli", "build"] }
-serde = { version = "1", features = ["derive"] }
-bincode = "1"
 
 # Error handling
 thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
-criterion = "=0.3.6"
 paste = "1.0.15"
 
 # halo2 stuff
-halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2" }
+halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2", optional = true }
 halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", tag = "v2023_04_20", features = [
     "dev-graph",
 ], optional = true }
