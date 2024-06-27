@@ -18,7 +18,7 @@ default = []
 
 # If we enable them here, they should be enabled in mopro-core as well
 halo2 = ["halo2_proofs"]
-circom = ["ark-circom", "ark-serialize", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations"]
+circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations"]
 # gpu-benchmarks = ["mopro-core/gpu-benchmarks", "circom"]
 
 [dependencies]
@@ -39,16 +39,12 @@ halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", 
     "dev-graph",
 ], optional = true }
 
-instant = "0.1"
-
 # circom deps
 ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", branch = "wasm-delete", optional = true }
 ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
-
-ruint = { version = "1.10.0", features = ["rand", "serde", "ark-ff-04"], optional = true }
 
 # ZKP generation
 ark-ec = { version = "=0.4.1", default-features = false, features = [
@@ -78,7 +74,5 @@ halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curv
 
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 color-eyre = "0.6"
-enumset = "1.0.8"
-toml = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"
