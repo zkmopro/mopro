@@ -6,3 +6,5 @@ set -e
 # The resulting output should be committed to the repo
 
 cargo run --bin uniffi-bindgen generate src/mopro.udl --language swift --out-dir SwiftBindings
+
+cargo run --bin uniffi-bindgen generate src/mopro.udl --language kotlin --out-dir KotlinBindings
