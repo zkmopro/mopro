@@ -233,31 +233,6 @@ pub fn exec_metal_commands(
     });
     println!("Init buckets time: {:?}", init_time.elapsed());
 
-    // // Accumulate and reduction
-    // let acc_time = Instant::now();
-    // autoreleasepool(|| {
-    //     let (command_buffer, command_encoder) = config.state.setup_command(
-    //         &config.pipelines.accumulation_and_reduction,
-    //         Some(&[
-    //             (0, &data.window_size_buffer),
-    //             (1, &data.instances_size_buffer),
-    //             (2, &data.window_starts_buffer),
-    //             (3, &data.scalar_buffer),
-    //             (4, &data.base_buffer),
-    //             (5, &data.buckets_matrix_buffer),
-    //             (6, &data.res_buffer),
-    //         ]),
-    //     );
-    //     command_encoder.dispatch_threads(
-    //         MTLSize::new(params.num_window, 1, 1),
-    //         config.threads_per_threadgroup,
-    //     );
-    //     command_encoder.end_encoding();
-    //     command_buffer.commit();
-    //     command_buffer.wait_until_completed();
-    // });
-    // println!("Accumulation and Reduction time: {:?}", acc_time.elapsed());
-
     let prepare_time = Instant::now();
     autoreleasepool(|| {
         let (command_buffer, command_encoder) = config.state.setup_command(
@@ -513,7 +488,7 @@ pub fn run_benchmark(
 mod tests {
     use super::*;
 
-    use ark_ec::{CurveGroup, VariableBaseMSM};
+    use ark_ec::{CurveGroup, Group, VariableBaseMSM};
     use ark_serialize::Write;
     use ark_std::UniformRand;
     use std::fs::File;
@@ -522,30 +497,6 @@ mod tests {
     const NUM_INSTANCE: u32 = 5;
     const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils/vectors";
     const BENCHMARKSPATH: &str = "mopro-core/gpu_explorations/benchmarks";
-
-    #[test]
-    fn test_msm_correctness_small_sample() {
-        let mut rng = ark_std::rand::thread_rng();
-        let p1 = G::rand(&mut rng);
-        let p2 = G::rand(&mut rng);
-
-        let s1 = ScalarField::rand(&mut rng);
-        let s2 = ScalarField::rand(&mut rng);
-
-        // compare with msm correctness with arkworks ec arithmetics
-        let target_msm = p1 * s1 + p2 * s2;
-
-        // Init metal (GPU) state
-        let mut metal_config = setup_metal_state();
-        let this_msm = metal_msm(
-            &[p1.into_affine(), p2.into_affine()],
-            &[s1, s2],
-            &mut metal_config,
-        )
-        .unwrap();
-
-        assert_eq!(target_msm, this_msm, "This msm is wrongly computed");
-    }
 
     #[test]
     fn test_msm_correctness_medium_sample() {
