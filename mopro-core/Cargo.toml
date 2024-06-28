@@ -6,12 +6,26 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["wasmer/dylib"]
-dylib = []                  # NOTE: can probably remove this if we use env config instead
-gpu-benchmarks = ["ark-ff", "metal", "objc", "proptest", "lazy_static", "ark-ed-on-bn254", "parallel"]
-calc-native-witness = ["witness"] # experimental feature to calculate witness with witness graph
-build-native-witness = ["witness/build-witness"] # only enable build-native-witness feature when building the witness graph
-parallel = ["rayon", "ark-std/parallel"]
+default = ["circom-default"]
+
+## Halo2 features
+
+# Halo2 dependencies
+halo2 = ["halo2_proofs", "halo2-circuit"]
+
+## Circom features
+
+# Default features for circom
+circom-default = ["wasmer/dylib", "circom"]
+# Circom dependencies
+circom = ["ark-circom", "ark-serialize", "num-bigint", "wasmer", "ruint", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-zkey"]
+
+# Each additional feature must also reference the circom feature to make sure the dependencies are included
+dylib = ["circom"]                  # NOTE: can probably remove this if we use env config instead
+gpu-benchmarks = ["ark-ff", "metal", "objc", "proptest", "parallel", "circom"]
+calc-native-witness = ["witness", "circom"] # experimental feature to calculate witness with witness graph
+build-native-witness = ["witness/build-witness", "circom"] # only enable build-native-witness feature when building the witness graph
+parallel = ["rayon", "ark-std/parallel", "circom"]
 
 [dependencies]
 
@@ -72,8 +86,6 @@ ark-ff = { version = "=0.4.1", default-features = false, optional = true, featur
 metal = { version = "=0.28.0", optional = true }
 objc = { version = "=0.2.4", optional = true }
 proptest = { version = "1.4.0", optional = true }
-lazy_static = { version = "1.4.0", optional = true }
-ark-ed-on-bn254 = { version = "0.4.0", optional = true }
 
 [build-dependencies]
 color-eyre = "0.6"
