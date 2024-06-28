@@ -18,7 +18,7 @@ fn tmp_local(build_path: &Path) -> PathBuf {
             panic!("non-directory tmp");
         }
     } else {
-        fs::create_dir(&tmp_path).expect("Failed to create local tmpdir");
+        fs::create_dir_all(&tmp_path).expect("Failed to create local tmpdir");
     }
     tmp_path
 }
