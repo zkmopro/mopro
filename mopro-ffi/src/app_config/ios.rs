@@ -40,7 +40,17 @@ pub fn build() {
         "x86_64" => "x86_64-apple-ios",
         v => panic!("Unknown architecture for host system: {}", v),
     };
-    let target_archs = vec!["aarch64-apple-ios", sim_arch];
+    let mut target_archs = vec!["aarch64-apple-ios", sim_arch];
+    // accept EXTRA_ARCHS as a comma separated list
+    let extra_archs = std::env::var("EXTRA_ARCHS").unwrap_or("".to_string());
+    for v in extra_archs.split(",").collect::<Vec<_>>() {
+        if v.len() == 0 {
+            continue;
+        }
+        if !target_archs.contains(&v) {
+            target_archs.push(v);
+        }
+    }
     let out_lib_paths: Vec<PathBuf> = target_archs
         .iter()
         .map(|arch| {
