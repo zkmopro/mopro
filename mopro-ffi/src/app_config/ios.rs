@@ -19,6 +19,11 @@ pub fn build() {
     let framework_out = work_dir.join("MoproBindings.xcframework");
     let framework_dest = Path::new(&manifest_dir).join("MoproBindings.xcframework");
 
+    let target_archs = vec![
+        vec!["aarch64-apple-ios"],
+        vec!["aarch64-apple-ios-sim", "x86_64-apple-ios"],
+    ];
+
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
     let mode;
     if let Ok(configuration) = std::env::var("CONFIGURATION") {
@@ -33,51 +38,58 @@ pub fn build() {
         mode = "debug";
     }
 
-    // Build multiple architectures into a single xcframework
-    // this let's us use a single build command for all xcode targets
-    let sim_arch = match std::env::consts::ARCH {
-        "aarch64" => "aarch64-apple-ios-sim",
-        "x86_64" => "x86_64-apple-ios",
-        v => panic!("Unknown architecture for host system: {}", v),
-    };
-    let mut target_archs = vec!["aarch64-apple-ios", sim_arch];
-    // accept EXTRA_ARCHS as a comma separated list
-    let extra_archs = std::env::var("EXTRA_ARCHS").unwrap_or("".to_string());
-    for v in extra_archs.split(",").collect::<Vec<_>>() {
-        if v.len() == 0 {
-            continue;
+    // Take a list of architectures, build them, and combine them into
+    // a single universal binary/archive
+    let build_combined_archs = |archs: &Vec<&str>| -> PathBuf {
+        let out_lib_paths: Vec<PathBuf> = archs
+            .iter()
+            .map(|arch| {
+                Path::new(&build_dir).join(Path::new(&format!(
+                    "{}/{}/{}/libmopro_bindings.a",
+                    build_dir, arch, mode
+                )))
+            })
+            .collect();
+        for arch in archs {
+            install_arch(arch.to_string());
+            let mut build_cmd = Command::new("cargo");
+            build_cmd.arg("build");
+            if mode == "release" {
+                build_cmd.arg("--release");
+            }
+            build_cmd
+                .arg("--lib")
+                .env("CARGO_BUILD_TARGET_DIR", &build_dir)
+                .env("CARGO_BUILD_TARGET", arch)
+                .spawn()
+                .expect("Failed to spawn cargo build")
+                .wait()
+                .expect("cargo build errored");
         }
-        if !target_archs.contains(&v) {
-            target_archs.push(v);
+        // now lipo the libraries together
+        let mut lipo_cmd = Command::new("lipo");
+        let lib_out = mktemp().join("libmopro_bindings.a");
+        lipo_cmd
+            .arg("-create")
+            .arg("-output")
+            .arg(lib_out.to_str().unwrap());
+        for p in out_lib_paths {
+            lipo_cmd.arg(p.to_str().unwrap());
         }
-    }
-    let out_lib_paths: Vec<PathBuf> = target_archs
-        .iter()
-        .map(|arch| {
-            Path::new(&build_dir).join(Path::new(&format!(
-                "{}/{}/{}/libmopro_bindings.a",
-                build_dir, arch, mode
-            )))
-        })
-        .collect();
-    for arch in target_archs {
-        install_arch(arch.to_string());
-        let mut build_cmd = Command::new("cargo");
-        build_cmd.arg("build");
-        if mode == "release" {
-            build_cmd.arg("--release");
-        }
-        build_cmd
-            .arg("--lib")
-            .env("CARGO_BUILD_TARGET_DIR", &build_dir)
-            .env("CARGO_BUILD_TARGET", arch)
+        lipo_cmd
             .spawn()
-            .expect("Failed to spawn cargo build")
+            .expect("Failed to spawn lipo")
             .wait()
-            .expect("cargo build errored");
-    }
+            .expect("lipo command failed");
+
+        lib_out
+    };
 
     write_bindings_swift(&swift_bindings_dir);
+    let out_lib_paths: Vec<PathBuf> = target_archs
+        .iter()
+        .map(|v| build_combined_archs(v))
+        .collect();
 
     let mut xcbuild_cmd = Command::new("xcodebuild");
     xcbuild_cmd.arg("-create-xcframework");
