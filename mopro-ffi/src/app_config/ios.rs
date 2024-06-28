@@ -2,7 +2,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use super::{install_arch, mktemp};
+use super::{cleanup_tmp_local, install_arch, mktemp_local};
 
 pub const MOPRO_SWIFT: &str = include_str!("../../SwiftBindings/mopro.swift");
 pub const MOPRO_FFI_H: &str = include_str!("../../SwiftBindings/moproFFI.h");
@@ -10,11 +10,12 @@ pub const MOPRO_MODULEMAP: &str = include_str!("../../SwiftBindings/moproFFI.mod
 
 // Load environment variables that are specified by by xcode
 pub fn build() {
-    let work_dir = mktemp();
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
     let build_dir = format!("{}/build", manifest_dir);
+    let build_dir_path = Path::new(&build_dir);
+    let work_dir = mktemp_local(&build_dir_path);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
     let framework_out = work_dir.join("MoproBindings.xcframework");
     let framework_dest = Path::new(&manifest_dir).join("MoproBindings.xcframework");
@@ -68,7 +69,7 @@ pub fn build() {
         }
         // now lipo the libraries together
         let mut lipo_cmd = Command::new("lipo");
-        let lib_out = mktemp().join("libmopro_bindings.a");
+        let lib_out = mktemp_local(&build_dir_path).join("libmopro_bindings.a");
         lipo_cmd
             .arg("-create")
             .arg("-output")
@@ -114,6 +115,7 @@ pub fn build() {
         fs::remove_dir_all(&framework_dest).expect("Failed to remove framework directory");
     }
     fs::rename(&framework_out, &framework_dest).expect("Failed to move framework into place");
+    cleanup_tmp_local(&build_dir_path)
 }
 
 pub fn write_bindings_swift(out_dir: &Path) {

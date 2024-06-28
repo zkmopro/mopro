@@ -11,6 +11,28 @@ pub fn mktemp() -> PathBuf {
     dir
 }
 
+fn tmp_local(build_path: &Path) -> PathBuf {
+    let tmp_path = build_path.join("tmp");
+    if let Ok(metadata) = fs::metadata(&tmp_path) {
+        if !metadata.is_dir() {
+            panic!("non-directory tmp");
+        }
+    } else {
+        fs::create_dir(&tmp_path).expect("Failed to create local tmpdir");
+    }
+    tmp_path
+}
+
+pub fn mktemp_local(build_path: &Path) -> PathBuf {
+    let dir = tmp_local(build_path).join(&Uuid::new_v4().to_string());
+    fs::create_dir(&dir).expect("Failed to create tmpdir");
+    dir
+}
+
+pub fn cleanup_tmp_local(build_path: &Path) {
+    fs::remove_dir_all(tmp_local(build_path)).expect("Failed to remove tmpdir");
+}
+
 pub const UDL: &str = include_str!("../mopro.udl");
 
 pub fn install_arch(arch: String) {
