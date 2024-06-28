@@ -1,5 +1,4 @@
-use ark_bn254::{Fq, Fr as ScalarField};
-// use ark_ed_on_bn254::EdwardsAffine;
+use ark_bls12_377::{Fq, Fr as ScalarField};
 use ark_ff::{prelude::*, MontFp};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_std::{vec::Vec, One};
@@ -9,9 +8,8 @@ use lazy_static::*;
 use rayon::prelude::*;
 
 lazy_static! {
-    // ref: https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/bn254.go
-    pub static ref MONT_ALPHA: Fq = MontFp!("21575463638280843010398324269430826099269044274347216827212613867836435027261");
-    pub static ref MONT_BETA: Fq = MontFp!("2821565182194536844548159561693502659359617185244120367078079554186484126554");
+    pub static ref MONT_ALPHA: Fq = MontFp!("80949648264912719408558363140637477264845294720710499478137287262712535938301461879813459410946");
+    pub static ref MONT_BETA: Fq = MontFp!("207913745465435703873309001080708636764682407053260289242004673792544811711776497012639468972230205966814119707502");
 
     // These two coefficients are unused
     pub static ref ED_COEFF_A: Fq = MontFp!("157163064917902313978814213261261898218646390773518349738660969080500653509624033038447657619791437448628296189665");
@@ -41,24 +39,6 @@ impl Default for EdwardsAffine {
     }
 }
 
-// impl ToBytes for EdwardsAffine {
-//     #[inline]
-//     fn write<W: Write>(&self, mut writer: W) -> ark_std::io::Result<()> {
-//         self.x.write(&mut writer)?;
-//         self.y.write(&mut writer)
-//     }
-// }
-
-// impl FromBytes for EdwardsAffine {
-//     #[inline]
-//     fn read<R: Read>(mut reader: R) -> ark_std::io::Result<Self> {
-//         let x = Fq::read(&mut reader)?;
-//         let y = Fq::read(&mut reader)?;
-
-//         Ok(Self { x, y })
-//     }
-// }
-
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(C)]
 pub struct EdwardsProjective {
@@ -86,26 +66,6 @@ impl Default for ExEdwardsAffine {
     }
 }
 
-// impl ToBytes for ExEdwardsAffine {
-//     #[inline]
-//     fn write<W: Write>(&self, mut writer: W) -> ark_std::io::Result<()> {
-//         self.x.write(&mut writer)?;
-//         self.y.write(&mut writer)?;
-//         self.t.write(&mut writer)
-//     }
-// }
-
-// impl FromBytes for ExEdwardsAffine {
-//     #[inline]
-//     fn read<R: Read>(mut reader: R) -> ark_std::io::Result<Self> {
-//         let x = Fq::read(&mut reader)?;
-//         let y = Fq::read(&mut reader)?;
-//         let t = Fq::read(&mut reader)?;
-
-//         Ok(Self { x, y, t })
-//     }
-// }
-
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(C)]
 pub struct ExEdwardsProjective {
@@ -131,10 +91,10 @@ fn get_alpha_beta() -> (Fq, Fq) {
     (*MONT_ALPHA, *MONT_BETA)
 }
 
-// #[inline]
-// fn get_a_d() -> (Fq, Fq) {
-//     (*ED_COEFF_A, *ED_COEFF_D)
-// }
+#[inline]
+fn get_a_d() -> (Fq, Fq) {
+    (*ED_COEFF_A, *ED_COEFF_D)
+}
 
 #[inline]
 fn get_dd_k() -> (Fq, Fq) {
