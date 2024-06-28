@@ -52,12 +52,15 @@ pub fn build() {
         .collect();
     for arch in target_archs {
         install_arch(arch.to_string());
-        Command::new("cargo")
-            .arg("build")
+        let mut build_cmd = Command::new("cargo");
+        build_cmd.arg("build");
+        if mode == "release" {
+            build_cmd.arg("--release");
+        }
+        build_cmd
             .arg("--lib")
             .env("CARGO_BUILD_TARGET_DIR", &build_dir)
             .env("CARGO_BUILD_TARGET", arch)
-            .env("CARGO_BUILD_MODE", mode)
             .spawn()
             .expect("Failed to spawn cargo build")
             .wait()
