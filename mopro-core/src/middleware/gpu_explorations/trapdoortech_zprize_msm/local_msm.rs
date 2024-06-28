@@ -1,33 +1,28 @@
-use ark_bls12_377_3 as bls377;
-use ark_bls12_377_3::Fq;
-use ark_ff_3::prelude::*;
-use ark_ff_3::FromBytes;
-use ark_ff_3::ToBytes;
-use ark_serialize_3::Read;
-use ark_serialize_3::Write;
-use ark_std_3::vec::Vec;
-use ark_std_3::One;
+use ark_bls12_377::{Fq, Fr as ScalarField};
+use ark_ff::{prelude::*, MontFp};
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
+use ark_std::{vec::Vec, One};
 use lazy_static::*;
-use std::str::FromStr;
 
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
 
-lazy_static! {
-    pub static ref MONT_ALPHA: Fq = Fq::from_str("80949648264912719408558363140637477264845294720710499478137287262712535938301461879813459410946").unwrap();
-    pub static ref MONT_BETA: Fq = Fq::from_str("207913745465435703873309001080708636764682407053260289242004673792544811711776497012639468972230205966814119707502").unwrap();
+pub const MONT_ALPHA: Fq = MontFp!("80949648264912719408558363140637477264845294720710499478137287262712535938301461879813459410946");
+pub const MONT_BETA: Fq = MontFp!("207913745465435703873309001080708636764682407053260289242004673792544811711776497012639468972230205966814119707502");
 
-    pub static ref ED_COEFF_A: Fq = Fq::from_str("157163064917902313978814213261261898218646390773518349738660969080500653509624033038447657619791437448628296189665").unwrap();
-    pub static ref ED_COEFF_D: Fq = Fq::from_str("101501361095066780517536410023107951769097300825221174390295061910482811707540513312796446149590693954692781734188").unwrap();
+// These two coefficients are unused
+pub const ED_COEFF_A: Fq = MontFp!("157163064917902313978814213261261898218646390773518349738660969080500653509624033038447657619791437448628296189665");
+pub const ED_COEFF_D: Fq = MontFp!("101501361095066780517536410023107951769097300825221174390295061910482811707540513312796446149590693954692781734188");
 
-    pub static ref ED_COEFF_DD: Fq = Fq::from_str("136396142414293534522166394536258004439411625840037520960350109084686791562955032044926524798337324377515360555012").unwrap();
-    pub static ref ED_COEFF_K: Fq = Fq::from_str("14127858815617975033680055377622475342429738925160381380815955502653114777569241314884161457101288630590399651847").unwrap();
+// TODO: change ED_COEFF_DD, ED_COEFF_K params from BLS12-377 to BN254
+pub const ED_COEFF_DD: Fq = MontFp!("136396142414293534522166394536258004439411625840037520960350109084686791562955032044926524798337324377515360555012");
+pub const ED_COEFF_K: Fq = MontFp!("14127858815617975033680055377622475342429738925160381380815955502653114777569241314884161457101288630590399651847");
 
-    pub static ref ED_COEFF_SQRT_NEG_A: Fq = Fq::from_str("237258690121739794091542072758217926613126300728951001700615245829450947395696022962309165363059235018940120114447").unwrap();
-    pub static ref ED_COEFF_SQRT_NEG_A_INV: Fq = Fq::from_str("85493388116597753391764605746615521878764370024930535315959456146985744891605502660739892967955718798310698221510").unwrap();
-}
+// TODO: change ED_COEFF_SQRT_NEG_A, ED_COEFF_SQRT_NEG_A_INV params from BLS12-377 to BN254
+pub const ED_COEFF_SQRT_NEG_A: Fq = MontFp!("237258690121739794091542072758217926613126300728951001700615245829450947395696022962309165363059235018940120114447");
+pub const ED_COEFF_SQRT_NEG_A_INV: Fq = MontFp!("85493388116597753391764605746615521878764370024930535315959456146985744891605502660739892967955718798310698221510");
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, CanonicalSerialize, CanonicalDeserialize)]
 #[repr(C)]
 pub struct EdwardsAffine {
     pub x: Fq,
@@ -42,24 +37,6 @@ impl Default for EdwardsAffine {
     }
 }
 
-impl ToBytes for EdwardsAffine {
-    #[inline]
-    fn write<W: Write>(&self, mut writer: W) -> ark_std::io::Result<()> {
-        self.x.write(&mut writer)?;
-        self.y.write(&mut writer)
-    }
-}
-
-impl FromBytes for EdwardsAffine {
-    #[inline]
-    fn read<R: Read>(mut reader: R) -> ark_std::io::Result<Self> {
-        let x = Fq::read(&mut reader)?;
-        let y = Fq::read(&mut reader)?;
-
-        Ok(Self { x, y })
-    }
-}
-
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(C)]
 pub struct EdwardsProjective {
@@ -69,7 +46,7 @@ pub struct EdwardsProjective {
 }
 
 /// for Edwards curves
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, CanonicalSerialize, CanonicalDeserialize)]
 #[repr(C)]
 pub struct ExEdwardsAffine {
     pub x: Fq,
@@ -84,26 +61,6 @@ impl Default for ExEdwardsAffine {
             y: Fq::one(),
             t: Fq::zero(),
         }
-    }
-}
-
-impl ToBytes for ExEdwardsAffine {
-    #[inline]
-    fn write<W: Write>(&self, mut writer: W) -> ark_std::io::Result<()> {
-        self.x.write(&mut writer)?;
-        self.y.write(&mut writer)?;
-        self.t.write(&mut writer)
-    }
-}
-
-impl FromBytes for ExEdwardsAffine {
-    #[inline]
-    fn read<R: Read>(mut reader: R) -> ark_std::io::Result<Self> {
-        let x = Fq::read(&mut reader)?;
-        let y = Fq::read(&mut reader)?;
-        let t = Fq::read(&mut reader)?;
-
-        Ok(Self { x, y, t })
     }
 }
 
@@ -424,7 +381,7 @@ fn ln_without_floats(a: usize) -> usize {
 
 pub fn multi_scalar_mul(
     bases: &[ExEdwardsAffine],
-    scalars: &[<bls377::Fr as PrimeField>::BigInt],
+    scalars: &[<ScalarField as PrimeField>::BigInt],
 ) -> ExEdwardsProjective {
     let size = ark_std::cmp::min(bases.len(), scalars.len());
     let scalars = &scalars[..size];
@@ -440,7 +397,7 @@ pub fn multi_scalar_mul(
 
     let num_bits: usize = 253;
 
-    let fr_one = bls377::Fr::one().into_repr(); //<bls377::Fr as PrimeField>::BigInt
+    let fr_one = ScalarField::one().into_bigint();
     let zero: ExEdwardsProjective = ExEdwardsProjective::zero();
     let window_starts: Vec<_> = (0..num_bits).step_by(c).collect();
 
