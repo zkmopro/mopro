@@ -58,7 +58,7 @@ uniffi = { version = "0.28", features = ["build"] }
 
 Now you should copy your wasm and zkey files somewhere in the project folder. For this tutorial we'll assume you placed them in `test-vectors/circom`.
 
-Now we need to add 3 rust files. First we'll add `build.rs` in the main project folder. This file should contain the following:
+Now we need to add 4 rust files. First we'll add `build.rs` in the main project folder. This file should contain the following:
 
 ```rust
 fn main() {
@@ -119,4 +119,15 @@ fn main() {
 }
 ```
 
-Now you're ready to build your static library! To build for iOS you should be able to run the following command: `cargo run --bin ios`. By default this will build an xcframework compatible with simulators and devices.
+and another at `src/bin/android.rs`:
+
+```rust
+fn main() {
+    // A simple wrapper around a build command provided by mopro.
+    // In the future this will likely be published in the mopro crate itself.
+    mopro_ffi::app_config::android::build();
+}
+```
+
+Now you're ready to build your static library! You should be able to run either `cargo run --bin ios` or `cargo run --bin android` to build the corresponding static library.
+
