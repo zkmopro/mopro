@@ -1,0 +1,82 @@
+p {
+  color: #D6D2B9;
+}
+
+.mainContainer {
+  padding: 5% 18% 0%;
+  background-color: #000;
+}
+
+.introContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+ }
+
+.heading {
+  font-size: 5.5rem;
+  line-height: 5.6rem;
+  font-weight: 600;
+  width: 55%;
+  order: 1
+}
+
+.firstP {
+  font-size: 1.125rem;
+  font-weight: 500;
+  width: 35%;
+  align-self: center;
+  order: 2;
+}
+
+.secondP {
+  font-size: 1.125rem;
+  font-weight: 500;
+  width: 40%;
+  align-self: center;
+  order: 3;
+}
+
+.phoneImg {
+  width: 50%;
+  order: 4;
+}
+
+.separator {
+  display: flex;
+  justify-content: center;
+  padding: 15% 0;
+}
+
+@media screen and (max-width: 996px) {
+  .mainContainer {
+    padding: 10% 10% 0%;
+  }
+
+  .introContainer {
+    gap: 2rem;
+  }
+
+  .heading {
+    font-size: 3.5rem;
+    line-height: 3.6rem;
+    font-weight: 500;
+    width: 100%;
+  }
+
+  .firstP {
+    width: 100%;
+  }
+
+  .secondP {
+    order: 4;
+    width: 100%;
+  }
+
+  .phoneImg {
+    order: 3;
+    width: 100%;
+    justify-self: center;
+  }
+}
+

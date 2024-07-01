@@ -1,0 +1,150 @@
+/* You can override the default Infima variables here. */
+
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+
+:root {
+  --ifm-font-family-base: 'Lexend';
+  --ifm-color-primary: #000000;
+  --ifm-color-primary-dark: #000000;
+  --ifm-color-primary-darker: #000000;
+  --ifm-color-primary-darkest: #000;
+  --ifm-color-primary-light: #000;
+  --ifm-color-primary-lighter: #000;
+  --ifm-color-primary-lightest: #000;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: white;
+  --ifm-color-primary-dark: white;
+  --ifm-color-primary-darker: #000;
+  --ifm-color-primary-darkest: #000;
+  --ifm-color-primary-light: #000;
+  --ifm-color-primary-lighter: #000;
+  --ifm-color-primary-lightest: #000;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+img {
+  border-radius: .5rem;
+}
+
+a {
+  /* color: #D6D2B9; */
+  color: #FFB546;
+  /* color: white; */
+}
+
+a:hover {
+  /* color: #FFB546; */
+  color: white;
+  /* color: #D6D2B9; */
+  text-decoration: none;
+}
+
+a:active {
+  color: #FFB546;
+}
+
+.navbar {
+  height: fit-content;
+  background-color: #000;
+}
+
+.navbar__logo {
+  height: fit-content;
+  padding-left: 1.25rem;
+  padding-top: 1.25rem;
+}
+
+.navbar__item {
+  font-size: 1rem;
+  padding-right: 2rem;
+}
+
+.custom-navbar-link {
+  display: flex;
+  font-weight: 500;
+}
+
+.menu__link {
+  /* color: #FFB546; */
+  /* color: white; */
+  color: #D6D2B9;
+}
+
+.menu__link:active, .menu__link:hover {
+  color: #FFB546;
+}
+
+.table-of-contents__link {
+  color: #D6D2B9;
+}
+
+.table-of-contents__link:hover {
+  color: #FFB546;
+}
+
+.blogSidebar {
+  color: #D6D2B9;
+}
+
+.pagination-nav__label {
+  color: #FFB546;
+}
+
+.footer {
+  background-color: #000;
+}
+
+.footer__links {
+  padding: 3% 25% 3% 25%;
+}
+
+.footer__col {
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+  text-align: left;
+  padding-left: 15%;
+}
+
+.footer__title {
+  text-decoration: underline;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.footer__item {
+  font-size: 1.25rem;
+  font-weight: 200;
+}
+
+.custom-footer-link {
+  display: flex;
+  font-size: 1.25rem;
+  font-weight: 200;
+}
+
+.footer__bottom {
+  font-size: 1rem;
+  font-weight: 200;
+}
+
+@media screen and (max-width: 996px) {
+  .navbar__logo img {
+    height: 70px;
+    width: 220px
+  }
+
+  .menu__link {
+    color: white;
+    padding-left: 1rem;
+  }
+
+  .custom-navbar-link {
+    padding-left: 1rem;
+  }
+}
