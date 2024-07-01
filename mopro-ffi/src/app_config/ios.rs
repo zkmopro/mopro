@@ -17,8 +17,10 @@ pub fn build() {
     let build_dir_path = Path::new(&build_dir);
     let work_dir = mktemp_local(&build_dir_path);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
-    let framework_out = work_dir.join("MoproBindings.xcframework");
-    let framework_dest = Path::new(&manifest_dir).join("MoproBindings.xcframework");
+    let bindings_out = work_dir.join("MoproiOSBindings");
+    fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
+    let bindings_dest = Path::new(&manifest_dir).join("MoproiOSBindings");
+    let framework_out = bindings_out.join("MoproBindings.xcframework");
 
     let target_archs = vec![
         vec!["aarch64-apple-ios"],
@@ -87,6 +89,11 @@ pub fn build() {
     };
 
     write_bindings_swift(&swift_bindings_dir);
+    fs::rename(
+        &swift_bindings_dir.join("mopro.swift"),
+        &bindings_out.join("mopro.swift"),
+    )
+    .expect("Failed to move mopro.swift into place");
     let out_lib_paths: Vec<PathBuf> = target_archs
         .iter()
         .map(|v| build_combined_archs(v))
@@ -108,13 +115,14 @@ pub fn build() {
         .unwrap()
         .wait()
         .unwrap();
-    if let Ok(info) = fs::metadata(&framework_dest) {
+    if let Ok(info) = fs::metadata(&bindings_dest) {
         if !info.is_dir() {
             panic!("framework directory exists and is not a directory");
         }
-        fs::remove_dir_all(&framework_dest).expect("Failed to remove framework directory");
+        fs::remove_dir_all(&bindings_dest).expect("Failed to remove framework directory");
     }
-    fs::rename(&framework_out, &framework_dest).expect("Failed to move framework into place");
+    fs::rename(&bindings_out, &bindings_dest).expect("Failed to move framework into place");
+    // Copy the mopro.swift file to the output directory
     cleanup_tmp_local(&build_dir_path)
 }
 
