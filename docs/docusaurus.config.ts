@@ -23,12 +23,12 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           editUrl:
-            'https://github.com/zkmopro/mopro/tree/main/mopro-web',
+            'https://github.com/zkmopro/mopro/tree/main/docs',
         },
         blog: {
           showReadingTime: true,
           editUrl:
-            'https://github.com/zkmopro/mopro/tree/main/mopro-web',
+            'https://github.com/zkmopro/mopro/tree/main/docs',
         },
         theme: {
           customCss: './src/css/custom.css',
