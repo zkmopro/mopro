@@ -17,7 +17,7 @@ Then, run the following commands:
 1. Clone the mopro repo
 
 ```sh
-git clone https://github.com/zkmopro/mopro.git
+git clone --branch v0.0.1 https://github.com/zkmopro/mopro.git
 ```
 
 2. Go to your newly cloned checkout

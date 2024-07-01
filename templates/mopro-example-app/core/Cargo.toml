@@ -13,7 +13,7 @@ num-bigint = { version = "=0.4.3", default-features = false, features = [
 ark-bn254 = { version = "=0.4.0" }
 
 # FIXME: This doesn't work due to custom build command in mopro-core
-mopro-core = { git = "https://github.com/zkmopro/mopro.git", package = "mopro-core" }
+mopro-core = { git = "https://github.com/zkmopro/mopro.git", tag = "v0.0.1", package = "mopro-core" }
 
 # NOTE: This works, set it to MOPRO_ROOT/mopro-core
 #mopro-core = { path = "../mopro-core", package = "mopro-core" }
