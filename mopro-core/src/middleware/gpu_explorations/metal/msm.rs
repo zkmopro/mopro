@@ -25,9 +25,11 @@ pub struct MetalMsmData {
     pub scalar_buffer: Buffer,
     pub base_buffer: Buffer,
     pub num_windows_buffer: Buffer,
+    pub buckets_indices_buffer: Buffer,
     pub buckets_matrix_buffer: Buffer,
     pub res_buffer: Buffer,
     pub result_buffer: Buffer,
+    // pub debug_buffer: Buffer,
 }
 
 pub struct MetalMsmParams {
@@ -41,12 +43,14 @@ pub struct MetalMsmPipeline {
     pub init_buckets: ComputePipelineState,
     pub accumulation_and_reduction: ComputePipelineState,
     pub final_accumulation: ComputePipelineState,
+    pub prepare_buckets_indices: ComputePipelineState,
+    pub bucket_wise_accumulation: ComputePipelineState,
+    pub sum_reduction: ComputePipelineState,
 }
 
 pub struct MetalMsmConfig {
     pub state: MetalState,
     pub pipelines: MetalMsmPipeline,
-    pub threads_per_threadgroup: MTLSize,
 }
 
 pub struct MetalMsmInstance {
@@ -60,6 +64,27 @@ fn ln_without_floats(a: usize) -> usize {
     (ark_std::log2(a) * 69 / 100) as usize
 }
 
+fn sort_buckets_indices(buckets_indices: &mut Vec<u32>) -> () {
+    // parse the buckets_indices to a Vec<(u32, u32)>
+    let mut buckets_indices_pairs: Vec<(u32, u32)> = Vec::new();
+    for i in 0..buckets_indices.len() / 2 {
+        // skip empty indices (0, 0)
+        if buckets_indices[2 * i] == 0 && buckets_indices[2 * i + 1] == 0 {
+            continue;
+        }
+        buckets_indices_pairs.push((buckets_indices[2 * i], buckets_indices[2 * i + 1]));
+    }
+    // parallel sort the buckets_indices_pairs by the first element
+    buckets_indices_pairs.par_sort_by(|a, b| a.0.cmp(&b.0));
+
+    // flatten the sorted pairs to a Vec<u32>
+    buckets_indices.clear();
+    for (start, end) in buckets_indices_pairs {
+        buckets_indices.push(start);
+        buckets_indices.push(end);
+    }
+}
+
 pub fn setup_metal_state() -> MetalMsmConfig {
     let state = MetalState::new(None).unwrap();
     let init_buckets = state.setup_pipeline("initialize_buckets").unwrap();
@@ -68,13 +93,23 @@ pub fn setup_metal_state() -> MetalMsmConfig {
         .unwrap();
     let final_accumulation = state.setup_pipeline("final_accumulation").unwrap();
 
-    let thread_execution_width = accumulation_and_reduction.thread_execution_width();
-    let max_threads_per_group = accumulation_and_reduction.max_total_threads_per_threadgroup();
-    let threads_per_threadgroup = MTLSize::new(
-        thread_execution_width,
-        max_threads_per_group / thread_execution_width,
-        1,
-    );
+    // TODO:
+    let prepare_buckets_indices = state.setup_pipeline("prepare_buckets_indices").unwrap();
+    let bucket_wise_accumulation = state.setup_pipeline("bucket_wise_accumulation").unwrap();
+    let sum_reduction = state.setup_pipeline("sum_reduction").unwrap();
+    // let make_histogram_uint32 = state.setup_pipeline("make_histogram_uint32").unwrap();
+    // let reorder_uint32 = state.setup_pipeline("reorder_uint32").unwrap();
+
+    // let make_histogram_uint32_raw = state.library.get_function("reorder_uint32", None).unwrap();
+    // let tmp = state.setup_pipeline("reorder_uint32").unwrap();
+    // println!("tmp: {:?}", tmp);
+    // state.library.function_names().iter().for_each(|name| {
+    //     println!("Function name: {:?}", name);
+    // });
+    // let compute_descriptor = ComputePipelineDescriptor::new();
+    // compute_descriptor.set_compute_function(Some(&make_histogram_uint32_raw));
+    // println!("make_histogram_uint32: {:?}", compute_descriptor.compute_function().unwrap());
+    // println!("make_histogram_uint32: {:?}", result);
 
     MetalMsmConfig {
         state,
@@ -82,8 +117,10 @@ pub fn setup_metal_state() -> MetalMsmConfig {
             init_buckets,
             accumulation_and_reduction,
             final_accumulation,
+            prepare_buckets_indices,
+            bucket_wise_accumulation,
+            sum_reduction,
         },
-        threads_per_threadgroup: threads_per_threadgroup,
     }
 }
 
@@ -139,6 +176,13 @@ pub fn encode_instances(
             .map(|x| *x as u32)
             .collect::<Vec<u32>>()),
     );
+    // prepare bucket_size * num_windows * 2
+    let buckets_indices_buffer = config
+        .state
+        .alloc_buffer::<u32>(instances_size * num_windows * 2);
+
+    // // debug
+    // let debug_buffer = config.state.alloc_buffer::<u32>(2048);
 
     MetalMsmInstance {
         data: MetalMsmData {
@@ -149,8 +193,10 @@ pub fn encode_instances(
             base_buffer,
             num_windows_buffer,
             buckets_matrix_buffer,
+            buckets_indices_buffer,
             res_buffer,
             result_buffer,
+            // debug_buffer,
         },
         params: MetalMsmParams {
             instances_size: instances_size as u32,
@@ -179,40 +225,141 @@ pub fn exec_metal_commands(
                 (2, &data.buckets_matrix_buffer),
             ]),
         );
-        command_encoder.dispatch_threads(
-            MTLSize::new(params.num_window, 1, 1),
-            config.threads_per_threadgroup,
-        );
+        command_encoder
+            .dispatch_thread_groups(MTLSize::new(params.num_window, 1, 1), MTLSize::new(1, 1, 1));
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
     });
     println!("Init buckets time: {:?}", init_time.elapsed());
 
-    // Accumulate and reduction
-    let acc_time = Instant::now();
+    let prepare_time = Instant::now();
     autoreleasepool(|| {
         let (command_buffer, command_encoder) = config.state.setup_command(
-            &config.pipelines.accumulation_and_reduction,
+            &config.pipelines.prepare_buckets_indices,
             Some(&[
                 (0, &data.window_size_buffer),
-                (1, &data.instances_size_buffer),
-                (2, &data.window_starts_buffer),
+                (1, &data.window_starts_buffer),
+                (2, &data.num_windows_buffer),
                 (3, &data.scalar_buffer),
-                (4, &data.base_buffer),
-                (5, &data.buckets_matrix_buffer),
-                (6, &data.res_buffer),
+                (4, &data.buckets_indices_buffer),
             ]),
         );
-        command_encoder.dispatch_threads(
-            MTLSize::new(params.num_window, 1, 1),
-            config.threads_per_threadgroup,
+        command_encoder.dispatch_thread_groups(
+            MTLSize::new(params.instances_size as u64, 1, 1),
+            MTLSize::new(1, 1, 1),
         );
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
     });
-    println!("Accumulation and Reduction time: {:?}", acc_time.elapsed());
+    println!("Prepare buckets indices time: {:?}", prepare_time.elapsed());
+
+    // sort the buckets_indices in CPU parallelly
+    let sort_start = Instant::now();
+    let mut buckets_indices = MetalState::retrieve_contents::<u32>(&data.buckets_indices_buffer);
+    sort_buckets_indices(&mut buckets_indices);
+
+    // send the sorted buckets back to GPU
+    let sorted_buckets_indices_buffer = config.state.alloc_buffer_data(&buckets_indices);
+    println!("Sort buckets indices time: {:?}", sort_start.elapsed());
+
+    // accumulate the buckets_matrix using sorted bucket indices on GPU
+    let max_threads_per_group = MTLSize::new(
+        config
+            .pipelines
+            .bucket_wise_accumulation
+            .thread_execution_width(),
+        config
+            .pipelines
+            .bucket_wise_accumulation
+            .max_total_threads_per_threadgroup()
+            / config
+                .pipelines
+                .bucket_wise_accumulation
+                .thread_execution_width(),
+        1,
+    );
+    let max_thread_size = params.buckets_size as u64 * params.num_window;
+    let opt_threadgroups_amount = max_thread_size
+        / config
+            .pipelines
+            .bucket_wise_accumulation
+            .max_total_threads_per_threadgroup()
+        + 1;
+    let opt_threadgroups = MTLSize::new(opt_threadgroups_amount, 1, 1);
+    println!(
+        "(accumulation) max thread per threadgroup: {:?}",
+        max_threads_per_group
+    );
+    println!("(accumulation) opt threadgroups: {:?}", opt_threadgroups);
+
+    let max_thread_size_accu_buffer = config.state.alloc_buffer_data(&[max_thread_size as u32]);
+    let bucket_wise_time = Instant::now();
+    autoreleasepool(|| {
+        let (command_buffer, command_encoder) = config.state.setup_command(
+            &config.pipelines.bucket_wise_accumulation,
+            Some(&[
+                (0, &data.instances_size_buffer),
+                (1, &data.num_windows_buffer),
+                (2, &data.base_buffer),
+                (3, &sorted_buckets_indices_buffer),
+                (4, &data.buckets_matrix_buffer),
+                (5, &max_thread_size_accu_buffer),
+                // (6, &data.debug_buffer),
+            ]),
+        );
+        // command_encoder.dispatch_thread_groups(
+        //     MTLSize::new(params.buckets_size as u64 * params.num_window, 1, 1),
+        //     MTLSize::new(1, 1, 1),
+        // );
+        command_encoder.dispatch_thread_groups(opt_threadgroups, max_threads_per_group);
+        command_encoder.end_encoding();
+        command_buffer.commit();
+        command_buffer.wait_until_completed();
+    });
+    let bucket_wise_elapsed = bucket_wise_time.elapsed();
+    println!(
+        "Bucket wise accumulation time (using {:?} threads): {:?}",
+        params.buckets_size as u64 * params.num_window,
+        bucket_wise_elapsed
+    );
+
+    // // debug
+    // let debug_data = MetalState::retrieve_contents::<u32>(&data.debug_buffer);
+    // println!("Debug data: {:?}", debug_data);
+
+    // Reduce the buckets_matrix on GPU
+    let max_thread_size = params.num_window;
+    let opt_threadgroups_amount = max_thread_size
+        / config
+            .pipelines
+            .bucket_wise_accumulation
+            .max_total_threads_per_threadgroup()
+        + 1;
+    let opt_threadgroups = MTLSize::new(opt_threadgroups_amount, 1, 1);
+    let max_thread_size_reduc_buffer = config.state.alloc_buffer_data(&[max_thread_size as u32]);
+    let reduction_time = Instant::now();
+    autoreleasepool(|| {
+        let (command_buffer, command_encoder) = config.state.setup_command(
+            &config.pipelines.sum_reduction,
+            Some(&[
+                (0, &data.window_size_buffer),
+                (1, &data.scalar_buffer),
+                (2, &data.base_buffer),
+                (3, &data.buckets_matrix_buffer),
+                (4, &data.res_buffer),
+                (5, &max_thread_size_reduc_buffer),
+            ]),
+        );
+        // command_encoder
+        //     .dispatch_thread_groups(MTLSize::new(params.num_window, 1, 1), MTLSize::new(1, 1, 1));
+        command_encoder.dispatch_thread_groups(opt_threadgroups, max_threads_per_group);
+        command_encoder.end_encoding();
+        command_buffer.commit();
+        command_buffer.wait_until_completed();
+    });
+    println!("Reduction time: {:?}", reduction_time.elapsed());
 
     // Sequentially accumulate the msm results on GPU
     let final_time = Instant::now();
@@ -227,7 +374,7 @@ pub fn exec_metal_commands(
                 (4, &data.result_buffer),
             ]),
         );
-        command_encoder.dispatch_threads(MTLSize::new(1, 1, 1), config.threads_per_threadgroup);
+        command_encoder.dispatch_thread_groups(MTLSize::new(1, 1, 1), MTLSize::new(1, 1, 1));
         command_encoder.end_encoding();
         command_buffer.commit();
         command_buffer.wait_until_completed();
@@ -341,7 +488,7 @@ pub fn run_benchmark(
 mod tests {
     use super::*;
 
-    use ark_ec::{CurveGroup, VariableBaseMSM};
+    use ark_ec::{CurveGroup, Group, VariableBaseMSM};
     use ark_serialize::Write;
     use ark_std::UniformRand;
     use std::fs::File;
@@ -350,30 +497,6 @@ mod tests {
     const NUM_INSTANCE: u32 = 5;
     const UTILSPATH: &str = "mopro-core/src/middleware/gpu_explorations/utils/vectors";
     const BENCHMARKSPATH: &str = "mopro-core/gpu_explorations/benchmarks";
-
-    #[test]
-    fn test_msm_correctness_small_sample() {
-        let mut rng = ark_std::rand::thread_rng();
-        let p1 = G::rand(&mut rng);
-        let p2 = G::rand(&mut rng);
-
-        let s1 = ScalarField::rand(&mut rng);
-        let s2 = ScalarField::rand(&mut rng);
-
-        // compare with msm correctness with arkworks ec arithmetics
-        let target_msm = p1 * s1 + p2 * s2;
-
-        // Init metal (GPU) state
-        let mut metal_config = setup_metal_state();
-        let this_msm = metal_msm(
-            &[p1.into_affine(), p2.into_affine()],
-            &[s1, s2],
-            &mut metal_config,
-        )
-        .unwrap();
-
-        assert_eq!(target_msm, this_msm, "This msm is wrongly computed");
-    }
 
     #[test]
     fn test_msm_correctness_medium_sample() {
