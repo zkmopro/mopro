@@ -49,8 +49,10 @@ a:active {
 }
 
 .navbar {
-  height: fit-content;
+  /* height: fit-content; */
   background-color: #000;
+  display: flex;
+  align-items: center;
 }
 
 .navbar__logo {
