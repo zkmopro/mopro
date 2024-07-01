@@ -156,10 +156,10 @@ mod tests {
 
     // This should be defined by a file that the mopro package consumer authors
     // then we reference it in our build somehow
-    fn circuit_data(name: &str) -> Result<WtnsFn, MoproError> {
+    fn zkey_witness_map(name: &str) -> Result<WtnsFn, MoproError> {
         match name {
-            "multiplier2_final" => Ok(multiplier2_witness),
-            "keccak256_256_test_final" => Ok(keccak256256test_witness),
+            "multiplier2_final.zkey" => Ok(multiplier2_witness),
+            "keccak256_256_test_final.zkey" => Ok(keccak256256test_witness),
             _ => Err(MoproError::CircomError("Unknown circuit name".to_string())),
         }
     }
@@ -169,9 +169,9 @@ mod tests {
         inputs: HashMap<String, Vec<String>>,
     ) -> Result<GenerateProofResult, MoproError> {
         let name = std::path::Path::new(zkey_path.as_str())
-            .file_stem()
+            .file_name()
             .unwrap();
-        if let Ok(witness_fn) = circuit_data(&name.to_str().unwrap()) {
+        if let Ok(witness_fn) = zkey_witness_map(&name.to_str().unwrap()) {
             generate_circom_proof_wtns(zkey_path, inputs, witness_fn)
         } else {
             Err(MoproError::CircomError("Unknown ZKEY".to_string()))

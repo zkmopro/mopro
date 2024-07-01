@@ -135,7 +135,7 @@ pub struct ProofCalldata {
 // This macro handles getting relevant functions into
 // scope and calling uniffi
 //
-// There should be a user defined `circuit_data` function
+// There should be a user defined `zkey_witness_map` function
 // that maps zkey file stub to a witness generation function
 // see test-e2e/src/lib.rs for an example
 #[macro_export]
@@ -158,8 +158,8 @@ macro_rules! app {
             in0: String,
             in1: HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
-            let name = std::path::Path::new(in0.as_str()).file_stem().unwrap();
-            if let Ok(witness_fn) = circuit_data(&name.to_str().unwrap()) {
+            let name = std::path::Path::new(in0.as_str()).file_name().unwrap();
+            if let Ok(witness_fn) = zkey_witness_map(&name.to_str().unwrap()) {
                 mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn)
             } else {
                 Err(MoproError::CircomError("Unknown ZKEY".to_string()))
