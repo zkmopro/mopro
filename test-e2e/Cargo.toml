@@ -10,6 +10,9 @@ crate-type = ["lib", "cdylib", "staticlib"]
 [[bin]]
 name = "ios"
 
+[[bin]]
+name = "android"
+
 [features]
 default = ["mopro-ffi/circom"]
 

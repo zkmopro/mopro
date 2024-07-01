@@ -79,3 +79,14 @@ jobs:
                   override: true
             - name: Build iOS xcframework
               run: cd test-e2e && cargo run --bin ios
+    test-android-ffi-build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install Rust toolchain
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  override: true
+            - name: Build Android bindings
+              run: cd test-e2e && cargo run --bin android
