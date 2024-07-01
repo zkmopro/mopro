@@ -27,11 +27,6 @@ const config: Config = {
           includeCurrentVersion: true,
           lastVersion: '0.0.1',
         },
-        blog: {
-          showReadingTime: true,
-          editUrl:
-            'https://github.com/zkmopro/mopro/tree/main/docs',
-        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -70,7 +65,6 @@ const config: Config = {
           position: 'right',
           label: 'Docs',
         },
-        { to: '/blog', label: 'Blog', position: 'right' },
         {
           type: 'html',
           position: 'right',
@@ -94,10 +88,6 @@ const config: Config = {
                     <a href="https://github.com/zkmopro/mopro" target="_blank" class="footer__link-item">Github</a>
                     <img src="/img/link_arrow.svg"/>
                   </div>`
-            },
-            {
-              label: 'Blog',
-              to: '/blog',
             },
             {
               label: 'Documentation',

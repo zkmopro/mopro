@@ -13,66 +13,18 @@ const sidebars: SidebarsConfig = {
       id: 'prerequisites',
     },
     {
-      type: 'doc',
+      type: 'category',
       label: 'Getting Started',
-      id: 'getting-started',
-    },
-    {
-      type: 'doc',
-      label: 'Mopro Core',
-      id: 'mopro-core',
+      items: [
+        'getting-started/rust-setup',
+        'getting-started/ios-setup',
+        'getting-started/android-setup'
+      ]
     },
     {
       type: 'doc',
       label: 'Mopro FFI',
       id: 'mopro-ffi',
-    },
-    {
-      type: 'doc',
-      label: 'Mopro CLI',
-      id: 'mopro-cli',
-    },
-    {
-      type: 'category',
-      label: 'Circom',
-      items: [
-        {
-          type: 'doc',
-          label: 'configuration',
-          id: 'circom/configuration',
-        },
-        {
-          type: 'doc',
-          label: 'Core API',
-          id: 'circom/core-api',
-        },
-        {
-          type: 'doc',
-          label: 'iOS',
-          id: 'circom/ios',
-        },
-        {
-          type: 'doc',
-          label: 'Android',
-          id: 'circom/android',
-        },
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Halo2',
-      items: [
-        {
-          type: 'doc',
-          label: 'configuration',
-          id: 'halo2/configuration',
-        },
-        {
-          type: 'doc',
-          label: 'introduction',
-          id: 'halo2/introduction',
-        },
-      ],
     },
     {
       type: 'doc',

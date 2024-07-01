@@ -8,15 +8,13 @@ Depending on what platforms and adapters you use, there are several prerequisite
 
 -   General
     -   [Rust](https://www.rust-lang.org/learn/get-started)
--   Circom
-    -   [circom](https://docs.circom.io/)
-    -   [snarkjs](https://github.com/iden3/snarkjs)
 -   iOS
     -   [Xcode](https://developer.apple.com/xcode/)
-    -   [CocoaPods](https://cocoapods.org/)
 -   Android
     -   [Android Studio](https://developer.android.com/studio)
     -   Also see [configuration](#android-configuration) below
+-   Circom
+    - Pre-built `zkey` and `wasm` files for your circuits
 
 ## Android configuration
 
