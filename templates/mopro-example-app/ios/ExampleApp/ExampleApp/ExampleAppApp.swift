@@ -17,6 +17,7 @@ struct ExampleAppApp: App {
             //KeccakCircuitView()
             //KeccakDylibCircuitView()
             //Halo2FibonacciCircuitView()
+            //Halo2KeccakCircuitView()
         }
     }
 }

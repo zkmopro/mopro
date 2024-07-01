@@ -28,6 +28,12 @@ ptau = "02"                       # ptau to use for trusted setup of circuit, "0
 #name = "fibonacci"                     # Name of the circuit
 #ptau = 4
 
+# Halo2 keccak256
+#adapter = "halo2"                         # Proving system options: circom (default), halo2
+#dir = "core/circuits/halo2-keccak256"  # Directory of the circuit
+#name = "keccak256"                     # Name of the circuit
+#ptau = 4
+
 [dylib]
 # NOTE: Dylib support is experimental and requires some fiddling in iOS
 # See https://github.com/zkmopro/mopro/pull/37 and https://github.com/zkmopro/mopro/pull/38
