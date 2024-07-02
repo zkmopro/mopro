@@ -24,6 +24,8 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           editUrl:
             'https://github.com/zkmopro/mopro/tree/main/docs',
+          includeCurrentVersion: true,
+          lastVersion: '0.0.1',
         },
         blog: {
           showReadingTime: true,
@@ -52,10 +54,16 @@ const config: Config = {
       logo: {
         alt: 'Mopro Logo',
         src: '/img/logo_title.svg',
-        width: '325',
+        width: '125',
         height: '80',
       },
       items: [
+        {
+          type: 'docsVersionDropdown',
+          position: 'left',
+          dropdownItemsAfter: [{to: '/versions', label: 'All versions'}],
+          dropdownActiveClassDisabled: true,
+        },
         {
           type: 'docSidebar',
           sidebarId: 'docsSidebar',
