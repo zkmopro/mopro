@@ -27,6 +27,8 @@ We welcome people to contribute support for [more proof systems](https://github.
 
 Mopro is multi-platform and aims to support as many platforms as possible. iOS, Android and Desktop (through Rust/CLI) are the main platforms supported.
 
+There's also support for Web, but this is more for convenience and won't give any performance improvements over what people usually do on web (right now).
+
 There's also very experimental React Native support [here](https://github.com/anon-aadhaar/anon-aadhaar-react-native/commit/d6443316200cd3e1f17ad2679458cc6e6e9fe1f2). We aim to make this easier to consume.
 
 We welcome people to contribute support for [more platforms](https://github.com/zkmopro/mopro/issues/16).
@@ -37,4 +39,6 @@ Mopro is for both proving and verifying ZKPs on mobile.
 
 ## Does Mopro run natively on a phone?
 
-Yes. Witness and proof generation happens natively in app.
+For the most part, yes. The one exception is that we currently do some witness generation for Circom using WASM. We hope to get rid of this soon to be 100% native.
+
+See [this issue](https://github.com/zkmopro/mopro/issues/109) for more details.

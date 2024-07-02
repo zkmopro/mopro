@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Introduction
 
-Mopro makes client-side proving simple. You can think of it as a toolkit for ZK app development. It primarily focuses on running natively mobile.
+Mopro makes client-side proving simple. You can think of it as a toolkit for ZK app development. It primarily focuses on running natively mobile, but it works for any platform.
 
 How? Mopro connects different adapters with different platforms. You can think of an adapter as a way to use a library with some proof system and performance profile. Because Mopro takes care of hooking up your circuit to some library, and generating bindings for use on multiple platforms, you can focus on what you do best: ZK app development.
 
@@ -20,11 +20,17 @@ Mopro consists of a set of libraries and utilities. The following subprojects ar
 
 Primary libraries and utilities of interest:
 
--   `mopro-ffi` - main package, exposes macros for configuring and building projects.
--   `test-e2e` - example implementation of mopro in Android and iOS apps, used for testing.
+-   `mopro-cli` - core Rust CLI util.
+-   `mopro-core` - core mobile Rust library.
+-   `mopro-ffi` - wraps `mopro-core` and exposes UniFFI bindings.
+-   `templates/mopro-example-app` - example multi-platform app template.
+-   `ark-zkey` - helper utility to make zkey more usable and faster in arkworks.
 
 Secondary subprojects:
 
+-   `web-prover` - Prove example circuits through a browser, used for benchmarking.
+-   `scripts` - various helper scripts for `mopro-cli` and testing.
+-   `mopro-web` - Mopro website.
 -   `research` - Ongoing research, e.g. GPU explorations.
 
 ## Architecture
