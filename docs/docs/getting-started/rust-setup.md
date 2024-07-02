@@ -119,4 +119,4 @@ fn main() {
 }
 ```
 
-Now you're ready to build your static library! You should be able to run either `cargo run --bin ios` or `cargo run --bin android` to build the corresponding static library. Move on to [iOS setup](docs/getting-started/ios-setup) or [Android setup](docs/getting-started/android-setup) to begin integrating in an app.
+Now you're ready to build your static library! You should be able to run either `cargo run --bin ios` or `cargo run --bin android` to build the corresponding static library. Move on to [iOS setup](ios-setup) or [Android setup](android-setup) to begin integrating in an app.
