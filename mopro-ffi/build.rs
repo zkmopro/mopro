@@ -1,3 +1,5 @@
 fn main() {
-    uniffi::generate_scaffolding("src/mopro.udl").expect("Building the UDL file failed");
+    if cfg!(test) {
+        rust_witness::transpile::transpile_wasm("../test-vectors/circom".to_string());
+    }
 }

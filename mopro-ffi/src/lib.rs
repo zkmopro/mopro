@@ -1,56 +1,101 @@
-#[cfg(all(feature = "halo2", feature = "circom"))]
-compile_error!(
-    "Cannot enable both `halo2` and `circom` features at the same time
-Please enable only one of them"
-);
-
+pub mod app_config;
+#[cfg(feature = "circom")]
 mod circom;
+#[cfg(feature = "halo2")]
 mod halo2;
 
-// We require that each adapter implements the same set of default functions
-// As well as allow an adapter to export its own unique functions as long as
-// There is as default (`dummy`) implementation for when the adapter is not enabled.
-#[cfg(feature = "circom")]
-use circom as adapter;
-#[cfg(feature = "halo2")]
-use halo2 as adapter;
-
 use std::collections::HashMap;
+use thiserror::Error;
 
-use mopro_core::MoproError;
+pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint::BigInt>;
 
-// A set of shared functions that each adapter is required to implement.
-// We wrap these functions in another layer of abstraction to enforce consistent types.
-// Adapter does not need to implement the `dummy` version as another adapter will provide it.
-
-pub fn initialize_mopro() -> Result<(), MoproError> {
-    adapter::initialize_mopro()
+#[derive(Debug, Error)]
+pub enum MoproError {
+    #[error("CircomError: {0}")]
+    CircomError(String),
+    #[error("Halo2Error: {0}")]
+    Halo2Error(String),
 }
 
-pub fn initialize_mopro_dylib(dylib_path: String) -> Result<(), MoproError> {
-    adapter::initialize_mopro_dylib(dylib_path)
-}
-
-pub fn generate_proof_static(
-    inputs: HashMap<String, Vec<String>>,
+#[cfg(feature = "halo2")]
+pub fn generate_halo2_proof(
+    in0: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
-    adapter::generate_proof_static(inputs)
+    halo2::generate_halo2_proof(in0)
 }
 
-pub fn verify_proof_static(proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, MoproError> {
-    adapter::verify_proof_static(proof, public_input)
+#[cfg(not(feature = "halo2"))]
+pub fn generate_halo2_proof(
+    _: HashMap<String, Vec<String>>,
+) -> Result<GenerateProofResult, MoproError> {
+    Err(MoproError::Halo2Error(
+        "Project does not have Halo2 feature enabled".to_string(),
+    ))
 }
 
-// A set of unique functions that each adapter can implement, which we directly re-export.
-// The adapter must provide a default (`dummy`) implementation for when the adapter is not enabled.
+#[cfg(feature = "halo2")]
+pub fn verify_halo2_proof(in0: Vec<u8>, in1: Vec<u8>) -> Result<bool, MoproError> {
+    halo2::verify_halo2_proof(in0, in1)
+}
 
-pub use circom::{arkworks_pippenger, metal_msm};
-pub use circom::{to_ethereum_inputs, to_ethereum_proof};
-pub use circom::{BenchmarkResult, MoproCircom, ProofCalldata, G1, G2};
+#[cfg(not(feature = "halo2"))]
+pub fn verify_halo2_proof(_: Vec<u8>, _: Vec<u8>) -> Result<bool, MoproError> {
+    Err(MoproError::Halo2Error(
+        "Project does not have Halo2 feature enabled".to_string(),
+    ))
+}
+
+#[cfg(feature = "circom")]
+pub fn generate_circom_proof_wtns(
+    in0: String,
+    in1: HashMap<String, Vec<String>>,
+    in2: WtnsFn,
+) -> Result<GenerateProofResult, MoproError> {
+    circom::generate_circom_proof_wtns(in0, in1, in2)
+}
+
+#[cfg(not(feature = "circom"))]
+pub fn generate_circom_proof_wtns(
+    _: String,
+    _: HashMap<String, Vec<String>>,
+    _: WtnsFn,
+) -> Result<GenerateProofResult, MoproError> {
+    Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
+}
+
+#[cfg(feature = "circom")]
+pub fn verify_circom_proof(in0: String, in1: Vec<u8>, in2: Vec<u8>) -> Result<bool, MoproError> {
+    circom::verify_circom_proof(in0, in1, in2)
+}
+
+#[cfg(not(feature = "circom"))]
+pub fn verify_circom_proof(_: String, _: Vec<u8>, _: Vec<u8>) -> Result<bool, MoproError> {
+    Err(MoproError::CircomError("Project is compiled for Halo2 proving system. This function is currently not supported in Halo2.".to_string()))
+}
+
+#[cfg(feature = "circom")]
+pub fn to_ethereum_proof(in0: Vec<u8>) -> ProofCalldata {
+    circom::to_ethereum_proof(in0)
+}
+
+#[cfg(not(feature = "circom"))]
+pub fn to_ethereum_proof(_: Vec<u8>) -> ProofCalldata {
+    panic!("not built with circom");
+}
+
+#[cfg(feature = "circom")]
+pub fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
+    circom::to_ethereum_inputs(in0)
+}
+
+#[cfg(not(feature = "circom"))]
+pub fn to_ethereum_inputs(_: Vec<u8>) -> Vec<String> {
+    panic!("not built with circom");
+}
 
 #[derive(Debug)]
 pub enum FFIError {
-    MoproError(mopro_core::MoproError),
+    MoproError(MoproError),
     SerializationError(String),
 }
 
@@ -66,32 +111,77 @@ impl From<MoproError> for FFIError {
     }
 }
 
-// Test functions (TODO - consider removing)
-
-fn add(a: u32, b: u32) -> u32 {
-    a + b
+#[derive(Debug, Clone, Default)]
+pub struct G1 {
+    pub x: String,
+    pub y: String,
 }
 
-fn hello() -> String {
-    "Hello World from Rust".to_string()
+#[derive(Debug, Clone, Default)]
+pub struct G2 {
+    pub x: Vec<String>,
+    pub y: Vec<String>,
 }
 
-// TODO: Remove me
-// UniFFI expects String type
-// See https://mozilla.github.io/uniffi-rs/udl/builtin_types.html
-// fn run_example(wasm_path: String, r1cs_path: String) -> Result<(), MoproError> {
-//     circom::run_example(wasm_path.as_str(), r1cs_path.as_str())
-// }
+#[derive(Debug, Clone, Default)]
+pub struct ProofCalldata {
+    pub a: G1,
+    pub b: G2,
+    pub c: G1,
+}
 
-uniffi::include_scaffolding!("mopro");
+// This macro should be used in dependent crates
+//
+// This macro handles getting relevant functions into
+// scope and calling uniffi
+//
+// There should be a user defined `zkey_witness_map` function
+// that maps zkey file stub to a witness generation function
+// see test-e2e/src/lib.rs for an example
+#[macro_export]
+macro_rules! app {
+    () => {
+        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
+        use std::collections::HashMap;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+        fn generate_halo2_proof(
+            in0: HashMap<String, Vec<String>>,
+        ) -> Result<GenerateProofResult, MoproError> {
+            mopro_ffi::generate_halo2_proof(in0)
+        }
 
-    #[test]
-    fn add_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+        fn verify_halo2_proof(in0: Vec<u8>, in1: Vec<u8>) -> Result<bool, MoproError> {
+            mopro_ffi::verify_halo2_proof(in0, in1)
+        }
+
+        fn generate_circom_proof(
+            in0: String,
+            in1: HashMap<String, Vec<String>>,
+        ) -> Result<GenerateProofResult, MoproError> {
+            let name = std::path::Path::new(in0.as_str()).file_name().unwrap();
+            if let Ok(witness_fn) = zkey_witness_map(&name.to_str().unwrap()) {
+                mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn)
+            } else {
+                Err(MoproError::CircomError("Unknown ZKEY".to_string()))
+            }
+        }
+
+        fn verify_circom_proof(
+            in0: String,
+            in1: Vec<u8>,
+            in2: Vec<u8>,
+        ) -> Result<bool, MoproError> {
+            mopro_ffi::verify_circom_proof(in0, in1, in2)
+        }
+
+        fn to_ethereum_proof(in0: Vec<u8>) -> ProofCalldata {
+            mopro_ffi::to_ethereum_proof(in0)
+        }
+
+        fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
+            mopro_ffi::to_ethereum_inputs(in0)
+        }
+
+        uniffi::include_scaffolding!("mopro");
+    };
 }
