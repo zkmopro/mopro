@@ -72,7 +72,7 @@ jobs:
                   cd test-e2e
                   curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
                   CLASSPATH=jna-5.13.0.jar cargo test -- --nocapture
-    test-xcframework-build:
+    build-xcframework:
         runs-on: macos-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
@@ -84,7 +84,68 @@ jobs:
                   override: true
             - name: Build iOS xcframework
               run: cd test-e2e && cargo run --bin ios
-    test-android-ffi-build:
+            - name: Cache xcframework
+              id: cache-xcframework
+              uses: actions/cache/save@v4
+              with:
+                path: test-e2e/MoproiOSBindings
+                key: ${{ github.sha }}-xcframework
+    build-ios-app-device:
+        runs-on: macos-latest
+        needs: build-xcframework
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install Rust toolchain
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  override: true
+            - name: Restore cached xcframework
+              id: cache-restore-xcframework
+              uses: actions/cache/restore@v4
+              with:
+                path: test-e2e/MoproiOSBindings
+                key: ${{ github.sha }}-xcframework
+            - name: Build app for device
+              run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    build-ios-app-simulator:
+        runs-on: macos-latest
+        needs: build-xcframework
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install Rust toolchain
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  override: true
+            - name: Restore cached xcframework
+              id: cache-restore-xcframework
+              uses: actions/cache/restore@v4
+              with:
+                path: test-e2e/MoproiOSBindings
+                key: ${{ github.sha }}-xcframework
+            - name: Build app for device
+              run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS\ Simulator build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    test-ios-app-simulator:
+        runs-on: macos-14
+        needs: build-xcframework
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install Rust toolchain
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  override: true
+            - name: Restore cached xcframework
+              id: cache-restore-xcframework
+              uses: actions/cache/restore@v4
+              with:
+                path: test-e2e/MoproiOSBindings
+                key: ${{ github.sha }}-xcframework
+            # to list available simulators: xcrun simctl list devices
+            - name: Test app in simulator
+              run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination 'platform=iOS Simulator,name=iPhone 15' test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    build-android-lib:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
@@ -96,3 +157,34 @@ jobs:
                   override: true
             - name: Build Android bindings
               run: cd test-e2e && cargo run --bin android
+            - name: Cache android lib
+              id: cache-android-lib
+              uses: actions/cache/save@v4
+              with:
+                path: test-e2e/MoproAndroidBindings
+                key: ${{ github.sha }}-android-lib
+    build-android-app:
+        runs-on: ubuntu-latest
+        needs: build-android-lib
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install Rust toolchain
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  override: true
+            - name: Restore cached android lib
+              id: cache-restore-android-lib
+              uses: actions/cache/restore@v4
+              with:
+                path: test-e2e/MoproAndroidBindings
+                key: ${{ github.sha }}-android-lib
+            - name: Setup Java
+              uses: actions/setup-java@v3
+              with:
+                distribution: 'temurin'
+                java-version: 17
+            - name: Setup Android SDK
+              uses: android-actions/setup-android@v2.0.10
+            - name: Build android app
+              run: cd test-e2e/android && ./gradlew build

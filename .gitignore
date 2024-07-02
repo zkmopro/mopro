@@ -5,5 +5,4 @@ mopro-example-app
 !templates/mopro-example-app
 graph.bin
 
-*.jar
 *.xcframework/
