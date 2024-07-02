@@ -25,7 +25,7 @@ Primary libraries and utilities of interest:
 
 Secondary subprojects:
 
--   `research` - Ongoing research, e.g. GPU explorations.
+-   `docs` - This documentation website.
 
 ## Architecture
 
