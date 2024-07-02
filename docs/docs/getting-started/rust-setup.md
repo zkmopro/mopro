@@ -35,13 +35,13 @@ name = "mopro_bindings"
 default = ["mopro-ffi/circom"]
 
 [dependencies]
-mopro-ffi = { git = "https://github.com/vimwitch/mopro.git" }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 uniffi = { version = "0.28", features = ["cli"] }
 num-bigint = "0.4.0"
 
 [build-dependencies]
-mopro-ffi = { git = "https://github.com/vimwitch/mopro.git" }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 uniffi = { version = "0.28", features = ["build"] }
 ```
