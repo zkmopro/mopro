@@ -172,11 +172,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
-import uniffi.mopro.generateCircomProof
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import kotlinx.coroutines.launch
+import uniffi.mopro.generateCircomProof
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -184,12 +184,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             // A surface container using the 'background' color from the theme
             Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                MainScreen(this)
-            }
-
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+            ) { MainScreen(this) }
         }
     }
 }
@@ -198,25 +195,22 @@ class MainActivity : ComponentActivity() {
 fun MainScreen(context: Context) {
     val coroutineScope = rememberCoroutineScope()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Button(onClick = {
-            coroutineScope.launch {
-                val assetFilePath = copyAssetToInternalStorage(context, "multiplier2_final.zkey")
-                assetFilePath?.let { path ->
-                    val inputs = mutableMapOf<String, List<String>>()
-                    inputs["a"] = listOf("3")
-                    inputs["b"] = listOf("5")
-                    val res = generateCircomProof(path, inputs)
-                    println(res)
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Button(
+                onClick = {
+                    coroutineScope.launch {
+                        val assetFilePath =
+                                copyAssetToInternalStorage(context, "multiplier2_final.zkey")
+                        assetFilePath?.let { path ->
+                            val inputs = mutableMapOf<String, List<String>>()
+                            inputs["a"] = listOf("3")
+                            inputs["b"] = listOf("5")
+                            val res = generateCircomProof(path, inputs)
+                            println(res)
+                        }
+                    }
                 }
-            }
-        }) {
-            Text(text = "Generate Proof")
-        }
+        ) { Text(text = "Generate Proof") }
     }
 }
 
