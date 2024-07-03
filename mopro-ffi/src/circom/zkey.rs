@@ -4,7 +4,6 @@ use ark_groth16::{ProvingKey, VerifyingKey};
 use ark_relations::r1cs::ConstraintMatrices;
 use ark_serialize::Read;
 use ark_std::Zero;
-use num_bigint::BigUint;
 use std::fs::File;
 
 pub struct ZkeyReader {
@@ -74,7 +73,6 @@ impl ZkeyReader {
     }
 
     fn read_section(&mut self, section_n: u32, section_len: u64) {
-        println!("{}", section_n);
         match section_n {
             1 => self.read_header(section_len),
             2 => self.read_groth16_header(section_len),
@@ -112,17 +110,16 @@ impl ZkeyReader {
 
     fn read_bigint(&mut self, n8: u32) -> BigInteger256 {
         let usize_n8 = usize::try_from(n8).unwrap();
-        // TODO: convert the [u8] in [u64] without involving
-        // BigUint/heap memory
-        let v = BigUint::from_bytes_le(
-            &self.data.as_ref().unwrap()[self.offset..(self.offset + usize_n8)],
-        );
-        self.offset += usize_n8;
-        let mut parts = v.to_u64_digits();
-        while parts.len() < 4 {
-            parts.push(0);
+        // convert an array of LE bytes to an array of LE 64 bit words
+        let bytes = &self.data.as_ref().unwrap()[self.offset..(self.offset + usize_n8)];
+        let mut words_64 = [0_u64; 4];
+        for x in 0..4 {
+            for y in 0..8 {
+                words_64[x] += u64::from(bytes[x * 8 + y]) << (8 * y);
+            }
         }
-        BigInteger256::new(parts.try_into().unwrap())
+        self.offset += usize_n8;
+        BigInteger256::new(words_64)
     }
 
     fn read_fr(&mut self, n8: u32) -> Fr {
