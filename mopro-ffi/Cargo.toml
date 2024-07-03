@@ -35,8 +35,8 @@ halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", 
 ], optional = true }
 
 # circom deps
-#ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", branch = "wasm-delete", optional = true }
-ark-circom = { path = "../../circom-compat", optional = true }
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", branch = "wasm-delete", optional = true }
+#ark-circom = { path = "../../circom-compat", optional = true }
 ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
