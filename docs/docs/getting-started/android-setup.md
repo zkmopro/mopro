@@ -18,11 +18,16 @@ MoproAndroidBindings
         └── mopro.kt
 ```
 
-First we will create an android app through Android Studio. If you already have an app project, you can skip this step. We'll do File -> New -> New Project and create an Empty Activity.
+First we will create an android app through Android Studio. If you already have an app project, you can skip this step. We'll do **File -> New -> New Project** and create an Empty Activity.
 
 ![create an android app project](/img/android-example-1.png)
 
 Your android project should be opened now.
+
+:::info
+Please make sure you choose the **Android** view like this.
+![android directory view](/img/android-example-5.png)
+:::
 
 Then add jna to `app/build.gradle.kts`
 
@@ -36,7 +41,7 @@ dependencies {
 
 ![add jna dependency](/img/android-example-2.png)
 
-Sync gradle with `shift`+`cmd`+`O`, or press
+Sync gradle with **File -> Sync Project with Gradle Files**, or press
 
 ![android sync gradle](/img/android-example-4.png)
 
@@ -47,7 +52,7 @@ Open Finder and drag folders:
 
 ![android bindings](/img/android-bindings.png)
 
-Create an asset folder: File -> New -> Folder -> Assets Folder. <br/>
+Create an asset folder: **File -> New -> Folder -> Assets Folder**. <br/>
 Paste the zkey in the assets folder.
 
 ![android paste zkey](/img/android-example-3.png)
@@ -76,10 +81,18 @@ import java.io.IOException
 
 This will make the proving functions `generateCircomProof` available in this module and also help to load zkey.
 
-In the `MainActivity.kt`, replace the `Greeting("Android")` with
+In the `MainActivity.kt`, make your `setContent` function look like this:
 
 ```kotlin
-MainScreen(this)
+    setContent {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            MainScreen(this)
+        }
+    }
 ```
 
 Add a private function to load zkey. It is used to copy a file from the app's assets directory to the app's internal storage so that we can read the path of the zkey file.
@@ -139,10 +152,10 @@ fun MainScreen(context: Context) {
 ```
 
 <details>
-  <summary>Full `MainActivity.ts` (simplified)</summary>
+  <summary>Full `MainActivity.kt` (simplified)</summary>
 
 ```kotlin
-package com.example.moproandroidapp
+package com.example.moproandroidapp // Your application ID
 
 import android.content.Context
 import android.os.Bundle
@@ -159,7 +172,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.moproandroidapp.ui.theme.MoproAndroidAppTheme
 import kotlinx.coroutines.launch
 import uniffi.mopro.generateCircomProof
 import java.io.File
@@ -167,66 +179,65 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-      super.onCreate(savedInstanceState)
-      setContent {
-          MoproAndroidAppTheme {
-              // A surface container using the 'background' color from the theme
-              Surface(
-                  modifier = Modifier.fillMaxSize(),
-                  color = MaterialTheme.colorScheme.background
-              ) {
-                  MainScreen(this)
-              }
-          }
-      }
-  }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            // A surface container using the 'background' color from the theme
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                MainScreen(this)
+            }
+
+        }
+    }
 }
 
 @Composable
 fun MainScreen(context: Context) {
-  val coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
-  Column(
-      modifier = Modifier
-          .fillMaxSize()
-          .padding(16.dp)
-  ) {
-      Button(onClick = {
-          coroutineScope.launch {
-              val assetFilePath = copyAssetToInternalStorage(context, "multiplier2_final.zkey")
-              assetFilePath?.let { path ->
-                  val inputs = mutableMapOf<String, List<String>>()
-                  inputs["a"] = listOf("3")
-                  inputs["b"] = listOf("5")
-                  val res = generateCircomProof(path, inputs)
-                  println(res)
-              }
-          }
-      }) {
-          Text(text = "Generate Proof")
-      }
-  }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Button(onClick = {
+            coroutineScope.launch {
+                val assetFilePath = copyAssetToInternalStorage(context, "multiplier2_final.zkey")
+                assetFilePath?.let { path ->
+                    val inputs = mutableMapOf<String, List<String>>()
+                    inputs["a"] = listOf("3")
+                    inputs["b"] = listOf("5")
+                    val res = generateCircomProof(path, inputs)
+                    println(res)
+                }
+            }
+        }) {
+            Text(text = "Generate Proof")
+        }
+    }
 }
 
 private fun copyAssetToInternalStorage(context: Context, assetFileName: String): String? {
-  val file = File(context.filesDir, assetFileName)
-  return try {
-      context.assets.open(assetFileName).use { inputStream ->
-          FileOutputStream(file).use { outputStream ->
-              val buffer = ByteArray(1024)
-              var length: Int
-              while (inputStream.read(buffer).also { length = it } > 0) {
-                  outputStream.write(buffer, 0, length)
-              }
-              outputStream.flush()
-          }
-      }
-      file.absolutePath
-  } catch (e: IOException) {
-      e.printStackTrace()
-      null
-  }
+    val file = File(context.filesDir, assetFileName)
+    return try {
+        context.assets.open(assetFileName).use { inputStream ->
+            FileOutputStream(file).use { outputStream ->
+                val buffer = ByteArray(1024)
+                var length: Int
+                while (inputStream.read(buffer).also { length = it } > 0) {
+                    outputStream.write(buffer, 0, length)
+                }
+                outputStream.flush()
+            }
+        }
+        file.absolutePath
+    } catch (e: IOException) {
+        e.printStackTrace()
+        null
+    }
 }
 
 ```
