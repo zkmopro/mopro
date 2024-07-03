@@ -30,22 +30,38 @@ pub fn generate_circom_proof_wtns(
     inputs: HashMap<String, Vec<String>>,
     witness_fn: WtnsFn,
 ) -> Result<GenerateProofResult, MoproError> {
-    let file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+    // We'll start a background thread building the witness
+    let witness_thread = std::thread::spawn(move || {
+        // Form the inputs
+        let bigint_inputs = inputs
+            .into_iter()
+            .map(|(k, v)| {
+                (
+                    k,
+                    v.into_iter()
+                        .map(|i| BigInt::from_str(&i).unwrap())
+                        .collect(),
+                )
+            })
+            .collect();
+
+        witness_fn(bigint_inputs)
+            .into_iter()
+            .map(|w| ark_bn254::Fr::from(w.to_biguint().unwrap()))
+            .collect::<Vec<_>>()
+    });
+
+    // Load the zkey in the current thread
+    let mut file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let mut reader = std::io::BufReader::new(file);
     let zkey = read_zkey(&mut reader).map_err(|e| MoproError::CircomError(e.to_string()))?;
 
-    // Form the inputs
-    let bigint_inputs = inputs
-        .into_iter()
-        .map(|(k, v)| {
-            (
-                k,
-                v.into_iter()
-                    .map(|i| BigInt::from_str(&i).unwrap())
-                    .collect(),
-            )
-        })
-        .collect();
+    // Get the result witness from the background thread
+    let full_assignment = witness_thread
+        .join()
+        .map_err(|_e| MoproError::CircomError("Failed to generate witness".to_string()))?;
+
+    let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
 
     // build the proof
     let mut rng = thread_rng();
@@ -53,13 +69,6 @@ pub fn generate_circom_proof_wtns(
 
     let r = ark_bn254::Fr::rand(rng);
     let s = ark_bn254::Fr::rand(rng);
-
-    let full_assignment = witness_fn(bigint_inputs)
-        .into_iter()
-        .map(|w| ark_bn254::Fr::from(w.to_biguint().unwrap()))
-        .collect::<Vec<_>>();
-
-    let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
 
     let now = std::time::Instant::now();
     let ark_proof = Groth16::<_, CircomReduction>::create_proof_with_reduction_and_matrices(
