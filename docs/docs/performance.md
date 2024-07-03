@@ -9,6 +9,12 @@ Both native witness generation and proof generation are generally faster than `s
 However, performance varies across different circuits.
 We _recommend_ developers benchmark their custom circuits before selecting tools for app development.
 
+:::warning
+- [witnesscalc](https://github.com/0xPolygonID/witnesscalc) hasn't been integrated in mopro. See [zkmopro/mopro#110](https://github.com/zkmopro/mopro/issues/110).
+- [circom-witness-rs](https://github.com/philsippl/circom-witness-rs) is not fully compatible with circom circuits. See: [zkmopro/mopro#32](https://github.com/zkmopro/mopro/issues/32).
+- [wasmer](https://github.com/arkworks-rs/circom-compat) doesn't work in iOS. See: [zkmopro/mopro#109](https://github.com/zkmopro/mopro/issues/109).
+:::
+
 ## iOS
 
 Benchmarks on an iPhone 12 mini (2020).
