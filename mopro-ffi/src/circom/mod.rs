@@ -91,8 +91,9 @@ pub fn verify_circom_proof(
 ) -> Result<bool, MoproError> {
     let deserialized_proof = serialization::deserialize_proof(proof);
     let deserialized_public_input = serialization::deserialize_inputs(public_input);
-    let mut file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
-    let zkey = read_zkey(&mut file).map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let mut reader = std::io::BufReader::new(file);
+    let zkey = read_zkey(&mut reader).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let start = Instant::now();
     let pvk = prepare_verifying_key(&zkey.0.vk);
 
