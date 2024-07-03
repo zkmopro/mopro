@@ -31,8 +31,6 @@ pub fn generate_circom_proof_wtns(
     inputs: HashMap<String, Vec<String>>,
     witness_fn: WtnsFn,
 ) -> Result<GenerateProofResult, MoproError> {
-    // let mut file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
-    // let zkey = read_zkey(&mut file).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let mut zkey_reader = zkey::ZkeyReader::new(&zkey_path);
     let zkey = zkey_reader.read();
 
@@ -56,12 +54,10 @@ pub fn generate_circom_proof_wtns(
     let r = ark_bn254::Fr::rand(rng);
     let s = ark_bn254::Fr::rand(rng);
 
-    println!("building witness");
     let full_assignment = witness_fn(bigint_inputs)
         .into_iter()
         .map(|w| ark_bn254::Fr::from(w.to_biguint().unwrap()))
         .collect::<Vec<_>>();
-    println!("done building witness");
 
     let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
 
