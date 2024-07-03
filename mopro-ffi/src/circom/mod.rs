@@ -52,9 +52,15 @@ pub fn generate_circom_proof_wtns(
     });
 
     // Load the zkey in the current thread
-    let mut file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let mut reader = std::io::BufReader::new(file);
     let zkey = read_zkey(&mut reader).map_err(|e| MoproError::CircomError(e.to_string()))?;
+
+    let mut rng = thread_rng();
+    let rng = &mut rng;
+
+    let r = ark_bn254::Fr::rand(rng);
+    let s = ark_bn254::Fr::rand(rng);
 
     // Get the result witness from the background thread
     let full_assignment = witness_thread
@@ -64,13 +70,6 @@ pub fn generate_circom_proof_wtns(
     let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
 
     // build the proof
-    let mut rng = thread_rng();
-    let rng = &mut rng;
-
-    let r = ark_bn254::Fr::rand(rng);
-    let s = ark_bn254::Fr::rand(rng);
-
-    let now = std::time::Instant::now();
     let ark_proof = Groth16::<_, CircomReduction>::create_proof_with_reduction_and_matrices(
         &zkey.0,
         r,
@@ -82,10 +81,6 @@ pub fn generate_circom_proof_wtns(
     );
 
     let proof = ark_proof.map_err(|e| MoproError::CircomError(e.to_string()))?;
-    // Ok((SerializableProof(proof), SerializableInputs(public_inputs)))
-
-    println!("proof generation took: {:.2?}", now.elapsed());
-    // let (proof, inputs) = prover.generate_proof(bigint_inputs)?;
 
     Ok(GenerateProofResult {
         proof: serialization::serialize_proof(&SerializableProof(proof)),
