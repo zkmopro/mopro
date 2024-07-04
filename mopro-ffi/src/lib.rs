@@ -1,4 +1,4 @@
-uniffi::include_scaffolding!("mopro");
+uniffi::setup_scaffolding!();
 
 pub mod app_config;
 #[cfg(feature = "circom")]
@@ -7,14 +7,12 @@ mod circom;
 mod halo2;
 
 #[cfg(feature = "halo2")]
-pub use {halo2::*, mopro_macro::Halo2Mopro};
+pub use {halo2::MoproHalo2, mopro_macro::Halo2CircuitBindings};
 
 use std::collections::HashMap;
-use thiserror::Error;
+use uniffi::Record;
 
-pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint::BigInt>;
-
-#[derive(Debug, Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum MoproError {
     #[error("CircomError: {0}")]
     CircomError(String),
@@ -22,36 +20,33 @@ pub enum MoproError {
     Halo2Error(String),
 }
 
-#[cfg(feature = "halo2")]
-pub fn generate_halo2_proof(
-    in0: HashMap<String, Vec<String>>,
-) -> Result<GenerateProofResult, MoproError> {
-    Err(MoproError::Halo2Error(
-        "Project does not have Halo2 feature enabled".to_string(),
-    ))
-}
+pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint::BigInt>;
 
-#[cfg(not(feature = "halo2"))]
-pub fn generate_halo2_proof(
-    _: HashMap<String, Vec<String>>,
-) -> Result<GenerateProofResult, MoproError> {
-    Err(MoproError::Halo2Error(
-        "Project does not have Halo2 feature enabled".to_string(),
-    ))
-}
+#[macro_export]
+macro_rules! setup_mopro_ffi {
+    () => {
+        // Setup the FFI bindings for dependent crates
+        uniffi::setup_scaffolding!();
 
-#[cfg(feature = "halo2")]
-pub fn verify_halo2_proof(in0: Vec<u8>, in1: Vec<u8>) -> Result<bool, MoproError> {
-    Err(MoproError::Halo2Error(
-        "Project does not have Halo2 feature enabled".to_string(),
-    ))
-}
+        use mopro_ffi::MoproError;
 
-#[cfg(not(feature = "halo2"))]
-pub fn verify_halo2_proof(_: Vec<u8>, _: Vec<u8>) -> Result<bool, MoproError> {
-    Err(MoproError::Halo2Error(
-        "Project does not have Halo2 feature enabled".to_string(),
-    ))
+        #[derive(Debug, thiserror::Error, uniffi::Error)]
+        pub enum MoproErrorExternal {
+            #[error("CircomError: {0}")]
+            CircomError(String),
+            #[error("Halo2Error: {0}")]
+            Halo2Error(String),
+        }
+
+        impl From<MoproError> for MoproErrorExternal {
+            fn from(e: MoproError) -> Self {
+                match e {
+                    MoproError::CircomError(e) => MoproErrorExternal::CircomError(e),
+                    MoproError::Halo2Error(e) => MoproErrorExternal::Halo2Error(e),
+                }
+            }
+        }
+    };
 }
 
 #[cfg(feature = "circom")]
@@ -108,7 +103,7 @@ pub enum FFIError {
     SerializationError(String),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Record)]
 pub struct GenerateProofResult {
     pub proof: Vec<u8>,
     pub inputs: Vec<u8>,

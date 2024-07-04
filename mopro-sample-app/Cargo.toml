@@ -6,23 +6,35 @@ edition = "2021"
 
 [lib]
 crate-type = ["lib", "cdylib", "staticlib"]
-name = "mopro_bindings"
+name = "mopro_app"
 
 [[bin]]
 name = "ios"
 
+[features]
+
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2"] }
-#mopro-ffi = { git = "https://github.com/vimwitch/mopro.git" }
-uniffi = { version = "0.28", features = ["cli"] }
-#rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+
+# Halo2 dependency crates
+
+
+# Circom dependency crates
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 num-bigint = "0.4.0"
+
+# Crates required for macro expansion
+thiserror = "^1.0"
+
+# Crates required by bin/ios
+camino = "^1.1"
+uniffi = { version = "0.28" }
+uniffi_bindgen = "0.28.0"
 
 [build-dependencies]
 
-#rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 mopro-ffi = { path = "../mopro-ffi" }
-uniffi = { version = "0.28", features = ["build"] }
 
 [dev-dependencies]
 uniffi = { version = "0.28", features = ["bindgen-tests"] }

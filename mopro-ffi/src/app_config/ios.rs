@@ -1,3 +1,4 @@
+use std::fmt::format;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::{fs, io};
@@ -5,13 +6,11 @@ use std::{fs, io};
 use super::{cleanup_tmp_local, install_arch, mktemp_local};
 
 // Load environment variables that are specified by by xcode
-pub fn build() {
+pub fn build(library_name: &str, manifest_dir: &str, bindings_dir: &str) {
     let cwd = std::env::current_dir().unwrap();
-    let manifest_dir =
-        std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
+
     let build_dir = format!("{}/build", manifest_dir);
     let build_dir_path = Path::new(&build_dir);
-    let bindings_dir = format!("{}/target/out", manifest_dir);
     let bindings_dir_path = Path::new(&bindings_dir);
     let work_dir = mktemp_local(&build_dir_path);
     let bindings_out = work_dir.join("MoproiOSBindings");
@@ -45,8 +44,8 @@ pub fn build() {
             .iter()
             .map(|arch| {
                 Path::new(&build_dir).join(Path::new(&format!(
-                    "{}/{}/{}/libmopro_bindings.a",
-                    build_dir, arch, mode
+                    "{}/{}/{}/lib{}.a",
+                    build_dir, arch, mode, library_name
                 )))
             })
             .collect();
@@ -68,7 +67,7 @@ pub fn build() {
         }
         // now lipo the libraries together
         let mut lipo_cmd = Command::new("lipo");
-        let lib_out = mktemp_local(&build_dir_path).join("libmopro_bindings.a");
+        let lib_out = mktemp_local(&build_dir_path).join(format!("lib{}.a", library_name));
         lipo_cmd
             .arg("-create")
             .arg("-output")

@@ -16,14 +16,14 @@ path = "src/uniffi-bindgen.rs"
 [features]
 default = []
 
-halo2 = ["halo2_proofs", "halo2curves", "serde", "mopro-macro/halo2"]
+halo2 = ["halo2_proofs", "halo2curves", "serde"]
 circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations"]
 
 [dependencies]
 mopro-macro = { path = "../mopro-macro" }
 
-#rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
-uniffi = { version = "=0.28.0", features = ["cli", "build"] }
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+uniffi = { version = "=0.28.0" }
 
 # Error handling
 thiserror = "=1.0.39"
@@ -59,8 +59,7 @@ ark-relations = { version = "0.4", default-features = false, optional = true }
 uuid = { version = "1.9.1", features = ["v4"] }
 
 [build-dependencies]
-#rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
-uniffi = { version = "=0.28.0", features = ["build"] }
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 
 [dev-dependencies]
 uniffi = { version = "=0.28.0", features = ["bindgen-tests"] }
@@ -69,7 +68,7 @@ ark-bn254 = { version = "=0.4.0" }
 # Halo2 test dependency
 halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2" }
 
-#rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 color-eyre = "0.6"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"

@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import mopro_bindingsFFI
-import moproFFI
 
 struct ContentView: View {
 
@@ -30,8 +28,6 @@ struct ContentView: View {
 }
 
 func hello() {
-    // Imported from mopro-app
-    MoproError1.CircomError("Hello")
     // Imported from mopro-ffi
     GenerateProofResult.init(proof: Data(), inputs: Data())
 
@@ -47,9 +43,11 @@ func hello() {
 
         print("Verifies", verifies)
 
-    } catch {
+    } catch MoproErrorExternal.Halo2Error(let err) {
 
-        print("Failed")
+        print("Failed with: ", err)
+    } catch {
+        print("Should not be here...")
     }
 
 }

@@ -7,8 +7,6 @@ edition = "2021"
 proc-macro = true
 
 [features]
-default = ["halo2"]
-halo2 = []
 
 [dependencies]
 # Marcos dependencies
