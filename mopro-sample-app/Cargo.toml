@@ -15,6 +15,7 @@ name = "ios"
 
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2"] }
+uniffi = { version = "0.28" }
 
 # Halo2 dependency crates
 
@@ -25,11 +26,6 @@ num-bigint = "0.4.0"
 
 # Crates required for macro expansion
 thiserror = "^1.0"
-
-# Crates required by bin/ios
-camino = "^1.1"
-uniffi = { version = "0.28" }
-uniffi_bindgen = "0.28.0"
 
 [build-dependencies]
 

@@ -115,19 +115,19 @@ impl From<MoproError> for FFIError {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Record)]
 pub struct G1 {
     pub x: String,
     pub y: String,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Record)]
 pub struct G2 {
     pub x: Vec<String>,
     pub y: Vec<String>,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Record)]
 pub struct ProofCalldata {
     pub a: G1,
     pub b: G2,

@@ -1,71 +1,70 @@
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::process::Command;
-use uuid::Uuid;
+use camino::Utf8Path;
+use uniffi_bindgen::bindings::{KotlinBindingGenerator, SwiftBindingGenerator};
+use uniffi_bindgen::library_mode::generate_bindings;
 
-pub mod android;
-pub mod ios;
+use crate::app_config::utils::build_release;
 
-pub fn mktemp() -> PathBuf {
-    let dir = std::env::temp_dir().join(Path::new(&Uuid::new_v4().to_string()));
-    fs::create_dir(&dir).expect("Failed to create tmpdir");
-    dir
+mod android;
+mod ios;
+mod utils;
+
+use utils::*;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Target {
+    Android,
+    Ios,
 }
 
-fn tmp_local(build_path: &Path) -> PathBuf {
-    let tmp_path = build_path.join("tmp");
-    if let Ok(metadata) = fs::metadata(&tmp_path) {
-        if !metadata.is_dir() {
-            panic!("non-directory tmp");
+#[derive(Debug, thiserror::Error)]
+pub enum MoproBuildError {
+    #[error("Failed to build the release library: {0}")]
+    LibraryBuildError(String),
+    #[error("Failed to generate bindings: {0}")]
+    GenerateBindingsError(String),
+}
+
+pub fn build(target: Target, library_name: &str) -> Result<(), MoproBuildError> {
+    // Build the crate as a release library for the bindgen
+    build_release().map_err(|e| MoproBuildError::LibraryBuildError(e.to_string()))?;
+
+    // Set up the directories for the bindings
+    let cwd = std::env::current_dir().unwrap();
+    let manifest_dir =
+        std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
+
+    let bindings_dir = format!("{}/target/out", manifest_dir);
+    let library_path = format!("{}/target/release/lib{}.dylib", manifest_dir, library_name);
+
+    // Generate the bindings for IOS
+    match target {
+        Target::Ios => {
+            generate_bindings(
+                Utf8Path::new(&library_path),
+                None,
+                &SwiftBindingGenerator,
+                None,
+                Utf8Path::new(&bindings_dir),
+                true,
+            )
+            .map_err(|e| MoproBuildError::GenerateBindingsError(e.to_string()))?;
+
+            ios::build(library_name, &manifest_dir, &bindings_dir); // TODO - add error handling
         }
-    } else {
-        fs::create_dir_all(&tmp_path).expect("Failed to create local tmpdir");
-    }
-    tmp_path
-}
+        Target::Android => {
+            generate_bindings(
+                Utf8Path::new(&library_path),
+                None,
+                &KotlinBindingGenerator,
+                None,
+                Utf8Path::new(&bindings_dir),
+                true,
+            )
+            .map_err(|e| MoproBuildError::GenerateBindingsError(e.to_string()))?;
 
-pub fn mktemp_local(build_path: &Path) -> PathBuf {
-    let dir = tmp_local(build_path).join(&Uuid::new_v4().to_string());
-    fs::create_dir(&dir).expect("Failed to create tmpdir");
-    dir
-}
+            android::build(); // TODO - rewrite this to make it work
+        }
+    };
 
-pub fn cleanup_tmp_local(build_path: &Path) {
-    fs::remove_dir_all(tmp_local(build_path)).expect("Failed to remove tmpdir");
-}
-
-pub fn install_ndk() {
-    Command::new("cargo")
-        .arg("install")
-        .arg("cargo-ndk")
-        .spawn()
-        .expect("Failed to spawn cargo, is it installed?")
-        .wait()
-        .expect("Failed to install cargo-ndk");
-}
-
-pub fn install_arch(arch: String) {
-    Command::new("rustup")
-        .arg("target")
-        .arg("add")
-        .arg(arch.clone())
-        .spawn()
-        .expect("Failed to spawn rustup, is it installed?")
-        .wait()
-        .expect(format!("Failed to install target architecture {}", arch).as_str());
-}
-
-pub fn install_archs() {
-    let archs = vec![
-        "x86_64-apple-ios",
-        "aarch64-apple-ios",
-        "aarch64-apple-ios-sim",
-        "aarch64-linux-android",
-        "armv7-linux-androideabi",
-        "i686-linux-android",
-        "x86_64-linux-android",
-    ];
-    for arch in archs {
-        install_arch(arch.to_string());
-    }
+    Ok(())
 }

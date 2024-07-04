@@ -30,7 +30,7 @@ impl MoproHalo2 for FibonacciCircuit {
         })
     }
 
-    fn verify(proof: Vec<u8>, public_inputs: Vec<u8>) -> Result<bool, MoproError> {
+    fn verify(_proof: Vec<u8>, _public_inputs: Vec<u8>) -> Result<bool, MoproError> {
         Ok(true)
     }
 }

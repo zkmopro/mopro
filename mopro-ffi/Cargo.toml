@@ -23,7 +23,13 @@ circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark
 mopro-macro = { path = "../mopro-macro" }
 
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+
 uniffi = { version = "=0.28.0" }
+
+# Required by `app_config`
+uniffi_bindgen = "0.28.0"
+camino = "^1.1"
+
 
 # Error handling
 thiserror = "=1.0.39"

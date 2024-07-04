@@ -932,19 +932,18 @@ dependencies = [
 name = "mopro-app"
 version = "0.1.0"
 dependencies = [
- "camino",
  "mopro-ffi",
  "num-bigint",
  "rust-witness",
  "thiserror",
  "uniffi",
- "uniffi_bindgen",
 ]
 
 [[package]]
 name = "mopro-ffi"
 version = "0.1.0"
 dependencies = [
+ "camino",
  "color-eyre",
  "halo2_proofs",
  "halo2curves",
@@ -954,6 +953,7 @@ dependencies = [
  "serde",
  "thiserror",
  "uniffi",
+ "uniffi_bindgen",
  "uuid",
 ]
 

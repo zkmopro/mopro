@@ -1662,6 +1662,7 @@ dependencies = [
  "ark-relations",
  "ark-serialize",
  "ark-std",
+ "camino",
  "color-eyre",
  "halo2_proofs",
  "halo2curves",
@@ -1672,6 +1673,7 @@ dependencies = [
  "serde_derive",
  "thiserror",
  "uniffi",
+ "uniffi_bindgen",
  "uuid",
 ]
 

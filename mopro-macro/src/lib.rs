@@ -8,18 +8,11 @@ pub fn halo2_macro_derive(input: TokenStream) -> TokenStream {
 
     let name = input.ident;
     let struct_name_str = name.to_string();
-    let prove_fn_name = syn::Ident::new(
-        &format!("prove_halo2_{}", struct_name_str.to_lowercase()),
-        name.span(),
-    );
-    let verify_fn_name = syn::Ident::new(
-        &format!("verify_halo2_{}", struct_name_str.to_lowercase()),
-        name.span(),
-    );
     let new_struct_name = syn::Ident::new(&format!("{}Halo2Mopro", struct_name_str), name.span());
 
     let expanded = quote! {
-        // Helper struct to enforce the trait bound
+        // Struct to define the prove and verify methods
+        // as well as enforce the trait bound on MoproHalo2
         #[derive(uniffi::Object)]
         struct #new_struct_name where #name: mopro_ffi::MoproHalo2;
 
