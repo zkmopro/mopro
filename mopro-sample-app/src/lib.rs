@@ -34,3 +34,11 @@ impl MoproHalo2 for FibonacciCircuit {
         Ok(true)
     }
 }
+
+// Generate the Halo2 bindings for the Fibonacci circuit
+mopro_halo2_circuit!(FibonacciCircuit);
+
+// Sample Circom circuit
+
+// Generate the Circom bindings for the Multiplier circuit
+mopro_circom_circuit!(multiplier3);

@@ -1,4 +1,4 @@
-use crate::{MoproError, ProofCalldata, WtnsFn, G1, G2};
+use crate::{MoproError, WtnsFn};
 mod serialization;
 
 use serialization::{SerializableInputs, SerializableProof};
@@ -20,8 +20,28 @@ use ark_std::rand::thread_rng;
 use color_eyre::Result;
 
 use num_bigint::BigInt;
+use uniffi::Record;
 
 type GrothBn = Groth16<Bn254>;
+
+#[derive(Debug, Clone, Default, Record)]
+pub struct G1 {
+    pub x: String,
+    pub y: String,
+}
+
+#[derive(Debug, Clone, Default, Record)]
+pub struct G2 {
+    pub x: Vec<String>,
+    pub y: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default, Record)]
+pub struct ProofCalldata {
+    pub a: G1,
+    pub b: G2,
+    pub c: G1,
+}
 
 // build a proof for a zkey using witness_fn to build
 // the witness
@@ -108,6 +128,7 @@ pub fn verify_circom_proof(
 }
 
 // Convert proof to String-tuples as expected by the Solidity Groth16 Verifier
+#[uniffi::export]
 pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
     let deserialized_proof = serialization::deserialize_proof(proof);
     let proof = serialization::to_ethereum_proof(&deserialized_proof);
@@ -126,6 +147,7 @@ pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
     ProofCalldata { a, b, c }
 }
 
+#[uniffi::export]
 pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
     let deserialized_inputs = serialization::deserialize_inputs(inputs);
     let inputs = deserialized_inputs
@@ -134,6 +156,45 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
         .map(|x| x.to_string())
         .collect();
     inputs
+}
+
+#[macro_export]
+macro_rules! mopro_circom_circuit {
+    ($name:ident) => {
+        paste::paste! {
+
+            // TODO - avoid this duplication, ideally this would be an inline macro
+            rust_witness::witness!(multiplier3);
+
+            #[derive(uniffi::Object)]
+            pub struct [<$name CircomMopro>] {
+                circuit_path: String,
+            }
+
+            #[uniffi::export]
+            impl [<$name CircomMopro>] {
+                #[uniffi::constructor]
+                pub fn new(circuit_path: String) -> Self {
+                    let _ = std::path::Path::new(circuit_path.as_str()).file_name().unwrap();
+                    Self { circuit_path }
+                }
+
+                pub fn prove(&self, in1: std::collections::HashMap<String, Vec<String>>) -> Result<GenerateProofResult, MoproErrorExternal> {
+
+                    // TODO - this causes linker error -
+                    // TODO - we will likely need to find another way to pass the witness generation function
+                    // mopro_ffi::generate_circom_proof_wtns(self.circuit_path.to_string(), in1, [<$name CircomMopro>]);
+
+                    Err(MoproErrorExternal::from(MoproError::CircomError("Not implemented".to_string())))
+                }
+
+                pub fn verify(&self, in1: Vec<u8>, in2: Vec<u8>) -> Result<bool, MoproErrorExternal> {
+                    let circuit_path = &self.circuit_path;
+                    mopro_ffi::verify_circom_proof(circuit_path.to_string(), in1, in2).map_err(|e| MoproErrorExternal::from(e))
+                }
+            }
+        }
+    };
 }
 
 #[cfg(test)]

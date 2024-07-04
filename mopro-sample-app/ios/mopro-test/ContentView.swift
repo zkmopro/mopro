@@ -15,8 +15,10 @@ struct ContentView: View {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
-            Text("Hello, world!")
-            Button("Test", action: hello).accessibilityIdentifier("prove")
+            Text("Hello to our proving systems!")
+            
+            Button("Test Circom", action: circom).accessibilityIdentifier("provecircom")
+            Button("Test Halo2", action: halo2).accessibilityIdentifier("provehalo2")
 
         }
         .padding()
@@ -27,9 +29,7 @@ struct ContentView: View {
     ContentView()
 }
 
-func hello() {
-    // Imported from mopro-ffi
-    GenerateProofResult.init(proof: Data(), inputs: Data())
+func halo2() {
 
     let input = ["a": ["1", "0x"], "b": ["2"]]
 
@@ -38,8 +38,8 @@ func hello() {
         // Call the prove function of the FibonacciCircuitHalo2Mopro circuit
         // Fix an error: Errors thrown from here are not handled because the enclosing catch is not exhaustive
         let fibonacciCircuit = FibonacciCircuitHalo2Mopro()
-        let result = try fibonacciCircuit.prove(in0: input)
-        let verifies = try fibonacciCircuit.verify(in0: result.proof, in1: result.inputs)
+        let result = try fibonacciCircuit.prove(in1: input)
+        let verifies = try fibonacciCircuit.verify(in1: result.proof, in2: result.inputs)
 
         print("Verifies", verifies)
 
@@ -50,4 +50,24 @@ func hello() {
         print("Should not be here...")
     }
 
+}
+
+func circom() {
+     
+    let input = ["a": ["1", "0x"], "b": ["2"]]
+
+    do {
+        
+        let circomCircuit = Multiplier3CircomMopro(circuitPath: "multiplier3_final.zkey")
+        // WARNING - this will always fail because for now the prove implementation is broken
+        let result = try circomCircuit.prove(in1: input)
+        let verifies = try circomCircuit.verify(in1: result.proof, in2: result.inputs)
+        
+        print("Verifies", verifies)
+    } catch MoproErrorExternal.CircomError(let err) {
+        
+        print("Failed with: ", err)
+    } catch {
+        print("Should not be here...")
+    }
 }
