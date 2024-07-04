@@ -1678,7 +1678,6 @@ dependencies = [
  "color-eyre",
  "halo2_proofs",
  "halo2curves",
- "mopro-macro",
  "num-bigint",
  "rust-witness",
  "serde",
@@ -1686,15 +1685,6 @@ dependencies = [
  "uniffi",
  "uniffi_bindgen",
  "uuid",
-]
-
-[[package]]
-name = "mopro-macro"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.68",
 ]
 
 [[package]]

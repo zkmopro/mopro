@@ -9,10 +9,6 @@ edition = "2021"
 crate-type = ["lib", "cdylib", "staticlib"]
 name = "mopro_ffi"
 
-[[bin]]
-name = "uniffi-bindgen"
-path = "src/uniffi-bindgen.rs"
-
 [features]
 default = []
 
@@ -20,8 +16,6 @@ halo2 = ["halo2_proofs", "halo2curves", "serde"]
 circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations"]
 
 [dependencies]
-mopro-macro = { path = "../mopro-macro" }
-
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 
 uniffi = { version = "=0.28.0" }

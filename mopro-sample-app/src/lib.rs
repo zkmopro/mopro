@@ -1,17 +1,18 @@
 // This is required to initiate the Mopro Bindings setup
 mopro_ffi::setup_mopro_ffi!();
 
-use mopro_ffi::{GenerateProofResult, Halo2CircuitBindings, MoproHalo2};
+// Sample Halo2 circuit
+
+use mopro_ffi::{mopro_circom_circuit, mopro_halo2_circuit, GenerateProofResult, MoproHalo2};
 use std::collections::HashMap;
 
-// We can derive Halo2 Mopro bindings as long as the circuit implements `MoproHalo2` trait
-#[derive(Halo2CircuitBindings)]
+// A sample Halo2 circuit
 struct FibonacciCircuit {
-    pub a: u64,
-    pub b: u64,
+    pub _a: u64,
+    pub _b: u64,
 }
 
-// Implementation of the `MoproHalo2` trait for the Fibonacci circuit
+/// The Halo2 circuit must implementation of the [`MoproHalo2`] to generate the bindings
 impl MoproHalo2 for FibonacciCircuit {
     fn prove(input: HashMap<String, Vec<String>>) -> Result<GenerateProofResult, MoproError> {
         let a = input.get("a").unwrap();
@@ -19,7 +20,7 @@ impl MoproHalo2 for FibonacciCircuit {
         let a = a[0].parse::<u64>().unwrap();
         let b = b[0].parse::<u64>().unwrap();
 
-        let _ = FibonacciCircuit { a, b };
+        let _ = FibonacciCircuit { _a: a, _b: b };
 
         let proof = Vec::new();
         let public_inputs = Vec::new();

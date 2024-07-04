@@ -8,7 +8,7 @@ mod circom;
 mod halo2;
 
 #[cfg(feature = "halo2")]
-pub use {halo2::MoproHalo2, mopro_macro::Halo2CircuitBindings};
+pub use halo2::MoproHalo2;
 
 #[cfg(feature = "circom")]
 pub use circom::{generate_circom_proof_wtns, verify_circom_proof};
