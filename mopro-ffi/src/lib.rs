@@ -1,8 +1,13 @@
+uniffi::include_scaffolding!("mopro");
+
 pub mod app_config;
 #[cfg(feature = "circom")]
 mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
+
+#[cfg(feature = "halo2")]
+pub use {halo2::*, mopro_macro::Halo2Mopro};
 
 use std::collections::HashMap;
 use thiserror::Error;
@@ -21,7 +26,9 @@ pub enum MoproError {
 pub fn generate_halo2_proof(
     in0: HashMap<String, Vec<String>>,
 ) -> Result<GenerateProofResult, MoproError> {
-    halo2::generate_halo2_proof(in0)
+    Err(MoproError::Halo2Error(
+        "Project does not have Halo2 feature enabled".to_string(),
+    ))
 }
 
 #[cfg(not(feature = "halo2"))]
@@ -35,7 +42,9 @@ pub fn generate_halo2_proof(
 
 #[cfg(feature = "halo2")]
 pub fn verify_halo2_proof(in0: Vec<u8>, in1: Vec<u8>) -> Result<bool, MoproError> {
-    halo2::verify_halo2_proof(in0, in1)
+    Err(MoproError::Halo2Error(
+        "Project does not have Halo2 feature enabled".to_string(),
+    ))
 }
 
 #[cfg(not(feature = "halo2"))]
