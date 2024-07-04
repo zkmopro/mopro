@@ -1,0 +1,28 @@
+[workspace]
+[package]
+name = "mopro-app"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib", "staticlib"]
+name = "mopro_bindings"
+
+[[bin]]
+name = "ios"
+
+[dependencies]
+mopro-ffi = { path = "../mopro-ffi", features = ["halo2"] }
+#mopro-ffi = { git = "https://github.com/vimwitch/mopro.git" }
+uniffi = { version = "0.28", features = ["cli"] }
+#rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+num-bigint = "0.4.0"
+
+[build-dependencies]
+
+#rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+mopro-ffi = { path = "../mopro-ffi" }
+uniffi = { version = "0.28", features = ["build"] }
+
+[dev-dependencies]
+uniffi = { version = "0.28", features = ["bindgen-tests"] }
