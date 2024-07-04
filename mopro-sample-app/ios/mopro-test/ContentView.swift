@@ -63,6 +63,9 @@ func circom() {
         let result = try circomCircuit.prove(in1: input)
         let verifies = try circomCircuit.verify(in1: result.proof, in2: result.inputs)
         
+        let ethereumProof = toEthereumProof(proof: result.proof)
+        let ethereumInput = toEthereumInputs(inputs: result.inputs)
+        
         print("Verifies", verifies)
     } catch MoproErrorExternal.CircomError(let err) {
         
