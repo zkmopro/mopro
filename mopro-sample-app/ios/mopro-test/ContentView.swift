@@ -39,10 +39,10 @@ func halo2() {
         
         let input = ["a": ["1", "0"], "b": ["2"], "out": ["55"]]
 
-        let result = try fibonacciCircuit.prove(in1: input)
+        let result = try fibonacciCircuit.prove(circuitInputs: input)
         print("Halo2: Generated the proof")
 
-        let verifies = try fibonacciCircuit.verify(in1: result.proof, in2: result.inputs)
+        let verifies = try fibonacciCircuit.verify(proof: result.proof, publicInput: result.inputs)
 
         print("Halo2: Verifies", verifies)
 
@@ -65,9 +65,9 @@ func circom() {
         print("Circom: Initiated the circuit")
         
         let input = ["a": ["1", "0"], "b": ["2"]]
-        let result = try circomCircuit.prove(in1: input)
+        let result = try circomCircuit.prove(circuitInputs: input)
         print("Circom: Generated the proof")
-        let verifies = try circomCircuit.verify(in1: result.proof, in2: result.inputs)
+        let verifies = try circomCircuit.verify(proof: result.proof, publicInput: result.inputs)
         
         print("Circom: Verifies", verifies)
 

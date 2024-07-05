@@ -179,17 +179,14 @@ macro_rules! mopro_circom_circuit {
                     Self { circuit_path }
                 }
 
-                pub fn prove(&self, in1: std::collections::HashMap<String, Vec<String>>) -> Result<mopro_ffi::GenerateProofResult, crate::MoproErrorExternal> {
-
-                    // TODO - this causes linker error -
-                    // TODO - we will likely need to find another way to pass the witness generation function
-                    mopro_ffi::generate_circom_proof_wtns(self.circuit_path.to_string(), in1, [<$name _witness>])
+                pub fn prove(&self, circuit_inputs: std::collections::HashMap<String, Vec<String>>) -> Result<mopro_ffi::GenerateProofResult, crate::MoproErrorExternal> {
+                    mopro_ffi::generate_circom_proof_wtns(self.circuit_path.to_string(), circuit_inputs, [<$name _witness>])
                         .map_err(|e| crate::MoproErrorExternal::from(e))
                 }
 
-                pub fn verify(&self, in1: Vec<u8>, in2: Vec<u8>) -> Result<bool, crate::MoproErrorExternal> {
+                pub fn verify(&self, proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, crate::MoproErrorExternal> {
                     let circuit_path = &self.circuit_path;
-                    mopro_ffi::verify_circom_proof(circuit_path.to_string(), in1, in2)
+                    mopro_ffi::verify_circom_proof(circuit_path.to_string(), proof, public_input)
                         .map_err(|e| crate::MoproErrorExternal::from(e))
                 }
             }

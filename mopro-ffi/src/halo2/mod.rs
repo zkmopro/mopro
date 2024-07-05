@@ -29,12 +29,12 @@ macro_rules! mopro_halo2_circuit {
                         Self {}
                     }
 
-                    pub fn prove(&self, in1: std::collections::HashMap<String, Vec<String>>) -> Result<mopro_ffi::GenerateProofResult, crate::MoproErrorExternal> {
-                        [<$struct_name>]::prove(in1).map_err(|e| e.into())
+                    pub fn prove(&self, circuit_inputs: std::collections::HashMap<String, Vec<String>>) -> Result<mopro_ffi::GenerateProofResult, crate::MoproErrorExternal> {
+                        [<$struct_name>]::prove(circuit_inputs).map_err(|e| e.into())
                     }
 
-                    pub fn verify(&self, in1: Vec<u8>, in2: Vec<u8>) -> Result<bool, crate::MoproErrorExternal> {
-                        [<$struct_name>]::verify(in1, in2).map_err(|e| e.into())
+                    pub fn verify(&self, proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, crate::MoproErrorExternal> {
+                        [<$struct_name>]::verify(proof, public_input).map_err(|e| e.into())
                     }
                 }
             }
