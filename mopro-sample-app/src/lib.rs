@@ -8,10 +8,10 @@ use crate::halo2::deserialize_circuit_inputs;
 use std::collections::HashMap;
 use std::time::Instant;
 
-struct FibonacciCircuit {}
+struct Fibonacci {}
 
 /// The Halo2 circuit must implementation of the [`mopro_ffi::MoproHalo2`] to generate the bindings
-impl mopro_ffi::MoproHalo2 for FibonacciCircuit {
+impl mopro_ffi::MoproHalo2 for Fibonacci {
     fn prove(
         input: HashMap<String, Vec<String>>,
     ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
@@ -60,7 +60,7 @@ impl mopro_ffi::MoproHalo2 for FibonacciCircuit {
 }
 
 // Generate the Halo2 bindings for the Fibonacci circuit
-mopro_ffi::mopro_halo2_circuit!(FibonacciCircuit);
+mopro_ffi::mopro_halo2_circuit!(Fibonacci);
 
 // Sample Circom circuit
 

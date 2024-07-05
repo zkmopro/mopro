@@ -1,4 +1,5 @@
-import mopro
+import test_e2eFFI
+
 import Foundation
 
 func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
@@ -28,6 +29,7 @@ func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
 
 do {
     let zkeyPath = "../../../test-vectors/circom/multiplier2_final.zkey"
+    let circuit = Multiplier2CircomCircuit(zkeyPath)
 
     // Prepare inputs
     var inputs = [String: [String]]()
@@ -42,13 +44,13 @@ do {
     let expectedOutput: [UInt8] = serializeOutputs(outputs)
 
     // Generate Proof
-    let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+    let generateProofResult = try circuit.prove(circuitInputs: inputs)
     assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
 
     // Verify Proof
     assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
 
-    let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
+    let isValid = try circuit.verify(proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
     assert(isValid, "Proof verification should succeed")
 
     // Convert proof to Ethereum compatible proof

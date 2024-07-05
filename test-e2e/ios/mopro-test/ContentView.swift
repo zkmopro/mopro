@@ -39,11 +39,11 @@ struct ContentView: View {
     @State private var generatedProof: Data?
     @State private var publicInputs: Data?
     private let zkeyPath: String
-    private let circuit: Multiplier2CircomMopro
+    private let circuit: Multiplier2CircomCircuit
 
     init() {
         self.zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
-        self.circuit = Multiplier2CircomMopro(circuitPath: zkeyPath)
+        self.circuit = Multiplier2CircomCircuit(circuitPath: zkeyPath)
     }
     
     var body: some View {

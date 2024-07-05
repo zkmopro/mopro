@@ -34,7 +34,7 @@ func halo2() {
     do {
         // Call the prove function of the FibonacciCircuitHalo2Mopro circuit
         // Fix an error: Errors thrown from here are not handled because the enclosing catch is not exhaustive
-        let fibonacciCircuit = FibonacciCircuitHalo2Mopro()
+        let fibonacciCircuit = FibonacciHalo2Circuit()
         print("Halo2: Initiated the circuit")
         
         let input = ["a": ["1", "0"], "b": ["2"], "out": ["55"]]
@@ -61,7 +61,7 @@ func circom() {
         
         let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
         
-        let circomCircuit = Multiplier2CircomMopro(circuitPath: zkeyPath)
+        let circomCircuit = Multiplier2CircomCircuit(circuitPath: zkeyPath)
         print("Circom: Initiated the circuit")
         
         let input = ["a": ["1", "0"], "b": ["2"]]

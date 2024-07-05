@@ -31,6 +31,7 @@ pub mod reexports {
     pub use paste::paste;
 }
 
+/// This macro **must** be called from the top of your `lib.rs` or `main.rs` file to setup the FFI bindings
 #[macro_export]
 macro_rules! setup_mopro {
     () => {
