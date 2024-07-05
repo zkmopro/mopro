@@ -161,7 +161,7 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
 #[macro_export]
 macro_rules! mopro_circom_circuit {
     ($name:ident) => {
-        mopro::reexports::paste! {
+        mopro_ffi::reexports::paste! {
 
             // TODO - avoid this duplication, ideally this would be an inline macro
             rust_witness::witness!([<$name>]);
@@ -179,17 +179,17 @@ macro_rules! mopro_circom_circuit {
                     Self { circuit_path }
                 }
 
-                pub fn prove(&self, in1: std::collections::HashMap<String, Vec<String>>) -> Result<mopro::GenerateProofResult, crate::MoproErrorExternal> {
+                pub fn prove(&self, in1: std::collections::HashMap<String, Vec<String>>) -> Result<mopro_ffi::GenerateProofResult, crate::MoproErrorExternal> {
 
                     // TODO - this causes linker error -
                     // TODO - we will likely need to find another way to pass the witness generation function
-                    mopro::generate_circom_proof_wtns(self.circuit_path.to_string(), in1, [<$name _witness>])
+                    mopro_ffi::generate_circom_proof_wtns(self.circuit_path.to_string(), in1, [<$name _witness>])
                         .map_err(|e| crate::MoproErrorExternal::from(e))
                 }
 
                 pub fn verify(&self, in1: Vec<u8>, in2: Vec<u8>) -> Result<bool, crate::MoproErrorExternal> {
                     let circuit_path = &self.circuit_path;
-                    mopro::verify_circom_proof(circuit_path.to_string(), in1, in2)
+                    mopro_ffi::verify_circom_proof(circuit_path.to_string(), in1, in2)
                         .map_err(|e| crate::MoproErrorExternal::from(e))
                 }
             }

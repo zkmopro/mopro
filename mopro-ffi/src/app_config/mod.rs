@@ -32,11 +32,10 @@ pub fn build(target: Target) -> Result<(), MoproBuildError> {
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
-    
+
     // Library name is the name of the crate with all `-` replaced with `_`
     let crate_name = std::env::var("CARGO_PKG_NAME").unwrap();
     let library_name = crate_name.replace("-", "_");
-
 
     let bindings_dir = format!("{}/target/out", manifest_dir);
     let library_path = format!("{}/target/release/lib{}.dylib", manifest_dir, library_name);
@@ -54,7 +53,7 @@ pub fn build(target: Target) -> Result<(), MoproBuildError> {
             )
             .map_err(|e| MoproBuildError::GenerateBindingsError(e.to_string()))?;
 
-            ios::build(library_name, &manifest_dir, &bindings_dir); // TODO - add error handling
+            ios::build(&library_name, &manifest_dir, &bindings_dir); // TODO - add error handling
         }
         Target::Android => {
             generate_bindings(

@@ -11,9 +11,10 @@
 		4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF977F02C2BCF0000CE1139 /* ContentView.swift */; };
 		4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F22C2BCF0300CE1139 /* Assets.xcassets */; };
 		4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */; };
-		60243E472C38868600C7D2F8 /* mopro_app.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60243E432C38868600C7D2F8 /* mopro_app.swift */; };
-		60243E482C38868600C7D2F8 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60243E442C38868600C7D2F8 /* mopro.swift */; };
-		60243E492C38868600C7D2F8 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60243E452C38868600C7D2F8 /* MoproBindings.xcframework */; };
+		60243E4B2C3892C000C7D2F8 /* multiplier2_final.zkey in Resources */ = {isa = PBXBuildFile; fileRef = 60243E4A2C3892C000C7D2F8 /* multiplier2_final.zkey */; };
+		60243E502C38971700C7D2F8 /* mopro_app.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60243E4C2C38971700C7D2F8 /* mopro_app.swift */; };
+		60243E512C38971700C7D2F8 /* mopro_ffi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60243E4D2C38971700C7D2F8 /* mopro_ffi.swift */; };
+		60243E522C38971700C7D2F8 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60243E4E2C38971700C7D2F8 /* MoproBindings.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,9 +24,10 @@
 		4CF977F02C2BCF0000CE1139 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CF977F22C2BCF0300CE1139 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		60243E432C38868600C7D2F8 /* mopro_app.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mopro_app.swift; sourceTree = "<group>"; };
-		60243E442C38868600C7D2F8 /* mopro.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mopro.swift; sourceTree = "<group>"; };
-		60243E452C38868600C7D2F8 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
+		60243E4A2C3892C000C7D2F8 /* multiplier2_final.zkey */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2_final.zkey; path = "../../test-vectors/circom/multiplier2_final.zkey"; sourceTree = "<group>"; };
+		60243E4C2C38971700C7D2F8 /* mopro_app.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mopro_app.swift; sourceTree = "<group>"; };
+		60243E4D2C38971700C7D2F8 /* mopro_ffi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mopro_ffi.swift; sourceTree = "<group>"; };
+		60243E4E2C38971700C7D2F8 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
 		60EFDF1A2C36ED97002C66FD /* first.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = first.swift; sourceTree = "<group>"; };
 		60EFDF1B2C36ED97002C66FD /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
 		60EFDF1C2C36ED97002C66FD /* second.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = second.swift; sourceTree = "<group>"; };
@@ -39,7 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				60243E492C38868600C7D2F8 /* MoproBindings.xcframework in Frameworks */,
+				60243E522C38971700C7D2F8 /* MoproBindings.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,7 +59,8 @@
 		4CF977E22C2BCF0000CE1139 = {
 			isa = PBXGroup;
 			children = (
-				60243E462C38868600C7D2F8 /* MoproiOSBindings */,
+				60243E4F2C38971700C7D2F8 /* MoproiOSBindings */,
+				60243E4A2C3892C000C7D2F8 /* multiplier2_final.zkey */,
 				4CF977ED2C2BCF0000CE1139 /* mopro-test */,
 				4C05CDB02C327C4F00BEBACD /* mopro-test-UITests */,
 				4CF977EC2C2BCF0000CE1139 /* Products */,
@@ -101,12 +104,12 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		60243E462C38868600C7D2F8 /* MoproiOSBindings */ = {
+		60243E4F2C38971700C7D2F8 /* MoproiOSBindings */ = {
 			isa = PBXGroup;
 			children = (
-				60243E432C38868600C7D2F8 /* mopro_app.swift */,
-				60243E442C38868600C7D2F8 /* mopro.swift */,
-				60243E452C38868600C7D2F8 /* MoproBindings.xcframework */,
+				60243E4C2C38971700C7D2F8 /* mopro_app.swift */,
+				60243E4D2C38971700C7D2F8 /* mopro_ffi.swift */,
+				60243E4E2C38971700C7D2F8 /* MoproBindings.xcframework */,
 			);
 			name = MoproiOSBindings;
 			path = ../MoproiOSBindings;
@@ -193,6 +196,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */,
+				60243E4B2C3892C000C7D2F8 /* multiplier2_final.zkey in Resources */,
 				4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -205,9 +209,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */,
-				60243E472C38868600C7D2F8 /* mopro_app.swift in Sources */,
+				60243E502C38971700C7D2F8 /* mopro_app.swift in Sources */,
 				4CF977EF2C2BCF0000CE1139 /* mopro_testApp.swift in Sources */,
-				60243E482C38868600C7D2F8 /* mopro.swift in Sources */,
+				60243E512C38971700C7D2F8 /* mopro_ffi.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

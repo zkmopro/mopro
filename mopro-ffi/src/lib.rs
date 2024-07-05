@@ -52,11 +52,11 @@ macro_rules! setup_mopro {
             }
         }
 
-        impl From<mopro::MoproError> for MoproErrorExternal {
-            fn from(e: mopro::MoproError) -> Self {
+        impl From<mopro_ffi::MoproError> for MoproErrorExternal {
+            fn from(e: mopro_ffi::MoproError) -> Self {
                 match e {
-                    mopro::MoproError::CircomError(e) => MoproErrorExternal::CircomError(e),
-                    mopro::MoproError::Halo2Error(e) => MoproErrorExternal::Halo2Error(e),
+                    mopro_ffi::MoproError::CircomError(e) => MoproErrorExternal::CircomError(e),
+                    mopro_ffi::MoproError::Halo2Error(e) => MoproErrorExternal::Halo2Error(e),
                 }
             }
         }

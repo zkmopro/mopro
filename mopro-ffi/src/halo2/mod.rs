@@ -12,13 +12,13 @@ pub trait MoproHalo2 {
 #[macro_export]
 macro_rules! mopro_halo2_circuit {
     ($struct_name:ident) => {
-        mopro::reexports::paste! {
+        mopro_ffi::reexports::paste! {
             #[derive(uniffi::Object)]
-            pub struct [<$struct_name Halo2Mopro>] where [<$struct_name>]: mopro::MoproHalo2 {}
+            pub struct [<$struct_name Halo2Mopro>] where [<$struct_name>]: mopro_ffi::MoproHalo2 {}
 
             /// A separate module to avoid duplicate imports for `MoproHalo2`
             mod [<$struct_name _tmp_impl_mod>] {
-                use mopro::MoproHalo2;
+                use mopro_ffi::MoproHalo2;
                 use super::{[<$struct_name Halo2Mopro>], [<$struct_name>]};
 
                 #[uniffi::export]
@@ -29,7 +29,7 @@ macro_rules! mopro_halo2_circuit {
                         Self {}
                     }
 
-                    pub fn prove(&self, in1: std::collections::HashMap<String, Vec<String>>) -> Result<mopro::GenerateProofResult, crate::MoproErrorExternal> {
+                    pub fn prove(&self, in1: std::collections::HashMap<String, Vec<String>>) -> Result<mopro_ffi::GenerateProofResult, crate::MoproErrorExternal> {
                         [<$struct_name>]::prove(in1).map_err(|e| e.into())
                     }
 

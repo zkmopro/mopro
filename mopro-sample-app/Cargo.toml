@@ -17,7 +17,7 @@ path = "src/halo2/gen_keys.rs"
 [features]
 
 [dependencies]
-mopro = { path = "../mopro-ffi", features = ["halo2", "circom"] }
+mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
 uniffi = { version = "0.28" }
 
 # Halo2 dependency crates

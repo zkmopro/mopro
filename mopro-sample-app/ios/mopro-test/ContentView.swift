@@ -35,46 +35,51 @@ func halo2() {
         // Call the prove function of the FibonacciCircuitHalo2Mopro circuit
         // Fix an error: Errors thrown from here are not handled because the enclosing catch is not exhaustive
         let fibonacciCircuit = FibonacciCircuitHalo2Mopro()
-        print("Initiated the circuit")
+        print("Halo2: Initiated the circuit")
         
         let input = ["a": ["1", "0"], "b": ["2"], "out": ["55"]]
 
         let result = try fibonacciCircuit.prove(in1: input)
-        print("Generated the proof")
+        print("Halo2: Generated the proof")
 
         let verifies = try fibonacciCircuit.verify(in1: result.proof, in2: result.inputs)
 
-        print("Verifies", verifies)
+        print("Halo2: Verifies", verifies)
 
     } catch MoproErrorExternal.Halo2Error(let err) {
 
-        print("Failed with: ", err)
+        print("Halo2: Failed with: ", err)
     } catch {
-        print("Should not be here...")
+        print("Halo2: Should not be here: \(error)")
     }
 
 }
 
 func circom() {
     // Imported form mopro-app
-    let input = ["a": ["1", "0x"], "b": ["2"]]
-
     do {
         
-        let circomCircuit = Multiplier2CircomMopro(circuitPath: "multiplier3_final.zkey")
-        // WARNING - this will always fail because for now the prove implementation is broken
+        let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
+        
+        let circomCircuit = Multiplier2CircomMopro(circuitPath: zkeyPath)
+        print("Circom: Initiated the circuit")
+        
+        let input = ["a": ["1", "0"], "b": ["2"]]
         let result = try circomCircuit.prove(in1: input)
+        print("Circom: Generated the proof")
         let verifies = try circomCircuit.verify(in1: result.proof, in2: result.inputs)
         
+        print("Circom: Verifies", verifies)
+
         // Imported form mopro-ffi
         let ethereumProof = toEthereumProof(proof: result.proof)
         let ethereumInput = toEthereumInputs(inputs: result.inputs)
         
-        print("Verifies", verifies)
+        print("Circom: Generated Ethereum proof and inputs")
     } catch MoproErrorExternal.CircomError(let err) {
         
-        print("Failed with: ", err)
+        print("Circom: Failed with: ", err)
     } catch {
-        print("Should not be here...")
+        print("Circom: Should not be here: \(error)")
     }
 }
