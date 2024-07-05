@@ -94,25 +94,25 @@ Benchmarks on an Macbook Pro M1 Max (2021).
 
 | SHA256 | [Tachyon](https://github.com/kroma-network/tachyon) | [witnesscalc](https://github.com/0xPolygonID/witnesscalc) | [circom-witness-rs](https://github.com/philsippl/circom-witness-rs) | [wasmer](https://github.com/arkworks-rs/circom-compat) | [w2c](https://github.com/vimwitch/rust-witness) | [snarkjs](https://github.com/iden3/snarkjs) |
 | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
-| Average | 3.2 ms | 22.2 ms | 42.8 ms | 454.5 ms | 88.8 ms | 132.8 ms | 
-| Stdev | 0.2 ms | 5.2 ms | 2.2 ms | 26.7 ms | 1.0 ms | 1.3 ms |
-| Comparing to snarkjs | <font color="FFB546">**~41x**</font> | ~6x | ~3x | ~(-3.4)x | ~1.5x | - |
+| Average | 32.7 ms | 22.2 ms | 42.8 ms | 454.5 ms | 88.8 ms | 132.8 ms | 
+| Stdev | 0.7 ms | 5.2 ms | 2.2 ms | 26.7 ms | 1.0 ms | 1.3 ms |
+| Comparing to snarkjs | ~4x | <font color="FFB546">**~6x**</font> | ~3x | ~(-3.4)x | ~1.5x | - |
 
 <iframe width="466" height="254" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuS5abdzvh6znXORvSo7M85ubmDpSmE3C1Zs_l56wd25lMK4FZPEWOaCp7WrOlIjc3jEcWa0lfiy9/pubchart?oid=2079338651&amp;format=interactive"></iframe>
 
 | Keccak256 | [Tachyon](https://github.com/kroma-network/tachyon) | [witnesscalc](https://github.com/0xPolygonID/witnesscalc) | [circom-witness-rs](https://github.com/philsippl/circom-witness-rs) | [wasmer](https://github.com/arkworks-rs/circom-compat) | [w2c](https://github.com/vimwitch/rust-witness) | [snarkjs](https://github.com/iden3/snarkjs) |
 | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
-| Average | 9.8 ms | 72.3 ms | 14.1 ms | 447.1 ms | 169 ms | 234.6 ms | 
-| Stdev | 0.4 ms | 7.7 ms | 0.8 ms | 5.9 ms | 2.0 ms | 3.2 ms |
-| Comparing to snarkjs | <font color="FFB546">**~23x**</font> | ~3x | ~16x | ~(-1.9)x | x1.4x | - |
+| Average | 82.9 ms | 72.3 ms | 14.1 ms | 447.1 ms | 169 ms | 234.6 ms | 
+| Stdev | 0.2 ms | 7.7 ms | 0.8 ms | 5.9 ms | 2.0 ms | 3.2 ms |
+| Comparing to snarkjs | ~2.8x | ~3x | <font color="FFB546">**~16x**</font> | ~(-1.9)x | x1.4x | - |
 
 <iframe width="530" height="245" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuS5abdzvh6znXORvSo7M85ubmDpSmE3C1Zs_l56wd25lMK4FZPEWOaCp7WrOlIjc3jEcWa0lfiy9/pubchart?oid=129836159&amp;format=interactive"></iframe>
 
 | RSA | [Tachyon](https://github.com/kroma-network/tachyon) | [witnesscalc](https://github.com/0xPolygonID/witnesscalc) | [circom-witness-rs](https://github.com/philsippl/circom-witness-rs) | [wasmer](https://github.com/arkworks-rs/circom-compat) | [w2c](https://github.com/vimwitch/rust-witness) | [snarkjs](https://github.com/iden3/snarkjs) |
 | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
-| Average | 4.3 ms | 167.6 ms | 522.9 ms | 5109 ms | 3847.2 ms | 4638.8 ms | 
-| Stdev | 0.2 ms | 7.5 ms | 7.7 ms | 25.1 ms | 61.3 ms | 32.4 ms |
-| Comparing to snarkjs | <font color="FFB546">**~1078x**</font> | ~27x | ~8.8x | ~(-1.1)x | ~1.2x | - |
+| Average | 218.4 ms | 167.6 ms | 522.9 ms | 5109 ms | 3847.2 ms | 4638.8 ms | 
+| Stdev | 16.8 ms | 7.5 ms | 7.7 ms | 25.1 ms | 61.3 ms | 32.4 ms |
+| Comparing to snarkjs | ~21.2 | <font color="FFB546">**~27x**</font> | ~8.8x | ~(-1.1)x | ~1.2x | - |
 
 <iframe width="552" height="259" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuS5abdzvh6znXORvSo7M85ubmDpSmE3C1Zs_l56wd25lMK4FZPEWOaCp7WrOlIjc3jEcWa0lfiy9/pubchart?oid=1347845461&amp;format=interactive"></iframe>
 </details>
@@ -122,25 +122,25 @@ Benchmarks on an Macbook Pro M1 Max (2021).
   <summary>Proof generation</summary>
 | SHA256 | [Tachyon](https://github.com/kroma-network/tachyon) | [rapidsnark](https://github.com/iden3/rapidsnark) | [ark-works](https://github.com/arkworks-rs/circom-compat) | [snarkjs](https://github.com/iden3/snarkjs) |
 | :--: | :--: | :--: | :--: | :--: | 
-| Average | 385.2 ms | 773.8 ms | 1137.3 ms | 1350.4 ms |
-| Stdev | 3.6 ms | 17 ms | 127 ms | 26 ms |
-| Comparing to snarkjs | <font color="FFB546">**~3.5x**</font> | ~1.7x | ~1.1 | - |
+| Average | 536.1 ms | 773.8 ms | 1137.3 ms | 1350.4 ms |
+| Stdev | 10 ms | 17 ms | 127 ms | 26 ms |
+| Comparing to snarkjs | <font color="FFB546">**~2.5x**</font> | ~1.7x | ~1.1 | - |
 
 <iframe width="432" height="267" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuS5abdzvh6znXORvSo7M85ubmDpSmE3C1Zs_l56wd25lMK4FZPEWOaCp7WrOlIjc3jEcWa0lfiy9/pubchart?oid=160655426&amp;format=interactive"></iframe>
 
 | Keccak256 | [Tachyon](https://github.com/kroma-network/tachyon) | [rapidsnark](https://github.com/iden3/rapidsnark) | [ark-works](https://github.com/arkworks-rs/circom-compat) | [snarkjs](https://github.com/iden3/snarkjs) |
 | :--: | :--: | :--: | :--: | :--: | 
-| Average | 1365 ms | 2514 ms | 1133 ms | 3791 ms |
-| Stdev | 11.6 ms | 75.2 ms | 168 ms | 58.6 ms |
-| Comparing to snarkjs | **~2.7x** | ~1.5x | <font color="FFB546">**~3.3**</font> | - |
+| Average | 1931 ms | 2514 ms | 1133 ms | 3791 ms |
+| Stdev | 31.9 ms | 75.2 ms | 168 ms | 58.6 ms |
+| Comparing to snarkjs | ~1.9x | ~1.5x | <font color="FFB546">**~3.3**</font> | - |
 
 <iframe width="472" height="263" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuS5abdzvh6znXORvSo7M85ubmDpSmE3C1Zs_l56wd25lMK4FZPEWOaCp7WrOlIjc3jEcWa0lfiy9/pubchart?oid=222721960&amp;format=interactive"></iframe>
 
 | RSA | [Tachyon](https://github.com/kroma-network/tachyon) | [rapidsnark](https://github.com/iden3/rapidsnark) | [ark-works](https://github.com/arkworks-rs/circom-compat) | [snarkjs](https://github.com/iden3/snarkjs) |
 | :--: | :--: | :--: | :--: | :--: | 
-| Average | 1665 ms | 2560 ms | 2530 ms | 5504 ms |
-| Stdev | 11.2 ms | 21.3 ms | 266.1 ms | 69.3 ms |
-| Comparing to snarkjs | <font color="FFB546">**~3.3**</font> | ~2.1x | ~2.1x | - |
+| Average | 2307 ms | 2560 ms | 2530 ms | 5504 ms |
+| Stdev | 18.7 ms | 21.3 ms | 266.1 ms | 69.3 ms |
+| Comparing to snarkjs | <font color="FFB546">**~2.3**</font> | ~2.1x | ~2.1x | - |
 
 <iframe width="472" height="279" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuS5abdzvh6znXORvSo7M85ubmDpSmE3C1Zs_l56wd25lMK4FZPEWOaCp7WrOlIjc3jEcWa0lfiy9/pubchart?oid=1443184132&amp;format=interactive"></iframe>
 </details>
