@@ -24,7 +24,7 @@ pub enum MoproBuildError {
     GenerateBindingsError(String),
 }
 
-pub fn build(target: Target, library_name: &str) -> Result<(), MoproBuildError> {
+pub fn build(target: Target) -> Result<(), MoproBuildError> {
     // Build the crate as a release library for the bindgen
     build_release().map_err(|e| MoproBuildError::LibraryBuildError(e.to_string()))?;
 
@@ -32,6 +32,11 @@ pub fn build(target: Target, library_name: &str) -> Result<(), MoproBuildError> 
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
+    
+    // Library name is the name of the crate with all `-` replaced with `_`
+    let crate_name = std::env::var("CARGO_PKG_NAME").unwrap();
+    let library_name = crate_name.replace("-", "_");
+
 
     let bindings_dir = format!("{}/target/out", manifest_dir);
     let library_path = format!("{}/target/release/lib{}.dylib", manifest_dir, library_name);
