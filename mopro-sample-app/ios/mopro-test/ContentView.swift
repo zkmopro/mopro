@@ -61,7 +61,7 @@ func circom() {
 
     do {
         
-        let circomCircuit = Multiplier3CircomMopro(circuitPath: "multiplier3_final.zkey")
+        let circomCircuit = Multiplier2CircomMopro(circuitPath: "multiplier3_final.zkey")
         // WARNING - this will always fail because for now the prove implementation is broken
         let result = try circomCircuit.prove(in1: input)
         let verifies = try circomCircuit.verify(in1: result.proof, in2: result.inputs)

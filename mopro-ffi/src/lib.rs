@@ -26,18 +26,30 @@ pub enum MoproError {
 
 pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint::BigInt>;
 
+/// Re-export the required dependencies to be used by the `mopro_<adapter>_circuit!` macros
+pub mod reexports {
+    pub use paste::paste;
+}
+
 #[macro_export]
 macro_rules! setup_mopro {
     () => {
         // Setup the FFI bindings for dependent crates
         uniffi::setup_scaffolding!();
 
-        #[derive(Debug, thiserror::Error, uniffi::Error)]
+        #[derive(Debug, uniffi::Error)]
         pub enum MoproErrorExternal {
-            #[error("CircomError: {0}")]
             CircomError(String),
-            #[error("Halo2Error: {0}")]
             Halo2Error(String),
+        }
+
+        impl std::fmt::Display for MoproErrorExternal {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                match self {
+                    MoproErrorExternal::CircomError(e) => write!(f, "CircomError: {}", e),
+                    MoproErrorExternal::Halo2Error(e) => write!(f, "Halo2Error: {}", e),
+                }
+            }
         }
 
         impl From<mopro::MoproError> for MoproErrorExternal {

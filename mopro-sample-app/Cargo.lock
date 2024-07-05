@@ -1667,6 +1667,7 @@ dependencies = [
  "halo2_proofs",
  "halo2curves",
  "num-bigint",
+ "paste",
  "rust-witness",
  "serde",
  "thiserror",
@@ -1684,14 +1685,12 @@ dependencies = [
  "mopro",
  "num-bigint",
  "once_cell",
- "paste",
  "plotters",
  "rand",
  "rust-witness",
  "serde",
  "serde_json",
  "tabbycat",
- "thiserror",
  "uniffi",
 ]
 

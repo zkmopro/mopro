@@ -12,7 +12,7 @@ pub trait MoproHalo2 {
 #[macro_export]
 macro_rules! mopro_halo2_circuit {
     ($struct_name:ident) => {
-        paste::paste! {
+        mopro::reexports::paste! {
             #[derive(uniffi::Object)]
             pub struct [<$struct_name Halo2Mopro>] where [<$struct_name>]: mopro::MoproHalo2 {}
 

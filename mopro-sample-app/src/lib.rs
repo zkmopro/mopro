@@ -62,4 +62,4 @@ mopro::mopro_halo2_circuit!(FibonacciCircuit);
 // Sample Circom circuit
 
 // Generate the Circom bindings for the Multiplier circuit
-mopro::mopro_circom_circuit!(multiplier3);
+mopro::mopro_circom_circuit!(multiplier2);

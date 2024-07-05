@@ -161,7 +161,7 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
 #[macro_export]
 macro_rules! mopro_circom_circuit {
     ($name:ident) => {
-        paste::paste! {
+        mopro::reexports::paste! {
 
             // TODO - avoid this duplication, ideally this would be an inline macro
             rust_witness::witness!([<$name>]);
