@@ -1,5 +1,5 @@
 [package]
-name = "mopro-ffi"
+name = "mopro"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,7 +7,7 @@ edition = "2021"
 
 [lib]
 crate-type = ["lib", "cdylib", "staticlib"]
-name = "mopro_ffi"
+name = "mopro"
 
 [features]
 default = []

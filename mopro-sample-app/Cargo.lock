@@ -1651,27 +1651,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mopro-app"
-version = "0.1.0"
-dependencies = [
- "bincode",
- "halo2_proofs",
- "mopro-ffi",
- "num-bigint",
- "once_cell",
- "paste",
- "plotters",
- "rand",
- "rust-witness",
- "serde",
- "serde_json",
- "tabbycat",
- "thiserror",
- "uniffi",
-]
-
-[[package]]
-name = "mopro-ffi"
+name = "mopro"
 version = "0.1.0"
 dependencies = [
  "ark-bn254",
@@ -1693,6 +1673,26 @@ dependencies = [
  "uniffi",
  "uniffi_bindgen",
  "uuid",
+]
+
+[[package]]
+name = "mopro-app"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "halo2_proofs",
+ "mopro",
+ "num-bigint",
+ "once_cell",
+ "paste",
+ "plotters",
+ "rand",
+ "rust-witness",
+ "serde",
+ "serde_json",
+ "tabbycat",
+ "thiserror",
+ "uniffi",
 ]
 
 [[package]]

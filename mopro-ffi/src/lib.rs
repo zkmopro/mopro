@@ -27,12 +27,10 @@ pub enum MoproError {
 pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint::BigInt>;
 
 #[macro_export]
-macro_rules! setup_mopro_ffi {
+macro_rules! setup_mopro {
     () => {
         // Setup the FFI bindings for dependent crates
         uniffi::setup_scaffolding!();
-
-        use mopro_ffi::MoproError;
 
         #[derive(Debug, thiserror::Error, uniffi::Error)]
         pub enum MoproErrorExternal {
@@ -42,11 +40,11 @@ macro_rules! setup_mopro_ffi {
             Halo2Error(String),
         }
 
-        impl From<MoproError> for MoproErrorExternal {
-            fn from(e: MoproError) -> Self {
+        impl From<mopro::MoproError> for MoproErrorExternal {
+            fn from(e: mopro::MoproError) -> Self {
                 match e {
-                    MoproError::CircomError(e) => MoproErrorExternal::CircomError(e),
-                    MoproError::Halo2Error(e) => MoproErrorExternal::Halo2Error(e),
+                    mopro::MoproError::CircomError(e) => MoproErrorExternal::CircomError(e),
+                    mopro::MoproError::Halo2Error(e) => MoproErrorExternal::Halo2Error(e),
                 }
             }
         }

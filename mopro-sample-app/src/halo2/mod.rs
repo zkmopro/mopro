@@ -15,7 +15,7 @@ use halo2_proofs::transcript::{
     Blake2bRead, Blake2bWrite, TranscriptReadBuffer, TranscriptWriterBuffer,
 };
 use halo2_proofs::SerdeFormat::RawBytes;
-use mopro_ffi::MoproError;
+use mopro::MoproError;
 use once_cell::sync::Lazy;
 use rand::thread_rng;
 use serde::{Deserialize, Serialize};

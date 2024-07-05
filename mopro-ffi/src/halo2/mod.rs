@@ -14,22 +14,28 @@ macro_rules! mopro_halo2_circuit {
     ($struct_name:ident) => {
         paste::paste! {
             #[derive(uniffi::Object)]
-            pub struct [<$struct_name Halo2Mopro>] where [<$struct_name>]: mopro_ffi::MoproHalo2 {}
+            pub struct [<$struct_name Halo2Mopro>] where [<$struct_name>]: mopro::MoproHalo2 {}
 
-            #[uniffi::export]
-            impl [<$struct_name Halo2Mopro>] {
+            /// A separate module to avoid duplicate imports for `MoproHalo2`
+            mod [<$struct_name _tmp_impl_mod>] {
+                use mopro::MoproHalo2;
+                use super::{[<$struct_name Halo2Mopro>], [<$struct_name>]};
 
-                #[uniffi::constructor]
-                pub fn new() -> Self {
-                    Self {}
-                }
+                #[uniffi::export]
+                impl [<$struct_name Halo2Mopro>] {
 
-                pub fn prove(&self, in1: std::collections::HashMap<String, Vec<String>>) -> Result<mopro_ffi::GenerateProofResult, crate::MoproErrorExternal> {
-                    [<$struct_name>]::prove(in1).map_err(|e| crate::MoproErrorExternal::from(e))
-                }
+                    #[uniffi::constructor]
+                    pub fn new() -> Self {
+                        Self {}
+                    }
 
-                pub fn verify(&self, in1: Vec<u8>, in2: Vec<u8>) -> Result<bool, crate::MoproErrorExternal> {
-                    [<$struct_name>]::verify(in1, in2).map_err(|e| crate::MoproErrorExternal::from(e))
+                    pub fn prove(&self, in1: std::collections::HashMap<String, Vec<String>>) -> Result<mopro::GenerateProofResult, crate::MoproErrorExternal> {
+                        [<$struct_name>]::prove(in1).map_err(|e| e.into())
+                    }
+
+                    pub fn verify(&self, in1: Vec<u8>, in2: Vec<u8>) -> Result<bool, crate::MoproErrorExternal> {
+                        [<$struct_name>]::verify(in1, in2).map_err(|e| e.into())
+                    }
                 }
             }
         }

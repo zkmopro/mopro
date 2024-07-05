@@ -1,47 +1,49 @@
-pub mod halo2; // This is required to initiate the Mopro Bindings setup
-mopro_ffi::setup_mopro_ffi!();
+// This is required to initiate the Mopro Bindings setup
+mopro::setup_mopro!();
 
-// Sample Halo2 circuit
+/// Sample Halo2 circuit
+pub mod halo2;
 
 use crate::halo2::deserialize_circuit_inputs;
-use mopro_ffi::{mopro_circom_circuit, mopro_halo2_circuit, GenerateProofResult, MoproHalo2};
 use std::collections::HashMap;
 use std::time::Instant;
 
-// A sample Halo2 circuit
 struct FibonacciCircuit {}
 
-/// The Halo2 circuit must implementation of the [`MoproHalo2`] to generate the bindings
-impl MoproHalo2 for FibonacciCircuit {
-    fn prove(input: HashMap<String, Vec<String>>) -> Result<GenerateProofResult, MoproError> {
+/// The Halo2 circuit must implementation of the [`mopro::MoproHalo2`] to generate the bindings
+impl mopro::MoproHalo2 for FibonacciCircuit {
+    fn prove(
+        input: HashMap<String, Vec<String>>,
+    ) -> Result<mopro::GenerateProofResult, mopro::MoproError> {
         let circuit_inputs = deserialize_circuit_inputs(input).map_err(|e| {
-            MoproError::Halo2Error(format!("Failed to deserialize circuit inputs: {}", e))
+            mopro::MoproError::Halo2Error(format!("Failed to deserialize circuit inputs: {}", e))
         })?;
 
         let start = Instant::now();
 
         println!("Proving the circuit with inputs: {:?}", circuit_inputs);
 
-        let (proof, inputs) = halo2::generate_halo2_proof(circuit_inputs)
-            .map_err(|e| MoproError::Halo2Error(format!("Failed to generate the proof: {}", e)))?;
+        let (proof, inputs) = halo2::generate_halo2_proof(circuit_inputs).map_err(|e| {
+            mopro::MoproError::Halo2Error(format!("Failed to generate the proof: {}", e))
+        })?;
 
         let duration = start.elapsed();
         println!("Proving time: {:?}", duration);
 
         let serialized_inputs = bincode::serialize(&inputs).map_err(|e| {
-            MoproError::Halo2Error(format!("Serialisation of Inputs failed: {}", e))
+            mopro::MoproError::Halo2Error(format!("Serialisation of Inputs failed: {}", e))
         })?;
 
-        Ok(GenerateProofResult {
+        Ok(mopro::GenerateProofResult {
             proof,
             inputs: serialized_inputs,
         })
     }
 
-    fn verify(proof: Vec<u8>, public_inputs: Vec<u8>) -> Result<bool, MoproError> {
+    fn verify(proof: Vec<u8>, public_inputs: Vec<u8>) -> Result<bool, mopro::MoproError> {
         let deserialized_inputs: halo2::SerializablePublicInputs =
             bincode::deserialize(&public_inputs)
-                .map_err(|e| MoproError::Halo2Error(e.to_string()))?;
+                .map_err(|e| mopro::MoproError::Halo2Error(e.to_string()))?;
 
         let start = Instant::now();
 
@@ -55,9 +57,9 @@ impl MoproHalo2 for FibonacciCircuit {
 }
 
 // Generate the Halo2 bindings for the Fibonacci circuit
-mopro_halo2_circuit!(FibonacciCircuit);
+mopro::mopro_halo2_circuit!(FibonacciCircuit);
 
 // Sample Circom circuit
 
 // Generate the Circom bindings for the Multiplier circuit
-mopro_circom_circuit!(multiplier3);
+mopro::mopro_circom_circuit!(multiplier3);

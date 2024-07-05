@@ -1,10 +1,10 @@
-use mopro_ffi::app_config::build;
-use mopro_ffi::app_config::Target::Ios;
+use mopro::app_config::build;
+use mopro::app_config::Target::Ios;
 
 fn main() {
-    // The name of the this crates "cdylib"
-    // TODO - get this from the Cargo.toml
-    let library_name = "mopro_app";
+    // Library name is the name of the crate with all `-` replaced with `_`
+    let crate_name = std::env::var("CARGO_PKG_NAME").unwrap();
+    let library_name = crate_name.replace("-", "_");
 
-    build(Ios, library_name).unwrap();
+    build(Ios, &library_name).unwrap();
 }
