@@ -5,7 +5,6 @@
 //  Created by Chance on 6/25/24.
 //
 import SwiftUI
-import moproFFI
 
 func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
     var bytesArray: [UInt8] = []
@@ -39,7 +38,13 @@ struct ContentView: View {
     @State private var isVerifyButtonEnabled = false
     @State private var generatedProof: Data?
     @State private var publicInputs: Data?
-    private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
+    private let zkeyPath: String
+    private let circuit: Multiplier2CircomMopro
+
+    init() {
+        self.zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
+        self.circuit = Multiplier2CircomMopro(circuitPath: zkeyPath)
+    }
     
     var body: some View {
         VStack(spacing: 10) {
@@ -78,7 +83,7 @@ extension ContentView {
             let start = CFAbsoluteTimeGetCurrent()
             
             // Generate Proof
-            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+            let generateProofResult = try circuit.prove(circuitInputs: inputs)
             assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
             assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
             
@@ -108,7 +113,7 @@ extension ContentView {
         do {
             let start = CFAbsoluteTimeGetCurrent()
             
-            let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proof: proof, publicInput: inputs)
+            let isValid = try circuit.verify(proof: proof, publicInput: inputs)
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
             
@@ -127,7 +132,7 @@ extension ContentView {
                 textViewText += "\nProof verification failed.\n"
             }
             isVerifyButtonEnabled = false
-        } catch let error as MoproError {
+        } catch let error as MoproErrorExternal {
             print("\nMoproError: \(error)")
         } catch {
             print("\nUnexpected error: \(error)")

@@ -9,12 +9,14 @@
 /* Begin PBXBuildFile section */
 		4C05CDB22C327C4F00BEBACD /* mopro_test_UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C05CDB12C327C4F00BEBACD /* mopro_test_UITests.swift */; };
 		4CBAB2782C3334B300B536B7 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */; };
-		4CBAB27A2C3334B800B536B7 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAB2792C3334B800B536B7 /* mopro.swift */; };
 		4CCB9BDF2C33C20800C659C4 /* multiplier2_final.zkey in Resources */ = {isa = PBXBuildFile; fileRef = 4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */; };
 		4CF977EF2C2BCF0000CE1139 /* mopro_testApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF977EE2C2BCF0000CE1139 /* mopro_testApp.swift */; };
 		4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF977F02C2BCF0000CE1139 /* ContentView.swift */; };
 		4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F22C2BCF0300CE1139 /* Assets.xcassets */; };
 		4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */; };
+		60243E572C3897A300C7D2F8 /* mopro_ffi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60243E532C3897A300C7D2F8 /* mopro_ffi.swift */; };
+		60243E582C3897A300C7D2F8 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60243E542C3897A300C7D2F8 /* MoproBindings.xcframework */; };
+		60243E592C3897A300C7D2F8 /* test_e2e.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60243E552C3897A300C7D2F8 /* test_e2e.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,13 +33,15 @@
 		4C05CDAF2C327C4F00BEBACD /* mopro-test-UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mopro-test-UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C05CDB12C327C4F00BEBACD /* mopro_test_UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro_test_UITests.swift; sourceTree = "<group>"; };
 		4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MoproBindings.xcframework; path = ../MoproiOSBindings/MoproBindings.xcframework; sourceTree = "<group>"; };
-		4CBAB2792C3334B800B536B7 /* mopro.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = mopro.swift; path = ../../MoproiOSBindings/mopro.swift; sourceTree = "<group>"; };
 		4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2_final.zkey; path = "../../test-vectors/circom/multiplier2_final.zkey"; sourceTree = "<group>"; };
 		4CF977EB2C2BCF0000CE1139 /* mopro-test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mopro-test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CF977EE2C2BCF0000CE1139 /* mopro_testApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro_testApp.swift; sourceTree = "<group>"; };
 		4CF977F02C2BCF0000CE1139 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CF977F22C2BCF0300CE1139 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		60243E532C3897A300C7D2F8 /* mopro_ffi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mopro_ffi.swift; sourceTree = "<group>"; };
+		60243E542C3897A300C7D2F8 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
+		60243E552C3897A300C7D2F8 /* test_e2e.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = test_e2e.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +57,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CBAB2782C3334B300B536B7 /* MoproBindings.xcframework in Frameworks */,
+				60243E582C3897A300C7D2F8 /* MoproBindings.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,6 +75,7 @@
 		4CF977E22C2BCF0000CE1139 = {
 			isa = PBXGroup;
 			children = (
+				60243E562C3897A300C7D2F8 /* MoproiOSBindings */,
 				4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */,
 				4CF977ED2C2BCF0000CE1139 /* mopro-test */,
 				4C05CDB02C327C4F00BEBACD /* mopro-test-UITests */,
@@ -90,7 +96,6 @@
 		4CF977ED2C2BCF0000CE1139 /* mopro-test */ = {
 			isa = PBXGroup;
 			children = (
-				4CBAB2792C3334B800B536B7 /* mopro.swift */,
 				4CF977EE2C2BCF0000CE1139 /* mopro_testApp.swift */,
 				4CF977F02C2BCF0000CE1139 /* ContentView.swift */,
 				4CF977F22C2BCF0300CE1139 /* Assets.xcassets */,
@@ -113,6 +118,17 @@
 				4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		60243E562C3897A300C7D2F8 /* MoproiOSBindings */ = {
+			isa = PBXGroup;
+			children = (
+				60243E532C3897A300C7D2F8 /* mopro_ffi.swift */,
+				60243E542C3897A300C7D2F8 /* MoproBindings.xcframework */,
+				60243E552C3897A300C7D2F8 /* test_e2e.swift */,
+			);
+			name = MoproiOSBindings;
+			path = ../MoproiOSBindings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -224,8 +240,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CBAB27A2C3334B800B536B7 /* mopro.swift in Sources */,
+				60243E592C3897A300C7D2F8 /* test_e2e.swift in Sources */,
 				4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */,
+				60243E572C3897A300C7D2F8 /* mopro_ffi.swift in Sources */,
 				4CF977EF2C2BCF0000CE1139 /* mopro_testApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
