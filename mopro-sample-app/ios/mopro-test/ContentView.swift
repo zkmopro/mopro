@@ -30,15 +30,18 @@ struct ContentView: View {
 }
 
 func halo2() {
-
-    let input = ["a": ["1", "0x"], "b": ["2"]]
-
     // Imported from mopro-app
     do {
         // Call the prove function of the FibonacciCircuitHalo2Mopro circuit
         // Fix an error: Errors thrown from here are not handled because the enclosing catch is not exhaustive
         let fibonacciCircuit = FibonacciCircuitHalo2Mopro()
+        print("Initiated the circuit")
+        
+        let input = ["a": ["1", "0"], "b": ["2"], "out": ["55"]]
+
         let result = try fibonacciCircuit.prove(in1: input)
+        print("Generated the proof")
+
         let verifies = try fibonacciCircuit.verify(in1: result.proof, in2: result.inputs)
 
         print("Verifies", verifies)
@@ -53,7 +56,7 @@ func halo2() {
 }
 
 func circom() {
-     
+    // Imported form mopro-app
     let input = ["a": ["1", "0x"], "b": ["2"]]
 
     do {
@@ -63,6 +66,7 @@ func circom() {
         let result = try circomCircuit.prove(in1: input)
         let verifies = try circomCircuit.verify(in1: result.proof, in2: result.inputs)
         
+        // Imported form mopro-ffi
         let ethereumProof = toEthereumProof(proof: result.proof)
         let ethereumInput = toEthereumInputs(inputs: result.inputs)
         

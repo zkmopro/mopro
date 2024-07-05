@@ -3,27 +3,31 @@ use std::fmt;
 use std::str::FromStr;
 
 use halo2_proofs::halo2curves::ff::PrimeField;
+use mopro_ffi::MoproError;
 use serde::de::{SeqAccess, Visitor};
 use serde::ser::SerializeSeq;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::halo2::{Fp, SerializablePublicInputs};
+use super::{Fp, SerializablePublicInputs};
 
 pub fn deserialize_circuit_inputs(
     ser_inputs: HashMap<String, Vec<String>>,
-) -> HashMap<String, Vec<Fp>> {
+) -> Result<HashMap<String, Vec<Fp>>, MoproError> {
     ser_inputs
         .iter()
         .map(|(k, v)| {
-            let fp_vec: Vec<Fp> = v
+            let fp_vec: Result<Vec<Fp>, MoproError> = v
                 .iter()
                 .map(|s| {
                     // TODO - support big integers full range, not just u128
-                    let int = u128::from_str(s).unwrap();
-                    Fp::from_u128(int)
+                    let int = u128::from_str(s).map_err(|e| {
+                        MoproError::Halo2Error(format!("Failed to parse input as u128: {}", e))
+                    });
+
+                    int.map(|i| Fp::from_u128(i))
                 })
                 .collect();
-            (k.clone(), fp_vec)
+            fp_vec.map(|v| (k.clone(), v))
         })
         .collect()
 }
@@ -61,7 +65,7 @@ impl<'de> Deserialize<'de> for SerializablePublicInputs {
             {
                 let mut vec = Vec::new();
                 while let Some(bytes) = seq.next_element::<[u8; 32]>()? {
-                    vec.push(Fp::from_bytes(&bytes).unwrap());
+                    vec.push(Fp::from_bytes(&bytes).expect("Invalid bytes"));
                 }
                 Ok(SerializablePublicInputs(vec))
             }
@@ -74,8 +78,9 @@ impl<'de> Deserialize<'de> for SerializablePublicInputs {
 // Tests for serialization and deserialization
 #[cfg(test)]
 mod tests {
-    use super::*;
     use serde_json;
+
+    use super::*;
 
     #[test]
     fn test_serialization() {
@@ -97,7 +102,7 @@ mod tests {
     fn test_circuit_inputs_deserialization() {
         let mut serialized = HashMap::new();
         serialized.insert("out".to_string(), vec!["1".to_string(), "2".to_string()]);
-        let deserialized = deserialize_circuit_inputs(serialized);
+        let deserialized = deserialize_circuit_inputs(serialized).unwrap();
         assert_eq!(deserialized.len(), 1);
         assert_eq!(deserialized.get("out").unwrap().len(), 2);
         assert_eq!(deserialized.get("out").unwrap()[0], Fp::from(1));
