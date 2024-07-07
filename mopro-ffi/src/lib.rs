@@ -4,11 +4,6 @@ pub mod app_config;
 
 #[cfg(feature = "circom")]
 mod circom;
-#[cfg(feature = "halo2")]
-mod halo2;
-
-#[cfg(feature = "halo2")]
-pub use halo2::MoproHalo2;
 
 #[cfg(feature = "circom")]
 pub use circom::{generate_circom_proof_wtns, verify_circom_proof};
@@ -20,8 +15,6 @@ use uniffi::Record;
 pub enum MoproError {
     #[error("CircomError: {0}")]
     CircomError(String),
-    #[error("Halo2Error: {0}")]
-    Halo2Error(String),
 }
 
 pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint::BigInt>;
@@ -41,14 +34,12 @@ macro_rules! setup_mopro {
         #[derive(Debug, uniffi::Error)]
         pub enum MoproErrorExternal {
             CircomError(String),
-            Halo2Error(String),
         }
 
         impl std::fmt::Display for MoproErrorExternal {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 match self {
                     MoproErrorExternal::CircomError(e) => write!(f, "CircomError: {}", e),
-                    MoproErrorExternal::Halo2Error(e) => write!(f, "Halo2Error: {}", e),
                 }
             }
         }
@@ -57,7 +48,6 @@ macro_rules! setup_mopro {
             fn from(e: mopro_ffi::MoproError) -> Self {
                 match e {
                     mopro_ffi::MoproError::CircomError(e) => MoproErrorExternal::CircomError(e),
-                    mopro_ffi::MoproError::Halo2Error(e) => MoproErrorExternal::Halo2Error(e),
                 }
             }
         }
