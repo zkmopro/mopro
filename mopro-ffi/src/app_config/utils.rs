@@ -3,9 +3,11 @@ use std::process::Command;
 use std::{fs, io};
 use uuid::Uuid;
 
-pub fn build_release() -> io::Result<()> {
+pub fn build_cdylib(build_dir_str: &str) -> io::Result<()> {
+    let build_dir = Path::new(build_dir_str);
     // Set up the command to run `cargo build --release`
     let output = Command::new("cargo")
+        .env("CARGO_BUILD_TARGET_DIR", build_dir)
         .arg("build")
         .arg("--release")
         .spawn()

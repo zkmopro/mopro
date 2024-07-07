@@ -25,9 +25,6 @@ pub enum MoproBuildError {
 }
 
 pub fn build(target: Target) -> Result<(), MoproBuildError> {
-    // Build the crate as a release library for the bindgen
-    build_release().map_err(|e| MoproBuildError::LibraryBuildError(e.to_string()))?;
-
     // Set up the directories for the bindings
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
@@ -37,8 +34,13 @@ pub fn build(target: Target) -> Result<(), MoproBuildError> {
     let crate_name = std::env::var("CARGO_PKG_NAME").unwrap();
     let library_name = crate_name.replace("-", "_");
 
-    let bindings_dir = format!("{}/target/out", manifest_dir);
-    let library_path = format!("{}/target/release/lib{}.dylib", manifest_dir, library_name);
+    let build_dir = format!("{}/build", manifest_dir);
+
+    let bindings_dir = format!("{}/out", build_dir);
+    let library_path = format!("{}/debug/lib{}.dylib", build_dir, library_name);
+
+    // Build the crate as a release library for the bindgen
+    build_cdylib(&build_dir).map_err(|e| MoproBuildError::LibraryBuildError(e.to_string()))?;
 
     // Generate the bindings for IOS
     match target {
