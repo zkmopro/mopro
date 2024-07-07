@@ -2,7 +2,7 @@ use camino::Utf8Path;
 use uniffi_bindgen::bindings::{KotlinBindingGenerator, SwiftBindingGenerator};
 use uniffi_bindgen::library_mode::generate_bindings;
 
-use crate::app_config::utils::build_release;
+use crate::app_config::utils::build_cdylib;
 
 mod android;
 mod ios;
