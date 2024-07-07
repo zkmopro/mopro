@@ -1,4 +1,4 @@
-import test_e2eFFI
+import test_e2e
 
 import Foundation
 
@@ -28,8 +28,13 @@ func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
 }
 
 do {
-    let zkeyPath = "../../../test-vectors/circom/multiplier2_final.zkey"
-    let circuit = Multiplier2CircomCircuit(zkeyPath)
+    let zkeyPath = "../../../../test-vectors/circom/multiplier2_final.zkey"
+    let circuit = Multiplier2CircomCircuit(circuitPath: zkeyPath)
+
+    // Print the current working directory
+    let fileManager = FileManager.default
+    let currentPath = fileManager.currentDirectoryPath
+    print("Current path: \(currentPath)")
 
     // Prepare inputs
     var inputs = [String: [String]]()
@@ -59,7 +64,7 @@ do {
     assert(convertProofResult.a.x.count > 0, "Proof should not be empty")
     assert(convertInputsResult.count > 0, "Inputs should not be empty")
 
-} catch let error as MoproError {
+} catch let error as MoproErrorExternal {
     print("MoproError: \(error)")
     throw error
 } catch {

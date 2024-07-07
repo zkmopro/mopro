@@ -6,6 +6,7 @@ edition = "2021"
 
 [lib]
 crate-type = ["lib", "cdylib", "staticlib"]
+name = "test_e2e"
 
 [[bin]]
 name = "ios"
@@ -24,7 +25,6 @@ uniffi = "0.28.0"
 
 [build-dependencies]
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
-uniffi = { version = "0.28.0", features = ["build"] }
 
 [dev-dependencies]
 uniffi = { version = "0.28.0", features = ["bindgen-tests"] }

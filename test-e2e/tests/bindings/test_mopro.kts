@@ -1,7 +1,9 @@
-import uniffi.mopro.*
+import uniffi.test_e2e.*
+import uniffi.mopro_ffi.*
 
 try {
-    var zkeyPath = "../test-vectors/circom/multiplier2_final.zkey"
+    var zkeyPath = "../../../../test-vectors/circom/multiplier2_final.zkey"
+    val circuit = Multiplier2CircomCircuit(zkeyPath)
 
     // Prepare inputs
     val inputs = mutableMapOf<String, List<String>>()
@@ -9,11 +11,11 @@ try {
     inputs["b"] = listOf("5")
 
     // Generate proof
-    var generateProofResult = generateCircomProof(zkeyPath, inputs)
+    var generateProofResult = circuit.prove(inputs)
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
 
     // Verify proof
-    var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs)
+    var isValid = circuit.verify(generateProofResult.proof, generateProofResult.inputs)
     assert(isValid) { "Proof is invalid" }
 
     // Convert proof to Ethereum compatible proof
