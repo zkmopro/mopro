@@ -2,7 +2,7 @@ import uniffi.test_e2e.*
 import uniffi.mopro_ffi.*
 
 try {
-    var zkeyPath = "../../../../test-vectors/circom/multiplier2_final.zkey"
+    var zkeyPath = "../test-vectors/circom/multiplier2_final.zkey"
     val circuit = Multiplier2CircomCircuit(zkeyPath)
 
     // Prepare inputs
