@@ -4,9 +4,10 @@ use std::process::Command;
 
 use super::{cleanup_tmp_local, install_arch, install_ndk, mktemp_local};
 
-pub const MOPRO_KOTLIN: &str = include_str!("../../KotlinBindings/uniffi/mopro/mopro.kt");
+// pub const MOPRO_KOTLIN: &str = include_str!("../../KotlinBindings/uniffi/mopro/mopro.kt");
 
 pub fn build() {
+    panic!("Android build not implemented");
     let cwd = std::env::current_dir().expect("Failed to get current directory");
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());
@@ -85,7 +86,7 @@ fn write_kotlin_bindings(bindings_out: &Path) {
     let mopro_kt_path = bindings_out.join("uniffi/mopro/mopro.kt");
     fs::create_dir_all(mopro_kt_path.parent().unwrap())
         .expect("Failed to create uniffi/mopro directory");
-    fs::write(&mopro_kt_path, MOPRO_KOTLIN).expect("Failed to write mopro.kt");
+    // fs::write(&mopro_kt_path, MOPRO_KOTLIN).expect("Failed to write mopro.kt"); // TODO - rewrite
 }
 
 fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
