@@ -9,7 +9,6 @@ pub fn build_cdylib(build_dir_str: &str) -> io::Result<()> {
     let output = Command::new("cargo")
         .env("CARGO_BUILD_TARGET_DIR", build_dir)
         .arg("build")
-        .arg("--release")
         .spawn()
         .expect("Failed to spawn cargo build")
         .wait()
