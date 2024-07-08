@@ -14,9 +14,9 @@
 		4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF977F02C2BCF0000CE1139 /* ContentView.swift */; };
 		4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F22C2BCF0300CE1139 /* Assets.xcassets */; };
 		4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */; };
-		60243E572C3897A300C7D2F8 /* mopro_ffi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60243E532C3897A300C7D2F8 /* mopro_ffi.swift */; };
-		60243E582C3897A300C7D2F8 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60243E542C3897A300C7D2F8 /* MoproBindings.xcframework */; };
-		60243E592C3897A300C7D2F8 /* test_e2e.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60243E552C3897A300C7D2F8 /* test_e2e.swift */; };
+		604774332C3CA63A001D3689 /* mopro_ffi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6047742F2C3CA63A001D3689 /* mopro_ffi.swift */; };
+		604774342C3CA63A001D3689 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 604774302C3CA63A001D3689 /* MoproBindings.xcframework */; };
+		604774352C3CA63A001D3689 /* test_e2e.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604774312C3CA63A001D3689 /* test_e2e.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,9 +39,9 @@
 		4CF977F02C2BCF0000CE1139 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CF977F22C2BCF0300CE1139 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		60243E532C3897A300C7D2F8 /* mopro_ffi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mopro_ffi.swift; sourceTree = "<group>"; };
-		60243E542C3897A300C7D2F8 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
-		60243E552C3897A300C7D2F8 /* test_e2e.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = test_e2e.swift; sourceTree = "<group>"; };
+		6047742F2C3CA63A001D3689 /* mopro_ffi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mopro_ffi.swift; sourceTree = "<group>"; };
+		604774302C3CA63A001D3689 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
+		604774312C3CA63A001D3689 /* test_e2e.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = test_e2e.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +57,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CBAB2782C3334B300B536B7 /* MoproBindings.xcframework in Frameworks */,
-				60243E582C3897A300C7D2F8 /* MoproBindings.xcframework in Frameworks */,
+				604774342C3CA63A001D3689 /* MoproBindings.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,7 +75,7 @@
 		4CF977E22C2BCF0000CE1139 = {
 			isa = PBXGroup;
 			children = (
-				60243E562C3897A300C7D2F8 /* MoproiOSBindings */,
+				604774322C3CA63A001D3689 /* MoproiOSBindings */,
 				4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */,
 				4CF977ED2C2BCF0000CE1139 /* mopro-test */,
 				4C05CDB02C327C4F00BEBACD /* mopro-test-UITests */,
@@ -120,12 +120,12 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		60243E562C3897A300C7D2F8 /* MoproiOSBindings */ = {
+		604774322C3CA63A001D3689 /* MoproiOSBindings */ = {
 			isa = PBXGroup;
 			children = (
-				60243E532C3897A300C7D2F8 /* mopro_ffi.swift */,
-				60243E542C3897A300C7D2F8 /* MoproBindings.xcframework */,
-				60243E552C3897A300C7D2F8 /* test_e2e.swift */,
+				6047742F2C3CA63A001D3689 /* mopro_ffi.swift */,
+				604774302C3CA63A001D3689 /* MoproBindings.xcframework */,
+				604774312C3CA63A001D3689 /* test_e2e.swift */,
 			);
 			name = MoproiOSBindings;
 			path = ../MoproiOSBindings;
@@ -240,9 +240,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				60243E592C3897A300C7D2F8 /* test_e2e.swift in Sources */,
+				604774352C3CA63A001D3689 /* test_e2e.swift in Sources */,
 				4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */,
-				60243E572C3897A300C7D2F8 /* mopro_ffi.swift in Sources */,
+				604774332C3CA63A001D3689 /* mopro_ffi.swift in Sources */,
 				4CF977EF2C2BCF0000CE1139 /* mopro_testApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
