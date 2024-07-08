@@ -1,14 +1,16 @@
+use crate::app_config::sys_commands::build_cdylib;
 use camino::Utf8Path;
+use std::fs;
+use std::path::{Path, PathBuf};
 use uniffi_bindgen::bindings::{KotlinBindingGenerator, SwiftBindingGenerator};
 use uniffi_bindgen::library_mode::generate_bindings;
-
-use crate::app_config::utils::build_cdylib;
+use uuid::Uuid;
 
 mod android;
 mod ios;
-mod utils;
+mod sys_commands;
 
-use utils::*;
+use sys_commands::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Target {
@@ -73,4 +75,26 @@ pub fn build(target: Target) -> Result<(), MoproBuildError> {
     };
 
     Ok(())
+}
+
+fn tmp_local(build_path: &Path) -> PathBuf {
+    let tmp_path = build_path.join("tmp");
+    if let Ok(metadata) = fs::metadata(&tmp_path) {
+        if !metadata.is_dir() {
+            panic!("non-directory tmp");
+        }
+    } else {
+        fs::create_dir_all(&tmp_path).expect("Failed to create local tmpdir");
+    }
+    tmp_path
+}
+
+pub fn mktemp_local(build_path: &Path) -> PathBuf {
+    let dir = tmp_local(build_path).join(&Uuid::new_v4().to_string());
+    fs::create_dir(&dir).expect("Failed to create tmpdir");
+    dir
+}
+
+pub fn cleanup_tmp_local(build_path: &Path) {
+    fs::remove_dir_all(tmp_local(build_path)).expect("Failed to remove tmpdir");
 }
