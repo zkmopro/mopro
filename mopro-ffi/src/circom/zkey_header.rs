@@ -16,6 +16,16 @@ pub struct ZkeyHeaderReader {
     pub r: BigUint,
 }
 
+// This implementation loads only the first few bytes
+// of the zkey file to get the groth16 header.
+//
+// This header tells us what curve the zkey was built for.
+// This is difficult to do in zkey.rs because we define the
+// size if integers based on the type at the rust level, while
+// zkeys specify their integer sizes in the file.
+//
+// e.g. we need to use the integer size specified in the zkey to
+// determine what type to use in rust
 impl ZkeyHeaderReader {
     pub fn new(zkey_path: &str) -> Self {
         ZkeyHeaderReader {
@@ -129,78 +139,35 @@ impl ZkeyHeaderReader {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use crate::circom::zkey::{Fr, ZkeyReader};
-//     use ark_bn254::{G1Affine, G2Affine};
-//     use ark_circom::read_zkey;
-//     use std::fs::File;
+#[cfg(test)]
+mod tests {
+    use crate::circom::zkey_header::ZkeyHeaderReader;
+    use ark_ff::PrimeField;
+    use num_bigint::BigUint;
 
-//     fn compare_g1_vecs(v1: Vec<G1Affine>, v2: Vec<G1Affine>) {
-//         assert!(v1.len() == v2.len());
-//         for x in 0..v1.len() {
-//             assert!(v1[x] == v2[x]);
-//         }
-//     }
+    #[test]
+    fn test_zkey_parse_bn() {
+        let zkey_path = "../test-vectors/circom/keccak256_256_test_final.zkey".to_string();
 
-//     fn compare_g2_vecs(v1: Vec<G2Affine>, v2: Vec<G2Affine>) {
-//         assert!(v1.len() == v2.len());
-//         for x in 0..v1.len() {
-//             assert!(v1[x] == v2[x]);
-//         }
-//     }
+        let mut zkey_reader = ZkeyHeaderReader::new(&zkey_path);
+        zkey_reader.read();
 
-//     fn compare_fr_matrix(v1: Vec<Vec<(Fr, usize)>>, v2: Vec<Vec<(Fr, usize)>>) {
-//         assert!(v1.len() == v2.len());
-//         for x in 0..v1.len() {
-//             assert!(v1[x].len() == v2[x].len());
-//             for y in 0..v1[x].len() {
-//                 assert!(v1[x][y].0 == v2[x][y].0);
-//                 assert!(v1[x][y].1 == v2[x][y].1);
-//             }
-//         }
-//     }
+        assert_eq!(zkey_reader.n8q, 32);
+        assert_eq!(zkey_reader.n8r, 32);
+        assert_eq!(zkey_reader.q, BigUint::from(ark_bn254::Fq::MODULUS));
+        assert_eq!(zkey_reader.r, BigUint::from(ark_bn254::Fr::MODULUS));
+    }
 
-//     #[test]
-//     fn test_zkey_parse() {
-//         let zkey_path = "../test-vectors/circom/keccak256_256_test_final.zkey".to_string();
-//         use std::time::Instant;
-//         let now = Instant::now();
+    #[test]
+    fn test_zkey_parse_bls() {
+        let zkey_path = "../test-vectors/circom/multiplier2_bls_final.zkey".to_string();
 
-//         let mut file = File::open(&zkey_path).unwrap();
-//         let c_zkey = read_zkey(&mut file).unwrap();
-//         let elapsed = now.elapsed();
-//         println!("orig Elapsed: {:.2?}", elapsed);
+        let mut zkey_reader = ZkeyHeaderReader::new(&zkey_path);
+        zkey_reader.read();
 
-//         let now = Instant::now();
-//         let mut zkey_reader = ZkeyReader::new(&zkey_path);
-//         let zkey = zkey_reader.read();
-//         let elapsed = now.elapsed();
-//         println!("new Elapsed: {:.2?}", elapsed);
-
-//         // Compare the parsed ProvingKey
-//         assert!(c_zkey.0.vk.alpha_g1 == zkey.0.vk.alpha_g1);
-//         assert!(c_zkey.0.vk.beta_g2 == zkey.0.vk.beta_g2);
-//         assert!(c_zkey.0.vk.gamma_g2 == zkey.0.vk.gamma_g2);
-//         assert!(c_zkey.0.vk.delta_g2 == zkey.0.vk.delta_g2);
-//         compare_g1_vecs(c_zkey.0.vk.gamma_abc_g1, zkey.0.vk.gamma_abc_g1);
-//         assert!(c_zkey.0.beta_g1 == zkey.0.beta_g1);
-//         assert!(c_zkey.0.delta_g1 == zkey.0.delta_g1);
-//         compare_g1_vecs(c_zkey.0.a_query, zkey.0.a_query);
-//         compare_g1_vecs(c_zkey.0.b_g1_query, zkey.0.b_g1_query);
-//         compare_g2_vecs(c_zkey.0.b_g2_query, zkey.0.b_g2_query);
-//         compare_g1_vecs(c_zkey.0.h_query, zkey.0.h_query);
-//         compare_g1_vecs(c_zkey.0.l_query, zkey.0.l_query);
-
-//         // Compare the parsed ConstraintMatrices
-//         assert!(c_zkey.1.num_instance_variables == zkey.1.num_instance_variables);
-//         assert!(c_zkey.1.num_witness_variables == zkey.1.num_witness_variables);
-//         assert!(c_zkey.1.num_constraints == zkey.1.num_constraints);
-//         assert!(c_zkey.1.a_num_non_zero == zkey.1.a_num_non_zero);
-//         assert!(c_zkey.1.b_num_non_zero == zkey.1.b_num_non_zero);
-//         assert!(c_zkey.1.c_num_non_zero == zkey.1.c_num_non_zero);
-//         compare_fr_matrix(c_zkey.1.a, zkey.1.a);
-//         compare_fr_matrix(c_zkey.1.b, zkey.1.b);
-//         compare_fr_matrix(c_zkey.1.c, zkey.1.c);
-//     }
-// }
+        assert_eq!(zkey_reader.n8q, 48);
+        assert_eq!(zkey_reader.n8r, 32);
+        assert_eq!(zkey_reader.q, BigUint::from(ark_bls12_381::Fq::MODULUS));
+        assert_eq!(zkey_reader.r, BigUint::from(ark_bls12_381::Fr::MODULUS));
+    }
+}
