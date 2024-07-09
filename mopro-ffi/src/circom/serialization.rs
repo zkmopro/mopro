@@ -4,17 +4,18 @@ use ark_ec::pairing::Pairing;
 use ark_groth16::{Proof, ProvingKey};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use color_eyre::Result;
+use num_bigint::BigUint;
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug)]
 pub struct SerializableProvingKey(pub ProvingKey<Bn254>);
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug)]
-pub struct SerializableProof(pub Proof<Bn254>);
+pub struct SerializableProof<T: Pairing>(pub Proof<T>);
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug, PartialEq)]
-pub struct SerializableInputs(pub Vec<<Bn254 as Pairing>::ScalarField>);
+pub struct SerializableInputs(pub Vec<BigUint>);
 
-pub fn serialize_proof(proof: &SerializableProof) -> Vec<u8> {
+pub fn serialize_proof<T: Pairing>(proof: &SerializableProof<T>) -> Vec<u8> {
     let mut serialized_data = Vec::new();
     proof
         .serialize_uncompressed(&mut serialized_data)
@@ -22,7 +23,7 @@ pub fn serialize_proof(proof: &SerializableProof) -> Vec<u8> {
     serialized_data
 }
 
-pub fn deserialize_proof(data: Vec<u8>) -> SerializableProof {
+pub fn deserialize_proof<T: Pairing>(data: Vec<u8>) -> SerializableProof<T> {
     SerializableProof::deserialize_uncompressed(&mut &data[..]).expect("Deserialization failed")
 }
 
@@ -39,7 +40,8 @@ pub fn deserialize_inputs(data: Vec<u8>) -> SerializableInputs {
 }
 
 // Convert proof to U256-tuples as expected by the Solidity Groth16 Verifier
-pub fn to_ethereum_proof(proof: &SerializableProof) -> ethereum::Proof {
+// Only supports bn254 for now
+pub fn to_ethereum_proof(proof: &SerializableProof<Bn254>) -> ethereum::Proof {
     ethereum::Proof::from(proof.0.clone())
 }
 

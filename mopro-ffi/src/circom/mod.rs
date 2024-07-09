@@ -1,27 +1,31 @@
 use crate::{MoproError, ProofCalldata, WtnsFn, G1, G2};
 mod serialization;
+mod zkey;
 
+use ark_bls12_381::Bls12_381;
+use ark_bn254::Bn254;
+use ark_ec::pairing::Pairing;
+use ark_ff::PrimeField;
+use ark_relations::r1cs::ConstraintMatrices;
 use serialization::{SerializableInputs, SerializableProof};
+
+use zkey::{BinFile, FieldSerialization};
 
 use std::collections::HashMap;
 use std::fs::File;
 use std::str::FromStr;
-use std::time::Instant;
 
 use crate::GenerateProofResult;
-use ark_bn254::Bn254;
-use ark_circom::{read_zkey, CircomReduction};
+use ark_circom::CircomReduction;
 
 use ark_crypto_primitives::snark::SNARK;
-use ark_groth16::{prepare_verifying_key, Groth16};
+use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey, VerifyingKey};
 use ark_std::UniformRand;
 
 use ark_std::rand::thread_rng;
 use color_eyre::Result;
 
-use num_bigint::BigInt;
-
-type GrothBn = Groth16<Bn254>;
+use num_bigint::{BigInt, BigUint};
 
 // build a proof for a zkey using witness_fn to build
 // the witness
@@ -47,37 +51,83 @@ pub fn generate_circom_proof_wtns(
 
         witness_fn(bigint_inputs)
             .into_iter()
-            .map(|w| ark_bn254::Fr::from(w.to_biguint().unwrap()))
+            .map(|w| w.to_biguint().unwrap())
             .collect::<Vec<_>>()
     });
 
-    // Load the zkey in the current thread
-    let file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let header;
+    {
+        let mut file =
+            File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        // let mut reader = std::io::BufReader::new(file);
+        let mut header_reader = BinFile::<_, Bn254>::new(&mut file)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        header = header_reader
+            .groth_header()
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+    }
+    let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let mut reader = std::io::BufReader::new(file);
-    let zkey = read_zkey(&mut reader).map_err(|e| MoproError::CircomError(e.to_string()))?;
+    // check the prime in the header
+    if header.r == ark_bn254::Fr::MODULUS {
+        let mut binfile = BinFile::<_, Bn254>::new(&mut reader)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let proving_key = binfile
+            .proving_key()
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let matrices = binfile
+            .matrices()
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let full_assignment = witness_thread
+            .join()
+            .map_err(|_e| MoproError::CircomError("Failed to generate witness".to_string()))?;
+        return prove(proving_key, matrices, full_assignment);
+    } else if header.r == ark_bls12_381::Fr::MODULUS {
+        let mut binfile = BinFile::<_, Bls12_381>::new(&mut reader)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let proving_key = binfile
+            .proving_key()
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let matrices = binfile
+            .matrices()
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let full_assignment = witness_thread
+            .join()
+            .map_err(|_e| MoproError::CircomError("Failed to generate witness".to_string()))?;
+        return prove(proving_key, matrices, full_assignment);
+    } else {
+        // unknown curve
+        return Err(MoproError::CircomError(
+            "unknown curve detected in zkey".to_string(),
+        ));
+    }
+}
 
+// Prove on a generic curve
+fn prove<T: Pairing + FieldSerialization>(
+    pkey: ProvingKey<T>,
+    matrices: ConstraintMatrices<T::ScalarField>,
+    witness: Vec<BigUint>,
+) -> Result<GenerateProofResult, MoproError> {
+    let witness_fr = witness
+        .iter()
+        .map(|v| T::ScalarField::from(v.clone()))
+        .collect::<Vec<_>>();
     let mut rng = thread_rng();
     let rng = &mut rng;
-
-    let r = ark_bn254::Fr::rand(rng);
-    let s = ark_bn254::Fr::rand(rng);
-
-    // Get the result witness from the background thread
-    let full_assignment = witness_thread
-        .join()
-        .map_err(|_e| MoproError::CircomError("Failed to generate witness".to_string()))?;
-
-    let public_inputs = full_assignment.as_slice()[1..zkey.1.num_instance_variables].to_vec();
+    let r = T::ScalarField::rand(rng);
+    let s = T::ScalarField::rand(rng);
+    let public_inputs = witness.as_slice()[1..matrices.num_instance_variables].to_vec();
 
     // build the proof
     let ark_proof = Groth16::<_, CircomReduction>::create_proof_with_reduction_and_matrices(
-        &zkey.0,
+        &pkey,
         r,
         s,
-        &zkey.1,
-        zkey.1.num_instance_variables,
-        zkey.1.num_constraints,
-        full_assignment.as_slice(),
+        &matrices,
+        matrices.num_instance_variables,
+        matrices.num_constraints,
+        witness_fr.as_slice(),
     );
 
     let proof = ark_proof.map_err(|e| MoproError::CircomError(e.to_string()))?;
@@ -88,29 +138,67 @@ pub fn generate_circom_proof_wtns(
     })
 }
 
+// Prove on a generic curve
 pub fn verify_circom_proof(
     zkey_path: String,
     proof: Vec<u8>,
     public_input: Vec<u8>,
 ) -> Result<bool, MoproError> {
-    let deserialized_proof = serialization::deserialize_proof(proof);
-    let deserialized_public_input = serialization::deserialize_inputs(public_input);
-    let file = File::open(zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let header;
+    {
+        let mut file =
+            File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        // let mut reader = std::io::BufReader::new(file);
+        let mut header_reader = BinFile::<_, Bn254>::new(&mut file)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        header = header_reader
+            .groth_header()
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+    }
+    let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let mut reader = std::io::BufReader::new(file);
-    let zkey = read_zkey(&mut reader).map_err(|e| MoproError::CircomError(e.to_string()))?;
-    let start = Instant::now();
-    let pvk = prepare_verifying_key(&zkey.0.vk);
+    if header.r == ark_bn254::Fr::MODULUS {
+        let mut binfile = BinFile::<_, Bn254>::new(&mut reader)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let proving_key = binfile
+            .proving_key()
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let p = serialization::deserialize_inputs(public_input);
+        return verify(proving_key.vk, p.0, proof);
+    } else if header.r == ark_bls12_381::Fr::MODULUS {
+        let mut binfile = BinFile::<_, Bn254>::new(&mut reader)
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let proving_key = binfile
+            .proving_key()
+            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let p = serialization::deserialize_inputs(public_input);
+        return verify(proving_key.vk, p.0, proof);
+    } else {
+        // unknown curve
+        return Err(MoproError::CircomError(
+            "unknown curve detected in zkey".to_string(),
+        ));
+    }
+}
 
-    let proof_verified = GrothBn::verify_with_processed_vk(
+fn verify<T: Pairing + FieldSerialization>(
+    vk: VerifyingKey<T>,
+    public_inputs: Vec<BigUint>,
+    proof: Vec<u8>,
+) -> Result<bool, MoproError> {
+    let pvk = prepare_verifying_key(&vk);
+    let public_inputs_fr = public_inputs
+        .iter()
+        .map(|v| T::ScalarField::from(v.clone()))
+        .collect::<Vec<_>>();
+    let proof_parsed = serialization::deserialize_proof::<T>(proof);
+    let verified = Groth16::<_, CircomReduction>::verify_with_processed_vk(
         &pvk,
-        &deserialized_public_input.0,
-        &deserialized_proof.0,
+        &public_inputs_fr,
+        &proof_parsed.0,
     )
     .map_err(|e| MoproError::CircomError(e.to_string()))?;
-
-    let verification_duration = start.elapsed();
-    println!("Verification time: {:?}", verification_duration);
-    Ok(proof_verified)
+    Ok(verified)
 }
 
 // Convert proof to String-tuples as expected by the Solidity Groth16 Verifier
@@ -152,8 +240,8 @@ mod tests {
         verify_circom_proof, WtnsFn,
     };
     use crate::{GenerateProofResult, MoproError};
-    use ark_bn254::Fr;
-    use num_bigint::BigInt;
+    use ark_bn254::{Bn254, Fr};
+    use num_bigint::{BigInt, BigUint};
 
     // Only build the witness functions for tests, don't bundle them into
     // the final library
@@ -208,7 +296,10 @@ mod tests {
 
     fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<u8> {
         let bits = bytes_to_bits(bytes);
-        let field_bits = bits.into_iter().map(|bit| Fr::from(bit as u8)).collect();
+        let field_bits = bits
+            .into_iter()
+            .map(|bit| BigUint::from(bit as u8))
+            .collect();
         let circom_outputs = serialization::SerializableInputs(field_bits);
         serialization::serialize_inputs(&circom_outputs)
     }
@@ -229,8 +320,8 @@ mod tests {
         inputs.insert("b".to_string(), vec![b.to_string()]);
         // output = [public output c, public input a]
         let expected_output = vec![
-            Fr::from(c.clone().to_biguint().unwrap()),
-            Fr::from(a.clone().to_biguint().unwrap()),
+            c.clone().to_biguint().unwrap(),
+            a.clone().to_biguint().unwrap(),
         ];
         let circom_outputs = serialization::SerializableInputs(expected_output);
         let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
