@@ -59,9 +59,7 @@ pub fn generate_circom_proof_wtns(
 
     // here we make a loader just to get the groth16 header
     // this header tells us what curve the zkey was compiled for
-    //
-    // we specify the BinFile as Bn254 here just to satisfy the compiler
-    // we'll make a separate instance after this using the correct type
+    // this loader will only load the first few bytes
     let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
     header_reader.read();
     let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
