@@ -16,7 +16,7 @@ path = "src/uniffi-bindgen.rs"
 default = []
 
 halo2 = ["halo2_proofs", "halo2curves", "serde"]
-circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-ff", "ark-bls12-381", "num-traits"]
+circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-ff", "ark-bls12-381", "num-traits", "byteorder"]
 
 [dependencies]
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
@@ -54,7 +54,7 @@ ark-groth16 = { version = "=0.4.0", default-features = false, features = [
 ], optional = true }
 ark-relations = { version = "0.4", default-features = false, optional = true }
 uuid = { version = "1.9.1", features = ["v4"] }
-byteorder = "1.0.0"
+byteorder = { version = "1.0.0", optional = true }
 ark-ff = { version = "0.4.0", optional = true }
 ark-bls12-381 =  { version = "0.4.0", optional = true }
 num-traits = { version = "0.2.0", optional = true }
