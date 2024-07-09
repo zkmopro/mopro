@@ -55,12 +55,16 @@ pub fn generate_circom_proof_wtns(
             .collect::<Vec<_>>()
     });
 
+    // here we make a loader just to get the groth16 header
+    // this header tells us what curve the zkey was compiled for
+    //
+    // we specify the BinFile as Bn254 here just to satisfy the compiler
+    // we'll make a separate instance after this using the correct type
     let header;
     {
-        let mut file =
-            File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
-        // let mut reader = std::io::BufReader::new(file);
-        let mut header_reader = BinFile::<_, Bn254>::new(&mut file)
+        let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let mut reader = std::io::BufReader::new(file);
+        let mut header_reader = BinFile::<_, Bn254>::new(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         header = header_reader
             .groth_header()
@@ -146,10 +150,9 @@ pub fn verify_circom_proof(
 ) -> Result<bool, MoproError> {
     let header;
     {
-        let mut file =
-            File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
-        // let mut reader = std::io::BufReader::new(file);
-        let mut header_reader = BinFile::<_, Bn254>::new(&mut file)
+        let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let mut reader = std::io::BufReader::new(file);
+        let mut header_reader = BinFile::<_, Bn254>::new(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         header = header_reader
             .groth_header()
