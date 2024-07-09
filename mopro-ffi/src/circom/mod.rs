@@ -101,6 +101,10 @@ pub fn generate_circom_proof_wtns(
         return prove(proving_key, matrices, full_assignment);
     } else {
         // unknown curve
+        // wait for the witness thread to finish for consistency
+        witness_thread
+            .join()
+            .map_err(|_e| MoproError::CircomError("Failed to generate witness".to_string()))?;
         return Err(MoproError::CircomError(
             "unknown curve detected in zkey".to_string(),
         ));
