@@ -27,7 +27,7 @@
 //!  Contributions(10)
 use ark_bls12_381::Bls12_381;
 use ark_ec::pairing::Pairing;
-use ark_ff::{BigInteger, BigInteger256, BigInteger384, Field, PrimeField};
+use ark_ff::{BigInteger256, BigInteger384, Field, PrimeField};
 use ark_relations::r1cs::ConstraintMatrices;
 use ark_serialize::{CanonicalDeserialize, SerializationError};
 use ark_std::log2;

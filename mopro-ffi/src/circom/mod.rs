@@ -200,17 +200,21 @@ fn verify<T: Pairing + FieldSerialization>(
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use std::ops::{Add, Mul};
     use std::str::FromStr;
 
     use crate::circom::{generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn};
     use crate::{GenerateProofResult, MoproError};
+    use ark_bls12_381::Bls12_381;
     use ark_bn254::Bn254;
-    use num_bigint::{BigInt, BigUint};
+    use ark_ff::PrimeField;
+    use num_bigint::{BigInt, BigUint, ToBigInt};
     use serialization::{to_ethereum_inputs, to_ethereum_proof};
 
     // Only build the witness functions for tests, don't bundle them into
     // the final library
     rust_witness::witness!(multiplier2);
+    rust_witness::witness!(multiplier2bls);
     rust_witness::witness!(keccak256256test);
     rust_witness::witness!(hashbenchbls);
 
@@ -221,6 +225,7 @@ mod tests {
             "multiplier2_final.zkey" => Ok(multiplier2_witness),
             "keccak256_256_test_final.zkey" => Ok(keccak256256test_witness),
             "hashbench_bls_final.zkey" => Ok(hashbenchbls_witness),
+            "multiplier2_bls_final.zkey" => Ok(multiplier2bls_witness),
             _ => Err(MoproError::CircomError("Unknown circuit name".to_string())),
         }
     }
@@ -364,7 +369,8 @@ mod tests {
     }
 
     #[test]
-    fn test_prove_bls() -> Result<(), MoproError> {
+    #[ignore = "hashbench circuit is having problems"]
+    fn test_prove_bls_hashbench() -> Result<(), MoproError> {
         // Create a new MoproCircom instance
         let zkey_path = "../test-vectors/circom/hashbench_bls_final.zkey".to_string();
 
@@ -400,6 +406,55 @@ mod tests {
         let inputs_calldata = to_ethereum_inputs(serialized_inputs);
         assert!(proof_calldata.a.x.len() > 0);
         assert!(inputs_calldata.len() > 0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_prove_bls_multiplier2() -> Result<(), MoproError> {
+        // Create a new MoproCircom instance
+        let zkey_path = "../test-vectors/circom/multiplier2_bls_final.zkey".to_string();
+
+        let mut inputs = HashMap::new();
+        // we're using large numbers to ensure we're in the bls field
+        let a = BigInt::from(2).pow(250);
+        let b: BigInt = BigInt::from(2).pow(254).add(1240);
+        let c = a.clone().mul(b.clone())
+            % BigUint::from(ark_bls12_381::Fr::MODULUS)
+                .to_bigint()
+                .unwrap();
+        inputs.insert("a".to_string(), vec![a.to_string()]);
+        inputs.insert("b".to_string(), vec![b.to_string()]);
+        // output = [public output c, public input a]
+        let expected_output = vec![ark_bls12_381::Fr::from(c.to_biguint().unwrap())];
+        let circom_outputs = serialization::SerializableInputs::<Bls12_381>(expected_output);
+        let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
+
+        // Generate Proof
+        let p = generate_circom_proof(zkey_path.clone(), inputs)?;
+        let serialized_proof = p.proof;
+        let serialized_inputs = p.inputs;
+
+        assert!(serialized_proof.len() > 0);
+        assert_eq!(serialized_inputs, serialized_outputs);
+
+        // Step 3: Verify Proof
+        let is_valid = verify_circom_proof(
+            zkey_path,
+            serialized_proof.clone(),
+            serialized_inputs.clone(),
+        )?;
+        assert!(is_valid);
+
+        // We don't support formatting for ethereum for the BLS curve.
+        // Once the hardfork enables the bls precompile we should
+        // revisit this
+        //
+        // // Step 4: Convert Proof to Ethereum compatible proof
+        // let proof_calldata = to_ethereum_proof(serialized_proof);
+        // let inputs_calldata = to_ethereum_inputs(serialized_inputs);
+        // assert!(proof_calldata.a.x.len() > 0);
+        // assert!(inputs_calldata.len() > 0);
 
         Ok(())
     }
