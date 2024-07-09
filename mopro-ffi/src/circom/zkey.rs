@@ -27,7 +27,7 @@
 //!  Contributions(10)
 use ark_bls12_381::Bls12_381;
 use ark_ec::pairing::Pairing;
-use ark_ff::{BigInteger256, BigInteger384, Field, PrimeField};
+use ark_ff::{BigInteger, BigInteger256, BigInteger384, Field, PrimeField};
 use ark_relations::r1cs::ConstraintMatrices;
 use ark_serialize::{CanonicalDeserialize, SerializationError};
 use ark_std::log2;
@@ -133,7 +133,7 @@ impl FieldSerialization for Bls12_381 {
 
     // skips the multiplication by R because Circom points are already in Montgomery form
     fn deserialize_field<R: Read>(reader: &mut R) -> IoResult<Self::Fq> {
-        let bigint = BigInteger384::deserialize_uncompressed_unchecked(reader)?;
+        let bigint = BigInteger384::deserialize_uncompressed(reader)?;
         // if you use Fq::new it multiplies by R
         Ok(Self::Fq::new_unchecked(bigint))
     }
@@ -151,7 +151,7 @@ impl FieldSerialization for Bls12_381 {
         if infinity {
             Ok(Self::G1Affine::identity())
         } else {
-            Ok(Self::G1Affine::new_unchecked(x, y))
+            Ok(Self::G1Affine::new(x, y))
         }
     }
 
@@ -162,7 +162,7 @@ impl FieldSerialization for Bls12_381 {
         if infinity {
             Ok(Self::G2Affine::identity())
         } else {
-            Ok(Self::G2Affine::new_unchecked(f1, f2))
+            Ok(Self::G2Affine::new(f1, f2))
         }
     }
 
@@ -195,13 +195,13 @@ pub struct BinFile<'a, R, P: Pairing + FieldSerialization> {
 
 pub struct HeaderGroth<F: FieldSerialization> {
     #[allow(dead_code)]
-    n8q: u32,
+    pub n8q: u32,
     #[allow(dead_code)]
-    pub q: BigInteger256,
+    pub q: F::Fq,
     #[allow(dead_code)]
-    n8r: u32,
+    pub n8r: u32,
     #[allow(dead_code)]
-    pub r: BigInteger256,
+    pub r: F::Fr,
 
     n_vars: usize,
     n_public: usize,
@@ -291,13 +291,14 @@ impl<'a, R: Read + Seek, P: Pairing + FieldSerialization> BinFile<'a, R, P> {
         self.reader.seek(SeekFrom::Start(section.position))?;
 
         // TODO: Impl From<u32> in Arkworks
+        // Number of bytes per q element
         let n8q: u32 = u32::deserialize_uncompressed_unchecked(&mut self.reader)?;
-        // group order r of Bn254
-        let q = BigInteger256::deserialize_uncompressed_unchecked(&mut self.reader)?;
+        let q = P::deserialize_field(&mut self.reader)?;
 
+        // Number of bytes per r element
         let n8r: u32 = u32::deserialize_uncompressed_unchecked(&mut self.reader)?;
         // Prime field modulus
-        let r = BigInteger256::deserialize_uncompressed_unchecked(&mut self.reader)?;
+        let r = P::deserialize_field_fr(&mut self.reader)?;
 
         let n_vars = u32::deserialize_uncompressed_unchecked(&mut self.reader)? as usize;
         let n_public = u32::deserialize_uncompressed_unchecked(&mut self.reader)? as usize;

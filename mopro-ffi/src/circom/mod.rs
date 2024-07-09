@@ -1,6 +1,7 @@
 use crate::{MoproError, WtnsFn};
 pub mod serialization;
 mod zkey;
+mod zkey_header;
 
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
@@ -10,6 +11,7 @@ use ark_relations::r1cs::ConstraintMatrices;
 use serialization::{SerializableInputs, SerializableProof};
 
 use zkey::{BinFile, FieldSerialization};
+use zkey_header::ZkeyHeaderReader;
 
 use std::collections::HashMap;
 use std::fs::File;
@@ -60,20 +62,13 @@ pub fn generate_circom_proof_wtns(
     //
     // we specify the BinFile as Bn254 here just to satisfy the compiler
     // we'll make a separate instance after this using the correct type
-    let header;
-    {
-        let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let mut reader = std::io::BufReader::new(file);
-        let mut header_reader = BinFile::<_, Bn254>::new(&mut reader)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        header = header_reader
-            .groth_header()
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-    }
+    let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
+    header_reader.read();
     let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let mut reader = std::io::BufReader::new(file);
     // check the prime in the header
-    if header.r == ark_bn254::Fr::MODULUS {
+    // println!("{} {} {}", header.q, header.n8q, ark_bls12_381::Fq::MODULUS);
+    if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
         let mut binfile = BinFile::<_, Bn254>::new(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let proving_key = binfile
@@ -86,7 +81,7 @@ pub fn generate_circom_proof_wtns(
             .join()
             .map_err(|_e| MoproError::CircomError("Failed to generate witness".to_string()))?;
         return prove(proving_key, matrices, full_assignment);
-    } else if header.r == ark_bls12_381::Fr::MODULUS {
+    } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
         let mut binfile = BinFile::<_, Bls12_381>::new(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let proving_key = binfile
@@ -128,7 +123,7 @@ fn prove<T: Pairing + FieldSerialization>(
     let public_inputs = witness_fr.as_slice()[1..matrices.num_instance_variables].to_vec();
 
     // build the proof
-    let ark_proof = Groth16::<_, CircomReduction>::create_proof_with_reduction_and_matrices(
+    let ark_proof = Groth16::<T, CircomReduction>::create_proof_with_reduction_and_matrices(
         &pkey,
         r,
         s,
@@ -139,6 +134,8 @@ fn prove<T: Pairing + FieldSerialization>(
     );
 
     let proof = ark_proof.map_err(|e| MoproError::CircomError(e.to_string()))?;
+    // println!("{} {} {}", proof.a, proof.b, proof.c);
+    // println!("{} {}",public_inputs.len(), public_inputs[0]);
 
     Ok(GenerateProofResult {
         proof: serialization::serialize_proof(&SerializableProof(proof)),
@@ -152,19 +149,11 @@ pub fn verify_circom_proof(
     proof: Vec<u8>,
     public_input: Vec<u8>,
 ) -> Result<bool, MoproError> {
-    let header;
-    {
-        let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let mut reader = std::io::BufReader::new(file);
-        let mut header_reader = BinFile::<_, Bn254>::new(&mut reader)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        header = header_reader
-            .groth_header()
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-    }
+    let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
+    header_reader.read();
     let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let mut reader = std::io::BufReader::new(file);
-    if header.r == ark_bn254::Fr::MODULUS {
+    if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
         let mut binfile = BinFile::<_, Bn254>::new(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let proving_key = binfile
@@ -172,7 +161,7 @@ pub fn verify_circom_proof(
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let p = serialization::deserialize_inputs::<Bn254>(public_input);
         return verify(proving_key.vk, p.0, proof);
-    } else if header.r == ark_bls12_381::Fr::MODULUS {
+    } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
         let mut binfile = BinFile::<_, Bls12_381>::new(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let proving_key = binfile
@@ -199,7 +188,7 @@ fn verify<T: Pairing + FieldSerialization>(
         .map(|v| T::ScalarField::from(v.clone()))
         .collect::<Vec<_>>();
     let proof_parsed = serialization::deserialize_proof::<T>(proof);
-    let verified = Groth16::<_, CircomReduction>::verify_with_processed_vk(
+    let verified = Groth16::<T, CircomReduction>::verify_with_processed_vk(
         &pvk,
         &public_inputs_fr,
         &proof_parsed.0,
@@ -215,14 +204,15 @@ mod tests {
 
     use crate::circom::{generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn};
     use crate::{GenerateProofResult, MoproError};
-    use ark_bn254::{Bn254, Fr};
-    use num_bigint::BigInt;
+    use ark_bn254::Bn254;
+    use num_bigint::{BigInt, BigUint};
     use serialization::{to_ethereum_inputs, to_ethereum_proof};
 
     // Only build the witness functions for tests, don't bundle them into
     // the final library
     rust_witness::witness!(multiplier2);
     rust_witness::witness!(keccak256256test);
+    rust_witness::witness!(hashbenchbls);
 
     // This should be defined by a file that the mopro package consumer authors
     // then we reference it in our build somehow
@@ -230,6 +220,7 @@ mod tests {
         match name {
             "multiplier2_final.zkey" => Ok(multiplier2_witness),
             "keccak256_256_test_final.zkey" => Ok(keccak256256test_witness),
+            "hashbench_bls_final.zkey" => Ok(hashbenchbls_witness),
             _ => Err(MoproError::CircomError("Unknown circuit name".to_string())),
         }
     }
@@ -272,7 +263,10 @@ mod tests {
 
     fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<u8> {
         let bits = bytes_to_bits(bytes);
-        let field_bits = bits.into_iter().map(|bit| Fr::from(bit as u8)).collect();
+        let field_bits = bits
+            .into_iter()
+            .map(|bit| ark_bn254::Fr::from(bit as u8))
+            .collect();
         let circom_outputs = serialization::SerializableInputs::<Bn254>(field_bits);
         serialization::serialize_inputs(&circom_outputs)
     }
@@ -293,8 +287,8 @@ mod tests {
         inputs.insert("b".to_string(), vec![b.to_string()]);
         // output = [public output c, public input a]
         let expected_output = vec![
-            Fr::from(c.clone().to_biguint().unwrap()),
-            Fr::from(a.clone().to_biguint().unwrap()),
+            ark_bn254::Fr::from(c.clone().to_biguint().unwrap()),
+            ark_bn254::Fr::from(a.clone().to_biguint().unwrap()),
         ];
         let circom_outputs = serialization::SerializableInputs::<Bn254>(expected_output);
         let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
@@ -353,6 +347,47 @@ mod tests {
 
         // Verify Proof
 
+        let is_valid = verify_circom_proof(
+            zkey_path,
+            serialized_proof.clone(),
+            serialized_inputs.clone(),
+        )?;
+        assert!(is_valid);
+
+        // Step 4: Convert Proof to Ethereum compatible proof
+        let proof_calldata = to_ethereum_proof(serialized_proof);
+        let inputs_calldata = to_ethereum_inputs(serialized_inputs);
+        assert!(proof_calldata.a.x.len() > 0);
+        assert!(inputs_calldata.len() > 0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_prove_bls() -> Result<(), MoproError> {
+        // Create a new MoproCircom instance
+        let zkey_path = "../test-vectors/circom/hashbench_bls_final.zkey".to_string();
+
+        let mut inputs = HashMap::new();
+        let a = BigInt::from(1);
+        let b = BigInt::from(1);
+        inputs.insert("inputs".to_string(), vec![a.to_string(), b.to_string()]);
+        // output = [public output c, public input a]
+        // let expected_output = vec![
+        //     Bls12_381::ScalarField::from(BigUint::from_str("").unwrap())
+        // ];
+        // let circom_outputs = serialization::SerializableInputs::<Bls12_381>(expected_output);
+        // let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
+
+        // Generate Proof
+        let p = generate_circom_proof(zkey_path.clone(), inputs)?;
+        let serialized_proof = p.proof;
+        let serialized_inputs = p.inputs;
+
+        assert!(serialized_proof.len() > 0);
+        // assert_eq!(serialized_inputs, serialized_outputs);
+
+        // Step 3: Verify Proof
         let is_valid = verify_circom_proof(
             zkey_path,
             serialized_proof.clone(),
