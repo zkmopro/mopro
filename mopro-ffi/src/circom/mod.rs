@@ -132,8 +132,6 @@ fn prove<T: Pairing + FieldSerialization>(
     );
 
     let proof = ark_proof.map_err(|e| MoproError::CircomError(e.to_string()))?;
-    // println!("{} {} {}", proof.a, proof.b, proof.c);
-    // println!("{} {}",public_inputs.len(), public_inputs[0]);
 
     Ok(GenerateProofResult {
         proof: serialization::serialize_proof(&SerializableProof(proof)),
