@@ -1,5 +1,5 @@
-use crate::{MoproError, ProofCalldata, WtnsFn, G1, G2};
-mod serialization;
+use crate::{MoproError, WtnsFn};
+pub mod serialization;
 mod zkey;
 
 use ark_bls12_381::Bls12_381;
@@ -117,7 +117,7 @@ fn prove<T: Pairing + FieldSerialization>(
     let rng = &mut rng;
     let r = T::ScalarField::rand(rng);
     let s = T::ScalarField::rand(rng);
-    let public_inputs = witness.as_slice()[1..matrices.num_instance_variables].to_vec();
+    let public_inputs = witness_fr.as_slice()[1..matrices.num_instance_variables].to_vec();
 
     // build the proof
     let ark_proof = Groth16::<_, CircomReduction>::create_proof_with_reduction_and_matrices(
@@ -134,7 +134,7 @@ fn prove<T: Pairing + FieldSerialization>(
 
     Ok(GenerateProofResult {
         proof: serialization::serialize_proof(&SerializableProof(proof)),
-        inputs: serialization::serialize_inputs(&SerializableInputs(public_inputs)),
+        inputs: serialization::serialize_inputs(&SerializableInputs::<T>(public_inputs)),
     })
 }
 
@@ -163,15 +163,15 @@ pub fn verify_circom_proof(
         let proving_key = binfile
             .proving_key()
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let p = serialization::deserialize_inputs(public_input);
+        let p = serialization::deserialize_inputs::<Bn254>(public_input);
         return verify(proving_key.vk, p.0, proof);
     } else if header.r == ark_bls12_381::Fr::MODULUS {
-        let mut binfile = BinFile::<_, Bn254>::new(&mut reader)
+        let mut binfile = BinFile::<_, Bls12_381>::new(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let proving_key = binfile
             .proving_key()
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let p = serialization::deserialize_inputs(public_input);
+        let p = serialization::deserialize_inputs::<Bls12_381>(public_input);
         return verify(proving_key.vk, p.0, proof);
     } else {
         // unknown curve
@@ -183,7 +183,7 @@ pub fn verify_circom_proof(
 
 fn verify<T: Pairing + FieldSerialization>(
     vk: VerifyingKey<T>,
-    public_inputs: Vec<BigUint>,
+    public_inputs: Vec<T::ScalarField>,
     proof: Vec<u8>,
 ) -> Result<bool, MoproError> {
     let pvk = prepare_verifying_key(&vk);
@@ -201,47 +201,16 @@ fn verify<T: Pairing + FieldSerialization>(
     Ok(verified)
 }
 
-// Convert proof to String-tuples as expected by the Solidity Groth16 Verifier
-pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
-    let deserialized_proof = serialization::deserialize_proof(proof);
-    let proof = serialization::to_ethereum_proof(&deserialized_proof);
-    let a = G1 {
-        x: proof.a.x.to_string(),
-        y: proof.a.y.to_string(),
-    };
-    let b = G2 {
-        x: proof.b.x.iter().map(|x| x.to_string()).collect(),
-        y: proof.b.y.iter().map(|x| x.to_string()).collect(),
-    };
-    let c = G1 {
-        x: proof.c.x.to_string(),
-        y: proof.c.y.to_string(),
-    };
-    ProofCalldata { a, b, c }
-}
-
-pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
-    let deserialized_inputs = serialization::deserialize_inputs(inputs);
-    let inputs = deserialized_inputs
-        .0
-        .iter()
-        .map(|x| x.to_string())
-        .collect();
-    inputs
-}
-
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
     use std::str::FromStr;
 
-    use crate::circom::{
-        generate_circom_proof_wtns, serialization, to_ethereum_inputs, to_ethereum_proof,
-        verify_circom_proof, WtnsFn,
-    };
+    use crate::circom::{generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn};
     use crate::{GenerateProofResult, MoproError};
     use ark_bn254::{Bn254, Fr};
-    use num_bigint::{BigInt, BigUint};
+    use num_bigint::BigInt;
+    use serialization::{to_ethereum_inputs, to_ethereum_proof};
 
     // Only build the witness functions for tests, don't bundle them into
     // the final library
@@ -296,11 +265,8 @@ mod tests {
 
     fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<u8> {
         let bits = bytes_to_bits(bytes);
-        let field_bits = bits
-            .into_iter()
-            .map(|bit| BigUint::from(bit as u8))
-            .collect();
-        let circom_outputs = serialization::SerializableInputs(field_bits);
+        let field_bits = bits.into_iter().map(|bit| Fr::from(bit as u8)).collect();
+        let circom_outputs = serialization::SerializableInputs::<Bn254>(field_bits);
         serialization::serialize_inputs(&circom_outputs)
     }
 
@@ -320,10 +286,10 @@ mod tests {
         inputs.insert("b".to_string(), vec![b.to_string()]);
         // output = [public output c, public input a]
         let expected_output = vec![
-            c.clone().to_biguint().unwrap(),
-            a.clone().to_biguint().unwrap(),
+            Fr::from(c.clone().to_biguint().unwrap()),
+            Fr::from(a.clone().to_biguint().unwrap()),
         ];
-        let circom_outputs = serialization::SerializableInputs(expected_output);
+        let circom_outputs = serialization::SerializableInputs::<Bn254>(expected_output);
         let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
 
         // Generate Proof
