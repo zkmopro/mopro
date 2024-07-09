@@ -75,7 +75,7 @@ pub fn verify_circom_proof(_: String, _: Vec<u8>, _: Vec<u8>) -> Result<bool, Mo
 
 #[cfg(feature = "circom")]
 pub fn to_ethereum_proof(in0: Vec<u8>) -> ProofCalldata {
-    circom::to_ethereum_proof(in0)
+    circom::serialization::to_ethereum_proof(in0)
 }
 
 #[cfg(not(feature = "circom"))]
@@ -85,7 +85,7 @@ pub fn to_ethereum_proof(_: Vec<u8>) -> ProofCalldata {
 
 #[cfg(feature = "circom")]
 pub fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
-    circom::to_ethereum_inputs(in0)
+    circom::serialization::to_ethereum_inputs(in0)
 }
 
 #[cfg(not(feature = "circom"))]
