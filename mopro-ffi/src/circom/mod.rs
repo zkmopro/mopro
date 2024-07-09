@@ -1,4 +1,6 @@
 use crate::{MoproError, WtnsFn};
+mod ethereum;
+mod qap;
 pub mod serialization;
 mod zkey;
 mod zkey_header;
@@ -18,7 +20,7 @@ use std::fs::File;
 use std::str::FromStr;
 
 use crate::GenerateProofResult;
-use ark_circom::CircomReduction;
+use qap::CircomReduction;
 
 use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey, VerifyingKey};

@@ -16,7 +16,21 @@ path = "src/uniffi-bindgen.rs"
 default = []
 
 halo2 = ["halo2_proofs", "halo2curves", "serde"]
-circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-ff", "ark-bls12-381", "num-traits", "byteorder"]
+circom = [
+    "ark-poly",
+    "ark-serialize",
+    "ark-ec",
+    "ark-crypto-primitives",
+    "ark-std",
+    "ark-bn254",
+    "ark-groth16",
+    "ark-relations",
+    "ark-ff",
+    "ark-bls12-381",
+    "num-traits",
+    "byteorder",
+    "ethers-core",
+]
 
 [dependencies]
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
@@ -34,7 +48,6 @@ halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", 
 ], optional = true }
 
 # circom deps
-ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", branch = "wasm-delete", optional = true }
 ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
@@ -49,6 +62,9 @@ ark-std = { version = "=0.4.0", default-features = false, features = [
     "parallel",
 ], optional = true }
 ark-bn254 = { version = "=0.4.0", optional = true }
+ark-poly = { version = "=0.4.1", default-features = false, features = [
+    "parallel",
+], optional = true }
 ark-groth16 = { version = "=0.4.0", default-features = false, features = [
     "parallel",
 ], optional = true }
@@ -56,8 +72,11 @@ ark-relations = { version = "0.4", default-features = false, optional = true }
 uuid = { version = "1.9.1", features = ["v4"] }
 byteorder = { version = "1.0.0", optional = true }
 ark-ff = { version = "0.4.0", optional = true }
-ark-bls12-381 =  { version = "0.4.0", optional = true }
+ark-bls12-381 = { version = "0.4.0", optional = true }
 num-traits = { version = "0.2.0", optional = true }
+
+# Ethereum compat
+ethers-core = { version = "=2.0.7", default-features = false, optional = true }
 
 [build-dependencies]
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
