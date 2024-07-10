@@ -30,6 +30,7 @@ fun MultiplierComponent(zkeyPath: String) {
             GenerateProofResult(proof = ByteArray(size = 0), inputs = ByteArray(size = 0))
         )
     }
+    var circuit = Multiplier2CircomCircuit(zkeyPath)
 
     val inputs = mutableMapOf<String, List<String>>()
     inputs["a"] = listOf("3")
@@ -41,7 +42,7 @@ fun MultiplierComponent(zkeyPath: String) {
                 Thread(
                     Runnable {
                         val startTime = System.currentTimeMillis()
-                        res = generateCircomProof(zkeyPath, inputs)
+                        res = circuit.prove(inputs)
                         val endTime = System.currentTimeMillis()
                         provingTime =
                             "proving time: " +
@@ -56,7 +57,7 @@ fun MultiplierComponent(zkeyPath: String) {
         Button(
             onClick = {
                 val startTime = System.currentTimeMillis()
-                valid = "valid: " + verifyCircomProof(zkeyPath, res.proof, res.inputs).toString()
+                valid = "valid: " + circuit.verify(res.proof, res.inputs).toString()
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
                 output = "output: " + uniffi.mopro.toEthereumInputs(res.inputs)
