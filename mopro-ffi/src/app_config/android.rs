@@ -37,7 +37,7 @@ pub fn build() {
 
     // To reuse build assets we take `dylib` from the build directory of one of `archs`
     let out_dylib_path = build_dir_path.join(format!(
-        "{}/{}/lib{}.dylib",
+        "{}/{}/lib{}.so",
         target_archs[0], mode, library_name
     ));
     let bindings_build_path = build_dir_path.join("out");
