@@ -1427,6 +1427,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b43ede17f21864e81be2fa654110bf1e793774238d86ef8555c37e6519c0403"
 
 [[package]]
+name = "halo2-fibonacci"
+version = "0.1.0"
+source = "git+https://github.com/ElusAegis/halo2-fibonacci-sample.git#a20ec7ac1aae65bb3420fa3b3029a37c42201a85"
+dependencies = [
+ "halo2_proofs",
+ "halo2curves",
+]
+
+[[package]]
 name = "halo2_proofs"
 version = "0.2.0"
 source = "git+https://github.com/privacy-scaling-explorations/halo2?tag=v2023_04_20#be955686f86eb618f55d2320c0e042485b313d22"
@@ -1779,8 +1788,6 @@ dependencies = [
  "ark-std",
  "byteorder",
  "color-eyre",
- "halo2_proofs",
- "halo2curves",
  "num-bigint",
  "num-traits",
  "rust-witness",
@@ -2663,9 +2670,17 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
+ "bincode",
+ "halo2-fibonacci",
+ "halo2_proofs",
+ "halo2curves",
  "mopro-ffi",
  "num-bigint",
+ "once_cell",
+ "rand",
  "rust-witness",
+ "serde",
+ "serde_json",
  "uniffi",
 ]
 

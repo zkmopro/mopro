@@ -14,18 +14,39 @@ name = "ios"
 name = "android"
 
 [features]
-default = ["mopro-ffi/circom"]
+default = ["circom", "halo2"]
+circom = ["mopro-ffi/circom", "rust-witness"]
+halo2 = ["mopro-ffi/halo2", "halo2_proofs", "halo2curves", "serde"]
 
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
 num-bigint = "0.4.0"
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 uniffi = "0.28.0"
+
+# Circom dependencies
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git", optional = true }
+
+# Halo2 dependencies
+halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
+bincode = "1.3.3"
+halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2", optional = true }
+halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", tag = "v2023_04_20", features = [
+    "dev-graph",
+], optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+rand = "0.8.5"
+once_cell = "1.19.0"
 
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 uniffi = { version = "0.28.0", features = ["build"] }
+
+# Circom dependencies
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git", optional = true }
 
 [dev-dependencies]
 uniffi = { version = "0.28.0", features = ["bindgen-tests"] }
+
+# Halo2 dependencies
+serde_json = { version = "1.0.120" }
+once_cell = "1.19.0"

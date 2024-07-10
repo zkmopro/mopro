@@ -7,6 +7,9 @@ mod halo2;
 use std::collections::HashMap;
 use thiserror::Error;
 
+#[cfg(feature = "halo2")]
+pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
+
 pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint::BigInt>;
 
 #[derive(Debug, Error)]
@@ -15,34 +18,6 @@ pub enum MoproError {
     CircomError(String),
     #[error("Halo2Error: {0}")]
     Halo2Error(String),
-}
-
-#[cfg(feature = "halo2")]
-pub fn generate_halo2_proof(
-    in0: HashMap<String, Vec<String>>,
-) -> Result<GenerateProofResult, MoproError> {
-    halo2::generate_halo2_proof(in0)
-}
-
-#[cfg(not(feature = "halo2"))]
-pub fn generate_halo2_proof(
-    _: HashMap<String, Vec<String>>,
-) -> Result<GenerateProofResult, MoproError> {
-    Err(MoproError::Halo2Error(
-        "Project does not have Halo2 feature enabled".to_string(),
-    ))
-}
-
-#[cfg(feature = "halo2")]
-pub fn verify_halo2_proof(in0: Vec<u8>, in1: Vec<u8>) -> Result<bool, MoproError> {
-    halo2::verify_halo2_proof(in0, in1)
-}
-
-#[cfg(not(feature = "halo2"))]
-pub fn verify_halo2_proof(_: Vec<u8>, _: Vec<u8>) -> Result<bool, MoproError> {
-    Err(MoproError::Halo2Error(
-        "Project does not have Halo2 feature enabled".to_string(),
-    ))
 }
 
 #[cfg(feature = "circom")]
@@ -145,13 +120,28 @@ macro_rules! app {
         use std::collections::HashMap;
 
         fn generate_halo2_proof(
-            in0: HashMap<String, Vec<String>>,
+            in0: String,
+            in1: String,
+            in2: HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
-            mopro_ffi::generate_halo2_proof(in0)
+            if let Ok((prove_fn, _)) = key_halo2_circuit_map(in1.as_str()) {
+                prove_fn(&in0, &in1, in2)
+            } else {
+                Err(MoproError::Halo2Error("Unknown circuit name".to_string()))
+            }
         }
 
-        fn verify_halo2_proof(in0: Vec<u8>, in1: Vec<u8>) -> Result<bool, MoproError> {
-            mopro_ffi::verify_halo2_proof(in0, in1)
+        fn verify_halo2_proof(
+            in0: String,
+            in1: String,
+            in2: Vec<u8>,
+            in3: Vec<u8>,
+        ) -> Result<bool, MoproError> {
+            if let Ok((_, verify_fn)) = key_halo2_circuit_map(in1.as_str()) {
+                verify_fn(&in0, &in1, in2, in3)
+            } else {
+                Err(MoproError::Halo2Error("Unknown circuit name".to_string()))
+            }
         }
 
         fn generate_circom_proof(
