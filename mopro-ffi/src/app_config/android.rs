@@ -89,6 +89,11 @@ fn generate_kotlin_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(),
         remove_dir_all(binding_dir)?;
     }
 
+    // Configure `uniffi` to generate bindings for Android
+    let content = "[bindings.kotlin]\nandroid = true";
+    let config_path = binding_dir.parent().unwrap().join("uniffi_config.toml");
+    fs::write(&config_path, content).expect("Failed to write uniffi_config.toml");
+
     generate_bindings(
         Utf8Path::from_path(&dylib_path).ok_or(Error::new(
             io::ErrorKind::InvalidInput,
@@ -96,7 +101,10 @@ fn generate_kotlin_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(),
         ))?,
         None,
         &KotlinBindingGenerator,
-        None,
+        Option::from(Utf8Path::from_path(&config_path).ok_or(Error::new(
+            io::ErrorKind::InvalidInput,
+            "Invalid uniffi_config path",
+        ))?),
         Utf8Path::from_path(&binding_dir).ok_or(Error::new(
             io::ErrorKind::InvalidInput,
             "Invalid kotlin files directory",
