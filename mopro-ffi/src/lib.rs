@@ -21,7 +21,7 @@ macro_rules! circom_app {
 
         fn generate_circom_proof(
             in0: String,
-            in1: HashMap<String, Vec<String>>,
+            in1: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
@@ -153,8 +153,8 @@ pub struct ProofCalldata {
 #[macro_export]
 macro_rules! app {
     () => {
+        // These are mandatory imports for the uniffi to pick them up and match with UDL
         use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
-        use std::collections::HashMap;
 
         mopro_ffi::circom_app!();
 

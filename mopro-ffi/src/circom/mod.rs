@@ -34,18 +34,19 @@ pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint
 #[macro_export]
 macro_rules! circom_app {
     () => {
-        static CIRCOM_CIRCUITS: once_cell::sync::Lazy<HashMap<String, mopro_ffi::WtnsFn>> =
-            once_cell::sync::Lazy::new(|| set_circom_circuits());
+        static CIRCOM_CIRCUITS: once_cell::sync::Lazy<
+            std::collections::HashMap<String, mopro_ffi::WtnsFn>,
+        > = once_cell::sync::Lazy::new(|| set_circom_circuits());
 
         fn generate_circom_proof(
             in0: String,
-            in1: HashMap<String, Vec<String>>,
-        ) -> Result<GenerateProofResult, MoproError> {
+            in1: std::collections::HashMap<String, Vec<String>>,
+        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             let name = std::path::Path::new(in0.as_str()).file_name().unwrap();
             if let Some(witness_fn) = CIRCOM_CIRCUITS.get(name.to_str().unwrap()) {
                 mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn.clone())
             } else {
-                Err(MoproError::CircomError(
+                Err(mopro_ffi::MoproError::CircomError(
                     format!(
                         "Unknown ZKEY: {}. Have keys: {:?}",
                         in0,
@@ -60,11 +61,11 @@ macro_rules! circom_app {
             in0: String,
             in1: Vec<u8>,
             in2: Vec<u8>,
-        ) -> Result<bool, MoproError> {
+        ) -> Result<bool, mopro_ffi::MoproError> {
             mopro_ffi::verify_circom_proof(in0, in1, in2)
         }
 
-        fn to_ethereum_proof(in0: Vec<u8>) -> ProofCalldata {
+        fn to_ethereum_proof(in0: Vec<u8>) -> mopro_ffi::ProofCalldata {
             mopro_ffi::to_ethereum_proof(in0)
         }
 
@@ -85,8 +86,8 @@ macro_rules! circom_app {
 macro_rules! set_circom_circuits {
     // Generates a function `set_circom_circuits` that takes no arguments and updates CIRCOM_CIRCUITS
     ($($key:expr, $func:expr),+ $(,)?) => {
-        fn set_circom_circuits() -> HashMap<String, mopro_ffi::WtnsFn> {
-            let mut m: HashMap<String, mopro_ffi::WtnsFn> = HashMap::new();
+        fn set_circom_circuits() -> std::collections::HashMap<String, mopro_ffi::WtnsFn> {
+            let mut m: std::collections::HashMap<String, mopro_ffi::WtnsFn> = std::collections::HashMap::new();
 
             $(
                     m.insert($key.to_string(), $func);
@@ -268,7 +269,7 @@ mod tests {
     use std::str::FromStr;
 
     use crate::circom::{generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn};
-    use crate::{GenerateProofResult, MoproError, ProofCalldata};
+    use crate::{GenerateProofResult, MoproError};
     use ark_bls12_381::Bls12_381;
     use ark_bn254::Bn254;
     use ark_ff::PrimeField;
@@ -285,11 +286,8 @@ mod tests {
     use crate as mopro_ffi;
 
     #[test]
+    #[allow(dead_code)]
     fn test_circom_macros() {
-        fn dummy_witness(_inputs: HashMap<String, Vec<BigInt>>) -> Vec<BigInt> {
-            vec![]
-        }
-
         circom_app!();
 
         set_circom_circuits! {
@@ -304,7 +302,6 @@ mod tests {
         )
         .unwrap();
         let b = BigInt::from(1u8);
-        let c = a.clone() * b.clone();
         inputs.insert("a".to_string(), vec![a.to_string()]);
         inputs.insert("b".to_string(), vec![b.to_string()]);
 

@@ -4,23 +4,23 @@ use std::collections::HashMap;
 macro_rules! halo2_app {
     () => {
         static HALO2_PROVING_CIRCUITS: once_cell::sync::Lazy<
-            HashMap<String, mopro_ffi::Halo2ProveFn>,
+            std::collections::HashMap<String, mopro_ffi::Halo2ProveFn>,
         > = once_cell::sync::Lazy::new(|| set_halo2_proving_circuits());
 
         static HALO2_VERIFYING_CIRCUITS: once_cell::sync::Lazy<
-            HashMap<String, mopro_ffi::Halo2VerifyFn>,
+            std::collections::HashMap<String, mopro_ffi::Halo2VerifyFn>,
         > = once_cell::sync::Lazy::new(|| set_halo2_verifying_circuits());
 
         fn generate_halo2_proof(
             in0: String,
             in1: String,
-            in2: HashMap<String, Vec<String>>,
-        ) -> Result<GenerateProofResult, MoproError> {
+            in2: std::collections::HashMap<String, Vec<String>>,
+        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
             if let Some(prove_fn) = HALO2_PROVING_CIRCUITS.get(name.to_str().unwrap()) {
                 prove_fn(&in0, &in1, in2)
             } else {
-                Err(MoproError::Halo2Error(
+                Err(mopro_ffi::MoproError::Halo2Error(
                     format!(
                         "Unknown Prove Circuit: {}. Have Prove Circuits: {:?}",
                         in1,
@@ -36,12 +36,12 @@ macro_rules! halo2_app {
             in1: String,
             in2: Vec<u8>,
             in3: Vec<u8>,
-        ) -> Result<bool, MoproError> {
+        ) -> Result<bool, mopro_ffi::MoproError> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
             if let Some(verify_fn) = HALO2_VERIFYING_CIRCUITS.get(name.to_str().unwrap()) {
                 verify_fn(&in0, &in1, in2, in3)
             } else {
-                Err(MoproError::Halo2Error(
+                Err(mopro_ffi::MoproError::Halo2Error(
                     format!(
                         "Unknown Verify Circuit: {}. Have Verify Circuits: {:?}",
                         in1,
@@ -65,8 +65,8 @@ macro_rules! halo2_app {
 macro_rules! set_halo2_proving_circuits {
     // Generates a function `set_circom_circuits` that takes no arguments and updates CIRCOM_CIRCUITS
     ($($key:expr, $func:expr),+ $(,)?) => {
-        fn set_halo2_proving_circuits() -> HashMap<String, mopro_ffi::Halo2ProveFn> {
-            let mut circuits: HashMap<String, mopro_ffi::Halo2ProveFn> = HashMap::new();
+        fn set_halo2_proving_circuits() -> std::collections::HashMap<String, mopro_ffi::Halo2ProveFn> {
+            let mut circuits: std::collections::HashMap<String, mopro_ffi::Halo2ProveFn> = std::collections::HashMap::new();
 
             $(
                     circuits.insert($key.to_string(), $func);
@@ -88,8 +88,8 @@ macro_rules! set_halo2_proving_circuits {
 macro_rules! set_halo2_verifying_circuits {
     // Generates a function `set_circom_circuits` that takes no arguments and updates CIRCOM_CIRCUITS
     ($($key:expr, $func:expr),+ $(,)?) => {
-        fn set_halo2_verifying_circuits() -> HashMap<String, mopro_ffi::Halo2VerifyFn> {
-            let mut circuits: HashMap<String, mopro_ffi::Halo2VerifyFn> = HashMap::new();
+        fn set_halo2_verifying_circuits() -> std::collections::HashMap<String, mopro_ffi::Halo2VerifyFn> {
+            let mut circuits: std::collections::HashMap<String, mopro_ffi::Halo2VerifyFn> = std::collections::HashMap::new();
 
             $(
                     circuits.insert($key.to_string(), $func);
@@ -113,7 +113,7 @@ mod test {
     use crate as mopro_ffi;
     use std::collections::HashMap;
 
-    use mopro_ffi::{GenerateProofResult, MoproError};
+    use mopro_ffi::MoproError;
 
     fn dummy_prove_fn(
         _srs_key_path: &str,
