@@ -13,9 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import uniffi.mopro.GenerateProofResult
-import uniffi.mopro.generateCircomProof
-import uniffi.mopro.verifyCircomProof
+import uniffi.test_e2e.*
+import uniffi.mopro_ffi.*
 import java.nio.file.Paths
 
 @Composable
