@@ -1,16 +1,16 @@
+use camino::Utf8Path;
+use std::fs::remove_dir_all;
 use std::io::Error;
 use std::path::Path;
 use std::process::Command;
 use std::{fs, io};
-
-use camino::Utf8Path;
 use uniffi_bindgen::bindings::KotlinBindingGenerator;
 use uniffi_bindgen::library_mode::generate_bindings;
 
-use super::{install_arch, install_ndk, setup_directories};
+use super::{cleanup_tmp_local, install_arch, install_ndk, setup_directories};
 
 pub fn build() {
-    let (manifest_dir, library_name, build_dir, build_dir_path, work_dir) = setup_directories();
+    let (manifest_dir, library_name, _, build_dir_path, work_dir) = setup_directories();
 
     let bindings_out = work_dir.join("MoproAndroidBindings");
     let bindings_dest = Path::new(&manifest_dir).join("MoproAndroidBindings");
@@ -36,16 +36,16 @@ pub fn build() {
     }
 
     // To reuse build assets we take `dylib` from the build directory of one of `archs`
-    let out_dylib_path = Path::new(&build_dir).join(Path::new(&format!(
-        "{}/{}/{}/lib{}.dylib",
-        build_dir, target_archs[0], mode, library_name
-    )));
-    let bindings_build_path = Path::new(&build_dir).join("out");
+    let out_dylib_path = build_dir_path.join(format!(
+        "{}/{}/lib{}.dylib",
+        target_archs[0], mode, library_name
+    ));
+    let bindings_build_path = build_dir_path.join("out");
     generate_kotlin_bindings(&out_dylib_path, &bindings_build_path)
-        .expect("Failed to prepare bindings for iOS");
+        .expect("Failed to prepare bindings for Kotlin");
 
     move_bindings(&bindings_build_path, &bindings_dest);
-    // cleanup_tmp_local(&build_dir_path);
+    cleanup_tmp_local(&build_dir_path);
 }
 
 fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str) {
@@ -90,7 +90,8 @@ fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str)
 }
 
 fn generate_kotlin_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Error> {
-    // Generate the bindings for IOS
+    remove_dir_all(binding_dir)?;
+
     generate_bindings(
         Utf8Path::from_path(&dylib_path).ok_or(Error::new(
             io::ErrorKind::InvalidInput,

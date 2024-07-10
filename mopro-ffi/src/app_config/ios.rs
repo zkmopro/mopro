@@ -1,5 +1,6 @@
 use super::{cleanup_tmp_local, install_arch, mktemp_local, setup_directories};
 use camino::Utf8Path;
+use std::fs::remove_dir_all;
 use std::io::Error;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -87,10 +88,10 @@ pub fn build() {
         .collect();
 
     // To reuse build assets we take `dylib` from the build directory of one of `archs`
-    let out_dylib_path = Path::new(&build_dir).join(Path::new(&format!(
-        "{}/{}/{}/lib{}.dylib",
-        build_dir, target_archs[0][0], mode, library_name
-    )));
+    let out_dylib_path = build_dir_path.join(format!(
+        "{}/{}/lib{}.dylib",
+        target_archs[0][0], mode, library_name
+    ));
     let bindings_build_path = Path::new(&build_dir).join("out");
     generate_ios_bindings(&out_dylib_path, &bindings_build_path)
         .expect("Failed to generate bindings for iOS");
@@ -173,7 +174,8 @@ pub fn move_ios_bindings(binding_dir: &Path, swift_files_dir: &Path) -> io::Resu
 }
 
 fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Error> {
-    // Generate the bindings for IOS
+    remove_dir_all(binding_dir)?;
+
     generate_bindings(
         Utf8Path::from_path(&dylib_path).ok_or(Error::new(
             io::ErrorKind::InvalidInput,
