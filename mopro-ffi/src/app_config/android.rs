@@ -82,15 +82,24 @@ fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str)
         _ => panic!("Unknown target architecture: {}", arch),
     };
 
-    let out_lib_path = build_dir.join(format!(
-        "{}/{}/{}/libmopro_bindings.so",
-        build_dir.display(),
-        arch,
-        mode
-    ));
+    let out_lib_path = build_dir.join(format!("{}/{}/libmopro_bindings.so", arch, mode));
     let out_lib_dest = bindings_out.join(format!("jniLibs/{}/libuniffi_mopro.so", folder));
 
     fs::create_dir_all(out_lib_dest.parent().unwrap()).expect("Failed to create jniLibs directory");
+    // TODO - remove. Checks if the file out_lib_path exists
+    if !out_lib_path.exists() {
+        // Print the files and folders in the build_dir
+        let paths = fs::read_dir(&build_dir).unwrap();
+        for path in paths {
+            println!("Name: {}", path.unwrap().path().display());
+            // Print the contents of the directory
+            let paths = fs::read_dir(&path.unwrap().path()).unwrap();
+            for path in paths {
+                println!("Name: {}", path.unwrap().path().display());
+            }
+        }
+        panic!("File does not exist: {:?}", out_lib_path);
+    }
     fs::copy(&out_lib_path, &out_lib_dest).expect("Failed to copy file");
 }
 
