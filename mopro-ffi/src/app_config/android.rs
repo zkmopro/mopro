@@ -31,8 +31,8 @@ pub fn build() {
     };
 
     install_ndk();
-    for arch in target_archs {
-        build_for_arch(&arch, &build_dir_path, &bindings_out, &mode);
+    for arch in &target_archs {
+        build_for_arch(arch, &build_dir_path, &bindings_out, &mode);
     }
 
     // To reuse build assets we take `dylib` from the build directory of one of `archs`
