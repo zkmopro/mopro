@@ -56,3 +56,25 @@ pub fn install_arch(arch: String) {
         .wait()
         .expect(format!("Failed to install target architecture {}", arch).as_str());
 }
+
+fn setup_directories() -> (String, String, String, PathBuf, PathBuf) {
+    let cwd = std::env::current_dir().unwrap();
+    let manifest_dir =
+        std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
+
+    // Library name is the name of the crate with all `-` replaced with `_`
+    // TODO - find a way to get the real name of the library as it might not be the same as the crate name
+    let crate_name = std::env::var("CARGO_PKG_NAME").unwrap();
+    let library_name = crate_name.replace("-", "_");
+
+    let build_dir = format!("{}/build", manifest_dir);
+    let build_dir_path = Path::new(&build_dir).to_path_buf();
+    let work_dir = mktemp_local(&build_dir_path);
+    (
+        manifest_dir,
+        library_name,
+        build_dir,
+        build_dir_path,
+        work_dir,
+    )
+}

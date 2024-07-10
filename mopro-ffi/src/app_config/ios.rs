@@ -1,5 +1,6 @@
-use super::{cleanup_tmp_local, install_arch, mktemp_local};
+use super::{cleanup_tmp_local, install_arch, mktemp_local, setup_directories};
 use camino::Utf8Path;
+use std::io::Error;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::{fs, io};
@@ -8,18 +9,7 @@ use uniffi_bindgen::library_mode::generate_bindings;
 
 // Load environment variables that are specified by by xcode
 pub fn build() {
-    let cwd = std::env::current_dir().unwrap();
-    let manifest_dir =
-        std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
-
-    // Library name is the name of the crate with all `-` replaced with `_`
-    // TODO - find a way to get the real name of the library as it might not be the same as the crate name
-    let crate_name = std::env::var("CARGO_PKG_NAME").unwrap();
-    let library_name = crate_name.replace("-", "_");
-
-    let build_dir = format!("{}/build", manifest_dir);
-    let build_dir_path = Path::new(&build_dir);
-    let work_dir = mktemp_local(&build_dir_path);
+    let (manifest_dir, library_name, build_dir, build_dir_path, work_dir) = setup_directories();
     let bindings_out = work_dir.join("MoproiOSBindings");
     fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
     let bindings_dest = Path::new(&manifest_dir).join("MoproiOSBindings");
@@ -102,7 +92,9 @@ pub fn build() {
         build_dir, target_archs[0][0], mode, library_name
     )));
     let bindings_build_path = Path::new(&build_dir).join("out");
-    build_bindings(&out_dylib_path, &bindings_build_path, &bindings_out)
+    generate_ios_bindings(&out_dylib_path, &bindings_build_path)
+        .expect("Failed to generate bindings for iOS");
+    move_ios_bindings(&bindings_build_path, &bindings_out)
         .expect("Failed to prepare bindings for iOS");
 
     let mut xcbuild_cmd = Command::new("xcodebuild");
@@ -132,28 +124,7 @@ pub fn build() {
     cleanup_tmp_local(&build_dir_path)
 }
 
-pub fn build_bindings(
-    dylib_path: &Path,
-    binding_dir: &Path,
-    swift_files_dir: &Path,
-) -> io::Result<()> {
-    // Generate the bindings for IOS
-    generate_bindings(
-        Utf8Path::from_path(&dylib_path).ok_or(io::Error::new(
-            io::ErrorKind::InvalidInput,
-            "Invalid dylib path",
-        ))?,
-        None,
-        &SwiftBindingGenerator,
-        None,
-        Utf8Path::from_path(&binding_dir).ok_or(io::Error::new(
-            io::ErrorKind::InvalidInput,
-            "Invalid swift files directory",
-        ))?,
-        true,
-    )
-    .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
-
+pub fn move_ios_bindings(binding_dir: &Path, swift_files_dir: &Path) -> io::Result<()> {
     // Iterate over each `.swift` file in the `binding_dir` directory
     for entry in fs::read_dir(binding_dir)? {
         let entry = entry?;
@@ -189,7 +160,7 @@ pub fn build_bindings(
                     let modulemap_dest = ffi_dir.join("module.modulemap");
                     fs::rename(modulemap_src, modulemap_dest)?;
                 } else {
-                    return Err(io::Error::new(
+                    return Err(Error::new(
                         io::ErrorKind::NotFound,
                         format!("{}FFI.modulemap not found", file_stem),
                     ));
@@ -198,5 +169,25 @@ pub fn build_bindings(
         }
     }
 
+    Ok(())
+}
+
+fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Error> {
+    // Generate the bindings for IOS
+    generate_bindings(
+        Utf8Path::from_path(&dylib_path).ok_or(Error::new(
+            io::ErrorKind::InvalidInput,
+            "Invalid dylib path",
+        ))?,
+        None,
+        &SwiftBindingGenerator,
+        None,
+        Utf8Path::from_path(&binding_dir).ok_or(Error::new(
+            io::ErrorKind::InvalidInput,
+            "Invalid swift files directory",
+        ))?,
+        true,
+    )
+    .map_err(|e| Error::new(io::ErrorKind::Other, e.to_string()))?;
     Ok(())
 }
