@@ -1,8 +1,9 @@
 import uniffi.mopro.*
 
-try {
-    initializeMopro()
 
+try {
+    var zkeyPath = "../test-vectors/circom/keccak256_256_test_final.zkey"
+    
     val inputs = mutableMapOf<String, List<String>>()
     inputs["in"] =
             listOf(
@@ -264,9 +265,9 @@ try {
                     "0"
             )
 
-    var generateProofResult = generateProofStatic(inputs)
+    var generateProofResult = generateCircomProof(zkeyPath, inputs)
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
-    var isValid = verifyProofStatic(generateProofResult.proof, generateProofResult.inputs)
+    var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs)
     assert(isValid) { "Proof is invalid" }
 } catch (e: Exception) {
     println(e)
