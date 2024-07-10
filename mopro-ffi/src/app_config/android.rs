@@ -104,6 +104,12 @@ fn generate_kotlin_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(),
         true,
     )
     .map_err(|e| Error::new(io::ErrorKind::Other, e.to_string()))?;
+
+    // Print the content of the `uniffi/test_e2e/test_e2e.kt` file
+    let test_e2e_kt = binding_dir.join("uniffi/test_e2e/test_e2e.kt");
+    let content = fs::read_to_string(&test_e2e_kt).expect("Failed to read test_e2e.kt");
+    println!("{}", content);
+
     Ok(())
 }
 
