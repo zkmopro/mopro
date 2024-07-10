@@ -92,6 +92,7 @@ pub fn build() {
         "{}/{}/lib{}.dylib",
         target_archs[0][0], mode, library_name
     ));
+    println!("out_dylib_path: {:?}", out_dylib_path);
     let bindings_build_path = Path::new(&build_dir).join("out");
     generate_ios_bindings(&out_dylib_path, &bindings_build_path)
         .expect("Failed to generate bindings for iOS");
@@ -174,7 +175,9 @@ pub fn move_ios_bindings(binding_dir: &Path, swift_files_dir: &Path) -> io::Resu
 }
 
 fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Error> {
-    remove_dir_all(binding_dir)?;
+    if binding_dir.exists() {
+        remove_dir_all(binding_dir)?;
+    }
 
     generate_bindings(
         Utf8Path::from_path(&dylib_path).ok_or(Error::new(

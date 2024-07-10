@@ -95,7 +95,9 @@ fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str)
 }
 
 fn generate_kotlin_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Error> {
-    remove_dir_all(binding_dir)?;
+    if binding_dir.exists() {
+        remove_dir_all(binding_dir)?;
+    }
 
     generate_bindings(
         Utf8Path::from_path(&dylib_path).ok_or(Error::new(
