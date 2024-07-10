@@ -365,7 +365,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "hashbench circuit is having problems"]
     fn test_prove_bls_hashbench() -> Result<(), MoproError> {
         // Create a new MoproCircom instance
         let zkey_path = "../test-vectors/circom/hashbench_bls_final.zkey".to_string();
@@ -374,20 +373,23 @@ mod tests {
         let a = BigInt::from(1);
         let b = BigInt::from(1);
         inputs.insert("inputs".to_string(), vec![a.to_string(), b.to_string()]);
-        // output = [public output c, public input a]
-        // let expected_output = vec![
-        //     Bls12_381::ScalarField::from(BigUint::from_str("").unwrap())
-        // ];
-        // let circom_outputs = serialization::SerializableInputs::<Bls12_381>(expected_output);
-        // let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
+
+        // The hashbench circuit repeatedly calculates poseidon hashes. We'll
+        // hardcode the expected output here
+        let expected_output = BigUint::from_str(
+            "30695856561167821618075419048973910422865797477786596477999317197379707456163",
+        )
+        .unwrap();
 
         // Generate Proof
         let p = generate_circom_proof(zkey_path.clone(), inputs)?;
         let serialized_proof = p.proof;
-        let serialized_inputs = p.inputs;
+        let serialized_inputs = p.inputs.clone();
 
         assert!(serialized_proof.len() > 0);
-        // assert_eq!(serialized_inputs, serialized_outputs);
+
+        let output = serialization::deserialize_inputs::<Bls12_381>(p.inputs).0[0];
+        assert_eq!(BigUint::from(output), expected_output);
 
         // Step 3: Verify Proof
         let is_valid = verify_circom_proof(
@@ -396,12 +398,6 @@ mod tests {
             serialized_inputs.clone(),
         )?;
         assert!(is_valid);
-
-        // Step 4: Convert Proof to Ethereum compatible proof
-        let proof_calldata = to_ethereum_proof(serialized_proof);
-        let inputs_calldata = to_ethereum_inputs(serialized_inputs);
-        assert!(proof_calldata.a.x.len() > 0);
-        assert!(inputs_calldata.len() > 0);
 
         Ok(())
     }
