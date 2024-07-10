@@ -164,41 +164,40 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
     inputs
 }
 
-/// This marco will generate a Circom circuit struct named: `<circuit_name>CircomCircuit`.
+/// This macro will generate a Circom circuit struct named: `<circuit_name>CircomCircuit`.
 /// You can then call the `prove` and `verify` methods on this struct to interact with the circuit.
-/// Warning: Make sure that there are no other circuits with the same name that you export
+/// Input 1: the name of the witness generation function that you want to use for this circuit.
+/// Input 2: the name of the circuit.
+/// It will be used to generate the name of the circuit struct.
+/// Warning: Make sure that there are no other circuits with the same name that you export.
 #[macro_export]
 macro_rules! mopro_circom_circuit {
-    ($name:ident) => {
+    ($circuit_name:ident, $witness_fn_name:ident) => {
         mopro_ffi::reexports::paste! {
-
-            mod [<$name _tmp_impl_module_circom>] {
-
-                rust_witness::witness!([<$name>]);
-
+            mod [<$circuit_name _tmp_impl_module_circom>] {
+                use super::[<$witness_fn_name>];
 
                 #[derive(uniffi::Object)]
-                pub struct [<$name CircomCircuit>] {
+                pub struct [<$circuit_name>] {
                     circuit_path: String,
                 }
 
                 #[uniffi::export]
-                impl [<$name CircomCircuit>] {
+                impl [<$circuit_name>] {
                     #[uniffi::constructor]
                     pub fn new(circuit_path: String) -> Self {
-                        let _ = std::path::Path::new(circuit_path.as_str()).file_name().unwrap();
+                        let _ = std::path::Path::new(&circuit_path).file_name().unwrap();
                         Self { circuit_path }
                     }
 
                     pub fn prove(&self, circuit_inputs: std::collections::HashMap<String, Vec<String>>) -> Result<mopro_ffi::GenerateProofResult, crate::MoproErrorExternal> {
-                        mopro_ffi::generate_circom_proof_wtns(self.circuit_path.to_string(), circuit_inputs, [<$name _witness>])
-                            .map_err(|e| crate::MoproErrorExternal::from(e))
+                        mopro_ffi::generate_circom_proof_wtns(self.circuit_path.clone(), circuit_inputs, [<$witness_fn_name>])
+                            .map_err(crate::MoproErrorExternal::from)
                     }
 
                     pub fn verify(&self, proof: Vec<u8>, public_input: Vec<u8>) -> Result<bool, crate::MoproErrorExternal> {
-                        let circuit_path = &self.circuit_path;
-                        mopro_ffi::verify_circom_proof(circuit_path.to_string(), proof, public_input)
-                            .map_err(|e| crate::MoproErrorExternal::from(e))
+                        mopro_ffi::verify_circom_proof(self.circuit_path.clone(), proof, public_input)
+                            .map_err(crate::MoproErrorExternal::from)
                     }
                 }
             }
