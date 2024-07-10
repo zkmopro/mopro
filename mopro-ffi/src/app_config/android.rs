@@ -89,7 +89,7 @@ fn generate_kotlin_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(),
         remove_dir_all(binding_dir)?;
     }
 
-    // Configure `uniffi` to generate bindings for Android
+    // Configure `uniffi` to generate bindings specifically for Android
     let content = "[bindings.kotlin]\nandroid = true";
     let config_path = binding_dir.parent().unwrap().join("uniffi_config.toml");
     fs::write(&config_path, content).expect("Failed to write uniffi_config.toml");
@@ -112,12 +112,6 @@ fn generate_kotlin_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(),
         true,
     )
     .map_err(|e| Error::new(io::ErrorKind::Other, e.to_string()))?;
-
-    // Print the content of the `uniffi/test_e2e/test_e2e.kt` file
-    let test_e2e_kt = binding_dir.join("uniffi/test_e2e/test_e2e.kt");
-    let content = fs::read_to_string(&test_e2e_kt).expect("Failed to read test_e2e.kt");
-    println!("{}", content);
-
     Ok(())
 }
 
