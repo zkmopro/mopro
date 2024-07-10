@@ -59,7 +59,7 @@ fun MultiplierComponent(zkeyPath: String) {
                 valid = "valid: " + circuit.verify(res.proof, res.inputs).toString()
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
-                output = "output: " + uniffi.mopro.toEthereumInputs(res.inputs)
+                output = "output: " + toEthereumInputs(res.inputs)
             },
             modifier = Modifier.padding(top = 120.dp)
         ) { Text(text = "verify proof") }
