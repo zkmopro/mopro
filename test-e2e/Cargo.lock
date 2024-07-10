@@ -1206,8 +1206,6 @@ dependencies = [
  "num-bigint",
  "paste",
  "rust-witness",
- "serde",
- "serde_derive",
  "thiserror",
  "uniffi",
  "uniffi_bindgen",
@@ -1945,6 +1943,16 @@ dependencies = [
  "fastrand",
  "rustix",
  "windows-sys",
+]
+
+[[package]]
+name = "test-e2e"
+version = "0.1.0"
+dependencies = [
+ "mopro-ffi",
+ "num-bigint",
+ "rust-witness",
+ "uniffi",
 ]
 
 [[package]]

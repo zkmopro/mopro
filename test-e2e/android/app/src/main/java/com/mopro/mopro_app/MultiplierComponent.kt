@@ -13,9 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import uniffi.mopro.GenerateProofResult
-import uniffi.mopro.generateCircomProof
-import uniffi.mopro.verifyCircomProof
+import uniffi.test_e2e.*
+import uniffi.mopro_ffi.*
 import java.nio.file.Paths
 
 @Composable
@@ -30,6 +29,7 @@ fun MultiplierComponent(zkeyPath: String) {
             GenerateProofResult(proof = ByteArray(size = 0), inputs = ByteArray(size = 0))
         )
     }
+    var circuit = Multiplier2CircomCircuit(zkeyPath)
 
     val inputs = mutableMapOf<String, List<String>>()
     inputs["a"] = listOf("3")
@@ -41,7 +41,7 @@ fun MultiplierComponent(zkeyPath: String) {
                 Thread(
                     Runnable {
                         val startTime = System.currentTimeMillis()
-                        res = generateCircomProof(zkeyPath, inputs)
+                        res = circuit.prove(inputs)
                         val endTime = System.currentTimeMillis()
                         provingTime =
                             "proving time: " +
@@ -56,10 +56,10 @@ fun MultiplierComponent(zkeyPath: String) {
         Button(
             onClick = {
                 val startTime = System.currentTimeMillis()
-                valid = "valid: " + verifyCircomProof(zkeyPath, res.proof, res.inputs).toString()
+                valid = "valid: " + circuit.verify(res.proof, res.inputs).toString()
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
-                output = "output: " + uniffi.mopro.toEthereumInputs(res.inputs)
+                output = "output: " + toEthereumInputs(res.inputs)
             },
             modifier = Modifier.padding(top = 120.dp)
         ) { Text(text = "verify proof") }

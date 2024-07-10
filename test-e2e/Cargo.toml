@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "mopro_bindings"
 crate-type = ["lib", "cdylib", "staticlib"]
+name = "test_e2e"
 
 [[bin]]
 name = "ios"
@@ -14,18 +14,16 @@ name = "ios"
 name = "android"
 
 [features]
-default = ["mopro-ffi/circom"]
+default = []
 
 [dependencies]
-mopro-ffi = { path = "../mopro-ffi" }
+mopro-ffi = { path = "../mopro-ffi", features = ["circom"] }
 num-bigint = "0.4.0"
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 uniffi = "0.28.0"
 
 [build-dependencies]
-mopro-ffi = { path = "../mopro-ffi" }
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
-uniffi = { version = "0.28.0", features = ["build"] }
 
 [dev-dependencies]
 uniffi = { version = "0.28.0", features = ["bindgen-tests"] }

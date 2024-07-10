@@ -6,3 +6,5 @@ mopro-example-app
 graph.bin
 
 *.xcframework/
+/mopro-sample-app/MoproiOSBindings/
+/mopro-sample-app/build/
