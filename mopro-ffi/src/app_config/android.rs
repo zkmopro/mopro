@@ -7,11 +7,16 @@ use std::{fs, io};
 use uniffi_bindgen::bindings::KotlinBindingGenerator;
 use uniffi_bindgen::library_mode::generate_bindings;
 
-use super::{cleanup_tmp_local, install_arch, install_ndk, setup_directories};
+use super::{cleanup_tmp_local, install_arch, install_ndk, mktemp_local, setup_directories};
 
 pub fn build() {
     let (manifest_dir, library_name, _, build_dir_path, work_dir) = setup_directories();
 
+    let cwd = std::env::current_dir().expect("Failed to get current directory");
+    let manifest_dir =
+        std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());
+    let build_dir = Path::new(&manifest_dir).join("build");
+    let work_dir = mktemp_local(&build_dir);
     let bindings_out = work_dir.join("MoproAndroidBindings");
     let bindings_dest = Path::new(&manifest_dir).join("MoproAndroidBindings");
 
@@ -31,8 +36,8 @@ pub fn build() {
     };
 
     install_ndk();
-    for arch in &target_archs {
-        build_for_arch(arch, &build_dir_path, &bindings_out, &mode);
+    for arch in target_archs.clone() {
+        build_for_arch(&arch, &build_dir, &bindings_out, &mode);
     }
 
     // To reuse build assets we take `dylib` from the build directory of one of `archs`
