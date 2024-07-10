@@ -7,16 +7,11 @@ use std::{fs, io};
 use uniffi_bindgen::bindings::KotlinBindingGenerator;
 use uniffi_bindgen::library_mode::generate_bindings;
 
-use super::{cleanup_tmp_local, install_arch, install_ndk, mktemp_local, setup_directories};
+use super::{cleanup_tmp_local, install_arch, install_ndk, setup_directories};
 
 pub fn build() {
     let (manifest_dir, library_name, _, build_dir_path, work_dir) = setup_directories();
 
-    let cwd = std::env::current_dir().expect("Failed to get current directory");
-    let manifest_dir =
-        std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());
-    let build_dir = Path::new(&manifest_dir).join("build");
-    let work_dir = mktemp_local(&build_dir);
     let bindings_out = work_dir.join("MoproAndroidBindings");
     let bindings_dest = Path::new(&manifest_dir).join("MoproAndroidBindings");
 
@@ -36,8 +31,8 @@ pub fn build() {
     };
 
     install_ndk();
-    for arch in target_archs.clone() {
-        build_for_arch(&arch, &build_dir, &bindings_out, &mode);
+    for arch in &target_archs {
+        build_for_arch(arch, &build_dir_path, &bindings_out, &mode, &library_name);
     }
 
     // To reuse build assets we take `dylib` from the build directory of one of `archs`
@@ -53,7 +48,7 @@ pub fn build() {
     cleanup_tmp_local(&build_dir_path);
 }
 
-fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str) {
+fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str, lib_name: &str) {
     install_arch(arch.to_string());
 
     let mut build_cmd = Command::new("cargo");
@@ -82,20 +77,10 @@ fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str)
         _ => panic!("Unknown target architecture: {}", arch),
     };
 
-    let out_lib_path = build_dir.join(format!("{}/{}/libmopro_bindings.so", arch, mode));
+    let out_lib_path = build_dir.join(format!("{}/{}/lib{}.so", arch, mode, lib_name));
     let out_lib_dest = bindings_out.join(format!("jniLibs/{}/libuniffi_mopro.so", folder));
 
     fs::create_dir_all(out_lib_dest.parent().unwrap()).expect("Failed to create jniLibs directory");
-    // TODO - remove. Checks if the file out_lib_path exists
-    if !out_lib_path.exists() {
-        // Print the files and folders in the build_dir
-        let paths = fs::read_dir(&build_dir.join(arch).join(mode)).unwrap();
-        for path in paths {
-            let path_dir = path.unwrap().path();
-            println!("Name: {}", path_dir.display());
-        }
-        panic!("File does not exist: {:?}", out_lib_path);
-    }
     fs::copy(&out_lib_path, &out_lib_dest).expect("Failed to copy file");
 }
 

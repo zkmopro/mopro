@@ -92,7 +92,6 @@ pub fn build() {
         "{}/{}/lib{}.dylib",
         target_archs[0][0], mode, library_name
     ));
-    println!("out_dylib_path: {:?}", out_dylib_path);
     let bindings_build_path = Path::new(&build_dir).join("out");
     generate_ios_bindings(&out_dylib_path, &bindings_build_path)
         .expect("Failed to generate bindings for iOS");
