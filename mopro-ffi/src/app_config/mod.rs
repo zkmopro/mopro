@@ -58,7 +58,7 @@ pub fn install_arch(arch: String) {
 }
 
 fn setup_directories() -> (String, String, String, PathBuf, PathBuf) {
-    let cwd = std::env::current_dir().unwrap();
+    let cwd = std::env::current_dir().expect("Failed to get current directory");
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
 
