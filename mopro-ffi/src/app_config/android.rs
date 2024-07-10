@@ -91,9 +91,10 @@ fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str)
         // Print the files and folders in the build_dir
         let paths = fs::read_dir(&build_dir).unwrap();
         for path in paths {
-            println!("Name: {}", path.unwrap().path().display());
+            let path_dir = path.unwrap().path();
+            println!("Name: {}", path_dir.display());
             // Print the contents of the directory
-            let paths = fs::read_dir(&path.unwrap().path()).unwrap();
+            let paths = fs::read_dir(path_dir).unwrap();
             for path in paths {
                 println!("Name: {}", path.unwrap().path().display());
             }
