@@ -1,4 +1,4 @@
-use crate::{MoproError, WtnsFn};
+use crate::MoproError;
 pub mod serialization;
 mod zkey;
 mod zkey_header;
@@ -28,6 +28,62 @@ use ark_std::rand::thread_rng;
 use color_eyre::Result;
 
 use num_bigint::{BigInt, BigUint};
+
+pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint::BigInt>;
+
+#[macro_export]
+macro_rules! circom_app {
+    () => {
+        static CIRCOM_CIRCUITS: Lazy<HashMap<String, mopro_ffi::WtnsFn>> =
+            Lazy::new(|| set_circom_circuits());
+
+        fn generate_circom_proof(
+            in0: String,
+            in1: HashMap<String, Vec<String>>,
+        ) -> Result<GenerateProofResult, MoproError> {
+            let name = std::path::Path::new(in0.as_str()).file_name().unwrap();
+            if let Ok(witness_fn) =
+                mopro_ffi::zkey_witness_map(&CIRCOM_CIRCUITS, &name.to_str().unwrap())
+            {
+                mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn)
+            } else {
+                Err(MoproError::CircomError("Unknown ZKEY".to_string()))
+            }
+        }
+
+        fn verify_circom_proof(
+            in0: String,
+            in1: Vec<u8>,
+            in2: Vec<u8>,
+        ) -> Result<bool, MoproError> {
+            mopro_ffi::verify_circom_proof(in0, in1, in2)
+        }
+
+        fn to_ethereum_proof(in0: Vec<u8>) -> ProofCalldata {
+            mopro_ffi::to_ethereum_proof(in0)
+        }
+
+        fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
+            mopro_ffi::to_ethereum_inputs(in0)
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! set_circom_circuits {
+    // Generates a function `set_circom_circuits` that takes no arguments and updates CIRCOM_CIRCUITS
+    ($($key:expr, $func:expr),+ $(,)?) => {
+        fn set_circom_circuits() -> HashMap<String, mopro_ffi::WtnsFn> {
+            let mut m: HashMap<String, mopro_ffi::WtnsFn> = HashMap::new();
+
+            $(
+                    m.insert($key.to_string(), $func);
+            )+
+
+            m
+        }
+    };
+}
 
 pub fn zkey_witness_map(
     circuits: &HashMap<String, WtnsFn>,

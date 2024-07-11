@@ -2,8 +2,8 @@ extern crate core;
 
 use once_cell::sync::Lazy;
 
-use mopro_ffi::halo2::{Halo2ProveFn, Halo2VerifyFn};
-use mopro_ffi::{app, set_circom_circuits, WtnsFn};
+use mopro_ffi::app;
+use mopro_ffi::{Halo2ProveFn, Halo2VerifyFn};
 
 use crate::halo2::FibonacciMoproCircuit;
 
@@ -17,7 +17,7 @@ rust_witness::witness!(keccak256256test);
 rust_witness::witness!(hashbenchbls);
 
 // If you are not using circom, you need to have an empty set_circom_circuits! macro
-set_circom_circuits!(
+mopro_ffi::set_circom_circuits!(
     "multiplier2_final.zkey",
     multiplier2_witness,
     "multiplier2_bls_final.zkey",
