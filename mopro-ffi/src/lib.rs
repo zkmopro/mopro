@@ -51,7 +51,7 @@ macro_rules! halo2_app {
         fn generate_halo2_proof(
             in0: String,
             in1: String,
-            in2: HashMap<String, Vec<String>>,
+            in2: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
