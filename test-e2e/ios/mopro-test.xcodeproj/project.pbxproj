@@ -15,6 +15,9 @@
 		4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF977F02C2BCF0000CE1139 /* ContentView.swift */; };
 		4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F22C2BCF0300CE1139 /* Assets.xcassets */; };
 		4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */; };
+		60A8E4382C40404300D3A953 /* fibonacci_srs in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4352C40404200D3A953 /* fibonacci_srs */; };
+		60A8E4392C40404300D3A953 /* fibonacci_pk in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4362C40404300D3A953 /* fibonacci_pk */; };
+		60A8E43A2C40404300D3A953 /* fibonacci_vk in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4372C40404300D3A953 /* fibonacci_vk */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +41,9 @@
 		4CF977F02C2BCF0000CE1139 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CF977F22C2BCF0300CE1139 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		60A8E4352C40404200D3A953 /* fibonacci_srs */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_srs; path = "../../test-vectors/halo2/fibonacci_srs"; sourceTree = "<group>"; };
+		60A8E4362C40404300D3A953 /* fibonacci_pk */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_pk; path = "../../test-vectors/halo2/fibonacci_pk"; sourceTree = "<group>"; };
+		60A8E4372C40404300D3A953 /* fibonacci_vk */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_vk; path = "../../test-vectors/halo2/fibonacci_vk"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +76,9 @@
 		4CF977E22C2BCF0000CE1139 = {
 			isa = PBXGroup;
 			children = (
+				60A8E4362C40404300D3A953 /* fibonacci_pk */,
+				60A8E4352C40404200D3A953 /* fibonacci_srs */,
+				60A8E4372C40404300D3A953 /* fibonacci_vk */,
 				4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */,
 				4CF977ED2C2BCF0000CE1139 /* mopro-test */,
 				4C05CDB02C327C4F00BEBACD /* mopro-test-UITests */,
@@ -205,7 +214,10 @@
 			files = (
 				4CCB9BDF2C33C20800C659C4 /* multiplier2_final.zkey in Resources */,
 				4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */,
+				60A8E43A2C40404300D3A953 /* fibonacci_vk in Resources */,
+				60A8E4382C40404300D3A953 /* fibonacci_srs in Resources */,
 				4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */,
+				60A8E4392C40404300D3A953 /* fibonacci_pk in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
