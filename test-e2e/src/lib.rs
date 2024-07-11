@@ -2,25 +2,51 @@ extern crate core;
 
 mopro_ffi::app!();
 
-// Circom Sample
+/// Macro containing the Circom example
+macro_rules! circom_example {
+    // Circom Sample
+    // Copy this snippet to your project
+    () => {
+        // Circom Sample Snippet of setting up 4 circuits
+        rust_witness::witness!(multiplier2);
+        rust_witness::witness!(multiplier2bls);
+        rust_witness::witness!(keccak256256test);
+        rust_witness::witness!(hashbenchbls);
 
-rust_witness::witness!(multiplier2);
-rust_witness::witness!(multiplier2bls);
-rust_witness::witness!(keccak256256test);
-rust_witness::witness!(hashbenchbls);
+        mopro_ffi::set_circom_circuits!(
+            "multiplier2_final.zkey",
+            multiplier2_witness,
+            "multiplier2_bls_final.zkey",
+            multiplier2bls_witness,
+            "keccak256_256_test_final.zkey",
+            keccak256256test_witness,
+        );
+        // Circom Snipet End
+    };
+}
 
-// If you are not using circom, you need to have an empty set_circom_circuits! macro
-mopro_ffi::set_circom_circuits!(
-    "multiplier2_final.zkey",
-    multiplier2_witness,
-    "multiplier2_bls_final.zkey",
-    multiplier2bls_witness,
-    "keccak256_256_test_final.zkey",
-    keccak256256test_witness,
-);
+/// Macro containing the Halo2 example
+macro_rules! halo2_example {
+    () => {
+        // Halo2 Sample of using a single proving and verifying circuit
+        
+        // Module containing the Halo2 circuit logic (FibonacciMoproCircuit)
+        mod halo2;
 
-// Halo2 Sample
-mod halo2;
+        mopro_ffi::set_halo2_proving_circuits!(
+            "fibonacci_pk", 
+            halo2::FibonacciMoproCircuit::prove)
+        ;
+        mopro_ffi::set_halo2_verifying_circuits!(
+            "fibonacci_vk",
+            halo2::FibonacciMoproCircuit::verify
+        );
+        // Halo2 Snipet End
+    };
+}
 
-mopro_ffi::set_halo2_proving_circuits!("fibonacci_pk", halo2::FibonacciMoproCircuit::prove);
-mopro_ffi::set_halo2_verifying_circuits!("fibonacci_vk", halo2::FibonacciMoproCircuit::verify);
+// Based on the feature flags, include the respective examples
+#[cfg(feature = "circom")]
+circom_example!();
+#[cfg(feature = "halo2")]
+halo2_example!();
