@@ -1,8 +1,6 @@
 extern crate core;
 
-use mopro_ffi::app;
-
-app!();
+mopro_ffi::app!();
 
 // Circom Sample
 
@@ -24,7 +22,6 @@ mopro_ffi::set_circom_circuits!(
 // Halo2 Sample
 mod halo2;
 use crate::halo2::FibonacciMoproCircuit;
-use mopro_ffi::{Halo2ProveFn, Halo2VerifyFn};
 
 mopro_ffi::set_halo2_proving_circuits!("fibonacci_pk", FibonacciMoproCircuit::prove);
 mopro_ffi::set_halo2_verifying_circuits!("fibonacci_vk", FibonacciMoproCircuit::verify);
