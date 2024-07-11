@@ -24,7 +24,7 @@ macro_rules! halo2_app {
                 Err(MoproError::Halo2Error(
                     format!(
                         "Unknown Prove Circuit: {}. Have Prove Circuits: {:?}",
-                        in0,
+                        in1,
                         HALO2_PROVING_CIRCUITS.keys()
                     )
                     .to_string(),
@@ -45,7 +45,7 @@ macro_rules! halo2_app {
                 Err(MoproError::Halo2Error(
                     format!(
                         "Unknown Verify Circuit: {}. Have Verify Circuits: {:?}",
-                        in0,
+                        in1,
                         HALO2_VERIFYING_CIRCUITS.keys()
                     )
                     .to_string(),
