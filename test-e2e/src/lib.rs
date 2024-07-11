@@ -3,9 +3,6 @@ extern crate core;
 use once_cell::sync::Lazy;
 
 use mopro_ffi::app;
-use mopro_ffi::{Halo2ProveFn, Halo2VerifyFn};
-
-use crate::halo2::FibonacciMoproCircuit;
 
 app!();
 
@@ -26,14 +23,9 @@ mopro_ffi::set_circom_circuits!(
 
 // Halo2 Sample
 mod halo2;
+use crate::halo2::FibonacciMoproCircuit;
+use mopro_ffi::{Halo2ProveFn, Halo2VerifyFn};
 
-// These circuits are specific to the app we're building here
-// e.g. they're on in the mopro-ffi build, only in test-e2e
-fn key_halo2_circuit_map(name: &str) -> Result<(Halo2ProveFn, Halo2VerifyFn), MoproError> {
-    match name {
-        "fibonacci_pk" | "fibonacci_vk" => {
-            Ok((FibonacciMoproCircuit::prove, FibonacciMoproCircuit::verify))
-        }
-        _ => Err(MoproError::Halo2Error("Unknown circuit name".to_string())),
-    }
-}
+mopro_ffi::set_halo2_proving_circuits!("fibonacci_pk", FibonacciMoproCircuit::prove);
+
+mopro_ffi::set_halo2_verifying_circuits!("fibonacci_vk", FibonacciMoproCircuit::verify);

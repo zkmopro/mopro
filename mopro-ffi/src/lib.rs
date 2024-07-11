@@ -44,6 +44,29 @@ macro_rules! circom_app {
     };
 }
 
+#[cfg(not(feature = "halo2"))]
+#[macro_export]
+macro_rules! halo2_app {
+    () => {
+        fn generate_halo2_proof(
+            in0: String,
+            in1: String,
+            in2: HashMap<String, Vec<String>>,
+        ) -> Result<GenerateProofResult, MoproError> {
+            panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
+        }
+
+        fn verify_halo2_proof(
+            in0: String,
+            in1: String,
+            in2: Vec<u8>,
+            in3: Vec<u8>,
+        ) -> Result<bool, MoproError> {
+            panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
+        }
+    };
+}
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -89,36 +112,6 @@ pub struct ProofCalldata {
     pub a: G1,
     pub b: G2,
     pub c: G1,
-}
-
-#[macro_export]
-macro_rules! halo2_app {
-    () => {
-        fn generate_halo2_proof(
-            in0: String,
-            in1: String,
-            in2: HashMap<String, Vec<String>>,
-        ) -> Result<GenerateProofResult, MoproError> {
-            if let Ok((prove_fn, _)) = key_halo2_circuit_map(in1.as_str()) {
-                prove_fn(&in0, &in1, in2)
-            } else {
-                Err(MoproError::Halo2Error("Unknown circuit name".to_string()))
-            }
-        }
-
-        fn verify_halo2_proof(
-            in0: String,
-            in1: String,
-            in2: Vec<u8>,
-            in3: Vec<u8>,
-        ) -> Result<bool, MoproError> {
-            if let Ok((_, verify_fn)) = key_halo2_circuit_map(in1.as_str()) {
-                verify_fn(&in0, &in1, in2, in3)
-            } else {
-                Err(MoproError::Halo2Error("Unknown circuit name".to_string()))
-            }
-        }
-    };
 }
 
 // This macro should be used in dependent crates
