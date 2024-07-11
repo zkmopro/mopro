@@ -15,10 +15,18 @@ macro_rules! halo2_app {
             in1: String,
             in2: HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
-            if let Some(prove_fn) = HALO2_PROVING_CIRCUITS.get(&in1) {
+            let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
+            if let Some(prove_fn) = HALO2_PROVING_CIRCUITS.get(name.to_str().unwrap()) {
                 prove_fn(&in0, &in1, in2)
             } else {
-                Err(MoproError::Halo2Error("Unknown circuit name".to_string()))
+                Err(MoproError::Halo2Error(
+                    format!(
+                        "Unknown Prove Circuit: {}. Have Prove Circuits: {:?}",
+                        in0,
+                        HALO2_PROVING_CIRCUITS.keys()
+                    )
+                    .to_string(),
+                ))
             }
         }
 
@@ -28,10 +36,18 @@ macro_rules! halo2_app {
             in2: Vec<u8>,
             in3: Vec<u8>,
         ) -> Result<bool, MoproError> {
-            if let Some(verify_fn) = HALO2_VERIFYING_CIRCUITS.get(&in1) {
+            let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
+            if let Some(verify_fn) = HALO2_VERIFYING_CIRCUITS.get(name.to_str().unwrap()) {
                 verify_fn(&in0, &in1, in2, in3)
             } else {
-                Err(MoproError::Halo2Error("Unknown circuit name".to_string()))
+                Err(MoproError::Halo2Error(
+                    format!(
+                        "Unknown Verify Circuit: {}. Have Verify Circuits: {:?}",
+                        in0,
+                        HALO2_VERIFYING_CIRCUITS.keys()
+                    )
+                    .to_string(),
+                ))
             }
         }
     };

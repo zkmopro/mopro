@@ -42,10 +42,17 @@ macro_rules! circom_app {
             in1: HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
             let name = std::path::Path::new(in0.as_str()).file_name().unwrap();
-            if let Some(witness_fn) = CIRCOM_CIRCUITS.get(&in0) {
+            if let Some(witness_fn) = CIRCOM_CIRCUITS.get(name.to_str().unwrap()) {
                 mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn.clone())
             } else {
-                Err(MoproError::CircomError("Unknown ZKEY".to_string()))
+                Err(MoproError::CircomError(
+                    format!(
+                        "Unknown ZKEY: {}. Have keys: {:?}",
+                        in0,
+                        CIRCOM_CIRCUITS.keys()
+                    )
+                    .to_string(),
+                ))
             }
         }
 
