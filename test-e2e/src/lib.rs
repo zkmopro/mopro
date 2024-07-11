@@ -1,7 +1,5 @@
 extern crate core;
 
-use once_cell::sync::Lazy;
-
 use mopro_ffi::app;
 
 app!();
@@ -29,5 +27,4 @@ use crate::halo2::FibonacciMoproCircuit;
 use mopro_ffi::{Halo2ProveFn, Halo2VerifyFn};
 
 mopro_ffi::set_halo2_proving_circuits!("fibonacci_pk", FibonacciMoproCircuit::prove);
-
 mopro_ffi::set_halo2_verifying_circuits!("fibonacci_vk", FibonacciMoproCircuit::verify);

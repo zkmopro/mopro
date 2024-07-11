@@ -4,11 +4,11 @@ use std::collections::HashMap;
 #[macro_export]
 macro_rules! halo2_app {
     () => {
-        static HALO2_PROVING_CIRCUITS: Lazy<HashMap<String, Halo2ProveFn>> =
-            Lazy::new(|| set_halo2_proving_circuits());
+        static HALO2_PROVING_CIRCUITS: once_cell::sync::Lazy<HashMap<String, Halo2ProveFn>> =
+            once_cell::sync::Lazy::new(|| set_halo2_proving_circuits());
 
-        static HALO2_VERIFYING_CIRCUITS: Lazy<HashMap<String, Halo2VerifyFn>> =
-            Lazy::new(|| set_halo2_verifying_circuits());
+        static HALO2_VERIFYING_CIRCUITS: once_cell::sync::Lazy<HashMap<String, Halo2VerifyFn>> =
+            once_cell::sync::Lazy::new(|| set_halo2_verifying_circuits());
 
         fn generate_halo2_proof(
             in0: String,

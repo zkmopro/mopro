@@ -34,8 +34,8 @@ pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint
 #[macro_export]
 macro_rules! circom_app {
     () => {
-        static CIRCOM_CIRCUITS: Lazy<HashMap<String, mopro_ffi::WtnsFn>> =
-            Lazy::new(|| set_circom_circuits());
+        static CIRCOM_CIRCUITS: once_cell::sync::Lazy<HashMap<String, mopro_ffi::WtnsFn>> =
+            once_cell::sync::Lazy::new(|| set_circom_circuits());
 
         fn generate_circom_proof(
             in0: String,
