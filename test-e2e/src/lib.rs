@@ -1,7 +1,11 @@
 extern crate core;
 
+use once_cell::sync::Lazy;
+
+use mopro_ffi::halo2::{Halo2ProveFn, Halo2VerifyFn};
+use mopro_ffi::{app, set_circom_circuits, WtnsFn};
+
 use crate::halo2::FibonacciMoproCircuit;
-use mopro_ffi::{app, Halo2ProveFn, Halo2VerifyFn, WtnsFn};
 
 app!();
 
@@ -12,17 +16,13 @@ rust_witness::witness!(multiplier2bls);
 rust_witness::witness!(keccak256256test);
 rust_witness::witness!(hashbenchbls);
 
-// These circuits are specific to the app we're building here
-// e.g. they're on in the mopro-ffi build, only in test-e2e
-fn zkey_witness_map(name: &str) -> Result<WtnsFn, MoproError> {
-    match name {
-        "multiplier2_final.zkey" => Ok(multiplier2_witness),
-        "keccak256_256_test_final.zkey" => Ok(keccak256256test_witness),
-        "hashbench_bls_final.zkey" => Ok(hashbenchbls_witness),
-        "multiplier2_bls_final.zkey" => Ok(multiplier2bls_witness),
-        _ => Err(MoproError::CircomError("Unknown circuit name".to_string())),
-    }
-}
+// If you are not using circom, you need to have an empty set_circom_circuits! macro
+set_circom_circuits!(
+    "multiplier2_final.zkey",
+    multiplier2_witness,
+    "multiplier2_bls_final.zkey",
+    multiplier2bls_witness
+);
 
 // Halo2 Sample
 mod halo2;

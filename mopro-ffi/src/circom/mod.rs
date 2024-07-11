@@ -29,6 +29,16 @@ use color_eyre::Result;
 
 use num_bigint::{BigInt, BigUint};
 
+pub fn zkey_witness_map(
+    circuits: &HashMap<String, WtnsFn>,
+    name: &str,
+) -> std::result::Result<WtnsFn, MoproError> {
+    circuits
+        .get(name)
+        .map(|f| f.clone())
+        .ok_or(MoproError::CircomError("Unknown circuit name".to_string()))
+}
+
 // build a proof for a zkey using witness_fn to build
 // the witness
 pub fn generate_circom_proof_wtns(
