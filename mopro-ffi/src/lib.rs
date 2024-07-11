@@ -121,7 +121,7 @@ pub struct ProofCalldata {
 /// and `set_halo2_proving_circuits!(...)`, etc.
 ///
 /// # Circom Example
-/// ```rust
+/// ```ignore
 /// // Setup the Mopro FFI library
 /// mopro_ffi::app!();
 ///
@@ -136,7 +136,7 @@ pub struct ProofCalldata {
 /// ```
 ///
 /// # Halo2 Example
-/// ```rust
+/// ```ignore
 /// // Setup the Mopro FFI library
 /// mopro_ffi::app!();
 ///

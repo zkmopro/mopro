@@ -1,4 +1,3 @@
-use crate::{GenerateProofResult, MoproError};
 use std::collections::HashMap;
 
 #[macro_export]
@@ -101,7 +100,73 @@ macro_rules! set_halo2_verifying_circuits {
     };
 }
 
-pub type Halo2ProveFn =
-    fn(&str, &str, HashMap<String, Vec<String>>) -> Result<GenerateProofResult, MoproError>;
+pub type Halo2ProveFn = fn(
+    &str,
+    &str,
+    HashMap<String, Vec<String>>,
+) -> Result<crate::GenerateProofResult, crate::MoproError>;
 
-pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, MoproError>;
+pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, crate::MoproError>;
+
+#[cfg(test)]
+mod test {
+    use crate as mopro_ffi;
+    use std::collections::HashMap;
+
+    use mopro_ffi::{GenerateProofResult, MoproError};
+
+    fn dummy_prove_fn(
+        _srs_key_path: &str,
+        _proving_key_path: &str,
+        _input: HashMap<String, Vec<String>>,
+    ) -> Result<crate::GenerateProofResult, MoproError> {
+        Ok(crate::GenerateProofResult {
+            proof: vec![],
+            inputs: vec![],
+        })
+    }
+
+    fn dummy_verify_fn(
+        _srs_key_path: &str,
+        _verifying_key_path: &str,
+        _proof: Vec<u8>,
+        _public_inputs: Vec<u8>,
+    ) -> Result<bool, MoproError> {
+        Ok(true)
+    }
+
+    halo2_app!();
+
+    set_halo2_proving_circuits! {
+        "fibonacci_pk", dummy_prove_fn,
+    }
+    set_halo2_verifying_circuits! {
+        "fibonacci_vk", dummy_verify_fn,
+    }
+
+    const SRS_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_srs";
+    const PROVING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_pk";
+    const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_vk";
+
+    #[test]
+    fn test_generate_halo2_proof() {
+        let result = generate_halo2_proof(
+            SRS_KEY_PATH.to_string(),
+            PROVING_KEY_PATH.to_string(),
+            HashMap::new(),
+        );
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_verify_halo2_proof() {
+        let result = verify_halo2_proof(
+            SRS_KEY_PATH.to_string(),
+            VERIFYING_KEY_PATH.to_string(),
+            vec![],
+            vec![],
+        );
+        println!("{:?}", result);
+        assert!(result.is_ok());
+    }
+}

@@ -1790,6 +1790,7 @@ dependencies = [
  "color-eyre",
  "num-bigint",
  "num-traits",
+ "once_cell",
  "rust-witness",
  "serde",
  "serde_derive",
