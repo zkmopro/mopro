@@ -18,7 +18,9 @@ mopro_ffi::set_circom_circuits!(
     "multiplier2_final.zkey",
     multiplier2_witness,
     "multiplier2_bls_final.zkey",
-    multiplier2bls_witness
+    multiplier2bls_witness,
+    "keccak256_256_test_final.zkey",
+    keccak256256test_witness,
 );
 
 // Halo2 Sample

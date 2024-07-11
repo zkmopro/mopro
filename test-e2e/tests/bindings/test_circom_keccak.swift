@@ -73,6 +73,8 @@ do {
 
 } catch let error as MoproError {
   print("MoproError: \(error)")
+  throw error
 } catch {
   print("Unexpected error: \(error)")
+  throw error
 }
