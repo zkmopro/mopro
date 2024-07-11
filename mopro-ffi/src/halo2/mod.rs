@@ -53,6 +53,13 @@ macro_rules! halo2_app {
     };
 }
 
+/// Proving Circuits are Halo2 Circuits that can generate proofs
+/// Provide the circuits that you want to be able to generate proofs for
+/// as a list of pairs of the form `circuit_proving_key`, `prove_fn`
+/// Where `circuit_proving_key` is the name of the proving key file
+/// and `prove_fn` is the function that generates the proof available locally
+/// NOTE: YOU CAN ONLY USE THIS MACROS ONCE IN YOUR CODEBASE, IN THE SAME MODULE AS `app!()`
+/// NOTE: TO USE THIS MACRO, YOU MUST HAVE THE `mopro-ffi/halo2` FEATURE ENABLED
 #[macro_export]
 macro_rules! set_halo2_proving_circuits {
     // Generates a function `set_circom_circuits` that takes no arguments and updates CIRCOM_CIRCUITS

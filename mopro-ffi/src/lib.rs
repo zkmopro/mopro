@@ -114,14 +114,42 @@ pub struct ProofCalldata {
     pub c: G1,
 }
 
-// This macro should be used in dependent crates
-//
-// This macro handles getting relevant functions into
-// scope and calling uniffi
-//
-// There should be a user defined `zkey_witness_map` function
-// that maps zkey file stub to a witness generation function
-// see test-e2e/src/lib.rs for an example
+/// This macro is used to setup the Mopro FFI library
+/// It should be included in the `lib.rs` file of the project
+///
+/// This should be used with the adapter-specific macros, such as `set_circom_circuits!(...)`
+/// and `set_halo2_proving_circuits!(...)`, etc.
+///
+/// # Circom Example
+/// ```rust
+/// // Setup the Mopro FFI library
+/// mopro_ffi::app!();
+///
+/// // Generate a Witness Generation function for the `multiplier2` circom circuit
+/// rust_witness::witness!(multiplier2);
+///
+/// // Add `multiplier2` circom circuit to be exposed to the FFI
+/// mopro_ffi::set_circom_circuits!(
+///     "multiplier2_final.zkey",
+//     multiplier2_witness,
+/// )
+/// ```
+///
+/// # Halo2 Example
+/// ```rust
+/// // Setup the Mopro FFI library
+/// mopro_ffi::app!();
+///
+/// // Import a prepared Halo2 circuit
+/// use crate::halo2::FibonacciMoproCircuit;
+///
+/// // Add `Fibonacci` circuit to generate proofs
+/// mopro_ffi::set_halo2_proving_circuits!("fibonacci_pk", FibonacciMoproCircuit::prove);
+///
+/// // Add `Fibonacci` circuit to verify proofs
+// mopro_ffi::set_halo2_verifying_circuits!("fibonacci_vk", FibonacciMoproCircuit::verify);
+///
+///
 #[macro_export]
 macro_rules! app {
     () => {

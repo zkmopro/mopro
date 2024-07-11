@@ -74,6 +74,13 @@ macro_rules! circom_app {
     };
 }
 
+/// Set the circuits that can be proven by the mopro library
+/// Provide the circuits that you want to be able to generate proofs for
+/// as a list of pairs of the form `zkey`, `wtns_fn`
+/// Where `zkey` is the name of the zkey file
+/// and `wtns_fn` is the function that generates the witness for the circuit
+/// NOTE: YOU CAN ONLY USE THIS MACROS ONCE IN YOUR CODEBASE, IN THE SAME MODULE AS `app!()`
+/// NOTE: TO USE THIS MACRO, YOU MUST HAVE THE `mopro-ffi/circom` FEATURE ENABLED
 #[macro_export]
 macro_rules! set_circom_circuits {
     // Generates a function `set_circom_circuits` that takes no arguments and updates CIRCOM_CIRCUITS
