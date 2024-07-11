@@ -42,10 +42,8 @@ macro_rules! circom_app {
             in1: HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
             let name = std::path::Path::new(in0.as_str()).file_name().unwrap();
-            if let Ok(witness_fn) =
-                mopro_ffi::zkey_witness_map(&CIRCOM_CIRCUITS, &name.to_str().unwrap())
-            {
-                mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn)
+            if let Some(witness_fn) = CIRCOM_CIRCUITS.get(&in0) {
+                mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn.clone())
             } else {
                 Err(MoproError::CircomError("Unknown ZKEY".to_string()))
             }
@@ -83,16 +81,6 @@ macro_rules! set_circom_circuits {
             m
         }
     };
-}
-
-pub fn zkey_witness_map(
-    circuits: &HashMap<String, WtnsFn>,
-    name: &str,
-) -> std::result::Result<WtnsFn, MoproError> {
-    circuits
-        .get(name)
-        .map(|f| f.clone())
-        .ok_or(MoproError::CircomError("Unknown circuit name".to_string()))
 }
 
 // build a proof for a zkey using witness_fn to build
