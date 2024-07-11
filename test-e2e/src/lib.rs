@@ -1,13 +1,13 @@
 extern crate core;
 
+// First, configure the Mopro FFI library
 mopro_ffi::app!();
 
 /// Macro containing the Circom example
+#[cfg(feature = "circom")]
 macro_rules! circom_example {
-    // Circom Sample
-    // Copy this snippet to your project
     () => {
-        // Circom Sample Snippet of setting up 4 circuits
+        // Circom Example of setting up 4 circuits
         rust_witness::witness!(multiplier2);
         rust_witness::witness!(multiplier2bls);
         rust_witness::witness!(keccak256256test);
@@ -26,17 +26,15 @@ macro_rules! circom_example {
 }
 
 /// Macro containing the Halo2 example
+#[cfg(feature = "halo2")]
 macro_rules! halo2_example {
     () => {
         // Halo2 Sample of using a single proving and verifying circuit
-        
+
         // Module containing the Halo2 circuit logic (FibonacciMoproCircuit)
         mod halo2;
 
-        mopro_ffi::set_halo2_proving_circuits!(
-            "fibonacci_pk", 
-            halo2::FibonacciMoproCircuit::prove)
-        ;
+        mopro_ffi::set_halo2_proving_circuits!("fibonacci_pk", halo2::FibonacciMoproCircuit::prove);
         mopro_ffi::set_halo2_verifying_circuits!(
             "fibonacci_vk",
             halo2::FibonacciMoproCircuit::verify
