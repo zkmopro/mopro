@@ -21,7 +21,6 @@ mopro_ffi::set_circom_circuits!(
 
 // Halo2 Sample
 mod halo2;
-use crate::halo2::FibonacciMoproCircuit;
 
-mopro_ffi::set_halo2_proving_circuits!("fibonacci_pk", FibonacciMoproCircuit::prove);
-mopro_ffi::set_halo2_verifying_circuits!("fibonacci_vk", FibonacciMoproCircuit::verify);
+mopro_ffi::set_halo2_proving_circuits!("fibonacci_pk", halo2::FibonacciMoproCircuit::prove);
+mopro_ffi::set_halo2_verifying_circuits!("fibonacci_vk", halo2::FibonacciMoproCircuit::verify);
