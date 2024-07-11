@@ -258,7 +258,7 @@ RustBuffer uniffi_mopro_bindings_fn_func_generate_circom_proof(RustBuffer zkey_p
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_GENERATE_HALO2_PROOF
 #define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_GENERATE_HALO2_PROOF
-RustBuffer uniffi_mopro_bindings_fn_func_generate_halo2_proof(RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
+RustBuffer uniffi_mopro_bindings_fn_func_generate_halo2_proof(RustBuffer srs_path, RustBuffer pk_path, RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
 );
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_TO_ETHEREUM_INPUTS
@@ -278,7 +278,7 @@ int8_t uniffi_mopro_bindings_fn_func_verify_circom_proof(RustBuffer zkey_path, R
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_VERIFY_HALO2_PROOF
 #define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_VERIFY_HALO2_PROOF
-int8_t uniffi_mopro_bindings_fn_func_verify_halo2_proof(RustBuffer proof, RustBuffer public_input, RustCallStatus *_Nonnull out_status
+int8_t uniffi_mopro_bindings_fn_func_verify_halo2_proof(RustBuffer srs_path, RustBuffer vk_path, RustBuffer proof, RustBuffer public_input, RustCallStatus *_Nonnull out_status
 );
 #endif
 #ifndef UNIFFI_FFIDEF_FFI_MOPRO_BINDINGS_RUSTBUFFER_ALLOC
