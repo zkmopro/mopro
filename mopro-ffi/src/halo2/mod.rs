@@ -3,32 +3,14 @@ use std::collections::HashMap;
 #[macro_export]
 macro_rules! halo2_app {
     () => {
-        static HALO2_PROVING_CIRCUITS: once_cell::sync::Lazy<
-            std::collections::HashMap<String, mopro_ffi::Halo2ProveFn>,
-        > = once_cell::sync::Lazy::new(|| set_halo2_proving_circuits());
-
-        static HALO2_VERIFYING_CIRCUITS: once_cell::sync::Lazy<
-            std::collections::HashMap<String, mopro_ffi::Halo2VerifyFn>,
-        > = once_cell::sync::Lazy::new(|| set_halo2_verifying_circuits());
-
         fn generate_halo2_proof(
             in0: String,
             in1: String,
             in2: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
-            if let Some(prove_fn) = HALO2_PROVING_CIRCUITS.get(name.to_str().unwrap()) {
-                prove_fn(&in0, &in1, in2)
-            } else {
-                Err(mopro_ffi::MoproError::Halo2Error(
-                    format!(
-                        "Unknown Prove Circuit: {}. Have Prove Circuits: {:?}",
-                        in1,
-                        HALO2_PROVING_CIRCUITS.keys()
-                    )
-                    .to_string(),
-                ))
-            }
+            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())?;
+            proving_fn(&in0, &in1, in2)
         }
 
         fn verify_halo2_proof(
@@ -38,64 +20,82 @@ macro_rules! halo2_app {
             in3: Vec<u8>,
         ) -> Result<bool, mopro_ffi::MoproError> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
-            if let Some(verify_fn) = HALO2_VERIFYING_CIRCUITS.get(name.to_str().unwrap()) {
-                verify_fn(&in0, &in1, in2, in3)
-            } else {
-                Err(mopro_ffi::MoproError::Halo2Error(
-                    format!(
-                        "Unknown Verify Circuit: {}. Have Verify Circuits: {:?}",
-                        in1,
-                        HALO2_VERIFYING_CIRCUITS.keys()
-                    )
-                    .to_string(),
-                ))
+            let verifying_fn = get_halo2_verifying_circuit(name.to_str().unwrap())?;
+            verifying_fn(&in0, &in1, in2, in3)
+        }
+    };
+}
+
+/// Set the Halo2 circuits that can be used within the mopro library.
+/// Provide the circuits you want to be able to generate and verify proofs for
+/// as a list of quadruples in the form `(prove_key, prove_fn, verify_key, verify_fn)`.
+/// Where `prove_key` is the name of the proving key file, `prove_fn` is the function
+/// that generates the proof, `verify_key` is the name of the verifying key file, and
+/// `verify_fn` is the function that verifies the proof.
+///
+/// ## How to use:
+/// This macro should only be used once in the same module as the `mopro_ffi::app!()`.
+/// Ensure that the `mopro-ffi/halo2` feature is enabled to use this macro.
+///
+/// #### Example:
+///
+/// ```ignore
+/// mopro_ffi::app!();
+///
+/// set_halo2_circuits! {
+///   (
+///     "circuit1_proving_key", circuit1_prove_function,
+///     "circuit1_verifying_key", circuit1_verify_function
+///   ),
+///   (
+///     "circuit2_proving_key", circuit2_prove_function,
+///     "circuit2_verifying_key", circuit2_verify_function
+///   )
+/// }
+/// ```
+///
+/// ## For Advanced Users:
+/// This macro abstracts away the implementation of:
+/// - `get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError>`
+/// - `get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError>`
+///
+/// You can choose to implement these functions directly with your custom logic:
+///
+/// #### Example:
+/// ```ignore
+/// fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError> {
+///    match circuit_pk {
+///       "circuit1_proving_key" => Ok(circuit1_prove_function),
+///       _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk).to_string()))
+///    }
+/// }
+///
+/// fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError> {
+///    match circuit_vk {
+///       "circuit1_verifying_key" => Ok(circuit1_verify_function),
+///       _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk).to_string()))
+///    }
+/// }
+/// ```
+#[macro_export]
+macro_rules! set_halo2_circuits {
+    ($(($prove_key:expr, $prove_fn:expr, $verify_key:expr, $verify_fn:expr)),+ $(,)?) => {
+        fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError> {
+            match circuit_pk {
+                $(
+                    $prove_key => Ok($prove_fn),
+                )+
+                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk))),
             }
         }
-    };
-}
 
-/// Proving Circuits are Halo2 Circuits that can generate proofs
-/// Provide the circuits that you want to be able to generate proofs for
-/// as a list of pairs of the form `circuit_proving_key`, `prove_fn`
-/// Where `circuit_proving_key` is the name of the proving key file
-/// and `prove_fn` is the function that generates the proof available locally
-/// NOTE: YOU CAN ONLY USE THIS MACROS ONCE IN YOUR CODEBASE, IN THE SAME MODULE AS `app!()`
-/// NOTE: TO USE THIS MACRO, YOU MUST HAVE THE `mopro-ffi/halo2` FEATURE ENABLED
-#[macro_export]
-macro_rules! set_halo2_proving_circuits {
-    // Generates a function `set_circom_circuits` that takes no arguments and updates CIRCOM_CIRCUITS
-    ($($key:expr, $func:expr),+ $(,)?) => {
-        fn set_halo2_proving_circuits() -> std::collections::HashMap<String, mopro_ffi::Halo2ProveFn> {
-            let mut circuits: std::collections::HashMap<String, mopro_ffi::Halo2ProveFn> = std::collections::HashMap::new();
-
-            $(
-                    circuits.insert($key.to_string(), $func);
-            )+
-
-            circuits
-        }
-    };
-}
-
-/// Verifying Circuits are Halo2 Circuits that can verify proofs
-/// Provide the circuits that you want to be able to verify proofs for
-/// as a list of pairs of the form `circuit_verifying_key`, `verify_fn`
-/// Where `circuit_verifying_key` is the name of the verifying key file
-/// and `verify_fn` is the function that verifies the proof available locally
-/// NOTE: YOU CAN ONLY USE THIS MACROS ONCE IN YOUR CODEBASE, IN THE SAME MODULE AS `app!()`
-/// NOTE: TO USE THIS MACRO, YOU MUST HAVE THE `mopro-ffi/halo2` FEATURE ENABLED
-#[macro_export]
-macro_rules! set_halo2_verifying_circuits {
-    // Generates a function `set_circom_circuits` that takes no arguments and updates CIRCOM_CIRCUITS
-    ($($key:expr, $func:expr),+ $(,)?) => {
-        fn set_halo2_verifying_circuits() -> std::collections::HashMap<String, mopro_ffi::Halo2VerifyFn> {
-            let mut circuits: std::collections::HashMap<String, mopro_ffi::Halo2VerifyFn> = std::collections::HashMap::new();
-
-            $(
-                    circuits.insert($key.to_string(), $func);
-            )+
-
-            circuits
+        fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError> {
+            match circuit_vk {
+                $(
+                    $verify_key => Ok($verify_fn),
+                )+
+                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk))),
+            }
         }
     };
 }
@@ -137,11 +137,8 @@ mod test {
 
     halo2_app!();
 
-    set_halo2_proving_circuits! {
-        "fibonacci_pk", dummy_prove_fn,
-    }
-    set_halo2_verifying_circuits! {
-        "fibonacci_vk", dummy_verify_fn,
+    set_halo2_circuits! {
+        ("fibonacci_pk", dummy_prove_fn, "fibonacci_vk", dummy_verify_fn),
     }
 
     const SRS_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_srs";
