@@ -65,9 +65,39 @@ macro_rules! circom_app {
 /// Provide the circuits that you want to be able to generate proofs for
 /// as a list of pairs of the form `zkey`, `wtns_fn`
 /// Where `zkey` is the name of the zkey file
-/// and `wtns_fn` is the function that generates the witness for the circuit
-/// NOTE: YOU CAN ONLY USE THIS MACROS ONCE IN YOUR CODEBASE, IN THE SAME MODULE AS `app!()`
-/// NOTE: TO USE THIS MACRO, YOU MUST HAVE THE `mopro-ffi/circom` FEATURE ENABLED
+/// and `wtns_fn` is the function that generates the witness for the circuit.
+///
+/// ## How to use:
+/// You should only use this macro once, in the same module as the `mopro_ffi::app!()`
+/// To use this macro, make sure to have `mopro-ffi/circom` feature enabled
+///
+/// #### Example:
+///
+///
+/// ```ignore
+/// mopro_ffi::app!();
+///
+/// set_circom_circuits! {
+///    "multiplier2_final.zkey", multiplier2_witness,
+///   "multiplier2_bls_final.zkey", multiplier2bls_witness,
+/// }
+/// ```
+///
+///
+/// ## For Advanced Users:
+/// This macro is abstracting away the implementation of
+/// `get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::WtnsFn, mopro_ffi::MoproError>`.
+/// You can choose to implement it directly with your custom logic:
+///
+/// #### Example:
+/// ```ignore
+/// fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::WtnsFn, mopro_ffi::MoproError> {
+///    match circuit {
+///       "multiplier2_final.zkey" => Ok(multiplier2_witness),
+///      _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit).to_string()))
+///   }
+/// }
+/// ```
 #[macro_export]
 macro_rules! set_circom_circuits {
     // Generates a function `set_circom_circuits` that takes no arguments and updates CIRCOM_CIRCUITS
