@@ -20,5 +20,6 @@ mopro_ffi::set_circom_circuits! {
 // Module containing the Halo2 circuit logic (FibonacciMoproCircuit)
 
 mopro_ffi::set_halo2_circuits! {
-    ("fibonacci_pk", halo2_fibonacci::prove, "fibonacci_vk", halo2_fibonacci::verify)
+    ("fibonacci_pk", halo2_fibonacci::prove, "fibonacci_vk", halo2_fibonacci::verify),
+    ("keccak256_pk", halo2_keccak_256::prove, "keccak256_vk", halo2_keccak_256::verify),
 }
