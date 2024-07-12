@@ -9,14 +9,11 @@ rust_witness::witness!(multiplier2bls);
 rust_witness::witness!(keccak256256test);
 rust_witness::witness!(hashbenchbls);
 
-mopro_ffi::set_circom_circuits!(
-    "multiplier2_final.zkey",
-    multiplier2_witness,
-    "multiplier2_bls_final.zkey",
-    multiplier2bls_witness,
-    "keccak256_256_test_final.zkey",
-    keccak256256test_witness,
-);
+mopro_ffi::set_circom_circuits! {
+    ("multiplier2_final.zkey", multiplier2_witness),
+    ("multiplier2_bls_final.zkey", multiplier2bls_witness),
+    ("keccak256_256_test_final.zkey", keccak256256test_witness),
+}
 // Circom Snipet End
 
 // Halo2 Sample of using a single proving and verifying circuit
