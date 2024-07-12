@@ -115,57 +115,11 @@ pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dy
 mod test {
     use crate as mopro_ffi;
     use std::collections::HashMap;
-    use std::error::Error;
-    use std::fmt::Display;
-    use thiserror::Error;
-
-    #[derive(Debug, Error)]
-    pub struct CustomError(String);
-
-    impl Display for CustomError {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
-
-    fn dummy_prove_fn(
-        _srs_key_path: &str,
-        _proving_key_path: &str,
-        _input: HashMap<String, Vec<String>>,
-    ) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>> {
-        Ok((vec![], vec![]))
-    }
-
-    fn dummy_fail_prove_fn(
-        _srs_key_path: &str,
-        _proving_key_path: &str,
-        _input: HashMap<String, Vec<String>>,
-    ) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>> {
-        Err(CustomError("Failed to generate proof".to_string()).into())
-    }
-
-    fn dummy_verify_fn(
-        _srs_key_path: &str,
-        _verifying_key_path: &str,
-        _proof: Vec<u8>,
-        _public_inputs: Vec<u8>,
-    ) -> Result<bool, Box<dyn Error>> {
-        Ok(true)
-    }
-
-    fn dummy_fail_verify_fn(
-        _srs_key_path: &str,
-        _verifying_key_path: &str,
-        _proof: Vec<u8>,
-        _public_inputs: Vec<u8>,
-    ) -> Result<bool, Box<dyn Error>> {
-        Err(CustomError("Failed to verify proof".to_string()).into())
-    }
 
     halo2_app!();
 
     set_halo2_circuits! {
-        ("fibonacci_pk", dummy_prove_fn, "fibonacci_vk", dummy_verify_fn),
+        ("fibonacci_pk", halo2_fibonacci::prove, "fibonacci_vk", halo2_fibonacci::verify),
     }
 
     const SRS_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_srs";
@@ -174,23 +128,36 @@ mod test {
 
     #[test]
     fn test_generate_halo2_proof() {
+        let mut input = HashMap::new();
+        input.insert("out".to_string(), vec!["55".to_string()]);
+
         let result = generate_halo2_proof(
             SRS_KEY_PATH.to_string(),
             PROVING_KEY_PATH.to_string(),
-            HashMap::new(),
+            input,
         );
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_verify_halo2_proof() {
-        let result = verify_halo2_proof(
+        let mut input = HashMap::new();
+        input.insert("out".to_string(), vec!["55".to_string()]);
+
+        if let Ok(proof_result) = generate_halo2_proof(
             SRS_KEY_PATH.to_string(),
-            VERIFYING_KEY_PATH.to_string(),
-            vec![],
-            vec![],
-        );
-        println!("{:?}", result);
-        assert!(result.is_ok());
+            PROVING_KEY_PATH.to_string(),
+            input,
+        ) {
+            let result = verify_halo2_proof(
+                SRS_KEY_PATH.to_string(),
+                VERIFYING_KEY_PATH.to_string(),
+                proof_result.proof,
+                proof_result.inputs,
+            );
+            assert!(result.is_ok());
+        } else {
+            panic!("Failed to generate proof")
+        }
     }
 }
