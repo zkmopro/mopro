@@ -2770,7 +2770,6 @@ dependencies = [
  "halo2curves",
  "mopro-ffi",
  "num-bigint",
- "once_cell",
  "rand",
  "rust-witness",
  "serde",

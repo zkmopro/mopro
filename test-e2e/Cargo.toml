@@ -16,7 +16,6 @@ name = "android"
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
 uniffi = "0.28.0"
-once_cell = "1.19.0"
 
 # Circom dependencies
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
@@ -44,4 +43,3 @@ uniffi = { version = "0.28.0", features = ["bindgen-tests"] }
 
 # Halo2 dependencies
 serde_json = { version = "1.0.120" }
-once_cell = "1.19.0"
