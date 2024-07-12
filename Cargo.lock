@@ -575,9 +575,9 @@ checksum = "37b2a672a2cb129a2e41c10b1224bb368f9f37a2b16b612598138befd7b37eb5"
 
 [[package]]
 name = "cc"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eaff6f8ce506b9773fa786672d63fc7a191ffea1be33f72bbd4aeacefca9ffc8"
+checksum = "907d8581360765417f8f2e0e7d602733bbed60156b4465b7617243689ef9b83d"
 
 [[package]]
 name = "cfg-if"
@@ -1126,10 +1126,14 @@ checksum = "1b43ede17f21864e81be2fa654110bf1e793774238d86ef8555c37e6519c0403"
 [[package]]
 name = "halo2-fibonacci"
 version = "0.1.0"
-source = "git+https://github.com/ElusAegis/halo2-fibonacci-sample.git#d76c2516a36fe957f06a172cc2c10a0d906d7ab8"
+source = "git+https://github.com/ElusAegis/halo2-fibonacci-sample.git#6cd3a7f957aa03f6d1f79d2b47fd6d7a0cc086f8"
 dependencies = [
+ "bincode",
  "halo2_proofs",
  "halo2curves",
+ "rand",
+ "serde",
+ "thiserror",
 ]
 
 [[package]]

@@ -18,8 +18,7 @@ mopro_ffi::set_circom_circuits! {
 // --- Halo2 Example of using a single proving and verifying circuit ---
 
 // Module containing the Halo2 circuit logic (FibonacciMoproCircuit)
-mod halo2;
 
 mopro_ffi::set_halo2_circuits! {
-    ("fibonacci_pk", halo2::FibonacciMoproCircuit::prove, "fibonacci_vk", halo2::FibonacciMoproCircuit::verify)
+    ("fibonacci_pk", halo2_fibonacci::prove, "fibonacci_vk", halo2_fibonacci::verify)
 }

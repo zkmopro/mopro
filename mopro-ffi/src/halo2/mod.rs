@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::error::Error;
 
 #[macro_export]
 macro_rules! halo2_app {
@@ -11,6 +12,8 @@ macro_rules! halo2_app {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
             let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())?;
             proving_fn(&in0, &in1, in2)
+                .map_err(|e| mopro_ffi::MoproError::Halo2Error(e.to_string()))
+                .map(|(proof, inputs)| mopro_ffi::GenerateProofResult { proof, inputs })
         }
 
         fn verify_halo2_proof(
@@ -22,6 +25,7 @@ macro_rules! halo2_app {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
             let verifying_fn = get_halo2_verifying_circuit(name.to_str().unwrap())?;
             verifying_fn(&in0, &in1, in2, in3)
+                .map_err(|e| mopro_ffi::MoproError::Halo2Error(e.to_string()))
         }
     };
 }
@@ -100,30 +104,44 @@ macro_rules! set_halo2_circuits {
     };
 }
 
-pub type Halo2ProveFn = fn(
-    &str,
-    &str,
-    HashMap<String, Vec<String>>,
-) -> Result<crate::GenerateProofResult, crate::MoproError>;
+type GenerateProofResult = (Vec<u8>, Vec<u8>);
 
-pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, crate::MoproError>;
+pub type Halo2ProveFn =
+    fn(&str, &str, HashMap<String, Vec<String>>) -> Result<GenerateProofResult, Box<dyn Error>>;
+
+pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
 
 #[cfg(test)]
 mod test {
     use crate as mopro_ffi;
     use std::collections::HashMap;
+    use std::error::Error;
+    use std::fmt::Display;
+    use thiserror::Error;
 
-    use mopro_ffi::MoproError;
+    #[derive(Debug, Error)]
+    pub struct CustomError(String);
+
+    impl Display for CustomError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "{}", self.0)
+        }
+    }
 
     fn dummy_prove_fn(
         _srs_key_path: &str,
         _proving_key_path: &str,
         _input: HashMap<String, Vec<String>>,
-    ) -> Result<crate::GenerateProofResult, MoproError> {
-        Ok(crate::GenerateProofResult {
-            proof: vec![],
-            inputs: vec![],
-        })
+    ) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>> {
+        Ok((vec![], vec![]))
+    }
+
+    fn dummy_fail_prove_fn(
+        _srs_key_path: &str,
+        _proving_key_path: &str,
+        _input: HashMap<String, Vec<String>>,
+    ) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>> {
+        Err(CustomError("Failed to generate proof".to_string()).into())
     }
 
     fn dummy_verify_fn(
@@ -131,8 +149,17 @@ mod test {
         _verifying_key_path: &str,
         _proof: Vec<u8>,
         _public_inputs: Vec<u8>,
-    ) -> Result<bool, MoproError> {
+    ) -> Result<bool, Box<dyn Error>> {
         Ok(true)
+    }
+
+    fn dummy_fail_verify_fn(
+        _srs_key_path: &str,
+        _verifying_key_path: &str,
+        _proof: Vec<u8>,
+        _public_inputs: Vec<u8>,
+    ) -> Result<bool, Box<dyn Error>> {
+        Err(CustomError("Failed to verify proof".to_string()).into())
     }
 
     halo2_app!();
