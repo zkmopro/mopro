@@ -29,32 +29,18 @@ use color_eyre::Result;
 
 use num_bigint::{BigInt, BigUint};
 
-pub type WtnsFn = fn(HashMap<String, Vec<num_bigint::BigInt>>) -> Vec<num_bigint::BigInt>;
+pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 
 #[macro_export]
 macro_rules! circom_app {
     () => {
-        static CIRCOM_CIRCUITS: once_cell::sync::Lazy<
-            std::collections::HashMap<String, mopro_ffi::WtnsFn>,
-        > = once_cell::sync::Lazy::new(|| set_circom_circuits());
-
         fn generate_circom_proof(
             in0: String,
             in1: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             let name = std::path::Path::new(in0.as_str()).file_name().unwrap();
-            if let Some(witness_fn) = CIRCOM_CIRCUITS.get(name.to_str().unwrap()) {
-                mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn.clone())
-            } else {
-                Err(mopro_ffi::MoproError::CircomError(
-                    format!(
-                        "Unknown ZKEY: {}. Have keys: {:?}",
-                        in0,
-                        CIRCOM_CIRCUITS.keys()
-                    )
-                    .to_string(),
-                ))
-            }
+            let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
+            mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn.clone())
         }
 
         fn verify_circom_proof(
@@ -86,14 +72,13 @@ macro_rules! circom_app {
 macro_rules! set_circom_circuits {
     // Generates a function `set_circom_circuits` that takes no arguments and updates CIRCOM_CIRCUITS
     ($($key:expr, $func:expr),+ $(,)?) => {
-        fn set_circom_circuits() -> std::collections::HashMap<String, mopro_ffi::WtnsFn> {
-            let mut m: std::collections::HashMap<String, mopro_ffi::WtnsFn> = std::collections::HashMap::new();
-
-            $(
-                    m.insert($key.to_string(), $func);
-            )+
-
-            m
+        fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::WtnsFn, mopro_ffi::MoproError> {
+            match circuit {
+                $(
+                   $key => Ok($func),
+                )+
+                _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit).to_string()))
+            }
         }
     };
 }
