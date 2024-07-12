@@ -2763,17 +2763,11 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
- "bincode",
  "halo2-fibonacci",
  "halo2-keccak-256",
- "halo2_proofs",
- "halo2curves",
  "mopro-ffi",
  "num-bigint",
- "rand",
  "rust-witness",
- "serde",
- "serde_json",
  "uniffi",
 ]
 

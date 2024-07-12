@@ -25,12 +25,6 @@ num-bigint = { version = "0.4.0" }
 halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
 halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
 
-bincode = "1.3.3"
-halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves", tag = "0.3.2" }
-halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2", tag = "v2023_04_20" }
-serde = { version = "1", features = ["derive"] }
-rand = "0.8.5"
-
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
 uniffi = { version = "0.28.0", features = ["build"] }
@@ -40,6 +34,3 @@ rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 
 [dev-dependencies]
 uniffi = { version = "0.28.0", features = ["bindgen-tests"] }
-
-# Halo2 dependencies
-serde_json = { version = "1.0.120" }
