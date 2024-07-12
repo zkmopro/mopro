@@ -8,16 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		4C05CDB22C327C4F00BEBACD /* mopro_test_UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C05CDB12C327C4F00BEBACD /* mopro_test_UITests.swift */; };
-		4CBAB2782C3334B300B536B7 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */; };
-		4CBAB27A2C3334B800B536B7 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAB2792C3334B800B536B7 /* mopro.swift */; };
 		4CCB9BDF2C33C20800C659C4 /* multiplier2_final.zkey in Resources */ = {isa = PBXBuildFile; fileRef = 4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */; };
 		4CF977EF2C2BCF0000CE1139 /* mopro_testApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF977EE2C2BCF0000CE1139 /* mopro_testApp.swift */; };
 		4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF977F02C2BCF0000CE1139 /* ContentView.swift */; };
 		4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F22C2BCF0300CE1139 /* Assets.xcassets */; };
 		4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */; };
-		60A8E4382C40404300D3A953 /* fibonacci_srs in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4352C40404200D3A953 /* fibonacci_srs */; };
-		60A8E4392C40404300D3A953 /* fibonacci_pk in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4362C40404300D3A953 /* fibonacci_pk */; };
-		60A8E43A2C40404300D3A953 /* fibonacci_vk in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4372C40404300D3A953 /* fibonacci_vk */; };
+		604850D52C4181A9003C61D5 /* keccak256_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 604850D22C4181A9003C61D5 /* keccak256_pk.bin */; };
+		604850D62C4181A9003C61D5 /* keccak256_srs.bin in Resources */ = {isa = PBXBuildFile; fileRef = 604850D32C4181A9003C61D5 /* keccak256_srs.bin */; };
+		604850D72C4181A9003C61D5 /* keccak256_vk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 604850D42C4181A9003C61D5 /* keccak256_vk.bin */; };
+		604850D92C41A708003C61D5 /* rsa_srs in Resources */ = {isa = PBXBuildFile; fileRef = 604850D82C41A708003C61D5 /* rsa_srs */; };
+		604850DC2C41A78E003C61D5 /* rsa_pk in Resources */ = {isa = PBXBuildFile; fileRef = 604850DA2C41A78E003C61D5 /* rsa_pk */; };
+		604850DD2C41A78E003C61D5 /* rsa_vk in Resources */ = {isa = PBXBuildFile; fileRef = 604850DB2C41A78E003C61D5 /* rsa_vk */; };
+		604850EE2C41C633003C61D5 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604850EB2C41C633003C61D5 /* mopro.swift */; };
+		604850EF2C41C633003C61D5 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 604850EC2C41C633003C61D5 /* MoproBindings.xcframework */; };
+		60A8E4382C40404300D3A953 /* fibonacci_srs.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4352C40404200D3A953 /* fibonacci_srs.bin */; };
+		60A8E4392C40404300D3A953 /* fibonacci_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4362C40404300D3A953 /* fibonacci_pk.bin */; };
+		60A8E43A2C40404300D3A953 /* fibonacci_vk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4372C40404300D3A953 /* fibonacci_vk.bin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,16 +40,25 @@
 		4C05CDAF2C327C4F00BEBACD /* mopro-test-UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mopro-test-UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C05CDB12C327C4F00BEBACD /* mopro_test_UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro_test_UITests.swift; sourceTree = "<group>"; };
 		4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MoproBindings.xcframework; path = ../MoproiOSBindings/MoproBindings.xcframework; sourceTree = "<group>"; };
-		4CBAB2792C3334B800B536B7 /* mopro.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = mopro.swift; path = ../../MoproiOSBindings/mopro.swift; sourceTree = "<group>"; };
 		4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2_final.zkey; path = "../../test-vectors/circom/multiplier2_final.zkey"; sourceTree = "<group>"; };
 		4CF977EB2C2BCF0000CE1139 /* mopro-test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mopro-test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CF977EE2C2BCF0000CE1139 /* mopro_testApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro_testApp.swift; sourceTree = "<group>"; };
 		4CF977F02C2BCF0000CE1139 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CF977F22C2BCF0300CE1139 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		60A8E4352C40404200D3A953 /* fibonacci_srs */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_srs; path = "../../test-vectors/halo2/fibonacci_srs"; sourceTree = "<group>"; };
-		60A8E4362C40404300D3A953 /* fibonacci_pk */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_pk; path = "../../test-vectors/halo2/fibonacci_pk"; sourceTree = "<group>"; };
-		60A8E4372C40404300D3A953 /* fibonacci_vk */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_vk; path = "../../test-vectors/halo2/fibonacci_vk"; sourceTree = "<group>"; };
+		604850D22C4181A9003C61D5 /* keccak256_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_pk.bin; path = "../../test-vectors/halo2/keccak256_pk.bin"; sourceTree = "<group>"; };
+		604850D32C4181A9003C61D5 /* keccak256_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_srs.bin; path = "../../test-vectors/halo2/keccak256_srs.bin"; sourceTree = "<group>"; };
+		604850D42C4181A9003C61D5 /* keccak256_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = keccak256_vk.bin; path = "../../test-vectors/halo2/keccak256_vk.bin"; sourceTree = "<group>"; };
+		604850D82C41A708003C61D5 /* rsa_srs */ = {isa = PBXFileReference; lastKnownFileType = file; name = rsa_srs; path = "../../../mopro-halo2-rsa-sample/out/rsa_srs"; sourceTree = "<group>"; };
+		604850DA2C41A78E003C61D5 /* rsa_pk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = rsa_pk; path = "../../../mopro-halo2-rsa-sample/out/rsa_pk"; sourceTree = "<group>"; };
+		604850DB2C41A78E003C61D5 /* rsa_vk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = rsa_vk; path = "../../../mopro-halo2-rsa-sample/out/rsa_vk"; sourceTree = "<group>"; };
+		604850DE2C41A7DE003C61D5 /* mopro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro.swift; sourceTree = "<group>"; };
+		604850DF2C41A7DE003C61D5 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
+		604850EB2C41C633003C61D5 /* mopro.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mopro.swift; sourceTree = "<group>"; };
+		604850EC2C41C633003C61D5 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
+		60A8E4352C40404200D3A953 /* fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_srs.bin; path = "../../test-vectors/halo2/fibonacci_srs.bin"; sourceTree = "<group>"; };
+		60A8E4362C40404300D3A953 /* fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_pk.bin; path = "../../test-vectors/halo2/fibonacci_pk.bin"; sourceTree = "<group>"; };
+		60A8E4372C40404300D3A953 /* fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_vk.bin; path = "../../test-vectors/halo2/fibonacci_vk.bin"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,7 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CBAB2782C3334B300B536B7 /* MoproBindings.xcframework in Frameworks */,
+				604850EF2C41C633003C61D5 /* MoproBindings.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,9 +91,16 @@
 		4CF977E22C2BCF0000CE1139 = {
 			isa = PBXGroup;
 			children = (
-				60A8E4362C40404300D3A953 /* fibonacci_pk */,
-				60A8E4352C40404200D3A953 /* fibonacci_srs */,
-				60A8E4372C40404300D3A953 /* fibonacci_vk */,
+				604850ED2C41C633003C61D5 /* MoproiOSBindings */,
+				604850DA2C41A78E003C61D5 /* rsa_pk */,
+				604850DB2C41A78E003C61D5 /* rsa_vk */,
+				604850D82C41A708003C61D5 /* rsa_srs */,
+				60A8E4362C40404300D3A953 /* fibonacci_pk.bin */,
+				604850D22C4181A9003C61D5 /* keccak256_pk.bin */,
+				604850D32C4181A9003C61D5 /* keccak256_srs.bin */,
+				604850D42C4181A9003C61D5 /* keccak256_vk.bin */,
+				60A8E4352C40404200D3A953 /* fibonacci_srs.bin */,
+				60A8E4372C40404300D3A953 /* fibonacci_vk.bin */,
 				4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */,
 				4CF977ED2C2BCF0000CE1139 /* mopro-test */,
 				4C05CDB02C327C4F00BEBACD /* mopro-test-UITests */,
@@ -99,7 +121,6 @@
 		4CF977ED2C2BCF0000CE1139 /* mopro-test */ = {
 			isa = PBXGroup;
 			children = (
-				4CBAB2792C3334B800B536B7 /* mopro.swift */,
 				4CF977EE2C2BCF0000CE1139 /* mopro_testApp.swift */,
 				4CF977F02C2BCF0000CE1139 /* ContentView.swift */,
 				4CF977F22C2BCF0300CE1139 /* Assets.xcassets */,
@@ -119,9 +140,30 @@
 		4CF978102C2BF45500CE1139 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				604850E02C41A7DE003C61D5 /* MoproiOSBindings */,
 				4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		604850E02C41A7DE003C61D5 /* MoproiOSBindings */ = {
+			isa = PBXGroup;
+			children = (
+				604850DE2C41A7DE003C61D5 /* mopro.swift */,
+				604850DF2C41A7DE003C61D5 /* MoproBindings.xcframework */,
+			);
+			name = MoproiOSBindings;
+			path = "../../../mopro-halo2-rsa-sample/MoproiOSBindings";
+			sourceTree = "<group>";
+		};
+		604850ED2C41C633003C61D5 /* MoproiOSBindings */ = {
+			isa = PBXGroup;
+			children = (
+				604850EB2C41C633003C61D5 /* mopro.swift */,
+				604850EC2C41C633003C61D5 /* MoproBindings.xcframework */,
+			);
+			name = MoproiOSBindings;
+			path = "../../../mopro-halo2-rsa-sample/MoproiOSBindings";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -212,12 +254,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				604850DD2C41A78E003C61D5 /* rsa_vk in Resources */,
+				604850DC2C41A78E003C61D5 /* rsa_pk in Resources */,
 				4CCB9BDF2C33C20800C659C4 /* multiplier2_final.zkey in Resources */,
 				4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */,
-				60A8E43A2C40404300D3A953 /* fibonacci_vk in Resources */,
-				60A8E4382C40404300D3A953 /* fibonacci_srs in Resources */,
+				604850D72C4181A9003C61D5 /* keccak256_vk.bin in Resources */,
+				60A8E43A2C40404300D3A953 /* fibonacci_vk.bin in Resources */,
+				604850D92C41A708003C61D5 /* rsa_srs in Resources */,
+				604850D62C4181A9003C61D5 /* keccak256_srs.bin in Resources */,
+				60A8E4382C40404300D3A953 /* fibonacci_srs.bin in Resources */,
+				604850D52C4181A9003C61D5 /* keccak256_pk.bin in Resources */,
 				4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */,
-				60A8E4392C40404300D3A953 /* fibonacci_pk in Resources */,
+				60A8E4392C40404300D3A953 /* fibonacci_pk.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,7 +284,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CBAB27A2C3334B800B536B7 /* mopro.swift in Sources */,
+				604850EE2C41C633003C61D5 /* mopro.swift in Sources */,
 				4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */,
 				4CF977EF2C2BCF0000CE1139 /* mopro_testApp.swift in Sources */,
 			);
@@ -412,7 +460,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"mopro-test/Preview Content\"";
-				DEVELOPMENT_TEAM = R92BA9L62G;
+				DEVELOPMENT_TEAM = LMRM26A744;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -425,7 +473,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mopro.mopro-test";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.local.mopro.mopro-test";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -441,7 +489,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"mopro-test/Preview Content\"";
-				DEVELOPMENT_TEAM = R92BA9L62G;
+				DEVELOPMENT_TEAM = LMRM26A744;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -454,7 +502,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mopro.mopro-test";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.local.mopro.mopro-test";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

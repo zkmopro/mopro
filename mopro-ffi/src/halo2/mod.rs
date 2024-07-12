@@ -119,12 +119,12 @@ mod test {
     halo2_app!();
 
     set_halo2_circuits! {
-        ("fibonacci_pk", halo2_fibonacci::prove, "fibonacci_vk", halo2_fibonacci::verify),
+        ("fibonacci_pk.bin", halo2_fibonacci::prove, "fibonacci_vk.bin", halo2_fibonacci::verify),
     }
 
-    const SRS_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_srs";
-    const PROVING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_pk";
-    const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_vk";
+    const SRS_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_srs.bin";
+    const PROVING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_pk.bin";
+    const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_vk.bin";
 
     #[test]
     fn test_generate_halo2_proof() {

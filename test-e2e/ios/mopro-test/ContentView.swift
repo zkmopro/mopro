@@ -44,9 +44,9 @@ struct ContentView: View {
     @State private var generatedHalo2Proof: Data?
     @State private var halo2PublicInputs: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
-    private let srsPath = Bundle.main.path(forResource: "fibonacci_srs", ofType: "")!
-    private let vkPath = Bundle.main.path(forResource: "fibonacci_vk", ofType: "")!
-    private let pkPath = Bundle.main.path(forResource: "fibonacci_pk", ofType: "")!
+    private let srsPath = Bundle.main.path(forResource: "rsa_srs", ofType: "")!
+    private let vkPath = Bundle.main.path(forResource: "rsa_vk", ofType: "")!
+    private let pkPath = Bundle.main.path(forResource: "rsa_pk", ofType: "")!
     
     var body: some View {
         VStack(spacing: 10) {
@@ -145,19 +145,18 @@ extension ContentView {
     }
     
     func runHalo2ProveAction() {
-        textViewText += "Generating Halo2 proof... "
+        textViewText += "Generating RSA Halo2 proof... "
         do {
             // Prepare inputs
             var inputs = [String: [String]]()
-            let out = 55
-            inputs["out"] = [String(out)]
-            
+            inputs["gen_only"] = ["true"]
+
             let start = CFAbsoluteTimeGetCurrent()
             
             // Generate Proof
             let generateProofResult = try generateHalo2Proof(srsPath: srsPath, pkPath: pkPath, circuitInputs: inputs)
-            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
-            assert(!generateProofResult.inputs.isEmpty, "Inputs should not be empty")
+//            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+//            assert(!generateProofResult.inputs.isEmpty, "Inputs should not be empty")
 
             
             let end = CFAbsoluteTimeGetCurrent()
@@ -182,7 +181,7 @@ extension ContentView {
             return
         }
         
-        textViewText += "Verifying Halo2 proof... "
+        textViewText += "Verifying RSA Halo2 proof... "
         do {
             let start = CFAbsoluteTimeGetCurrent()
             

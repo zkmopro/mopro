@@ -2,9 +2,9 @@ import Foundation
 import mopro
 
 do {
-  let srsPath = "../../../test-vectors/halo2/fibonacci_srs"
-  let vkPath = "../../../test-vectors/halo2/fibonacci_vk"
-  let pkPath = "../../../test-vectors/halo2/fibonacci_pk"
+  let srsPath = "../../../test-vectors/halo2/fibonacci_srs.bin"
+  let vkPath = "../../../test-vectors/halo2/fibonacci_vk.bin"
+  let pkPath = "../../../test-vectors/halo2/fibonacci_pk.bin"
 
   // Prepare inputs
   var inputs = [String: [String]]()

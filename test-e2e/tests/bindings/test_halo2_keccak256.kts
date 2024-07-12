@@ -1,9 +1,9 @@
 import uniffi.mopro.*
 
 try {
-    val srsPath = "../test-vectors/halo2/keccak256_srs"
-    val vkPath = "../test-vectors/halo2/keccak256_vk"
-    val pkPath = "../test-vectors/halo2/keccak256_pk"
+    val srsPath = "../test-vectors/halo2/keccak256_srs.bin"
+    val vkPath = "../test-vectors/halo2/keccak256_vk.bin"
+    val pkPath = "../test-vectors/halo2/keccak256_pk.bin"
 
     // Prepare inputs
     val inputs = mutableMapOf<String, List<String>>()
