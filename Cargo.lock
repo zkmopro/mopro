@@ -134,7 +134,7 @@ dependencies = [
 [[package]]
 name = "ark-circom"
 version = "0.1.0"
-source = "git+https://github.com/zkmopro/circom-compat.git?branch=bls-zkey#05caba854f2180fd1ccf3ede7972d4e10eb2fefa"
+source = "git+https://github.com/zkmopro/circom-compat.git?branch=wasm-delete#83a6bad2a16b1383281d114e6eaeb19b373a2c1a"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
