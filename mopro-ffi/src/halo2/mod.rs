@@ -127,20 +127,7 @@ mod test {
     const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_vk.bin";
 
     #[test]
-    fn test_generate_halo2_proof() {
-        let mut input = HashMap::new();
-        input.insert("out".to_string(), vec!["55".to_string()]);
-
-        let result = generate_halo2_proof(
-            SRS_KEY_PATH.to_string(),
-            PROVING_KEY_PATH.to_string(),
-            input,
-        );
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_verify_halo2_proof() {
+    fn test_generate_and_verify_halo2_proof() {
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec!["55".to_string()]);
 
