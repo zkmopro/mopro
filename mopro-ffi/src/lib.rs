@@ -4,6 +4,9 @@ mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
 
+#[cfg(feature = "gpu-acceleration")]
+use mopro_msm::msm::{self, utils::benchmark};
+
 use std::collections::HashMap;
 use thiserror::Error;
 
@@ -15,6 +18,19 @@ pub enum MoproError {
     CircomError(String),
     #[error("Halo2Error: {0}")]
     Halo2Error(String),
+    #[error("MSMError: {0}")]
+    MSMError(String),
+}
+
+#[cfg(feature = "gpu-acceleration")]
+impl From<benchmark::BenchmarkResult> for BenchmarkResult {
+    fn from(msm_result: benchmark::BenchmarkResult) -> Self {
+        BenchmarkResult {
+            instance_size: msm_result.instance_size,
+            num_instance: msm_result.num_instance,
+            avg_processing_time: msm_result.avg_processing_time,
+        }
+    }
 }
 
 #[cfg(feature = "halo2")]
@@ -93,6 +109,68 @@ pub fn to_ethereum_inputs(_: Vec<u8>) -> Vec<String> {
     panic!("not built with circom");
 }
 
+#[cfg(feature = "gpu-acceleration")]
+pub fn arkworks_pippenger(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
+    let benchmarks =
+        msm::arkworks_pippenger::run_benchmark(instance_size, num_instance, &utils_dir)
+            .unwrap()
+            .into();
+    Ok(benchmarks)
+}
+
+#[cfg(not(feature = "gpu-acceleration"))]
+pub fn arkworks_pippenger(_: u32, _: u32, _: &str) -> Result<BenchmarkResult, MoproError> {
+    Err(MoproError::MSMError(
+        "gpu-acceleration feature not enabled!".to_string(),
+    ))
+}
+
+#[cfg(feature = "gpu-acceleration")]
+pub fn metal_msm(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
+    let benchmarks = msm::metal::msm::run_benchmark(instance_size, num_instance, utils_dir)
+        .unwrap()
+        .into();
+    Ok(benchmarks)
+}
+
+#[cfg(not(feature = "gpu-acceleration"))]
+pub fn metal_msm(_: u32, _: u32, _: &str) -> Result<BenchmarkResult, MoproError> {
+    Err(MoproError::MSMError(
+        "gpu-acceleration feature not enabled!".to_string(),
+    ))
+}
+
+// #[cfg(feature = "gpu-acceleration")]
+// pub fn trapdoortech_zprize_msm(
+//     instance_size: u32,
+//     num_instance: u32,
+//     utils_dir: &str,
+// ) -> Result<BenchmarkResult, MoproError> {
+//     let benchmarks = msm::trapdoortech_zprize_msm::run_benchmark(
+//         instance_size,
+//         num_instance,
+//         &utils_dir,
+//     )
+//     .unwrap()
+//     .into();
+//     Ok(benchmarks)
+// }
+
+// #[cfg(not(feature = "gpu-acceleration"))]
+// pub fn trapdoortech_zprize_msm(_: u32, _: u32, _: &str) -> Result<BenchmarkResult, MoproError> {
+//     Err(MoproError::MSMError(
+//         "gpu-acceleration feature not enabled!".to_string(),
+//     ))
+// }
+
 #[derive(Debug)]
 pub enum FFIError {
     MoproError(MoproError),
@@ -130,6 +208,13 @@ pub struct ProofCalldata {
     pub c: G1,
 }
 
+#[derive(Debug, Clone)]
+pub struct BenchmarkResult {
+    pub instance_size: u32,
+    pub num_instance: u32,
+    pub avg_processing_time: f64,
+}
+
 // This macro should be used in dependent crates
 //
 // This macro handles getting relevant functions into
@@ -141,7 +226,7 @@ pub struct ProofCalldata {
 #[macro_export]
 macro_rules! app {
     () => {
-        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
+        use mopro_ffi::{BenchmarkResult, GenerateProofResult, MoproError, ProofCalldata, G1, G2};
         use std::collections::HashMap;
 
         fn generate_halo2_proof(
@@ -181,6 +266,30 @@ macro_rules! app {
         fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
             mopro_ffi::to_ethereum_inputs(in0)
         }
+
+        fn arkworks_pippenger(
+            instance_size: u32,
+            num_instance: u32,
+            utils_dir: &str,
+        ) -> Result<BenchmarkResult, MoproError> {
+            mopro_ffi::arkworks_pippenger(instance_size, num_instance, utils_dir)
+        }
+
+        fn metal_msm(
+            instance_size: u32,
+            num_instance: u32,
+            utils_dir: &str,
+        ) -> Result<BenchmarkResult, MoproError> {
+            mopro_ffi::metal_msm(instance_size, num_instance, utils_dir)
+        }
+
+        // fn trapdoortech_zprize_msm(
+        //     instance_size: u32,
+        //     num_instance: u32,
+        //     utils_dir: &str,
+        // ) -> Result<BenchmarkResult, MoproError> {
+        //     mopro_ffi::trapdoortech_zprize_msm(instance_size, num_instance, utils_dir)
+        // }
 
         uniffi::include_scaffolding!("mopro");
     };

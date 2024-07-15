@@ -17,6 +17,7 @@ default = []
 
 halo2 = ["halo2_proofs", "halo2curves", "serde"]
 circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-ff", "ark-bls12-381", "num-traits", "byteorder"]
+gpu-acceleration = ["mopro-msm", "circom"]
 
 [dependencies]
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
@@ -58,6 +59,9 @@ byteorder = { version = "1.0.0", optional = true }
 ark-ff = { version = "0.4.0", optional = true }
 ark-bls12-381 =  { version = "0.4.0", optional = true }
 num-traits = { version = "0.2.0", optional = true }
+
+# gpu acceleration deps
+mopro-msm = { git = "https://github.com/zkmopro/gpu-acceleration.git", optional = true }
 
 [build-dependencies]
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
