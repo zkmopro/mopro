@@ -13,7 +13,9 @@ use std::fs::File;
 use std::str::FromStr;
 
 use crate::GenerateProofResult;
-use ark_circom::{read_zkey, CircomReduction, FieldSerialization, ZkeyHeaderReader};
+use ark_circom::{
+    read_proving_key, read_zkey, CircomReduction, FieldSerialization, ZkeyHeaderReader,
+};
 
 use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey, VerifyingKey};
@@ -133,12 +135,12 @@ pub fn verify_circom_proof(
     let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let mut reader = std::io::BufReader::new(file);
     if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
-        let (proving_key, _) = read_zkey::<_, Bn254>(&mut reader)
+        let proving_key = read_proving_key::<_, Bn254>(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let p = serialization::deserialize_inputs::<Bn254>(public_input);
         return verify(proving_key.vk, p.0, proof);
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
-        let (proving_key, _) = read_zkey::<_, Bls12_381>(&mut reader)
+        let proving_key = read_proving_key::<_, Bls12_381>(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let p = serialization::deserialize_inputs::<Bls12_381>(public_input);
         return verify(proving_key.vk, p.0, proof);
