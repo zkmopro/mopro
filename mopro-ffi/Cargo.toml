@@ -16,7 +16,20 @@ path = "src/uniffi-bindgen.rs"
 default = []
 
 halo2 = []
-circom = ["ark-circom", "ark-serialize", "ark-ec", "ark-crypto-primitives", "ark-std", "ark-bn254", "ark-groth16", "ark-relations", "ark-ff", "ark-bls12-381", "num-traits", "byteorder"]
+circom = [
+    "ark-circom",
+    "ark-serialize",
+    "ark-ec",
+    "ark-crypto-primitives",
+    "ark-std",
+    "ark-bn254",
+    "ark-groth16",
+    "ark-relations",
+    "ark-ff",
+    "ark-bls12-381",
+    "num-traits",
+    "byteorder",
+]
 
 [dependencies]
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }

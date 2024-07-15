@@ -1,7 +1,5 @@
 use crate::MoproError;
 pub mod serialization;
-mod zkey;
-mod zkey_header;
 
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
@@ -10,15 +8,14 @@ use ark_ff::PrimeField;
 use ark_relations::r1cs::ConstraintMatrices;
 use serialization::{SerializableInputs, SerializableProof};
 
-use zkey::{BinFile, FieldSerialization};
-use zkey_header::ZkeyHeaderReader;
-
 use std::collections::HashMap;
 use std::fs::File;
 use std::str::FromStr;
 
 use crate::GenerateProofResult;
-use ark_circom::CircomReduction;
+use ark_circom::{
+    read_proving_key, read_zkey, CircomReduction, FieldSerialization, ZkeyHeaderReader,
+};
 
 use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey, VerifyingKey};
@@ -150,26 +147,14 @@ pub fn generate_circom_proof_wtns(
     // check the prime in the header
     // println!("{} {} {}", header.q, header.n8q, ark_bls12_381::Fq::MODULUS);
     if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
-        let mut binfile = BinFile::<_, Bn254>::new(&mut reader)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let proving_key = binfile
-            .proving_key()
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let matrices = binfile
-            .matrices()
+        let (proving_key, matrices) = read_zkey::<_, Bn254>(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let full_assignment = witness_thread
             .join()
             .map_err(|_e| MoproError::CircomError("Failed to generate witness".to_string()))?;
         return prove(proving_key, matrices, full_assignment);
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
-        let mut binfile = BinFile::<_, Bls12_381>::new(&mut reader)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let proving_key = binfile
-            .proving_key()
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let matrices = binfile
-            .matrices()
+        let (proving_key, matrices) = read_zkey::<_, Bls12_381>(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let full_assignment = witness_thread
             .join()
@@ -233,18 +218,12 @@ pub fn verify_circom_proof(
     let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
     let mut reader = std::io::BufReader::new(file);
     if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
-        let mut binfile = BinFile::<_, Bn254>::new(&mut reader)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let proving_key = binfile
-            .proving_key()
+        let proving_key = read_proving_key::<_, Bn254>(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let p = serialization::deserialize_inputs::<Bn254>(public_input);
         return verify(proving_key.vk, p.0, proof);
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
-        let mut binfile = BinFile::<_, Bls12_381>::new(&mut reader)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let proving_key = binfile
-            .proving_key()
+        let proving_key = read_proving_key::<_, Bls12_381>(&mut reader)
             .map_err(|e| MoproError::CircomError(e.to_string()))?;
         let p = serialization::deserialize_inputs::<Bls12_381>(public_input);
         return verify(proving_key.vk, p.0, proof);
