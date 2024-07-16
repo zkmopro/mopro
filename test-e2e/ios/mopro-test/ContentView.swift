@@ -35,19 +35,29 @@ func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
 
 struct ContentView: View {
     @State private var textViewText = ""
-    @State private var isProveButtonEnabled = true
-    @State private var isVerifyButtonEnabled = false
-    @State private var generatedProof: Data?
-    @State private var publicInputs: Data?
+    @State private var isCircomProveButtonEnabled = true
+    @State private var isCircomVerifyButtonEnabled = false
+    @State private var isHalo2roveButtonEnabled = true
+    @State private var isHalo2VerifyButtonEnabled = false
+    @State private var generatedCircomProof: Data?
+    @State private var circomPublicInputs: Data?
+    @State private var generatedHalo2Proof: Data?
+    @State private var halo2PublicInputs: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
+    private let srsPath = Bundle.main.path(forResource: "fibonacci_srs.bin", ofType: "")!
+    private let vkPath = Bundle.main.path(forResource: "fibonacci_vk.bin", ofType: "")!
+    private let pkPath = Bundle.main.path(forResource: "fibonacci_pk.bin", ofType: "")!
     
     var body: some View {
         VStack(spacing: 10) {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
-            Button("Prove", action: runProveAction).disabled(!isProveButtonEnabled).accessibilityIdentifier("prove")
-            Button("Verify", action: runVerifyAction).disabled(!isVerifyButtonEnabled).accessibilityIdentifier("verify")
+            Button("Prove Circom", action: runCircomProveAction).disabled(!isCircomProveButtonEnabled).accessibilityIdentifier("proveCircom")
+            Button("Verify Circom", action: runCircomVerifyAction).disabled(!isCircomVerifyButtonEnabled).accessibilityIdentifier("verifyCircom")
+            Button("Prove Halo2", action: runHalo2ProveAction).disabled(!isHalo2roveButtonEnabled).accessibilityIdentifier("proveHalo2")
+            Button("Verify Halo2", action: runHalo2VerifyAction).disabled(!isHalo2VerifyButtonEnabled).accessibilityIdentifier("verifyHalo2")
+
             ScrollView {
                 Text(textViewText)
                     .padding()
@@ -60,8 +70,8 @@ struct ContentView: View {
 }
 
 extension ContentView {
-    func runProveAction() {
-        textViewText += "Generating proof... "
+    func runCircomProveAction() {
+        textViewText += "Generating Circom proof... "
         do {
             // Prepare inputs
             var inputs = [String: [String]]()
@@ -86,25 +96,25 @@ extension ContentView {
             let timeTaken = end - start
             
             // Store the generated proof and public inputs for later verification
-            generatedProof = generateProofResult.proof
-            publicInputs = generateProofResult.inputs
+            generatedCircomProof = generateProofResult.proof
+            circomPublicInputs = generateProofResult.inputs
             
             textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
             
-            isVerifyButtonEnabled = true
+            isCircomVerifyButtonEnabled = true
         } catch {
             textViewText += "\nProof generation failed: \(error.localizedDescription)\n"
         }
     }
     
-    func runVerifyAction() {
-        guard let proof = generatedProof,
-              let inputs = publicInputs else {
+    func runCircomVerifyAction() {
+        guard let proof = generatedCircomProof,
+              let inputs = circomPublicInputs else {
             textViewText += "Proof has not been generated yet.\n"
             return
         }
         
-        textViewText += "Verifying proof... "
+        textViewText += "Verifying Circom proof... "
         do {
             let start = CFAbsoluteTimeGetCurrent()
             
@@ -126,7 +136,68 @@ extension ContentView {
             } else {
                 textViewText += "\nProof verification failed.\n"
             }
-            isVerifyButtonEnabled = false
+            isCircomVerifyButtonEnabled = false
+        } catch let error as MoproError {
+            print("\nMoproError: \(error)")
+        } catch {
+            print("\nUnexpected error: \(error)")
+        }
+    }
+    
+    func runHalo2ProveAction() {
+        textViewText += "Generating Halo2 proof... "
+        do {
+            // Prepare inputs
+            var inputs = [String: [String]]()
+            let out = 55
+            inputs["out"] = [String(out)]
+            
+            let start = CFAbsoluteTimeGetCurrent()
+            
+            // Generate Proof
+            let generateProofResult = try generateHalo2Proof(srsPath: srsPath, pkPath: pkPath, circuitInputs: inputs)
+            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+            assert(!generateProofResult.inputs.isEmpty, "Inputs should not be empty")
+
+            
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+            
+            // Store the generated proof and public inputs for later verification
+            generatedHalo2Proof = generateProofResult.proof
+            halo2PublicInputs = generateProofResult.inputs
+            
+            textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
+            
+            isHalo2VerifyButtonEnabled = true
+        } catch {
+            textViewText += "\nProof generation failed: \(error.localizedDescription)\n"
+        }
+    }
+    
+    func runHalo2VerifyAction() {
+        guard let proof = generatedHalo2Proof,
+              let inputs = halo2PublicInputs else {
+            textViewText += "Proof has not been generated yet.\n"
+            return
+        }
+        
+        textViewText += "Verifying Halo2 proof... "
+        do {
+            let start = CFAbsoluteTimeGetCurrent()
+            
+            let isValid = try verifyHalo2Proof(
+              srsPath: srsPath, vkPath: vkPath, proof: proof, publicInput: inputs)
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+
+            
+            if isValid {
+                textViewText += "\(String(format: "%.3f", timeTaken))s 2️⃣\n"
+            } else {
+                textViewText += "\nProof verification failed.\n"
+            }
+            isHalo2VerifyButtonEnabled = false
         } catch let error as MoproError {
             print("\nMoproError: \(error)")
         } catch {

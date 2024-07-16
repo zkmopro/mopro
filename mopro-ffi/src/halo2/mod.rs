@@ -1,69 +1,150 @@
-use crate::{GenerateProofResult, MoproError};
 use std::collections::HashMap;
+use std::error::Error;
 
-type CircuitInputs = HashMap<String, Vec<Fp>>;
+#[macro_export]
+macro_rules! halo2_app {
+    () => {
+        fn generate_halo2_proof(
+            in0: String,
+            in1: String,
+            in2: std::collections::HashMap<String, Vec<String>>,
+        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
+            let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
+            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())?;
+            proving_fn(&in0, &in1, in2)
+                .map_err(|e| mopro_ffi::MoproError::Halo2Error(e.to_string()))
+                .map(|(proof, inputs)| mopro_ffi::GenerateProofResult { proof, inputs })
+        }
 
-pub(crate) use halo2_proofs::halo2curves::bn256::{Bn256, Fr as Fp, G1Affine};
-use serde::{Deserialize, Serialize};
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct SerializableProof(pub Vec<u8>);
-
-#[derive(Clone, Debug)]
-pub struct SerializablePublicInputs(pub Vec<Fp>);
-
-pub fn generate_halo2_proof(
-    circuit_inputs: HashMap<String, Vec<String>>,
-) -> Result<GenerateProofResult, MoproError> {
-    panic!("stub implementation: TODO: copy logic from mopro-core to here");
-    // let circuit_inputs = deserialize_circuit_inputs(circuit_inputs);
-
-    // let (proof, inputs) = halo2::generate_halo2_proof(circuit_inputs).unwrap();
-
-    // let serialized_proof =
-    //     bincode::serialize(&proof).map_err(|e| MoproError::Halo2Error(e.to_string()))?;
-    // let serialized_inputs = bincode::serialize(&inputs).expect("Serialization of Inputs failed");
-
-    // Ok(GenerateProofResult {
-    //     proof: serialized_proof,
-    //     inputs: serialized_inputs,
-    // })
+        fn verify_halo2_proof(
+            in0: String,
+            in1: String,
+            in2: Vec<u8>,
+            in3: Vec<u8>,
+        ) -> Result<bool, mopro_ffi::MoproError> {
+            let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
+            let verifying_fn = get_halo2_verifying_circuit(name.to_str().unwrap())?;
+            verifying_fn(&in0, &in1, in2, in3)
+                .map_err(|e| mopro_ffi::MoproError::Halo2Error(e.to_string()))
+        }
+    };
 }
 
-pub fn verify_halo2_proof(proof: Vec<u8>, public_inputs: Vec<u8>) -> Result<bool, MoproError> {
-    panic!("stub implementation: TODO: copy logic from mopro-core to here");
-    // let deserialized_proof: halo2::SerializableProof =
-    //     bincode::deserialize(&proof).map_err(|e| MoproError::Halo2Error(e.to_string()))?;
-    // let deserialized_inputs: halo2::SerializablePublicInputs =
-    //     bincode::deserialize(&public_inputs).map_err(|e| MoproError::Halo2Error(e.to_string()))?;
-    // let is_valid = halo2::verify_halo2_proof(deserialized_proof, deserialized_inputs).unwrap();
-    // Ok(is_valid)
+/// Set the Halo2 circuits that can be used within the mopro library.
+/// Provide the circuits you want to be able to generate and verify proofs for
+/// as a list of quadruples in the form `(prove_key, prove_fn, verify_key, verify_fn)`.
+/// Where `prove_key` is the name of the proving key file, `prove_fn` is the function
+/// that generates the proof, `verify_key` is the name of the verifying key file, and
+/// `verify_fn` is the function that verifies the proof.
+///
+/// ## How to use:
+/// This macro should only be used once in the same module as the `mopro_ffi::app!()`.
+/// Ensure that the `mopro-ffi/halo2` feature is enabled to use this macro.
+///
+/// #### Example:
+///
+/// ```ignore
+/// mopro_ffi::app!();
+///
+/// set_halo2_circuits! {
+///   (
+///     "circuit1_proving_key", circuit1_prove_function,
+///     "circuit1_verifying_key", circuit1_verify_function
+///   ),
+///   (
+///     "circuit2_proving_key", circuit2_prove_function,
+///     "circuit2_verifying_key", circuit2_verify_function
+///   )
+/// }
+/// ```
+///
+/// ## For Advanced Users:
+/// This macro abstracts away the implementation of:
+/// - `get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError>`
+/// - `get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError>`
+///
+/// You can choose to implement these functions directly with your custom logic:
+///
+/// #### Example:
+/// ```ignore
+/// fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError> {
+///    match circuit_pk {
+///       "circuit1_proving_key" => Ok(circuit1_prove_function),
+///       _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk).to_string()))
+///    }
+/// }
+///
+/// fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError> {
+///    match circuit_vk {
+///       "circuit1_verifying_key" => Ok(circuit1_verify_function),
+///       _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk).to_string()))
+///    }
+/// }
+/// ```
+#[macro_export]
+macro_rules! set_halo2_circuits {
+    ($(($prove_key:expr, $prove_fn:expr, $verify_key:expr, $verify_fn:expr)),+ $(,)?) => {
+        fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError> {
+            match circuit_pk {
+                $(
+                    $prove_key => Ok($prove_fn),
+                )+
+                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk))),
+            }
+        }
+
+        fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError> {
+            match circuit_vk {
+                $(
+                    $verify_key => Ok($verify_fn),
+                )+
+                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk))),
+            }
+        }
+    };
 }
 
-#[test]
-fn test_end_to_end() -> Result<(), MoproError> {
-    // We by default compile the Fibonacci Halo2 Circuit
-    // TODO - For the future we should consider a stateful circuit to change the keys on the fly.
+type GenerateProofResult = (Vec<u8>, Vec<u8>);
 
-    let mut inputs = HashMap::new();
-    let out = 55u64;
-    inputs.insert("out".to_string(), vec![out.to_string()]);
+pub type Halo2ProveFn =
+    fn(&str, &str, HashMap<String, Vec<String>>) -> Result<GenerateProofResult, Box<dyn Error>>;
 
-    let expected_output = vec![Fr::from(1), Fr::from(1), Fr::from(out)];
-    let expected_output_bytes = bincode::serialize(&SerializablePublicInputs(expected_output))
-        .expect("Serialization of Output Expected bytes failed");
+pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
 
-    // Step 2: Generate Proof
-    let generate_proof_result = generate_halo2_proof(inputs)?;
-    let serialized_proof = generate_proof_result.proof;
-    let serialized_inputs = generate_proof_result.inputs;
+#[cfg(test)]
+mod test {
+    use crate as mopro_ffi;
+    use std::collections::HashMap;
 
-    assert!(serialized_proof.len() > 0);
-    assert_eq!(serialized_inputs, expected_output_bytes);
+    halo2_app!();
 
-    // Step 3: Verify Proof
-    let is_valid = verify_halo2_proof(serialized_proof.clone(), serialized_inputs.clone())?;
-    assert!(is_valid);
+    set_halo2_circuits! {
+        ("fibonacci_pk.bin", halo2_fibonacci::prove, "fibonacci_vk.bin", halo2_fibonacci::verify),
+    }
 
-    Ok(())
+    const SRS_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_srs.bin";
+    const PROVING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_pk.bin";
+    const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_vk.bin";
+
+    #[test]
+    fn test_generate_and_verify_halo2_proof() {
+        let mut input = HashMap::new();
+        input.insert("out".to_string(), vec!["55".to_string()]);
+
+        if let Ok(proof_result) = generate_halo2_proof(
+            SRS_KEY_PATH.to_string(),
+            PROVING_KEY_PATH.to_string(),
+            input,
+        ) {
+            let result = verify_halo2_proof(
+                SRS_KEY_PATH.to_string(),
+                VERIFYING_KEY_PATH.to_string(),
+                proof_result.proof,
+                proof_result.inputs,
+            );
+            assert!(result.is_ok());
+        } else {
+            panic!("Failed to generate the proof!")
+        }
+    }
 }

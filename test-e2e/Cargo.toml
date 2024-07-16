@@ -13,19 +13,24 @@ name = "ios"
 [[bin]]
 name = "android"
 
-[features]
-default = ["mopro-ffi/circom"]
-
 [dependencies]
-mopro-ffi = { path = "../mopro-ffi" }
-num-bigint = "0.4.0"
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
 uniffi = "0.28.0"
+
+# Circom dependencies
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+num-bigint = { version = "0.4.0" }
+
+# Halo2 dependencies
+halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
+halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
 
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 uniffi = { version = "0.28.0", features = ["build"] }
+
+# Circom dependencies
+rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 
 [dev-dependencies]
 uniffi = { version = "0.28.0", features = ["bindgen-tests"] }

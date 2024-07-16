@@ -1,4 +1,4 @@
-use crate::{MoproError, WtnsFn};
+use crate::MoproError;
 pub mod serialization;
 
 use ark_bls12_381::Bls12_381;
@@ -25,6 +25,89 @@ use ark_std::rand::thread_rng;
 use color_eyre::Result;
 
 use num_bigint::{BigInt, BigUint};
+
+pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
+
+#[macro_export]
+macro_rules! circom_app {
+    () => {
+        fn generate_circom_proof(
+            in0: String,
+            in1: std::collections::HashMap<String, Vec<String>>,
+        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
+            let name = std::path::Path::new(in0.as_str()).file_name().unwrap();
+            let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
+            mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn.clone())
+        }
+
+        fn verify_circom_proof(
+            in0: String,
+            in1: Vec<u8>,
+            in2: Vec<u8>,
+        ) -> Result<bool, mopro_ffi::MoproError> {
+            mopro_ffi::verify_circom_proof(in0, in1, in2)
+        }
+
+        fn to_ethereum_proof(in0: Vec<u8>) -> mopro_ffi::ProofCalldata {
+            mopro_ffi::to_ethereum_proof(in0)
+        }
+
+        fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
+            mopro_ffi::to_ethereum_inputs(in0)
+        }
+    };
+}
+
+/// Set the circuits that can be proven by the mopro library
+/// Provide the circuits that you want to be able to generate proofs for
+/// as a list of pairs of the form `zkey`, `wtns_fn`
+/// Where `zkey` is the name of the zkey file
+/// and `wtns_fn` is the function that generates the witness for the circuit.
+///
+/// ## How to use:
+/// You should only use this macro once, in the same module as the `mopro_ffi::app!()`
+/// To use this macro, make sure to have `mopro-ffi/circom` feature enabled
+///
+/// #### Example:
+///
+///
+/// ```ignore
+/// mopro_ffi::app!();
+///
+/// set_circom_circuits! {
+///   ("circuit1.zkey", circuit1_witness_fn),
+///   ("circuit2.zkey", circuit2_witness_fn),
+/// }
+/// ```
+///
+///
+/// ## For Advanced Users:
+/// This macro is abstracting away the implementation of
+/// `get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::WtnsFn, mopro_ffi::MoproError>`.
+/// You can choose to implement it directly with your custom logic:
+///
+/// #### Example:
+/// ```ignore
+/// fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::WtnsFn, mopro_ffi::MoproError> {
+///    match circuit {
+///       "circuit1.zkey" => Ok(circuit1_witness_fn),
+///      _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit).to_string()))
+///   }
+/// }
+/// ```
+#[macro_export]
+macro_rules! set_circom_circuits {
+    ($(($key:expr, $func:expr)),+ $(,)?) => {
+        fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::WtnsFn, mopro_ffi::MoproError> {
+            match circuit {
+                $(
+                   $key => Ok($func),
+                )+
+                _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit).to_string()))
+            }
+        }
+    };
+}
 
 // build a proof for a zkey using witness_fn to build
 // the witness
@@ -192,6 +275,33 @@ mod tests {
     rust_witness::witness!(multiplier2bls);
     rust_witness::witness!(keccak256256test);
     rust_witness::witness!(hashbenchbls);
+
+    use crate as mopro_ffi;
+
+    #[test]
+    #[allow(dead_code)]
+    fn test_circom_macros() {
+        circom_app!();
+
+        set_circom_circuits! {
+            ("multiplier2_final.zkey", multiplier2_witness),
+        }
+
+        const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
+
+        let mut inputs = HashMap::new();
+        let a = BigInt::from_str(
+            "21888242871839275222246405745257275088548364400416034343698204186575808495616",
+        )
+        .unwrap();
+        let b = BigInt::from(1u8);
+        inputs.insert("a".to_string(), vec![a.to_string()]);
+        inputs.insert("b".to_string(), vec![b.to_string()]);
+
+        let result = generate_circom_proof(ZKEY_PATH.to_string(), inputs);
+
+        assert!(result.is_ok());
+    }
 
     // This should be defined by a file that the mopro package consumer authors
     // then we reference it in our build somehow

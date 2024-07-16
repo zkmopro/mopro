@@ -32,18 +32,8 @@ jobs:
               with:
                   toolchain: stable
                   override: true
-            - name: Build package with halo2 config
-              run: cd mopro-ffi && cargo build --features halo2 --no-default-features
-            ### Halo2 tests will fail until we replace the stub implementation
-            ### just build to make sure the flags don't cause errors
-            # - name: Run halo2 tests
-            #   # TODO: Fix this custom jar thing
-            #   run: |
-            #       cd mopro-ffi/
-            #       curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
-            #       CLASSPATH=jna-5.13.0.jar cargo test -- --nocapture
-            #       cargo test --features halo2 --no-default-features
-
+            - name: Run ffi halo2 tests
+              run: cd mopro-ffi && cargo test --features halo2 --no-default-features
     test-ffi-circom:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -56,7 +46,7 @@ jobs:
                   override: true
             - name: Run ffi circom tests
               run: cd mopro-ffi && cargo test --features circom --no-default-features
-    test-e2e-circom:
+    test-e2e:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
@@ -71,7 +61,9 @@ jobs:
               run: |
                   cd test-e2e
                   curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
-                  CLASSPATH=jna-5.13.0.jar cargo test -- --nocapture
+                  CLASSPATH=jna-5.13.0.jar cargo test --test circom -- --nocapture
+            - name: Run e2e halo2 tests
+              run: CLASSPATH=jna-5.13.0.jar cargo test --test halo2 -- --nocapture
     build-xcframework:
         runs-on: macos-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
