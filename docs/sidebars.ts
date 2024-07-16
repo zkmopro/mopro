@@ -25,6 +25,7 @@ const sidebars: SidebarsConfig = {
             type: 'category',
             label: 'Supported Adapters',
             items: [
+                'adapters/overview',
                 'adapters/circom',
                 'adapters/halo2',
             ]
