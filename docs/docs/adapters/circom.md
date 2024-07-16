@@ -1,20 +1,20 @@
 # Circom Adapter
 
-Mopro supports Circom circuits. To develop with Circom, you need to have pre-built `zkey` and `wasm` files for your
+Mopro supports the integration of Circom circuits. For this, you need to have pre-built `zkey` and `wasm` files for your
 circuits. You can find more information on how to generate these files in
 the [Circom documentation](https://docs.circom.io).
 
 ## Sample Project
 
-You can find a sample project that demonstrates how to use the Circom adapter in
-the [mopro-app](https://github.com/vimwitch/mopro-app).
+Explore how the Circom adapter is implemented by checking out this sample
+project: [mopro-app](https://github.com/vimwitch/mopro-app).
 
 ## Setup the rust project
 
 You can follow the instructions in the [Rust Setup](/getting-started/rust-setup.md) guide to create a new Rust project
 that builds this library with Circom proofs.
 
-You must make sure that the `Cargo.toml` file has the `mopro-ffi/circom` feature enabled:
+In your `Cargo.toml` file, ensure the `mopro-ffi/circom` feature is activated:
 
 ```toml
 [features]
@@ -25,7 +25,7 @@ default = ["mopro-ffi/circom"]
 
 In order for the Mopro to be able to generate proofs for your chosen circom circuits, you need to provide a witness
 generation function for each of the circuits you plan to use to generate proofs for. This function handles the witness
-generation for your circuit. You can read more about witness for circom
+generation for your circuit. You can read more about witnesses for circom
 circuits [here](https://docs.circom.io/background/background/#witness).
 
 The function signature should be:
@@ -40,7 +40,7 @@ For simplicity, you can use the `witness!` macro provided by the `rust-witness` 
 function for you given the circuit name. You can read more about the `witness!`
 macro [here](https://github.com/vimwitch/rust-witness).
 
-To use it, you must add first add the `rust-witness` crate to your `Cargo.toml` regular and build dependencies:
+To use it, you must first add the `rust-witness` crate to your `Cargo.toml` regular and build dependencies:
 
 ```toml
 [dependencies]
@@ -73,13 +73,14 @@ rust_witness::generate_witnesses!("your_circuit_name");
 ```
 
 This will generate the witness function for the specified circuit
-following [the naming convention here](https://github.com/vimwitch/rust-witness?tab=readme-ov-file#rust-witness)
+following [the naming convention here](https://github.com/vimwitch/rust-witness?tab=readme-ov-file#rust-witness). Make
+sure that the repository contains the `zkey` and `wasm` files for the circuit.
 
 ## Setting the Circom Circuits
 
 To set Circom circuits, you need to use the `set_circom_circuits!` macro provided by the `mopro-ffi` crate. This macro
 should be called in the `lib.rs` file of your project, after the `mopro_ffi::app()` macro, and it should contain a list
-of tuples, where the first element is the path to the `zkey` file and the second element is the witness generation
+of tuples, where the first element is the name of the `zkey` file and the second element is the witness generation
 function.
 
 For example:
@@ -92,8 +93,7 @@ mopro_ffi::set_circom_circuits! {
 ```
 
 Under the hood, the `set_circom_circuits!` macro will generate a `get_circom_wtns_fn` function that will be used to get
-the witness generation
-function for a given circuit `zkey` file.
+the witness generation function for a given circuit `zkey` file.
 
 ### Manual Configuration
 
@@ -107,6 +107,8 @@ fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::WtnsFn, mopro_ffi::Mop
     }
 }
 ```
+
+This might be useful if you want to have more control over the proving functions for each circuit.
 
 ## Using the Library
 
