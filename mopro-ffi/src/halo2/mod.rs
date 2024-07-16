@@ -144,7 +144,7 @@ mod test {
             );
             assert!(result.is_ok());
         } else {
-            panic!("Failed to generate proof")
+            panic!("Failed to generate the proof!")
         }
     }
 }
