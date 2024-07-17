@@ -79,8 +79,7 @@ Benchmarks on an iPhone 12 mini (2020).
 <iframe width="484" height="266" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTbLHpEzT1ybhta5NVQrDQuOLwgGzLGpm2amiWgLRu0l9ZvXMNtNZ-DWIlySL0zO30UWn_nZvkfaQWY/pubchart?oid=1171109874&amp;format=interactive"></iframe>
 </details>
 
-**Details:
-** [Spreadsheet of Circom benchmark (iOS)](https://docs.google.com/spreadsheets/d/1MFABmsYSUsWDmhbjleqhBXk7nkYwhu589yK-CHtRkNI/edit?usp=sharing)
+**Details:** [Spreadsheet of Circom benchmark (iOS)](https://docs.google.com/spreadsheets/d/1MFABmsYSUsWDmhbjleqhBXk7nkYwhu589yK-CHtRkNI/edit?usp=sharing)
 
 :::note
 
