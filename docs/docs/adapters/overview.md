@@ -35,8 +35,8 @@ For adapter specific dependencies, please refer to each adapter's documentation.
 
 ## Supported Adapters
 
-- [Circom](/adapters/circom.md) - ["mopro-ffi/circom"]
-- [Halo](/adapters/halo.md) - ["mopro-ffi/halo"]
+- [Circom](/adapters/circom.md) - `["mopro-ffi/circom"]`
+- [Halo](/adapters/halo2.md) - `["mopro-ffi/halo"]`
 
 ## Using Adapters
 

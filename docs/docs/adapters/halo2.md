@@ -14,15 +14,16 @@ project: [Halo2 RSA Mopro on GitHub](https://github.com/ElusAegis/halo2-rsa-mopr
 Start by following the general instructions in the [Rust Setup Guide](/getting-started/rust-setup.md) to create a new
 Rust project for building libraries with Circom proofs. However, note these specific adjustments for Halo2:
 
-In your `Cargo.toml` file, ensure the `mopro-ffi/halo` feature is activated:
+In your `Cargo.toml` file, ensure the `halo2` feature is activated for `mopro-ffi`:
 
 ```toml
 [features]
-default = ["mopro-ffi/halo"]
+default = ["mopro-ffi/halo2"]
 ```
 
 You can also remove the rust-witness dependency as it is unnecessary for Halo2 circuits. Likewise, remove the
-`rust_witness::generate_witnesses!("...")` macro from the `build.rs` file.
+`rust_witness::transpile::transpile_wasm!("...")` macro from the `build.rs` file and any `rust_witness::witness!(...)`
+from the `lib.rs`.
 
 ## Implementing the Halo2 Circuit
 
@@ -127,9 +128,9 @@ if you want to only add the proving or verifying function for a circuit.
 After you have specified the circuits you want to use, you can follow the usual steps to build the library and use it
 in your project.
 
-### IOS
+### iOS API
 
-The Halo2 adapter exposes the following functions to be used in the IOS project:
+The Halo2 adapter exposes the following functions to be used in the iOS project:
 
 ```swift
 // Generate a proof for a Halo2 circuit given the srs and proving key files, as well as the circuit inputs
@@ -150,7 +151,7 @@ public struct GenerateProofResult {
 }
 ```
 
-### Android
+### Android API
 
 The circom adapter exposes the equivalent functions and types to be used in the Android project. 
 

@@ -2,12 +2,12 @@
 
 Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple.
 
-The example below shows how to deploy **Circom** circuits to **IOS** and **Android**. For other adapters as
-well as deployment targets, please refer to the documentation at [zkmopro](https://zkmopro.org/docs/next/intro).
+The example below shows how to bind **Circom** circuits to **iOS** and **Android**. For other adapters as
+well as deployment targets, please refer to the documentation at [zkmopro](https://zkmopro.org/docs/intro).
 
 ## Getting started
 
-Make sure you've installed the [prerequisites](https://zkmopro.org/docs/docs/prerequisites).
+Make sure you've installed the [prerequisites](https://zkmopro.org/docs/prerequisites).
 
 After that, you can clone the repo and run `cargo build` or `cargo test`.
 
@@ -138,5 +138,5 @@ or `cargo run --bin android` to build the corresponding static library.
 
 ## Using the library
 
-To read how to add the resulting static library to your IOS or Android project, please refer to the documentation
-at [zkmopro](https://zkmopro.org/docs/next/intro).
+To read how to add the resulting static library to your iOS or Android project, please refer to the documentation
+at [zkmopro](https://zkmopro.org/docs/intro).

@@ -14,7 +14,7 @@ project: [mopro-app](https://github.com/vimwitch/mopro-app).
 You can follow the instructions in the [Rust Setup](/getting-started/rust-setup.md) guide to create a new Rust project
 that builds this library with Circom proofs.
 
-In your `Cargo.toml` file, ensure the `mopro-ffi/circom` feature is activated:
+In your `Cargo.toml` file, ensure the `circom` feature is activated for `mopro-ffi`:
 
 ```toml
 [features]
@@ -40,6 +40,8 @@ For simplicity, you can use the `witness!` macro provided by the `rust-witness` 
 function for you given the circuit name. You can read more about the `witness!`
 macro [here](https://github.com/vimwitch/rust-witness).
 
+#### Adding the `rust-witness` Crate Dependency
+
 To use it, you must first add the `rust-witness` crate to your `Cargo.toml` regular and build dependencies:
 
 ```toml
@@ -52,24 +54,51 @@ rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 ```
 
-Then you need to add the following to the `build.rs` file to compile the circom circuits:
+#### Configuring the path to the `.wasm` circuit files in the `build.rs`
+
+Then you need to add the `generate_witnesses` to the `build.rs` file and specify the path to your circom circuits to
+compile them.
+
+The value passed to the `generate_witnesses` macro should be the path to the folder containing the `.wasm` files for
+circom circuits. It should be absolute or a relative path to the location of the `build.rs` file.
+The `.wasm` files could also be in a subfolders of the specified folder.
+
+For example for the following project structure:
+
+```text
+your-rust-project
+├── build.rs
+...
+test-vectors
+├── circom
+│   ├── multiplier
+│   │   ├── multiplier2.wasm
+│   │   └── multiplier3.wasm
+│   └── keccak256_256_test.wasm
+...
+```
+
+You will need to add the following to the `build.rs` file:
 
 ```rust
 fn main() {
     // ...
 
-    rust_witness::generate_witnesses!("path/to/circom/circuits/files");
-
+    rust_witness::transpile::transpile_wasm("../test-vectors/circom".to_string());
     // ...
 }
 ```
+
+#### Automatically Generating Witness Functions
 
 And then you can automatically generate the witness functions for all the circuits in the specified folder.
 
 To do so, in the `lib.rs` file, you can add the following:
 
 ```rust
-rust_witness::generate_witnesses!("your_circuit_name");
+rust_witness::witness!(multiplier2);
+rust_witness::witness!(multiplier3);
+rust_witness::witness!(keccak256256test);    
 ```
 
 This will generate the witness function for the specified circuit
@@ -115,9 +144,9 @@ This might be useful if you want to have more control over the proving functions
 After you have specified the circuits you want to use, you can follow the usual steps to build the library and use it in
 your project.
 
-### IOS
+### iOS API
 
-The Circom adapter exposes the following functions to be used in the IOS project:
+The Circom adapter exposes the following functions to be used in the iOS project:
 
 ```swift
 // Generate a proof for a given circuit zkey, as well as the circuit inputs
@@ -160,7 +189,7 @@ public struct GenerateProofResult {
 }
 ```
 
-### Android
+### Android API
 
 The circom adapter exposes the equivalent functions and types to be used in the Android project. 
 
