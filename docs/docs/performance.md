@@ -7,8 +7,7 @@ sidebar_position: 5
 ## Circom
 
 In summary: <br/>
-Both native witness generation and proof generation are generally faster than `snarkjs` in the browser, with potential
-speed improvements of up to **20 times**. <br/>
+Both native witness generation and proof generation are generally faster than `snarkjs` in the browser, with potential speed improvements of up to **20 times**. <br/>
 However, performance varies across different circuits.
 We _recommend_ developers benchmark their custom circuits before selecting tools for app development.
 
