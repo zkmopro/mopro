@@ -7,17 +7,14 @@ adapters are designed to be modular and easy to use.
 ## Overview
 
 Mopro's modular architecture allows you to combine different adapters in your project, such as mixing Halo2 and Circom
-circuits in the same project. The adapters are designed to be easy to use and to provide a consistent interface across
-different platforms.
+circuits in the same project. The adapters are designed to be easy to use and to provide a consistent interface across different platforms.
 
 ## Enabling Adapters
 
-To activate a specific adapter, you must enable it in your library's `Cargo.toml` file using the `mopro-ffi` feature
-mechanism. Each adapter has its own feature name, along with a list of dependencies that need to be included in your
-project.
+To activate a specific adapter, you must enable it in your Rust project's `Cargo.toml` file using the `mopro-ffi`
+feature mechanism. Each adapter has its own feature name, along with a list of dependencies that need to be included in your project.
 
-For example, to enable the Circom adapter, ensure that the `mopro-ffi/circom` feature is enabled in your `Cargo.toml`
-file:
+For example, to enable the Circom adapter, ensure that the `mopro-ffi/circom` feature is enabled in your `Cargo.toml` file:
 
 ```toml
 [features]
@@ -28,7 +25,7 @@ To mix different adapters, you can enable multiple features:
 
 ```toml
 [features]
-default = ["mopro-ffi/circom", "mopro-ffi/halo"]
+default = ["mopro-ffi/circom", "mopro-ffi/halo2"]
 ```
 
 For adapter specific dependencies, please refer to each adapter's documentation.
@@ -36,7 +33,7 @@ For adapter specific dependencies, please refer to each adapter's documentation.
 ## Supported Adapters
 
 - [Circom](/adapters/circom.md) - `["mopro-ffi/circom"]`
-- [Halo](/adapters/halo2.md) - `["mopro-ffi/halo"]`
+- [Halo](/adapters/halo2.md) - `["mopro-ffi/halo2"]`
 
 ## Using Adapters
 
@@ -45,8 +42,7 @@ the target platform. Detailed information can be found on each adapter’s docum
 
 ## Using Multiple Adapters
 
-The adapters are independent of each other, so they can be used simultaneously in the same project. For example, you can
-use both Circom and Halo adapters in the same project:
+The adapters are independent of each other, so they can be used simultaneously in the same project. For example, you can use both Circom and Halo adapters in the same project:
 
 ```rust
 mopro_ffi::app!();
