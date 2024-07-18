@@ -4,15 +4,16 @@ import MultiplierComponent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.mopro.mopro_app.ui.theme.MoproappTheme
 import java.io.File
 import java.io.IOException
@@ -20,45 +21,61 @@ import java.io.InputStream
 import java.io.OutputStream
 
 @Throws(IOException::class)
-private fun copyFile(`in`: InputStream, out: OutputStream) {
+fun copyFile(inputStream: InputStream, outputStream: OutputStream) {
     val buffer = ByteArray(1024)
     var read: Int
-    while ((`in`.read(buffer).also { read = it }) != -1) {
-        out.write(buffer, 0, read)
+    while (inputStream.read(buffer).also { read = it } != -1) {
+        outputStream.write(buffer, 0, read)
+    }
+}
+
+@Composable
+fun getFilePathFromAssets(name: String): String {
+    val context = LocalContext.current
+    return remember {
+        val assetManager = context.assets
+        val inputStream = assetManager.open(name)
+        val file = File(context.filesDir, name)
+        copyFile(inputStream, file.outputStream())
+        file.absolutePath
     }
 }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             MoproappTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val s = assets.open("multiplier2_final.zkey")
-                    val f = File(filesDir, "multiplier2_final.zkey")
-                    copyFile(s, f.outputStream())
-                    Column(modifier = Modifier.fillMaxSize().padding(paddingValues = innerPadding)) {
-                        MultiplierComponent(f.absolutePath)
-                    }
-                }
+                MainScreen()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun MainScreen() {
+    var selectedTab by remember { mutableStateOf(0) }
+    val tabs = listOf("Circom", "Halo2")
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MoproappTheme {
-        Greeting("Android")
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+        ) {
+            TabRow(selectedTabIndex = selectedTab) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        text = { Text(title) },
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index }
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            when (selectedTab) {
+                0 -> MultiplierComponent()
+                1 -> FibonacciComponent()
+            }
+        }
     }
 }
