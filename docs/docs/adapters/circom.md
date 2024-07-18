@@ -3,9 +3,10 @@
 Mopro supports the integration of Circom circuits. For this, you need to have pre-built `zkey` and `wasm` files for your
 circuits. You can find more information on how to generate these files in the [Circom documentation](https://docs.circom.io).
 
-## Sample Project
+## Samples
 
-Explore how the Circom adapter is implemented by checking out this sample project [mopro-app](https://github.com/vimwitch/mopro-app) or the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
+Explore how the Circom adapter is implemented by checking out this sample project [mopro-app](https://github.com/vimwitch/mopro-app) 
+or the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
 
 ## Setup the rust project
 
@@ -180,6 +181,6 @@ public struct GenerateProofResult {
 
 ### Android API
 
-The circom adapter exposes the equivalent functions and types to be used in the Android project. 
+The Circom adapter exposes the equivalent functions and types to be used in the Android project. 
 
 
