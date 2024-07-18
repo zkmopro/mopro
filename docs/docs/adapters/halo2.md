@@ -6,7 +6,7 @@ as well as how Halo2 circuits work, and have some experience in Rust. For more d
 
 ## Samples
 
-Explore how the Halo2 adapter is implemented by checking out this sample project [Halo2 RSA Mopro on GitHub](https://github.com/ElusAegis/halo2-rsa-mopro) 
+Explore how the Halo2 adapter is implemented by checking out this [Sample Mopro Halo2-Adapter Project](https://github.com/zkmopro/halo2-app) 
 or the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
 
 ## Setting Up the Rust Project
