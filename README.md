@@ -2,8 +2,7 @@
 
 Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple.
 
-The example below shows how to bind **Circom** circuits to **iOS** and **Android**. For other adapters as
-well as deployment targets, please refer to the documentation at [zkmopro](https://zkmopro.org/docs/intro).
+The example below shows how to bind **Circom** circuits to **iOS** and **Android**. For other adapters as well as deployment targets, please refer to the documentation at [zkmopro](https://zkmopro.org/docs/intro).
 
 ## Getting started
 

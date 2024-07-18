@@ -1,18 +1,14 @@
 # Adapters
 
-The objective of Mopro is to support a wide range of circuits and platforms. To achieve this, Mopro provides adapters
-that allow you to build proofs for your circuits and do other cryptographic operations on different platforms. The
-adapters are designed to be modular and easy to use.
+The objective of Mopro is to support a wide range of circuits and platforms. To achieve this, Mopro provides adapters that allow you to build proofs for your circuits and do other cryptographic operations on different platforms. The adapters are designed to be modular and easy to use.
 
 ## Overview
 
-Mopro's modular architecture allows you to combine different adapters in your project, such as mixing Halo2 and Circom
-circuits in the same project. The adapters are designed to be easy to use and to provide a consistent interface across different platforms.
+Mopro's modular architecture allows you to combine different adapters in your project, such as mixing Halo2 and Circom circuits in the same project. The adapters are designed to be easy to use and to provide a consistent interface across different platforms.
 
 ## Enabling Adapters
 
-To activate a specific adapter, you must enable it in your Rust project's `Cargo.toml` file using the `mopro-ffi`
-feature mechanism. Each adapter has its own feature name, along with a list of dependencies that need to be included in your project.
+To activate a specific adapter, you must enable it in your Rust project's `Cargo.toml` file using the `mopro-ffi` feature mechanism. Each adapter has its own feature name, along with a list of dependencies that need to be included in your project.
 
 For example, to enable the Circom adapter, ensure that the `mopro-ffi/circom` feature is enabled in your `Cargo.toml` file:
 
@@ -37,8 +33,7 @@ For adapter specific dependencies, please refer to each adapter's documentation.
 
 ## Using Adapters
 
-Each adapter provides its functionality to set it up for the project as well as exports its own functions to be used on
-the target platform. Detailed information can be found on each adapter’s documentation page.
+Each adapter provides its functionality to set it up for the project as well as exports its own functions to be used on the target platform. Detailed information can be found on each adapter’s documentation page.
 
 ## Using Multiple Adapters
 

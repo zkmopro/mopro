@@ -1,12 +1,10 @@
 # Circom Adapter
 
-Mopro supports the integration of Circom circuits. For this, you need to have pre-built `zkey` and `wasm` files for your
-circuits. You can find more information on how to generate these files in the [Circom documentation](https://docs.circom.io).
+Mopro supports the integration of Circom circuits. For this, you need to have pre-built `zkey` and `wasm` files for your circuits. You can find more information on how to generate these files in the [Circom documentation](https://docs.circom.io).
 
 ## Samples
 
-Explore how the Circom adapter is implemented by checking out this sample project [mopro-app](https://github.com/vimwitch/mopro-app) 
-or the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
+Explore how the Circom adapter is implemented by checking out this sample project [mopro-app](https://github.com/vimwitch/mopro-app) or the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
 
 ## Setup the rust project
 
@@ -21,9 +19,7 @@ default = ["mopro-ffi/circom"]
 
 ## Witness Generation Functions
 
-In order for the Mopro to be able to generate proofs for your chosen circom circuits, you need to provide a witness
-generation function for each of the circuits you plan to use to generate proofs for. This function handles the witness
-generation for your circuit. You can read more about witnesses for circom circuits [here](https://docs.circom.io/background/background/#witness).
+In order for the Mopro to be able to generate proofs for your chosen circom circuits, you need to provide a witness generation function for each of the circuits you plan to use to generate proofs for. This function handles the witness generation for your circuit. You can read more about witnesses for circom circuits [here](https://docs.circom.io/background/background/#witness).
 
 The function signature should be:
 
@@ -33,8 +29,7 @@ pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 
 ## Implementing the Witness Function
 
-For simplicity, you can use the `witness!` macro provided by the `rust-witness` crate. This macro generates a witness
-function for you given the circuit name. You can read more about the `witness!` macro [here](https://github.com/vimwitch/rust-witness).
+For simplicity, you can use the `witness!` macro provided by the `rust-witness` crate. This macro generates a witness function for you given the circuit name. You can read more about the `witness!` macro [here](https://github.com/vimwitch/rust-witness).
 
 #### Adding the `rust-witness` Crate Dependency
 
@@ -52,9 +47,7 @@ rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
 
 #### Configuring the path to the `.wasm` circuit files in the `build.rs`
 
-Then you need to add to the `build.rs` the call to `rust_witness::transpile::transpile_wasm` macro and pass it the path 
-to the folder containing the `.wasm` files for the circom circuits. The path can be absolute or a relative to the location 
-of the `build.rs` file. Note that the `.wasm` files can be recursively in subfolders of the specified folder, as in the example below.
+Then you need to add to the `build.rs` the call to `rust_witness::transpile::transpile_wasm` macro and pass it the path to the folder containing the `.wasm` files for the circom circuits. The path can be absolute or a relative to the location of the `build.rs` file. Note that the `.wasm` files can be recursively in subfolders of the specified folder, as in the example below.
 
 For example, for the following project structure:
 
@@ -97,9 +90,7 @@ This will generate the witness function for the specified circuit following [the
 
 ## Setting the Circom Circuits
 
-To set Circom circuits you want to use on other platforms, you need to use the `set_circom_circuits!` macro provided by the 
-`mopro-ffi` crate. This macro should be called in the `lib.rs` file of your project, after the `mopro_ffi::app()` macro call.
- You should pass it a list of tuples (pairs), where the first element is the name of the `zkey` file and the second element is the witness generation function.
+To set Circom circuits you want to use on other platforms, you need to use the `set_circom_circuits!` macro provided by the `mopro-ffi` crate. This macro should be called in the `lib.rs` file of your project, after the `mopro_ffi::app()` macro call. You should pass it a list of tuples (pairs), where the first element is the name of the `zkey` file and the second element is the witness generation function.
 
 For example:
 
@@ -111,8 +102,7 @@ mopro_ffi::set_circom_circuits! {
 }
 ```
 
-Under the hood, the `set_circom_circuits!` macro will generate a `get_circom_wtns_fn` function that will be used to get
-the witness generation function for a given circuit `zkey` file.
+Under the hood, the `set_circom_circuits!` macro will generate a `get_circom_wtns_fn` function that will be used to get the witness generation function for a given circuit `zkey` file.
 
 ### Manual Configuration
 
