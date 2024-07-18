@@ -1,6 +1,6 @@
 # Rust Setup
 
-This tutorial will show you how to build static library for Android and iOS. Later pages show how to integrate into an existing iOS or Android app.
+This tutorial will show you how to build static library with Circom adapter for Android and iOS. Later pages show how to integrate into an existing iOS or Android app.
 
 Make sure you've installed the [prerequisites](/docs/prerequisites).
 
@@ -30,7 +30,7 @@ edition = "2021"
 crate-type = ["lib", "cdylib", "staticlib"]
 name = "mopro_bindings"
 
-# We're going to build support for circom proofs only
+# We're going to build support for circom proofs only for this example
 [features]
 default = ["mopro-ffi/circom"]
 
@@ -50,9 +50,10 @@ Now you should copy your wasm and zkey files somewhere in the project folder. Fo
 
 :::info
 Download example multiplier2 wasm and zkey here:
+
 - [multiplier2.wasm](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2.wasm)
 - [multiplier2_final.zkey](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2_final.zkey)
-:::
+  :::
 
 Now we need to add 4 rust files. First we'll add `build.rs` in the main project folder. This file should contain the following:
 
@@ -74,14 +75,12 @@ fn main() {
 Second we'll change the file at `./src/lib.rs` to look like the following:
 
 ```rust
-use mopro_ffi::{app, WtnsFn};
-
-// Here we're generating the C functions for a circuit named
-// multiplier2.
+// Here we're generating the C witness generator functions
+// for a circuit named `multiplier2`.
 // Your circuit name will be the name of the wasm file all lowercase
 // with spaces, dashes and underscores removed
 //
-// e.g. 
+// e.g.
 // multiplier2 -> multiplier2
 // keccak_256_256_main -> keccak256256main
 // aadhaar-verifier -> aadhaarverifier
@@ -89,19 +88,16 @@ rust_witness::witness!(multiplier2);
 
 // Here we're calling a macro exported by uniffi. This macro will
 // write some functions and bind them to the uniffi UDL file. These
-// functions will invoke the zkey_witness_map function written below.
-app!();
+// functions will invoke the `get_circom_wtns_fn` generated below.
+mopro_ffi::app!();
 
-// This function defines a mapping between zkey filename and witness
-// generator. When you make a proof the zkey filename will be passed to
-// this function in order to retrieve the appropriate witness generator.
-// Remember, we built the witness generator for the circuit above using
-// rust_witness.
-fn zkey_witness_map(name: &str) -> Result<WtnsFn, MoproError> {
-    match name {
-        "multiplier2_final.zkey" => Ok(multiplier2_witness),
-        _ => Err(MoproError::CircomError("Unknown circuit name".to_string())),
-    }
+// This macro is used to define the `get_circom_wtns_fn` function
+// which defines a mapping between zkey filename and witness generator.
+// You can pass multiple comma seperated `(filename, witness_function)` pairs to it.
+// You can read in the `circom` doc section how you can manually set this function.
+// One way to create the witness generator function is to use the `rust_witness!` above.
+mopro_ffi::set_circom_circuits! {
+    ("multiplier2_final.zkey", multiplier2_witness),
 }
 ```
 
