@@ -151,8 +151,7 @@ Benchmarks on an Macbook Pro M1 Max (2021).
 <iframe width="472" height="279" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQOuS5abdzvh6znXORvSo7M85ubmDpSmE3C1Zs_l56wd25lMK4FZPEWOaCp7WrOlIjc3jEcWa0lfiy9/pubchart?oid=1443184132&amp;format=interactive"></iframe>
 </details>
 
-**Details:
-** [Spreadsheet of Circom benchmark (macOS)](https://docs.google.com/spreadsheets/d/1irKg_TOP-yXms8igwCN_3OjVrtFe5gTHkuF0RbrVuho/edit?usp=sharing)
+**Details:** [Spreadsheet of Circom benchmark (macOS)](https://docs.google.com/spreadsheets/d/1irKg_TOP-yXms8igwCN_3OjVrtFe5gTHkuF0RbrVuho/edit?usp=sharing)
 </details>
 
 ## Halo2
