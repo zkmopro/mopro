@@ -25,7 +25,7 @@ const config: Config = {
           editUrl:
             'https://github.com/zkmopro/mopro/tree/main/docs',
           includeCurrentVersion: true,
-          lastVersion: '0.0.2',
+          lastVersion: '0.1.0',
         },
         theme: {
           customCss: './src/css/custom.css',
