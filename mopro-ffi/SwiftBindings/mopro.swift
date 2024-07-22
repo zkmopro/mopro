@@ -862,6 +862,16 @@ public func arkworksPippenger(instanceSize: UInt32, numInstance: UInt32, utilsDi
     })
 }
 
+public func bucketWiseMsm(instanceSize: UInt32, numInstance: UInt32, utilsDir: String) throws -> BenchmarkResult {
+    return try FfiConverterTypeBenchmarkResult.lift(rustCallWithError(FfiConverterTypeMoproError.lift) {
+        uniffi_mopro_bindings_fn_func_bucket_wise_msm(
+            FfiConverterUInt32.lower(instanceSize),
+            FfiConverterUInt32.lower(numInstance),
+            FfiConverterString.lower(utilsDir), $0
+        )
+    })
+}
+
 public func generateCircomProof(zkeyPath: String, circuitInputs: [String: [String]]) throws -> GenerateProofResult {
     return try FfiConverterTypeGenerateProofResult.lift(rustCallWithError(FfiConverterTypeMoproError.lift) {
         uniffi_mopro_bindings_fn_func_generate_circom_proof(
@@ -882,6 +892,16 @@ public func generateHalo2Proof(circuitInputs: [String: [String]]) throws -> Gene
 public func metalMsm(instanceSize: UInt32, numInstance: UInt32, utilsDir: String) throws -> BenchmarkResult {
     return try FfiConverterTypeBenchmarkResult.lift(rustCallWithError(FfiConverterTypeMoproError.lift) {
         uniffi_mopro_bindings_fn_func_metal_msm(
+            FfiConverterUInt32.lower(instanceSize),
+            FfiConverterUInt32.lower(numInstance),
+            FfiConverterString.lower(utilsDir), $0
+        )
+    })
+}
+
+public func precomputeMsm(instanceSize: UInt32, numInstance: UInt32, utilsDir: String) throws -> BenchmarkResult {
+    return try FfiConverterTypeBenchmarkResult.lift(rustCallWithError(FfiConverterTypeMoproError.lift) {
+        uniffi_mopro_bindings_fn_func_precompute_msm(
             FfiConverterUInt32.lower(instanceSize),
             FfiConverterUInt32.lower(numInstance),
             FfiConverterString.lower(utilsDir), $0
@@ -943,6 +963,9 @@ private var initializationResult: InitializationResult = {
     if uniffi_mopro_bindings_checksum_func_arkworks_pippenger() != 25844 {
         return InitializationResult.apiChecksumMismatch
     }
+    if uniffi_mopro_bindings_checksum_func_bucket_wise_msm() != 21506 {
+        return InitializationResult.apiChecksumMismatch
+    }
     if uniffi_mopro_bindings_checksum_func_generate_circom_proof() != 54365 {
         return InitializationResult.apiChecksumMismatch
     }
@@ -950,6 +973,9 @@ private var initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_bindings_checksum_func_metal_msm() != 62388 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_mopro_bindings_checksum_func_precompute_msm() != 45282 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_mopro_bindings_checksum_func_to_ethereum_inputs() != 64747 {

@@ -256,6 +256,11 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureStr
 RustBuffer uniffi_mopro_bindings_fn_func_arkworks_pippenger(uint32_t instance_size, uint32_t num_instance, RustBuffer utils_dir, RustCallStatus *_Nonnull out_status
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_BUCKET_WISE_MSM
+#define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_BUCKET_WISE_MSM
+RustBuffer uniffi_mopro_bindings_fn_func_bucket_wise_msm(uint32_t instance_size, uint32_t num_instance, RustBuffer utils_dir, RustCallStatus *_Nonnull out_status
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_GENERATE_CIRCOM_PROOF
 #define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_GENERATE_CIRCOM_PROOF
 RustBuffer uniffi_mopro_bindings_fn_func_generate_circom_proof(RustBuffer zkey_path, RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
@@ -269,6 +274,11 @@ RustBuffer uniffi_mopro_bindings_fn_func_generate_halo2_proof(RustBuffer circuit
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_METAL_MSM
 #define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_METAL_MSM
 RustBuffer uniffi_mopro_bindings_fn_func_metal_msm(uint32_t instance_size, uint32_t num_instance, RustBuffer utils_dir, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_PRECOMPUTE_MSM
+#define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_PRECOMPUTE_MSM
+RustBuffer uniffi_mopro_bindings_fn_func_precompute_msm(uint32_t instance_size, uint32_t num_instance, RustBuffer utils_dir, RustCallStatus *_Nonnull out_status
 );
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_TO_ETHEREUM_INPUTS
@@ -577,6 +587,12 @@ uint16_t uniffi_mopro_bindings_checksum_func_arkworks_pippenger(void
     
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_BUCKET_WISE_MSM
+#define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_BUCKET_WISE_MSM
+uint16_t uniffi_mopro_bindings_checksum_func_bucket_wise_msm(void
+    
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_GENERATE_CIRCOM_PROOF
 #define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_GENERATE_CIRCOM_PROOF
 uint16_t uniffi_mopro_bindings_checksum_func_generate_circom_proof(void
@@ -592,6 +608,12 @@ uint16_t uniffi_mopro_bindings_checksum_func_generate_halo2_proof(void
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_METAL_MSM
 #define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_METAL_MSM
 uint16_t uniffi_mopro_bindings_checksum_func_metal_msm(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_PRECOMPUTE_MSM
+#define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_PRECOMPUTE_MSM
+uint16_t uniffi_mopro_bindings_checksum_func_precompute_msm(void
     
 );
 #endif

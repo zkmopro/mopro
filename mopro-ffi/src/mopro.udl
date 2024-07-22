@@ -20,6 +20,12 @@ namespace mopro {
   [Throws=MoproError]
   BenchmarkResult metal_msm(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
 
+  [Throws=MoproError]
+  BenchmarkResult bucket_wise_msm(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
+
+  [Throws=MoproError]
+  BenchmarkResult precompute_msm(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
+
   ProofCalldata to_ethereum_proof(bytes proof);
   sequence<string> to_ethereum_inputs(bytes inputs);
 };

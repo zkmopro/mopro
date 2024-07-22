@@ -702,6 +702,14 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
+
+
+
+
+
+
+
+
 // A JNA Library to expose the extern-C FFI definitions.
 // This is an implementation detail which will be called internally by the public API.
 
@@ -717,9 +725,17 @@ internal interface UniffiLib : Library {
         
     }
 
+    fun uniffi_mopro_bindings_fn_func_arkworks_pippenger(`instanceSize`: Int,`numInstance`: Int,`utilsDir`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): RustBuffer.ByValue
+    fun uniffi_mopro_bindings_fn_func_bucket_wise_msm(`instanceSize`: Int,`numInstance`: Int,`utilsDir`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): RustBuffer.ByValue
     fun uniffi_mopro_bindings_fn_func_generate_circom_proof(`zkeyPath`: RustBuffer.ByValue,`circuitInputs`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
     fun uniffi_mopro_bindings_fn_func_generate_halo2_proof(`circuitInputs`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): RustBuffer.ByValue
+    fun uniffi_mopro_bindings_fn_func_metal_msm(`instanceSize`: Int,`numInstance`: Int,`utilsDir`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): RustBuffer.ByValue
+    fun uniffi_mopro_bindings_fn_func_precompute_msm(`instanceSize`: Int,`numInstance`: Int,`utilsDir`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
     fun uniffi_mopro_bindings_fn_func_to_ethereum_inputs(`inputs`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
@@ -841,9 +857,17 @@ internal interface UniffiLib : Library {
     ): Unit
     fun ffi_mopro_bindings_rust_future_complete_void(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
+    fun uniffi_mopro_bindings_checksum_func_arkworks_pippenger(
+    ): Short
+    fun uniffi_mopro_bindings_checksum_func_bucket_wise_msm(
+    ): Short
     fun uniffi_mopro_bindings_checksum_func_generate_circom_proof(
     ): Short
     fun uniffi_mopro_bindings_checksum_func_generate_halo2_proof(
+    ): Short
+    fun uniffi_mopro_bindings_checksum_func_metal_msm(
+    ): Short
+    fun uniffi_mopro_bindings_checksum_func_precompute_msm(
     ): Short
     fun uniffi_mopro_bindings_checksum_func_to_ethereum_inputs(
     ): Short
@@ -870,10 +894,22 @@ private fun uniffiCheckContractApiVersion(lib: UniffiLib) {
 
 @Suppress("UNUSED_PARAMETER")
 private fun uniffiCheckApiChecksums(lib: UniffiLib) {
+    if (lib.uniffi_mopro_bindings_checksum_func_arkworks_pippenger() != 25844.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_mopro_bindings_checksum_func_bucket_wise_msm() != 21506.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_mopro_bindings_checksum_func_generate_circom_proof() != 54365.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_mopro_bindings_checksum_func_generate_halo2_proof() != 36145.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_mopro_bindings_checksum_func_metal_msm() != 62388.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_mopro_bindings_checksum_func_precompute_msm() != 45282.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_mopro_bindings_checksum_func_to_ethereum_inputs() != 64747.toShort()) {
@@ -927,6 +963,46 @@ inline fun <T : Disposable?, R> T.use(block: (T) -> R) =
 
 /** Used to instantiate an interface without an actual pointer, for fakes in tests, mostly. */
 object NoPointer
+
+public object FfiConverterUInt: FfiConverter<UInt, Int> {
+    override fun lift(value: Int): UInt {
+        return value.toUInt()
+    }
+
+    override fun read(buf: ByteBuffer): UInt {
+        return lift(buf.getInt())
+    }
+
+    override fun lower(value: UInt): Int {
+        return value.toInt()
+    }
+
+    override fun allocationSize(value: UInt) = 4UL
+
+    override fun write(value: UInt, buf: ByteBuffer) {
+        buf.putInt(value.toInt())
+    }
+}
+
+public object FfiConverterDouble: FfiConverter<Double, Double> {
+    override fun lift(value: Double): Double {
+        return value
+    }
+
+    override fun read(buf: ByteBuffer): Double {
+        return buf.getDouble()
+    }
+
+    override fun lower(value: Double): Double {
+        return value
+    }
+
+    override fun allocationSize(value: Double) = 8UL
+
+    override fun write(value: Double, buf: ByteBuffer) {
+        buf.putDouble(value)
+    }
+}
 
 public object FfiConverterBoolean: FfiConverter<Boolean, Byte> {
     override fun lift(value: Byte): Boolean {
@@ -1015,6 +1091,39 @@ public object FfiConverterByteArray: FfiConverterRustBuffer<ByteArray> {
     override fun write(value: ByteArray, buf: ByteBuffer) {
         buf.putInt(value.size)
         buf.put(value)
+    }
+}
+
+
+
+data class BenchmarkResult (
+    var `instanceSize`: kotlin.UInt, 
+    var `numInstance`: kotlin.UInt, 
+    var `avgProcessingTime`: kotlin.Double
+) {
+    
+    companion object
+}
+
+public object FfiConverterTypeBenchmarkResult: FfiConverterRustBuffer<BenchmarkResult> {
+    override fun read(buf: ByteBuffer): BenchmarkResult {
+        return BenchmarkResult(
+            FfiConverterUInt.read(buf),
+            FfiConverterUInt.read(buf),
+            FfiConverterDouble.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: BenchmarkResult) = (
+            FfiConverterUInt.allocationSize(value.`instanceSize`) +
+            FfiConverterUInt.allocationSize(value.`numInstance`) +
+            FfiConverterDouble.allocationSize(value.`avgProcessingTime`)
+    )
+
+    override fun write(value: BenchmarkResult, buf: ByteBuffer) {
+            FfiConverterUInt.write(value.`instanceSize`, buf)
+            FfiConverterUInt.write(value.`numInstance`, buf)
+            FfiConverterDouble.write(value.`avgProcessingTime`, buf)
     }
 }
 
@@ -1148,6 +1257,8 @@ sealed class MoproException(message: String): kotlin.Exception(message) {
         
         class Halo2Exception(message: String) : MoproException(message)
         
+        class MsmException(message: String) : MoproException(message)
+        
 
     companion object ErrorHandler : UniffiRustCallStatusErrorHandler<MoproException> {
         override fun lift(error_buf: RustBuffer.ByValue): MoproException = FfiConverterTypeMoproError.lift(error_buf)
@@ -1160,6 +1271,7 @@ public object FfiConverterTypeMoproError : FfiConverterRustBuffer<MoproException
             return when(buf.getInt()) {
             1 -> MoproException.CircomException(FfiConverterString.read(buf))
             2 -> MoproException.Halo2Exception(FfiConverterString.read(buf))
+            3 -> MoproException.MsmException(FfiConverterString.read(buf))
             else -> throw RuntimeException("invalid error enum value, something is very wrong!!")
         }
         
@@ -1177,6 +1289,10 @@ public object FfiConverterTypeMoproError : FfiConverterRustBuffer<MoproException
             }
             is MoproException.Halo2Exception -> {
                 buf.putInt(2)
+                Unit
+            }
+            is MoproException.MsmException -> {
+                buf.putInt(3)
                 Unit
             }
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
@@ -1243,6 +1359,26 @@ public object FfiConverterMapStringSequenceString: FfiConverterRustBuffer<Map<ko
         }
     }
 }
+    @Throws(MoproException::class) fun `arkworksPippenger`(`instanceSize`: kotlin.UInt, `numInstance`: kotlin.UInt, `utilsDir`: kotlin.String): BenchmarkResult {
+            return FfiConverterTypeBenchmarkResult.lift(
+    uniffiRustCallWithError(MoproException) { _status ->
+    UniffiLib.INSTANCE.uniffi_mopro_bindings_fn_func_arkworks_pippenger(
+        FfiConverterUInt.lower(`instanceSize`),FfiConverterUInt.lower(`numInstance`),FfiConverterString.lower(`utilsDir`),_status)
+}
+    )
+    }
+    
+
+    @Throws(MoproException::class) fun `bucketWiseMsm`(`instanceSize`: kotlin.UInt, `numInstance`: kotlin.UInt, `utilsDir`: kotlin.String): BenchmarkResult {
+            return FfiConverterTypeBenchmarkResult.lift(
+    uniffiRustCallWithError(MoproException) { _status ->
+    UniffiLib.INSTANCE.uniffi_mopro_bindings_fn_func_bucket_wise_msm(
+        FfiConverterUInt.lower(`instanceSize`),FfiConverterUInt.lower(`numInstance`),FfiConverterString.lower(`utilsDir`),_status)
+}
+    )
+    }
+    
+
     @Throws(MoproException::class) fun `generateCircomProof`(`zkeyPath`: kotlin.String, `circuitInputs`: Map<kotlin.String, List<kotlin.String>>): GenerateProofResult {
             return FfiConverterTypeGenerateProofResult.lift(
     uniffiRustCallWithError(MoproException) { _status ->
@@ -1258,6 +1394,26 @@ public object FfiConverterMapStringSequenceString: FfiConverterRustBuffer<Map<ko
     uniffiRustCallWithError(MoproException) { _status ->
     UniffiLib.INSTANCE.uniffi_mopro_bindings_fn_func_generate_halo2_proof(
         FfiConverterMapStringSequenceString.lower(`circuitInputs`),_status)
+}
+    )
+    }
+    
+
+    @Throws(MoproException::class) fun `metalMsm`(`instanceSize`: kotlin.UInt, `numInstance`: kotlin.UInt, `utilsDir`: kotlin.String): BenchmarkResult {
+            return FfiConverterTypeBenchmarkResult.lift(
+    uniffiRustCallWithError(MoproException) { _status ->
+    UniffiLib.INSTANCE.uniffi_mopro_bindings_fn_func_metal_msm(
+        FfiConverterUInt.lower(`instanceSize`),FfiConverterUInt.lower(`numInstance`),FfiConverterString.lower(`utilsDir`),_status)
+}
+    )
+    }
+    
+
+    @Throws(MoproException::class) fun `precomputeMsm`(`instanceSize`: kotlin.UInt, `numInstance`: kotlin.UInt, `utilsDir`: kotlin.String): BenchmarkResult {
+            return FfiConverterTypeBenchmarkResult.lift(
+    uniffiRustCallWithError(MoproException) { _status ->
+    UniffiLib.INSTANCE.uniffi_mopro_bindings_fn_func_precompute_msm(
+        FfiConverterUInt.lower(`instanceSize`),FfiConverterUInt.lower(`numInstance`),FfiConverterString.lower(`utilsDir`),_status)
 }
     )
     }

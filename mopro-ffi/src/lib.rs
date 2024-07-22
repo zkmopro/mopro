@@ -148,6 +148,46 @@ pub fn metal_msm(_: u32, _: u32, _: &str) -> Result<BenchmarkResult, MoproError>
     ))
 }
 
+#[cfg(feature = "gpu-acceleration")]
+pub fn bucket_wise_msm(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
+    let benchmarks =
+        msm::bucket_wise_msm::run_benchmark(instance_size, num_instance, &utils_dir)
+            .unwrap()
+            .into();
+    Ok(benchmarks)
+}
+
+#[cfg(not(feature = "gpu-acceleration"))]
+pub fn bucket_wise_msm(_: u32, _: u32, _: &str) -> Result<BenchmarkResult, MoproError> {
+    Err(MoproError::MSMError(
+        "gpu-acceleration feature not enabled!".to_string(),
+    ))
+}
+
+#[cfg(feature = "gpu-acceleration")]
+pub fn precompute_msm(
+    instance_size: u32,
+    num_instance: u32,
+    utils_dir: &str,
+) -> Result<BenchmarkResult, MoproError> {
+    let benchmarks =
+        msm::precompute_msm::run_benchmark(instance_size, num_instance, &utils_dir)
+            .unwrap()
+            .into();
+    Ok(benchmarks)
+}
+
+#[cfg(not(feature = "gpu-acceleration"))]
+pub fn precompute_msm(_: u32, _: u32, _: &str) -> Result<BenchmarkResult, MoproError> {
+    Err(MoproError::MSMError(
+        "gpu-acceleration feature not enabled!".to_string(),
+    ))
+}
+
 // #[cfg(feature = "gpu-acceleration")]
 // pub fn trapdoortech_zprize_msm(
 //     instance_size: u32,
@@ -281,6 +321,22 @@ macro_rules! app {
             utils_dir: &str,
         ) -> Result<BenchmarkResult, MoproError> {
             mopro_ffi::metal_msm(instance_size, num_instance, utils_dir)
+        }
+
+        fn bucket_wise_msm(
+            instance_size: u32,
+            num_instance: u32,
+            utils_dir: &str,
+        ) -> Result<BenchmarkResult, MoproError> {
+            mopro_ffi::bucket_wise_msm(instance_size, num_instance, utils_dir)
+        }
+
+        fn precompute_msm(
+            instance_size: u32,
+            num_instance: u32,
+            utils_dir: &str,
+        ) -> Result<BenchmarkResult, MoproError> {
+            mopro_ffi::precompute_msm(instance_size, num_instance, utils_dir)
         }
 
         // fn trapdoortech_zprize_msm(
