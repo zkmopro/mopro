@@ -21,6 +21,7 @@ default = []
 
 halo2 = []
 circom = [
+    "rust-witness",
     "ark-circom",
     "ark-serialize",
     "ark-ec",
@@ -36,7 +37,6 @@ circom = [
 ]
 
 [dependencies]
-rust-witness = "=0.1.0"
 uniffi = { version = "=0.28.0", features = ["cli", "build"] }
 
 # Error handling
@@ -44,6 +44,7 @@ thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 
 # circom deps
+rust-witness = { version = "=0.1.0", optional = true }
 ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", version = "0.1.0", branch = "wasm-delete", optional = true }
 ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "0.4.3", default-features = false, features = [
@@ -78,12 +79,9 @@ uniffi = { version = "=0.28.0", features = ["bindgen-tests"] }
 # Circom test dependency
 ark-bn254 = { version = "=0.4.0" }
 
-rust-witness = "=0.1.0"
 color-eyre = "0.6"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"
 
 # Halo2 dependencies
 halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
-
-
