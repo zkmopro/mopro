@@ -2,8 +2,12 @@
 name = "mopro-ffi"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zkmopro/mopro"
+documentation = "https://zkmopro.org/"
+homepage = "https://zkmopro.org/"
+exclude = ["target/*"]
 
 [lib]
 name = "mopro_ffi"
@@ -32,7 +36,7 @@ circom = [
 ]
 
 [dependencies]
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+rust-witness = "=0.1.0"
 uniffi = { version = "=0.28.0", features = ["cli", "build"] }
 
 # Error handling
@@ -40,7 +44,7 @@ thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 
 # circom deps
-ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", branch = "wasm-delete", optional = true }
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", version = "0.1.0", branch = "wasm-delete", optional = true }
 ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
@@ -66,7 +70,7 @@ ark-bls12-381 = { version = "0.4.0", optional = true }
 num-traits = { version = "0.2.0", optional = true }
 
 [build-dependencies]
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+rust-witness = "=0.1.0"
 uniffi = { version = "=0.28.0", features = ["build"] }
 
 [dev-dependencies]
@@ -74,7 +78,7 @@ uniffi = { version = "=0.28.0", features = ["bindgen-tests"] }
 # Circom test dependency
 ark-bn254 = { version = "=0.4.0" }
 
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+rust-witness = "=0.1.0"
 color-eyre = "0.6"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"

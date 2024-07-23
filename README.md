@@ -51,11 +51,11 @@ default = ["mopro-ffi/circom"]
 [dependencies]
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
 uniffi = { version = "0.28", features = ["cli"] }
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+rust-witness = "=0.1.0"
 num-bigint = "0.4.0"
 
 [build-dependencies]
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+rust-witness = "=0.1.0"
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
 uniffi = { version = "0.28", features = ["build"] }
 ```

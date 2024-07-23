@@ -1,8 +1,27 @@
 # mopro-ffi
 
-This is the main/only crate that is used to build mopro apps.
+Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple.
 
-## `SwiftBindings`
+## Getting started
+
+- Make sure you've installed the [prerequisites](https://zkmopro.org/docs/prerequisites).
+- Getting started with this [tutorial](https://zkmopro.org/docs/getting-started/rust-setup).
+
+## Run tests
+
+- circom
+  ```sh
+  cargo test --features circom --no-default-features
+  ```
+- halo2
+  ```sh
+  cargo test --features halo2 --no-default-features
+  ```
+
+## Bindings
+
+- `SwiftBindings`
+- `KotlinBindings`
 
 The uniffi bindings are precompiled and committed here for a specifically named crate. This avoids the complexity of building/invoking the uniffi cli by dependent packages. Note that dependent crates _must_ have the library name `mopro_bindings`, or rebuild the binding themselves.
 
@@ -16,4 +35,8 @@ Includes all proving and serialization logic for circom proofs. Does _not_ inclu
 
 ### `halo2`
 
-Includes proving logic for halo2. Implementation is currently stubbed.
+Includes all proving logic for halo2. 
+
+## Community
+- Telegram: https://t.me/zkmopro
+- X: https://x.com/zkmopro
