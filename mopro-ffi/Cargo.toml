@@ -44,7 +44,7 @@ thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 
 # circom deps
-rust-witness = { version = "=0.1.0", optional = true }
+rust-witness = { version = "0.1.0", optional = true }
 ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", version = "0.1.0", branch = "wasm-delete", optional = true }
 ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "0.4.3", default-features = false, features = [
@@ -71,7 +71,7 @@ ark-bls12-381 = { version = "0.4.0", optional = true }
 num-traits = { version = "0.2.0", optional = true }
 
 [build-dependencies]
-rust-witness = "=0.1.0"
+rust-witness = "0.1.0"
 uniffi = { version = "=0.28.0", features = ["build"] }
 
 [dev-dependencies]

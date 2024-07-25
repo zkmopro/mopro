@@ -11,11 +11,11 @@ Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side pro
 
 - circom
   ```sh
-  cargo test --features circom --no-default-features
+  cargo test --features circom
   ```
 - halo2
   ```sh
-  cargo test --features halo2 --no-default-features
+  cargo test --features halo2
   ```
 
 ## Bindings

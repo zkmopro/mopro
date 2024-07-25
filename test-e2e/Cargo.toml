@@ -18,7 +18,7 @@ mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
 uniffi = "0.28.0"
 
 # Circom dependencies
-rust-witness = "=0.1.0"
+rust-witness = "0.1.0"
 num-bigint = { version = "0.4.0" }
 
 # Halo2 dependencies
@@ -30,7 +30,7 @@ mopro-ffi = { path = "../mopro-ffi" }
 uniffi = { version = "0.28.0", features = ["build"] }
 
 # Circom dependencies
-rust-witness = "=0.1.0"
+rust-witness = "0.1.0"
 
 [dev-dependencies]
 uniffi = { version = "0.28.0", features = ["bindgen-tests"] }
