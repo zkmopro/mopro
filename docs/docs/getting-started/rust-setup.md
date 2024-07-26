@@ -30,20 +30,32 @@ edition = "2021"
 crate-type = ["lib", "cdylib", "staticlib"]
 name = "mopro_bindings"
 
+# This is a script used to build the iOS static library
+[[bin]]
+name = "ios"
+
+# This is a script used to build the Android static library
+[[bin]]
+name = "android"
+
 # We're going to build support for circom proofs only for this example
 [features]
 default = ["mopro-ffi/circom"]
 
 [dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+mopro-ffi = "0.1.0"
+rust-witness = "0.1.0"
 uniffi = { version = "0.28", features = ["cli"] }
 num-bigint = "0.4.0"
 
 [build-dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+mopro-ffi = "0.1.0"
+rust-witness = "0.1.0"
 uniffi = { version = "0.28", features = ["build"] }
+
+# TODO: fix this
+[patch.crates-io]
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", version = "0.1.0", branch = "wasm-delete" }
 ```
 
 Now you should copy your wasm and zkey files somewhere in the project folder. For this tutorial we'll assume you placed them in `test-vectors/circom`.
@@ -51,9 +63,10 @@ Now you should copy your wasm and zkey files somewhere in the project folder. Fo
 :::info
 Download example multiplier2 wasm and zkey here:
 
-- [multiplier2.wasm](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2.wasm)
-- [multiplier2_final.zkey](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2_final.zkey)
-  :::
+-   [multiplier2.wasm](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2.wasm)
+-   [multiplier2_final.zkey](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2_final.zkey)
+    
+:::
 
 Now we need to add 4 rust files. First we'll add `build.rs` in the main project folder. This file should contain the following:
 
@@ -62,7 +75,7 @@ fn main() {
     // We're going to transpile the wasm witness generators to C
     // Change this to where you put your zkeys and wasm files
     rust_witness::transpile::transpile_wasm("./test-vectors/circom".to_string());
-    // This is writing the UDL file which defines the functions exposed 
+    // This is writing the UDL file which defines the functions exposed
     // to your app. We have pre-generated this file for you
     // This file must be written to ./src
     std::fs::write("./src/mopro.udl", mopro_ffi::app_config::UDL).expect("Failed to write UDL");
@@ -121,4 +134,12 @@ fn main() {
 }
 ```
 
-Now you're ready to build your static library! You should be able to run either `cargo run --bin ios` or `cargo run --bin android` to build the corresponding static library. Move on to [iOS setup](ios-setup) or [Android setup](android-setup) to begin integrating in an app.
+Now you're ready to build your static library! You should be able to run either
+```sh
+cargo run --bin ios
+```
+or
+```sh
+cargo run --bin android
+```
+to build the corresponding static library. Move on to [iOS setup](ios-setup) or [Android setup](android-setup) to begin integrating in an app.

@@ -38,5 +38,10 @@ Includes all proving and serialization logic for circom proofs. Does _not_ inclu
 Includes all proving logic for halo2. 
 
 ## Community
-- Telegram: https://t.me/zkmopro
-- X: https://x.com/zkmopro
+
+- X account: <a href="https://twitter.com/zkmopro"><img src="https://img.shields.io/twitter/follow/zkmopro?style=flat-square&logo=x&label=zkmopro"></a>
+- Telegram group: <a href="https://t.me/zkmopro"><img src="https://img.shields.io/badge/telegram-@zkmopro-blue.svg?style=flat-square&logo=telegram"></a>
+
+## Acknowledgements
+
+This work was initially sponsored by a joint grant from [PSE](https://pse.dev/) and [0xPARC](https://0xparc.org/). It is currently incubated by PSE.

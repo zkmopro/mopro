@@ -15,11 +15,9 @@ See one of the recent [talks](/docs/community) for more details.
 
 ## What proof systems does Mopro support?
 
-Currently Circom/Groth16, but due to its modular architecture it is easy to add support for new proof systems.
+Currently Circom/Groth16 and Halo2, but due to its modular architecture it is easy to add support for new proof systems.
 
 There's experimental support for Kimchi, a Plonkish proof system, that was done during a hackathon in this [PR](https://github.com/zkmopro/mopro/pull/34).
-
-There's a grantee working on adding Halo2 support. Please see the [Telegram group](https://t.me/zkmopro) for more information.
 
 We welcome people to contribute support for [more proof systems](https://github.com/zkmopro/mopro/issues/15).
 
