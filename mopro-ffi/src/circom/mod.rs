@@ -250,7 +250,7 @@ mod tests {
     use std::str::FromStr;
 
     use crate::circom::{generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn};
-    use crate::{GenerateProofResult, MoproError};
+    use crate::GenerateProofResult;
     use anyhow::bail;
     use anyhow::Result;
     use ark_bls12_381::Bls12_381;
@@ -352,7 +352,7 @@ mod tests {
     }
 
     #[test]
-    fn test_prove() -> Result<(), MoproError> {
+    fn test_prove() -> Result<()> {
         // Create a new MoproCircom instance
         let zkey_path = "../test-vectors/circom/multiplier2_final.zkey".to_string();
 
@@ -399,7 +399,7 @@ mod tests {
     }
 
     #[test]
-    fn test_prove_keccak() -> Result<(), MoproError> {
+    fn test_prove_keccak() -> Result<()> {
         // Create a new MoproCircom instance
         let zkey_path = "../test-vectors/circom/keccak256_256_test_final.zkey".to_string();
         // Prepare inputs
@@ -444,7 +444,7 @@ mod tests {
     }
 
     #[test]
-    fn test_prove_bls_hashbench() -> Result<(), MoproError> {
+    fn test_prove_bls_hashbench() -> Result<()> {
         // Create a new MoproCircom instance
         let zkey_path = "../test-vectors/circom/hashbench_bls_final.zkey".to_string();
 
@@ -482,7 +482,7 @@ mod tests {
     }
 
     #[test]
-    fn test_prove_bls_multiplier2() -> Result<(), MoproError> {
+    fn test_prove_bls_multiplier2() -> Result<()> {
         // Create a new MoproCircom instance
         let zkey_path = "../test-vectors/circom/multiplier2_bls_final.zkey".to_string();
 
