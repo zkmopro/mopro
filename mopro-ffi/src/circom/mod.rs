@@ -1,6 +1,6 @@
-use crate::MoproError;
 pub mod serialization;
 
+use anyhow::bail;
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
 use ark_ec::pairing::Pairing;
@@ -21,8 +21,8 @@ use ark_crypto_primitives::snark::SNARK;
 use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey, VerifyingKey};
 use ark_std::UniformRand;
 
+use anyhow::Result;
 use ark_std::rand::thread_rng;
-use color_eyre::Result;
 
 use num_bigint::{BigInt, BigUint};
 
@@ -38,6 +38,7 @@ macro_rules! circom_app {
             let name = std::path::Path::new(in0.as_str()).file_name().unwrap();
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
             mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn.clone())
+                .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
         }
 
         fn verify_circom_proof(
@@ -45,7 +46,9 @@ macro_rules! circom_app {
             in1: Vec<u8>,
             in2: Vec<u8>,
         ) -> Result<bool, mopro_ffi::MoproError> {
-            mopro_ffi::verify_circom_proof(in0, in1, in2)
+            mopro_ffi::verify_circom_proof(in0, in1, in2).map_err(|e| {
+                mopro_ffi::MoproError::CircomError(format!("Verification error: {}", e))
+            })
         }
 
         fn to_ethereum_proof(in0: Vec<u8>) -> mopro_ffi::ProofCalldata {
@@ -103,7 +106,7 @@ macro_rules! set_circom_circuits {
                 $(
                    $key => Ok($func),
                 )+
-                _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit).to_string()))
+                _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit)))
             }
         }
     };
@@ -115,7 +118,7 @@ pub fn generate_circom_proof_wtns(
     zkey_path: String,
     inputs: HashMap<String, Vec<String>>,
     witness_fn: WtnsFn,
-) -> Result<GenerateProofResult, MoproError> {
+) -> Result<GenerateProofResult> {
     // We'll start a background thread building the witness
     let witness_thread = std::thread::spawn(move || {
         // Form the inputs
@@ -142,33 +145,23 @@ pub fn generate_circom_proof_wtns(
     // this loader will only load the first few bytes
     let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
     header_reader.read();
-    let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let file = File::open(&zkey_path)?;
     let mut reader = std::io::BufReader::new(file);
     // check the prime in the header
     // println!("{} {} {}", header.q, header.n8q, ark_bls12_381::Fq::MODULUS);
     if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
-        let (proving_key, matrices) = read_zkey::<_, Bn254>(&mut reader)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let full_assignment = witness_thread
-            .join()
-            .map_err(|_e| MoproError::CircomError("Failed to generate witness".to_string()))?;
+        let (proving_key, matrices) = read_zkey::<_, Bn254>(&mut reader)?;
+        let full_assignment = witness_thread.join().unwrap();
         return prove(proving_key, matrices, full_assignment);
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
-        let (proving_key, matrices) = read_zkey::<_, Bls12_381>(&mut reader)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
-        let full_assignment = witness_thread
-            .join()
-            .map_err(|_e| MoproError::CircomError("Failed to generate witness".to_string()))?;
+        let (proving_key, matrices) = read_zkey::<_, Bls12_381>(&mut reader)?;
+        let full_assignment = witness_thread.join().unwrap();
         return prove(proving_key, matrices, full_assignment);
     } else {
         // unknown curve
         // wait for the witness thread to finish for consistency
-        witness_thread
-            .join()
-            .map_err(|_e| MoproError::CircomError("Failed to generate witness".to_string()))?;
-        return Err(MoproError::CircomError(
-            "unknown curve detected in zkey".to_string(),
-        ));
+        witness_thread.join().unwrap();
+        bail!("unknown curve detected in zkey");
     }
 }
 
@@ -177,7 +170,7 @@ fn prove<T: Pairing + FieldSerialization>(
     pkey: ProvingKey<T>,
     matrices: ConstraintMatrices<T::ScalarField>,
     witness: Vec<BigUint>,
-) -> Result<GenerateProofResult, MoproError> {
+) -> Result<GenerateProofResult> {
     let witness_fr = witness
         .iter()
         .map(|v| T::ScalarField::from(v.clone()))
@@ -199,7 +192,7 @@ fn prove<T: Pairing + FieldSerialization>(
         witness_fr.as_slice(),
     );
 
-    let proof = ark_proof.map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let proof = ark_proof?;
 
     Ok(GenerateProofResult {
         proof: serialization::serialize_proof(&SerializableProof(proof)),
@@ -212,26 +205,22 @@ pub fn verify_circom_proof(
     zkey_path: String,
     proof: Vec<u8>,
     public_input: Vec<u8>,
-) -> Result<bool, MoproError> {
+) -> Result<bool> {
     let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
     header_reader.read();
-    let file = File::open(&zkey_path).map_err(|e| MoproError::CircomError(e.to_string()))?;
+    let file = File::open(&zkey_path)?;
     let mut reader = std::io::BufReader::new(file);
     if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
-        let proving_key = read_proving_key::<_, Bn254>(&mut reader)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let proving_key = read_proving_key::<_, Bn254>(&mut reader)?;
         let p = serialization::deserialize_inputs::<Bn254>(public_input);
         return verify(proving_key.vk, p.0, proof);
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
-        let proving_key = read_proving_key::<_, Bls12_381>(&mut reader)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let proving_key = read_proving_key::<_, Bls12_381>(&mut reader)?;
         let p = serialization::deserialize_inputs::<Bls12_381>(public_input);
         return verify(proving_key.vk, p.0, proof);
     } else {
         // unknown curve
-        return Err(MoproError::CircomError(
-            "unknown curve detected in zkey".to_string(),
-        ));
+        bail!("unknown curve detected in zkey")
     }
 }
 
@@ -239,7 +228,7 @@ fn verify<T: Pairing + FieldSerialization>(
     vk: VerifyingKey<T>,
     public_inputs: Vec<T::ScalarField>,
     proof: Vec<u8>,
-) -> Result<bool, MoproError> {
+) -> Result<bool> {
     let pvk = prepare_verifying_key(&vk);
     let public_inputs_fr = public_inputs
         .iter()
@@ -250,8 +239,7 @@ fn verify<T: Pairing + FieldSerialization>(
         &pvk,
         &public_inputs_fr,
         &proof_parsed.0,
-    )
-    .map_err(|e| MoproError::CircomError(e.to_string()))?;
+    )?;
     Ok(verified)
 }
 
@@ -263,6 +251,8 @@ mod tests {
 
     use crate::circom::{generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn};
     use crate::{GenerateProofResult, MoproError};
+    use anyhow::bail;
+    use anyhow::Result;
     use ark_bls12_381::Bls12_381;
     use ark_bn254::Bn254;
     use ark_ff::PrimeField;
@@ -305,27 +295,27 @@ mod tests {
 
     // This should be defined by a file that the mopro package consumer authors
     // then we reference it in our build somehow
-    fn zkey_witness_map(name: &str) -> Result<WtnsFn, MoproError> {
+    fn zkey_witness_map(name: &str) -> Result<WtnsFn> {
         match name {
             "multiplier2_final.zkey" => Ok(multiplier2_witness),
             "keccak256_256_test_final.zkey" => Ok(keccak256256test_witness),
             "hashbench_bls_final.zkey" => Ok(hashbenchbls_witness),
             "multiplier2_bls_final.zkey" => Ok(multiplier2bls_witness),
-            _ => Err(MoproError::CircomError("Unknown circuit name".to_string())),
+            _ => bail!("Unknown circuit name"),
         }
     }
 
     fn generate_circom_proof(
         zkey_path: String,
         inputs: HashMap<String, Vec<String>>,
-    ) -> Result<GenerateProofResult, MoproError> {
+    ) -> Result<GenerateProofResult> {
         let name = std::path::Path::new(zkey_path.as_str())
             .file_name()
             .unwrap();
         if let Ok(witness_fn) = zkey_witness_map(&name.to_str().unwrap()) {
             generate_circom_proof_wtns(zkey_path, inputs, witness_fn)
         } else {
-            Err(MoproError::CircomError("Unknown ZKEY".to_string()))
+            bail!("unknown zkey");
         }
     }
 
