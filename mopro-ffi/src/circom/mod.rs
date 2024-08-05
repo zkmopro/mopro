@@ -35,7 +35,14 @@ macro_rules! circom_app {
             in0: String,
             in1: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
-            let name = std::path::Path::new(in0.as_str()).file_name().unwrap();
+            let name = match std::path::Path::new(in0.as_str()).file_name() {
+                Some(v) => v,
+                None => {
+                    return Err(mopro_ffi::MoproError::CircomError(format!(
+                        "failed to parse file name from zkey_path"
+                    )))
+                }
+            };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
             mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn.clone())
                 .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
@@ -164,7 +171,9 @@ pub fn generate_circom_proof_wtns(
     } else {
         // unknown curve
         // wait for the witness thread to finish for consistency
-        witness_thread.join().unwrap();
+        witness_thread
+            .join()
+            .map_err(|_e| anyhow::anyhow!("witness thread panicked"))?;
         bail!("unknown curve detected in zkey");
     }
 }
