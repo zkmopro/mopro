@@ -1,6 +1,6 @@
 pub mod serialization;
 
-use anyhow::bail;
+use anyhow::{bail, Error};
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
 use ark_ec::pairing::Pairing;
@@ -8,9 +8,9 @@ use ark_ff::PrimeField;
 use ark_relations::r1cs::ConstraintMatrices;
 use serialization::{SerializableInputs, SerializableProof};
 
-use std::collections::HashMap;
 use std::fs::File;
 use std::str::FromStr;
+use std::{collections::HashMap, panic};
 
 use crate::GenerateProofResult;
 use ark_circom::{
@@ -151,11 +151,15 @@ pub fn generate_circom_proof_wtns(
     // println!("{} {} {}", header.q, header.n8q, ark_bls12_381::Fq::MODULUS);
     if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
         let (proving_key, matrices) = read_zkey::<_, Bn254>(&mut reader)?;
-        let full_assignment = witness_thread.join().unwrap();
+        let full_assignment = witness_thread
+            .join()
+            .map_err(|_e| anyhow::anyhow!("witness thread panicked"))?;
         return prove(proving_key, matrices, full_assignment);
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
         let (proving_key, matrices) = read_zkey::<_, Bls12_381>(&mut reader)?;
-        let full_assignment = witness_thread.join().unwrap();
+        let full_assignment = witness_thread
+            .join()
+            .map_err(|_e| anyhow::anyhow!("witness thread panicked"))?;
         return prove(proving_key, matrices, full_assignment);
     } else {
         // unknown curve
