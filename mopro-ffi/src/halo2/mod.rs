@@ -10,10 +10,12 @@ macro_rules! halo2_app {
             in2: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
-            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())?;
+            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap()).map_err(|e| {
+                mopro_ffi::MoproError::Halo2Error(format!("error getting proving circuit: {}", e))
+            })?;
             proving_fn(&in0, &in1, in2)
-                .map_err(|e| mopro_ffi::MoproError::Halo2Error(e.to_string()))
                 .map(|(proof, inputs)| mopro_ffi::GenerateProofResult { proof, inputs })
+                .map_err(|e| mopro_ffi::MoproError::Halo2Error(format!("halo2 error: {}", e)))
         }
 
         fn verify_halo2_proof(
@@ -23,9 +25,16 @@ macro_rules! halo2_app {
             in3: Vec<u8>,
         ) -> Result<bool, mopro_ffi::MoproError> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
-            let verifying_fn = get_halo2_verifying_circuit(name.to_str().unwrap())?;
-            verifying_fn(&in0, &in1, in2, in3)
-                .map_err(|e| mopro_ffi::MoproError::Halo2Error(e.to_string()))
+            let verifying_fn =
+                get_halo2_verifying_circuit(name.to_str().unwrap()).map_err(|e| {
+                    mopro_ffi::MoproError::Halo2Error(format!(
+                        "error getting verification circuit: {}",
+                        e
+                    ))
+                })?;
+            verifying_fn(&in0, &in1, in2, in3).map_err(|e| {
+                mopro_ffi::MoproError::Halo2Error(format!("error verifying proof: {}", e))
+            })
         }
     };
 }
@@ -89,7 +98,7 @@ macro_rules! set_halo2_circuits {
                 $(
                     $prove_key => Ok($prove_fn),
                 )+
-                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk))),
+                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk)))
             }
         }
 
@@ -98,7 +107,7 @@ macro_rules! set_halo2_circuits {
                 $(
                     $verify_key => Ok($verify_fn),
                 )+
-                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk))),
+                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk)))
             }
         }
     };

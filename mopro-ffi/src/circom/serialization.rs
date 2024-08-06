@@ -74,12 +74,11 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
 mod tests {
     use super::*;
     use crate::circom::serialization::SerializableProvingKey;
-    use crate::MoproError;
+    use anyhow::Result;
     use ark_bn254::Bn254;
     use ark_circom::circom::{r1cs_reader::R1CSFile, CircomCircuit};
     use ark_groth16::Groth16;
     use ark_std::rand::thread_rng;
-    use color_eyre::Result;
     use std::{fs::File, path::Path};
 
     fn serialize_proving_key<T: Pairing>(pk: &SerializableProvingKey<T>) -> Vec<u8> {
@@ -96,13 +95,10 @@ mod tests {
 
     fn generate_serializable_proving_key<T: Pairing>(
         r1cs_path: &str,
-    ) -> Result<SerializableProvingKey<T>, MoproError> {
+    ) -> Result<SerializableProvingKey<T>> {
         // Check that the files exist - ark-circom should probably do this instead and not panic
         if !Path::new(r1cs_path).exists() {
-            return Err(MoproError::CircomError(format!(
-                "Path does not exist: {}",
-                r1cs_path
-            )));
+            anyhow::bail!("Path does not exist: {}", r1cs_path);
         }
 
         let mut circom = CircomCircuit {
@@ -116,8 +112,7 @@ mod tests {
         circom.r1cs.wire_mapping = None;
 
         let mut rng = thread_rng();
-        let raw_params = Groth16::<T>::generate_random_parameters_with_reduction(circom, &mut rng)
-            .map_err(|e| MoproError::CircomError(e.to_string()))?;
+        let raw_params = Groth16::<T>::generate_random_parameters_with_reduction(circom, &mut rng)?;
 
         Ok(SerializableProvingKey::<T>(raw_params))
     }

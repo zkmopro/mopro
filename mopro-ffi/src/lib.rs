@@ -77,22 +77,10 @@ pub enum MoproError {
     Halo2Error(String),
 }
 
-#[derive(Debug)]
-pub enum FFIError {
-    MoproError(MoproError),
-    SerializationError(String),
-}
-
 #[derive(Debug, Clone)]
 pub struct GenerateProofResult {
     pub proof: Vec<u8>,
     pub inputs: Vec<u8>,
-}
-
-impl From<MoproError> for FFIError {
-    fn from(error: MoproError) -> Self {
-        FFIError::MoproError(error)
-    }
 }
 
 #[derive(Debug, Clone, Default)]
