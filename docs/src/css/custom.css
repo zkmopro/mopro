@@ -150,3 +150,7 @@ a:active {
     padding-left: 1rem;
   }
 }
+
+[data-theme='dark'] .DocSearch {
+  --docsearch-hit-active-color: var(--ifm-color-black);
+}
