@@ -43,6 +43,12 @@ const config: Config = {
     prism: {
       additionalLanguages: ['powershell', 'bash', 'toml'],
     },
+    algolia: {
+      appId: '57U3VFSJ7M',
+      apiKey: '430a9611dea4e9f5a937a6b8c108592d',
+      indexName: 'zkmopro',
+      contextualSearch: true,
+    },
     image: 'img/logo_title.svg',
     navbar: {
       style: 'dark',
