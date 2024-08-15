@@ -71,9 +71,6 @@ extension ContentView {
         } catch {
             print("Error generate a proof: \(error)")
         }
-
-        // Make some assertions about the resulting proof
-        assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
         
         let end = CFAbsoluteTimeGetCurrent()
         let timeTaken = end - start
