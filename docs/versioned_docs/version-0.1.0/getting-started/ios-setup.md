@@ -3,6 +3,12 @@
 
 Once you've completed the [Rust setup](docs/getting-started/rust-setup.md) you should be able to run `cargo run --bin ios`. This will create a new folder called `MoproiOSBindings`. Inside this folder there should be a file named `mopro.swift` and a folder named `MoproBindings.xcframework`.
 
+## Demo video of this tutorial
+
+<p align="center">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/6TydXwYMQCU?si=TDw5qkbWSs-Uhw5E" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</p>
+
 First let's make a new iOS app Xcode project. If you already have an app project you can skip this step. We'll do File -> New -> Project and create a iOS App. Make sure the language is Swift. We suggest putting this iOS project inside the rust project folder created above.
 
 ![create an ios app project](/img/ios-example-1.png)
