@@ -72,6 +72,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import kotlinx.coroutines.launch
 import uniffi.mopro.generateCircomProof
 import java.io.File
