@@ -18,6 +18,12 @@ MoproAndroidBindings
         └── mopro.kt
 ```
 
+## Demo video of this tutorial
+
+<p align="center">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/r6WolEEHuMw?si=TZbYI8WUAd2Qr5p7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</p>
+
 First we will create an android app through Android Studio. If you already have an app project, you can skip this step. We'll do **File -> New -> New Project** and create an Empty Activity.
 
 ![create an android app project](/img/android-example-1.png)
