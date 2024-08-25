@@ -1,0 +1,29 @@
+[package]
+name = "mopro-example"
+version = "0.1.0"
+edition = "2021"
+
+# We're going to build a static library named mopro_bindings
+# This library name should not be changed
+[lib]
+crate-type = ["lib", "cdylib", "staticlib"]
+name = "mopro_bindings"
+
+# We're going to build support for circom proofs only for this example
+[features]
+default = ["mopro-ffi/circom"]
+
+[dependencies]
+mopro-ffi = "0.1.0"
+rust-witness = "0.1.0"
+uniffi = { version = "0.28", features = ["cli"] }
+num-bigint = "0.4.0"
+
+[build-dependencies]
+mopro-ffi = "0.1.0"
+rust-witness = "0.1.0"
+uniffi = { version = "0.28", features = ["build"] }
+
+# TODO: fix this
+[patch.crates-io]
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", version = "0.1.0", branch = "wasm-delete" }
