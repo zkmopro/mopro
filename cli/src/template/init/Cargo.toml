@@ -1,5 +1,5 @@
 [package]
-name = "mopro-example"
+name = "<PROJECT_NAME>"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,21 +9,20 @@ edition = "2021"
 crate-type = ["lib", "cdylib", "staticlib"]
 name = "mopro_bindings"
 
-# We're going to build support for circom proofs only for this example
+# Adapters for different proof systems
 [features]
-default = ["mopro-ffi/circom"]
+default = ["<FEATURES>"]
 
 [dependencies]
 mopro-ffi = "0.1.0"
 rust-witness = "0.1.0"
 uniffi = { version = "0.28", features = ["cli"] }
 num-bigint = "0.4.0"
+# HALO2_DEPENDENCIES
 
 [build-dependencies]
 mopro-ffi = "0.1.0"
 rust-witness = "0.1.0"
 uniffi = { version = "0.28", features = ["build"] }
 
-# TODO: fix this
-[patch.crates-io]
-ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", version = "0.1.0", branch = "wasm-delete" }
+# CIRCOM_DEPENDENCIES

@@ -1,7 +1,5 @@
 fn main() {
-    // We're going to transpile the wasm witness generators to C
-    // Change this to where you put your zkeys and wasm files
-    rust_witness::transpile::transpile_wasm("./test-vectors/circom".to_string());
+    // CIRCOM_TEMPLATE
     // This is writing the UDL file which defines the functions exposed
     // to your app. We have pre-generated this file for you
     // This file must be written to ./src

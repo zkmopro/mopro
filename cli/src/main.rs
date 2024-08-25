@@ -23,11 +23,13 @@ enum Commands {
     // Deps {},
     /// Initializes a new project
     Init {
-        #[arg(long, default_value = "circom")]
+        #[arg(
+            long,
+            default_value = "",
+            help = "Specify the adapter to use (e.g., 'circom', 'halo2' or 'circom,halo2')."
+        )]
         adapter: String,
-        #[arg(long, num_args = 1.., default_value = "core")]
-        platforms: Vec<String>,
-        #[arg(long, default_value = "mopro-example-app")]
+        #[arg(long, default_value = "")]
         project_name: String,
     },
     // /// Prepare and build circuit artifacts
@@ -81,14 +83,10 @@ fn main() {
         // Commands::Deps {} => deps::install_deps(),
         Commands::Init {
             adapter,
-            platforms,
             project_name,
-        } => match init::init_project(adapter, platforms) {
-            Ok(_) => println!("Success!"),
-            Err(e) => eprintln!(
-                "\x1b[1;31mFailed to initialize project '{}': {}\x1b[0m",
-                project_name, e
-            ),
+        } => match init::init_project(&adapter, &project_name) {
+            Ok(_) => {}
+            Err(e) => println!("\x1b[1;31mFailed to initialize project {:?}\x1b[0m", e),
         },
         // Commands::Prepare { config } => prepare::prepare_circuit(config),
         // Commands::Build {
