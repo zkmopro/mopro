@@ -25,12 +25,11 @@ enum Commands {
     Init {
         #[arg(
             long,
-            default_value = "",
             help = "Specify the adapter to use (e.g., 'circom', 'halo2' or 'circom,halo2')."
         )]
-        adapter: String,
-        #[arg(long, default_value = "")]
-        project_name: String,
+        adapter: Option<String>,
+        #[arg(long)]
+        project_name: Option<String>,
     },
     // /// Prepare and build circuit artifacts
     // Prepare {
@@ -84,7 +83,7 @@ fn main() {
         Commands::Init {
             adapter,
             project_name,
-        } => match init::init_project(&adapter, &project_name) {
+        } => match init::init_project(adapter, project_name) {
             Ok(_) => {}
             Err(e) => println!("\x1b[1;31mFailed to initialize project {:?}\x1b[0m", e),
         },

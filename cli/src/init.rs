@@ -6,27 +6,30 @@ use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
 
-pub fn init_project(arg_adapter: &str, arg_project_name: &str) -> Result<(), Box<dyn Error>> {
-    let project_name: String = match arg_project_name {
-        "" => Input::with_theme(&ColorfulTheme::default())
+pub fn init_project(
+    arg_adapter: &Option<String>,
+    arg_project_name: &Option<String>,
+) -> Result<(), Box<dyn Error>> {
+    let project_name: String = match arg_project_name.as_deref() {
+        None => Input::with_theme(&ColorfulTheme::default())
             .with_prompt("Project name")
             .with_initial_text("mopro-example-app".to_string())
             .interact_text()?,
-        _ => arg_project_name.to_string(),
+        Some(name) => name.to_string(),
     };
 
     let adapters = vec!["circom", "halo2"];
 
-    let selection = match arg_adapter {
-        "" => MultiSelect::with_theme(&ColorfulTheme::default())
+    let selection = match arg_adapter.as_deref() {
+        None => MultiSelect::with_theme(&ColorfulTheme::default())
             .with_prompt("Pick the adapters you want to use (multiple selection with space)")
             .items(&adapters)
             .interact()
             .unwrap(),
-        _ => {
+        Some(a) => {
             let mut selection = vec![];
             for (i, adapter) in adapters.iter().enumerate() {
-                if arg_adapter.contains(adapter) {
+                if a.contains(adapter) {
                     selection.push(i);
                 }
             }
@@ -36,7 +39,7 @@ pub fn init_project(arg_adapter: &str, arg_project_name: &str) -> Result<(), Box
 
     if selection.is_empty() {
         println!("\x1b[33mNo adapters selected. Use space to select an adapter.\x1b[0m");
-        init_project("", &project_name)?;
+        init_project(arg_adapter, &Some(project_name))?;
     } else {
         let current_dir = env::current_dir()?;
 
