@@ -38,7 +38,7 @@ pub fn init_project(
     };
 
     if selection.is_empty() {
-        println!("\x1b[33mNo adapters selected. Use space to select an adapter.\x1b[0m");
+        println!("\x1b[33mNo adapter selected. Use space to select adapter(s).\x1b[0m");
         init_project(arg_adapter, &Some(project_name))?;
     } else {
         let current_dir = env::current_dir()?;
@@ -96,9 +96,8 @@ pub fn init_project(
         println!("\x1b[1;32m1. Navigate to your project directory:\x1b[0m");
         println!("\x1b[1m   cd {}\x1b[0m", &project_name);
         println!();
-        println!("\x1b[1;32m2. Run the following commands to build and run the project:\x1b[0m");
-        println!("\x1b[1m   cargo run --bin ios\x1b[0m");
-        println!("\x1b[1m   cargo run --bin android\x1b[0m");
+        println!("\x1b[1;32m2. Run the following command to build and run the project:\x1b[0m");
+        println!("\x1b[1m   mopro build\x1b[0m");
         println!();
         println!("📚 To learn more about mopro, visit: \x1b[1;34mhttps://zkmopro.org\x1b[0m");
         println!();

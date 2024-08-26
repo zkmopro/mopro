@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-// mod build;
+mod build;
 // mod deps;
 // mod export;
 mod init;
@@ -31,20 +31,13 @@ enum Commands {
         #[arg(long)]
         project_name: Option<String>,
     },
-    // /// Prepare and build circuit artifacts
-    // Prepare {
-    //     #[arg(long, default_value = "mopro-config.toml")]
-    //     config: String,
-    // },
-    // /// Builds the project for specified platforms
-    // Build {
-    //     #[arg(long, default_value = "mopro-config.toml")]
-    //     config: String,
-    //     #[arg(long, default_value = "circom")]
-    //     adapter: String,
-    //     #[arg(long, num_args = 1.., default_value = "core")]
-    //     platforms: Vec<String>,
-    // },
+    /// Builds the project for specified platforms
+    Build {
+        #[arg(long, help = "Specify the build mode (e.g., 'release' or 'debug').")]
+        mode: Option<String>,
+        #[arg(long, num_args = 1.., help = "Specify the platforms to build for (e.g., 'ios', 'android').")]
+        platforms: Option<Vec<String>>,
+    },
     // // TODO: Update this when it does something useful over just `build`
     // // Updates bindings for the specified platforms
     // // Update {
@@ -87,12 +80,10 @@ fn main() {
             Ok(_) => {}
             Err(e) => println!("\x1b[1;31mFailed to initialize project {:?}\x1b[0m", e),
         },
-        // Commands::Prepare { config } => prepare::prepare_circuit(config),
-        // Commands::Build {
-        //     config,
-        //     adapter,
-        //     platforms,
-        // } => build::build_project(config, adapter, platforms),
+        Commands::Build { mode, platforms } => match build::build_project(mode, platforms) {
+            Ok(_) => {}
+            Err(e) => println!("\x1b[1;31mFailed to build project {:?}\x1b[0m", e),
+        },
         // // Commands::Update {
         // //     config,
         // //     adapter,
