@@ -36,14 +36,6 @@ edition = "2021"
 crate-type = ["lib", "cdylib", "staticlib"]
 name = "mopro_bindings"
 
-# This is a script used to build the iOS static library
-[[bin]]
-name = "ios"
-
-# This is a script used to build the Android static library
-[[bin]]
-name = "android"
-
 # We're going to build support for circom proofs only for this example
 [features]
 default = ["mopro-ffi/circom"]
@@ -71,7 +63,7 @@ Download example multiplier2 wasm and zkey here:
 
 -   [multiplier2.wasm](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2.wasm)
 -   [multiplier2_final.zkey](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2_final.zkey)
-    
+
 :::
 
 Now we need to add 4 rust files. First we'll add `build.rs` in the main project folder. This file should contain the following:
@@ -141,11 +133,34 @@ fn main() {
 ```
 
 Now you're ready to build your static library! You should be able to run either
+
 ```sh
-cargo run --bin ios
+cargo run --bin ios # Debug mode
 ```
+
 or
+
 ```sh
-cargo run --bin android
+cargo run --bin android # Debug mode
 ```
+
 to build the corresponding static library. Move on to [iOS setup](ios-setup) or [Android setup](android-setup) to begin integrating in an app.
+
+:::info
+To achieve optimal performance, it's recommended to build and run your application in release mode. You can do this by setting the `CONFIGURATION` environment variable to `release` before running your commands.
+
+Example usage
+
+```sh
+CONFIGURATION=release cargo run --bin ios # Release mode
+```
+
+or
+
+```sh
+CONFIGURATION=release cargo run --bin android # Release mode
+```
+
+Running your project in release mode significantly enhances performance compared to debug mode. This is because the Rust compiler applies optimizations that improve runtime speed and reduce binary size, making your application more efficient.
+
+:::
