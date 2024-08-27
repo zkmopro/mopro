@@ -4,12 +4,27 @@ After completing the [Rust setup](rust-setup.md) and setting up either [iOS setu
 React Native is a _JavaScript_ framework that enables developers to build native apps for multiple platforms with a single codebase.
 
 In this tutorial, you will learn how to create a native Mopro module on both Android and iOS simulators. <br/>
-Alternatively, download the [zkmopro/react-native-app](https://github.com/zkmopro/react-native-app) repository to get started with `multipler2` circuits.
 
 <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
     <img src="/img/react-native-android.png" alt="First Image" width="250"/>
     <img src="/img/react-native-ios.png" alt="Second Image" width="250"/>
 </div>
+
+You have 2 options to get started with a mopro React Native project:
+
+### Option 1: Clone the Repository and Import the Bindings
+
+1. Clone the [zkmopro/react-native-app](https://github.com/zkmopro/react-native-app) repository
+
+```sh
+git clone https://github.com/zkmopro/react-native-app
+```
+
+2. Import mopro bindings in [Android](#4-2-include-mopro-bindings-in-the-native-android-module) and [iOS](#51-use-a-framework) native module
+
+### Option 2: Follow the Tutorial and Build a React Native Module
+
+If you prefer a more hands-on approach and wish to understand how everything works, you can follow the tutorial to build a React Native module from scratch.
 
 ## 1. Initializing a New React Native Project or Using an Existing One
 
