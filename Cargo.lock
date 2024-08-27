@@ -1806,6 +1806,7 @@ name = "mopro-cli"
 version = "0.1.0"
 dependencies = [
  "clap 4.5.13",
+ "console",
  "dialoguer",
  "fs_extra",
  "include_dir",

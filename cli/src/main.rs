@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 
 mod init;
+mod style;
 
 /// CLI for creating a mopro project.
 #[derive(Parser, Debug)]
@@ -32,7 +33,7 @@ fn main() {
             project_name,
         } => match init::init_project(adapter, project_name) {
             Ok(_) => {}
-            Err(e) => println!("\x1b[1;31mFailed to initialize project {:?}\x1b[0m", e),
+            Err(e) => style::print_read_bold(format!("Failed to initialize project {:?}", e)),
         },
     }
 }

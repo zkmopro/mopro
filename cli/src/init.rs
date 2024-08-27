@@ -1,3 +1,4 @@
+use crate::style::{self, print_bold, print_green_bold};
 use dialoguer::{theme::ColorfulTheme, Input, MultiSelect};
 use include_dir::{include_dir, Dir};
 use std::env;
@@ -38,7 +39,7 @@ pub fn init_project(
     };
 
     if selection.is_empty() {
-        println!("\x1b[33mNo adapters selected. Use space to select an adapter.\x1b[0m");
+        style::print_yellow("No adapters selected. Use space to select an adapter".to_string());
         init_project(arg_adapter, &Some(project_name))?;
     } else {
         let current_dir = env::current_dir()?;
@@ -93,14 +94,17 @@ pub fn init_project(
         println!();
         println!("To get started, follow these steps:");
         println!();
-        println!("\x1b[1;32m1. Navigate to your project directory:\x1b[0m");
-        println!("\x1b[1m   cd {}\x1b[0m", &project_name);
+        print_green_bold("1. Navigate to your project directory:".to_string());
+        print_bold(format!("   cd {}", &project_name));
         println!();
-        println!("\x1b[1;32m2. Run the following commands to build and run the project:\x1b[0m");
-        println!("\x1b[1m   cargo run --bin ios\x1b[0m");
-        println!("\x1b[1m   cargo run --bin android\x1b[0m");
+        print_green_bold("2. Run the following commands to build and run the project:".to_string());
+        print_bold("   cargo run --bin ios".to_string());
+        print_bold("   cargo run --bin android".to_string());
         println!();
-        println!("📚 To learn more about mopro, visit: \x1b[1;34mhttps://zkmopro.org\x1b[0m");
+        println!(
+            "📚 To learn more about mopro, visit: {}",
+            style::blue_bold("https://zkmopro.org".to_string())
+        );
         println!();
         println!("Happy coding! 🚀");
     }
