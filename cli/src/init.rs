@@ -53,35 +53,35 @@ pub fn init_project(
         copy_embedded_dir(&TEMPLATE_DIR, &project_dir, selection.clone())?;
 
         if let Some(cargo_toml_path) = project_dir.join("Cargo.toml").to_str() {
-            let _ = replace_project_name(cargo_toml_path, &project_name);
-            let _ = replace_features(
+            replace_project_name(cargo_toml_path, &project_name)?;
+            replace_features(
                 cargo_toml_path,
                 selection.iter().map(|&i| adapters[i]).collect(),
-            );
+            )?;
             if selection.contains(&0) {
                 // circom is selected
-                let _ = circom_dependencies_template(cargo_toml_path);
+                circom_dependencies_template(cargo_toml_path)?;
             }
             if selection.contains(&1) {
                 // halo2 is selected
-                let _ = halo2_dependencies_template(cargo_toml_path);
+                halo2_dependencies_template(cargo_toml_path)?;
             }
         }
 
         if let Some(build_rs_path) = project_dir.join("build.rs").to_str() {
             if selection.contains(&0) {
-                let _ = circom_build_template(build_rs_path);
+                circom_build_template(build_rs_path)?;
             }
         }
 
         if let Some(lib_rs_path) = project_dir.join("src").join("lib.rs").to_str() {
             if selection.contains(&0) {
                 // circom is selected
-                let _ = circom_lib_template(lib_rs_path);
+                circom_lib_template(lib_rs_path)?;
             }
             if selection.contains(&1) {
                 // halo2 is selected
-                let _ = halo2_lib_template(lib_rs_path);
+                halo2_lib_template(lib_rs_path)?;
             }
         }
 
