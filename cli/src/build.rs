@@ -1,3 +1,4 @@
+use crate::style::{self, blue_bold, print_green_bold};
 use dialoguer::{theme::ColorfulTheme, MultiSelect, Select};
 use std::{env, error::Error};
 
@@ -14,7 +15,7 @@ pub fn build_project(
             if MODES.contains(&m) {
                 m.to_string()
             } else {
-                println!("\x1b[33mInvalid mode selected. Please choose a valid mode (e.g., 'release' or 'debug').\x1b[0m");
+                style::print_yellow("Invalid mode selected. Please choose a valid mode (e.g., 'release' or 'debug').".to_string());
                 select_mode()?
             }
         }
@@ -30,14 +31,17 @@ pub fn build_project(
                 .collect();
 
             if valid_platforms.is_empty() {
-                println!(
-                    "\x1b[33mNo platforms selected. Please select at least one platform.\x1b[0m"
+                style::print_yellow(
+                    "No platforms selected. Please select at least one platform.".to_string(),
                 );
                 valid_platforms = select_platforms()?;
             } else if valid_platforms.len() != p.len() {
-                println!(
-                    "\x1b[33mInvalid platform(s) selected. Only {:?} platform(s) is createds\x1b[0m",
-                    valid_platforms
+                style::print_yellow(
+                    format!(
+                        "Invalid platform(s) selected. Only {:?} platform(s) is created.",
+                        &valid_platforms
+                    )
+                    .to_string(),
                 );
             }
 
@@ -46,7 +50,7 @@ pub fn build_project(
     };
 
     if platforms.is_empty() {
-        println!("\x1b[33mNo platform selected. Use space to select platform(s).\x1b[0m");
+        style::print_yellow("No platform selected. Use space to select platform(s).".to_string());
         build_project(&Some(mode), &None)?;
     } else {
         for platform in platforms.clone() {
@@ -92,19 +96,23 @@ fn select_platforms() -> Result<Vec<String>, Box<dyn Error>> {
 
 fn print_binding_message(platforms: Vec<String>) -> Result<(), Box<dyn Error>> {
     let current_dir = env::current_dir()?;
-    println!("\x1b[1;32m✨ Bindings Built Successfully! ✨\x1b[0m\n");
+    print_green_bold("✨ Bindings Built Successfully! ✨".to_string());
     println!("The Mopro bindings have been successfully generated and are available in the following directories:\n");
     for platform in platforms {
-        println!(
-            "\x1b[1;34m- {}/Mopro{}Bindings\x1b[0m",
+        let text = format!(
+            "- {}/Mopro{}Bindings",
             current_dir.display(),
             platform
                 .to_lowercase()
                 .replace("ios", "iOS")
                 .replace("android", "Android")
         );
+        println!("{}", blue_bold(text.to_string()));
     }
     println!();
-    println!("📚 To learn more about mopro, visit: \x1b[1;34mhttps://zkmopro.org\x1b[0m");
+    println!(
+        "📚 To learn more about mopro, visit: {}",
+        style::blue_bold("https://zkmopro.org".to_string())
+    );
     Ok(())
 }
