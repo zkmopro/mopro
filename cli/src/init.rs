@@ -1,3 +1,4 @@
+use crate::style::{self, print_bold, print_green_bold};
 use dialoguer::{theme::ColorfulTheme, Input, MultiSelect};
 use include_dir::{include_dir, Dir};
 use std::env;
@@ -38,7 +39,7 @@ pub fn init_project(
     };
 
     if selection.is_empty() {
-        println!("\x1b[33mNo adapter selected. Use space to select adapter(s).\x1b[0m");
+        style::print_yellow("No adapters selected. Use space to select an adapter".to_string());
         init_project(arg_adapter, &Some(project_name))?;
     } else {
         let current_dir = env::current_dir()?;
@@ -53,35 +54,35 @@ pub fn init_project(
         copy_embedded_dir(&TEMPLATE_DIR, &project_dir, selection.clone())?;
 
         if let Some(cargo_toml_path) = project_dir.join("Cargo.toml").to_str() {
-            let _ = replace_project_name(cargo_toml_path, &project_name);
-            let _ = replace_features(
+            replace_project_name(cargo_toml_path, &project_name)?;
+            replace_features(
                 cargo_toml_path,
                 selection.iter().map(|&i| adapters[i]).collect(),
-            );
+            )?;
             if selection.contains(&0) {
                 // circom is selected
-                let _ = circom_dependencies_template(cargo_toml_path);
+                circom_dependencies_template(cargo_toml_path)?;
             }
             if selection.contains(&1) {
                 // halo2 is selected
-                let _ = halo2_dependencies_template(cargo_toml_path);
+                halo2_dependencies_template(cargo_toml_path)?;
             }
         }
 
         if let Some(build_rs_path) = project_dir.join("build.rs").to_str() {
             if selection.contains(&0) {
-                let _ = circom_build_template(build_rs_path);
+                circom_build_template(build_rs_path)?;
             }
         }
 
         if let Some(lib_rs_path) = project_dir.join("src").join("lib.rs").to_str() {
             if selection.contains(&0) {
                 // circom is selected
-                let _ = circom_lib_template(lib_rs_path);
+                circom_lib_template(lib_rs_path)?;
             }
             if selection.contains(&1) {
                 // halo2 is selected
-                let _ = halo2_lib_template(lib_rs_path);
+                halo2_lib_template(lib_rs_path)?;
             }
         }
 
@@ -93,13 +94,16 @@ pub fn init_project(
         println!();
         println!("To get started, follow these steps:");
         println!();
-        println!("\x1b[1;32m1. Navigate to your project directory:\x1b[0m");
-        println!("\x1b[1m   cd {}\x1b[0m", &project_name);
+        print_green_bold("1. Navigate to your project directory:".to_string());
+        print_bold(format!("   cd {}", &project_name));
         println!();
-        println!("\x1b[1;32m2. Run the following command to build and run the project:\x1b[0m");
-        println!("\x1b[1m   mopro build\x1b[0m");
+        print_green_bold("2. Run the following commands to build and run the project:".to_string());
+        print_bold("   mopro build".to_string());
         println!();
-        println!("📚 To learn more about mopro, visit: \x1b[1;34mhttps://zkmopro.org\x1b[0m");
+        println!(
+            "📚 To learn more about mopro, visit: {}",
+            style::blue_bold("https://zkmopro.org".to_string())
+        );
         println!();
         println!("Happy coding! 🚀");
     }
@@ -123,9 +127,7 @@ fn copy_embedded_dir(dir: &Dir, output_dir: &Path, selection: Vec<usize>) -> std
                     return Ok(());
                 }
             }
-            if let Err(e) = fs::create_dir_all(parent) {
-                return Err(e);
-            }
+            fs::create_dir_all(parent)?;
         }
 
         // Write the file to the output directory
