@@ -1,0 +1,28 @@
+[package]
+name = "<PROJECT_NAME>"
+version = "0.1.0"
+edition = "2021"
+
+# We're going to build a static library named mopro_bindings
+# This library name should not be changed
+[lib]
+crate-type = ["lib", "cdylib", "staticlib"]
+name = "mopro_bindings"
+
+# Adapters for different proof systems
+[features]
+default = ["<FEATURES>"]
+
+[dependencies]
+mopro-ffi = "0.1.0"
+rust-witness = "0.1.0"
+uniffi = { version = "0.28", features = ["cli"] }
+num-bigint = "0.4.0"
+# HALO2_DEPENDENCIES
+
+[build-dependencies]
+mopro-ffi = "0.1.0"
+rust-witness = "0.1.0"
+uniffi = { version = "0.28", features = ["build"] }
+
+# CIRCOM_DEPENDENCIES

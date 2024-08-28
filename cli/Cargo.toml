@@ -1,0 +1,15 @@
+[package]
+name = "mopro-cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "mopro"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+fs_extra = "1.2.0"
+include_dir = "0.7"
+dialoguer = "0.10"
+console = "0.15.8"
