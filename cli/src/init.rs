@@ -128,9 +128,7 @@ fn copy_embedded_dir(dir: &Dir, output_dir: &Path, selection: Vec<usize>) -> std
                     return Ok(());
                 }
             }
-            if let Err(e) = fs::create_dir_all(parent) {
-                return Err(e);
-            }
+            fs::create_dir_all(parent)?;
         }
 
         // Write the file to the output directory
