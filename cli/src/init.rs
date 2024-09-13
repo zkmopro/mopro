@@ -98,8 +98,7 @@ pub fn init_project(
         print_bold(format!("   cd {}", &project_name));
         println!();
         print_green_bold("2. Run the following commands to build and run the project:".to_string());
-        print_bold("   cargo run --bin ios".to_string());
-        print_bold("   cargo run --bin android".to_string());
+        print_bold("   mopro build".to_string());
         println!();
         println!(
             "📚 To learn more about mopro, visit: {}",
