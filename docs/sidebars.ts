@@ -18,7 +18,8 @@ const sidebars: SidebarsConfig = {
             items: [
                 'getting-started/rust-setup',
                 'getting-started/ios-setup',
-                'getting-started/android-setup'
+                'getting-started/android-setup',
+                'getting-started/flutter-setup'
             ]
         },
         {
