@@ -1,23 +1,18 @@
 use anyhow::{bail, Error};
 
-use std::fs::File;
-use std::str::FromStr;
 use std::{collections::HashMap, panic};
 
 use crate::GenerateProofResult;
-use nova_scotia::{
-    circom::{circuit::CircomCircuit, reader::load_r1cs},
-    create_public_params, create_recursive_circuit, FileLocation, F, S,
-};
+use nova_scotia::*;
 
 use nova_snark::{
     provider,
     traits::{circuit::TrivialTestCircuit, Group},
-    CompressedSNARK, PublicParams,
+    CompressedSNARK, PublicParams, RecursiveSNARK
 };
 use serde_json::json;
 use pasta_curves;
-use std::env::{current_dir};
+use std::env::current_dir;
 
 #[macro_export]
 macro_rules! nova_scotia_app {
@@ -28,12 +23,12 @@ macro_rules! nova_scotia_app {
 
         // Return value should be Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError>
         fn generate_nova_scotia_proof(
-            witness_generator_file:PathBuf,
-            r1cs:R1CS<Fq>,
-            private_inputs: Vec<HashMap<String, Value>>,
+            witness_generator_file: FileLocation::PathBuf,
+            r1cs: circom::circuit::R1CS<Fq>,
+            private_inputs: Vec<HashMap<String, serde_json::Value>>,
             start_public_input: Vec<F<G1>>,
             pp:PublicParams<G1, G2, _, _>,
-        ) -> Result<RecursiveSNARK<E1, E2, C1, C2>, mopro_ffi::MoproError> {
+        ) -> Result<RecursiveSNARK<E1, E2, C1<G1>, C2<G2>>, mopro_ffi::MoproError> {
             
 
             // recursively construct the input to circom witness generator
@@ -54,8 +49,8 @@ macro_rules! nova_scotia_app {
             iteration_count: usize,
             start_public_input: &[E1::Scalar],
             z0_secondary:[Fp;1],
-        ) -> Result</*(Vec<E1::Scalar>, Vec<E2::Scalar>)*/bool, mopro_ffi::MoproError> {
-            let res=recursive_snark.verify(
+        ) -> (Vec<E1::Scalar>, Vec<E2::Scalar>) {
+            let res = recursive_snark.verify(
                 &pp,
                 iteration_count,
                 &start_public_input.clone(),
@@ -78,15 +73,12 @@ mod test {
     use std::str::FromStr;
     use std::{collections::HashMap, panic};
 
-    use nova_scotia::{
-        circom::{circuit::CircomCircuit, reader::load_r1cs},
-        create_public_params, create_recursive_circuit, FileLocation, F, S,
-    };
+    use nova_scotia::*;
 
     use nova_snark::{
         provider,
         traits::{circuit::TrivialTestCircuit, Group},
-        CompressedSNARK, PublicParams,
+        CompressedSNARK, PublicParams, RecursiveSNARK
     };
 
     use pasta_curves;
@@ -106,11 +98,11 @@ mod test {
     fn test_generate_and_verify_nova_scotia_proof() {
 
 
-        let root = current_dir().unwrap();
+        let root = std::env::current_dir().unwrap();
 
         // load r1cs file
         let circuit_file = root.join(R1CS_PATH.to_string());
-        let r1cs = load_r1cs::<G1, G2>(&circuit_file);
+        let r1cs = circom::reader::load_r1cs::<G1, G2>(&circuit_file);
 
         // load c++ binary or wasm file
         let witness_generator_file = root.join(WASM_PATH.to_string());
@@ -132,10 +124,6 @@ mod test {
 
         //
         let pp: PublicParams<G1, G2, _, _> = create_public_params(r1cs.clone());
-
-        //create a recursive SNARK
-        let start = Instant::now();
-
 
         if let Ok(proof_result) = generate_nova_scotia_proof(
             witness_generator_file,
