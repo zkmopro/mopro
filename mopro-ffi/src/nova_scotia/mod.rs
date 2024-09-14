@@ -27,22 +27,13 @@ macro_rules! nova_scotia_app {
 
         // Return value should be Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError>
         fn generate_nova_scotia_proof(
-            r1cs_path: String,
-            cpp_bin_or_wasm_path: String,
+            witness_generator_file:PathBuf,
+            r1cs:R1CS<Fq>,
             private_inputs: Vec<HashMap<String, Value>>,
             start_public_input: Vec<F<G1>>,
+            pp:PublicParams<G1, G2, _, _>,
         ) -> Result<RecursiveSNARK<E1, E2, C1, C2>, mopro_ffi::MoproError> {
-            let root = current_dir().unwrap();
-
-            // load r1cs file
-            let circuit_file = root.join(r1cs_path);
-            let r1cs = load_r1cs::<G1, G2>(&circuit_file);
-
-            // load c++ binary or wasm file
-            let witness_generator_file = root.join(cpp_bin_or_wasm_path);
-
-            // create public parameters(CRS)
-            let pp = create_public_params::<G1, G2>(r1cs.clone());
+            
 
             // recursively construct the input to circom witness generator
             let recursive_snark = create_recursive_circuit(
@@ -51,25 +42,23 @@ macro_rules! nova_scotia_app {
                 private_inputs,
                 start_public_input.to_vec(),
                 &pp,
-            ).unwrap()
-                .map(|(proof, inputs)| mopro_ffi::GenerateProofResult { proof, inputs })
-                .map_err(|e| mopro_ffi::MoproError::NovaScotiaError(format!("Recursive Snark Error: {}", e)))
+            ).unwrap().map_err(|e| mopro_ffi::MoproError::NovaScotiaError(format!("Recursive Snark Error: {}", e)))
         }
 
         // Return value should be Result<bool, mopro_ffi::MoproError>
         fn verify_nova_scotia_proof(
             recursive_snark: RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
-            pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
+            pp: PublicParams<G1, G2, C1<G1>, C2<G2>>,
             iteration_count: usize,
             start_public_input: &[E1::Scalar],
+            z0_secondary:[Fp;1],
         ) -> Result</*(Vec<E1::Scalar>, Vec<E2::Scalar>)*/bool, mopro_ffi::MoproError> {
             recursive_snark.verify(
                 &pp,
                 iteration_count,
                 &start_public_input.clone(),
-                &[F<G2>::zero()],
-            ).is_ok()
-                .map_err(|e| mopro_ffi::MoproError::NovaScotiaError(format!("Recursive Snark Verification Error: {}", e)))
+                &z0_secondary,
+            ).map_err(|e| mopro_ffi::MoproError::NovaScotiaError(format!("Recursive Snark Verification Error: {}", e)))
 
             // assert!(res.is_ok());
 
@@ -98,21 +87,74 @@ mod test {
     };
 
     use pasta_curves;
-    type G1 = pasta_curves::pallas::Point;
-    type G2 = pasta_curves::vesta::Point;
-
     use crate as mopro_ffi;
 
-    fn test_nova_scotia_macro() {
-        nova_scotia_app!();
+    nova_scotia_app!();
 
-        const R1CS_PATH: &str = "../test-vectors/nova_scotia/";
-        const WASN_PATH: &str = "../test-vectors/nova_scotia/";
-        const PRIVATE_INPUTS: Vec<HashMap<String, Value>> = vec![];
-        const START_PUBLIC_INPUT: Vec<F<G1>> = vec![];
+    
+    const R1CS_PATH: &str = "../test-vectors/nova_scotia/";
+    const WASM_PATH: &str = "../test-vectors/nova_scotia/";
+    //const PRIVATE_INPUTS: Vec<HashMap<String, Value>> = vec![];
+    //const START_PUBLIC_INPUT: Vec<F<G1>> = vec![];
 
-        let result = generate_nova_scotia_proof(R1CS_PATH.to_string(), WASN_PATH.to_string(), PRIVATE_INPUTS, START_PUBLIC_INPUT);
 
-        assert!(result.is_ok());
+    #[test]
+    fn test_generate_and_verify_nova_scotia_proof() {
+
+
+        let root = current_dir().unwrap();
+
+        // load r1cs file
+        let circuit_file = root.join(R1CS_PATH.to_string());
+        let r1cs = load_r1cs::<G1, G2>(&circuit_file);
+
+        // load c++ binary or wasm file
+        let witness_generator_file = root.join(WASM_PATH.to_string());
+
+        // create public parameters(CRS)
+        let pp = create_public_params::<G1, G2>(r1cs.clone());
+
+        //private inputs
+        let iteration_count = 5;
+        let mut private_inputs = Vec::new();
+        for i in 0..iteration_count {
+            let mut private_input = HashMap::new();
+            private_input.insert("adder".to_string(), json!(i));
+            private_inputs.push(private_input);
+        }
+
+        //start public input
+        let start_public_input = [F::<G1>::from(10), F::<G1>::from(10)];
+
+        //
+        let pp: PublicParams<G1, G2, _, _> = create_public_params(r1cs.clone());
+
+        //create a recursive SNARK
+        let start = Instant::now();
+
+
+        if let Ok(proof_result) = generate_nova_scotia_proof(
+            witness_generator_file,
+            r1cs,
+            private_inputs,
+            start_public_input,
+            &pp,
+        ) {
+            let z0_secondary = [F::<G2>::from(0)];
+
+            let result = verify_nova_scotia_proof(
+                proof_result,
+                &pp,
+                iteration_count,
+                &start_public_input,
+                &z0_secondary,
+            );
+            assert!(result.is_ok());
+        } else {
+            panic!("Failed to generate the proof!")
+        }
+
     }
+    
+
 }
