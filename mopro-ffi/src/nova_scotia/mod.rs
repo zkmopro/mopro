@@ -25,12 +25,13 @@ macro_rules! nova_scotia_app {
         type G1 = pasta_curves::pallas::Point;
         type G2 = pasta_curves::vesta::Point;
 
+        // Return value should be Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError>
         fn generate_nova_scotia_proof(
             r1cs_path: String,
             cpp_bin_or_wasm_path: String,
             private_inputs: Vec<HashMap<String, Value>>,
             start_public_input: Vec<F<G1>>,
-        ) -> Result<RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>, mopro_ffi::MoproError> {
+        ) -> Result</*RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>*/mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             let root = current_dir().unwrap();
 
             // load r1cs file
@@ -51,15 +52,17 @@ macro_rules! nova_scotia_app {
                 start_public_input.to_vec(),
                 &pp,
             ).unwrap()
+                .map(|(proof, inputs)| mopro_ffi::GenerateProofResult { proof, inputs })
                 .map_err(|e| mopro_ffi::MoproError::NovaScotiaError(format!("Recursive Snark Error: {}", e)))
         }
 
+        // Return value should be Result<bool, mopro_ffi::MoproError>
         fn verify_nova_scotia_proof(
             recursive_snark: RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
             iteration_count: usize,
             start_public_input: &[E1::Scalar],
-        ) -> Result<(Vec<E1::Scalar>, Vec<E2::Scalar>), NovaError> {
+        ) -> Result</*(Vec<E1::Scalar>, Vec<E2::Scalar>)*/bool, mopro_ffi::MoproError> {
             let res = recursive_snark.verify(
                 &pp,
                 iteration_count,
