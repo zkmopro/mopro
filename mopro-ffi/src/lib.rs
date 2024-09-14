@@ -4,6 +4,8 @@ pub mod app_config;
 mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
+#[cfg(feature = "nova_scotia")]
+mod nova_scotia;
 
 #[cfg(feature = "circom")]
 pub use circom::{
@@ -13,6 +15,9 @@ pub use circom::{
 
 #[cfg(feature = "halo2")]
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
+
+#[cfg(feature = "nova_scotia")]
+pub use nova_scotia::{};
 
 #[cfg(not(feature = "circom"))]
 #[macro_export]
@@ -67,6 +72,30 @@ macro_rules! halo2_app {
     };
 }
 
+#[cfg(not(feature = "nova_scotia"))]
+#[macro_export]
+macro_rules! nova_scotia_app {
+    () => {
+        fn generate_nova_scotia_proof(
+            r1cs_path: String,
+            cpp_bin_or_wasm_path: String,
+            private_inputs: Vec<HashMap<String, Value>>,
+            start_public_input: Vec<F<G1>>,
+        ) -> Result<GenerateProofResult, MoproError> {
+            panic!("Nova Scotia is not enabled in this build. Please pass `nova-scotia` feature to `mopro-ffi` to enable Nova Scotia.")
+        }
+
+        fn verify_nova_scotia_proof(
+            recursive_snark: RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
+            pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
+            iteration_count: usize,
+            start_public_input: &[E1::Scalar],
+        ) -> Result<bool, MoproError> {
+            panic!("Nova Scotia is not enabled in this build. Please pass `nova-scotia` feature to `mopro-ffi` to enable Nova Scotia.")
+        }
+    };
+}
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -75,6 +104,8 @@ pub enum MoproError {
     CircomError(String),
     #[error("Halo2Error: {0}")]
     Halo2Error(String),
+    #[error("NovaScotiaError: {0}")]
+    NovaScotiaError(String),
 }
 
 #[derive(Debug, Clone)]
@@ -147,6 +178,8 @@ macro_rules! app {
         mopro_ffi::circom_app!();
 
         mopro_ffi::halo2_app!();
+
+        mopro_ffi::nova_scotia_app!();
 
         uniffi::include_scaffolding!("mopro");
     };
