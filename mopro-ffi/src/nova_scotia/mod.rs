@@ -31,7 +31,7 @@ macro_rules! nova_scotia_app {
             cpp_bin_or_wasm_path: String,
             private_inputs: Vec<HashMap<String, Value>>,
             start_public_input: Vec<F<G1>>,
-        ) -> Result</*RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>*/mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
+        ) -> Result<RecursiveSNARK<E1, E2, C1, C2>, mopro_ffi::MoproError> {
             let root = current_dir().unwrap();
 
             // load r1cs file
@@ -63,16 +63,17 @@ macro_rules! nova_scotia_app {
             iteration_count: usize,
             start_public_input: &[E1::Scalar],
         ) -> Result</*(Vec<E1::Scalar>, Vec<E2::Scalar>)*/bool, mopro_ffi::MoproError> {
-            let res = recursive_snark.verify(
+            recursive_snark.verify(
                 &pp,
                 iteration_count,
                 &start_public_input.clone(),
                 &[F<G2>::zero()],
-            );
+            ).is_ok()
+                .map_err(|e| mopro_ffi::MoproError::NovaScotiaError(format!("Recursive Snark Verification Error: {}", e)))
 
-            assert!(res.is_ok());
+            // assert!(res.is_ok());
 
-            res
+            // res
         }
     };
 }
@@ -97,4 +98,21 @@ mod test {
     };
 
     use pasta_curves;
+    type G1 = pasta_curves::pallas::Point;
+    type G2 = pasta_curves::vesta::Point;
+
+    use crate as mopro_ffi;
+
+    fn test_nova_scotia_macro() {
+        nova_scotia_app!();
+
+        const R1CS_PATH: &str = "../test-vectors/nova_scotia/";
+        const WASN_PATH: &str = "../test-vectors/nova_scotia/";
+        const PRIVATE_INPUTS: Vec<HashMap<String, Value>> = vec![];
+        const START_PUBLIC_INPUT: Vec<F<G1>> = vec![];
+
+        let result = generate_nova_scotia_proof(R1CS_PATH.to_string(), WASN_PATH.to_string(), PRIVATE_INPUTS, START_PUBLIC_INPUT);
+
+        assert!(result.is_ok());
+    }
 }
