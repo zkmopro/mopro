@@ -18,7 +18,6 @@ use std::path::PathBuf;
 #[macro_export]
 macro_rules! nova_scotia_app {
     () => {
-        
 
         // can be any cycle supported by Nova
         type G1 = pasta_curves::pallas::Point;
@@ -50,7 +49,7 @@ macro_rules! nova_scotia_app {
             iteration_count: usize,
             start_public_input: [Fq; 2],
             z0_secondary: [Fp; 1],
-        ) -> Result<(Vec<G1::Scalar>, Vec<G2::Scalar>), mopro_ffi::MoproError> {
+        ) -> Result<(Vec<Fq>, Vec<Fp>), mopro_ffi::MoproError> {
             let res = recursive_snark.verify(
                 &pp,
                 iteration_count,
@@ -60,7 +59,9 @@ macro_rules! nova_scotia_app {
 
             // assert!(res.is_ok());
 
-            res.map_err(|e| mopro_ffi::MoproError::NovaScotiaError(format!("nova_scotia error: {}", e)))
+            res.map_err(|e| {
+                mopro_ffi::MoproError::NovaScotiaError(format!("error verifying proof: {}", e))
+            })
         }
     };
 }
