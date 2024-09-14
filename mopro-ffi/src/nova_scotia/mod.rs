@@ -15,8 +15,9 @@ use nova_snark::{
     traits::{circuit::TrivialTestCircuit, Group},
     CompressedSNARK, PublicParams,
 };
-
+use serde_json::json;
 use pasta_curves;
+use std::env::{current_dir};
 
 #[macro_export]
 macro_rules! nova_scotia_app {
@@ -42,7 +43,8 @@ macro_rules! nova_scotia_app {
                 private_inputs,
                 start_public_input.to_vec(),
                 &pp,
-            ).unwrap().map_err(|e| mopro_ffi::MoproError::NovaScotiaError(format!("Recursive Snark Error: {}", e)))
+            ).unwrap();
+            recursive_snark
         }
 
         // Return value should be Result<bool, mopro_ffi::MoproError>
@@ -53,16 +55,17 @@ macro_rules! nova_scotia_app {
             start_public_input: &[E1::Scalar],
             z0_secondary:[Fp;1],
         ) -> Result</*(Vec<E1::Scalar>, Vec<E2::Scalar>)*/bool, mopro_ffi::MoproError> {
-            recursive_snark.verify(
+            let res=recursive_snark.verify(
                 &pp,
                 iteration_count,
                 &start_public_input.clone(),
                 &z0_secondary,
-            ).map_err(|e| mopro_ffi::MoproError::NovaScotiaError(format!("Recursive Snark Verification Error: {}", e)))
+            );
+
 
             // assert!(res.is_ok());
 
-            // res
+            res
         }
     };
 }
@@ -88,6 +91,7 @@ mod test {
 
     use pasta_curves;
     use crate as mopro_ffi;
+    use serde_json::json;
 
     nova_scotia_app!();
 
