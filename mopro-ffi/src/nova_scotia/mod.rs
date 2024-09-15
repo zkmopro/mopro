@@ -20,15 +20,16 @@ macro_rules! nova_scotia_app {
     () => {
 
         // can be any cycle supported by Nova
-        type G1 = pasta_curves::pallas::Point;
-        type G2 = pasta_curves::vesta::Point;
+        type G1 = provider::bn256_grumpkin::bn256::Point;
+        type G2 = provider::bn256_grumpkin::grumpkin::Point;
 
         // Return value should be Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError>
+        
         fn generate_nova_scotia_proof(
             witness_generator_file: PathBuf,
-            r1cs: circom::circuit::R1CS<Fq>,
+            r1cs: circom::circuit::R1CS<F<G1>>,
             private_inputs: Vec<HashMap<String, serde_json::Value>>,
-            start_public_input: [Fq; 2],
+            start_public_input: [F<G1>; 2],
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
         ) -> Result<RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>, mopro_ffi::MoproError> {
             // recursively construct the input to circom witness generator
@@ -47,9 +48,9 @@ macro_rules! nova_scotia_app {
             recursive_snark: RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
             iteration_count: usize,
-            start_public_input: [Fq; 2],
-            z0_secondary: [Fp; 1],
-        ) -> Result<(Vec<Fq>, Vec<Fp>), mopro_ffi::MoproError> {
+            start_public_input: [F<G1>; 2],
+            z0_secondary: [F<G2>; 1],
+        ) -> Result<(Vec<F<G1>>, Vec<F<G2>>), mopro_ffi::MoproError> {
             let res = recursive_snark.verify(
                 &pp,
                 iteration_count,
@@ -62,6 +63,7 @@ macro_rules! nova_scotia_app {
                 mopro_ffi::MoproError::NovaScotiaError(format!("error verifying proof: {}", e))
             })
         }
+        
     };
 }
 
@@ -89,10 +91,8 @@ mod test {
 
     nova_scotia_app!();
 
-    const R1CS_PATH: &str = "../test-vectors/nova_scotia/toy.r1cs";
-    const WASM_PATH: &str = "../test-vectors/nova_scotia/toy_js/toy.wasm";
-    //const PRIVATE_INPUTS: Vec<HashMap<String, Value>> = vec![];
-    //const START_PUBLIC_INPUT: Vec<F<G1>> = vec![];
+    const R1CS_PATH: &str = "../test-vectors/nova_scotia/main.r1cs";
+    const WASM_PATH: &str = "../test-vectors/nova_scotia/toy_js/main.wasm";
 
     #[test]
     fn test_generate_and_verify_nova_scotia_proof() {
@@ -124,7 +124,6 @@ mod test {
         let pp = create_public_params::<G1, G2>(r1cs.clone());
         let z0_secondary = [F::<G2>::from(0)];
 
-        /*
         if let Ok(proof_result) = generate_nova_scotia_proof(
             witness_generator_file,
             r1cs,
@@ -146,21 +145,6 @@ mod test {
         } else {
             panic!("Failed to generate the proof!")
         }
-        */
-        let recursive_snark = create_recursive_circuit(
-            FileLocation::PathBuf(witness_generator_file.clone()),
-            r1cs.clone(),
-            private_inputs,
-            start_public_input.to_vec(),
-            &pp,
-        ).unwrap();
 
-        let result = recursive_snark.verify(
-        &pp,
-        iteration_count,
-        &start_public_input.clone(),
-        &z0_secondary,
-        );
-        assert!(result.is_ok());
     }
 }
