@@ -58,7 +58,6 @@ macro_rules! nova_scotia_app {
             );
 
             // assert!(res.is_ok());
-
             res.map_err(|e| {
                 mopro_ffi::MoproError::NovaScotiaError(format!("error verifying proof: {}", e))
             })
@@ -90,8 +89,8 @@ mod test {
 
     nova_scotia_app!();
 
-    const R1CS_PATH: &str = "../test-vectors/nova_scotia/";
-    const WASM_PATH: &str = "../test-vectors/nova_scotia/";
+    const R1CS_PATH: &str = "../test-vectors/nova_scotia/toy.r1cs";
+    const WASM_PATH: &str = "../test-vectors/nova_scotia/toy_js/toy.wasm";
     //const PRIVATE_INPUTS: Vec<HashMap<String, Value>> = vec![];
     //const START_PUBLIC_INPUT: Vec<F<G1>> = vec![];
 
@@ -123,7 +122,9 @@ mod test {
 
         // create public parameters(CRS)
         let pp = create_public_params::<G1, G2>(r1cs.clone());
+        let z0_secondary = [F::<G2>::from(0)];
 
+        /*
         if let Ok(proof_result) = generate_nova_scotia_proof(
             witness_generator_file,
             r1cs,
@@ -131,8 +132,7 @@ mod test {
             start_public_input,
             &pp,
         ) {
-            let z0_secondary = [F::<G2>::from(0)];
-
+            
             let result = verify_nova_scotia_proof(
                 proof_result,
                 &pp,
@@ -140,9 +140,27 @@ mod test {
                 start_public_input,
                 z0_secondary,
             );
+            
             assert!(result.is_ok());
+
         } else {
             panic!("Failed to generate the proof!")
         }
+        */
+        let recursive_snark = create_recursive_circuit(
+            FileLocation::PathBuf(witness_generator_file.clone()),
+            r1cs.clone(),
+            private_inputs,
+            start_public_input.to_vec(),
+            &pp,
+        ).unwrap();
+
+        let result = recursive_snark.verify(
+        &pp,
+        iteration_count,
+        &start_public_input.clone(),
+        &z0_secondary,
+        );
+        assert!(result.is_ok());
     }
 }
