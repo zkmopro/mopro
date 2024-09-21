@@ -1,27 +1,8 @@
-/*
-use anyhow::{bail, Error};
-use std::{collections::HashMap, panic};
-
-use crate::GenerateProofResult;
-use nova_scotia::*;
-
-use nova_snark::{
-    provider,
-    traits::{circuit::TrivialTestCircuit, Group},
-    CompressedSNARK, PublicParams, RecursiveSNARK, ProverKey, VerifierKey,
-};
-use serde_json::json;
-use std::env::current_dir;
-use std::path::PathBuf;
-*/
 #[macro_export]
 macro_rules! nova_scotia_app {
     () => {
 
-        
-
-
-        fn generate_nova_scotia_proof(
+        fn generate_recursive_snark_proof(
             witness_generator_file: PathBuf,
             r1cs: circom::circuit::R1CS<F<G1>>,
             private_inputs: Vec<HashMap<String, serde_json::Value>>,
@@ -29,7 +10,6 @@ macro_rules! nova_scotia_app {
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
         ) -> Result<RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>, mopro_ffi::MoproError> {
 
-            // recursively construct the input to circom witness generator
             let res = create_recursive_circuit(
                 FileLocation::PathBuf(witness_generator_file),
                 r1cs,
@@ -42,7 +22,7 @@ macro_rules! nova_scotia_app {
         }
 
         
-        fn verify_nova_scotia_proof(
+        fn verify_recursive_snark_proof(
             recursive_snark: &RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
             iteration_count: usize,
@@ -62,7 +42,7 @@ macro_rules! nova_scotia_app {
             })
         }
 
-        // Compress SNARK
+        
         fn compress_snark_proof(
             recursive_snark: RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
@@ -77,7 +57,7 @@ macro_rules! nova_scotia_app {
         }
 
 
-        fn verify_compressed_proof(
+        fn verify_compressed_snark_proof(
             compressed_snark: CompressedSNARK<G1, G2, C1<G1>, C2<G2>,S<G1>, S<G2>>,
             vk: &VerifierKey<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>,
             iteration_count: usize,
@@ -103,18 +83,12 @@ macro_rules! nova_scotia_app {
 
 #[cfg(test)]
 mod test {
-    
-    //use anyhow::{bail, Error};
-
-    //use std::fs::File;
-    //use std::str::FromStr;
     use std::{collections::HashMap, panic};
 
     use nova_scotia::*;
 
     use nova_snark::{
         provider,
-        //traits::{circuit::TrivialTestCircuit, Group},
         CompressedSNARK, PublicParams, RecursiveSNARK, ProverKey, VerifierKey,
     };
 
@@ -170,12 +144,12 @@ mod test {
         // Set starting public input
         let start_public_input = [F::<G1>::from(10), F::<G1>::from(10)];
 
-        // Sreate public parameters(CRS)
+        // Create public parameters(CRS)
         let pp = create_public_params::<G1, G2>(r1cs.clone());
-        
+
         let z0_secondary = [F::<G2>::from(0)];
         
-        if let Ok(proof_result) = generate_nova_scotia_proof(
+        if let Ok(proof_result) = generate_recursive_snark_proof(
             witness_generator_file,
             r1cs,
             private_inputs,
@@ -183,7 +157,7 @@ mod test {
             &pp,
         ) {
             
-            let result = verify_nova_scotia_proof(
+            let result = verify_recursive_snark_proof(
                 &proof_result,
                 &pp,
                 iteration_count,
@@ -200,7 +174,7 @@ mod test {
                 &pk,
             ) {
                 
-                let result = verify_compressed_proof(
+                let result = verify_compressed_snark_proof(
                     compressed_proof_result,
                     &vk,
                     iteration_count,
