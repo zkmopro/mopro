@@ -11,3 +11,9 @@ cargo install --path .
 ```sh
 mopro init
 ```
+
+## Build bindings
+
+```sh
+mopro build
+```
