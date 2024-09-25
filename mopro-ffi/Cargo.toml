@@ -36,7 +36,7 @@ circom = [
     "byteorder",
 ]
 
-nova_scotia = []
+nova_scotia = ["nova-scotia", "nova-snark", "serde_json", "pasta_curves"]
 
 [dependencies]
 uniffi = { version = "=0.28.0", features = ["cli", "build"] }

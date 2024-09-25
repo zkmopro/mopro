@@ -98,8 +98,8 @@ mod test {
 
     nova_scotia_app!();
 
-    const R1CS_PATH: &str = "../test-vectors/nova_scotia/toy.r1cs";
-    const WASM_PATH: &str = "../test-vectors/nova_scotia/toy_js/toy.wasm";
+    const R1CS_PATH: &str = "../test-vectors/nova_scotia/fibonacci.r1cs";
+    const WASM_PATH: &str = "../test-vectors/nova_scotia/fibonacci.wasm";
 
     // Define curve cycle, can be any curve cycle supported by Nova
     type G1 = provider::bn256_grumpkin::bn256::Point;
