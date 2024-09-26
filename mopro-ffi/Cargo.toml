@@ -91,7 +91,7 @@ serde_derive = "1.0"
 halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
 
 # Nova Scotia dependencies
-nova-scotia = "0.5.0"
-nova-snark = "0.23.0"
-serde_json = "1.0.85"
-pasta_curves = "0.5"
+nova-scotia = { version="0.5.0", optional = true}
+nova-snark = { version="0.23.0", optional = true}
+serde_json = { version="1.0.85", optional = true}
+pasta_curves = { version="0.5", optional = true}
