@@ -20,6 +20,7 @@ path = "src/uniffi-bindgen.rs"
 default = []
 
 halo2 = []
+plonkish = []
 circom = [
     "rust-witness",
     "ark-circom",
@@ -86,3 +87,4 @@ serde_derive = "1.0"
 
 # Halo2 dependencies
 halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
+plonkish-fibonacci = { git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git", branch = "plonkish"}

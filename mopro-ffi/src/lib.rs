@@ -4,6 +4,8 @@ pub mod app_config;
 mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
+#[cfg(feature = "plonkish")]
+mod plonkish;
 
 #[cfg(feature = "circom")]
 pub use circom::{
@@ -13,6 +15,9 @@ pub use circom::{
 
 #[cfg(feature = "halo2")]
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
+
+#[cfg(feature = "plonkish")]
+pub use plonkish::{Halo2ProveFn, Halo2VerifyFn};
 
 #[cfg(not(feature = "circom"))]
 #[macro_export]
@@ -63,6 +68,29 @@ macro_rules! halo2_app {
             in3: Vec<u8>,
         ) -> Result<bool, MoproError> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
+        }
+    };
+}
+
+#[cfg(not(feature = "plonkish"))]
+#[macro_export]
+macro_rules! plonkish_app {
+    () => {
+        fn generate_plonkish_proof(
+            in0: String,
+            in1: String,
+            in2: std::collections::HashMap<String, Vec<String>>,
+        ) -> Result<GenerateProofResult, MoproError> {
+            panic!("Plonkish is not enabled in this build. Please pass `plonkish` feature to `mopro-ffi` to enable Plonkish.")
+        }
+
+        fn verify_plonkish_proof(
+            in0: String,
+            in1: String,
+            in2: Vec<u8>,
+            in3: Vec<u8>,
+        ) -> Result<bool, MoproError> {
+            panic!("Plonkish is not enabled in this build. Please pass `plonkish` feature to `mopro-ffi` to enable Plonkish.")
         }
     };
 }
@@ -147,6 +175,8 @@ macro_rules! app {
         mopro_ffi::circom_app!();
 
         mopro_ffi::halo2_app!();
+
+        mopro_ffi::plonkish_app!();
 
         uniffi::include_scaffolding!("mopro");
     };
