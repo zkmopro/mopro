@@ -16,11 +16,29 @@ You have 2 options to get started with a mopro React Native project:
 
 1. Clone the [zkmopro/react-native-app](https://github.com/zkmopro/react-native-app) repository
 
-```sh
-git clone https://github.com/zkmopro/react-native-app
-```
+    ```sh
+    git clone https://github.com/zkmopro/react-native-app
+    ```
 
-2. Import mopro bindings in [Android](#4-2-include-mopro-bindings-in-the-native-android-module) and [iOS](#51-use-a-framework) native module
+2. Install dependencies
+
+    ```sh
+    npm install
+    ```
+
+3. Run the app
+
+    ```sh
+    npm run android
+    ```
+
+    or
+
+    ```sh
+    npm run ios
+    ```
+
+4. Update mopro bindings in [Android](#4-2-include-mopro-bindings-in-the-native-android-module) and [iOS](#51-use-a-framework) native module
 
 ### Option 2: Follow the Tutorial and Build a React Native Module
 
