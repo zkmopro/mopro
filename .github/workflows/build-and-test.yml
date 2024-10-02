@@ -46,6 +46,18 @@ jobs:
                   override: true
             - name: Run ffi circom tests
               run: cd mopro-ffi && cargo test --features circom --no-default-features
+    test-ffi-gkr:
+        runs-on: ubuntu-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install Rust toolchain
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  override: true
+            - name: Run ffi gkr tests
+              run: cd mopro-ffi && cargo test --features gkr --no-default-features
     test-e2e:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -80,8 +92,8 @@ jobs:
               id: cache-xcframework
               uses: actions/cache/save@v4
               with:
-                path: test-e2e/MoproiOSBindings
-                key: ${{ github.sha }}-xcframework
+                  path: test-e2e/MoproiOSBindings
+                  key: ${{ github.sha }}-xcframework
     build-ios-app-device:
         runs-on: macos-latest
         needs: build-xcframework
@@ -96,8 +108,8 @@ jobs:
               id: cache-restore-xcframework
               uses: actions/cache/restore@v4
               with:
-                path: test-e2e/MoproiOSBindings
-                key: ${{ github.sha }}-xcframework
+                  path: test-e2e/MoproiOSBindings
+                  key: ${{ github.sha }}-xcframework
             - name: Build app for device
               run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
     build-ios-app-simulator:
@@ -114,8 +126,8 @@ jobs:
               id: cache-restore-xcframework
               uses: actions/cache/restore@v4
               with:
-                path: test-e2e/MoproiOSBindings
-                key: ${{ github.sha }}-xcframework
+                  path: test-e2e/MoproiOSBindings
+                  key: ${{ github.sha }}-xcframework
             - name: Build app for device
               run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS\ Simulator build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
     test-ios-app-simulator:
@@ -132,8 +144,8 @@ jobs:
               id: cache-restore-xcframework
               uses: actions/cache/restore@v4
               with:
-                path: test-e2e/MoproiOSBindings
-                key: ${{ github.sha }}-xcframework
+                  path: test-e2e/MoproiOSBindings
+                  key: ${{ github.sha }}-xcframework
             # to list available simulators: xcrun simctl list devices
             - name: Test app in simulator
               run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination 'platform=iOS Simulator,name=iPhone 15' test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
@@ -153,8 +165,8 @@ jobs:
               id: cache-android-lib
               uses: actions/cache/save@v4
               with:
-                path: test-e2e/MoproAndroidBindings
-                key: ${{ github.sha }}-android-lib
+                  path: test-e2e/MoproAndroidBindings
+                  key: ${{ github.sha }}-android-lib
     build-android-app:
         runs-on: ubuntu-latest
         needs: build-android-lib
@@ -169,13 +181,13 @@ jobs:
               id: cache-restore-android-lib
               uses: actions/cache/restore@v4
               with:
-                path: test-e2e/MoproAndroidBindings
-                key: ${{ github.sha }}-android-lib
+                  path: test-e2e/MoproAndroidBindings
+                  key: ${{ github.sha }}-android-lib
             - name: Setup Java
               uses: actions/setup-java@v3
               with:
-                distribution: 'temurin'
-                java-version: 17
+                  distribution: "temurin"
+                  java-version: 17
             - name: Setup Android SDK
               uses: android-actions/setup-android@v2.0.10
             - name: Build android app
