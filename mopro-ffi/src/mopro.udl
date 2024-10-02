@@ -29,6 +29,11 @@ dictionary GenerateProofResult {
   bytes inputs;
 };
 
+dictionary GkrProofResult {
+  bytes proof;
+  string output_claims;
+};
+
 // dictionary BenchmarkResult {
 //  u32 instance_size;
 //  u32 num_instance;
@@ -55,4 +60,5 @@ dictionary ProofCalldata {
 enum MoproError {
   "CircomError",
   "Halo2Error",
+  "GkrError",
 };
