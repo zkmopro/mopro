@@ -2,6 +2,8 @@ pub mod app_config;
 
 #[cfg(feature = "circom")]
 mod circom;
+#[cfg(feature = "gkr")]
+mod gkr;
 #[cfg(feature = "halo2")]
 mod halo2;
 
@@ -13,6 +15,9 @@ pub use circom::{
 
 #[cfg(feature = "halo2")]
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
+
+#[cfg(feature = "gkr")]
+pub use gkr::{GkrProveFn, GkrVerifyFn};
 
 #[cfg(not(feature = "circom"))]
 #[macro_export]
@@ -67,6 +72,28 @@ macro_rules! halo2_app {
     };
 }
 
+#[cfg(not(feature = "gkr"))]
+#[macro_export]
+macro_rules! gkr_app {
+    () => {
+        fn generate_gkr_proof(
+            in0: String,
+            in1: Vec<u8>,
+        ) -> Result<mopro_ffi::GkrProofResult, mopro_ffi::MoproError> {
+            panic!("Gkr is not enabled in this build. Please pass `gkr` feature to `mopro-ffi` to enable Gkr.")
+        }
+
+        fn verify_gkr_proof(
+            in0: String,
+            in1: Vec<u8>,
+            in2: String,
+            in3: Vec<u8>,
+        ) -> Result<bool, mopro_ffi::MoproError> {
+            panic!("Gkr is not enabled in this build. Please pass `gkr` feature to `mopro-ffi` to enable Gkr.")
+        }
+    };
+}
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -75,12 +102,20 @@ pub enum MoproError {
     CircomError(String),
     #[error("Halo2Error: {0}")]
     Halo2Error(String),
+    #[error("GkrError: {0}")]
+    GkrError(String),
 }
 
 #[derive(Debug, Clone)]
 pub struct GenerateProofResult {
     pub proof: Vec<u8>,
     pub inputs: Vec<u8>,
+}
+
+#[derive(Debug, Clone)]
+pub struct GkrProofResult {
+    pub proof: Vec<u8>,
+    pub output_claims: String,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -142,11 +177,13 @@ pub struct ProofCalldata {
 macro_rules! app {
     () => {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
-        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
+        use mopro_ffi::{GenerateProofResult, GkrProofResult, MoproError, ProofCalldata, G1, G2};
 
         mopro_ffi::circom_app!();
 
         mopro_ffi::halo2_app!();
+
+        mopro_ffi::gkr_app!();
 
         uniffi::include_scaffolding!("mopro");
     };

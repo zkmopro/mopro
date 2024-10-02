@@ -187,7 +187,7 @@ dependencies = [
  "ark-std",
  "derivative",
  "hashbrown 0.13.2",
- "itertools",
+ "itertools 0.10.5",
  "num-traits",
  "rayon",
  "zeroize",
@@ -205,7 +205,7 @@ dependencies = [
  "ark-std",
  "derivative",
  "digest 0.10.7",
- "itertools",
+ "itertools 0.10.5",
  "num-bigint",
  "num-traits",
  "paste",
@@ -823,7 +823,7 @@ dependencies = [
  "clap 2.34.0",
  "criterion-plot",
  "csv",
- "itertools",
+ "itertools 0.10.5",
  "lazy_static",
  "num-traits",
  "oorandom",
@@ -845,7 +845,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2673cc8207403546f45f5fd319a974b1e6983ad1a3ee7e6041650013be041876"
 dependencies = [
  "cast",
- "itertools",
+ "itertools 0.10.5",
 ]
 
 [[package]]
@@ -1310,6 +1310,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ff-ext"
+version = "0.1.0"
+source = "git+https://github.com/han0110/gkr#5ebd4975bea76596b680906d815a3fe0a8dd1416"
+dependencies = [
+ "ff 0.13.0",
+ "goldilocks",
+]
+
+[[package]]
 name = "fixed-hash"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1398,6 +1407,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 
 [[package]]
+name = "gkr"
+version = "0.1.0"
+source = "git+https://github.com/han0110/gkr#5ebd4975bea76596b680906d815a3fe0a8dd1416"
+dependencies = [
+ "auto_impl",
+ "ff-ext",
+ "itertools 0.11.0",
+ "rand_chacha",
+ "rand_core",
+ "rayon",
+]
+
+[[package]]
+name = "gkr-keccak256"
+version = "0.1.0"
+source = "git+https://github.com/vivianjeng/gkr-keccak256.git#a579f811dc4b31c27955f467b58dd3e3fa0df6a2"
+dependencies = [
+ "bincode",
+ "ff-ext",
+ "gkr",
+ "goldilocks",
+ "halo2curves 0.6.1",
+ "itertools 0.11.0",
+ "rand",
+ "rand_core",
+ "rayon",
+ "serde",
+ "serde_json",
+ "tiny-keccak",
+]
+
+[[package]]
 name = "glob"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1412,6 +1453,19 @@ dependencies = [
  "log",
  "plain",
  "scroll",
+]
+
+[[package]]
+name = "goldilocks"
+version = "0.1.0"
+source = "git+https://github.com/han0110/goldilocks?branch=feature/qe_op_b#49742413a1d26a637603dcaa3c0610b4c3104986"
+dependencies = [
+ "ff 0.13.0",
+ "halo2curves 0.1.0",
+ "itertools 0.12.1",
+ "rand_core",
+ "serde",
+ "subtle",
 ]
 
 [[package]]
@@ -1449,7 +1503,7 @@ source = "git+https://github.com/ElusAegis/halo2-fibonacci-sample.git#4e5f955c93
 dependencies = [
  "bincode",
  "halo2_proofs",
- "halo2curves",
+ "halo2curves 0.3.2",
  "rand",
  "serde",
  "thiserror",
@@ -1465,7 +1519,7 @@ dependencies = [
  "clap 3.2.25",
  "ethers-core 0.17.0",
  "halo2_proofs",
- "itertools",
+ "itertools 0.10.5",
  "lazy_static",
  "log",
  "num-bigint",
@@ -1484,12 +1538,32 @@ dependencies = [
  "blake2b_simd",
  "ff 0.13.0",
  "group 0.13.0",
- "halo2curves",
+ "halo2curves 0.3.2",
  "rand_chacha",
  "rand_core",
  "rayon",
  "sha3 0.9.1",
  "tracing",
+]
+
+[[package]]
+name = "halo2curves"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6b1142bd1059aacde1b477e0c80c142910f1ceae67fc619311d6a17428007ab"
+dependencies = [
+ "blake2b_simd",
+ "ff 0.13.0",
+ "group 0.13.0",
+ "lazy_static",
+ "num-bigint",
+ "num-traits",
+ "pasta_curves",
+ "paste",
+ "rand",
+ "rand_core",
+ "static_assertions",
+ "subtle",
 ]
 
 [[package]]
@@ -1506,6 +1580,28 @@ dependencies = [
  "paste",
  "rand",
  "rand_core",
+ "static_assertions",
+ "subtle",
+]
+
+[[package]]
+name = "halo2curves"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db81d01d0bbfec9f624d7590fc6929ee2537a64ec1e080d8f8c9e2d2da291405"
+dependencies = [
+ "blake2b_simd",
+ "ff 0.13.0",
+ "group 0.13.0",
+ "lazy_static",
+ "num-bigint",
+ "num-traits",
+ "pairing",
+ "pasta_curves",
+ "paste",
+ "rand",
+ "rand_core",
+ "rayon",
  "static_assertions",
  "subtle",
 ]
@@ -1688,6 +1784,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1829,6 +1943,7 @@ dependencies = [
  "ark-std",
  "byteorder",
  "color-eyre",
+ "gkr-keccak256",
  "halo2-fibonacci",
  "num-bigint",
  "num-traits",
@@ -2010,6 +2125,15 @@ name = "owo-colors"
 version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c1b04fb49957986fdce4d6ee7a65027d55d4b6d2265e5848bbb507b58ccfdb6f"
+
+[[package]]
+name = "pairing"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81fec4625e73cf41ef4bb6846cafa6d44736525f442ba45e407c4a000a13996f"
+dependencies = [
+ "group 0.13.0",
+]
 
 [[package]]
 name = "parity-scale-codec"

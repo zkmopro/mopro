@@ -35,6 +35,7 @@ circom = [
     "num-traits",
     "byteorder",
 ]
+gkr = []
 
 [dependencies]
 uniffi = { version = "=0.28.0", features = ["cli", "build"] }
@@ -50,6 +51,7 @@ ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
+
 
 # ZKP generation
 ark-ec = { version = "=0.4.1", default-features = false, features = [
@@ -86,3 +88,4 @@ serde_derive = "1.0"
 
 # Halo2 dependencies
 halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
+gkr-keccak256 = { git = "https://github.com/vivianjeng/gkr-keccak256.git" }
