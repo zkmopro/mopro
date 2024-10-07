@@ -1,7 +1,8 @@
+use std::collections::HashMap;
+
 #[macro_export]
 macro_rules! nova_scotia_app {
     () => {
-
         fn generate_recursive_snark_proof(
             witness_generator_file: PathBuf,
             r1cs: circom::circuit::R1CS<F<G1>>,
@@ -9,7 +10,6 @@ macro_rules! nova_scotia_app {
             start_public_input: [F<G1>; 2],
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
         ) -> Result<RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>, mopro_ffi::MoproError> {
-
             let res = create_recursive_circuit(
                 FileLocation::PathBuf(witness_generator_file),
                 r1cs,
@@ -18,10 +18,11 @@ macro_rules! nova_scotia_app {
                 &pp,
             );
 
-            res.map_err(|e| mopro_ffi::MoproError::NovaScotiaError(format!("nova_scotia error: {}", e)))
+            res.map_err(|e| {
+                mopro_ffi::MoproError::NovaScotiaError(format!("nova_scotia error: {}", e))
+            })
         }
 
-        
         fn verify_recursive_snark_proof(
             recursive_snark: &RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
@@ -29,7 +30,6 @@ macro_rules! nova_scotia_app {
             start_public_input: [F<G1>; 2],
             z0_secondary: [F<G2>; 1],
         ) -> Result<(Vec<F<G1>>, Vec<F<G2>>), mopro_ffi::MoproError> {
-
             let res = recursive_snark.verify(
                 &pp,
                 iteration_count,
@@ -42,29 +42,26 @@ macro_rules! nova_scotia_app {
             })
         }
 
-        
         fn compress_snark_proof(
             recursive_snark: RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
             pk: &ProverKey<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>,
         ) -> Result<CompressedSNARK<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>, mopro_ffi::MoproError> {
-            
-            let res = CompressedSNARK::<_, _, _, _, S<G1>, S<G2>>::prove(&pp, &pk, &recursive_snark);
+            let res =
+                CompressedSNARK::<_, _, _, _, S<G1>, S<G2>>::prove(&pp, &pk, &recursive_snark);
 
             res.map_err(|e| {
                 mopro_ffi::MoproError::NovaScotiaError(format!("error compress proof: {}", e))
             })
         }
 
-
         fn verify_compressed_snark_proof(
-            compressed_snark: CompressedSNARK<G1, G2, C1<G1>, C2<G2>,S<G1>, S<G2>>,
+            compressed_snark: CompressedSNARK<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>,
             vk: &VerifierKey<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>,
             iteration_count: usize,
             start_public_input: [F<G1>; 2],
             z0_secondary: [F<G2>; 1],
         ) -> Result<(Vec<F<G1>>, Vec<F<G2>>), mopro_ffi::MoproError> {
-            
             let res = compressed_snark.verify(
                 &vk,
                 iteration_count,
@@ -76,8 +73,6 @@ macro_rules! nova_scotia_app {
                 mopro_ffi::MoproError::NovaScotiaError(format!("error verifying proof: {}", e))
             })
         }
-        
-        
     };
 }
 
@@ -88,8 +83,7 @@ mod test {
     use nova_scotia::*;
 
     use nova_snark::{
-        provider,
-        CompressedSNARK, PublicParams, RecursiveSNARK, ProverKey, VerifierKey,
+        provider, CompressedSNARK, ProverKey, PublicParams, RecursiveSNARK, VerifierKey,
     };
 
     use crate as mopro_ffi;
@@ -148,7 +142,7 @@ mod test {
         let pp = create_public_params::<G1, G2>(r1cs.clone());
 
         let z0_secondary = [F::<G2>::from(0)];
-        
+
         if let Ok(proof_result) = generate_recursive_snark_proof(
             witness_generator_file,
             r1cs,
@@ -156,7 +150,6 @@ mod test {
             start_public_input,
             &pp,
         ) {
-            
             let result = verify_recursive_snark_proof(
                 &proof_result,
                 &pp,
@@ -164,16 +157,11 @@ mod test {
                 start_public_input,
                 z0_secondary,
             );
-            
+
             assert!(result.is_ok());
             let (pk, vk) = CompressedSNARK::<_, _, _, _, S<G1>, S<G2>>::setup(&pp).unwrap();
 
-            if let Ok(compressed_proof_result) = compress_snark_proof(
-                proof_result,
-                &pp,
-                &pk,
-            ) {
-                
+            if let Ok(compressed_proof_result) = compress_snark_proof(proof_result, &pp, &pk) {
                 let result = verify_compressed_snark_proof(
                     compressed_proof_result,
                     &vk,
@@ -181,13 +169,11 @@ mod test {
                     start_public_input,
                     z0_secondary,
                 );
-                
-                assert!(result.is_ok());
 
+                assert!(result.is_ok());
             } else {
                 panic!("Failed to generate the compressed proof!")
             }
-
         } else {
             panic!("Failed to generate the recursive proof!")
         }

@@ -600,15 +600,16 @@ public func FfiConverterTypeProofCalldata_lower(_ value: ProofCalldata) -> RustB
 }
 
 public enum MoproError {
-
-    
     
     // Simple error enums only carry a message
     case CircomError(message: String)
     
     // Simple error enums only carry a message
     case Halo2Error(message: String)
-    
+
+    // Simple error enums only carry a message
+    case NovaScotiaError(message: String)
+
 
     fileprivate static func uniffiErrorHandler(_ error: RustBuffer) throws -> Error {
         return try FfiConverterTypeMoproError.lift(error)
@@ -622,9 +623,6 @@ public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> MoproError {
         let variant: Int32 = try readInt(&buf)
         switch variant {
-
-        
-
         
         case 1: return .CircomError(
             message: try FfiConverterString.read(from: &buf)
@@ -633,7 +631,10 @@ public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
         case 2: return .Halo2Error(
             message: try FfiConverterString.read(from: &buf)
         )
-        
+
+        case 2: return .NovaScotiaError(
+            message: try FfiConverterString.read(from: &buf)
+        )
 
         default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -641,20 +642,15 @@ public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
 
     public static func write(_ value: MoproError, into buf: inout [UInt8]) {
         switch value {
-
-        
-
-        
         case .CircomError(_ /* message is ignored*/):
             writeInt(&buf, Int32(1))
         case .Halo2Error(_ /* message is ignored*/):
             writeInt(&buf, Int32(2))
-
-        
+        case .NovaScotiaError(_ /* message is ignored*/):
+            writeInt(&buf, Int32(3))
         }
     }
 }
-
 
 extension MoproError: Equatable, Hashable {}
 

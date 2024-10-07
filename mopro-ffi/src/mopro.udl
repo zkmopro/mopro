@@ -55,4 +55,5 @@ dictionary ProofCalldata {
 enum MoproError {
   "CircomError",
   "Halo2Error",
+  "NovaScotiaError",
 };

@@ -2220,8 +2220,7 @@ dependencies = [
 [[package]]
 name = "nova-scotia"
 version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2cfb2d46479b23f5235e40399c68f708733d21a6658c64a1fc8efbbb692ddbaa"
+source = "git+https://github.com/nalinbhardwaj/Nova-Scotia.git?branch=main#54f2bdbb78aad841d8714f7e2d0344bcc593a922"
 dependencies = [
  "anyhow",
  "bellperson",

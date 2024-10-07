@@ -1,6 +1,6 @@
 pub mod serialization;
 
-use anyhow::{bail, Error};
+use anyhow::bail;
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
 use ark_ec::pairing::Pairing;
@@ -10,7 +10,7 @@ use serialization::{SerializableInputs, SerializableProof};
 
 use std::fs::File;
 use std::str::FromStr;
-use std::{collections::HashMap, panic};
+use std::collections::HashMap;
 
 use crate::GenerateProofResult;
 use ark_circom::{

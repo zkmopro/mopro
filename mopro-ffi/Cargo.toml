@@ -74,7 +74,7 @@ num-traits = { version = "0.2.0", optional = true }
 anyhow = "1.0.86"
 
 # Nova Scotia dependencies
-nova-scotia = { version="0.5.0", optional = true}
+nova-scotia = { git = "https://github.com/nalinbhardwaj/Nova-Scotia.git", version="0.5.0", branch = "main", optional = true}
 nova-snark = { version="0.23.0", optional = true}
 serde_json = { version="1.0.85", optional = true}
 pasta_curves = { version="0.5", optional = true}

@@ -675,6 +675,8 @@ public enum MoproError {
     case CircomError(message: String)
 
     case Halo2Error(message: String)
+
+    case NovaScotiaError(message: String)
 }
 
 public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
@@ -691,6 +693,10 @@ public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
                 message: FfiConverterString.read(from: &buf)
             )
 
+        case 3: return try .NovaScotiaError(
+                message: FfiConverterString.read(from: &buf)
+            )
+
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
@@ -701,6 +707,8 @@ public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
             writeInt(&buf, Int32(1))
         case .Halo2Error(_ /* message is ignored*/ ):
             writeInt(&buf, Int32(2))
+        case .NovaScotiaError(_ /* message is ignored*/ ):
+            writeInt(&buf, Int32(3))
         }
     }
 }
