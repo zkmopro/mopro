@@ -2,14 +2,14 @@
 macro_rules! nova_scotia_app {
     () => {
         fn generate_recursive_snark_proof(
-            witness_generator_file: PathBuf,
-            r1cs: circom::circuit::R1CS<F<G1>>,
+            witness_generator_file: std::path::PathBuf,
+            r1cs: nova_scotia::circom::circuit::R1CS<F<G1>>,
             private_inputs: Vec<HashMap<String, serde_json::Value>>,
             start_public_input: [F<G1>; 2],
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
         ) -> Result<RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>, mopro_ffi::MoproError> {
-            let res = create_recursive_circuit(
-                FileLocation::PathBuf(witness_generator_file),
+            let res = nova_scotia::create_recursive_circuit(
+                nova_scotia::FileLocation::PathBuf(witness_generator_file),
                 r1cs,
                 private_inputs,
                 start_public_input.to_vec(),
@@ -43,7 +43,7 @@ macro_rules! nova_scotia_app {
         fn compress_snark_proof(
             recursive_snark: RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
-            pk: &ProverKey<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>,
+            pk: &nova_snark::ProverKey<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>,
         ) -> Result<CompressedSNARK<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>, mopro_ffi::MoproError> {
             let res =
                 CompressedSNARK::<_, _, _, _, S<G1>, S<G2>>::prove(&pp, &pk, &recursive_snark);
@@ -55,7 +55,7 @@ macro_rules! nova_scotia_app {
 
         fn verify_compressed_snark_proof(
             compressed_snark: CompressedSNARK<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>,
-            vk: &VerifierKey<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>,
+            vk: &nova_snark::VerifierKey<G1, G2, C1<G1>, C2<G2>, S<G1>, S<G2>>,
             iteration_count: usize,
             start_public_input: [F<G1>; 2],
             z0_secondary: [F<G2>; 1],
@@ -77,15 +77,9 @@ macro_rules! nova_scotia_app {
 #[cfg(test)]
 mod test {
     use crate as mopro_ffi;
-    use serde_json::json;
-    use std::collections::HashMap;
-    use std::path::PathBuf;
-
-    use nova_scotia::*;
-
-    use nova_snark::{
-        provider, CompressedSNARK, ProverKey, PublicParams, RecursiveSNARK, VerifierKey,
-    };
+    use nova_scotia::{C1, C2, F, S};
+    use nova_snark::{CompressedSNARK, PublicParams, RecursiveSNARK};
+    pub use std::collections::HashMap;
 
     nova_scotia_app!();
 
@@ -93,8 +87,8 @@ mod test {
     const WASM_PATH: &str = "../test-vectors/nova_scotia/fibonacci.wasm";
 
     // Define curve cycle, can be any curve cycle supported by Nova
-    type G1 = provider::bn256_grumpkin::bn256::Point;
-    type G2 = provider::bn256_grumpkin::grumpkin::Point;
+    type G1 = nova_snark::provider::bn256_grumpkin::bn256::Point;
+    type G2 = nova_snark::provider::bn256_grumpkin::grumpkin::Point;
 
     #[test]
     fn test_generate_and_verify_nova_scotia_proof() {
@@ -102,7 +96,9 @@ mod test {
 
         // Load r1cs file
         let circuit_file = root.join(R1CS_PATH.to_string());
-        let r1cs = circom::reader::load_r1cs::<G1, G2>(&FileLocation::PathBuf(circuit_file));
+        let r1cs = nova_scotia::circom::reader::load_r1cs::<G1, G2>(
+            &nova_scotia::FileLocation::PathBuf(circuit_file),
+        );
 
         // Load c++ binary or wasm file
         let witness_generator_file = root.join(WASM_PATH.to_string());
@@ -128,7 +124,7 @@ mod test {
         let mut private_inputs = Vec::new();
         for i in 0..iteration_count {
             let mut private_input = HashMap::new();
-            private_input.insert("adder".to_string(), json!(i));
+            private_input.insert("adder".to_string(), serde_json::json!(i));
             private_inputs.push(private_input);
         }
 
@@ -136,7 +132,7 @@ mod test {
         let start_public_input = [F::<G1>::from(10), F::<G1>::from(10)];
 
         // Create public parameters(CRS)
-        let pp = create_public_params::<G1, G2>(r1cs.clone());
+        let pp = nova_scotia::create_public_params::<G1, G2>(r1cs.clone());
 
         let z0_secondary = [F::<G2>::from(0)];
 

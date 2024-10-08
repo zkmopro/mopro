@@ -20,7 +20,6 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 
 #[cfg(feature = "nova_scotia")]
 // pub use nova_scotia::{};
-#[cfg(not(feature = "circom"))]
 #[macro_export]
 macro_rules! circom_app {
     () => {
@@ -76,21 +75,23 @@ macro_rules! halo2_app {
 #[macro_export]
 macro_rules! nova_scotia_app {
     () => {
-        pub use nova_scotia_types::*;
+        pub use nova_scotia::{C1, C2, F};
+        type P1 = nova_snark::provider::bn256_grumpkin::bn256::Point;
+        type P2 = nova_snark::provider::bn256_grumpkin::grumpkin::Point;
 
         fn generate_recursive_snark_proof(
-            witness_generator_file: PathBuf,
-            r1cs: R1CS<F<P1>>,
-            private_inputs: Vec<HashMap<String, Value>>,
+            witness_generator_file: std::path::PathBuf,
+            r1cs: nova_scotia::circom::circuit::R1CS<F<P1>>,
+            private_inputs: Vec<std::collections::HashMap<String, serde_json::Value>>,
             start_public_input: [F<P1>; 2],
-            pp: &PublicParams<P1, P2, C1<P1>, C2<P2>>,
-        ) -> Result<RecursiveSNARK<P1, P2, C1<P1>, C2<P2>>, MoproError> {
+            pp: &nova_snark::PublicParams<P1, P2, C1<P1>, C2<P2>>,
+        ) -> Result<nova_snark::RecursiveSNARK<P1, P2, C1<P1>, C2<P2>>, MoproError> {
             panic!("Nova Scotia is not enabled in this build. Please pass `nova-scotia` feature to `mopro-ffi` to enable Nova Scotia.")
         }
 
         fn verify_recursive_snark_proof(
-            recursive_snark: &RecursiveSNARK<P1, P2, C1<P1>, C2<P2>>,
-            pp: &PublicParams<P1, P2, C1<P1>, C2<P2>>,
+            recursive_snark: &nova_snark::RecursiveSNARK<P1, P2, C1<P1>, C2<P2>>,
+            pp: &nova_snark::PublicParams<P1, P2, C1<P1>, C2<P2>>,
             iteration_count: usize,
             start_public_input: [F<P1>; 2],
             z0_secondary: [F<P2>; 1],

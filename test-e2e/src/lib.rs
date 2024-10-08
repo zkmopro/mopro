@@ -1,7 +1,5 @@
 extern crate core;
 
-mod nova_scotia_types;
-
 // First, configure the Mopro FFI library
 mopro_ffi::app!();
 
