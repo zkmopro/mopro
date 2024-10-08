@@ -632,7 +632,7 @@ public struct FfiConverterTypeMoproError: FfiConverterRustBuffer {
             message: try FfiConverterString.read(from: &buf)
         )
 
-        case 2: return .NovaScotiaError(
+        case 3: return .NovaScotiaError(
             message: try FfiConverterString.read(from: &buf)
         )
 
