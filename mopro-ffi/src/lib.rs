@@ -19,7 +19,7 @@ pub use circom::{
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 
 #[cfg(feature = "nova_scotia")]
-pub use nova_scotia::{};
+// pub use nova_scotia::{};
 
 #[cfg(not(feature = "circom"))]
 #[macro_export]
@@ -77,19 +77,7 @@ macro_rules! halo2_app {
 #[macro_export]
 macro_rules! nova_scotia_app {
     () => {
-        use std::{collections::HashMap, path::PathBuf};
-        use serde_json::Value;
-        use nova_snark::{
-            traits::{circuit::TrivialTestCircuit, Group},
-            provider, PublicParams, RecursiveSNARK,
-        };
-        use nova_scotia::circom::circuit::{Constraint, R1CS, CircomCircuit};
-
-        pub type F<G> = <G as Group>::Scalar;
-        pub type P1 = provider::bn256_grumpkin::bn256::Point;
-        pub type P2 = provider::bn256_grumpkin::grumpkin::Point;
-        pub type C1<G> = CircomCircuit<<G as Group>::Scalar>;
-        pub type C2<G> = TrivialTestCircuit<<G as Group>::Scalar>;
+        pub use nova_scotia_types::*;
 
         fn generate_recursive_snark_proof(
             witness_generator_file: PathBuf,

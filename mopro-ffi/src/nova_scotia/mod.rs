@@ -1,11 +1,3 @@
-// use nova_snark::{
-//     traits::{circuit::TrivialTestCircuit, Group},
-//     provider, PublicParams, RecursiveSNARK,
-// };
-// use ff::PrimeField;
-// use std::path::PathBuf;
-// use std::collections::HashMap;
-
 #[macro_export]
 macro_rules! nova_scotia_app {
     () => {
