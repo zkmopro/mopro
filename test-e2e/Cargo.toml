@@ -23,7 +23,6 @@ num-bigint = { version = "0.4.0" }
 
 # Halo2 dependencies
 halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
-plonkish-fibonacci = { git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git"}
 halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
 
 [build-dependencies]
