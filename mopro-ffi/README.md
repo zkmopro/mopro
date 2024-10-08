@@ -17,11 +17,6 @@ Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side pro
   ```sh
   cargo test --features halo2
   ```
-- plonkish
-  ```sh
-  cargo test --features plonkish
-  ```
-
 
 ## Bindings
 

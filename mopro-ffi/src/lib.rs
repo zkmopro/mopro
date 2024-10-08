@@ -144,10 +144,10 @@ macro_rules! app {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
         use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
 
-        // mopro_ffi::circom_app!();
+        mopro_ffi::circom_app!();
 
         mopro_ffi::halo2_app!();
 
-        // uniffi::include_scaffolding!("mopro");
+        uniffi::include_scaffolding!("mopro");
     };
 }
