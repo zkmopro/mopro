@@ -25,10 +25,9 @@ pub use nova_scotia::{};
 #[macro_export]
 macro_rules! circom_app {
     () => {
-
         fn generate_circom_proof(
             in0: String,
-            in1: std::collections::HashMap<String, Vec<String>>,
+            in1: HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
@@ -58,7 +57,7 @@ macro_rules! halo2_app {
         fn generate_halo2_proof(
             in0: String,
             in1: String,
-            in2: std::collections::HashMap<String, Vec<String>>,
+            in2: HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
@@ -78,51 +77,37 @@ macro_rules! halo2_app {
 #[macro_export]
 macro_rules! nova_scotia_app {
     () => {
-        // use nova_snark::{
-        //     traits::{circuit::TrivialTestCircuit, Group},
-        //     PublicParams, RecursiveSNARK,
-        // };
-        // use ff::PrimeField;
-        // use std::path::PathBuf; 
-        // use std::collections::HashMap;
+        use std::{collections::HashMap, path::PathBuf};
+        use serde_json::Value;
+        use nova_snark::{
+            traits::{circuit::TrivialTestCircuit, Group},
+            provider, PublicParams, RecursiveSNARK,
+        };
+        use nova_scotia::circom::circuit::{Constraint, R1CS, CircomCircuit};
 
-        // #[derive(Clone, Debug)]
-        // pub struct R1CS<Fr: PrimeField> {
-        //     pub num_inputs: usize,
-        //     pub num_aux: usize,
-        //     pub num_variables: usize,
-        //     pub constraints: Vec<Constraint<Fr>>,
-        // }
-
-        // #[derive(Clone, Debug)]
-        // pub struct CircomCircuit<Fr: PrimeField> {
-        //     pub r1cs: R1CS<Fr>,
-        //     pub witness: Option<Vec<Fr>>,
-        // }
-
-        // pub type F<G> = <G as Group>::Scalar;
-        // pub type C1<G> = CircomCircuit<<G as Group>::Scalar>;
-        // pub type C2<G> = TrivialTestCircuit<<G as Group>::Scalar>;
-        // pub type Constraint<Fr> = (Vec<(usize, Fr)>, Vec<(usize, Fr)>, Vec<(usize, Fr)>);
-
+        pub type F<G> = <G as Group>::Scalar;
+        pub type P1 = provider::bn256_grumpkin::bn256::Point;
+        pub type P2 = provider::bn256_grumpkin::grumpkin::Point;
+        pub type C1<G> = CircomCircuit<<G as Group>::Scalar>;
+        pub type C2<G> = TrivialTestCircuit<<G as Group>::Scalar>;
 
         fn generate_recursive_snark_proof(
             witness_generator_file: PathBuf,
-            r1cs: circom::circuit::R1CS<F<G1>>,
-            private_inputs: Vec<HashMap<String, serde_json::Value>>,
-            start_public_input: [F<G1>; 2],
-            pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
-        ) -> Result<RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>, mopro_ffi::MoproError> {
+            r1cs: R1CS<F<P1>>,
+            private_inputs: Vec<HashMap<String, Value>>,
+            start_public_input: [F<P1>; 2],
+            pp: &PublicParams<P1, P2, C1<P1>, C2<P2>>,
+        ) -> Result<RecursiveSNARK<P1, P2, C1<P1>, C2<P2>>, MoproError> {
             panic!("Nova Scotia is not enabled in this build. Please pass `nova-scotia` feature to `mopro-ffi` to enable Nova Scotia.")
         }
 
         fn verify_recursive_snark_proof(
-            recursive_snark: &RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
-            pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
+            recursive_snark: &RecursiveSNARK<P1, P2, C1<P1>, C2<P2>>,
+            pp: &PublicParams<P1, P2, C1<P1>, C2<P2>>,
             iteration_count: usize,
-            start_public_input: [F<G1>; 2],
-            z0_secondary: [F<G2>; 1],
-        ) -> Result<(Vec<F<G1>>, Vec<F<G2>>), mopro_ffi::MoproError> {
+            start_public_input: [F<P1>; 2],
+            z0_secondary: [F<P2>; 1],
+        ) -> Result<(Vec<F<P1>>, Vec<F<P2>>), MoproError> {
             panic!("Nova Scotia is not enabled in this build. Please pass `nova-scotia` feature to `mopro-ffi` to enable Nova Scotia.")
         }
     };

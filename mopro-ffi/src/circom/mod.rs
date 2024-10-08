@@ -8,9 +8,9 @@ use ark_ff::PrimeField;
 use ark_relations::r1cs::ConstraintMatrices;
 use serialization::{SerializableInputs, SerializableProof};
 
+use std::collections::HashMap;
 use std::fs::File;
 use std::str::FromStr;
-use std::collections::HashMap;
 
 use crate::GenerateProofResult;
 use ark_circom::{
