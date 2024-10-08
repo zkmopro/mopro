@@ -23,11 +23,6 @@ To learn more about mopro, please refer to the documentation at [zkmopro](https:
   cd mopro-ffi
   cargo test --features halo2
   ```
-- plonkish
-  ```sh
-  cd mopro-ffi
-  cargo test --features plonkish
-  ```
 - circom-e2e
   ```sh
   cd test-e2e

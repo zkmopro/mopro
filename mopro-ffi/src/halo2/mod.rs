@@ -125,18 +125,83 @@ mod test {
     use crate as mopro_ffi;
     use std::collections::HashMap;
 
-    halo2_app!();
-
-    set_halo2_circuits! {
-        ("fibonacci_pk.bin", halo2_fibonacci::prove, "fibonacci_vk.bin", halo2_fibonacci::verify),
-    }
-
-    const SRS_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_srs.bin";
-    const PROVING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_pk.bin";
-    const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_vk.bin";
-
     #[test]
     fn test_generate_and_verify_halo2_proof() {
+        halo2_app!();
+
+        set_halo2_circuits! {
+            ("fibonacci_pk.bin", halo2_fibonacci::prove, "fibonacci_vk.bin", halo2_fibonacci::verify),
+        }
+
+        const SRS_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_srs.bin";
+        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_vk.bin";
+
+        let mut input = HashMap::new();
+        input.insert("out".to_string(), vec!["55".to_string()]);
+
+        if let Ok(proof_result) = generate_halo2_proof(
+            SRS_KEY_PATH.to_string(),
+            PROVING_KEY_PATH.to_string(),
+            input,
+        ) {
+            let result = verify_halo2_proof(
+                SRS_KEY_PATH.to_string(),
+                VERIFYING_KEY_PATH.to_string(),
+                proof_result.proof,
+                proof_result.inputs,
+            );
+            assert!(result.is_ok());
+        } else {
+            panic!("Failed to generate the proof!")
+        }
+    }
+    
+
+    #[test]
+    fn test_generate_and_verify_hyperplonk_proof() {
+        halo2_app!();
+
+        set_halo2_circuits! {
+            ("hyperplonk_fibonacci_pk.bin", hyperplonk_fibonacci::prove, "hyperplonk_fibonacci_vk.bin", hyperplonk_fibonacci::verify),
+        }
+
+        const SRS_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_srs.bin";
+        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_vk.bin";
+
+        let mut input = HashMap::new();
+        input.insert("out".to_string(), vec!["55".to_string()]);
+
+        if let Ok(proof_result) = generate_halo2_proof(
+            SRS_KEY_PATH.to_string(),
+            PROVING_KEY_PATH.to_string(),
+            input,
+        ) {
+            let result = verify_halo2_proof(
+                SRS_KEY_PATH.to_string(),
+                VERIFYING_KEY_PATH.to_string(),
+                proof_result.proof,
+                proof_result.inputs,
+            );
+            assert!(result.is_ok());
+        } else {
+            panic!("Failed to generate the proof!")
+        }
+    }
+
+    #[test]
+    fn test_generate_and_verify_gemini_proof() {
+        halo2_app!();
+
+        set_halo2_circuits! {
+            ("gemini_fibonacci_pk.bin", gemini_fibonacci::prove, "gemini_fibonacci_vk.bin", gemini_fibonacci::verify),
+        }
+
+        const SRS_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_srs.bin";
+        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_vk.bin";
+
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec!["55".to_string()]);
 

@@ -87,4 +87,5 @@ serde_derive = "1.0"
 
 # Halo2 dependencies
 halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
-plonkish-fibonacci = { git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git", branch = "plonkish"}
+hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
