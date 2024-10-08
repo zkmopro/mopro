@@ -20,7 +20,6 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 
 #[cfg(feature = "nova_scotia")]
 // pub use nova_scotia::{};
-
 #[cfg(not(feature = "circom"))]
 #[macro_export]
 macro_rules! circom_app {

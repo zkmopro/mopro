@@ -1,10 +1,11 @@
-pub use std::{collections::HashMap, path::PathBuf};
-pub use serde_json::Value;
+pub use nova_scotia::circom::circuit::{CircomCircuit, Constraint, R1CS};
 pub use nova_snark::{
+    provider,
     traits::{circuit::TrivialTestCircuit, Group},
-    provider, PublicParams, RecursiveSNARK,
+    PublicParams, RecursiveSNARK,
 };
-pub use nova_scotia::circom::circuit::{Constraint, R1CS, CircomCircuit};
+pub use serde_json::Value;
+pub use std::{collections::HashMap, path::PathBuf};
 
 pub type F<G> = <G as Group>::Scalar;
 pub type P1 = provider::bn256_grumpkin::bn256::Point;
