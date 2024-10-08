@@ -78,32 +78,32 @@ macro_rules! halo2_app {
 #[macro_export]
 macro_rules! nova_scotia_app {
     () => {
-        use nova_snark::{
-            traits::{circuit::TrivialTestCircuit, Group},
-            PublicParams, RecursiveSNARK,
-        };
-        use ff::PrimeField;
-        use std::path::PathBuf; 
-        use std::collections::HashMap;
+        // use nova_snark::{
+        //     traits::{circuit::TrivialTestCircuit, Group},
+        //     PublicParams, RecursiveSNARK,
+        // };
+        // use ff::PrimeField;
+        // use std::path::PathBuf; 
+        // use std::collections::HashMap;
 
-        #[derive(Clone, Debug)]
-        pub struct R1CS<Fr: PrimeField> {
-            pub num_inputs: usize,
-            pub num_aux: usize,
-            pub num_variables: usize,
-            pub constraints: Vec<Constraint<Fr>>,
-        }
+        // #[derive(Clone, Debug)]
+        // pub struct R1CS<Fr: PrimeField> {
+        //     pub num_inputs: usize,
+        //     pub num_aux: usize,
+        //     pub num_variables: usize,
+        //     pub constraints: Vec<Constraint<Fr>>,
+        // }
 
-        #[derive(Clone, Debug)]
-        pub struct CircomCircuit<Fr: PrimeField> {
-            pub r1cs: R1CS<Fr>,
-            pub witness: Option<Vec<Fr>>,
-        }
+        // #[derive(Clone, Debug)]
+        // pub struct CircomCircuit<Fr: PrimeField> {
+        //     pub r1cs: R1CS<Fr>,
+        //     pub witness: Option<Vec<Fr>>,
+        // }
 
-        pub type F<G> = <G as Group>::Scalar;
-        pub type C1<G> = CircomCircuit<<G as Group>::Scalar>;
-        pub type C2<G> = TrivialTestCircuit<<G as Group>::Scalar>;
-        pub type Constraint<Fr> = (Vec<(usize, Fr)>, Vec<(usize, Fr)>, Vec<(usize, Fr)>);
+        // pub type F<G> = <G as Group>::Scalar;
+        // pub type C1<G> = CircomCircuit<<G as Group>::Scalar>;
+        // pub type C2<G> = TrivialTestCircuit<<G as Group>::Scalar>;
+        // pub type Constraint<Fr> = (Vec<(usize, Fr)>, Vec<(usize, Fr)>, Vec<(usize, Fr)>);
 
 
         fn generate_recursive_snark_proof(
