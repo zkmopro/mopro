@@ -1,3 +1,5 @@
+extern crate core;
+
 pub mod app_config;
 
 #[cfg(feature = "circom")]
@@ -76,21 +78,51 @@ macro_rules! halo2_app {
 #[macro_export]
 macro_rules! nova_scotia_app {
     () => {
-        fn generate_nova_scotia_proof(
-            r1cs_path: String,
-            cpp_bin_or_wasm_path: String,
-            private_inputs: Vec<HashMap<String, Value>>,
-            start_public_input: Vec<F<G1>>,
-        ) -> Result<GenerateProofResult, MoproError> {
+        use nova_snark::{
+            traits::{circuit::TrivialTestCircuit, Group},
+            PublicParams, RecursiveSNARK,
+        };
+        use ff::PrimeField;
+        use std::path::PathBuf; 
+        use std::collections::HashMap;
+
+        #[derive(Clone, Debug)]
+        pub struct R1CS<Fr: PrimeField> {
+            pub num_inputs: usize,
+            pub num_aux: usize,
+            pub num_variables: usize,
+            pub constraints: Vec<Constraint<Fr>>,
+        }
+
+        #[derive(Clone, Debug)]
+        pub struct CircomCircuit<Fr: PrimeField> {
+            pub r1cs: R1CS<Fr>,
+            pub witness: Option<Vec<Fr>>,
+        }
+
+        pub type F<G> = <G as Group>::Scalar;
+        pub type C1<G> = CircomCircuit<<G as Group>::Scalar>;
+        pub type C2<G> = TrivialTestCircuit<<G as Group>::Scalar>;
+        pub type Constraint<Fr> = (Vec<(usize, Fr)>, Vec<(usize, Fr)>, Vec<(usize, Fr)>);
+
+
+        fn generate_recursive_snark_proof(
+            witness_generator_file: PathBuf,
+            r1cs: circom::circuit::R1CS<F<G1>>,
+            private_inputs: Vec<HashMap<String, serde_json::Value>>,
+            start_public_input: [F<G1>; 2],
+            pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
+        ) -> Result<RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>, mopro_ffi::MoproError> {
             panic!("Nova Scotia is not enabled in this build. Please pass `nova-scotia` feature to `mopro-ffi` to enable Nova Scotia.")
         }
 
-        fn verify_nova_scotia_proof(
-            recursive_snark: RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
+        fn verify_recursive_snark_proof(
+            recursive_snark: &RecursiveSNARK<G1, G2, C1<G1>, C2<G2>>,
             pp: &PublicParams<G1, G2, C1<G1>, C2<G2>>,
             iteration_count: usize,
-            start_public_input: &[E1::Scalar],
-        ) -> Result<bool, MoproError> {
+            start_public_input: [F<G1>; 2],
+            z0_secondary: [F<G2>; 1],
+        ) -> Result<(Vec<F<G1>>, Vec<F<G2>>), mopro_ffi::MoproError> {
             panic!("Nova Scotia is not enabled in this build. Please pass `nova-scotia` feature to `mopro-ffi` to enable Nova Scotia.")
         }
     };

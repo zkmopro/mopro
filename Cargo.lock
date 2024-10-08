@@ -2173,6 +2173,7 @@ dependencies = [
  "ark-std",
  "byteorder",
  "color-eyre",
+ "ff 0.13.0",
  "halo2-fibonacci",
  "nova-scotia",
  "nova-snark",

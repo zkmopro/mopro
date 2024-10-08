@@ -1,3 +1,9 @@
+use nova_snark::{
+    traits::{circuit::TrivialTestCircuit, Group},
+    PublicParams, RecursiveSNARK,
+};
+use ff::PrimeField;
+use srd::path::PathBuf; 
 use std::collections::HashMap;
 
 #[macro_export]
@@ -78,17 +84,17 @@ macro_rules! nova_scotia_app {
 
 #[cfg(test)]
 mod test {
-    use std::{collections::HashMap, panic};
+    use crate as mopro_ffi;
+    use std::collections::HashMap;
+    use serde_json::json;
+    use std::path::PathBuf;
 
     use nova_scotia::*;
 
     use nova_snark::{
         provider, CompressedSNARK, ProverKey, PublicParams, RecursiveSNARK, VerifierKey,
     };
-
-    use crate as mopro_ffi;
-    use serde_json::json;
-    use std::path::PathBuf;
+    
 
     nova_scotia_app!();
 
