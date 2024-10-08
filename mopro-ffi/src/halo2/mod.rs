@@ -156,7 +156,6 @@ mod test {
             panic!("Failed to generate the proof!")
         }
     }
-    
 
     #[test]
     fn test_generate_and_verify_hyperplonk_proof() {
