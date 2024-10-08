@@ -2963,8 +2963,10 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
+ "gemini-fibonacci",
  "halo2-fibonacci",
  "halo2-keccak-256",
+ "hyperplonk-fibonacci",
  "mopro-ffi",
  "num-bigint",
  "rust-witness",
