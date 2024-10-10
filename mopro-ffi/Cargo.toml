@@ -20,7 +20,6 @@ path = "src/uniffi-bindgen.rs"
 default = []
 
 halo2 = []
-plonkish = []
 circom = [
     "rust-witness",
     "ark-circom",
