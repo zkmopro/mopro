@@ -1,7 +1,6 @@
 import uniffi.mopro.*
 
 try {
-    // TODO: There should be error on that
     val srsPath = "../test-vectors/halo2/gemini_fibonacci_srs.bin"
     val vkPath = "../test-vectors/halo2/gemini_fibonacci_vk.bin"
     val pkPath = "../test-vectors/halo2/gemini_fibonacci_pk.bin"

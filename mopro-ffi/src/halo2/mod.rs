@@ -79,6 +79,7 @@ macro_rules! halo2_app {
 /// fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError> {
 ///    match circuit_pk {
 ///       "circuit1_proving_key" => Ok(circuit1_prove_function),
+///       "circuit2_proving_key" => Ok(circuit1_prove_function),
 ///       _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk).to_string()))
 ///    }
 /// }
@@ -86,6 +87,7 @@ macro_rules! halo2_app {
 /// fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError> {
 ///    match circuit_vk {
 ///       "circuit1_verifying_key" => Ok(circuit1_verify_function),
+///       "circuit2_verifying_key" => Ok(circuit2_verify_function),
 ///       _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk).to_string()))
 ///    }
 /// }
