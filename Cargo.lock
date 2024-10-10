@@ -187,7 +187,7 @@ dependencies = [
  "ark-std",
  "derivative",
  "hashbrown 0.13.2",
- "itertools",
+ "itertools 0.10.5",
  "num-traits",
  "rayon",
  "zeroize",
@@ -205,7 +205,7 @@ dependencies = [
  "ark-std",
  "derivative",
  "digest 0.10.7",
- "itertools",
+ "itertools 0.10.5",
  "num-bigint",
  "num-traits",
  "paste",
@@ -823,7 +823,7 @@ dependencies = [
  "clap 2.34.0",
  "criterion-plot",
  "csv",
- "itertools",
+ "itertools 0.10.5",
  "lazy_static",
  "num-traits",
  "oorandom",
@@ -845,7 +845,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2673cc8207403546f45f5fd319a974b1e6983ad1a3ee7e6041650013be041876"
 dependencies = [
  "cast",
- "itertools",
+ "itertools 0.10.5",
 ]
 
 [[package]]
@@ -1310,6 +1310,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "fibonacci-circuit"
+version = "0.1.0"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#948ec731ab1bb502f55fc4baf4920e39b25cc7c9"
+dependencies = [
+ "bincode",
+ "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
+ "halo2curves 0.3.3",
+ "itertools 0.13.0",
+ "plonkish_backend",
+ "rand",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "fixed-hash"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1370,11 +1385,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6d5a32815ae3f33302d95fdcb2ce17862f8c65363dcfd29360480ba1001fc9c"
 
 [[package]]
+name = "gemini-fibonacci"
+version = "0.1.0"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#948ec731ab1bb502f55fc4baf4920e39b25cc7c9"
+dependencies = [
+ "fibonacci-circuit",
+ "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
+ "halo2curves 0.3.3",
+ "plonkish_backend",
+]
+
+[[package]]
 name = "generic-array"
 version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
+ "serde",
  "typenum",
  "version_check",
  "zeroize",
@@ -1448,8 +1475,8 @@ version = "0.1.0"
 source = "git+https://github.com/ElusAegis/halo2-fibonacci-sample.git#4e5f955c936e4c9199a8183152dbad780b10c6d6"
 dependencies = [
  "bincode",
- "halo2_proofs",
- "halo2curves",
+ "halo2_proofs 0.2.0 (git+https://github.com/privacy-scaling-explorations/halo2?tag=v2023_04_20)",
+ "halo2curves 0.3.2",
  "rand",
  "serde",
  "thiserror",
@@ -1464,8 +1491,8 @@ dependencies = [
  "bincode",
  "clap 3.2.25",
  "ethers-core 0.17.0",
- "halo2_proofs",
- "itertools",
+ "halo2_proofs 0.2.0 (git+https://github.com/privacy-scaling-explorations/halo2?tag=v2023_04_20)",
+ "itertools 0.10.5",
  "lazy_static",
  "log",
  "num-bigint",
@@ -1484,7 +1511,24 @@ dependencies = [
  "blake2b_simd",
  "ff 0.13.0",
  "group 0.13.0",
- "halo2curves",
+ "halo2curves 0.3.2",
+ "rand_chacha",
+ "rand_core",
+ "rayon",
+ "sha3 0.9.1",
+ "tracing",
+]
+
+[[package]]
+name = "halo2_proofs"
+version = "0.2.0"
+source = "git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark#4981b8d5bdaab04af9b56a5d2c482b6eec9f7fa4"
+dependencies = [
+ "ark-std",
+ "blake2b_simd",
+ "ff 0.13.0",
+ "group 0.13.0",
+ "halo2curves 0.3.3",
  "rand_chacha",
  "rand_core",
  "rayon",
@@ -1506,6 +1550,25 @@ dependencies = [
  "paste",
  "rand",
  "rand_core",
+ "static_assertions",
+ "subtle",
+]
+
+[[package]]
+name = "halo2curves"
+version = "0.3.3"
+source = "git+https://github.com/privacy-scaling-explorations/halo2curves?tag=0.3.3#8e4cb9f0c66c864e8ca25da07f50ae95f664a5b7"
+dependencies = [
+ "ff 0.13.0",
+ "group 0.13.0",
+ "lazy_static",
+ "num-bigint",
+ "num-traits",
+ "pasta_curves",
+ "paste",
+ "rand",
+ "rand_core",
+ "serde",
  "static_assertions",
  "subtle",
 ]
@@ -1560,6 +1623,9 @@ name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "hmac"
@@ -1568,6 +1634,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c49c37c09c17a53d937dfbb742eb3a961d65a994e6bcdcf37e7399d0cc8ab5e"
 dependencies = [
  "digest 0.10.7",
+]
+
+[[package]]
+name = "hyperplonk-fibonacci"
+version = "0.1.0"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#948ec731ab1bb502f55fc4baf4920e39b25cc7c9"
+dependencies = [
+ "fibonacci-circuit",
+ "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
+ "halo2curves 0.3.3",
+ "plonkish_backend",
 ]
 
 [[package]]
@@ -1683,6 +1760,15 @@ name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
 dependencies = [
  "either",
 ]
@@ -1829,7 +1915,9 @@ dependencies = [
  "ark-std",
  "byteorder",
  "color-eyre",
+ "gemini-fibonacci",
  "halo2-fibonacci",
+ "hyperplonk-fibonacci",
  "num-bigint",
  "num-traits",
  "rust-witness",
@@ -2046,8 +2134,10 @@ dependencies = [
  "blake2b_simd",
  "ff 0.13.0",
  "group 0.13.0",
+ "hex",
  "lazy_static",
  "rand",
+ "serde",
  "static_assertions",
  "subtle",
 ]
@@ -2097,6 +2187,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 
 [[package]]
+name = "plonkish_backend"
+version = "0.1.0"
+source = "git+https://github.com/sifnoc/plonkish?branch=setup_custom#3e8d41907041a3b9e1b9bd1d22c03bbc054e740d"
+dependencies = [
+ "bincode",
+ "bitvec",
+ "generic-array",
+ "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
+ "halo2curves 0.3.3",
+ "itertools 0.10.5",
+ "num-bigint",
+ "num-integer",
+ "pasta_curves",
+ "poseidon",
+ "rand",
+ "rayon",
+ "serde",
+ "sha3 0.10.8",
+]
+
+[[package]]
 name = "plotters"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2122,6 +2233,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81b30686a7d9c3e010b84284bdd26a29f2138574f52f5eb6f794fc0ad924e705"
 dependencies = [
  "plotters-backend",
+]
+
+[[package]]
+name = "poseidon"
+version = "0.2.0"
+source = "git+https://github.com/han0110/poseidon?branch=feature/with-spec#fa4c2544ed38666f1f72d1c4fd0956756a7112b3"
+dependencies = [
+ "halo2curves 0.3.2",
+ "subtle",
 ]
 
 [[package]]
@@ -2843,8 +2963,10 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
+ "gemini-fibonacci",
  "halo2-fibonacci",
  "halo2-keccak-256",
+ "hyperplonk-fibonacci",
  "mopro-ffi",
  "num-bigint",
  "rust-witness",

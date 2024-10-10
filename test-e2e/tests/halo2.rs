@@ -3,4 +3,8 @@ uniffi::build_foreign_language_testcases!(
     "tests/bindings/test_halo2_fibonacci.kts",
     "tests/bindings/test_halo2_keccak256.swift",
     "tests/bindings/test_halo2_keccak256.kts",
+    "tests/bindings/test_hyperplonk_fibonacci.swift",
+    "tests/bindings/test_hyperplonk_fibonacci.kts",
+    "tests/bindings/test_gemini_fibonacci.swift",
+    "tests/bindings/test_gemini_fibonacci.kts"
 );
