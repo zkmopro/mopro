@@ -372,7 +372,9 @@ checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
 
 [[package]]
 name = "ashlang"
-version = "0.0.1"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3a8c030774f024c705121307b124f7d94c8120c0c20cf00eb3622d705bb7c32"
 dependencies = [
  "anyhow",
  "camino",
@@ -2951,7 +2953,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a6b1679d49b24bbfe0c803429aa1874472f50d9b363131f0e89fc356b544d03"
 dependencies = [
  "getrandom 0.1.16",
- "libc",
  "rand_chacha 0.2.2",
  "rand_core 0.5.1",
  "rand_hc",
@@ -3113,6 +3114,8 @@ dependencies = [
 [[package]]
 name = "ring-math"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a714f2e4c98b496b65ff9de23fdc2e132195a7eb66b8c7633e89248bd61de1b5"
 dependencies = [
  "anyhow",
  "rand 0.8.5",
@@ -3258,6 +3261,8 @@ dependencies = [
 [[package]]
 name = "scalarff"
 version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "087fe17cda5f63e91dab4c22fcd6740ed92ede6752ee229f7769cbd55a33a0df"
 dependencies = [
  "ark-bn254",
  "ark-ff",

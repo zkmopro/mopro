@@ -28,13 +28,11 @@ pub fn verify(in0: String, in1: Vec<u8>, in2: Vec<u8>) -> Result<bool, MoproErro
 
 #[cfg(test)]
 mod tests {
-    use ::ashlang::AshlangProver;
-
-    use crate::ashlang;
+    use super::*;
 
     #[test]
     fn test_ashlang_prove_verify() -> anyhow::Result<()> {
-        let proof = ashlang::prove(
+        prove(
             "../test-vectors/ashlang/example.ar1cs".to_string(),
             vec!["55".to_string()],
         )?;
