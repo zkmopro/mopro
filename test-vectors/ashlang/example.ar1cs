@@ -1,3 +1,10 @@
+# r1cs_test.ash
+# This script tests various mathemetical operators
+# view the source below
+#
+# https://github.com/chancehudson/ashlang/blob/main/ashlang/test-vectors/r1cs_test.ash
+#
+
 x1 = (1*one) * (0*one)                  # scalar literal (0) to signal index 0 (member of vector)
 x2 = (1*one) * (100*one)                # scalar literal (100) to signal index 0 (member of vector)
 x3 = (100*one) + (0*one)                # assert_eq() (./ashlang/stdlib/assert_eq.ar1cs)
