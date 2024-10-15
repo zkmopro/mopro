@@ -1,5 +1,7 @@
 pub mod app_config;
 
+#[cfg(feature = "ashlang")]
+pub mod ashlang;
 #[cfg(feature = "circom")]
 mod circom;
 #[cfg(feature = "halo2")]
