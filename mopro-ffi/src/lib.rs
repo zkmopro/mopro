@@ -77,6 +77,8 @@ pub enum MoproError {
     CircomError(String),
     #[error("Halo2Error: {0}")]
     Halo2Error(String),
+    #[error("AshlangError: {0}")]
+    AshlangError(String),
 }
 
 #[derive(Debug, Clone)]
@@ -149,6 +151,8 @@ macro_rules! app {
         mopro_ffi::circom_app!();
 
         mopro_ffi::halo2_app!();
+
+        mopro_ffi::ashlang_spartan_app!();
 
         uniffi::include_scaffolding!("mopro");
     };

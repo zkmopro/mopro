@@ -46,8 +46,9 @@ thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 
 # ashlang deps
-#ashlang = { path = "../../ashlang/ashlang", optional = true }
-ashlang = { version = "0.1.0", optional = true }
+ashlang = { path = "../../ashlang/ashlang", optional = true }
+#ashlang = { version = "0.1.0", optional = true, default-features = false, features = ["spartan-prover"] }
+#scalarff = { path = "../../scalarff", optional = true }
 
 # circom deps
 rust-witness = { version = "0.1.0", optional = true }
