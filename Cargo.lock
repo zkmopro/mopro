@@ -395,7 +395,7 @@ dependencies = [
  "pest",
  "pest_derive",
  "ring-math",
- "scalarff",
+ "scalarff 0.6.1",
  "serde",
  "spartan",
 ]
@@ -2278,6 +2278,7 @@ dependencies = [
  "num-bigint",
  "num-traits",
  "rust-witness",
+ "scalarff 0.7.0",
  "serde",
  "serde_derive",
  "thiserror",
@@ -2978,7 +2979,7 @@ checksum = "48d61cdd8db8de7cca6c2a0e3ba1f7660a28e81bfc5125749c2d1594bdee8ad2"
 dependencies = [
  "anyhow",
  "rand",
- "scalarff",
+ "scalarff 0.6.1",
 ]
 
 [[package]]
@@ -3133,6 +3134,16 @@ dependencies = [
  "num-integer",
  "rand",
  "twenty-first",
+]
+
+[[package]]
+name = "scalarff"
+version = "0.7.0"
+source = "git+https://github.com/chancehudson/scalarff.git?branch=no-twenty-first#3c20a70485d5499b8696f9dd67d361a14ec3a32e"
+dependencies = [
+ "colored",
+ "num-bigint",
+ "num-integer",
 ]
 
 [[package]]
