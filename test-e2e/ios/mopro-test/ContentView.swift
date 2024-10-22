@@ -48,9 +48,9 @@ struct ContentView: View {
     @State private var generatedAshlangProof: Data?
     @State private var ashlangPublicInputs: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
-    private let srsPath = Bundle.main.path(forResource: "fibonacci_srs.bin", ofType: "")!
-    private let vkPath = Bundle.main.path(forResource: "fibonacci_vk.bin", ofType: "")!
-    private let pkPath = Bundle.main.path(forResource: "fibonacci_pk.bin", ofType: "")!
+    private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
+    private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
+    private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
     private let ar1csPath = Bundle.main.path(forResource: "example.ar1cs", ofType: "")!
     
     var body: some View {
