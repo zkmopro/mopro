@@ -5,7 +5,7 @@ do {
   let ar1csPath = "../../../test-vectors/ashlang/example.ar1cs"
 
   // this number is used but not constrained
-  var inputs = [String(55)]
+  let inputs = [String(55)]
 
   // Generate Proof
   let generateProofResult = try generateAshlangSpartanProof(ar1csPath: ar1csPath, inputs: inputs)

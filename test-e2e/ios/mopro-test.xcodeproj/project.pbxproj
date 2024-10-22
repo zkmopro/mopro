@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A5992962CC79C1700135402 /* example.ar1cs in Resources */ = {isa = PBXBuildFile; fileRef = 2A5992952CC79C1700135402 /* example.ar1cs */; };
 		4C05CDB22C327C4F00BEBACD /* mopro_test_UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C05CDB12C327C4F00BEBACD /* mopro_test_UITests.swift */; };
 		4CBAB2782C3334B300B536B7 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */; };
 		4CBAB27A2C3334B800B536B7 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAB2792C3334B800B536B7 /* mopro.swift */; };
@@ -31,6 +32,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2A5992952CC79C1700135402 /* example.ar1cs */ = {isa = PBXFileReference; lastKnownFileType = text; name = example.ar1cs; path = "/Users/zhengyawen/Documents/GitHub/mopro/test-vectors/ashlang/example.ar1cs"; sourceTree = "<absolute>"; };
 		4C05CDAF2C327C4F00BEBACD /* mopro-test-UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mopro-test-UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C05CDB12C327C4F00BEBACD /* mopro_test_UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro_test_UITests.swift; sourceTree = "<group>"; };
 		4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MoproBindings.xcframework; path = ../MoproiOSBindings/MoproBindings.xcframework; sourceTree = "<group>"; };
@@ -41,9 +43,9 @@
 		4CF977F02C2BCF0000CE1139 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CF977F22C2BCF0300CE1139 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		60A8E4352C40404200D3A953 /* fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_srs.bin; path = "../../test-vectors/halo2/fibonacci_srs.bin"; sourceTree = "<group>"; };
-		60A8E4362C40404300D3A953 /* fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_pk.bin; path = "../../test-vectors/halo2/fibonacci_pk.bin"; sourceTree = "<group>"; };
-		60A8E4372C40404300D3A953 /* fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_vk.bin; path = "../../test-vectors/halo2/fibonacci_vk.bin"; sourceTree = "<group>"; };
+		60A8E4352C40404200D3A953 /* fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = fibonacci_srs.bin; path = "../../test-vectors/halo2/fibonacci_srs.bin"; sourceTree = "<group>"; };
+		60A8E4362C40404300D3A953 /* fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = fibonacci_pk.bin; path = "../../test-vectors/halo2/fibonacci_pk.bin"; sourceTree = "<group>"; };
+		60A8E4372C40404300D3A953 /* fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = fibonacci_vk.bin; path = "../../test-vectors/halo2/fibonacci_vk.bin"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 				60A8E4352C40404200D3A953 /* fibonacci_srs.bin */,
 				60A8E4372C40404300D3A953 /* fibonacci_vk.bin */,
 				4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */,
+				2A5992952CC79C1700135402 /* example.ar1cs */,
 				4CF977ED2C2BCF0000CE1139 /* mopro-test */,
 				4C05CDB02C327C4F00BEBACD /* mopro-test-UITests */,
 				4CF977EC2C2BCF0000CE1139 /* Products */,
@@ -218,6 +221,7 @@
 				60A8E4382C40404300D3A953 /* fibonacci_srs.bin in Resources */,
 				4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */,
 				60A8E4392C40404300D3A953 /* fibonacci_pk.bin in Resources */,
+				2A5992962CC79C1700135402 /* example.ar1cs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,7 +416,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"mopro-test/Preview Content\"";
-				DEVELOPMENT_TEAM = R92BA9L62G;
+				DEVELOPMENT_TEAM = N3ESL929H7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -441,7 +445,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"mopro-test/Preview Content\"";
-				DEVELOPMENT_TEAM = R92BA9L62G;
+				DEVELOPMENT_TEAM = N3ESL929H7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
