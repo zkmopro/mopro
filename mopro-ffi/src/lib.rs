@@ -16,6 +16,26 @@ pub use circom::{
 #[cfg(feature = "halo2")]
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 
+#[cfg(not(feature = "ashlang"))]
+#[macro_export]
+macro_rules! ashlang_spartan_app {
+    () => {
+        fn generate_ashlang_spartan_proof(
+            ar1cs_path: String, // path to ar1cs file
+            secret_inputs: Vec<String>,
+        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
+            panic!("Ashlang proving is not enabled in this build. Please pass `ashlang` feature to `mopro-ffi` to enable Ashlang.");
+        }
+
+        fn verify_ashlang_spartan_proof(
+            ar1cs_path: String,
+            proof: Vec<u8>,
+        ) -> Result<bool, mopro_ffi::MoproError> {
+            panic!("Ashlang proving is not enabled in this build. Please pass `ashlang` feature to `mopro-ffi` to enable Ashlang.");
+        }
+    };
+}
+
 #[cfg(not(feature = "circom"))]
 #[macro_export]
 macro_rules! circom_app {

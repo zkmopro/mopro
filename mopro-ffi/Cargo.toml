@@ -17,7 +17,7 @@ name = "uniffi-bindgen"
 path = "src/uniffi-bindgen.rs"
 
 [features]
-default = ["ashlang"]
+default = []
 
 ashlang = ["dep:ashlang"]
 halo2 = []
@@ -46,10 +46,7 @@ thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 
 # ashlang deps
-#ashlang = { path = "../../ashlang/ashlang", optional = true, default-features = false, features = ["spartan-prover", "serde"] }
 ashlang = { git = "https://github.com/chancehudson/ashlang.git", rev = "696960a0c15db47170fdd1ff058682023d904b1b", optional = true, default-features = false, features = ["spartan-prover", "serde"] }
-#ashlang = { version = "0.1.0", optional = true, default-features = false, features = ["spartan-prover"] }
-#scalarff = { git = "https://github.com/chancehudson/scalarff.git", branch = "no-twenty-first", optional = true }
 
 # circom deps
 rust-witness = { version = "0.1.0", optional = true }
