@@ -12,7 +12,7 @@ macro_rules! ashlang_spartan_app {
             ar1cs_path: String, // path to ar1cs file
             secret_inputs: Vec<String>,
         ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
-            mopro_ffi::ashlang::prove(ar1cs_path, secret_inputs).map_err(|e| {
+            mopro_ffi::ashlang::prove(&ar1cs_path, secret_inputs).map_err(|e| {
                 mopro_ffi::MoproError::AshlangError(
                     "error generating ashlang spartan proof".to_string(),
                 )
@@ -23,18 +23,20 @@ macro_rules! ashlang_spartan_app {
             ar1cs_path: String,
             proof: Vec<u8>,
         ) -> Result<bool, mopro_ffi::MoproError> {
-            mopro_ffi::ashlang::verify(ar1cs_path, proof).map_err(|e| {
+            mopro_ffi::ashlang::verify(&ar1cs_path, proof).map_err(|e| {
                 mopro_ffi::MoproError::AshlangError("error verifying proof".to_string())
             })
         }
     };
 }
 
+/// Generates a spartan proof from an ar1cs file compiled
+/// with the ashlang compiler.
 pub fn prove(
-    ar1cs_path: String, // path to ar1cs file
+    ar1cs_path: &str, // path to ar1cs file
     secret_inputs: Vec<String>,
 ) -> anyhow::Result<GenerateProofResult> {
-    let ir_source = fs::read_to_string(&ar1cs_path)?;
+    let ir_source = fs::read_to_string(ar1cs_path)?;
     // we pass an empty vec for public inputs because
     // they are not supported in the ashlang spartan prover
     // outputs are public and should be used instead
@@ -46,10 +48,12 @@ pub fn prove(
     })
 }
 
-/// TODO: build gens params from ar1cs file/confirm that a proof is for the
-/// expected ar1cs file
-pub fn verify(_ar1cs_path: String, proof: Vec<u8>) -> anyhow::Result<bool> {
-    ashlang::SpartanProver::verify(bincode::deserialize(&proof)?)
+/// Verifies a spartan proof from an ar1cs file
+pub fn verify(ar1cs_path: &str, proof: Vec<u8>) -> anyhow::Result<bool> {
+    let ir_source = fs::read_to_string(ar1cs_path)?;
+    let p = bincode::deserialize(&proof)?;
+    ashlang::SpartanProver::verify(&ir_source, p)
+    // Ok(true)
 }
 
 #[cfg(test)]
@@ -58,13 +62,9 @@ mod tests {
 
     #[test]
     fn test_ashlang_prove_verify() -> anyhow::Result<()> {
-        let proof = prove(
-            "../test-vectors/ashlang/example.ar1cs".to_string(),
-            vec!["55".to_string()],
-        )?;
-
-        ashlang::SpartanProver::verify(bincode::deserialize(&proof.proof)?)?;
-
+        let ar1cs_path = "../test-vectors/ashlang/example.ar1cs".to_string();
+        let proof = prove(&ar1cs_path, vec!["55".to_string()])?;
+        verify(&ar1cs_path, proof.proof)?;
         Ok(())
     }
 }

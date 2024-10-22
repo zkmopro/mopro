@@ -46,8 +46,8 @@ thiserror = "=1.0.39"
 color-eyre = "=0.6.2"
 
 # ashlang deps
-#ashlang = { path = "../../ashlang/ashlang", optional = true }
-ashlang = { git = "https://github.com/chancehudson/ashlang.git", optional = true, default-features = false, features = ["spartan-prover", "serde"] }
+#ashlang = { path = "../../ashlang/ashlang", optional = true, default-features = false, features = ["spartan-prover", "serde"] }
+ashlang = { git = "https://github.com/chancehudson/ashlang.git", branch = "main", optional = true, default-features = false, features = ["spartan-prover", "serde"] }
 #ashlang = { version = "0.1.0", optional = true, default-features = false, features = ["spartan-prover"] }
 #scalarff = { git = "https://github.com/chancehudson/scalarff.git", branch = "no-twenty-first", optional = true }
 
