@@ -19,7 +19,8 @@ const sidebars: SidebarsConfig = {
                 'getting-started/rust-setup',
                 'getting-started/ios-setup',
                 'getting-started/android-setup',
-                'getting-started/react-native-setup'
+                'getting-started/react-native-setup',
+                'getting-started/flutter-setup'
             ]
         },
         {
