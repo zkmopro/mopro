@@ -1,4 +1,4 @@
-import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 const sidebars: SidebarsConfig = {
     docsSidebar: [
@@ -19,6 +19,7 @@ const sidebars: SidebarsConfig = {
                 'getting-started/rust-setup',
                 'getting-started/ios-setup',
                 'getting-started/android-setup',
+                'getting-started/react-native-setup',
                 'getting-started/flutter-setup'
             ]
         },
