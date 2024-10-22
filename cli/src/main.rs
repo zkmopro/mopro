@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 
 mod build;
+mod create;
 mod init;
 mod style;
 
@@ -30,6 +31,10 @@ enum Commands {
         #[arg(long, num_args = 1.., help = "Specify the platforms to build for (e.g., 'ios', 'android').")]
         platforms: Option<Vec<String>>,
     },
+    Create {
+        #[arg(long, help = "Specify the platform")]
+        mode: Option<String>,
+    },
 }
 
 fn main() {
@@ -44,6 +49,10 @@ fn main() {
             Err(e) => style::print_read_bold(format!("Failed to initialize project {:?}", e)),
         },
         Commands::Build { mode, platforms } => match build::build_project(mode, platforms) {
+            Ok(_) => {}
+            Err(e) => style::print_read_bold(format!("Failed to build project {:?}", e)),
+        },
+        Commands::Create { mode } => match create::create_project(mode) {
             Ok(_) => {}
             Err(e) => style::print_read_bold(format!("Failed to build project {:?}", e)),
         },
