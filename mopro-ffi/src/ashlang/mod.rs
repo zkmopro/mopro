@@ -53,7 +53,6 @@ pub fn verify(ar1cs_path: &str, proof: Vec<u8>) -> anyhow::Result<bool> {
     let ir_source = fs::read_to_string(ar1cs_path)?;
     let p = bincode::deserialize(&proof)?;
     ashlang::SpartanProver::verify(&ir_source, p)
-    // Ok(true)
 }
 
 #[cfg(test)]
