@@ -5,10 +5,10 @@ Flutter is a framework for building natively compiled, multi-platform applicatio
 
 ## Flutter plugin example
 
-You can now clone the repository from [zkmopro/flutter-app](https://github.com/zkmopro/flutter-app) with
+You can now clone the repository from [zkmopro/flutter-plugin](https://github.com/zkmopro/flutter-plugin) with
 
 ```sh
-git clone https://github.com/zkmopro/flutter-app
+git clone https://github.com/zkmopro/flutter-plugin
 ```
 
 Once cloned, follow the instructions in the README file to run the example app for the plugin.
@@ -31,5 +31,5 @@ dependencies:
     # The example app is bundled with the plugin so we use a path dependency on
     # the parent directory to use the current plugin's version.
     path: <THE_PATH_TO_MOPRO_PLUGIN>
-    # e.g. path: ../flutter-app
+    # e.g. path: ../flutter-plugin
 ```
