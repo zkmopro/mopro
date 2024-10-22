@@ -17,9 +17,9 @@ name = "uniffi-bindgen"
 path = "src/uniffi-bindgen.rs"
 
 [features]
-default = ["ashlang_t"]
+default = ["ashlang"]
 
-ashlang_t = ["ashlang"]
+ashlang = ["dep:ashlang"]
 halo2 = []
 circom = [
     "rust-witness",
