@@ -44,7 +44,7 @@ pub fn prove(
 
     Ok(GenerateProofResult {
         proof: bincode::serialize(&proof)?,
-        inputs: bincode::serialize(&secret_inputs)?,
+        inputs: vec![],
     })
 }
 
