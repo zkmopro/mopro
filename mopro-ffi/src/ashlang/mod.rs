@@ -60,9 +60,17 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_ashlang_prove_verify() -> anyhow::Result<()> {
+    fn test_ashlang_spartan_prove_verify() -> anyhow::Result<()> {
         let ar1cs_path = "../test-vectors/ashlang/example.ar1cs".to_string();
         let proof = prove(&ar1cs_path, vec!["55".to_string()])?;
+        verify(&ar1cs_path, proof.proof)?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_ashlang_spartan_multiplier2() -> anyhow::Result<()> {
+        let ar1cs_path = "../test-vectors/ashlang/multiplier2.ar1cs".to_string();
+        let proof = prove(&ar1cs_path, vec!["55".to_string(), "56".to_string()])?;
         verify(&ar1cs_path, proof.proof)?;
         Ok(())
     }
