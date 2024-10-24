@@ -1,0 +1,12 @@
+# multiplier2
+# Compiled at 2024-10-24T07:36:29.607Z
+# Compiled for curve25519 x^64+1 polynomial ring
+#
+x1 = (1*one) input (1*one)              #
+x2 = (1*one) input (1*one)              #
+x3 = (1*x1) * (1*x2)                    # write_output() (./ashlang/stdlib/io/write_output.ar1cs)
+x4 = (1*one) * (1*x3)                   #
+x4 = (1*one) output (1*one)             #
+0 = (7237005577332262213973186563042994240857116359379907606001950938285454250988*one) * (7237005577332262213973186563042994240857116359379907606001950938285454250988*one) - (1*one) # field safety constraint
+0 = (1*x1) * (1*x2) - (1*x3)            # multiplication between 1 and 2 into 3
+0 = (1*one) * (1*x4) - (1*x3)           # constrain intermediate output assignment

@@ -14,7 +14,7 @@ name = "ios"
 name = "android"
 
 [dependencies]
-mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
+mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom", "ashlang"] }
 uniffi = "0.28.0"
 
 # Circom dependencies

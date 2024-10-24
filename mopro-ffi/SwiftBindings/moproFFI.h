@@ -251,6 +251,11 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureStr
     );
 
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_GENERATE_ASHLANG_SPARTAN_PROOF
+#define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_GENERATE_ASHLANG_SPARTAN_PROOF
+RustBuffer uniffi_mopro_bindings_fn_func_generate_ashlang_spartan_proof(RustBuffer ar1cs_path, RustBuffer inputs, RustCallStatus *_Nonnull out_status
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_GENERATE_CIRCOM_PROOF
 #define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_GENERATE_CIRCOM_PROOF
 RustBuffer uniffi_mopro_bindings_fn_func_generate_circom_proof(RustBuffer zkey_path, RustBuffer circuit_inputs, RustCallStatus *_Nonnull out_status
@@ -269,6 +274,11 @@ RustBuffer uniffi_mopro_bindings_fn_func_to_ethereum_inputs(RustBuffer inputs, R
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_TO_ETHEREUM_PROOF
 #define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_TO_ETHEREUM_PROOF
 RustBuffer uniffi_mopro_bindings_fn_func_to_ethereum_proof(RustBuffer proof, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_VERIFY_ASHLANG_SPARTAN_PROOF
+#define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_VERIFY_ASHLANG_SPARTAN_PROOF
+int8_t uniffi_mopro_bindings_fn_func_verify_ashlang_spartan_proof(RustBuffer ar1cs_path, RustBuffer proof, RustCallStatus *_Nonnull out_status
 );
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_FN_FUNC_VERIFY_CIRCOM_PROOF
@@ -561,6 +571,12 @@ void ffi_mopro_bindings_rust_future_free_void(uint64_t handle
 void ffi_mopro_bindings_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_GENERATE_ASHLANG_SPARTAN_PROOF
+#define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_GENERATE_ASHLANG_SPARTAN_PROOF
+uint16_t uniffi_mopro_bindings_checksum_func_generate_ashlang_spartan_proof(void
+    
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_GENERATE_CIRCOM_PROOF
 #define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_GENERATE_CIRCOM_PROOF
 uint16_t uniffi_mopro_bindings_checksum_func_generate_circom_proof(void
@@ -582,6 +598,12 @@ uint16_t uniffi_mopro_bindings_checksum_func_to_ethereum_inputs(void
 #ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_TO_ETHEREUM_PROOF
 #define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_TO_ETHEREUM_PROOF
 uint16_t uniffi_mopro_bindings_checksum_func_to_ethereum_proof(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_VERIFY_ASHLANG_SPARTAN_PROOF
+#define UNIFFI_FFIDEF_UNIFFI_MOPRO_BINDINGS_CHECKSUM_FUNC_VERIFY_ASHLANG_SPARTAN_PROOF
+uint16_t uniffi_mopro_bindings_checksum_func_verify_ashlang_spartan_proof(void
     
 );
 #endif
