@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 mod build;
 mod create;
 mod init;
+mod print;
 mod style;
 
 /// CLI for creating a mopro project.
@@ -15,6 +16,7 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Initialize the project for specified adapters
     Init {
         #[arg(
             long,
@@ -31,9 +33,10 @@ enum Commands {
         #[arg(long, num_args = 1.., help = "Specify the platforms to build for (e.g., 'ios', 'android').")]
         platforms: Option<Vec<String>>,
     },
+    /// Create templates for the specified platform
     Create {
         #[arg(long, help = "Specify the platform")]
-        mode: Option<String>,
+        template: Option<String>,
     },
 }
 
@@ -52,9 +55,9 @@ fn main() {
             Ok(_) => {}
             Err(e) => style::print_read_bold(format!("Failed to build project {:?}", e)),
         },
-        Commands::Create { mode } => match create::create_project(mode) {
+        Commands::Create { template } => match create::create_project(template) {
             Ok(_) => {}
-            Err(e) => style::print_read_bold(format!("Failed to build project {:?}", e)),
+            Err(e) => style::print_read_bold(format!("Failed to create template {:?}", e)),
         },
     }
 }

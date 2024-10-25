@@ -3,7 +3,8 @@ use std::{env, error::Error, fs, path::Path};
 use dialoguer::{theme::ColorfulTheme, Select};
 use include_dir::{include_dir, Dir};
 
-use crate::style::{self, print_bold, print_green_bold};
+use crate::print::{print_create_android_success_message, print_create_ios_success_message};
+use crate::style::{self};
 
 // TODO: add  "react-native", "flutter"
 const TEMPLATES: [&str; 2] = ["ios", "android"];
@@ -45,7 +46,7 @@ pub fn create_project(arg_platform: &Option<String>) -> Result<(), Box<dyn Error
             fs::create_dir(target_ios_bindings_dir.clone())?;
             copy_dir(&ios_bindings_dir, &target_ios_bindings_dir)?;
 
-            print_ios_success_message();
+            print_create_ios_success_message();
         }
 
         if platform.contains(TEMPLATES[1]) {
@@ -83,7 +84,7 @@ pub fn create_project(arg_platform: &Option<String>) -> Result<(), Box<dyn Error
             fs::create_dir(target_uniffi_path.clone())?;
             copy_dir(&uniffi_path, &target_uniffi_path)?;
 
-            print_android_success_message();
+            print_create_android_success_message();
         }
     }
     Ok(())
@@ -141,40 +142,4 @@ fn copy_dir(input_dir: &Path, output_dir: &Path) -> std::io::Result<()> {
         }
     }
     Ok(())
-}
-
-fn print_ios_success_message() {
-    print_green_bold("Template created successfully!".to_string());
-    println!();
-    print_green_bold("Next steps:".to_string());
-    println!();
-    print_green_bold("  You can now use the following command to open the app:".to_string());
-    println!();
-    print_bold("    open ios/MoproApp.xcodeproj".to_string());
-    println!();
-    print_green_bold("This will open the iOS project in Xcode.".to_string());
-    println!();
-    println!(
-        "📚 To learn more about mopro, visit: {}",
-        style::blue_bold("https://zkmopro.org".to_string())
-    );
-    println!("Happy coding! 🚀");
-}
-
-fn print_android_success_message() {
-    print_green_bold("Template created successfully!".to_string());
-    println!();
-    print_green_bold("Next steps:".to_string());
-    println!();
-    print_green_bold("  You can now use the following command to open the app:".to_string());
-    println!();
-    print_bold(r"    open android -a Android\ Studio ".to_string());
-    println!();
-    print_green_bold("This will open the Android project in Android Studio.".to_string());
-    println!();
-    println!(
-        "📚 To learn more about mopro, visit: {}",
-        style::blue_bold("https://zkmopro.org".to_string())
-    );
-    println!("Happy coding! 🚀");
 }

@@ -1,4 +1,7 @@
-use crate::style::{self, blue_bold, print_bold, print_green_bold};
+use crate::{
+    print::print_build_success_message,
+    style::{self, blue_bold, print_green_bold},
+};
 use dialoguer::{theme::ColorfulTheme, MultiSelect, Select};
 use std::{env, error::Error};
 
@@ -109,13 +112,6 @@ fn print_binding_message(platforms: Vec<String>) -> Result<(), Box<dyn Error>> {
         );
         println!("{}", blue_bold(text.to_string()));
     }
-    println!();
-    print_green_bold("Run the following command to create templates.".to_string());
-    print_bold("   mopro create".to_string());
-    println!();
-    println!(
-        "📚 To learn more about mopro, visit: {}",
-        style::blue_bold("https://zkmopro.org".to_string())
-    );
+    print_build_success_message();
     Ok(())
 }

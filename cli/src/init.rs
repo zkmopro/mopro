@@ -1,4 +1,5 @@
-use crate::style::{self, print_bold, print_green_bold};
+use crate::print::print_init_instructions;
+use crate::style::{self};
 use dialoguer::{theme::ColorfulTheme, Input, MultiSelect};
 use include_dir::{include_dir, Dir};
 use std::env;
@@ -87,25 +88,7 @@ pub fn init_project(
         }
 
         // Print out the instructions
-        println!(
-            "🚀 Project '{}' initialized successfully! 🎉",
-            &project_name
-        );
-        println!();
-        println!("To get started, follow these steps:");
-        println!();
-        print_green_bold("1. Navigate to your project directory:".to_string());
-        print_bold(format!("   cd {}", &project_name));
-        println!();
-        print_green_bold("2. Run the following commands to build and run the project:".to_string());
-        print_bold("   mopro build".to_string());
-        println!();
-        println!(
-            "📚 To learn more about mopro, visit: {}",
-            style::blue_bold("https://zkmopro.org".to_string())
-        );
-        println!();
-        println!("Happy coding! 🚀");
+        print_init_instructions(project_name);
     }
     Ok(())
 }
