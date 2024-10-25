@@ -5,7 +5,8 @@ use include_dir::{include_dir, Dir};
 
 use crate::style::{self, print_bold, print_green_bold};
 
-const TEMPLATES: [&str; 4] = ["ios", "android", "react-native", "flutter"];
+// TODO: add  "react-native", "flutter"
+const TEMPLATES: [&str; 2] = ["ios", "android"];
 
 pub fn create_project(arg_platform: &Option<String>) -> Result<(), Box<dyn Error>> {
     let platform: String = match arg_platform.as_deref() {
@@ -44,17 +45,45 @@ pub fn create_project(arg_platform: &Option<String>) -> Result<(), Box<dyn Error
             fs::create_dir(target_ios_bindings_dir.clone())?;
             copy_dir(&ios_bindings_dir, &target_ios_bindings_dir)?;
 
-            print_green_bold("Template created successfully!".to_string());
-            println!();
-            print_green_bold("Next steps:".to_string());
-            println!();
-            print_green_bold(
-                "  You can now use the following command to open the app:".to_string(),
-            );
-            println!();
-            print_bold("    open ios/MoproApp.xcodeproj".to_string());
-            println!();
-            print_green_bold("This will open the iOS project in Xcode.".to_string());
+            print_ios_success_message();
+        }
+
+        if platform.contains(TEMPLATES[1]) {
+            let platform_name = "android";
+            let target_dir = project_dir.join(&platform_name);
+            fs::create_dir(&target_dir)?;
+
+            // Change directory to the project directory
+            env::set_current_dir(&target_dir)?;
+            const ANDROID_TEMPLATE_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/android");
+            copy_embedded_dir(&ANDROID_TEMPLATE_DIR, &target_dir)?;
+
+            // Copy Android bindings
+            env::set_current_dir(&project_dir)?;
+            let android_bindings = "MoproAndroidBindings";
+            let jni_libs_name = "jniLibs";
+            let uniffi_name = "uniffi";
+            let android_bindings_dir = project_dir.join(&android_bindings);
+            let jni_libs_path = android_bindings_dir.join(&jni_libs_name);
+            let uniffi_path = android_bindings_dir.join(&uniffi_name);
+            let target_jni_libs_path = target_dir
+                .join("app")
+                .join("src")
+                .join("main")
+                .join("jniLibs");
+            let target_uniffi_path = target_dir
+                .join("app")
+                .join("src")
+                .join("main")
+                .join("java")
+                .join("uniffi");
+            fs::create_dir(target_jni_libs_path.clone())?;
+            copy_dir(&jni_libs_path, &target_jni_libs_path)?;
+            fs::create_dir(target_uniffi_path.clone())?;
+            copy_dir(&uniffi_path, &target_uniffi_path)?;
+
+            print_android_success_message();
         }
     }
     Ok(())
@@ -112,4 +141,40 @@ fn copy_dir(input_dir: &Path, output_dir: &Path) -> std::io::Result<()> {
         }
     }
     Ok(())
+}
+
+fn print_ios_success_message() {
+    print_green_bold("Template created successfully!".to_string());
+    println!();
+    print_green_bold("Next steps:".to_string());
+    println!();
+    print_green_bold("  You can now use the following command to open the app:".to_string());
+    println!();
+    print_bold("    open ios/MoproApp.xcodeproj".to_string());
+    println!();
+    print_green_bold("This will open the iOS project in Xcode.".to_string());
+    println!();
+    println!(
+        "📚 To learn more about mopro, visit: {}",
+        style::blue_bold("https://zkmopro.org".to_string())
+    );
+    println!("Happy coding! 🚀");
+}
+
+fn print_android_success_message() {
+    print_green_bold("Template created successfully!".to_string());
+    println!();
+    print_green_bold("Next steps:".to_string());
+    println!();
+    print_green_bold("  You can now use the following command to open the app:".to_string());
+    println!();
+    print_bold(r"    open android -a Android\ Studio ".to_string());
+    println!();
+    print_green_bold("This will open the Android project in Android Studio.".to_string());
+    println!();
+    println!(
+        "📚 To learn more about mopro, visit: {}",
+        style::blue_bold("https://zkmopro.org".to_string())
+    );
+    println!("Happy coding! 🚀");
 }
