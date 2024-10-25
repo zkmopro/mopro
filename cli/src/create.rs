@@ -46,6 +46,14 @@ pub fn create_project(arg_platform: &Option<String>) -> Result<(), Box<dyn Error
             fs::create_dir(target_ios_bindings_dir.clone())?;
             copy_dir(&ios_bindings_dir, &target_ios_bindings_dir)?;
 
+            // Copy keys
+            const CIRCOM_KEYS_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom");
+            const HALO2_KEYS_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
+            copy_embedded_file(&CIRCOM_KEYS_DIR, &target_dir)?;
+            copy_embedded_file(&HALO2_KEYS_DIR, &target_dir)?;
+
             print_create_ios_success_message();
         }
 
@@ -84,6 +92,19 @@ pub fn create_project(arg_platform: &Option<String>) -> Result<(), Box<dyn Error
             fs::create_dir(target_uniffi_path.clone())?;
             copy_dir(&uniffi_path, &target_uniffi_path)?;
 
+            // Copy keys
+            let assets_dir = target_dir
+                .join("app")
+                .join("src")
+                .join("main")
+                .join("assets");
+            const CIRCOM_KEYS_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom");
+            const HALO2_KEYS_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
+            copy_embedded_file(&CIRCOM_KEYS_DIR, &assets_dir)?;
+            copy_embedded_file(&HALO2_KEYS_DIR, &assets_dir)?;
+
             print_create_android_success_message();
         }
     }
@@ -97,6 +118,29 @@ fn select_template() -> Result<String, Box<dyn Error>> {
         .interact()?;
 
     Ok(TEMPLATES[idx].to_owned())
+}
+
+fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> std::io::Result<()> {
+    for file in dir.entries() {
+        let relative_path = file.path();
+        let output_path = output_dir.join(relative_path);
+
+        // Create directories as needed
+        if let Some(parent) = output_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+
+        // Write the file to the output directory
+        match file.as_file() {
+            Some(file) => {
+                if let Err(e) = fs::write(&output_path, file.contents()) {
+                    return Err(e);
+                }
+            }
+            None => return Ok(()),
+        }
+    }
+    Ok(())
 }
 
 fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> std::io::Result<()> {
