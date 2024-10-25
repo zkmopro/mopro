@@ -1458,7 +1458,7 @@ checksum = "28dea519a9695b9977216879a3ebfddf92f1c08c05d984f8996aecd6ecdc811d"
 [[package]]
 name = "fibonacci-circuit"
 version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#41c05f7a1093c73d503953831f1accd6474d086e"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3dbc93f23197b2341eab6d1c5d84159ca94351f1"
 dependencies = [
  "bincode",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
@@ -1543,7 +1543,7 @@ checksum = "e6d5a32815ae3f33302d95fdcb2ce17862f8c65363dcfd29360480ba1001fc9c"
 [[package]]
 name = "gemini-fibonacci"
 version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#41c05f7a1093c73d503953831f1accd6474d086e"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3dbc93f23197b2341eab6d1c5d84159ca94351f1"
 dependencies = [
  "fibonacci-circuit",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
@@ -1633,19 +1633,6 @@ name = "half"
 version = "1.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b43ede17f21864e81be2fa654110bf1e793774238d86ef8555c37e6519c0403"
-
-[[package]]
-name = "halo2-fibonacci"
-version = "0.1.0"
-source = "git+https://github.com/ElusAegis/halo2-fibonacci-sample.git#4e5f955c936e4c9199a8183152dbad780b10c6d6"
-dependencies = [
- "bincode",
- "halo2_proofs 0.2.0 (git+https://github.com/privacy-scaling-explorations/halo2?tag=v2023_04_20)",
- "halo2curves 0.3.2",
- "rand",
- "serde",
- "thiserror",
-]
 
 [[package]]
 name = "halo2-keccak-256"
@@ -1804,7 +1791,7 @@ dependencies = [
 [[package]]
 name = "hyperplonk-fibonacci"
 version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#41c05f7a1093c73d503953831f1accd6474d086e"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3dbc93f23197b2341eab6d1c5d84159ca94351f1"
 dependencies = [
  "fibonacci-circuit",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
@@ -2127,10 +2114,10 @@ dependencies = [
  "byteorder",
  "color-eyre",
  "gemini-fibonacci",
- "halo2-fibonacci",
  "hyperplonk-fibonacci",
  "num-bigint",
  "num-traits",
+ "plonk-fibonacci",
  "rust-witness",
  "serde",
  "serde_derive",
@@ -2445,6 +2432,20 @@ name = "plain"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
+
+[[package]]
+name = "plonk-fibonacci"
+version = "0.1.0"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3dbc93f23197b2341eab6d1c5d84159ca94351f1"
+dependencies = [
+ "bincode",
+ "fibonacci-circuit",
+ "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
+ "halo2curves 0.3.3",
+ "plonkish_backend",
+ "rand",
+ "serde",
+]
 
 [[package]]
 name = "plonkish_backend"
@@ -3294,11 +3295,11 @@ name = "test-e2e"
 version = "0.1.0"
 dependencies = [
  "gemini-fibonacci",
- "halo2-fibonacci",
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
  "mopro-ffi",
  "num-bigint",
+ "plonk-fibonacci",
  "rust-witness",
  "uniffi",
 ]
