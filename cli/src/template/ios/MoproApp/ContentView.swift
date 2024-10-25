@@ -42,9 +42,9 @@ struct ContentView: View {
     @State private var generatedHalo2Proof: Data?
     @State private var halo2PublicInputs: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
-    private let srsPath = Bundle.main.path(forResource: "fibonacci_srs.bin", ofType: "")!
-    private let vkPath = Bundle.main.path(forResource: "fibonacci_vk.bin", ofType: "")!
-    private let pkPath = Bundle.main.path(forResource: "fibonacci_pk.bin", ofType: "")!
+    private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
+    private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
+    private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
     
     var body: some View {
         VStack(spacing: 10) {

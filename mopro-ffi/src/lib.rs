@@ -156,10 +156,10 @@ pub struct ProofCalldata {
 /// use crate::halo2::FibonacciMoproCircuit;
 ///
 /// // Add `Fibonacci` circuit to generate proofs
-/// mopro_ffi::set_halo2_proving_circuits!("fibonacci_pk.bin", FibonacciMoproCircuit::prove);
+/// mopro_ffi::set_halo2_proving_circuits!("plonk_fibonacci_pk.bin", FibonacciMoproCircuit::prove);
 ///
 /// // Add `Fibonacci` circuit to verify proofs
-// mopro_ffi::set_halo2_verifying_circuits!("fibonacci_vk.bin", FibonacciMoproCircuit::verify);
+// mopro_ffi::set_halo2_verifying_circuits!("plonk_fibonacci_vk.bin", FibonacciMoproCircuit::verify);
 ///
 ///
 #[macro_export]

@@ -187,7 +187,7 @@ fn circom_build_template(file_path: &str) -> Result<(), Box<dyn Error>> {
 
 fn halo2_dependencies_template(file_path: &str) -> Result<(), Box<dyn Error>> {
     let replacement =
-        "halo2-fibonacci = { git = \"https://github.com/ElusAegis/halo2-fibonacci-sample.git\" }";
+        "plonk-fibonacci = { package = \"plonk-fibonacci\", git = \"https://github.com/sifnoc/plonkish-fibonacci-sample.git\" }";
     let target = "# HALO2_DEPENDENCIES";
     replace_string_in_file(file_path, target, replacement)
 }
