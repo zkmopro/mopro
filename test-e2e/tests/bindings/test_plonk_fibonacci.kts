@@ -1,9 +1,9 @@
 import uniffi.mopro.*
 
 try {
-    val srsPath = "../test-vectors/halo2/fibonacci_srs.bin"
-    val vkPath = "../test-vectors/halo2/fibonacci_vk.bin"
-    val pkPath = "../test-vectors/halo2/fibonacci_pk.bin"
+    val srsPath = "../test-vectors/halo2/plonk_fibonacci_srs.bin"
+    val vkPath = "../test-vectors/halo2/plonk_fibonacci_vk.bin"
+    val pkPath = "../test-vectors/halo2/plonk_fibonacci_pk.bin"
 
     // Prepare inputs
     val inputs = mutableMapOf<String, List<String>>()

@@ -22,8 +22,8 @@ rust-witness = "0.1.0"
 num-bigint = { version = "0.4.0" }
 
 # Halo2 dependencies
-halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
 halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
+plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 

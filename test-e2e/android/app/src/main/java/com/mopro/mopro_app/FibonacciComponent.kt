@@ -30,9 +30,9 @@ fun FibonacciComponent() {
         )
     }
 
-    val srsPath = getFilePathFromAssets("fibonacci_srs.bin")
-    val provingKeyPath = getFilePathFromAssets("fibonacci_pk.bin")
-    val verifyingKeyPath = getFilePathFromAssets("fibonacci_vk.bin")
+    val srsPath = getFilePathFromAssets("plonk_fibonacci_srs.bin")
+    val provingKeyPath = getFilePathFromAssets("plonk_fibonacci_pk.bin")
+    val verifyingKeyPath = getFilePathFromAssets("plonk_fibonacci_vk.bin")
 
 
     val inputs = mutableMapOf<String, List<String>>()
