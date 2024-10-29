@@ -1,17 +1,19 @@
 use crate::print::print_init_instructions;
-use crate::style::{self};
-use dialoguer::{theme::ColorfulTheme, Input, MultiSelect};
-use include_dir::{include_dir, Dir};
+use crate::style;
+use dialoguer::theme::ColorfulTheme;
+use dialoguer::Input;
+use dialoguer::MultiSelect;
+use include_dir::include_dir;
+use include_dir::Dir;
 use std::env;
-use std::error::Error;
-use std::fs::{self, File};
+use std::fs;
 use std::io::Write;
 use std::path::Path;
 
 pub fn init_project(
     arg_adapter: &Option<String>,
     arg_project_name: &Option<String>,
-) -> Result<(), Box<dyn Error>> {
+) -> anyhow::Result<()> {
     let project_name: String = match arg_project_name.as_deref() {
         None => Input::with_theme(&ColorfulTheme::default())
             .with_prompt("Project name")
@@ -93,7 +95,7 @@ pub fn init_project(
     Ok(())
 }
 
-fn copy_embedded_dir(dir: &Dir, output_dir: &Path, selection: Vec<usize>) -> std::io::Result<()> {
+fn copy_embedded_dir(dir: &Dir, output_dir: &Path, selection: Vec<usize>) -> anyhow::Result<()> {
     for file in dir.entries() {
         let relative_path = file.path();
         let output_path = output_dir.join(relative_path);
@@ -127,7 +129,7 @@ fn copy_embedded_dir(dir: &Dir, output_dir: &Path, selection: Vec<usize>) -> std
                     }
                 }
                 if let Err(e) = fs::write(&output_path, file.contents()) {
-                    return Err(e);
+                    return Err(e.into());
                 }
             }
             None => {
@@ -142,12 +144,12 @@ fn copy_embedded_dir(dir: &Dir, output_dir: &Path, selection: Vec<usize>) -> std
     Ok(())
 }
 
-fn replace_project_name(file_path: &str, project_name: &str) -> Result<(), Box<dyn Error>> {
+fn replace_project_name(file_path: &str, project_name: &str) -> anyhow::Result<()> {
     let target = "<PROJECT_NAME>";
     replace_string_in_file(file_path, target, &project_name)
 }
 
-fn replace_features(file_path: &str, adapters: Vec<&str>) -> Result<(), Box<dyn Error>> {
+fn replace_features(file_path: &str, adapters: Vec<&str>) -> anyhow::Result<()> {
     let target = "\"<FEATURES>\"";
 
     let features: Vec<String> = adapters
@@ -158,41 +160,41 @@ fn replace_features(file_path: &str, adapters: Vec<&str>) -> Result<(), Box<dyn 
     replace_string_in_file(file_path, target, &features.join(", "))
 }
 
-fn circom_lib_template(file_path: &str) -> Result<(), Box<dyn Error>> {
+fn circom_lib_template(file_path: &str) -> anyhow::Result<()> {
     let template_dir: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/circom");
     let circom_lib_rs = match template_dir.get_file("lib.rs") {
         Some(file) => file.contents(),
-        None => return Err("lib.rs not found in template".into()),
+        None => return Err(anyhow::anyhow!("lib.rs not found in template")),
     };
     let target = "// CIRCOM_TEMPLATE";
     replace_string_in_file(file_path, target, &String::from_utf8_lossy(circom_lib_rs))
 }
 
-fn halo2_lib_template(file_path: &str) -> Result<(), Box<dyn Error>> {
+fn halo2_lib_template(file_path: &str) -> anyhow::Result<()> {
     let template_dir: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/halo2");
     let halo2_lib_rs = match template_dir.get_file("lib.rs") {
         Some(file) => file.contents(),
-        None => return Err("lib.rs not found in template".into()),
+        None => return Err(anyhow::anyhow!("lib.rs not found in template")),
     };
     let target = "// HALO2_TEMPLATE";
     replace_string_in_file(file_path, target, &String::from_utf8_lossy(halo2_lib_rs))
 }
 
-fn circom_build_template(file_path: &str) -> Result<(), Box<dyn Error>> {
+fn circom_build_template(file_path: &str) -> anyhow::Result<()> {
     let replacement =
         "rust_witness::transpile::transpile_wasm(\"./test-vectors/circom\".to_string());";
     let target = "// CIRCOM_TEMPLATE";
     replace_string_in_file(file_path, target, replacement)
 }
 
-fn halo2_dependencies_template(file_path: &str) -> Result<(), Box<dyn Error>> {
+fn halo2_dependencies_template(file_path: &str) -> anyhow::Result<()> {
     let replacement =
         "plonk-fibonacci = { package = \"plonk-fibonacci\", git = \"https://github.com/sifnoc/plonkish-fibonacci-sample.git\" }";
     let target = "# HALO2_DEPENDENCIES";
     replace_string_in_file(file_path, target, replacement)
 }
 
-fn circom_dependencies_template(file_path: &str) -> Result<(), Box<dyn Error>> {
+fn circom_dependencies_template(file_path: &str) -> anyhow::Result<()> {
     let replacement =
         "# TODO: fix this
 [patch.crates-io]
@@ -201,11 +203,7 @@ ark-circom = { git = \"https://github.com/zkmopro/circom-compat.git\", version =
     replace_string_in_file(file_path, target, replacement)
 }
 
-fn replace_string_in_file(
-    file_path: &str,
-    target: &str,
-    replacement: &str,
-) -> Result<(), Box<dyn Error>> {
+fn replace_string_in_file(file_path: &str, target: &str, replacement: &str) -> anyhow::Result<()> {
     // Read the entire content of the file
     let content = fs::read_to_string(file_path)?;
 
@@ -213,7 +211,7 @@ fn replace_string_in_file(
     let modified_content = content.replace(target, replacement);
 
     // Open the file in write mode, which truncates the file content
-    let mut file = File::create(file_path)?;
+    let mut file = fs::File::create(file_path)?;
 
     // Write the modified content back to the file
     file.write_all(modified_content.as_bytes())?;

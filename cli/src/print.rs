@@ -1,4 +1,6 @@
-use crate::style::{self, print_bold, print_green_bold};
+use crate::style;
+use crate::style::print_bold;
+use crate::style::print_green_bold;
 
 fn print_footer_message() {
     println!();

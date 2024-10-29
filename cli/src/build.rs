@@ -1,9 +1,11 @@
-use crate::{
-    print::print_build_success_message,
-    style::{self, blue_bold, print_green_bold},
-};
-use dialoguer::{theme::ColorfulTheme, MultiSelect, Select};
-use std::{env, error::Error};
+use crate::print::print_build_success_message;
+use crate::style;
+use crate::style::blue_bold;
+use crate::style::print_green_bold;
+use dialoguer::theme::ColorfulTheme;
+use dialoguer::MultiSelect;
+use dialoguer::Select;
+use std::env;
 
 const MODES: [&str; 2] = ["debug", "release"];
 const PLATFORMS: [&str; 2] = ["ios", "android"];
@@ -11,7 +13,7 @@ const PLATFORMS: [&str; 2] = ["ios", "android"];
 pub fn build_project(
     arg_mode: &Option<String>,
     arg_platforms: &Option<Vec<String>>,
-) -> Result<(), Box<dyn Error>> {
+) -> anyhow::Result<()> {
     let mode: String = match arg_mode.as_deref() {
         None => select_mode()?,
         Some(m) => {
@@ -66,7 +68,7 @@ pub fn build_project(
 
             if !status.success() {
                 // Return a custom error if the command fails
-                return Err(format!("Output with status code {}", status.code().unwrap()).into());
+                return Err(anyhow::anyhow!("Output with status code {}", status.code().unwrap()));
             }
         }
 
@@ -76,7 +78,7 @@ pub fn build_project(
     Ok(())
 }
 
-fn select_mode() -> Result<String, Box<dyn Error>> {
+fn select_mode() -> anyhow::Result<String> {
     let idx = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Build mode")
         .items(&MODES)
@@ -85,7 +87,7 @@ fn select_mode() -> Result<String, Box<dyn Error>> {
     Ok(MODES[idx].to_owned())
 }
 
-fn select_platforms() -> Result<Vec<String>, Box<dyn Error>> {
+fn select_platforms() -> anyhow::Result<Vec<String>> {
     let selected_platforms = MultiSelect::with_theme(&ColorfulTheme::default())
         .with_prompt("Select platform(s) to build for (multiple selection with space)")
         .items(&PLATFORMS)
@@ -97,7 +99,7 @@ fn select_platforms() -> Result<Vec<String>, Box<dyn Error>> {
         .collect())
 }
 
-fn print_binding_message(platforms: Vec<String>) -> Result<(), Box<dyn Error>> {
+fn print_binding_message(platforms: Vec<String>) -> anyhow::Result<()> {
     let current_dir = env::current_dir()?;
     print_green_bold("✨ Bindings Built Successfully! ✨".to_string());
     println!("The Mopro bindings have been successfully generated and are available in the following directories:\n");

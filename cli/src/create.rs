@@ -1,15 +1,20 @@
-use std::{env, error::Error, fs, path::Path};
+use std::env;
+use std::fs;
+use std::path::Path;
 
-use dialoguer::{theme::ColorfulTheme, Select};
-use include_dir::{include_dir, Dir};
+use dialoguer::theme::ColorfulTheme;
+use dialoguer::Select;
+use include_dir::include_dir;
+use include_dir::Dir;
 
-use crate::print::{print_create_android_success_message, print_create_ios_success_message};
-use crate::style::{self};
+use crate::print::print_create_android_success_message;
+use crate::print::print_create_ios_success_message;
+use crate::style;
 
 // TODO: add  "react-native", "flutter"
 const TEMPLATES: [&str; 2] = ["ios", "android"];
 
-pub fn create_project(arg_platform: &Option<String>) -> Result<(), Box<dyn Error>> {
+pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
     let platform: String = match arg_platform.as_deref() {
         None => select_template()?,
         Some(m) => {
@@ -111,7 +116,7 @@ pub fn create_project(arg_platform: &Option<String>) -> Result<(), Box<dyn Error
     Ok(())
 }
 
-fn select_template() -> Result<String, Box<dyn Error>> {
+fn select_template() -> anyhow::Result<String> {
     let idx = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Create template")
         .items(&TEMPLATES)
@@ -120,7 +125,7 @@ fn select_template() -> Result<String, Box<dyn Error>> {
     Ok(TEMPLATES[idx].to_owned())
 }
 
-fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> std::io::Result<()> {
+fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> anyhow::Result<()> {
     for file in dir.entries() {
         let relative_path = file.path();
         let output_path = output_dir.join(relative_path);
@@ -134,7 +139,7 @@ fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> std::io::Result<()> {
         match file.as_file() {
             Some(file) => {
                 if let Err(e) = fs::write(&output_path, file.contents()) {
-                    return Err(e);
+                    return Err(e.into());
                 }
             }
             None => return Ok(()),
@@ -143,7 +148,7 @@ fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> std::io::Result<()> {
     Ok(())
 }
 
-fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> std::io::Result<()> {
+fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> anyhow::Result<()> {
     for file in dir.entries() {
         let relative_path = file.path();
         let output_path = output_dir.join(relative_path);
@@ -157,7 +162,7 @@ fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> std::io::Result<()> {
         match file.as_file() {
             Some(file) => {
                 if let Err(e) = fs::write(&output_path, file.contents()) {
-                    return Err(e);
+                    return Err(e.into());
                 }
             }
             None => {
@@ -170,7 +175,7 @@ fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> std::io::Result<()> {
     Ok(())
 }
 
-fn copy_dir(input_dir: &Path, output_dir: &Path) -> std::io::Result<()> {
+fn copy_dir(input_dir: &Path, output_dir: &Path) -> anyhow::Result<()> {
     for entry in fs::read_dir(input_dir)? {
         let entry = entry?;
         let path = entry.path();

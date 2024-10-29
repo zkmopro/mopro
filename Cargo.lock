@@ -2087,6 +2087,7 @@ dependencies = [
 name = "mopro-cli"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "clap 4.5.20",
  "console",
  "dialoguer",
