@@ -68,7 +68,10 @@ pub fn build_project(
 
             if !status.success() {
                 // Return a custom error if the command fails
-                return Err(anyhow::anyhow!("Output with status code {}", status.code().unwrap()));
+                return Err(anyhow::anyhow!(
+                    "Output with status code {}",
+                    status.code().unwrap()
+                ));
             }
         }
 
