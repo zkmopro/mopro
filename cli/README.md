@@ -17,3 +17,9 @@ mopro init
 ```sh
 mopro build
 ```
+
+## Create templates
+
+```sh
+mopro create
+```

@@ -51,7 +51,7 @@ mopro_ffi::set_circom_circuits! {
 
 // Halo2 adapter
 mopro_ffi::set_halo2_circuits! {
-    ("fibonacci_pk.bin", halo2_fibonacci::prove, "fibonacci_vk.bin", halo2_fibonacci::verify),
+    ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
 }
 ```
 

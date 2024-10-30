@@ -1,4 +1,5 @@
-use console::{Style, StyledObject};
+use console::Style;
+use console::StyledObject;
 
 fn print_text(text: String, style: Style) {
     println!("{}", style.apply_to(text))

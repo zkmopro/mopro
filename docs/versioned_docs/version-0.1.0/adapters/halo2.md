@@ -65,7 +65,7 @@ For example:
 
 ```rust
 mopro_ffi::set_halo2_circuits! {
-    ("fibonacci_pk.bin", halo2_fibonacci::prove, "fibonacci_vk.bin", halo2_fibonacci::verify),
+    ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
 }
 ```
 
@@ -80,14 +80,14 @@ For example:
 ```rust
 fn get_halo2_proving_circuit(circuit: &str) -> Result<Halo2ProveFn, MoproError> {
     match circuit {
-        "fibonacci_pk.bin" => Ok(halo2_fibonacci::prove),
+        "plonk_fibonacci_pk.bin" => Ok(plonk_fibonacci::prove),
         _ => Err(MoproError::CircuitNotFound),
     }
 }
 
 fn get_halo2_verifying_circuit(circuit: &str) -> Result<Halo2VerifyFn, MoproError> {
     match circuit {
-        "fibonacci_vk.bin" => Ok(halo2_fibonacci::verify),
+        "fibonacci_vk.bin" => Ok(plonk_fibonacci::verify),
         _ => Err(MoproError::CircuitNotFound),
     }
 }

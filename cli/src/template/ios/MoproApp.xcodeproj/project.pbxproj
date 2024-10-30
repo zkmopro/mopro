@@ -1,0 +1,598 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2A59922F2CC7750200135402 /* multiplier2_final.zkey in Resources */ = {isa = PBXBuildFile; fileRef = 2A59922E2CC7750200135402 /* multiplier2_final.zkey */; };
+		2A5992332CC7750C00135402 /* plonk_fibonacci_vk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 2A5992322CC7750C00135402 /* plonk_fibonacci_vk.bin */; };
+		2A5992342CC7750C00135402 /* plonk_fibonacci_srs.bin in Resources */ = {isa = PBXBuildFile; fileRef = 2A5992312CC7750C00135402 /* plonk_fibonacci_srs.bin */; };
+		2A5992352CC7750C00135402 /* plonk_fibonacci_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 2A5992302CC7750C00135402 /* plonk_fibonacci_pk.bin */; };
+		2A5992392CC77A7E00135402 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A5992372CC77A7E00135402 /* MoproBindings.xcframework */; };
+		2A59923A2CC77A7E00135402 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5992362CC77A7E00135402 /* mopro.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2A5991FD2CC7722A00135402 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A5991E42CC7722900135402 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2A5991EB2CC7722900135402;
+			remoteInfo = MoproApp;
+		};
+		2A5992072CC7722A00135402 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A5991E42CC7722900135402 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2A5991EB2CC7722900135402;
+			remoteInfo = MoproApp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		2A5991EC2CC7722900135402 /* MoproApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoproApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A5991FC2CC7722A00135402 /* MoproAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoproAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A5992062CC7722A00135402 /* MoproAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoproAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A59922E2CC7750200135402 /* multiplier2_final.zkey */ = {isa = PBXFileReference; lastKnownFileType = file; path = multiplier2_final.zkey; sourceTree = "<group>"; };
+		2A5992302CC7750C00135402 /* plonk_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = plonk_fibonacci_pk.bin; sourceTree = "<group>"; };
+		2A5992312CC7750C00135402 /* plonk_fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = plonk_fibonacci_srs.bin; sourceTree = "<group>"; };
+		2A5992322CC7750C00135402 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = plonk_fibonacci_vk.bin; sourceTree = "<group>"; };
+		2A5992362CC77A7E00135402 /* mopro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro.swift; sourceTree = "<group>"; };
+		2A5992372CC77A7E00135402 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		2A5991EE2CC7722900135402 /* MoproApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MoproApp;
+			sourceTree = "<group>";
+		};
+		2A5991FF2CC7722A00135402 /* MoproAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MoproAppTests;
+			sourceTree = "<group>";
+		};
+		2A5992092CC7722A00135402 /* MoproAppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MoproAppUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2A5991E92CC7722900135402 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2A5992392CC77A7E00135402 /* MoproBindings.xcframework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2A5991F92CC7722A00135402 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2A5992032CC7722A00135402 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2A5991E32CC7722900135402 = {
+			isa = PBXGroup;
+			children = (
+				2A5991EE2CC7722900135402 /* MoproApp */,
+				2A5991FF2CC7722A00135402 /* MoproAppTests */,
+				2A5992092CC7722A00135402 /* MoproAppUITests */,
+				2A5991ED2CC7722900135402 /* Products */,
+				2A5992382CC77A7E00135402 /* MoproiOSBindings */,
+				2A59922E2CC7750200135402 /* multiplier2_final.zkey */,
+				2A5992302CC7750C00135402 /* plonk_fibonacci_pk.bin */,
+				2A5992312CC7750C00135402 /* plonk_fibonacci_srs.bin */,
+				2A5992322CC7750C00135402 /* plonk_fibonacci_vk.bin */,
+			);
+			sourceTree = "<group>";
+		};
+		2A5991ED2CC7722900135402 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2A5991EC2CC7722900135402 /* MoproApp.app */,
+				2A5991FC2CC7722A00135402 /* MoproAppTests.xctest */,
+				2A5992062CC7722A00135402 /* MoproAppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2A5992382CC77A7E00135402 /* MoproiOSBindings */ = {
+			isa = PBXGroup;
+			children = (
+				2A5992362CC77A7E00135402 /* mopro.swift */,
+				2A5992372CC77A7E00135402 /* MoproBindings.xcframework */,
+			);
+			path = MoproiOSBindings;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2A5991EB2CC7722900135402 /* MoproApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2A5992102CC7722A00135402 /* Build configuration list for PBXNativeTarget "MoproApp" */;
+			buildPhases = (
+				2A5991E82CC7722900135402 /* Sources */,
+				2A5991E92CC7722900135402 /* Frameworks */,
+				2A5991EA2CC7722900135402 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				2A5991EE2CC7722900135402 /* MoproApp */,
+			);
+			name = MoproApp;
+			packageProductDependencies = (
+			);
+			productName = MoproApp;
+			productReference = 2A5991EC2CC7722900135402 /* MoproApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		2A5991FB2CC7722A00135402 /* MoproAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2A5992132CC7722A00135402 /* Build configuration list for PBXNativeTarget "MoproAppTests" */;
+			buildPhases = (
+				2A5991F82CC7722A00135402 /* Sources */,
+				2A5991F92CC7722A00135402 /* Frameworks */,
+				2A5991FA2CC7722A00135402 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2A5991FE2CC7722A00135402 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				2A5991FF2CC7722A00135402 /* MoproAppTests */,
+			);
+			name = MoproAppTests;
+			packageProductDependencies = (
+			);
+			productName = MoproAppTests;
+			productReference = 2A5991FC2CC7722A00135402 /* MoproAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		2A5992052CC7722A00135402 /* MoproAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2A5992162CC7722A00135402 /* Build configuration list for PBXNativeTarget "MoproAppUITests" */;
+			buildPhases = (
+				2A5992022CC7722A00135402 /* Sources */,
+				2A5992032CC7722A00135402 /* Frameworks */,
+				2A5992042CC7722A00135402 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2A5992082CC7722A00135402 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				2A5992092CC7722A00135402 /* MoproAppUITests */,
+			);
+			name = MoproAppUITests;
+			packageProductDependencies = (
+			);
+			productName = MoproAppUITests;
+			productReference = 2A5992062CC7722A00135402 /* MoproAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2A5991E42CC7722900135402 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					2A5991EB2CC7722900135402 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					2A5991FB2CC7722A00135402 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 2A5991EB2CC7722900135402;
+					};
+					2A5992052CC7722A00135402 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 2A5991EB2CC7722900135402;
+					};
+				};
+			};
+			buildConfigurationList = 2A5991E72CC7722900135402 /* Build configuration list for PBXProject "MoproApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2A5991E32CC7722900135402;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 2A5991ED2CC7722900135402 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2A5991EB2CC7722900135402 /* MoproApp */,
+				2A5991FB2CC7722A00135402 /* MoproAppTests */,
+				2A5992052CC7722A00135402 /* MoproAppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2A5991EA2CC7722900135402 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2A5992332CC7750C00135402 /* plonk_fibonacci_vk.bin in Resources */,
+				2A5992342CC7750C00135402 /* plonk_fibonacci_srs.bin in Resources */,
+				2A5992352CC7750C00135402 /* plonk_fibonacci_pk.bin in Resources */,
+				2A59922F2CC7750200135402 /* multiplier2_final.zkey in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2A5991FA2CC7722A00135402 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2A5992042CC7722A00135402 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2A5991E82CC7722900135402 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2A59923A2CC77A7E00135402 /* mopro.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2A5991F82CC7722A00135402 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2A5992022CC7722A00135402 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2A5991FE2CC7722A00135402 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2A5991EB2CC7722900135402 /* MoproApp */;
+			targetProxy = 2A5991FD2CC7722A00135402 /* PBXContainerItemProxy */;
+		};
+		2A5992082CC7722A00135402 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2A5991EB2CC7722900135402 /* MoproApp */;
+			targetProxy = 2A5992072CC7722A00135402 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		2A59920E2CC7722A00135402 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		2A59920F2CC7722A00135402 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		2A5992112CC7722A00135402 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"MoproApp/Preview Content\"";
+				DEVELOPMENT_TEAM = N3ESL929H7;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2A5992122CC7722A00135402 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"MoproApp/Preview Content\"";
+				DEVELOPMENT_TEAM = N3ESL929H7;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		2A5992142CC7722A00135402 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N3ESL929H7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MoproApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MoproApp";
+			};
+			name = Debug;
+		};
+		2A5992152CC7722A00135402 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N3ESL929H7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MoproApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MoproApp";
+			};
+			name = Release;
+		};
+		2A5992172CC7722A00135402 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N3ESL929H7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = MoproApp;
+			};
+			name = Debug;
+		};
+		2A5992182CC7722A00135402 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N3ESL929H7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = MoproApp;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2A5991E72CC7722900135402 /* Build configuration list for PBXProject "MoproApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2A59920E2CC7722A00135402 /* Debug */,
+				2A59920F2CC7722A00135402 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2A5992102CC7722A00135402 /* Build configuration list for PBXNativeTarget "MoproApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2A5992112CC7722A00135402 /* Debug */,
+				2A5992122CC7722A00135402 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2A5992132CC7722A00135402 /* Build configuration list for PBXNativeTarget "MoproAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2A5992142CC7722A00135402 /* Debug */,
+				2A5992152CC7722A00135402 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2A5992162CC7722A00135402 /* Build configuration list for PBXNativeTarget "MoproAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2A5992172CC7722A00135402 /* Debug */,
+				2A5992182CC7722A00135402 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2A5991E42CC7722900135402 /* Project object */;
+}
