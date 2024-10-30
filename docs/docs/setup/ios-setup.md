@@ -1,7 +1,7 @@
 
 # iOS Setup
 
-Once you've completed the [Rust setup](docs/getting-started/rust-setup.md) you should be able to run `cargo run --bin ios`. This will create a new folder called `MoproiOSBindings`. Inside this folder there should be a file named `mopro.swift` and a folder named `MoproBindings.xcframework`.
+Once you've completed the [Rust setup](docs/setup/rust-setup.md) you should be able to run `cargo run --bin ios`. This will create a new folder called `MoproiOSBindings`. Inside this folder there should be a file named `mopro.swift` and a folder named `MoproBindings.xcframework`.
 
 ## Demo video of this tutorial
 

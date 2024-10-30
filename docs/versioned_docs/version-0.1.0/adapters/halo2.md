@@ -8,7 +8,7 @@ Explore how the Halo2 adapter is implemented by checking out this [Sample Mopro 
 
 ## Setting Up the Rust Project
 
-You can start by following the general instructions in the [Rust Setup Guide](/getting-started/rust-setup.md) to create a new Rust project for building libraries with Circom proofs. However, you will need to perform these specific adjustments for Halo2:
+You can start by following the general instructions in the [Rust Setup Guide](/setup/rust-setup.md) to create a new Rust project for building libraries with Circom proofs. However, you will need to perform these specific adjustments for Halo2:
 
 In your `Cargo.toml` file, ensure the `halo2` feature is activated for `mopro-ffi`:
 

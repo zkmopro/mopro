@@ -1,6 +1,6 @@
 # Android Setup
 
-After you've completed the [Rust setup](docs/getting-started/rust-setup.md) you should be able to run `cargo run --bin android`. This will create a new folder called `MoproAndroidBindings`. It should look like the structure
+After you've completed the [Rust setup](docs/setup/rust-setup.md) you should be able to run `cargo run --bin android`. This will create a new folder called `MoproAndroidBindings`. It should look like the structure
 
 ```sh
 MoproAndroidBindings

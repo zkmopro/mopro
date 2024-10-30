@@ -9,7 +9,7 @@ To learn more about mopro, please refer to the documentation at [zkmopro](https:
 ## Getting started
 
 - Make sure you've installed the [prerequisites](https://zkmopro.org/docs/prerequisites).
-- Getting started with this [tutorial](https://zkmopro.org/docs/getting-started/rust-setup).
+- Getting started with this [tutorial](https://zkmopro.org/docs/getting-started).
 
 ## Run tests
 
