@@ -48,31 +48,37 @@ Check the details here: [performance](https://zkmopro.org/docs/performance).
     <th>Circuits</th>
     <th>snarkjs groth16 fullprove</th>
     <th>mopro (rust-witness + ark-works)</th>
+    <th>witnesscalc + rapidsnark</th>
   </tr>
   <tr>
     <td>Keccak256</td>
     <td>8406.2 ms</td>
     <td>1381.8 ms (~6x)</td>
+    <td>2792.6 ms (~3x)</td>
   </tr>
   <tr>
     <td>SHA256</td>
     <td>2537.6 ms</td>
     <td>640.7 ms (~4x)</td>
+    <td>817.5 ms (~3.1x)</td>
   </tr>
   <tr>
     <td>RSA</td>
     <td>15.7 s</td>
     <td>6.1 s (~2.5x)</td>
+    <td>3.1 s (~5x)</td>
   </tr>
   <tr>
     <td>Semaphore</td>
     <td>902 ms</td>
     <td>257 ms (~3.5x)</td>
+    <td>347 ms (~2.5x)</td>
   </tr>
   <tr>
     <td>Anon Aadhaar</td>
     <td>26 s</td>
     <td>17 s (~1.5x)</td>
+    <td>11 s (~2.3x)</td>
   </tr>
 </table>
 
