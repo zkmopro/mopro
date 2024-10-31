@@ -8,7 +8,7 @@ Explore how the Circom adapter is implemented by checking out this sample projec
 
 ## Setup the rust project
 
-You can follow the instructions in the [Rust Setup](/getting-started/rust-setup.md) guide to create a new Rust project that builds this library with Circom proofs.
+You can follow the instructions in the [Rust Setup](/setup/rust-setup.md) guide to create a new Rust project that builds this library with Circom proofs.
 
 In your `Cargo.toml` file, ensure the `circom` feature is activated for `mopro-ffi`:
 
