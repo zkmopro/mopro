@@ -61,14 +61,15 @@ Now you should copy your wasm and zkey files somewhere in the project folder. Fo
 :::info
 Download example multiplier2 wasm and zkey here:
 
--   [multiplier2.wasm](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2.wasm)
--   [multiplier2_final.zkey](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2_final.zkey)
+- [multiplier2.wasm](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2.wasm)
+- [multiplier2_final.zkey](https://github.com/zkmopro/mopro/raw/ae88356e680ac4d785183267d6147167fabe071c/test-vectors/circom/multiplier2_final.zkey)
 
 :::
 
 Now we need to add 4 rust files. First we'll add `build.rs` in the main project folder. This file should contain the following:
 
 ```rust
+use std::path::Path;
 fn main() {
     // We're going to transpile the wasm witness generators to C
     // Change this to where you put your zkeys and wasm files
@@ -76,10 +77,13 @@ fn main() {
     // This is writing the UDL file which defines the functions exposed
     // to your app. We have pre-generated this file for you
     // This file must be written to ./src
-    std::fs::write("./src/mopro.udl", mopro_ffi::app_config::UDL).expect("Failed to write UDL");
+    let udl_path = Path::new("src/mopro.udl");
+    if !udl_path.exists() {
+        std::fs::write(udl_path, mopro_ffi::app_config::UDL).expect("Failed to write UDL");
+    }
     // Finally initialize uniffi and build the scaffolding into the
     // rust binary
-    uniffi::generate_scaffolding("./src/mopro.udl").unwrap();
+    uniffi::generate_scaffolding(udl_path).unwrap();
 }
 ```
 

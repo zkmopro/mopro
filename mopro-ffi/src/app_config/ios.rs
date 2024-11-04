@@ -4,10 +4,6 @@ use std::process::Command;
 
 use super::{cleanup_tmp_local, install_arch, mktemp_local};
 
-pub const MOPRO_SWIFT: &str = include_str!("../../SwiftBindings/mopro.swift");
-pub const MOPRO_FFI_H: &str = include_str!("../../SwiftBindings/moproFFI.h");
-pub const MOPRO_MODULEMAP: &str = include_str!("../../SwiftBindings/moproFFI.modulemap");
-
 // Load environment variables that are specified by by xcode
 pub fn build() {
     let cwd = std::env::current_dir().unwrap();
@@ -88,7 +84,32 @@ pub fn build() {
         lib_out
     };
 
-    write_bindings_swift(&swift_bindings_dir);
+    let uniffi_bindgen_path = {
+        let mut bin_path = std::env::current_exe().unwrap(); //Users/~/mopro/target/debug/ios
+        bin_path.pop(); // Remove the current executable name: //Users/~/mopro/target/debug
+        bin_path.pop(); //Users/~/mopro/target/
+        bin_path.pop(); //Users/~/mopro
+        bin_path.push("mopro-ffi");
+        bin_path
+    };
+
+    let mut bindgen_cmd = Command::new("cargo");
+    bindgen_cmd
+        .current_dir(&uniffi_bindgen_path)
+        .arg("run")
+        .arg("--bin")
+        .arg("uniffi-bindgen")
+        .arg("generate")
+        .arg(manifest_dir + "/src/mopro.udl")
+        .arg("--language")
+        .arg("swift")
+        .arg("--out-dir")
+        .arg(swift_bindings_dir.to_str().unwrap())
+        .spawn()
+        .expect("Failed to spawn uniffi-bindgen")
+        .wait()
+        .expect("uniffi-bindgen errored");
+
     fs::rename(
         &swift_bindings_dir.join("mopro.swift"),
         &bindings_out.join("mopro.swift"),
@@ -124,18 +145,4 @@ pub fn build() {
     fs::rename(&bindings_out, &bindings_dest).expect("Failed to move framework into place");
     // Copy the mopro.swift file to the output directory
     cleanup_tmp_local(&build_dir_path)
-}
-
-pub fn write_bindings_swift(out_dir: &Path) {
-    if let Ok(info) = fs::metadata(out_dir) {
-        if !info.is_dir() {
-            panic!("out_dir exists and is not a directory");
-        }
-    } else {
-        fs::create_dir(out_dir).expect("Failed to create output dir");
-    }
-    fs::write(out_dir.join("mopro.swift"), MOPRO_SWIFT).expect("Failed to write mopro.swift");
-    fs::write(out_dir.join("moproFFI.h"), MOPRO_FFI_H).expect("Failed to write moproFFI.h");
-    fs::write(out_dir.join("module.modulemap"), MOPRO_MODULEMAP)
-        .expect("Failed to write module.modulemap");
 }

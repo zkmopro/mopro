@@ -1,7 +1,12 @@
+use std::path::Path;
+
 fn main() {
     compile_circom_circuits();
 
-    std::fs::write("./src/mopro.udl", mopro_ffi::app_config::UDL).expect("Failed to write UDL");
+    let udl_path = Path::new("src/mopro.udl");
+    if !udl_path.exists() {
+        std::fs::write(udl_path, mopro_ffi::app_config::UDL).expect("Failed to write UDL");
+    }
     uniffi::generate_scaffolding("./src/mopro.udl").unwrap();
 }
 

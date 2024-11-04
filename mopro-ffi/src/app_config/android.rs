@@ -4,8 +4,6 @@ use std::process::Command;
 
 use super::{cleanup_tmp_local, install_arch, install_ndk, mktemp_local};
 
-pub const MOPRO_KOTLIN: &str = include_str!("../../KotlinBindings/uniffi/mopro/mopro.kt");
-
 pub fn build() {
     let cwd = std::env::current_dir().expect("Failed to get current directory");
     let manifest_dir =
@@ -35,7 +33,32 @@ pub fn build() {
         build_for_arch(&arch, &build_dir, &bindings_out, &mode);
     }
 
-    write_kotlin_bindings(&bindings_out);
+    let uniffi_bindgen_path = {
+        let mut bin_path = std::env::current_exe().unwrap(); //Users/~/mopro/target/debug/ios
+        bin_path.pop(); // Remove the current executable name: //Users/~/mopro/target/debug
+        bin_path.pop(); //Users/~/mopro/target/
+        bin_path.pop(); //Users/~/mopro
+        bin_path.push("mopro-ffi");
+        bin_path
+    };
+
+    let mut bindgen_cmd = Command::new("cargo");
+    bindgen_cmd
+        .current_dir(&uniffi_bindgen_path)
+        .arg("run")
+        .arg("--bin")
+        .arg("uniffi-bindgen")
+        .arg("generate")
+        .arg(manifest_dir + "/src/mopro.udl")
+        .arg("--language")
+        .arg("kotlin")
+        .arg("--out-dir")
+        .arg(bindings_out.to_str().unwrap())
+        .spawn()
+        .expect("Failed to spawn uniffi-bindgen")
+        .wait()
+        .expect("uniffi-bindgen errored");
+
     move_bindings(&bindings_out, &bindings_dest);
     cleanup_tmp_local(&build_dir);
 }
@@ -79,13 +102,6 @@ fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str)
 
     fs::create_dir_all(out_lib_dest.parent().unwrap()).expect("Failed to create jniLibs directory");
     fs::copy(&out_lib_path, &out_lib_dest).expect("Failed to copy file");
-}
-
-fn write_kotlin_bindings(bindings_out: &Path) {
-    let mopro_kt_path = bindings_out.join("uniffi/mopro/mopro.kt");
-    fs::create_dir_all(mopro_kt_path.parent().unwrap())
-        .expect("Failed to create uniffi/mopro directory");
-    fs::write(&mopro_kt_path, MOPRO_KOTLIN).expect("Failed to write mopro.kt");
 }
 
 fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
