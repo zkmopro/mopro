@@ -5,12 +5,11 @@ Mopro can compile wasm code instead of iOS/Android native code at [mopro-ffi](..
 ## Getting started
 
 - Install [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
+- Install `chrome` and `chromedriver` with same version.
  
 ## Run tests
 
-<!-- TODO: Is that right?? yes-->
-<!-- follow this refs: https://rustwasm.github.io/docs/wasm-bindgen/wasm-bindgen-test/usage.html#configure-cargoconfig-to-use-the-test-runner -->
-Run test in headless browser.
+Run test in browser on headless way.
 
 ```bash
 wasm-pack test --chrome --headless
