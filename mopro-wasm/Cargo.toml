@@ -13,9 +13,9 @@ hyperplonk = []
 gemini = []
 
 [dependencies]
-plonk-fibonacci = { package = "plonk-fibonacci", branch = "supporting-wasm", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", branch = "supporting-wasm", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-gemini-fibonacci = { package = "gemini-fibonacci", branch = "supporting-wasm", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+plonk-fibonacci = { workspace = true }
+hyperplonk-fibonacci = { workspace = true }
+gemini-fibonacci = { workspace = true }
 rand = "0.8.5"
 
 [target.wasm32-unknown-unknown.dependencies]

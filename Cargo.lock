@@ -1490,21 +1490,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fibonacci-circuit"
-version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3dbc93f23197b2341eab6d1c5d84159ca94351f1"
-dependencies = [
- "bincode",
- "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
- "halo2curves 0.3.3",
- "itertools 0.13.0",
- "plonkish_backend",
- "rand",
- "serde",
- "thiserror",
-]
-
-[[package]]
 name = "fixed-hash"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1579,19 +1564,8 @@ name = "gemini-fibonacci"
 version = "0.1.0"
 source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm#2aed27d4ae56bcdde607f875a5e2683de9a26840"
 dependencies = [
- "fibonacci-circuit 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm)",
+ "fibonacci-circuit",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
- "plonkish_backend",
-]
-
-[[package]]
-name = "gemini-fibonacci"
-version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3dbc93f23197b2341eab6d1c5d84159ca94351f1"
-dependencies = [
- "fibonacci-circuit 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
- "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
- "halo2curves 0.3.3",
  "plonkish_backend",
 ]
 
@@ -1839,19 +1813,8 @@ name = "hyperplonk-fibonacci"
 version = "0.1.0"
 source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm#2aed27d4ae56bcdde607f875a5e2683de9a26840"
 dependencies = [
- "fibonacci-circuit 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm)",
+ "fibonacci-circuit",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
- "plonkish_backend",
-]
-
-[[package]]
-name = "hyperplonk-fibonacci"
-version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3dbc93f23197b2341eab6d1c5d84159ca94351f1"
-dependencies = [
- "fibonacci-circuit 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
- "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
- "halo2curves 0.3.3",
  "plonkish_backend",
 ]
 
@@ -2179,11 +2142,11 @@ dependencies = [
  "bincode",
  "byteorder",
  "color-eyre",
- "gemini-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
- "hyperplonk-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
+ "gemini-fibonacci",
+ "hyperplonk-fibonacci",
  "num-bigint",
  "num-traits",
- "plonk-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
+ "plonk-fibonacci",
  "rust-witness",
  "serde",
  "serde_derive",
@@ -2197,10 +2160,10 @@ name = "mopro-wasm"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
- "gemini-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm)",
+ "gemini-fibonacci",
  "getrandom",
- "hyperplonk-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm)",
- "plonk-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm)",
+ "hyperplonk-fibonacci",
+ "plonk-fibonacci",
  "rand",
  "serde-wasm-bindgen",
  "wasm-bindgen",
@@ -2522,22 +2485,8 @@ version = "0.1.0"
 source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm#2aed27d4ae56bcdde607f875a5e2683de9a26840"
 dependencies = [
  "bincode",
- "fibonacci-circuit 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm)",
+ "fibonacci-circuit",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
- "plonkish_backend",
- "rand",
- "serde",
-]
-
-[[package]]
-name = "plonk-fibonacci"
-version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3dbc93f23197b2341eab6d1c5d84159ca94351f1"
-dependencies = [
- "bincode",
- "fibonacci-circuit 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
- "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
- "halo2curves 0.3.3",
  "plonkish_backend",
  "rand",
  "serde",
@@ -3409,12 +3358,12 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
- "gemini-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
+ "gemini-fibonacci",
  "halo2-keccak-256",
- "hyperplonk-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
+ "hyperplonk-fibonacci",
  "mopro-ffi",
  "num-bigint",
- "plonk-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
+ "plonk-fibonacci",
  "rust-witness",
  "uniffi",
 ]
