@@ -30,8 +30,8 @@ pub fn verify_proof(
     proof: JsValue,
     public_inputs: JsValue,
 ) -> Result<JsValue, JsValue> {
-    let proof: Vec<u8> =
-        from_value(proof).map_err(|e| JsValue::from_str(&format!("Failed to parse proof: {}", e)))?;
+    let proof: Vec<u8> = from_value(proof)
+        .map_err(|e| JsValue::from_str(&format!("Failed to parse proof: {}", e)))?;
     let public_inputs: Vec<u8> = from_value(public_inputs)
         .map_err(|e| JsValue::from_str(&format!("Failed to parse public_inputs: {}", e)))?;
 
