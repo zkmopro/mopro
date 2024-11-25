@@ -11,7 +11,7 @@ pub fn build() {
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
     let build_dir = format!("{}/build", manifest_dir);
     let build_dir_path = Path::new(&build_dir);
-    let work_dir = mktemp_local(&build_dir_path);
+    let work_dir = mktemp_local(build_dir_path);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
     let bindings_out = work_dir.join("MoproiOSBindings");
     fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
@@ -67,7 +67,7 @@ pub fn build() {
         }
         // now lipo the libraries together
         let mut lipo_cmd = Command::new("lipo");
-        let lib_out = mktemp_local(&build_dir_path).join("libmopro_bindings.a");
+        let lib_out = mktemp_local(build_dir_path).join("libmopro_bindings.a");
         lipo_cmd
             .arg("-create")
             .arg("-output")
@@ -111,10 +111,11 @@ pub fn build() {
         .expect("uniffi-bindgen errored");
 
     fs::rename(
-        &swift_bindings_dir.join("mopro.swift"),
-        &bindings_out.join("mopro.swift"),
+        swift_bindings_dir.join("mopro.swift"),
+        bindings_out.join("mopro.swift"),
     )
     .expect("Failed to move mopro.swift into place");
+
     let out_lib_paths: Vec<PathBuf> = target_archs
         .iter()
         .map(|v| build_combined_archs(v))
@@ -136,13 +137,33 @@ pub fn build() {
         .unwrap()
         .wait()
         .unwrap();
+
+    // The iOS project expects the module map to be named "module.modulemap",
+    // but uniffi-bindgen creates "moproFFI.modulemap" by default,
+    // therefore we need to rename it.
+    rename_module_map_recursively(&bindings_out);
+
     if let Ok(info) = fs::metadata(&bindings_dest) {
         if !info.is_dir() {
             panic!("framework directory exists and is not a directory");
         }
         fs::remove_dir_all(&bindings_dest).expect("Failed to remove framework directory");
     }
+
     fs::rename(&bindings_out, &bindings_dest).expect("Failed to move framework into place");
     // Copy the mopro.swift file to the output directory
-    cleanup_tmp_local(&build_dir_path)
+    cleanup_tmp_local(build_dir_path)
+}
+
+fn rename_module_map_recursively(bindings_out: &PathBuf) {
+    for entry in fs::read_dir(bindings_out).expect("Failed to read bindings out directory") {
+        let entry = entry.expect("Failed to read entry");
+        let path = entry.path();
+        if path.is_file() && path.file_name().unwrap() == "moproFFI.modulemap" {
+            let dest_path = path.with_file_name("module.modulemap");
+            fs::rename(&path, &dest_path).expect("Failed to rename module map");
+        } else if path.is_dir() {
+            rename_module_map_recursively(&path);
+        }
+    }
 }

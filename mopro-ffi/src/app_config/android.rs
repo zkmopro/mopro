@@ -30,7 +30,7 @@ pub fn build() {
 
     install_ndk();
     for arch in target_archs {
-        build_for_arch(&arch, &build_dir, &bindings_out, &mode);
+        build_for_arch(arch, &build_dir, &bindings_out, &mode);
     }
 
     let uniffi_bindgen_path = {
@@ -105,11 +105,11 @@ fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str)
 }
 
 fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
-    if let Ok(info) = fs::metadata(&bindings_dest) {
+    if let Ok(info) = fs::metadata(bindings_dest) {
         if !info.is_dir() {
             panic!("bindings directory exists and is not a directory");
         }
-        fs::remove_dir_all(&bindings_dest).expect("Failed to remove bindings directory");
+        fs::remove_dir_all(bindings_dest).expect("Failed to remove bindings directory");
     }
-    fs::rename(&bindings_out, &bindings_dest).expect("Failed to move bindings into place");
+    fs::rename(bindings_out, bindings_dest).expect("Failed to move bindings into place");
 }
