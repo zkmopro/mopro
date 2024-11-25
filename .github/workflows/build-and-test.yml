@@ -21,7 +21,7 @@ jobs:
             - uses: actions/checkout@v4
             - name: Check formatting
               run: cargo fmt --all -- --check
-    
+
     cli:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -56,7 +56,10 @@ jobs:
                   toolchain: stable
                   override: true
             - name: Run ffi circom tests
-              run: cd mopro-ffi && cargo test --features circom --no-default-features
+              run: |
+                sudo apt-get install -y protobuf-compiler
+                cd mopro-ffi
+                cargo test --features circom --no-default-features
     test-ffi-ashlang:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -82,6 +85,7 @@ jobs:
             - name: Run e2e circom tests
               # TODO: Fix this custom jar thing
               run: |
+                  sudo apt-get install -y protobuf-compiler
                   cd test-e2e
                   curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
                   CLASSPATH=jna-5.13.0.jar cargo test --test circom -- --nocapture
@@ -98,7 +102,10 @@ jobs:
                   toolchain: stable
                   override: true
             - name: Build iOS xcframework
-              run: cd test-e2e && cargo run --bin ios
+              run: |
+                brew install protobuf
+                cd test-e2e
+                cargo run --bin ios
             - name: Cache xcframework
               id: cache-xcframework
               uses: actions/cache/save@v4
@@ -122,7 +129,9 @@ jobs:
                 path: test-e2e/MoproiOSBindings
                 key: ${{ github.sha }}-xcframework
             - name: Build app for device
-              run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+              run: |
+                brew install protobuf
+                xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
     build-ios-app-simulator:
         runs-on: macos-latest
         needs: build-xcframework
@@ -140,7 +149,9 @@ jobs:
                 path: test-e2e/MoproiOSBindings
                 key: ${{ github.sha }}-xcframework
             - name: Build app for device
-              run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS\ Simulator build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+              run: |
+                brew install protobuf
+                xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS\ Simulator build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
     test-ios-app-simulator:
         runs-on: macos-14
         needs: build-xcframework
@@ -159,7 +170,9 @@ jobs:
                 key: ${{ github.sha }}-xcframework
             # to list available simulators: xcrun simctl list devices
             - name: Test app in simulator
-              run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination 'platform=iOS Simulator,name=iPhone 15' test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+              run: |
+                brew install protobuf
+                xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination 'platform=iOS Simulator,name=iPhone 15' test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
     build-android-lib:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -171,7 +184,10 @@ jobs:
                   toolchain: stable
                   override: true
             - name: Build Android bindings
-              run: cd test-e2e && cargo run --bin android
+              run: |
+                sudo apt-get install -y protobuf-compiler
+                cd test-e2e
+                cargo run --bin android
             - name: Cache android lib
               id: cache-android-lib
               uses: actions/cache/save@v4
@@ -202,4 +218,7 @@ jobs:
             - name: Setup Android SDK
               uses: android-actions/setup-android@v2.0.10
             - name: Build android app
-              run: cd test-e2e/android && ./gradlew build
+              run: |
+                sudo apt-get install -y protobuf-compiler
+                cd test-e2e/android
+                ./gradlew build
