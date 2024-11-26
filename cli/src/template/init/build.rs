@@ -11,5 +11,5 @@ fn main() {
     }
     // Finally initialize uniffi and build the scaffolding into the
     // rust binary
-    uniffi::generate_scaffolding(udl_path).unwrap();
+    uniffi::generate_scaffolding(udl_path.to_str().unwrap()).unwrap();
 }
