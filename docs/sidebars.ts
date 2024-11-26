@@ -34,6 +34,7 @@ const sidebars: SidebarsConfig = {
                 'adapters/overview',
                 'adapters/circom',
                 'adapters/halo2',
+                'adapters/ashlang',
             ]
         },
         {
