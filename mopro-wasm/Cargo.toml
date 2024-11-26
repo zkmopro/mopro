@@ -7,7 +7,6 @@ edition = "2021"
 crate-type = ["rlib", "cdylib"]
 
 [features]
-default = ["plonk"]
 plonk = []
 hyperplonk = []
 gemini = []

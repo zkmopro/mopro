@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 use serde_wasm_bindgen::{from_value, to_value};
 
 #[wasm_bindgen]
-pub fn generate_hyperplonk_proof(
+pub fn generate_proof(
     srs_key: &[u8],
     proving_key: &[u8],
     input: JsValue,
@@ -24,7 +24,7 @@ pub fn generate_hyperplonk_proof(
 }
 
 #[wasm_bindgen]
-pub fn verify_hyperplonk_proof(
+pub fn verify_proof(
     srs_key: &[u8],
     verifying_key: &[u8],
     proof: Vec<u8>,

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASM Browser Test</title>
+</head>
+<body>
+    <h1 style="text-align: center;">WASM Browser Test</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Test</th>
+                <th>Test Pass</th>
+                <th>Error</th>
+            </tr>
+        </thead>
+        <tbody id="test-results">
+            <!-- Rows will be dynamically added here -->
+        </tbody>
+    </table>
+    <script type="module">
+        const testCases = [
+            { name: "Plonk", input: { out: ["55"] } },
+            { name: "HyperPlonk", input: { out: ["55"] } },
+            { name: "Gemini", input: { out: ["55"] } }
+        ];
+
+        const resultsTable = document.getElementById('test-results');
+        const worker = new Worker('./test_halo2.js', { type: 'module' });
+
+        // Listen for messages from the worker
+        worker.addEventListener('message', (event) => {
+            const { testName, data, error } = event.data;
+
+            // Find or create a table row for this test case
+            let row = document.getElementById(testName);
+            if (!row) {
+                row = document.createElement('tr');
+                row.id = testName;
+                row.innerHTML = `
+                    <td>${testName}</td>
+                    <td id="${testName}-pass"></td>
+                    <td id="${testName}-error"></td>
+                `;
+                resultsTable.appendChild(row);
+            }
+
+            const passCell = document.getElementById(`${testName}-pass`);
+            const errorCell = document.getElementById(`${testName}-error`);
+            if (error) {
+                errorCell.textContent = error;
+                passCell.textContent = "";
+            } else {
+                passCell.textContent = data ? "true" : "false";
+                errorCell.textContent = "";
+            }
+        });
+
+        // For checking sequence
+        let currentIndex = 0;
+
+        function runNextTest() {
+            if (currentIndex < testCases.length) {
+                const testCase = testCases[currentIndex];
+                worker.postMessage({
+                    testName: testCase.name,
+                    input: testCase.input
+                });
+                currentIndex++;
+            }
+        }
+
+        // Start the test
+        worker.addEventListener('message', () => {
+            runNextTest();
+        });
+
+        runNextTest();
+    </script>
+</body>
+</html>

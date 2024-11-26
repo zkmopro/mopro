@@ -6,3 +6,4 @@ mopro-example-app
 graph.bin
 
 *.xcframework/
+node_modules
