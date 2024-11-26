@@ -2,6 +2,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use uniffi::{generate_bindings, SwiftBindingGenerator};
+
 use super::{cleanup_tmp_local, install_arch, mktemp_local};
 
 // Load environment variables that are specified by by xcode
@@ -84,31 +86,16 @@ pub fn build() {
         lib_out
     };
 
-    let uniffi_bindgen_path = {
-        let mut bin_path = std::env::current_exe().unwrap(); //Users/~/mopro/target/debug/ios
-        bin_path.pop(); // Remove the current executable name: //Users/~/mopro/target/debug
-        bin_path.pop(); //Users/~/mopro/target/
-        bin_path.pop(); //Users/~/mopro
-        bin_path.push("mopro-ffi");
-        bin_path
-    };
-
-    let mut bindgen_cmd = Command::new("cargo");
-    bindgen_cmd
-        .current_dir(&uniffi_bindgen_path)
-        .arg("run")
-        .arg("--bin")
-        .arg("uniffi-bindgen")
-        .arg("generate")
-        .arg(manifest_dir + "/src/mopro.udl")
-        .arg("--language")
-        .arg("swift")
-        .arg("--out-dir")
-        .arg(swift_bindings_dir.to_str().unwrap())
-        .spawn()
-        .expect("Failed to spawn uniffi-bindgen")
-        .wait()
-        .expect("uniffi-bindgen errored");
+    generate_bindings(
+        (manifest_dir.clone() + "/src/mopro.udl").as_str().into(),
+        None,
+        SwiftBindingGenerator,
+        Some(swift_bindings_dir.to_str().unwrap().into()),
+        None,
+        None,
+        false,
+    )
+    .expect("Failed to generate bindings");
 
     fs::rename(
         swift_bindings_dir.join("mopro.swift"),

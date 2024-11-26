@@ -2,6 +2,8 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
+use uniffi::{generate_bindings, KotlinBindingGenerator};
+
 use super::{cleanup_tmp_local, install_arch, install_ndk, mktemp_local};
 
 pub fn build() {
@@ -33,31 +35,16 @@ pub fn build() {
         build_for_arch(arch, &build_dir, &bindings_out, &mode);
     }
 
-    let uniffi_bindgen_path = {
-        let mut bin_path = std::env::current_exe().unwrap(); //Users/~/mopro/target/debug/ios
-        bin_path.pop(); // Remove the current executable name: //Users/~/mopro/target/debug
-        bin_path.pop(); //Users/~/mopro/target/
-        bin_path.pop(); //Users/~/mopro
-        bin_path.push("mopro-ffi");
-        bin_path
-    };
-
-    let mut bindgen_cmd = Command::new("cargo");
-    bindgen_cmd
-        .current_dir(&uniffi_bindgen_path)
-        .arg("run")
-        .arg("--bin")
-        .arg("uniffi-bindgen")
-        .arg("generate")
-        .arg(manifest_dir + "/src/mopro.udl")
-        .arg("--language")
-        .arg("kotlin")
-        .arg("--out-dir")
-        .arg(bindings_out.to_str().unwrap())
-        .spawn()
-        .expect("Failed to spawn uniffi-bindgen")
-        .wait()
-        .expect("uniffi-bindgen errored");
+    generate_bindings(
+        (manifest_dir + "/src/mopro.udl").as_str().into(),
+        None,
+        KotlinBindingGenerator,
+        Some(bindings_out.to_str().unwrap().into()),
+        None,
+        None,
+        false,
+    )
+    .expect("Failed to generate bindings");
 
     move_bindings(&bindings_out, &bindings_dest);
     cleanup_tmp_local(&build_dir);
