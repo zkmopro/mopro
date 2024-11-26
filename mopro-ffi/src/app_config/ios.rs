@@ -87,7 +87,7 @@ pub fn build() {
     };
 
     generate_bindings(
-        (manifest_dir.clone() + "/src/mopro.udl").as_str().into(),
+        (manifest_dir + "/src/mopro.udl").as_str().into(),
         None,
         SwiftBindingGenerator,
         Some(swift_bindings_dir.to_str().unwrap().into()),
