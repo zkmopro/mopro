@@ -128,16 +128,16 @@ mod test {
     use std::collections::HashMap;
 
     #[test]
-    fn test_generate_and_verify_halo2_proof() {
+    fn test_generate_and_verify_plonk_proof() {
         halo2_app!();
 
         set_halo2_circuits! {
-            ("fibonacci_pk.bin", halo2_fibonacci::prove, "fibonacci_vk.bin", halo2_fibonacci::verify),
+            ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
         }
 
-        const SRS_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_srs.bin";
-        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_pk.bin";
-        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_vk.bin";
+        const SRS_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_srs.bin";
+        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_vk.bin";
 
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec!["55".to_string()]);

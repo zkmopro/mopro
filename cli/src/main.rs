@@ -1,7 +1,10 @@
-use clap::{Parser, Subcommand};
+use clap::Parser;
+use clap::Subcommand;
 
 mod build;
+mod create;
 mod init;
+mod print;
 mod style;
 
 /// CLI for creating a mopro project.
@@ -14,6 +17,7 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Initialize the project for specified adapters
     Init {
         #[arg(
             long,
@@ -29,6 +33,11 @@ enum Commands {
         mode: Option<String>,
         #[arg(long, num_args = 1.., help = "Specify the platforms to build for (e.g., 'ios', 'android').")]
         platforms: Option<Vec<String>>,
+    },
+    /// Create templates for the specified platform
+    Create {
+        #[arg(long, help = "Specify the platform")]
+        template: Option<String>,
     },
 }
 
@@ -46,6 +55,10 @@ fn main() {
         Commands::Build { mode, platforms } => match build::build_project(mode, platforms) {
             Ok(_) => {}
             Err(e) => style::print_read_bold(format!("Failed to build project {:?}", e)),
+        },
+        Commands::Create { template } => match create::create_project(template) {
+            Ok(_) => {}
+            Err(e) => style::print_read_bold(format!("Failed to create template {:?}", e)),
         },
     }
 }

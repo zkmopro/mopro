@@ -757,61 +757,73 @@ private struct FfiConverterDictionaryStringSequenceString: FfiConverterRustBuffe
         return dict
     }
 }
-
-public func generateCircomProof(zkeyPath: String, circuitInputs: [String: [String]]) throws -> GenerateProofResult {
-    return try FfiConverterTypeGenerateProofResult.lift(rustCallWithError(FfiConverterTypeMoproError.lift) {
-        uniffi_mopro_bindings_fn_func_generate_circom_proof(
-            FfiConverterString.lower(zkeyPath),
-            FfiConverterDictionaryStringSequenceString.lower(circuitInputs), $0
-        )
-    })
+public func generateAshlangSpartanProof(ar1csPath: String, inputs: [String])throws  -> GenerateProofResult {
+    return try  FfiConverterTypeGenerateProofResult.lift(try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_bindings_fn_func_generate_ashlang_spartan_proof(
+        FfiConverterString.lower(ar1csPath),
+        FfiConverterSequenceString.lower(inputs),$0
+    )
+})
 }
-
-public func generateHalo2Proof(srsPath: String, pkPath: String, circuitInputs: [String: [String]]) throws -> GenerateProofResult {
-    return try FfiConverterTypeGenerateProofResult.lift(rustCallWithError(FfiConverterTypeMoproError.lift) {
-        uniffi_mopro_bindings_fn_func_generate_halo2_proof(
-            FfiConverterString.lower(srsPath),
-            FfiConverterString.lower(pkPath),
-            FfiConverterDictionaryStringSequenceString.lower(circuitInputs), $0
-        )
-    })
+public func generateCircomProof(zkeyPath: String, circuitInputs: [String: [String]])throws  -> GenerateProofResult {
+    return try  FfiConverterTypeGenerateProofResult.lift(try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_bindings_fn_func_generate_circom_proof(
+        FfiConverterString.lower(zkeyPath),
+        FfiConverterDictionaryStringSequenceString.lower(circuitInputs),$0
+    )
+})
+}
+public func generateHalo2Proof(srsPath: String, pkPath: String, circuitInputs: [String: [String]])throws  -> GenerateProofResult {
+    return try  FfiConverterTypeGenerateProofResult.lift(try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_bindings_fn_func_generate_halo2_proof(
+        FfiConverterString.lower(srsPath),
+        FfiConverterString.lower(pkPath),
+        FfiConverterDictionaryStringSequenceString.lower(circuitInputs),$0
+    )
+})
 }
 
 public func toEthereumInputs(inputs: Data) -> [String] {
-    return try! FfiConverterSequenceString.lift(try! rustCall {
-        uniffi_mopro_bindings_fn_func_to_ethereum_inputs(
-            FfiConverterData.lower(inputs), $0
-        )
-    })
+    return try!  FfiConverterSequenceString.lift(try! rustCall() {
+    uniffi_mopro_bindings_fn_func_to_ethereum_inputs(
+        FfiConverterData.lower(inputs),$0
+    )
+})
 }
 
 public func toEthereumProof(proof: Data) -> ProofCalldata {
-    return try! FfiConverterTypeProofCalldata.lift(try! rustCall {
-        uniffi_mopro_bindings_fn_func_to_ethereum_proof(
-            FfiConverterData.lower(proof), $0
-        )
-    })
+    return try!  FfiConverterTypeProofCalldata.lift(try! rustCall() {
+    uniffi_mopro_bindings_fn_func_to_ethereum_proof(
+        FfiConverterData.lower(proof),$0
+    )
+})
 }
-
-public func verifyCircomProof(zkeyPath: String, proof: Data, publicInput: Data) throws -> Bool {
-    return try FfiConverterBool.lift(rustCallWithError(FfiConverterTypeMoproError.lift) {
-        uniffi_mopro_bindings_fn_func_verify_circom_proof(
-            FfiConverterString.lower(zkeyPath),
-            FfiConverterData.lower(proof),
-            FfiConverterData.lower(publicInput), $0
-        )
-    })
+public func verifyAshlangSpartanProof(ar1csPath: String, proof: Data)throws  -> Bool {
+    return try  FfiConverterBool.lift(try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_bindings_fn_func_verify_ashlang_spartan_proof(
+        FfiConverterString.lower(ar1csPath),
+        FfiConverterData.lower(proof),$0
+    )
+})
 }
-
-public func verifyHalo2Proof(srsPath: String, vkPath: String, proof: Data, publicInput: Data) throws -> Bool {
-    return try FfiConverterBool.lift(rustCallWithError(FfiConverterTypeMoproError.lift) {
-        uniffi_mopro_bindings_fn_func_verify_halo2_proof(
-            FfiConverterString.lower(srsPath),
-            FfiConverterString.lower(vkPath),
-            FfiConverterData.lower(proof),
-            FfiConverterData.lower(publicInput), $0
-        )
-    })
+public func verifyCircomProof(zkeyPath: String, proof: Data, publicInput: Data)throws  -> Bool {
+    return try  FfiConverterBool.lift(try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_bindings_fn_func_verify_circom_proof(
+        FfiConverterString.lower(zkeyPath),
+        FfiConverterData.lower(proof),
+        FfiConverterData.lower(publicInput),$0
+    )
+})
+}
+public func verifyHalo2Proof(srsPath: String, vkPath: String, proof: Data, publicInput: Data)throws  -> Bool {
+    return try  FfiConverterBool.lift(try rustCallWithError(FfiConverterTypeMoproError.lift) {
+    uniffi_mopro_bindings_fn_func_verify_halo2_proof(
+        FfiConverterString.lower(srsPath),
+        FfiConverterString.lower(vkPath),
+        FfiConverterData.lower(proof),
+        FfiConverterData.lower(publicInput),$0
+    )
+})
 }
 
 private enum InitializationResult {
@@ -830,22 +842,28 @@ private var initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if uniffi_mopro_bindings_checksum_func_generate_circom_proof() != 54365 {
+    if (uniffi_mopro_bindings_checksum_func_generate_ashlang_spartan_proof() != 56657) {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_bindings_checksum_func_generate_halo2_proof() != 3963 {
+    if (uniffi_mopro_bindings_checksum_func_generate_circom_proof() != 54365) {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_bindings_checksum_func_to_ethereum_inputs() != 64747 {
+    if (uniffi_mopro_bindings_checksum_func_generate_halo2_proof() != 3963) {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_bindings_checksum_func_to_ethereum_proof() != 64531 {
+    if (uniffi_mopro_bindings_checksum_func_to_ethereum_inputs() != 64747) {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_bindings_checksum_func_verify_circom_proof() != 46591 {
+    if (uniffi_mopro_bindings_checksum_func_to_ethereum_proof() != 64531) {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_mopro_bindings_checksum_func_verify_halo2_proof() != 56128 {
+    if (uniffi_mopro_bindings_checksum_func_verify_ashlang_spartan_proof() != 65505) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_mopro_bindings_checksum_func_verify_circom_proof() != 46591) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_mopro_bindings_checksum_func_verify_halo2_proof() != 56128) {
         return InitializationResult.apiChecksumMismatch
     }
 

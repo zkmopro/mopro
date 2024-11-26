@@ -8,7 +8,7 @@ Explore how the Halo2 adapter is implemented by checking out this [Sample Mopro 
 
 ## Setting Up the Rust Project
 
-You can start by following the general instructions in the [Rust Setup Guide](/getting-started/rust-setup.md) to create a new Rust project for building libraries with Circom proofs. However, you will need to perform these specific adjustments for Halo2:
+You can start by following the general instructions in the [Rust Setup Guide](/setup/rust-setup.md) to create a new Rust project for building libraries with Circom proofs. However, you will need to perform these specific adjustments for Halo2:
 
 In your `Cargo.toml` file, ensure the `halo2` feature is activated for `mopro-ffi`:
 
@@ -65,7 +65,7 @@ For example:
 
 ```rust
 mopro_ffi::set_halo2_circuits! {
-    ("fibonacci_pk.bin", halo2_fibonacci::prove, "fibonacci_vk.bin", halo2_fibonacci::verify),
+    ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
 }
 ```
 
@@ -80,14 +80,14 @@ For example:
 ```rust
 fn get_halo2_proving_circuit(circuit: &str) -> Result<Halo2ProveFn, MoproError> {
     match circuit {
-        "fibonacci_pk.bin" => Ok(halo2_fibonacci::prove),
+        "plonk_fibonacci_pk.bin" => Ok(plonk_fibonacci::prove),
         _ => Err(MoproError::CircuitNotFound),
     }
 }
 
 fn get_halo2_verifying_circuit(circuit: &str) -> Result<Halo2VerifyFn, MoproError> {
     match circuit {
-        "fibonacci_vk.bin" => Ok(halo2_fibonacci::verify),
+        "plonk_fibonacci_vk.bin" => Ok(plonk_fibonacci::verify),
         _ => Err(MoproError::CircuitNotFound),
     }
 }
