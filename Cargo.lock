@@ -2142,17 +2142,22 @@ dependencies = [
  "bincode",
  "byteorder",
  "color-eyre",
+ "console_error_panic_hook",
  "gemini-fibonacci",
+ "getrandom",
  "hyperplonk-fibonacci",
  "num-bigint",
  "num-traits",
  "plonk-fibonacci",
  "rust-witness",
  "serde",
+ "serde-wasm-bindgen",
  "serde_derive",
  "thiserror",
  "uniffi",
  "uuid",
+ "wasm-bindgen",
+ "wasm-bindgen-test",
 ]
 
 [[package]]

@@ -7,6 +7,9 @@ mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
 
+mod utils;
+mod wasm;
+
 #[cfg(feature = "circom")]
 pub use circom::{
     generate_circom_proof_wtns, serialization::to_ethereum_inputs,
