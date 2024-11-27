@@ -125,10 +125,10 @@ pub fn build() {
         .wait()
         .unwrap();
 
-    // The iOS project expects the module map to be named "module.modulemap",
-    // but uniffi-bindgen creates "moproFFI.modulemap" by default,
-    // therefore we need to rename it.
-    rename_module_map_recursively(&bindings_out);
+    // The iOS project expects the module map files to be named "module.modulemap",
+    // but uniffi-bindgen creates "moproFFI.modulemap" files by default,
+    // therefore we need to rename all of them.
+    rename_module_maps_recursively(&bindings_out);
 
     if let Ok(info) = fs::metadata(&bindings_dest) {
         if !info.is_dir() {
@@ -142,7 +142,11 @@ pub fn build() {
     cleanup_tmp_local(build_dir_path)
 }
 
-fn rename_module_map_recursively(bindings_out: &PathBuf) {
+/// Recursively renames all module maps in the given directory to "module.modulemap".
+/// This is necessary because uniffi-bindgen creates module maps with the name "moproFFI.modulemap"
+/// by default. We're looking for multiple files as there are separate modules for the
+/// physical device and the simulator.
+fn rename_module_maps_recursively(bindings_out: &PathBuf) {
     for entry in fs::read_dir(bindings_out).expect("Failed to read bindings out directory") {
         let entry = entry.expect("Failed to read entry");
         let path = entry.path();
@@ -150,7 +154,7 @@ fn rename_module_map_recursively(bindings_out: &PathBuf) {
             let dest_path = path.with_file_name("module.modulemap");
             fs::rename(&path, &dest_path).expect("Failed to rename module map");
         } else if path.is_dir() {
-            rename_module_map_recursively(&path);
+            rename_module_maps_recursively(&path);
         }
     }
 }
