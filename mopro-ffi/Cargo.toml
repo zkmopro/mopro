@@ -12,10 +12,6 @@ exclude = ["target/*"]
 [lib]
 name = "mopro_ffi"
 
-[[bin]]
-name = "uniffi-bindgen"
-path = "src/uniffi-bindgen.rs"
-
 [features]
 default = []
 
@@ -82,8 +78,6 @@ rust-witness = { version = "0.1.0", optional = true }
 uniffi = { version = "=0.28.0", features = ["build"] }
 
 [dev-dependencies]
-uniffi = { version = "=0.28.0", features = ["bindgen-tests"] }
-
 color-eyre = "0.6"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"

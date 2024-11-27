@@ -17,15 +17,6 @@ namespace mopro {
   [Throws=MoproError]
   boolean verify_circom_proof(string zkey_path, bytes proof, bytes public_input);
 
-  // [Throws=MoproError]
-  // BenchmarkResult arkworks_pippenger(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
-
-  // [Throws=MoproError]
-  // BenchmarkResult trapdoortech_zprize_msm(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
-
-  // [Throws=MoproError]
-  // BenchmarkResult metal_msm(u32 instance_size, u32 num_instance, [ByRef] string utils_dir);
-
   ProofCalldata to_ethereum_proof(bytes proof);
   sequence<string> to_ethereum_inputs(bytes inputs);
 };
@@ -34,12 +25,6 @@ dictionary GenerateProofResult {
   bytes proof;
   bytes inputs;
 };
-
-// dictionary BenchmarkResult {
-//  u32 instance_size;
-//  u32 num_instance;
-//  double avg_processing_time;
-//};
 
 dictionary G1 {
   string x;
