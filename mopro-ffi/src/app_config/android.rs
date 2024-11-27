@@ -2,9 +2,13 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-use uniffi::{generate_bindings, KotlinBindingGenerator};
+use uniffi::generate_bindings;
+use uniffi::KotlinBindingGenerator;
 
-use super::{cleanup_tmp_local, install_arch, install_ndk, mktemp_local};
+use super::cleanup_tmp_local;
+use super::install_arch;
+use super::install_ndk;
+use super::mktemp_local;
 
 pub fn build() {
     let cwd = std::env::current_dir().expect("Failed to get current directory");

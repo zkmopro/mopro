@@ -2,9 +2,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use uniffi::{generate_bindings, SwiftBindingGenerator};
+use uniffi::generate_bindings;
+use uniffi::SwiftBindingGenerator;
 
-use super::{cleanup_tmp_local, install_arch, mktemp_local};
+use super::cleanup_tmp_local;
+use super::install_arch;
+use super::mktemp_local;
 
 // Load environment variables that are specified by by xcode
 pub fn build() {
