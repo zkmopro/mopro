@@ -2,9 +2,13 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-use super::{cleanup_tmp_local, install_arch, install_ndk, mktemp_local};
+use uniffi::generate_bindings;
+use uniffi::KotlinBindingGenerator;
 
-pub const MOPRO_KOTLIN: &str = include_str!("../../KotlinBindings/uniffi/mopro/mopro.kt");
+use super::cleanup_tmp_local;
+use super::install_arch;
+use super::install_ndk;
+use super::mktemp_local;
 
 pub fn build() {
     let cwd = std::env::current_dir().expect("Failed to get current directory");
@@ -32,10 +36,20 @@ pub fn build() {
 
     install_ndk();
     for arch in target_archs {
-        build_for_arch(&arch, &build_dir, &bindings_out, &mode);
+        build_for_arch(arch, &build_dir, &bindings_out, &mode);
     }
 
-    write_kotlin_bindings(&bindings_out);
+    generate_bindings(
+        (manifest_dir + "/src/mopro.udl").as_str().into(),
+        None,
+        KotlinBindingGenerator,
+        Some(bindings_out.to_str().unwrap().into()),
+        None,
+        None,
+        false,
+    )
+    .expect("Failed to generate bindings");
+
     move_bindings(&bindings_out, &bindings_dest);
     cleanup_tmp_local(&build_dir);
 }
@@ -81,19 +95,12 @@ fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str)
     fs::copy(&out_lib_path, &out_lib_dest).expect("Failed to copy file");
 }
 
-fn write_kotlin_bindings(bindings_out: &Path) {
-    let mopro_kt_path = bindings_out.join("uniffi/mopro/mopro.kt");
-    fs::create_dir_all(mopro_kt_path.parent().unwrap())
-        .expect("Failed to create uniffi/mopro directory");
-    fs::write(&mopro_kt_path, MOPRO_KOTLIN).expect("Failed to write mopro.kt");
-}
-
 fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
-    if let Ok(info) = fs::metadata(&bindings_dest) {
+    if let Ok(info) = fs::metadata(bindings_dest) {
         if !info.is_dir() {
             panic!("bindings directory exists and is not a directory");
         }
-        fs::remove_dir_all(&bindings_dest).expect("Failed to remove bindings directory");
+        fs::remove_dir_all(bindings_dest).expect("Failed to remove bindings directory");
     }
-    fs::rename(&bindings_out, &bindings_dest).expect("Failed to move bindings into place");
+    fs::rename(bindings_out, bindings_dest).expect("Failed to move bindings into place");
 }
