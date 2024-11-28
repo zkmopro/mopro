@@ -3,22 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WASM Browser Test</title>
+    <title>Halo2 WASM Test</title>
+    <style>
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
     <h1 style="text-align: center;">WASM Browser Test</h1>
-    <table>
+    <table style="margin-top: 20px; text-align: left">
         <thead>
             <tr>
                 <th>Test</th>
-                <th>Test Pass</th>
+                <th>Pass</th>
                 <th>Error</th>
             </tr>
         </thead>
         <tbody id="test-results">
-            <!-- Rows will be dynamically added here -->
+            <!-- Rows will be dynamically updated here -->
         </tbody>
     </table>
+    <div id="test-status" style="margin-top: 20px; text-align: center; font-size: 1.2em; font-weight: bold;">
+        <!-- Status will be added dynamically updated -->
+    </div>
     <script type="module">
         const testCases = [
             { name: "Plonk", input: { out: ["55"] } },
@@ -27,7 +45,12 @@
         ];
 
         const resultsTable = document.getElementById('test-results');
+        const statusDiv = document.getElementById('test-status');
         const worker = new Worker('./test_halo2.js', { type: 'module' });
+
+        // For checking sequence and status
+        let currentIndex = 0;
+        let allPassed = true;
 
         // Listen for messages from the worker
         worker.addEventListener('message', (event) => {
@@ -50,15 +73,25 @@
             const errorCell = document.getElementById(`${testName}-error`);
             if (error) {
                 errorCell.textContent = error;
-                passCell.textContent = "";
+                passCell.textContent = "-";
+                allPassed = false;
             } else {
                 passCell.textContent = data ? "true" : "false";
-                errorCell.textContent = "";
+                errorCell.textContent = "-";
+                if (!data) allPassed = false;
+            }
+
+            // Trigger next test or mark completion
+            if (currentIndex < testCases.length) {
+                runNextTest();
+            } else {
+                // Mark test completion after the last test
+                const finalStatus = allPassed ? "All tests passed" : "Some tests failed";
+                statusDiv.textContent = `Test Status: ${finalStatus}`;
+                statusDiv.dataset.status = allPassed ? "passed" : "failed"; // Add status attribute for WebDriver
             }
         });
 
-        // For checking sequence
-        let currentIndex = 0;
 
         function runNextTest() {
             if (currentIndex < testCases.length) {
