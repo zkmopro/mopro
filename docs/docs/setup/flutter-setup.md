@@ -75,9 +75,9 @@ If you prefer using the terminal to run the app, use the following steps:
 
 The example app comes with a simple prover generated from a Circom circuit. To integrate your own prover, follow the steps below.
 
-### Setup
+### Setting Up
 
-Follow the [Rust Setup steps from the mopro official docs](https://zkmopro.org/docs/getting-started/rust-setup) to generate the platform-specific libraries.
+Follow the [Rust Setup steps](/setup/rust-setup.md) to generate the platform-specific libraries.
 
 ### Copying The Generated Libraries
 
@@ -119,7 +119,7 @@ flutter-app/
 1. Replace the directory `mopro_flutter_plugin/android/src/main/jniLibs` with the one generated during the [Setup](#setup).
 2. Replace `mopro.kt` file at `mopro_flutter_plugin/android/src/main/kotlin/uniffi/mopro/mopro.kt` with the one generated during the [Setup](#setup).
 
-### zKey
+### Customizing the zKey
 
 ```
 flutter-app/
