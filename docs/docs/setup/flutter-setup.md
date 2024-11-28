@@ -3,22 +3,7 @@
 After completing the [Rust setup](rust-setup.md) and setting up either [iOS setup](ios-setup.md) or [Android setup](android-setup.md), you're ready to create a cross-platform project using [Flutter](https://flutter.dev/). <br/>
 Flutter is a framework for building natively compiled, multi-platform applications from a single codebase.
 
-## Flutter app example
-
-<div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-    <img src="/img/flutter-android.png" alt="Android app screenshot" width="250"/>
-    <img src="/img/flutter-ios.png" alt="iOS app screenshot" width="250"/>
-</div>
-
-You can now clone the repository from [zkmopro/flutter-app](https://github.com/zkmopro/flutter-app) with
-
-```sh
-git clone https://github.com/zkmopro/flutter-app
-```
-
-## Running The Example App
-
-### Prerequisites
+## 1. Prerequisites
 
 1. **Install Flutter**
 
@@ -44,6 +29,25 @@ git clone https://github.com/zkmopro/flutter-app
 
    This will install the necessary dependencies for the project.
 
+## 2. Integrating mopro into a Flutter app
+
+Depending on your case, you may want to integrate mopro into a [new](#21-creating-a-new-mopro-enabled-flutter-app) or [existing](#22-integrating-mopro-into-existing-flutter-app) Flutter app.
+
+## 2.1 Creating a New mopro-Enabled Flutter App
+
+Use the provided example app as a starting point.
+
+<div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+    <img src="/img/flutter-android.png" alt="Android app screenshot" width="250"/>
+    <img src="/img/flutter-ios.png" alt="iOS app screenshot" width="250"/>
+</div>
+
+Clone the repository from [zkmopro/flutter-app](https://github.com/zkmopro/flutter-app) with
+
+```sh
+git clone https://github.com/zkmopro/flutter-app
+```
+
 ### Running the App via VS Code
 
 1. Open the project in VS Code.
@@ -55,31 +59,15 @@ git clone https://github.com/zkmopro/flutter-app
 
 If you prefer using the terminal to run the app, use the following steps:
 
-1. For Android:
-
-   Ensure you have an Android emulator running or a device connected. Then run:
-
+1. Ensure you have either an Android or iOS emulator running or a device connected.
+2. Execute the following command:
    ```bash
    flutter run
    ```
 
-2. For iOS:
+### Integrating mopro bindings
 
-   Make sure you have an iOS simulator running or a device connected. Then run:
-
-   ```bash
-   flutter run
-   ```
-
-## Integrating Your ZKP
-
-The example app comes with a simple prover generated from a Circom circuit. To integrate your own prover, follow the steps below.
-
-### Setting Up
-
-Follow the [Rust Setup steps](/setup/rust-setup.md) to generate the platform-specific libraries.
-
-### Copying The Generated Libraries
+The example app comes with a simple prover generated from a Circom circuit. To integrate your own prover, follow the [Rust Setup steps](/setup/rust-setup.md) to generate the platform-specific libraries. Then, follow the steps below to integrate the generated libraries into the Flutter app.
 
 #### iOS
 
@@ -119,7 +107,7 @@ flutter-app/
 1. Replace the directory `mopro_flutter_plugin/android/src/main/jniLibs` with the one generated during the [Setup](#setup).
 2. Replace `mopro.kt` file at `mopro_flutter_plugin/android/src/main/kotlin/uniffi/mopro/mopro.kt` with the one generated during the [Setup](#setup).
 
-### Customizing the zKey
+#### Customizing the zKey
 
 ```
 flutter-app/
@@ -148,15 +136,40 @@ flutter-app/
 
 Don't forget to modify the input values for your specific case!
 
-## Modifying The Flutter Plugin code
+## 2.2 Integrating mopro Into Existing Flutter App
 
-```
-flutter-app/
-├── ...
-└── mopro_flutter_plugin
-```
+If you already have a Flutter project, follow the steps below to integrate mopro.
 
-You can find the Flutter plugin code that enables the communication between Flutter and you generated libraries in the `mopro_flutter_plugin` directory. However, typical IDEs may not provide platform-specific features such as syntax highlighting, code completion, or error detection if you load the whole project in your IDE. Here are some tips on how to edit the platform-specific plugin code:
+1. Copy the `mopro_flutter_plugin` directory from the repository root into the root folder of your existing Flutter project:
+
+   ```
+   your-flutter-app/
+   ├── ...
+   ├── lib/
+   ├── android/
+   ├── ios/
+   ├── pubspec.yaml
+   └── mopro_flutter_plugin/
+   ```
+
+2. Add the plugin to `pubspec.yaml` as a dependency:
+
+   ```yaml
+   ---
+   dependencies:
+   flutter:
+     sdk: flutter
+   mopro_flutter_plugin:
+     path: ./mopro_flutter_plugin
+   ```
+
+3. Follow the steps described in [Integrating mopro bindings](#integrating-mopro-bindings) section to generate your platform-specific libraries.
+4. Place the libraries in the corresponding directories for [iOS](#ios) and [Android](#android) as described [above](#integrating-mopro-bindings).
+5. Follow the steps described in [Customizing the zKey section](#customizing-the-zkey) to load your `.zkey` file.
+
+## 3. Modifying The Flutter Plugin code
+
+You can find the Flutter plugin code that enables the communication between Flutter and your generated libraries in the `mopro_flutter_plugin` directory. However, typical IDEs may not provide platform-specific features such as syntax highlighting, code completion, or error detection if you load the whole project in your IDE. Here are some tips on how to edit the platform-specific plugin code:
 
 :::info
 
