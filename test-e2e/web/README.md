@@ -19,7 +19,7 @@ mopro-wasm $ wasm-pack build --target web --out-dir ../test-e2e/web/halo2-gemini
 
 ### Copy Parameters
 
-Each generated halo2 wasm package requires a `parameters` folder, which is located in `test-vectors/halo2`.  
+Each generated halo2 wasm package requires a `parameters` folder, which is located in `test-vectors/halo2`.
 Copy the `parameters` folder into each corresponding `halo2-*-fibonacci` directory as shown below:
 
 ```text

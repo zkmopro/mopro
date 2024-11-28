@@ -19,6 +19,7 @@ jobs:
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
             - uses: actions/checkout@v4
+
             - name: Check formatting
               run: cargo fmt --all -- --check
 
@@ -68,7 +69,14 @@ jobs:
           with:
             toolchain: nightly-2024-07-18
             override: true
+        - name: Cache wasm-pack
+          id: cache-wasm-pack
+          uses: actions/cache@v4
+          with:
+            path: ~/.cargo/bin/wasm-pack
+            key: ${{ runner.os }}-wasm-pack
         - name: Install wasm-pack
+          if: steps.cache-wasm-pack.outputs.cache-hit != 'true'
           run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
         - name: Setup Chrome
           uses: browser-actions/setup-chrome@v1
@@ -80,8 +88,14 @@ jobs:
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         needs: setup-halo2-wasm-env
         steps:
-            - name: Run wasm halo2 tests
-              run: cd mopro-wasm && wasm-pack test --chrome --headless
+          - uses: actions/checkout@v4
+          - name: Restore cached wasm-pack
+            uses: actions/cache@v4
+            with:
+              path: ~/.cargo/bin/wasm-pack
+              key: ${{ runner.os }}-wasm-pack
+          - name: Run wasm halo2 tests
+            run: cd mopro-wasm && wasm-pack test --chrome --headless
     test-e2e:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -222,21 +236,44 @@ jobs:
       if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
       steps:
           - uses: actions/checkout@v4
+          - name: Restore cached wasm-pack
+            uses: actions/cache@v4
+            with:
+              path: ~/.cargo/bin/wasm-pack
+              key: ${{ runner.os }}-wasm-pack
+          - name: Cache halo2 wasm circuit
+            id: cache-halo2-wasm-circuit
+            uses: actions/cache@v4
+            with:
+              path: test-e2e/web
+              key: ${{ runner.os }}-halo2-wasm-circuit
           - name: Build circuits for Wasm Web app
             run: |
-              cd mopro_wasm && 
-              wasm-pack build --target web --out-dir ../test-e2e/web/halo2-plonk-fibonacci -- --features plonk &&
-              wasm-pack build --target web --out-dir ../test-e2e/web/halo2-hyperplonk-fibonacci -- --features hyperplonk &&
+              cd mopro-wasm 
+              wasm-pack build --target web --out-dir ../test-e2e/web/halo2-plonk-fibonacci -- --features plonk
+              wasm-pack build --target web --out-dir ../test-e2e/web/halo2-hyperplonk-fibonacci -- --features hyperplonk
               wasm-pack build --target web --out-dir ../test-e2e/web/halo2-gemini-fibonacci -- --features gemini
     test-halo2-wasm-web:
         runs-on: ubuntu-latest
         needs: build-halo2-wasm-web
+        defaults:
+          run:
+              working-directory: test-e2e/web
         steps:
+            - uses: actions/checkout@v4
+            - name: Restore cached wasm-pack
+              uses: actions/cache@v4
+              with:
+                path: ~/.cargo/bin/wasm-pack
+                key: ${{ runner.os }}-wasm-pack
+            - name: Restore cached halo2 wasm circuit
+              uses: actions/cache@v4
+              with:
+                path: test-e2e/web
+                key: ${{ runner.os }}-halo2-wasm-circuit
             - name: Install dependencies
               run: yarn install
             - name: Run halo2-wasm-app server
-              run: |
-                cd test-e2e/web
-                yarn start &
+              run: yarn start &
             - name: Test halo2-wasm-app in headless way
               run: yarn test
