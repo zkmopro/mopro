@@ -33,7 +33,7 @@ Flutter is a framework for building natively compiled, multi-platform applicatio
 
 Depending on your case, you may want to integrate mopro into a [new](#21-creating-a-new-mopro-enabled-flutter-app) or [existing](#22-integrating-mopro-into-existing-flutter-app) Flutter app.
 
-## 2.1 Creating a new mopro-enabled Flutter app
+## 2.1 Creating a New mopro-Enabled Flutter App
 
 Use the provided example app as a starting point.
 
@@ -83,8 +83,8 @@ flutter-app/
         └── MoproBindings.xcframework/...
 ```
 
-1. Replace `mopro.swift` file at `mopro_flutter_plugin/ios/Classes/mopro.swift` with the one generated during the [Setup](#setup).
-2. Replace the directory `mopro_flutter_plugin/ios/MoproBindings.xcframework` with the one generated during the [Setup](#setup).
+1. Replace `mopro.swift` file at `mopro_flutter_plugin/ios/Classes/mopro.swift` with the one generated during the [Setup](#integrating-mopro-bindings).
+2. Replace the directory `mopro_flutter_plugin/ios/MoproBindings.xcframework` with the one generated during the [Setup](#integrating-mopro-bindings).
 
 #### Android
 

@@ -83,8 +83,8 @@ flutter-app/
         └── MoproBindings.xcframework/...
 ```
 
-1. Replace `mopro.swift` file at `mopro_flutter_plugin/ios/Classes/mopro.swift` with the one generated during the [Setup](#setup).
-2. Replace the directory `mopro_flutter_plugin/ios/MoproBindings.xcframework` with the one generated during the [Setup](#setup).
+1. Replace `mopro.swift` file at `mopro_flutter_plugin/ios/Classes/mopro.swift` with the one generated during the [Setup](#integrating-mopro-bindings).
+2. Replace the directory `mopro_flutter_plugin/ios/MoproBindings.xcframework` with the one generated during the [Setup](#integrating-mopro-bindings).
 
 #### Android
 
