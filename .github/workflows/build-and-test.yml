@@ -58,22 +58,28 @@ jobs:
                   override: true
             - name: Run ffi ashlang tests
               run: cd mopro-ffi && cargo test --features ashlang --no-default-features
+    setup-halo2-wasm-env:
+      runs-on: ubuntu-latest
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+      steps:
+        - uses: actions/checkout@v4
+        - name: Install Rust toolchain
+          uses: actions-rs/toolchain@v1
+          with:
+            toolchain: nightly-2024-07-18
+            override: true
+        - name: Install wasm-pack
+          run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+        - name: Setup Chrome
+          uses: browser-actions/setup-chrome@v1
+          with:
+            chrome-version: 130
+            install-chromedriver: true
     test-wasm-halo2:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        needs: setup-halo2-wasm-env
         steps:
-            - uses: actions/checkout@v4
-            - name: Install Rust toolchain
-              uses: actions-rs/toolchain@v1
-              with:
-                  toolchain: nightly-2024-07-18
-                  override: true
-            - uses: browser-actions/setup-chrome@v1
-              with:
-                chrome-version: 130
-                install-chromedriver: true
-            - name: Install wasm-pack
-              run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
             - name: Run wasm halo2 tests
               run: cd mopro-wasm && wasm-pack test --chrome --headless
     test-e2e:
@@ -210,3 +216,27 @@ jobs:
               uses: android-actions/setup-android@v2.0.10
             - name: Build android app
               run: cd test-e2e/android && ./gradlew build
+    build-halo2-wasm-web:
+      runs-on: ubuntu-latest
+      needs: setup-halo2-wasm-env
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+      steps:
+          - uses: actions/checkout@v4
+          - name: Build circuits for Wasm Web app
+            run: |
+              cd mopro_wasm && 
+              wasm-pack build --target web --out-dir ../test-e2e/web/halo2-plonk-fibonacci -- --features plonk &&
+              wasm-pack build --target web --out-dir ../test-e2e/web/halo2-hyperplonk-fibonacci -- --features hyperplonk &&
+              wasm-pack build --target web --out-dir ../test-e2e/web/halo2-gemini-fibonacci -- --features gemini
+    test-halo2-wasm-web:
+        runs-on: ubuntu-latest
+        needs: build-halo2-wasm-web
+        steps:
+            - name: Install dependencies
+              run: yarn install
+            - name: Run halo2-wasm-app server
+              run: |
+                cd test-e2e/web
+                yarn start &
+            - name: Test halo2-wasm-app in headless way
+              run: yarn test
