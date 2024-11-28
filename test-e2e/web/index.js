@@ -2,13 +2,31 @@ const { Builder, By } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 
 (async function testStatusCheck() {
+    // Configure chrome if env set
     const options = new chrome.Options();
+    if (process.env.CHROME_BIN) {
+        options.setChromeBinaryPath(process.env.CHROME_BIN);
+    }
     options.addArguments('--headless');
+    options.addArguments('--no-sandbox');
 
-    const driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
-
+    const driverBuilder = new Builder()
+    .forBrowser('chrome')
+    .setChromeOptions(options);
+    
+    // Configure chromewdriver if env set
+    if (process.env.CHROMEDRIVER_BIN) {
+        const service = new chrome.ServiceBuilder(process.env.CHROMEDRIVER_BIN);
+        driverBuilder.setChromeService(service);
+    }
+    
     try {
-        // Load the test page with `serve` default port
+        const driver = await driverBuilder.build();
+        
+        // Log ChromeDriver version via WebDriver
+        const driverVersion = await driver.executeScript('return navigator.userAgent');
+        console.log(`WebDriver user agent: ${driverVersion}`);
+
         await driver.get('http://localhost:3000');
 
         // Wait for the test completion marker
@@ -16,7 +34,7 @@ const chrome = require('selenium-webdriver/chrome');
         await driver.wait(async () => {
             const status = await statusDiv.getAttribute('data-status');
             return status === 'passed' || status === 'failed';
-        }, 10000); // 10 seconds timeout
+        }, 10000);
 
         // Check the final test status
         const finalStatus = await statusDiv.getAttribute('data-status');
