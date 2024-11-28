@@ -167,7 +167,7 @@ If you already have a Flutter project, follow the steps below to integrate mopro
 4. Place the libraries in the corresponding directories for [iOS](#ios) and [Android](#android) as described [above](#integrating-mopro-bindings).
 5. Follow the steps described in [Customizing the zKey section](#customizing-the-zkey) to load your `.zkey` file.
 
-## 3. Modifying The Flutter Plugin code
+## 3. Modifying The Flutter Plugin code (Optional)
 
 You can find the Flutter plugin code that enables the communication between Flutter and your generated libraries in the `mopro_flutter_plugin` directory. However, typical IDEs may not provide platform-specific features such as syntax highlighting, code completion, or error detection if you load the whole project in your IDE. Here are some tips on how to edit the platform-specific plugin code:
 
