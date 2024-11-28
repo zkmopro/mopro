@@ -104,8 +104,8 @@ flutter-app/
                     └── uniffi/mopro/mopro.kt
 ```
 
-1. Replace the directory `mopro_flutter_plugin/android/src/main/jniLibs` with the one generated during the [Setup](#setup).
-2. Replace `mopro.kt` file at `mopro_flutter_plugin/android/src/main/kotlin/uniffi/mopro/mopro.kt` with the one generated during the [Setup](#setup).
+1. Replace the directory `mopro_flutter_plugin/android/src/main/jniLibs` with the one generated during the [Setup](#integrating-mopro-bindings).
+2. Replace `mopro.kt` file at `mopro_flutter_plugin/android/src/main/kotlin/uniffi/mopro/mopro.kt` with the one generated during the [Setup](#integrating-mopro-bindings).
 
 #### Customizing the zKey
 
