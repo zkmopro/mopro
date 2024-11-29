@@ -24,7 +24,8 @@ const sidebars: SidebarsConfig = {
                 'setup/rust-setup',
                 'setup/ios-setup',
                 'setup/android-setup',
-                'setup/react-native-setup'
+                'setup/react-native-setup',
+                'setup/flutter-setup'
             ]
         },
         {
