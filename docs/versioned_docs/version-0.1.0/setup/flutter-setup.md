@@ -83,8 +83,8 @@ flutter-app/
         └── MoproBindings.xcframework/...
 ```
 
-1. Replace `mopro.swift` file at `mopro_flutter_plugin/ios/Classes/mopro.swift` with the one generated during the [Setup](#integrating-mopro-bindings).
-2. Replace the directory `mopro_flutter_plugin/ios/MoproBindings.xcframework` with the one generated during the [Setup](#integrating-mopro-bindings).
+1. Replace `mopro.swift` file at `mopro_flutter_plugin/ios/Classes/mopro.swift` with the one generated during the [Rust Setup](/setup/rust-setup.md).
+2. Replace the directory `mopro_flutter_plugin/ios/MoproBindings.xcframework` with the one generated during the [Rust Setup](/setup/rust-setup.md).
 
 #### Android
 
@@ -104,8 +104,8 @@ flutter-app/
                     └── uniffi/mopro/mopro.kt
 ```
 
-1. Replace the directory `mopro_flutter_plugin/android/src/main/jniLibs` with the one generated during the [Setup](#integrating-mopro-bindings).
-2. Replace `mopro.kt` file at `mopro_flutter_plugin/android/src/main/kotlin/uniffi/mopro/mopro.kt` with the one generated during the [Setup](#integrating-mopro-bindings).
+1. Replace the directory `mopro_flutter_plugin/android/src/main/jniLibs` with the one generated during the [Rust Setup](/setup/rust-setup.md).
+2. Replace `mopro.kt` file at `mopro_flutter_plugin/android/src/main/kotlin/uniffi/mopro/mopro.kt` with the one generated during the [Rust Setup](/setup/rust-setup.md).
 
 #### Customizing the zKey
 
