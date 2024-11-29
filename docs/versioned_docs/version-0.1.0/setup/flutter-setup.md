@@ -140,7 +140,7 @@ Don't forget to modify the input values for your specific case!
 
 If you already have a Flutter project, follow the steps below to integrate mopro.
 
-1. Copy the `mopro_flutter_plugin` directory from the repository root into the root folder of your existing Flutter project:
+1. Copy the `mopro_flutter_plugin` directory from [the repository](https://github.com/zkmopro/flutter-app) root into the root folder of your existing Flutter project:
 
    ```
    your-flutter-app/
