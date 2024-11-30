@@ -7,7 +7,7 @@ Follow these steps only if there are changes in the `mopro-wasm` package. Otherw
 ### Compile Halo2 Circuits to Wasm
 
 This web test page requires three Wasm circuits: `halo2-plonk-fibonacci`, `halo2-hyperplonk-fibonacci`, and `halo2-gemini-fibonacci`.  
-Please refer to [`mopro-wasm/README.md`](../../mopro-wasm/README.md) for more details.
+Refer to [`mopro-wasm/README.md`](../../mopro-wasm/README.md) for more details.
 
 Use `wasm-pack` to generate halo2 wasm packages for this testing web app with the following commands:
 
@@ -29,6 +29,9 @@ test-e2e/web/halo2-gemini-fibonacci/parameters
 ```
 
 ## Test
+
+This test suite uses chromedriver to run the application in a browser in headless mode. Both chrome and chromedriver are required.
+Refer to the [mopro-wasm - Getting Start](../../mopro-wasm/README.md#getting-started) for installation and setup instructions.
 
 1. Start a simple server by running the following command:
 

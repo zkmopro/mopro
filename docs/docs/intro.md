@@ -21,6 +21,7 @@ Mopro consists of a set of libraries and utilities. The following subprojects ar
 Primary libraries and utilities of interest:
 
 -   `mopro-ffi` - main package, exposes macros for configuring and building projects.
+-   `mopro-wasm` - enables the compilation of Halo2 circuits into wasm modules.
 -   `test-e2e` - example implementation of mopro in Android and iOS apps, used for testing.
 
 Secondary subprojects:
