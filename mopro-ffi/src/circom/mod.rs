@@ -8,9 +8,9 @@ use ark_ff::PrimeField;
 use ark_relations::r1cs::ConstraintMatrices;
 use serialization::{SerializableInputs, SerializableProof};
 
-use std::collections::HashMap;
 use std::fs::File;
 use std::str::FromStr;
+use std::{collections::HashMap, io::Read};
 
 use crate::GenerateProofResult;
 use ark_circom::{
@@ -31,6 +31,14 @@ pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 #[macro_export]
 macro_rules! circom_app {
     () => {
+        // fn generate_circom_proof_wtns_bin(
+        //     in0: String, // zkey path
+        //     in1: String, // wtns bin path
+        //     in2: std::collections::HashMap<String, Vec<String>>,
+        // ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
+        //     mopro_ffi::generate_circom_proof_wtns_bin(in0, in2, in1)
+        // }
+
         fn generate_circom_proof(
             in0: String,
             in1: std::collections::HashMap<String, Vec<String>>,
@@ -117,6 +125,56 @@ macro_rules! set_circom_circuits {
             }
         }
     };
+}
+
+pub fn generate_circom_proof_wtns_bin(
+    zkey_path: String,
+    inputs: HashMap<String, Vec<String>>,
+    wtns_bin_path: String,
+) -> Result<GenerateProofResult> {
+    // We'll start a background thread building the witness
+    let witness_thread = std::thread::spawn(move || {
+        let wtns_bin_file = File::open(&wtns_bin_path).unwrap();
+        let mut wtns_bin_reader = std::io::BufReader::new(wtns_bin_file);
+        let mut wtns_bin = vec![];
+        wtns_bin_reader.read_to_end(&mut wtns_bin).unwrap();
+        // Form the inputs
+        let json_inputs = serde_json::to_string(&inputs).unwrap();
+        let wtns = circom_witnesscalc::calc_witness(&json_inputs, &wtns_bin).unwrap();
+        wtns.iter()
+            .map(|v| BigUint::from_bytes_le(&v.to_le_bytes_vec()))
+            .collect::<Vec<_>>()
+    });
+
+    // here we make a loader just to get the groth16 header
+    // this header tells us what curve the zkey was compiled for
+    // this loader will only load the first few bytes
+    let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
+    header_reader.read();
+    let file = File::open(&zkey_path)?;
+    let mut reader = std::io::BufReader::new(file);
+    // check the prime in the header
+    // println!("{} {} {}", header.q, header.n8q, ark_bls12_381::Fq::MODULUS);
+    if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
+        let (proving_key, matrices) = read_zkey::<_, Bn254>(&mut reader)?;
+        let full_assignment = witness_thread
+            .join()
+            .map_err(|_e| anyhow::anyhow!("witness thread panicked"))?;
+        return prove(proving_key, matrices, full_assignment);
+    } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
+        let (proving_key, matrices) = read_zkey::<_, Bls12_381>(&mut reader)?;
+        let full_assignment = witness_thread
+            .join()
+            .map_err(|_e| anyhow::anyhow!("witness thread panicked"))?;
+        return prove(proving_key, matrices, full_assignment);
+    } else {
+        // unknown curve
+        // wait for the witness thread to finish for consistency
+        witness_thread
+            .join()
+            .map_err(|_e| anyhow::anyhow!("witness thread panicked"))?;
+        bail!("unknown curve detected in zkey");
+    }
 }
 
 // build a proof for a zkey using witness_fn to build
@@ -263,7 +321,7 @@ mod tests {
     use std::str::FromStr;
 
     use crate::circom::{generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn};
-    use crate::GenerateProofResult;
+    use crate::{generate_circom_proof_wtns_bin, GenerateProofResult};
     use anyhow::bail;
     use anyhow::Result;
     use ark_bls12_381::Bls12_381;
@@ -432,6 +490,52 @@ mod tests {
 
         // Generate Proof
         let p = generate_circom_proof(zkey_path.clone(), inputs)?;
+        let serialized_proof = p.proof;
+        let serialized_inputs = p.inputs;
+
+        assert!(serialized_proof.len() > 0);
+        assert_eq!(serialized_inputs, serialized_outputs);
+
+        // Verify Proof
+
+        let is_valid = verify_circom_proof(
+            zkey_path,
+            serialized_proof.clone(),
+            serialized_inputs.clone(),
+        )?;
+        assert!(is_valid);
+
+        // Step 4: Convert Proof to Ethereum compatible proof
+        let proof_calldata = to_ethereum_proof(serialized_proof);
+        let inputs_calldata = to_ethereum_inputs(serialized_inputs);
+        assert!(proof_calldata.a.x.len() > 0);
+        assert!(inputs_calldata.len() > 0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_prove_keccak_bin() -> Result<()> {
+        // Create a new MoproCircom instance
+        let zkey_path = "../test-vectors/circom/keccak256_256_test_final.zkey".to_string();
+        let wtns_bin_path = "../test-vectors/circom/keccak256_256_test.bin".to_string();
+        // Prepare inputs
+        let input_vec = vec![
+            116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+        ];
+
+        // Expected output
+        let expected_output_vec = vec![
+            37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65, 228, 211, 170, 133, 153, 9, 88,
+            212, 4, 212, 175, 238, 249, 210, 214, 116, 170, 85, 45, 21,
+        ];
+
+        let inputs = bytes_to_circuit_inputs(&input_vec);
+        let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
+
+        // Generate Proof
+        let p = generate_circom_proof_wtns_bin(zkey_path.clone(), inputs, wtns_bin_path)?;
         let serialized_proof = p.proof;
         let serialized_inputs = p.inputs;
 
