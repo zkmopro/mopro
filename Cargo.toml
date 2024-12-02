@@ -4,6 +4,6 @@ resolver = "2"
 exclude = ["mopro-example-app"]
 
 [workspace.dependencies]
-plonk-fibonacci = { package = "plonk-fibonacci", branch = "supporting-wasm", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", branch = "supporting-wasm", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-gemini-fibonacci = { package = "gemini-fibonacci", branch = "supporting-wasm", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }

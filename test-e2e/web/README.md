@@ -42,7 +42,9 @@ Refer to the [mopro-wasm - Getting Start](../../mopro-wasm/README.md#getting-sta
 2. Test the application either manually or by using the test script:
 
    **Manually**:
-   - Open your browser and navigate to: [http://localhost:3000](http://localhost:3000).
+   - Open your browser and navigate to: [http://localhost:3000](http://localhost:3000)
+      
+      ![Result of test on web browser](manual-test-result.png)
 
    **Using the test script**:
    - Run the following command:

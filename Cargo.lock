@@ -1477,11 +1477,10 @@ checksum = "28dea519a9695b9977216879a3ebfddf92f1c08c05d984f8996aecd6ecdc811d"
 [[package]]
 name = "fibonacci-circuit"
 version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm#2aed27d4ae56bcdde607f875a5e2683de9a26840"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3917ee5e91f2237d97210821649b73806ada7e2f"
 dependencies = [
  "bincode",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
- "halo2curves 0.3.3",
  "itertools 0.13.0",
  "plonkish_backend",
  "rand",
@@ -1562,7 +1561,7 @@ checksum = "e6d5a32815ae3f33302d95fdcb2ce17862f8c65363dcfd29360480ba1001fc9c"
 [[package]]
 name = "gemini-fibonacci"
 version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm#2aed27d4ae56bcdde607f875a5e2683de9a26840"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3917ee5e91f2237d97210821649b73806ada7e2f"
 dependencies = [
  "fibonacci-circuit",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
@@ -1811,7 +1810,7 @@ dependencies = [
 [[package]]
 name = "hyperplonk-fibonacci"
 version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm#2aed27d4ae56bcdde607f875a5e2683de9a26840"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3917ee5e91f2237d97210821649b73806ada7e2f"
 dependencies = [
  "fibonacci-circuit",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature/for-benchmark)",
@@ -2482,7 +2481,7 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 [[package]]
 name = "plonk-fibonacci"
 version = "0.1.0"
-source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git?branch=supporting-wasm#2aed27d4ae56bcdde607f875a5e2683de9a26840"
+source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3917ee5e91f2237d97210821649b73806ada7e2f"
 dependencies = [
  "bincode",
  "fibonacci-circuit",
