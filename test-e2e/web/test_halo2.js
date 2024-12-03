@@ -28,7 +28,6 @@ async function run_plonk_test(input) {
 
         const [proof, public_input] = proofResult;
         
-        // const IsValidProof = await mopro_wasm.verify_plonk_proof(SRS_KEY, VERIFYING_KEY, proof, public_input);
         const { result: verifyResult, timeTaken: verifyTime } = await measureTime(() =>
             mopro_wasm.verify_plonk_proof(SRS_KEY, VERIFYING_KEY, proof, public_input)
         );
@@ -57,7 +56,6 @@ async function run_hyperplonk_test(input) {
 
         const [proof, public_input] = proofResult;
         
-        // const IsValidProof = await mopro_wasm.verify_plonk_proof(SRS_KEY, VERIFYING_KEY, proof, public_input);
         const { result: verifyResult, timeTaken: verifyTime } = await measureTime(() =>
             mopro_wasm.verify_hyperplonk_proof(SRS_KEY, VERIFYING_KEY, proof, public_input)
         );
@@ -87,7 +85,6 @@ async function run_gemini_test(input) {
 
         const [proof, public_input] = proofResult;
         
-        // const IsValidProof = await mopro_wasm.verify_plonk_proof(SRS_KEY, VERIFYING_KEY, proof, public_input);
         const { result: verifyResult, timeTaken: verifyTime } = await measureTime(() =>
             mopro_wasm.verify_gemini_proof(SRS_KEY, VERIFYING_KEY, proof, public_input)
         );
