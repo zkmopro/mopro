@@ -74,6 +74,7 @@
             }
 
             if (error) {
+                allPassed = false;
                 document.getElementById(`${testName}-error`).textContent = error;
             } else {
                 document.getElementById(`${testName}-pass`).textContent = data.isValid ? "true" : "false";
