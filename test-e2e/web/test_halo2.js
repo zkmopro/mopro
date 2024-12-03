@@ -16,6 +16,7 @@ async function measureTime(callback) {
 async function run_plonk_test(input) {
     try {
         await mopro_wasm.default();
+        await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
 
         const SRS_KEY = await fetchBinaryFile('./mopro-pkg/parameters/plonk_fibonacci_srs.bin');
         const PROVING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/plonk_fibonacci_pk.bin');
@@ -44,6 +45,7 @@ async function run_plonk_test(input) {
 async function run_hyperplonk_test(input) {
     try {
         await mopro_wasm.default();
+        await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
 
         const SRS_KEY = await fetchBinaryFile('./mopro-pkg/parameters/hyperplonk_fibonacci_srs.bin');
         const PROVING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/hyperplonk_fibonacci_pk.bin');
@@ -73,6 +75,7 @@ async function run_hyperplonk_test(input) {
 async function run_gemini_test(input) {
     try {
         await mopro_wasm.default();
+        await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
 
         const SRS_KEY = await fetchBinaryFile('./mopro-pkg/parameters/gemini_fibonacci_srs.bin');
         const PROVING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/gemini_fibonacci_pk.bin');

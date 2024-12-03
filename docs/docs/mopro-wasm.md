@@ -1,6 +1,8 @@
 # mopro-wasm
 
-The mopro-wasm module enables the compilation of WASM code using `wasm-pack`. This module supports multithreading in WASM through the use of `wasm-bindgen-rayon`.
+The mopro-wasm module enables the compilation of WASM code using `wasm-pack` for Halo2.
+
+This module supports multithreading in WASM through the use of `wasm-bindgen-rayon`.
 
 ## Development
 
@@ -23,18 +25,10 @@ The mopro-wasm module enables the compilation of WASM code using `wasm-pack`. Th
 
 ### Building
 
-To compile the WASM files, use the following commands based on the desired feature:
+To compile the WASM module for all supported halo2 circuits, run the following command:
 
-Compile plonk Circuit to WASM:
 ```bash
-wasm-pack build --target web -- --features plonk
-```
-Compile hyperplonk Circuit to WASM:
-```bash
-wasm-pack build --target web -- --features hyperplonk
+wasm-pack test --chrome --headless -- --all-features
 ```
 
-Compile gemini Circuit to WASM:
-```bash
-wasm-pack build --target web -- --features gemini
-```
+This commands output files into the **pkg** directory, includes the generated WASM file, JavaScript bindings, and metadata required for integration with web applications.
