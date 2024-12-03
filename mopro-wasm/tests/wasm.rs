@@ -3,9 +3,6 @@
 
 use std::collections::HashMap;
 
-use gemini_fibonacci;
-use hyperplonk_fibonacci;
-use plonk_fibonacci;
 use wasm_bindgen::prelude::*;
 pub use wasm_bindgen_rayon::init_thread_pool;
 use wasm_bindgen_test::*;

@@ -26,7 +26,9 @@
         <thead>
             <tr>
                 <th>Test</th>
-                <th>Pass</th>
+                <th>Proof Time (ms)</th>
+                <th>Verify Time (ms)</th>
+                <th>Test Pass</th>
                 <th>Error</th>
             </tr>
         </thead>
@@ -63,22 +65,20 @@
                 row.id = testName;
                 row.innerHTML = `
                     <td>${testName}</td>
+                    <td id="${testName}-proof-time"></td>
+                    <td id="${testName}-verify-time"></td>
                     <td id="${testName}-pass"></td>
                     <td id="${testName}-error"></td>
                 `;
                 resultsTable.appendChild(row);
             }
 
-            const passCell = document.getElementById(`${testName}-pass`);
-            const errorCell = document.getElementById(`${testName}-error`);
             if (error) {
-                errorCell.textContent = error;
-                passCell.textContent = "-";
-                allPassed = false;
+                document.getElementById(`${testName}-error`).textContent = error;
             } else {
-                passCell.textContent = data ? "true" : "false";
-                errorCell.textContent = "-";
-                if (!data) allPassed = false;
+                document.getElementById(`${testName}-pass`).textContent = data.isValid ? "true" : "false";
+                document.getElementById(`${testName}-proof-time`).textContent = data.proofTime;
+                document.getElementById(`${testName}-verify-time`).textContent = data.verifyTime;
             }
 
             // Trigger next test or mark completion

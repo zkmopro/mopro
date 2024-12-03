@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
-use gemini_fibonacci;
+use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::prelude::*;
 
-use serde_wasm_bindgen::{from_value, to_value};
+use gemini_fibonacci;
 
 #[wasm_bindgen]
-pub fn generate_proof(
+pub fn generate_gemini_proof(
     srs_key: &[u8],
     proving_key: &[u8],
     input: JsValue,
@@ -24,7 +24,7 @@ pub fn generate_proof(
 }
 
 #[wasm_bindgen]
-pub fn verify_proof(
+pub fn verify_gemini_proof(
     srs_key: &[u8],
     verifying_key: &[u8],
     proof: Vec<u8>,
