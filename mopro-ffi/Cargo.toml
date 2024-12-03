@@ -38,7 +38,7 @@ uniffi = { version = "=0.28.0", features = ["cli", "build"] }
 serde = { version = "1.0", features = ["derive"] }
 
 # Error handling
-thiserror = "=1.0.39"
+thiserror = "=2.0.3"
 color-eyre = "=0.6.2"
 
 # ashlang deps
