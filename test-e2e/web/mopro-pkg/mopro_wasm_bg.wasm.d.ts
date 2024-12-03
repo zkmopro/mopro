@@ -3,9 +3,9 @@
 export const generate_plonk_proof: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
 export const verify_plonk_proof: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
 export const generate_hyperplonk_proof: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
-export const verify_hyperplonk_proof: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+export const verify_hyperplonk_proof: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
 export const generate_gemini_proof: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
-export const verify_gemini_proof: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+export const verify_gemini_proof: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
 export const __wbg_wbg_rayon_poolbuilder_free: (a: number, b: number) => void;
 export const wbg_rayon_poolbuilder_mainJS: (a: number) => number;
 export const wbg_rayon_poolbuilder_numThreads: (a: number) => number;

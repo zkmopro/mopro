@@ -27,9 +27,14 @@ pub fn generate_gemini_proof(
 pub fn verify_gemini_proof(
     srs_key: &[u8],
     verifying_key: &[u8],
-    proof: Vec<u8>,
-    public_inputs: Vec<u8>,
+    proof: JsValue,
+    public_inputs: JsValue,
 ) -> Result<JsValue, JsValue> {
+    let proof: Vec<u8> = from_value(proof)
+        .map_err(|e| JsValue::from_str(&format!("Failed to parse proof: {}", e)))?;
+    let public_inputs: Vec<u8> = from_value(public_inputs)
+        .map_err(|e| JsValue::from_str(&format!("Failed to parse public_inputs: {}", e)))?;
+
     // Verify proof
     let is_valid = gemini_fibonacci::verify(srs_key, verifying_key, proof, public_inputs)
         .map_err(|e| JsValue::from_str(&format!("Proof verification failed: {}", e)))?;

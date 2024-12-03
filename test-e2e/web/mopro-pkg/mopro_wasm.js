@@ -275,8 +275,8 @@ export function generate_hyperplonk_proof(srs_key, proving_key, input) {
 /**
  * @param {Uint8Array} srs_key
  * @param {Uint8Array} verifying_key
- * @param {Uint8Array} proof
- * @param {Uint8Array} public_inputs
+ * @param {any} proof
+ * @param {any} public_inputs
  * @returns {any}
  */
 export function verify_hyperplonk_proof(srs_key, verifying_key, proof, public_inputs) {
@@ -286,11 +286,7 @@ export function verify_hyperplonk_proof(srs_key, verifying_key, proof, public_in
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passArray8ToWasm0(verifying_key, wasm.__wbindgen_malloc);
         const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passArray8ToWasm0(proof, wasm.__wbindgen_malloc);
-        const len2 = WASM_VECTOR_LEN;
-        const ptr3 = passArray8ToWasm0(public_inputs, wasm.__wbindgen_malloc);
-        const len3 = WASM_VECTOR_LEN;
-        wasm.verify_hyperplonk_proof(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+        wasm.verify_hyperplonk_proof(retptr, ptr0, len0, ptr1, len1, addHeapObject(proof), addHeapObject(public_inputs));
         var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
         var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
         var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
@@ -332,8 +328,8 @@ export function generate_gemini_proof(srs_key, proving_key, input) {
 /**
  * @param {Uint8Array} srs_key
  * @param {Uint8Array} verifying_key
- * @param {Uint8Array} proof
- * @param {Uint8Array} public_inputs
+ * @param {any} proof
+ * @param {any} public_inputs
  * @returns {any}
  */
 export function verify_gemini_proof(srs_key, verifying_key, proof, public_inputs) {
@@ -343,11 +339,7 @@ export function verify_gemini_proof(srs_key, verifying_key, proof, public_inputs
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passArray8ToWasm0(verifying_key, wasm.__wbindgen_malloc);
         const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passArray8ToWasm0(proof, wasm.__wbindgen_malloc);
-        const len2 = WASM_VECTOR_LEN;
-        const ptr3 = passArray8ToWasm0(public_inputs, wasm.__wbindgen_malloc);
-        const len3 = WASM_VECTOR_LEN;
-        wasm.verify_gemini_proof(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+        wasm.verify_gemini_proof(retptr, ptr0, len0, ptr1, len1, addHeapObject(proof), addHeapObject(public_inputs));
         var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
         var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
         var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);

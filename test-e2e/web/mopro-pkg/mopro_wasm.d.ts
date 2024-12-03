@@ -3,9 +3,9 @@
 export function generate_plonk_proof(srs_key: Uint8Array, proving_key: Uint8Array, input: any): any;
 export function verify_plonk_proof(srs_key: Uint8Array, verifying_key: Uint8Array, proof: any, public_inputs: any): any;
 export function generate_hyperplonk_proof(srs_key: Uint8Array, proving_key: Uint8Array, input: any): any;
-export function verify_hyperplonk_proof(srs_key: Uint8Array, verifying_key: Uint8Array, proof: Uint8Array, public_inputs: Uint8Array): any;
+export function verify_hyperplonk_proof(srs_key: Uint8Array, verifying_key: Uint8Array, proof: any, public_inputs: any): any;
 export function generate_gemini_proof(srs_key: Uint8Array, proving_key: Uint8Array, input: any): any;
-export function verify_gemini_proof(srs_key: Uint8Array, verifying_key: Uint8Array, proof: Uint8Array, public_inputs: Uint8Array): any;
+export function verify_gemini_proof(srs_key: Uint8Array, verifying_key: Uint8Array, proof: any, public_inputs: any): any;
 export function initThreadPool(num_threads: number): Promise<any>;
 export function wbg_rayon_start_worker(receiver: number): void;
 export class wbg_rayon_PoolBuilder {
@@ -23,9 +23,9 @@ export interface InitOutput {
   readonly generate_plonk_proof: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
   readonly verify_plonk_proof: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly generate_hyperplonk_proof: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
-  readonly verify_hyperplonk_proof: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+  readonly verify_hyperplonk_proof: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly generate_gemini_proof: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
-  readonly verify_gemini_proof: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+  readonly verify_gemini_proof: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly __wbg_wbg_rayon_poolbuilder_free: (a: number, b: number) => void;
   readonly wbg_rayon_poolbuilder_mainJS: (a: number) => number;
   readonly wbg_rayon_poolbuilder_numThreads: (a: number) => number;
