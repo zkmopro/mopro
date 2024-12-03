@@ -1,5 +1,18 @@
 import * as mopro_wasm from './mopro-pkg/mopro_wasm.js';
 
+// Initialize the WASM module and thread pool once
+const initializeWasm = async () => {
+    try {
+        await mopro_wasm.default();
+        await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
+    } catch (error) {
+        console.error("Failed to initialize WASM module or thread pool:", error);
+        throw error;
+    }
+};
+
+const initPromise = initializeWasm();
+
 async function fetchBinaryFile(url) {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Failed to load ${url}`);
@@ -15,9 +28,6 @@ async function measureTime(callback) {
 
 async function run_plonk_test(input) {
     try {
-        await mopro_wasm.default();
-        await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
-
         const SRS_KEY = await fetchBinaryFile('./mopro-pkg/parameters/plonk_fibonacci_srs.bin');
         const PROVING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/plonk_fibonacci_pk.bin');
         const VERIFYING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/plonk_fibonacci_vk.bin');
@@ -43,9 +53,6 @@ async function run_plonk_test(input) {
 
 async function run_hyperplonk_test(input) {
     try {
-        await mopro_wasm.default();
-        await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
-
         const SRS_KEY = await fetchBinaryFile('./mopro-pkg/parameters/hyperplonk_fibonacci_srs.bin');
         const PROVING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/hyperplonk_fibonacci_pk.bin');
         const VERIFYING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/hyperplonk_fibonacci_vk.bin');
@@ -72,9 +79,6 @@ async function run_hyperplonk_test(input) {
 
 async function run_gemini_test(input) {
     try {
-        await mopro_wasm.default();
-        await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
-
         const SRS_KEY = await fetchBinaryFile('./mopro-pkg/parameters/gemini_fibonacci_srs.bin');
         const PROVING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/gemini_fibonacci_pk.bin');
         const VERIFYING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/gemini_fibonacci_vk.bin');
@@ -103,6 +107,9 @@ async function run_gemini_test(input) {
 self.addEventListener('message', async (event) => {
     const { testName, input } = event.data;
     try {
+        // Initialize wasm instance once
+        await initPromise;
+
         if (testName === 'Plonk') {
             const result = await run_plonk_test(input);
             self.postMessage({ testName, data: result });
