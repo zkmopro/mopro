@@ -4,7 +4,9 @@ use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 use std::path::Path;
+use std::path::PathBuf;
 
+use anyhow::Error;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Select;
 use include_dir::include_dir;
@@ -41,16 +43,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
         let project_dir = env::current_dir()?;
 
         if platform.contains(TEMPLATES[0]) {
-            let ios_bindings = "MoproiOSBindings";
-            let ios_bindings_dir = project_dir.join(&ios_bindings);
-
-            // Check if the dir exists and is not empty
-            if !ios_bindings_dir.exists() || fs::read_dir(&ios_bindings_dir)?.count() == 0 {
-                style::print_red_bold(
-                    "iOS bindings are required to create the iOS template. Please run 'mopro build' to create them.".to_string(),
-                );
-                return Ok(());
-            }
+            let target_ios_bindings_dir = check_ios_bindings(&project_dir)?;
 
             let platform_name = "ios";
             let target_dir = project_dir.join(&platform_name);
@@ -64,9 +57,11 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             // Copy ios bindings
             env::set_current_dir(&project_dir)?;
 
-            let target_ios_bindings_dir = target_dir.join(&ios_bindings);
             fs::create_dir(target_ios_bindings_dir.clone())?;
-            copy_dir(&ios_bindings_dir, &target_ios_bindings_dir)?;
+            copy_dir(
+                &project_dir.join("MoproiOSBindings"),
+                &target_ios_bindings_dir,
+            )?;
 
             // Copy keys
             copy_keys(target_dir)?;
@@ -75,15 +70,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
         }
 
         if platform.contains(TEMPLATES[1]) {
-            let android_bindings = "MoproAndroidBindings";
-            let android_bindings_dir = project_dir.join(&android_bindings);
-            // Check if the dir exists and is not empty
-            if !android_bindings_dir.exists() || fs::read_dir(&android_bindings_dir)?.count() == 0 {
-                style::print_red_bold(
-                    "Android bindings are required to create Android template. Please run 'mopro build' to create them.".to_string(),
-                );
-                return Ok(());
-            }
+            let android_bindings_dir = check_android_bindings(&project_dir)?;
 
             let platform_name = "android";
             let target_dir = project_dir.join(&platform_name);
@@ -101,55 +88,24 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             let uniffi_name = "uniffi";
             let jni_libs_path = android_bindings_dir.join(&jni_libs_name);
             let uniffi_path = android_bindings_dir.join(&uniffi_name);
-            let target_jni_libs_path = target_dir
-                .join("app")
-                .join("src")
-                .join("main")
-                .join("jniLibs");
-            let target_uniffi_path = target_dir
-                .join("app")
-                .join("src")
-                .join("main")
-                .join("java")
-                .join("uniffi");
+            let main_dir = target_dir.join("app").join("src").join("main");
+            let target_jni_libs_path = main_dir.join("jniLibs");
+            let target_uniffi_path = main_dir.join("java").join("uniffi");
             fs::create_dir(target_jni_libs_path.clone())?;
             copy_dir(&jni_libs_path, &target_jni_libs_path)?;
             fs::create_dir(target_uniffi_path.clone())?;
             copy_dir(&uniffi_path, &target_uniffi_path)?;
 
             // Copy keys
-            let assets_dir = target_dir
-                .join("app")
-                .join("src")
-                .join("main")
-                .join("assets");
+            let assets_dir = main_dir.join("assets");
             copy_keys(assets_dir)?;
 
             print_create_android_success_message();
         }
 
         if platform.contains(TEMPLATES[2]) {
-            let ios_bindings = "MoproiOSBindings";
-            let ios_bindings_dir = project_dir.join(&ios_bindings);
-            // Check if the dir exists and is not empty
-            let mut ios_missing = false;
-            if !ios_bindings_dir.exists() || fs::read_dir(&ios_bindings_dir)?.count() == 0 {
-                ios_missing = true;
-            }
-            let android_bindings = "MoproAndroidBindings";
-            let android_bindings_dir = project_dir.join(&android_bindings);
-            // Check if the dir exists and is not empty
-            let mut android_missing = false;
-            if !android_bindings_dir.exists() || fs::read_dir(&android_bindings_dir)?.count() == 0 {
-                android_missing = true;
-            }
-
-            if ios_missing || android_missing {
-                style::print_red_bold(
-                    "Both iOS and Android bindings are required to create a Flutter template. Please run 'mopro build' to create the missing bindings.".to_string(),
-                );
-                return Ok(());
-            }
+            let ios_bindings_dir = check_ios_bindings(&project_dir)?;
+            let mopro_android_bindings_dir = check_android_bindings(&project_dir)?;
 
             download_and_extract_template(
                 "https://github.com/zkmopro/flutter-app/archive/refs/heads/main.zip",
@@ -181,24 +137,17 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             fs::copy(&mopro_swift_file, &classes_dir.join("mopro.swift"))?;
 
             // Copy Android bindings
-
             let jni_libs_name = "jniLibs";
             let uniffi_name = "uniffi";
-            let jni_libs_path = android_bindings_dir.join(&jni_libs_name);
-            let uniffi_path = android_bindings_dir.join(&uniffi_name);
-            let target_jni_libs_path = target_dir
+            let jni_libs_path = mopro_android_bindings_dir.join(&jni_libs_name);
+            let uniffi_path = mopro_android_bindings_dir.join(&uniffi_name);
+            let main_dir = target_dir
                 .join("mopro_flutter_plugin")
                 .join("android")
                 .join("src")
-                .join("main")
-                .join("jniLibs");
-            let target_uniffi_path = target_dir
-                .join("mopro_flutter_plugin")
-                .join("android")
-                .join("src")
-                .join("main")
-                .join("kotlin")
-                .join("uniffi");
+                .join("main");
+            let target_jni_libs_path = main_dir.join("jniLibs");
+            let target_uniffi_path = main_dir.join("kotlin").join("uniffi");
             fs::remove_dir_all(target_jni_libs_path.clone())?;
             fs::create_dir(target_jni_libs_path.clone())?;
             copy_dir(&jni_libs_path, &target_jni_libs_path)?;
@@ -229,16 +178,6 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             fs::rename(&react_native_dir, &target_dir)?;
         }
     }
-    Ok(())
-}
-
-fn copy_keys(target_dir: std::path::PathBuf) -> Result<(), anyhow::Error> {
-    const CIRCOM_KEYS_DIR: Dir =
-        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom");
-    const HALO2_KEYS_DIR: Dir =
-        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
-    copy_embedded_file(&CIRCOM_KEYS_DIR, &target_dir)?;
-    copy_embedded_file(&HALO2_KEYS_DIR, &target_dir)?;
     Ok(())
 }
 
@@ -317,6 +256,34 @@ fn copy_dir(input_dir: &Path, output_dir: &Path) -> anyhow::Result<()> {
         }
     }
     Ok(())
+}
+
+fn copy_keys(target_dir: std::path::PathBuf) -> Result<(), anyhow::Error> {
+    const CIRCOM_KEYS_DIR: Dir =
+        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom");
+    const HALO2_KEYS_DIR: Dir =
+        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
+    copy_embedded_file(&CIRCOM_KEYS_DIR, &target_dir)?;
+    copy_embedded_file(&HALO2_KEYS_DIR, &target_dir)?;
+    Ok(())
+}
+
+fn check_ios_bindings(project_dir: &Path) -> anyhow::Result<PathBuf> {
+    let ios_bindings_dir = project_dir.join("MoproiOSBindings");
+    if ios_bindings_dir.exists() && fs::read_dir(&ios_bindings_dir)?.count() > 0 {
+        Ok(ios_bindings_dir)
+    } else {
+        Err(Error::msg("iOS bindings are required to create the template. Please run 'mopro build' to generate them."))
+    }
+}
+
+fn check_android_bindings(project_dir: &Path) -> anyhow::Result<PathBuf> {
+    let android_bindings_dir = project_dir.join("MoproAndroidBindings");
+    if android_bindings_dir.exists() && fs::read_dir(&android_bindings_dir)?.count() > 0 {
+        Ok(android_bindings_dir)
+    } else {
+        Err(Error::msg("Android bindings are required to create the template. Please run 'mopro build' to generate them."))
+    }
 }
 
 fn download_and_extract_template(url: &str, dest: &Path, platform: &str) -> anyhow::Result<()> {
