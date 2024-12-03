@@ -2,19 +2,61 @@
 
 This is the example app of mopro. You can use the following commands to build native bindings for your iOS and/or Android app.
 
-📚 To learn more about mopro, visit: https://zkmopro.org
+**📚 To learn more about mopro, visit: https://zkmopro.org**
 
-## Build for iOS
+## Getting Started
 
-```sh
-cargo run --bin ios
-```
+To set up and build bindings, follow these steps.
 
-## Build for Android
+### 1. Install the Mopro CLI Tool
 
 ```sh
-cargo run --bin android
+git clone https://github.com/zkmopro/mopro
+cd mopro/cli
+cargo install --path .
 ```
+
+### 2. Generate Native Bindings
+
+Navigate to the Mopro example app directory, then build the bindings with:
+
+```sh
+mopro build
+```
+
+### 3. Create Platform-Specific Templates
+
+To generate templates tailored to your target platform, use:
+
+```sh
+mopro create
+```
+
+## Advanced: Customize Builds Using Rust
+
+For advanced usage, you can manually run Rust commands to build in either debug or release mode.
+
+### iOS
+
+- Debug Mode:
+    ```sh
+    cargo run --bin ios  # Debug mode
+    ```
+- Release Mode:
+    ```sh
+    CONFIGURATION=release cargo run --bin ios # Release mode
+    ```
+
+### Android
+
+- Debug Mode:
+    ```sh
+    cargo run --bin android  # Debug mode
+    ```
+- Release Mode:
+    ```sh
+    CONFIGURATION=release cargo run --bin android # Release mode
+    ```
 
 ## Community
 

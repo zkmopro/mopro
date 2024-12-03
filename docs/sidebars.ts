@@ -13,13 +13,19 @@ const sidebars: SidebarsConfig = {
             id: 'prerequisites',
         },
         {
-            type: 'category',
+            type: 'doc',
             label: 'Getting Started',
+            id: 'getting-started',
+        },
+        {
+            type: 'category',
+            label: 'Setup',
             items: [
-                'getting-started/rust-setup',
-                'getting-started/ios-setup',
-                'getting-started/android-setup',
-                'getting-started/react-native-setup'
+                'setup/rust-setup',
+                'setup/ios-setup',
+                'setup/android-setup',
+                'setup/react-native-setup',
+                'setup/flutter-setup'
             ]
         },
         {
