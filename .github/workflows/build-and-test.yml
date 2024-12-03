@@ -301,7 +301,6 @@ jobs:
               cd ..
               mkdir -p test-e2e/web/mopro-pkg/parameters
               cp test-vectors/halo2/* test-e2e/web/mopro-pkg/parameters/
-              
     test-halo2-wasm-web:
         runs-on: ubuntu-latest
         needs:

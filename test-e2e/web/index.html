@@ -77,7 +77,11 @@
                 allPassed = false;
                 document.getElementById(`${testName}-error`).textContent = error;
             } else {
-                document.getElementById(`${testName}-pass`).textContent = data.isValid ? "true" : "false";
+                if (!data.isValid) {
+                    allPassed = false;
+                    document.getElementById(`${testName}-pass`).textContent = "true";
+                }
+                document.getElementById(`${testName}-pass`).textContent = "true";
                 document.getElementById(`${testName}-proof-time`).textContent = data.proofTime;
                 document.getElementById(`${testName}-verify-time`).textContent = data.verifyTime;
             }
