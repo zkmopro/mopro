@@ -28,9 +28,9 @@ async function measureTime(callback) {
 
 async function run_plonk_test(input) {
     try {
-        const SRS_KEY = await fetchBinaryFile('./mopro-pkg/parameters/plonk_fibonacci_srs.bin');
-        const PROVING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/plonk_fibonacci_pk.bin');
-        const VERIFYING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/plonk_fibonacci_vk.bin');
+        const SRS_KEY = await fetchBinaryFile('./test-vectors/halo2/plonk_fibonacci_srs.bin');
+        const PROVING_KEY = await fetchBinaryFile('./test-vectors/halo2/plonk_fibonacci_pk.bin');
+        const VERIFYING_KEY = await fetchBinaryFile('./test-vectors/halo2/plonk_fibonacci_vk.bin');
         
         const { result: proofResult, timeTaken: proofTime } = await measureTime(() =>
             mopro_wasm.generate_plonk_proof(SRS_KEY, PROVING_KEY, input)
@@ -53,9 +53,9 @@ async function run_plonk_test(input) {
 
 async function run_hyperplonk_test(input) {
     try {
-        const SRS_KEY = await fetchBinaryFile('./mopro-pkg/parameters/hyperplonk_fibonacci_srs.bin');
-        const PROVING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/hyperplonk_fibonacci_pk.bin');
-        const VERIFYING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/hyperplonk_fibonacci_vk.bin');
+        const SRS_KEY = await fetchBinaryFile('./test-vectors/halo2/hyperplonk_fibonacci_srs.bin');
+        const PROVING_KEY = await fetchBinaryFile('./test-vectors/halo2/hyperplonk_fibonacci_pk.bin');
+        const VERIFYING_KEY = await fetchBinaryFile('./test-vectors/halo2/hyperplonk_fibonacci_vk.bin');
         
         const { result: proofResult, timeTaken: proofTime } = await measureTime(() =>
             mopro_wasm.generate_hyperplonk_proof(SRS_KEY, PROVING_KEY, input)
@@ -79,9 +79,9 @@ async function run_hyperplonk_test(input) {
 
 async function run_gemini_test(input) {
     try {
-        const SRS_KEY = await fetchBinaryFile('./mopro-pkg/parameters/gemini_fibonacci_srs.bin');
-        const PROVING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/gemini_fibonacci_pk.bin');
-        const VERIFYING_KEY = await fetchBinaryFile('./mopro-pkg/parameters/gemini_fibonacci_vk.bin');
+        const SRS_KEY = await fetchBinaryFile('./test-vectors/halo2/gemini_fibonacci_srs.bin');
+        const PROVING_KEY = await fetchBinaryFile('./test-vectors/halo2/gemini_fibonacci_pk.bin');
+        const VERIFYING_KEY = await fetchBinaryFile('./test-vectors/halo2/gemini_fibonacci_vk.bin');
         
         const { result: proofResult, timeTaken: proofTime } = await measureTime(() =>
             mopro_wasm.generate_gemini_proof(SRS_KEY, PROVING_KEY, input)

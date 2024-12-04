@@ -25,7 +25,7 @@ const chrome = require('selenium-webdriver/chrome');
         
         // Log ChromeDriver version via WebDriver
         const driverVersion = await driver.executeScript('return navigator.userAgent');
-        console.log(`WebDriver user agent: ${driverVersion}`);
+        console.log(`WebDriver user agent:\n${driverVersion}`);
 
         await driver.get('http://localhost:3000');
 

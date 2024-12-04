@@ -6,13 +6,13 @@
   "author": "Jinhwan",
   "license": "MIT",
   "scripts": {
-    "start": "yarn serve",
+    "start": "yarn lite-server",
     "test": "node index.js"
   },
   "dependencies": {
     "selenium-webdriver": "^4.27.0"
   },
   "devDependencies": {
-    "serve": "^14.2.4"
+    "lite-server": "^2.6.1"
   }
 }
