@@ -79,3 +79,18 @@ pub(crate) fn print_create_flutter_success_message() {
 
     print_footer_message();
 }
+
+pub(crate) fn print_create_react_native_success_message() {
+    print_green_bold("React Native template created successfully!".to_string());
+    println!();
+    print_green_bold("Next steps:".to_string());
+    println!();
+    print_green_bold(
+        "  You can now use the following command to open the app in VS Code:".to_string(),
+    );
+    println!();
+    print_bold(r"    code react-native-app".to_string());
+    println!();
+
+    print_footer_message();
+}

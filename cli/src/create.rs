@@ -19,6 +19,7 @@ use zip::ZipArchive;
 use crate::print::print_create_android_success_message;
 use crate::print::print_create_flutter_success_message;
 use crate::print::print_create_ios_success_message;
+use crate::print::print_create_react_native_success_message;
 use crate::style;
 
 const TEMPLATES: [&str; 4] = ["ios", "android", "flutter", "react-native"];
@@ -46,7 +47,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             let target_ios_bindings_dir = check_ios_bindings(&project_dir)?;
 
             let platform_name = "ios";
-            let target_dir = project_dir.join(&platform_name);
+            let target_dir = project_dir.join(platform_name);
             fs::create_dir(&target_dir)?;
 
             // Change directory to the project directory
@@ -73,7 +74,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             let android_bindings_dir = check_android_bindings(&project_dir)?;
 
             let platform_name = "android";
-            let target_dir = project_dir.join(&platform_name);
+            let target_dir = project_dir.join(platform_name);
             fs::create_dir(&target_dir)?;
 
             // Change directory to the project directory
@@ -86,8 +87,8 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             env::set_current_dir(&project_dir)?;
             let jni_libs_name = "jniLibs";
             let uniffi_name = "uniffi";
-            let jni_libs_path = android_bindings_dir.join(&jni_libs_name);
-            let uniffi_path = android_bindings_dir.join(&uniffi_name);
+            let jni_libs_path = android_bindings_dir.join(jni_libs_name);
+            let uniffi_path = android_bindings_dir.join(uniffi_name);
             let main_dir = target_dir.join("app").join("src").join("main");
             let target_jni_libs_path = main_dir.join("jniLibs");
             let target_uniffi_path = main_dir.join("java").join("uniffi");
@@ -107,6 +108,13 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             let ios_bindings_dir = check_ios_bindings(&project_dir)?;
             let mopro_android_bindings_dir = check_android_bindings(&project_dir)?;
 
+            let target_dir = project_dir.join("flutter-app");
+            if target_dir.exists() {
+                return Err(Error::msg(format!(
+                    "The directory {} already exists. Please remove it and try again.",
+                    target_dir.display()
+                )));
+            }
             download_and_extract_template(
                 "https://github.com/zkmopro/flutter-app/archive/refs/heads/main.zip",
                 &project_dir,
@@ -115,7 +123,6 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             // The resulting directory will have -main attached to its name, we need to remove it
             let flutter_dir = project_dir.join("flutter-app-main");
-            let target_dir = project_dir.join("flutter-app");
             fs::rename(&flutter_dir, &target_dir)?;
 
             // Copy iOS bindings
@@ -133,14 +140,14 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             copy_dir(&xcframeworks_dir, &mopro_bindings_dir)?;
 
             // Replace the mopro.swift file
-            fs::remove_file(&classes_dir.join("mopro.swift"))?;
-            fs::copy(&mopro_swift_file, &classes_dir.join("mopro.swift"))?;
+            fs::remove_file(classes_dir.join("mopro.swift"))?;
+            fs::copy(&mopro_swift_file, classes_dir.join("mopro.swift"))?;
 
             // Copy Android bindings
             let jni_libs_name = "jniLibs";
             let uniffi_name = "uniffi";
-            let jni_libs_path = mopro_android_bindings_dir.join(&jni_libs_name);
-            let uniffi_path = mopro_android_bindings_dir.join(&uniffi_name);
+            let jni_libs_path = mopro_android_bindings_dir.join(jni_libs_name);
+            let uniffi_path = mopro_android_bindings_dir.join(uniffi_name);
             let main_dir = target_dir
                 .join("mopro_flutter_plugin")
                 .join("android")
@@ -167,6 +174,16 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
         }
 
         if platform.contains(TEMPLATES[3]) {
+            let ios_bindings_dir = check_ios_bindings(&project_dir)?;
+            let mopro_android_bindings_dir = check_android_bindings(&project_dir)?;
+
+            let target_dir = project_dir.join("react-native-app");
+            if target_dir.exists() {
+                return Err(Error::msg(format!(
+                    "The directory {} already exists. Please remove it and try again.",
+                    target_dir.display()
+                )));
+            }
             download_and_extract_template(
                 "https://codeload.github.com/zkmopro/react-native-app/zip/refs/heads/main",
                 &project_dir,
@@ -174,8 +191,41 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             )?;
             // The resulting directory will have -main attached to its name, remove it
             let react_native_dir = project_dir.join("react-native-app-main");
-            let target_dir = project_dir.join("react-native-app");
             fs::rename(&react_native_dir, &target_dir)?;
+
+            // Copy iOS bindings
+            let mopro_module_dir = target_dir.join("modules").join("mopro");
+            let ios_bindings_target_dir = mopro_module_dir.join("ios").join("MoproiOSBindings");
+
+            // Replace the existing MoproBindings.xcframework dir with the one from the MoproiOSBindings
+            fs::remove_dir_all(&ios_bindings_target_dir)?;
+            fs::create_dir(&ios_bindings_target_dir)?;
+            copy_dir(&ios_bindings_dir, &ios_bindings_target_dir)?;
+
+            // Copy Android bindings
+            let jni_libs_name = "jniLibs";
+            let uniffi_name = "uniffi";
+            let jni_libs_path = mopro_android_bindings_dir.join(jni_libs_name);
+            let uniffi_path = mopro_android_bindings_dir.join(uniffi_name);
+            let main_dir = mopro_module_dir.join("android").join("src").join("main");
+            let target_jni_libs_path = main_dir.join("jniLibs");
+            let target_uniffi_path = main_dir.join("java").join("uniffi");
+            fs::remove_dir_all(target_jni_libs_path.clone())?;
+            fs::create_dir(target_jni_libs_path.clone())?;
+            copy_dir(&jni_libs_path, &target_jni_libs_path)?;
+            fs::remove_dir_all(target_uniffi_path.clone())?;
+            fs::create_dir(target_uniffi_path.clone())?;
+            copy_dir(&uniffi_path, &target_uniffi_path)?;
+
+            // Copy the keys to the flutter assets dir
+            let assets_dir = target_dir.join("assets").join("keys");
+            // Clear the assets dir before copying
+            fs::remove_dir_all(&assets_dir)?;
+            fs::create_dir(&assets_dir)?;
+
+            copy_keys(assets_dir)?;
+
+            print_create_react_native_success_message();
         }
     }
     Ok(())
@@ -192,6 +242,11 @@ fn select_template() -> anyhow::Result<String> {
 
 fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> anyhow::Result<()> {
     for file in dir.entries() {
+        // Skip .wasm files
+        if file.path().extension().map_or(false, |ext| ext == "wasm") {
+            continue;
+        }
+
         let relative_path = file.path();
         let output_path = output_dir.join(relative_path);
 
@@ -231,9 +286,7 @@ fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> anyhow::Result<()> {
                 }
             }
             None => {
-                if let Err(e) = copy_embedded_dir(file.as_dir().unwrap(), &output_dir) {
-                    return Err(e);
-                };
+                copy_embedded_dir(file.as_dir().unwrap(), &output_dir)?;
             }
         }
     }
