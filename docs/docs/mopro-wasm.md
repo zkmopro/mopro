@@ -1,6 +1,6 @@
 # mopro-wasm
 
-The mopro-wasm module enables the compilation of WASM code using `wasm-pack` for Halo2.
+The mopro-wasm module enables the compilation of WASM code using `wasm-pack` for supported proving systems.
 
 This module supports multithreading in WASM through the use of `wasm-bindgen-rayon`.
 
@@ -25,7 +25,7 @@ This module supports multithreading in WASM through the use of `wasm-bindgen-ray
 
 ### Building
 
-To compile the WASM module for all supported halo2 circuits, run the following command:
+To compile the WASM module for all supported circuits, run the following command:
 
 ```bash
 wasm-pack test --chrome --headless -- --all-features

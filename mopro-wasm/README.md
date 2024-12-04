@@ -1,6 +1,6 @@
 # mopro-wasm
 
-Mopro can compile wasm code instead of [mopro-ffi](../mopro-ffi/) for Halo2.
+Mopro can compile wasm code instead of [mopro-ffi](../mopro-ffi/) for supported proving systems.
 
 ## Introduction to WASM Compilation with Halo2
 

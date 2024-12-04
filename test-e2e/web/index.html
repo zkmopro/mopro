@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halo2 WASM Test</title>
+    <title>Mopro WASM Test</title>
     <style>
         table {
             width: 50%;
@@ -21,7 +21,7 @@
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">WASM Browser Test</h1>
+    <h1 style="text-align: center;">Mopro Browser Test</h1>
     <table style="margin-top: 20px; text-align: left">
         <thead>
             <tr>
@@ -48,7 +48,7 @@
 
         const resultsTable = document.getElementById('test-results');
         const statusDiv = document.getElementById('test-status');
-        const worker = new Worker('./test_halo2.js', { type: 'module' });
+        const worker = new Worker('./test_mopro.js', { type: 'module' });
 
         // For checking sequence and status
         let currentIndex = 0;

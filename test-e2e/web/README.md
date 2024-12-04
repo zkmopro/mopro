@@ -9,19 +9,10 @@ Follow these steps only if there are changes in the `mopro-wasm` package. Otherw
 This web test page requires three Wasm circuits: `halo2-plonk-fibonacci`, `halo2-hyperplonk-fibonacci`, and `halo2-gemini-fibonacci`.  
 Refer to [`mopro-wasm/README.md`](../../mopro-wasm/README.md) for more details.
 
-Use `wasm-pack` to generate halo2 wasm package for this testing web app with the following commands:
+Use `wasm-pack` to generate mopro wasm package for this testing web app with the following commands:
 
 ```bash
 mopro-wasm $ wasm-pack build --target web --out-dir ../test-e2e/web/mopro-pkg  -- --all-features
-```
-
-### Copy Parameters
-
-The generated Halo2 wasm package, **mopro-pkg**, requires a parameters folder, which is available in test-vectors/halo2. To set up the package correctly, copy the parameters folder into all files in the test directory as shown below:
-
-```text
-$ mkdir -p test-e2e/web/mopro-pkg/parameters/
-$ cp test-vectors/halo2/* test-e2e/web/mopro-pkg/parameters/
 ```
 
 ## Test
