@@ -37,84 +37,8 @@
         </tbody>
     </table>
     <div id="test-status" style="margin-top: 20px; text-align: center; font-size: 1.2em; font-weight: bold;">
-        <!-- Status will be added dynamically updated -->
+        <!-- Status will be dynamically updated -->
     </div>
-    <script type="module">
-        const testCases = [
-            { name: "Plonk", input: { out: ["55"] } },
-            { name: "HyperPlonk", input: { out: ["55"] } },
-            { name: "Gemini", input: { out: ["55"] } }
-        ];
-
-        const resultsTable = document.getElementById('test-results');
-        const statusDiv = document.getElementById('test-status');
-        const worker = new Worker('./test_mopro.js', { type: 'module' });
-
-        // For checking sequence and status
-        let currentIndex = 0;
-        let allPassed = true;
-
-        // Listen for messages from the worker
-        worker.addEventListener('message', (event) => {
-            const { testName, data, error } = event.data;
-
-            // Find or create a table row for this test case
-            let row = document.getElementById(testName);
-            if (!row) {
-                row = document.createElement('tr');
-                row.id = testName;
-                row.innerHTML = `
-                    <td>${testName}</td>
-                    <td id="${testName}-proof-time"></td>
-                    <td id="${testName}-verify-time"></td>
-                    <td id="${testName}-pass"></td>
-                    <td id="${testName}-error"></td>
-                `;
-                resultsTable.appendChild(row);
-            }
-
-            if (error) {
-                allPassed = false;
-                document.getElementById(`${testName}-error`).textContent = error;
-            } else {
-                if (!data.isValid) {
-                    allPassed = false;
-                    document.getElementById(`${testName}-pass`).textContent = "true";
-                }
-                document.getElementById(`${testName}-pass`).textContent = "true";
-                document.getElementById(`${testName}-proof-time`).textContent = data.proofTime;
-                document.getElementById(`${testName}-verify-time`).textContent = data.verifyTime;
-            }
-
-            // Trigger next test or mark completion
-            if (currentIndex < testCases.length) {
-                runNextTest();
-            } else {
-                // Mark test completion after the last test
-                const finalStatus = allPassed ? "All tests passed" : "Some tests failed";
-                statusDiv.textContent = `Test Status: ${finalStatus}`;
-                statusDiv.dataset.status = allPassed ? "passed" : "failed"; // Add status attribute for WebDriver
-            }
-        });
-
-
-        function runNextTest() {
-            if (currentIndex < testCases.length) {
-                const testCase = testCases[currentIndex];
-                worker.postMessage({
-                    testName: testCase.name,
-                    input: testCase.input
-                });
-                currentIndex++;
-            }
-        }
-
-        // Start the test
-        worker.addEventListener('message', () => {
-            runNextTest();
-        });
-
-        runNextTest();
-    </script>
+    <script src="./test_mopro.js"></script>
 </body>
 </html>
