@@ -10,7 +10,7 @@ pub fn print_bold(text: String) {
     print_text(text, style);
 }
 
-pub fn print_read_bold(text: String) {
+pub fn print_red_bold(text: String) {
     let style = Style::new().red().bold();
     print_text(text, style);
 }

@@ -133,11 +133,7 @@ fn copy_embedded_dir(dir: &Dir, output_dir: &Path, selection: Vec<usize>) -> any
                 }
             }
             None => {
-                if let Err(e) =
-                    copy_embedded_dir(file.as_dir().unwrap(), &output_dir, selection.clone())
-                {
-                    return Err(e);
-                };
+                copy_embedded_dir(file.as_dir().unwrap(), output_dir, selection.clone())?;
             }
         }
     }
@@ -146,7 +142,7 @@ fn copy_embedded_dir(dir: &Dir, output_dir: &Path, selection: Vec<usize>) -> any
 
 fn replace_project_name(file_path: &str, project_name: &str) -> anyhow::Result<()> {
     let target = "<PROJECT_NAME>";
-    replace_string_in_file(file_path, target, &project_name)
+    replace_string_in_file(file_path, target, project_name)
 }
 
 fn replace_features(file_path: &str, adapters: Vec<&str>) -> anyhow::Result<()> {
