@@ -44,7 +44,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
         let project_dir = env::current_dir()?;
 
         if platform.contains(TEMPLATES[0]) {
-            let target_ios_bindings_dir = check_ios_bindings(&project_dir)?;
+            let ios_bindings_dir = check_ios_bindings(&project_dir)?;
 
             let platform_name = "ios";
             let target_dir = project_dir.join(platform_name);
@@ -57,12 +57,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             // Copy ios bindings
             env::set_current_dir(&project_dir)?;
-
-            fs::create_dir(target_ios_bindings_dir.clone())?;
-            copy_dir(
-                &project_dir.join("MoproiOSBindings"),
-                &target_ios_bindings_dir,
-            )?;
+            copy_ios_bindings(ios_bindings_dir, target_dir.clone())?;
 
             // Copy keys
             copy_keys(target_dir)?;
@@ -85,20 +80,11 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             // Copy Android bindings
             env::set_current_dir(&project_dir)?;
-            let jni_libs_name = "jniLibs";
-            let uniffi_name = "uniffi";
-            let jni_libs_path = android_bindings_dir.join(jni_libs_name);
-            let uniffi_path = android_bindings_dir.join(uniffi_name);
-            let main_dir = target_dir.join("app").join("src").join("main");
-            let target_jni_libs_path = main_dir.join("jniLibs");
-            let target_uniffi_path = main_dir.join("java").join("uniffi");
-            fs::create_dir(target_jni_libs_path.clone())?;
-            copy_dir(&jni_libs_path, &target_jni_libs_path)?;
-            fs::create_dir(target_uniffi_path.clone())?;
-            copy_dir(&uniffi_path, &target_uniffi_path)?;
+            let app_dir = target_dir.join("app");
+            copy_android_bindings(&android_bindings_dir, &app_dir, "java")?;
 
             // Copy keys
-            let assets_dir = main_dir.join("assets");
+            let assets_dir = app_dir.join("src").join("main").join("assets");
             copy_keys(assets_dir)?;
 
             print_create_android_success_message();
@@ -106,7 +92,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
         if platform.contains(TEMPLATES[2]) {
             let ios_bindings_dir = check_ios_bindings(&project_dir)?;
-            let mopro_android_bindings_dir = check_android_bindings(&project_dir)?;
+            let android_bindings_dir = check_android_bindings(&project_dir)?;
 
             let target_dir = project_dir.join("flutter-app");
             if target_dir.exists() {
@@ -144,23 +130,11 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             fs::copy(&mopro_swift_file, classes_dir.join("mopro.swift"))?;
 
             // Copy Android bindings
-            let jni_libs_name = "jniLibs";
-            let uniffi_name = "uniffi";
-            let jni_libs_path = mopro_android_bindings_dir.join(jni_libs_name);
-            let uniffi_path = mopro_android_bindings_dir.join(uniffi_name);
-            let main_dir = target_dir
-                .join("mopro_flutter_plugin")
-                .join("android")
-                .join("src")
-                .join("main");
-            let target_jni_libs_path = main_dir.join("jniLibs");
-            let target_uniffi_path = main_dir.join("kotlin").join("uniffi");
-            fs::remove_dir_all(target_jni_libs_path.clone())?;
-            fs::create_dir(target_jni_libs_path.clone())?;
-            copy_dir(&jni_libs_path, &target_jni_libs_path)?;
-            fs::remove_dir_all(target_uniffi_path.clone())?;
-            fs::create_dir(target_uniffi_path.clone())?;
-            copy_dir(&uniffi_path, &target_uniffi_path)?;
+            copy_android_bindings(
+                &android_bindings_dir,
+                &target_dir.join("mopro_flutter_plugin").join("android"),
+                "kotlin",
+            )?;
 
             // Copy the keys to the flutter assets dir
             let assets_dir = target_dir.join("assets");
@@ -175,7 +149,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
         if platform.contains(TEMPLATES[3]) {
             let ios_bindings_dir = check_ios_bindings(&project_dir)?;
-            let mopro_android_bindings_dir = check_android_bindings(&project_dir)?;
+            let android_bindings_dir = check_android_bindings(&project_dir)?;
 
             let target_dir = project_dir.join("react-native-app");
             if target_dir.exists() {
@@ -195,27 +169,14 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             // Copy iOS bindings
             let mopro_module_dir = target_dir.join("modules").join("mopro");
-            let ios_bindings_target_dir = mopro_module_dir.join("ios").join("MoproiOSBindings");
-
-            // Replace the existing MoproBindings.xcframework dir with the one from the MoproiOSBindings
-            fs::remove_dir_all(&ios_bindings_target_dir)?;
-            fs::create_dir(&ios_bindings_target_dir)?;
-            copy_dir(&ios_bindings_dir, &ios_bindings_target_dir)?;
+            copy_ios_bindings(ios_bindings_dir, mopro_module_dir.join("ios"))?;
 
             // Copy Android bindings
-            let jni_libs_name = "jniLibs";
-            let uniffi_name = "uniffi";
-            let jni_libs_path = mopro_android_bindings_dir.join(jni_libs_name);
-            let uniffi_path = mopro_android_bindings_dir.join(uniffi_name);
-            let main_dir = mopro_module_dir.join("android").join("src").join("main");
-            let target_jni_libs_path = main_dir.join("jniLibs");
-            let target_uniffi_path = main_dir.join("java").join("uniffi");
-            fs::remove_dir_all(target_jni_libs_path.clone())?;
-            fs::create_dir(target_jni_libs_path.clone())?;
-            copy_dir(&jni_libs_path, &target_jni_libs_path)?;
-            fs::remove_dir_all(target_uniffi_path.clone())?;
-            fs::create_dir(target_uniffi_path.clone())?;
-            copy_dir(&uniffi_path, &target_uniffi_path)?;
+            copy_android_bindings(
+                &android_bindings_dir,
+                &mopro_module_dir.join("android"),
+                "java",
+            )?;
 
             // Copy the keys to the flutter assets dir
             let assets_dir = target_dir.join("assets").join("keys");
@@ -228,6 +189,43 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             print_create_react_native_success_message();
         }
     }
+    Ok(())
+}
+
+fn copy_android_bindings(
+    android_bindings_dir: &Path,
+    target_dir: &Path,
+    language: &str,
+) -> anyhow::Result<()> {
+    let jni_libs_name = "jniLibs";
+    let uniffi_name = "uniffi";
+    let jni_libs_path = android_bindings_dir.join(jni_libs_name);
+    let uniffi_path = android_bindings_dir.join(uniffi_name);
+    let main_dir = target_dir.join("src").join("main");
+    let target_jni_libs_path = main_dir.join("jniLibs");
+    let target_uniffi_path = main_dir.join(language).join("uniffi");
+
+    if target_jni_libs_path.exists() {
+        fs::remove_dir_all(target_jni_libs_path.clone())?;
+    }
+    fs::create_dir(&target_jni_libs_path)?;
+    copy_dir(&jni_libs_path, &target_jni_libs_path)?;
+    if target_uniffi_path.exists() {
+        fs::remove_dir_all(target_uniffi_path.clone())?;
+    }
+    fs::create_dir(&target_uniffi_path)?;
+    copy_dir(&uniffi_path, &target_uniffi_path)?;
+
+    Ok(())
+}
+
+fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Error> {
+    let ios_bindings_target_dir = output_dir.join("MoproiOSBindings");
+    if ios_bindings_target_dir.exists() {
+        fs::remove_dir_all(&ios_bindings_target_dir)?;
+    }
+    fs::create_dir(&ios_bindings_target_dir)?;
+    copy_dir(&input_dir, &ios_bindings_target_dir)?;
     Ok(())
 }
 
@@ -286,7 +284,7 @@ fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> anyhow::Result<()> {
                 }
             }
             None => {
-                copy_embedded_dir(file.as_dir().unwrap(), &output_dir)?;
+                copy_embedded_dir(file.as_dir().unwrap(), output_dir)?;
             }
         }
     }
@@ -342,13 +340,13 @@ fn check_android_bindings(project_dir: &Path) -> anyhow::Result<PathBuf> {
 fn download_and_extract_template(url: &str, dest: &Path, platform: &str) -> anyhow::Result<()> {
     let client = Client::new();
     let mut response = client.get(url).send()?;
-    let pb = ProgressBar::new_spinner();
-    pb.set_style(
+    let spinner = ProgressBar::new_spinner();
+    spinner.set_style(
         ProgressStyle::default_spinner()
             .template("{msg} {spinner} {bytes} downloaded")
             .unwrap(),
     );
-    pb.set_message(format!("Downloading {} template...", platform));
+    spinner.set_message(format!("Downloading {} template...", platform));
 
     // Save to a temporary file
     let temp_zip_path = dest.join("template.zip");
@@ -357,6 +355,7 @@ fn download_and_extract_template(url: &str, dest: &Path, platform: &str) -> anyh
     // Create a buffer and copy while updating the progress bar
     let mut buffer = [0u8; 8192];
     let mut downloaded: u64 = 0;
+    let mut start_time = std::time::Instant::now();
     loop {
         let bytes_read = response.read(&mut buffer)?;
         if bytes_read == 0 {
@@ -364,10 +363,15 @@ fn download_and_extract_template(url: &str, dest: &Path, platform: &str) -> anyh
         }
         dest_file.write_all(&buffer[..bytes_read])?;
         downloaded += bytes_read as u64;
-        pb.set_position(downloaded);
+        let current_time = std::time::Instant::now();
+        // Tick every 50 ms
+        if (current_time - start_time).as_millis() > 50 {
+            spinner.set_position(downloaded);
+            start_time = current_time;
+        }
     }
 
-    pb.finish_with_message("Download complete!");
+    spinner.finish_with_message("Download complete!");
 
     let zip_file = File::open(&temp_zip_path)?;
     let mut archive = ZipArchive::new(zip_file)?;
