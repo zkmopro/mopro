@@ -202,8 +202,8 @@ fn copy_android_bindings(
     let jni_libs_path = android_bindings_dir.join(jni_libs_name);
     let uniffi_path = android_bindings_dir.join(uniffi_name);
     let main_dir = target_dir.join("src").join("main");
-    let target_jni_libs_path = main_dir.join("jniLibs");
-    let target_uniffi_path = main_dir.join(language).join("uniffi");
+    let target_jni_libs_path = main_dir.join(jni_libs_name);
+    let target_uniffi_path = main_dir.join(language).join(uniffi_name);
 
     if target_jni_libs_path.exists() {
         fs::remove_dir_all(target_jni_libs_path.clone())?;
