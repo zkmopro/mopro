@@ -83,6 +83,6 @@ serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"
 
 # Halo2 dependencies
-plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+plonk-fibonacci = { workspace = true }
+hyperplonk-fibonacci = { workspace = true }
+gemini-fibonacci = { workspace = true }
