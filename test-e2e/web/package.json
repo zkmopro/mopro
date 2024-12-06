@@ -6,6 +6,7 @@
   "author": "Jinhwan",
   "license": "MIT",
   "scripts": {
+    "build": "cd ../../mopro-wasm && wasm-pack build --target web --out-dir ../test-e2e/web/mopro-pkg -- --all-features",
     "start": "yarn lite-server",
     "test": "node index.js"
   },
