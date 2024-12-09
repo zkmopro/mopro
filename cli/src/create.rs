@@ -121,10 +121,9 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             // Change directory to the project directory
             env::set_current_dir(&target_dir)?;
-            const WEB_TEMPLATE_DIR: Dir =
-                include_dir!("$CARGO_MANIFEST_DIR/src/template/web");
+            const WEB_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/web");
             copy_embedded_dir(&WEB_TEMPLATE_DIR, &target_dir)?;
- 
+
             // Copy WASM bindings
             env::set_current_dir(&project_dir)?;
             let wasm_bindings = "MoproWASMBindings";
@@ -137,7 +136,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             // Copy keys
             let asset_dir = target_dir.join("assets");
             const HALO2_KEYS_DIR: Dir =
-            include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
             copy_embedded_file(&HALO2_KEYS_DIR, &asset_dir)?;
 
             print_create_web_success_message();
