@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mopro WASM Test</title>
+    <style>
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Mopro WASM Test</h1>
+    <table style="margin-top: 20px; text-align: left">
+        <thead>
+            <tr>
+                <th>Proving System</th>
+                <th>Proof Gemeration Time (ms)</th>
+                <th>Proof Verification Time (ms)</th>
+                <th>Proof Validity</th>
+                <th>Error</th>
+            </tr>
+        </thead>
+        <tbody id="test-results">
+            <!-- Rows will be dynamically updated here -->
+        </tbody>
+    </table>
+    <script src="./index.js"></script>
+</body>
+</html>

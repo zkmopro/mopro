@@ -9,10 +9,11 @@ use include_dir::Dir;
 
 use crate::print::print_create_android_success_message;
 use crate::print::print_create_ios_success_message;
+use crate::print::print_create_web_success_message;
 use crate::style;
 
 // TODO: add  "react-native", "flutter"
-const TEMPLATES: [&str; 2] = ["ios", "android"];
+const TEMPLATES: [&str; 3] = ["ios", "android", "web"];
 
 pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
     let platform: String = match arg_platform.as_deref() {
@@ -111,6 +112,35 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             copy_embedded_file(&HALO2_KEYS_DIR, &assets_dir)?;
 
             print_create_android_success_message();
+        }
+
+        if platform.contains(TEMPLATES[2]) {
+            let platform_name = "web";
+            let target_dir = project_dir.join(&platform_name);
+            fs::create_dir(&target_dir)?;
+
+            // Change directory to the project directory
+            env::set_current_dir(&target_dir)?;
+            const WEB_TEMPLATE_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/web");
+            copy_embedded_dir(&WEB_TEMPLATE_DIR, &target_dir)?;
+ 
+            // Copy WASM bindings
+            env::set_current_dir(&project_dir)?;
+            let wasm_bindings = "MoproWASMBindings";
+            let wasm_bindings_dir = project_dir.join(&wasm_bindings);
+
+            let target_wasm_bindings_dir = target_dir.join(&wasm_bindings);
+            fs::create_dir(target_wasm_bindings_dir.clone())?;
+            copy_dir(&wasm_bindings_dir, &target_wasm_bindings_dir)?;
+
+            // Copy keys
+            let asset_dir = target_dir.join("assets");
+            const HALO2_KEYS_DIR: Dir =
+            include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
+            copy_embedded_file(&HALO2_KEYS_DIR, &asset_dir)?;
+
+            print_create_web_success_message();
         }
     }
     Ok(())
