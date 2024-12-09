@@ -44,6 +44,11 @@ const sidebars: SidebarsConfig = {
         },
         {
             type: 'doc',
+            label: 'Mopro WASM',
+            id: 'mopro-wasm',
+        },
+        {
+            type: 'doc',
             label: 'Performance and Benchmarks',
             id: 'performance',
         },
