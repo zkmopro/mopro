@@ -13,6 +13,9 @@ name = "ios"
 [[bin]]
 name = "android"
 
+[[bin]]
+name = "web"
+
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom", "ashlang"] }
 uniffi = "0.28.0"

@@ -1,24 +1,10 @@
 use std::{path::Path, process::Command};
 
 fn main() {
-    // The `mopro-wasm` package requires compilation using the nightly version of Rust.
-    // The build method that uses the `wasm-pack` crate cannot be called directly in `test-e2e` as it relies on stable Rust.
-    // Rust does not support mixing different toolchains or targets in a single build, hence this separation.
-    // Note: There is a known another issue with `wasm-pack` that may affect the build process. For more information, see: https://github.com/rustwasm/wasm-pack/issues/1400.
-
     // Define the paths
-    let mopro_wasm_path = "../mopro-wasm"; // Path to mopro-wasm
-    let output_dir = "../test-e2e/web/mopro-pkg"; // Output directory
-
-    // Debugging: Verify the mopro-wasm path
-    println!(
-        "Expected mopro-wasm path: {}",
-        Path::new(mopro_wasm_path)
-            .canonicalize()
-            .unwrap_or_else(|_| Path::new(mopro_wasm_path).to_path_buf())
-            .display()
-    );
-
+    let mopro_wasm_path = "./mopro-wasm";   // Path to mopro-wasm
+    let output_dir = "../MoproWASMBindings"; // Output directory
+    
     // Verify that the mopro-wasm directory exists
     if !Path::new(mopro_wasm_path).exists() {
         eprintln!("Error: The directory '{}' does not exist.", mopro_wasm_path);
@@ -33,7 +19,6 @@ fn main() {
         std::process::exit(1);
     }
 
-    // Recommended: Use the `yarn build` script in `test-e2e/web` for faster builds, as it avoids compiling Rust each time.
     let output = Command::new("rustup")
         .current_dir(mopro_wasm_path)
         .args(&[

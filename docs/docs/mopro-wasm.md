@@ -2,10 +2,11 @@
 
 The mopro-wasm module enables the compilation of WASM code using `wasm-pack` for supported proving systems.
 
+**Note:** Currently, only the WASM module for Halo2 can be generated in mopro-wasm. Support for additional proving systems may be added in the future.
+
 This module supports multithreading in WASM through the use of `wasm-bindgen-rayon`.
 
 ## Development
-
 
 ### Prerequisites
 
@@ -17,7 +18,7 @@ This module supports multithreading in WASM through the use of `wasm-bindgen-ray
     curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
     ```
 
-2. Install chrome and chromedriver:
+2. Install chrome and chromedriver(for testing):
     
     Both chrome and chromedriver must be installed, and their versions must match.
 
@@ -25,10 +26,18 @@ This module supports multithreading in WASM through the use of `wasm-bindgen-ray
 
 ### Building
 
-To compile the WASM module for all supported circuits, run the following command:
+To compile the WASM module for all supported backends-"plonk," "hyperplonk," and "gemini", run the following command:
+
+```bash
+wasm-pack build --target web -- --all-features
+```
+
+This commands output files into the **pkg** directory, includes the generated WASM file, JavaScript bindings, and metadata required for integration with web applications.
+
+### Testing
+
+Run the fibonacci circuit tests for all the backends in the browser in headless mode.
 
 ```bash
 wasm-pack test --chrome --headless -- --all-features
 ```
-
-This commands output files into the **pkg** directory, includes the generated WASM file, JavaScript bindings, and metadata required for integration with web applications.

@@ -16,15 +16,23 @@ cd mopro/cli
 cargo install --path .
 ```
 
-### 2. Generate Native Bindings
+### 1. Initialize Adaptor
 
-Navigate to the Mopro example app directory, then build the bindings with:
+Navigate to the Mopro example app directory and initialize setup by running:
+
+```sh
+mopro init
+```
+
+### 3. Generate Native Bindings
+
+Build bindings for your project by executing:
 
 ```sh
 mopro build
 ```
 
-### 3. Create Platform-Specific Templates
+### 4. Create Platform-Specific Templates
 
 To generate templates tailored to your target platform, use:
 
@@ -56,6 +64,17 @@ For advanced usage, you can manually run Rust commands to build in either debug 
 - Release Mode:
     ```sh
     CONFIGURATION=release cargo run --bin android # Release mode
+    ```
+
+### Web
+
+- Debug Mode:
+    ```sh
+    cargo run --bin web  # Debug mode
+    ```
+- Release Mode:
+    ```sh
+    CONFIGURATION=release cargo run --bin web # Release mode
     ```
 
 ## Community
