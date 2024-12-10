@@ -76,6 +76,9 @@ pub(crate) fn print_create_flutter_success_message() {
     println!();
     print_bold(r"    code flutter-app".to_string());
     println!();
+    print_green_bold(
+        "To learn more about setting up the Flutter app with mopro, visit https://zkmopro.org/docs/setup/flutter-setup/".to_string(),
+    );
 
     print_footer_message();
 }
@@ -91,6 +94,9 @@ pub(crate) fn print_create_react_native_success_message() {
     println!();
     print_bold(r"    code react-native-app".to_string());
     println!();
+    print_green_bold(
+        "To learn more about setting up the React Native app with mopro, visit https://zkmopro.org/docs/setup/react-native-setup/".to_string(),
+    );
 
     print_footer_message();
 }
