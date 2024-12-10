@@ -10,7 +10,7 @@ use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
-pub fn build() {
+pub fn build(target_archs: &[String]) {
     let cwd = std::env::current_dir().expect("Failed to get current directory");
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());
@@ -18,13 +18,6 @@ pub fn build() {
     let work_dir = mktemp_local(&build_dir);
     let bindings_out = work_dir.join("MoproAndroidBindings");
     let bindings_dest = Path::new(&manifest_dir).join("MoproAndroidBindings");
-
-    let target_archs = vec![
-        "x86_64-linux-android",
-        "i686-linux-android",
-        "armv7-linux-androideabi",
-        "aarch64-linux-android",
-    ];
 
     let mode = std::env::var("CONFIGURATION")
         .unwrap_or_else(|_| "debug".to_string())
