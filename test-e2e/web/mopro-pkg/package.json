@@ -1,0 +1,15 @@
+{
+  "name": "mopro-wasm",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "mopro_wasm_bg.wasm",
+    "mopro_wasm.js",
+    "mopro_wasm.d.ts"
+  ],
+  "main": "mopro_wasm.js",
+  "types": "mopro_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

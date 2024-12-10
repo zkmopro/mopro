@@ -1,0 +1,28 @@
+[package]
+name = "mopro-wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[features]
+plonk = []
+hyperplonk = []
+gemini = []
+
+[dependencies]
+plonk-fibonacci = { workspace = true }
+hyperplonk-fibonacci = { workspace = true }
+gemini-fibonacci = { workspace = true }
+rand = "0.8.5"
+
+[target.wasm32-unknown-unknown.dependencies]
+console_error_panic_hook = "0.1.7"
+getrandom = { version = "0.2.15", features = ["js"] }
+serde-wasm-bindgen = "0.6.5"
+wasm-bindgen = { version = "0.2.95", features = ["serde-serialize"] }
+wasm-bindgen-console-logger = "0.1.1"
+wasm-bindgen-futures = "0.4.47"
+wasm-bindgen-rayon = { version = "1.2.2",  features = ["no-bundler"] }
+wasm-bindgen-test = "0.3.42"
