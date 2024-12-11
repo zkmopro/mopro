@@ -32,16 +32,11 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             if TEMPLATES.contains(&m) {
                 m.to_string()
             } else {
-                style::print_yellow("Invalid template selected. Please choose a valid template (e.g., 'ios', 'android', 'react-native', 'flutter').".to_string());
+                style::print_yellow("Invalid template selected. Please choose a valid template (e.g., 'ios', 'android', 'web', 'react-native', 'flutter').".to_string());
                 select_template()?
             }
         }
     };
-
-    if platform.is_empty() {
-        style::print_yellow("No adapters selected. Use space to select an adapter".to_string());
-        return create_project(arg_platform);
-    }
 
     let project_dir = env::current_dir()?;
 
@@ -77,7 +72,8 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             fs::create_dir(&target_dir)?;
 
             env::set_current_dir(&target_dir)?;
-            const ANDROID_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/android");
+            const ANDROID_TEMPLATE_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/android");
             copy_embedded_dir(&ANDROID_TEMPLATE_DIR, &target_dir)?;
 
             env::set_current_dir(&project_dir)?;
@@ -105,7 +101,8 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             copy_dir(&wasm_bindings_dir, &target_wasm_bindings_dir)?;
 
             let asset_dir = target_dir.join("assets");
-            const HALO2_KEYS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
+            const HALO2_KEYS_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
             copy_embedded_file(&HALO2_KEYS_DIR, &asset_dir)?;
 
             print_create_web_success_message();
@@ -203,7 +200,6 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
     Ok(())
 }
-
 
 fn copy_android_bindings(
     android_bindings_dir: &Path,
