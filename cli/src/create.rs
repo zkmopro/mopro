@@ -40,11 +40,13 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
     if platform.is_empty() {
         style::print_yellow("No adapters selected. Use space to select an adapter".to_string());
-        create_project(arg_platform)?
-    } else {
-        let project_dir = env::current_dir()?;
+        return create_project(arg_platform);
+    }
 
-        if platform.contains(TEMPLATES[0]) {
+    let project_dir = env::current_dir()?;
+
+    match platform.as_str() {
+        "ios" => {
             let ios_bindings_dir = check_ios_bindings(&project_dir)?;
 
             let platform_name = "ios";
@@ -57,73 +59,58 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             }
             fs::create_dir(&target_dir)?;
 
-            // Change directory to the project directory
             env::set_current_dir(&target_dir)?;
             const IOS_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/ios");
             copy_embedded_dir(&IOS_TEMPLATE_DIR, &target_dir)?;
 
-            // Copy ios bindings
             env::set_current_dir(&project_dir)?;
             copy_ios_bindings(ios_bindings_dir, target_dir.clone())?;
-
-            // Copy keys
             copy_keys(target_dir)?;
 
             print_create_ios_success_message();
         }
-
-        if platform.contains(TEMPLATES[1]) {
+        "android" => {
             let android_bindings_dir = check_android_bindings(&project_dir)?;
 
             let platform_name = "android";
             let target_dir = project_dir.join(platform_name);
             fs::create_dir(&target_dir)?;
 
-            // Change directory to the project directory
             env::set_current_dir(&target_dir)?;
-            const ANDROID_TEMPLATE_DIR: Dir =
-                include_dir!("$CARGO_MANIFEST_DIR/src/template/android");
+            const ANDROID_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/android");
             copy_embedded_dir(&ANDROID_TEMPLATE_DIR, &target_dir)?;
 
-            // Copy Android bindings
             env::set_current_dir(&project_dir)?;
             let app_dir = target_dir.join("app");
             copy_android_bindings(&android_bindings_dir, &app_dir, "java")?;
 
-            // Copy keys
-            let assets_dir = app_dir.join("src").join("main").join("assets");
+            let assets_dir = app_dir.join("src/main/assets");
             copy_keys(assets_dir)?;
 
             print_create_android_success_message();
         }
-
-        if platform.contains(TEMPLATES[2]) {
+        "web" => {
             let wasm_bindings_dir = check_web_bindings(&project_dir)?;
-            let target_dir = project_dir.join(&TEMPLATES[2]);
+            let target_dir = project_dir.join("web");
             fs::create_dir(&target_dir)?;
 
-            // Change directory to the project directory
             env::set_current_dir(&target_dir)?;
             const WEB_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/web");
             copy_embedded_dir(&WEB_TEMPLATE_DIR, &target_dir)?;
 
-            // Copy WASM bindings
             env::set_current_dir(&project_dir)?;
 
             let target_wasm_bindings_dir = target_dir.join("MoproWasmBindings");
             fs::create_dir(target_wasm_bindings_dir.clone())?;
             copy_dir(&wasm_bindings_dir, &target_wasm_bindings_dir)?;
 
-            // Copy keys
             let asset_dir = target_dir.join("assets");
-            const HALO2_KEYS_DIR: Dir =
-                include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
+            const HALO2_KEYS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
             copy_embedded_file(&HALO2_KEYS_DIR, &asset_dir)?;
 
             print_create_web_success_message();
         }
-
-        if platform.contains(TEMPLATES[3]) {
+        "flutter" => {
             let ios_bindings_dir = check_ios_bindings(&project_dir)?;
             let android_bindings_dir = check_android_bindings(&project_dir)?;
 
@@ -137,14 +124,12 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             download_and_extract_template(
                 "https://github.com/zkmopro/flutter-app/archive/refs/heads/main.zip",
                 &project_dir,
-                TEMPLATES[3],
+                "flutter",
             )?;
 
-            // The resulting directory will have -main attached to its name, we need to remove it
             let flutter_dir = project_dir.join("flutter-app-main");
             fs::rename(&flutter_dir, &target_dir)?;
 
-            // Copy iOS bindings
             let xcframeworks_dir = ios_bindings_dir.join("MoproBindings.xcframework");
             let mopro_swift_file = ios_bindings_dir.join("mopro.swift");
 
@@ -153,25 +138,20 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             let mopro_bindings_dir = ios_dir.join("MoproBindings.xcframework");
             let classes_dir = ios_dir.join("Classes");
 
-            // Replace the existing MoproBindings.xcframework dir with the one from the MoproiOSBindings
             fs::remove_dir_all(&mopro_bindings_dir)?;
             fs::create_dir(&mopro_bindings_dir)?;
             copy_dir(&xcframeworks_dir, &mopro_bindings_dir)?;
 
-            // Replace the mopro.swift file
             fs::remove_file(classes_dir.join("mopro.swift"))?;
             fs::copy(&mopro_swift_file, classes_dir.join("mopro.swift"))?;
 
-            // Copy Android bindings
             copy_android_bindings(
                 &android_bindings_dir,
-                &target_dir.join("mopro_flutter_plugin").join("android"),
+                &target_dir.join("mopro_flutter_plugin/android"),
                 "kotlin",
             )?;
 
-            // Copy the keys to the flutter assets dir
             let assets_dir = target_dir.join("assets");
-            // Clear the assets dir before copying
             fs::remove_dir_all(&assets_dir)?;
             fs::create_dir(&assets_dir)?;
 
@@ -179,8 +159,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             print_create_flutter_success_message();
         }
-
-        if platform.contains(TEMPLATES[4]) {
+        "react-native" => {
             let ios_bindings_dir = check_ios_bindings(&project_dir)?;
             let android_bindings_dir = check_android_bindings(&project_dir)?;
 
@@ -194,26 +173,22 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             download_and_extract_template(
                 "https://codeload.github.com/zkmopro/react-native-app/zip/refs/heads/main",
                 &project_dir,
-                TEMPLATES[4],
+                "react-native",
             )?;
-            // The resulting directory will have -main attached to its name, remove it
+
             let react_native_dir = project_dir.join("react-native-app-main");
             fs::rename(&react_native_dir, &target_dir)?;
 
-            // Copy iOS bindings
-            let mopro_module_dir = target_dir.join("modules").join("mopro");
+            let mopro_module_dir = target_dir.join("modules/mopro");
             copy_ios_bindings(ios_bindings_dir, mopro_module_dir.join("ios"))?;
 
-            // Copy Android bindings
             copy_android_bindings(
                 &android_bindings_dir,
                 &mopro_module_dir.join("android"),
                 "java",
             )?;
 
-            // Copy the keys to the flutter assets dir
-            let assets_dir = target_dir.join("assets").join("keys");
-            // Clear the assets dir before copying
+            let assets_dir = target_dir.join("assets/keys");
             fs::remove_dir_all(&assets_dir)?;
             fs::create_dir(&assets_dir)?;
 
@@ -221,9 +196,14 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             print_create_react_native_success_message();
         }
+        _ => {
+            return Err(Error::msg("Unknown platform selected."));
+        }
     }
+
     Ok(())
 }
+
 
 fn copy_android_bindings(
     android_bindings_dir: &Path,
