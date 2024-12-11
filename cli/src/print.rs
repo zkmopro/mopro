@@ -68,7 +68,7 @@ pub(crate) fn print_create_web_success_message() {
     println!();
     print_green_bold("  You can now use the following command to start web server:".to_string());
     println!();
-    print_bold(r"    cd web && yarn start".to_string());
+    print_bold(r"    cd web && yarn && yarn start".to_string());
     println!();
     print_green_bold("This will start a simple web server for your browser.".to_string());
 }

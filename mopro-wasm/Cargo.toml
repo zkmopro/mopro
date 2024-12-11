@@ -26,3 +26,6 @@ wasm-bindgen-console-logger = "0.1.1"
 wasm-bindgen-futures = "0.4.47"
 wasm-bindgen-rayon = { version = "1.2.2",  features = ["no-bundler"] }
 wasm-bindgen-test = "0.3.42"
+
+# [target.wasm32-unknown-unknown]
+# rustflags = ["-C", "target-feature=+atomics,+bulk-memory,+mutable-globals", "-C", "link-arg=--max-memory=4294967296"]
