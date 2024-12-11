@@ -50,15 +50,15 @@ fn main() {
             project_name,
         } => match init::init_project(adapter, project_name) {
             Ok(_) => {}
-            Err(e) => style::print_read_bold(format!("Failed to initialize project {:?}", e)),
+            Err(e) => style::print_red_bold(format!("Failed to initialize project: {:?}", e)),
         },
         Commands::Build { mode, platforms } => match build::build_project(mode, platforms) {
             Ok(_) => {}
-            Err(e) => style::print_read_bold(format!("Failed to build project {:?}", e)),
+            Err(e) => style::print_red_bold(format!("Failed to build project: {:?}", e)),
         },
         Commands::Create { template } => match create::create_project(template) {
             Ok(_) => {}
-            Err(e) => style::print_read_bold(format!("Failed to create template {:?}", e)),
+            Err(e) => style::print_red_bold(format!("Failed to create template: {:?}", e)),
         },
     }
 }
