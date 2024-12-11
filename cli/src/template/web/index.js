@@ -1,7 +1,7 @@
 // Initialize the WASM module and thread pool
 async function initializeWasm() {
     try {
-        const mopro_wasm = await import('./MoproWASMBindings/mopro_wasm.js');
+        const mopro_wasm = await import('./MoproWasmBindings/mopro_wasm.js');
         await mopro_wasm.default();
         await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
         return mopro_wasm;

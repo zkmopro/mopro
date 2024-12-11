@@ -3,7 +3,7 @@ use std::{path::Path, process::Command};
 fn main() {
     // Define the paths
     let mopro_wasm_path = "./mopro-wasm";   // Path to mopro-wasm
-    let output_dir = "../MoproWASMBindings"; // Output directory
+    let output_dir = "../MoproWasmBindings"; // Output directory
     
     // Verify that the mopro-wasm directory exists
     if !Path::new(mopro_wasm_path).exists() {

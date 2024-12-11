@@ -19,8 +19,8 @@ use zip::ZipArchive;
 use crate::print::print_create_android_success_message;
 use crate::print::print_create_flutter_success_message;
 use crate::print::print_create_ios_success_message;
-use crate::print::print_create_web_success_message;
 use crate::print::print_create_react_native_success_message;
+use crate::print::print_create_web_success_message;
 use crate::style;
 
 const TEMPLATES: [&str; 5] = ["ios", "android", "web", "flutter", "react-native"];
@@ -49,6 +49,12 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             let platform_name = "ios";
             let target_dir = project_dir.join(platform_name);
+            if target_dir.exists() {
+                return Err(Error::msg(format!(
+                    "The directory {} already exists. Please remove it and try again.",
+                    target_dir.display()
+                )));
+            }
             fs::create_dir(&target_dir)?;
 
             // Change directory to the project directory
@@ -92,6 +98,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
         }
 
         if platform.contains(TEMPLATES[2]) {
+            let wasm_bindings_dir = check_web_bindings(&project_dir)?;
             let target_dir = project_dir.join(&TEMPLATES[2]);
             fs::create_dir(&target_dir)?;
 
@@ -102,10 +109,8 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             // Copy WASM bindings
             env::set_current_dir(&project_dir)?;
-            let wasm_bindings = "MoproWASMBindings";
-            let wasm_bindings_dir = project_dir.join(&wasm_bindings);
 
-            let target_wasm_bindings_dir = target_dir.join(&wasm_bindings);
+            let target_wasm_bindings_dir = target_dir.join("MoproWasmBindings");
             fs::create_dir(target_wasm_bindings_dir.clone())?;
             copy_dir(&wasm_bindings_dir, &target_wasm_bindings_dir)?;
 
@@ -117,7 +122,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             print_create_web_success_message();
         }
-            
+
         if platform.contains(TEMPLATES[3]) {
             let ios_bindings_dir = check_ios_bindings(&project_dir)?;
             let android_bindings_dir = check_android_bindings(&project_dir)?;
@@ -362,6 +367,15 @@ fn check_android_bindings(project_dir: &Path) -> anyhow::Result<PathBuf> {
         Ok(android_bindings_dir)
     } else {
         Err(Error::msg("Android bindings are required to create the template. Please run 'mopro build' to generate them."))
+    }
+}
+
+fn check_web_bindings(project_dir: &Path) -> anyhow::Result<PathBuf> {
+    let web_bindings_dir = project_dir.join("MoproWasmBindings");
+    if web_bindings_dir.exists() && fs::read_dir(&web_bindings_dir)?.count() > 0 {
+        Ok(web_bindings_dir)
+    } else {
+        Err(Error::msg("Web(WASM) bindings are required to create the template. Please run 'mopro build' to generate them."))
     }
 }
 
