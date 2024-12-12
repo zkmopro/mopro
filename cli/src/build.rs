@@ -1,14 +1,24 @@
+use std::env;
+use std::collections::HashMap;
+
+use dialoguer::theme::ColorfulTheme;
+use dialoguer::MultiSelect;
+use dialoguer::Select;
+
 use crate::print::print_build_success_message;
 use crate::style;
 use crate::style::blue_bold;
 use crate::style::print_green_bold;
-use dialoguer::theme::ColorfulTheme;
-use dialoguer::MultiSelect;
-use dialoguer::Select;
-use std::env;
 
 const MODES: [&str; 2] = ["debug", "release"];
 const PLATFORMS: [&str; 2] = ["ios", "android"];
+const IOS_ARCHS: [&str; 3] = ["aarch64-apple-ios", "aarch64-apple-ios-sim", "x86_64-apple-ios"];
+const ANDROID_ARCHS: [&str; 4] = [
+    "x86_64-linux-android",
+    "i686-linux-android",
+    "armv7-linux-androideabi",
+    "aarch64-linux-android",
+];
 
 pub fn build_project(
     arg_mode: &Option<String>,
@@ -54,16 +64,40 @@ pub fn build_project(
         }
     };
 
+    let mut selected_architectures: HashMap<String, Vec<String>> = HashMap::new();
+
+    for platform in &platforms {
+        let archs = match platform.as_str() {
+            "ios" => select_architectures("iOS", &IOS_ARCHS)?,
+            "android" => select_architectures("Android", &ANDROID_ARCHS)?,
+            _ => vec![],
+        };
+
+        selected_architectures.insert(platform.clone(), archs);
+    }
+
     if platforms.is_empty() {
         style::print_yellow("No platform selected. Use space to select platform(s).".to_string());
         build_project(&Some(mode), &None)?;
     } else {
         for platform in platforms.clone() {
+            let arch_key = match platform.as_str() {
+                "ios" => "IOS_ARCH",
+                "android" => "ANDROID_ARCH",
+                _ => unreachable!()
+            };
+
+            let selected_arch = selected_architectures
+                .get(&platform)
+                .map(|archs| archs.join(","))
+                .unwrap_or_else(|| "".to_string());
+
             let status = std::process::Command::new("cargo")
                 .arg("run")
                 .arg("--bin")
                 .arg(platform.clone())
                 .env("CONFIGURATION", mode.clone())
+                .env(arch_key, selected_arch)
                 .status()?;
 
             if !status.success() {
@@ -100,6 +134,29 @@ fn select_platforms() -> anyhow::Result<Vec<String>> {
         .iter()
         .map(|&idx| PLATFORMS[idx].to_owned())
         .collect())
+}
+
+fn select_architectures(platform: &str, archs: &[&str]) -> anyhow::Result<Vec<String>> {
+    // At least one architecture must be selected
+    loop {
+        let selected_archs = MultiSelect::with_theme(&ColorfulTheme::default())
+            .with_prompt(format!("Select {} architecture(s) to compile (default: all)", platform))
+            .items(archs)
+            .defaults(&vec![true; archs.len()])
+            .interact()?;
+
+        if selected_archs.is_empty() {
+            style::print_yellow(format!(
+                "No architectures selected for {}. Please select at least one architecture.",
+                platform
+            ));
+        } else {
+            return Ok(selected_archs
+                .iter()
+                .map(|&idx| archs[idx].to_owned())
+                .collect());
+        }
+    }
 }
 
 fn print_binding_message(platforms: Vec<String>) -> anyhow::Result<()> {

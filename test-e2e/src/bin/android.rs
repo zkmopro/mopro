@@ -7,10 +7,16 @@ fn main() {
     ];
 
     let android_archs: Vec<String> = if let Ok(android_archs) = std::env::var("ANDROID_ARCHS") {
-        android_archs.split(',').map(|arch| arch.to_string()).collect()
+        android_archs
+            .split(',')
+            .map(|arch| arch.to_string())
+            .collect()
     } else {
         // Default case: select all supported architectures if none are provided
-        available_archs.iter().map(|arch| arch.to_string()).collect()
+        available_archs
+            .iter()
+            .map(|arch| arch.to_string())
+            .collect()
     };
 
     // Check 'ANDRIOD_ARCH' input validation

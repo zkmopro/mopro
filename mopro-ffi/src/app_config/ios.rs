@@ -23,12 +23,6 @@ pub fn build(target_archs: &[String]) {
     let bindings_dest = Path::new(&manifest_dir).join("MoproiOSBindings");
     let framework_out = bindings_out.join("MoproBindings.xcframework");
 
-    // TODO: remove these hardcoded inputs
-    // let target_archs = vec![
-    //     vec!["aarch64-apple-ios"],
-    //     vec!["aarch64-apple-ios-sim", "x86_64-apple-ios"],
-    // ];
-
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
     let mode;
     if let Ok(configuration) = std::env::var("CONFIGURATION") {
@@ -42,6 +36,37 @@ pub fn build(target_archs: &[String]) {
     } else {
         mode = "debug";
     }
+
+    let build_archs = |archs: &[String]| {
+        let out_lib_paths: Vec<PathBuf> = archs
+            .iter()
+            .map(|arch| {
+                Path::new(&build_dir).join(Path::new(&format!(
+                    "{}/{}/{}/libmopro_bindings.a",
+                    build_dir, arch, mode
+                )))
+            })
+            .collect();
+
+        for arch in archs {
+            install_arch(arch.to_string());
+            let mut build_cmd = Command::new("cargo");
+            build_cmd.arg("build");
+            if mode == "release" {
+                build_cmd.arg("--release");
+            }
+            build_cmd
+                .arg("--lib")
+                .env("CARGO_BUILD_TARGET_DIR", &build_dir)
+                .env("CARGO_BUILD_TARGET", arch)
+                .spawn()
+                .expect("Failed to spawn cargo build")
+                .wait()
+                .expect("cargo build errored");
+        }
+
+        out_lib_paths
+    };
 
     // // Take a list of architectures, build them, and combine them into
     // // a single universal binary/archive
@@ -93,37 +118,6 @@ pub fn build(target_archs: &[String]) {
 
     //     lib_out
     // };
-
-    let build_archs = |archs: &[String]| {
-        let out_lib_paths: Vec<PathBuf> = archs
-            .iter()
-            .map(|arch| {
-                Path::new(&build_dir).join(Path::new(&format!(
-                    "{}/{}/{}/libmopro_bindings.a",
-                    build_dir, arch, mode
-                )))
-            })
-            .collect();
-
-        for arch in archs {
-            install_arch(arch.to_string());
-            let mut build_cmd = Command::new("cargo");
-            build_cmd.arg("build");
-            if mode == "release" {
-                build_cmd.arg("--release");
-            }
-            build_cmd
-                .arg("--lib")
-                .env("CARGO_BUILD_TARGET_DIR", &build_dir)
-                .env("CARGO_BUILD_TARGET", arch)
-                .spawn()
-                .expect("Failed to spawn cargo build")
-                .wait()
-                .expect("cargo build errored");
-        }
-
-        out_lib_paths
-    };
 
     generate_bindings(
         (manifest_dir + "/src/mopro.udl").as_str().into(),
