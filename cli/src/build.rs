@@ -12,6 +12,7 @@ use crate::style::print_green_bold;
 
 const MODES: [&str; 2] = ["debug", "release"];
 const PLATFORMS: [&str; 2] = ["ios", "android"];
+// Note that *_ARCH should align with `ios.rs` and `andriod.rs` in "mopro-ffi/src/app_config"
 const IOS_ARCHS: [&str; 3] = [
     "aarch64-apple-ios",
     "aarch64-apple-ios-sim",

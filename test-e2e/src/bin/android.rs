@@ -1,11 +1,6 @@
-fn main() {
-    let available_archs = vec![
-        "x86_64-linux-android",
-        "i686-linux-android",
-        "armv7-linux-androideabi",
-        "aarch64-linux-android",
-    ];
+use mopro_ffi::app_config::android::ANDROID_ARCHS;
 
+fn main() {
     let android_archs: Vec<String> = if let Ok(android_archs) = std::env::var("ANDROID_ARCHS") {
         android_archs
             .split(',')
@@ -13,16 +8,13 @@ fn main() {
             .collect()
     } else {
         // Default case: select all supported architectures if none are provided
-        available_archs
-            .iter()
-            .map(|arch| arch.to_string())
-            .collect()
+        ANDROID_ARCHS.iter().map(|arch| arch.to_string()).collect()
     };
 
     // Check 'ANDRIOD_ARCH' input validation
     for arch in &android_archs {
         assert!(
-            available_archs.contains(&arch.as_str()),
+            ANDROID_ARCHS.contains(&arch.as_str()),
             "Unsupported architecture: {}",
             arch
         );

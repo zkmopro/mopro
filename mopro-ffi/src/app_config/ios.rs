@@ -9,6 +9,13 @@ use super::cleanup_tmp_local;
 use super::install_arch;
 use super::mktemp_local;
 
+// This variable should be align with `cli/build.rs`
+pub const IOS_ARCHS: [&str; 3] = [
+    "aarch64-apple-ios",
+    "aarch64-apple-ios-sim",
+    "x86_64-apple-ios",
+];
+
 // Load environment variables that are specified by by xcode
 pub fn build(target_archs: &[String]) {
     let cwd = std::env::current_dir().unwrap();
@@ -37,7 +44,9 @@ pub fn build(target_archs: &[String]) {
         mode = "debug";
     }
 
-    let build_archs = |archs: &[String]| {
+    // Take a list of architectures, build them, and combine them into
+    // a single universal binary/archive
+    let build_combined_archs = |archs: &Vec<&str>| -> PathBuf {
         let out_lib_paths: Vec<PathBuf> = archs
             .iter()
             .map(|arch| {
@@ -47,7 +56,6 @@ pub fn build(target_archs: &[String]) {
                 )))
             })
             .collect();
-
         for arch in archs {
             install_arch(arch.to_string());
             let mut build_cmd = Command::new("cargo");
@@ -64,31 +72,25 @@ pub fn build(target_archs: &[String]) {
                 .wait()
                 .expect("cargo build errored");
         }
+        // now lipo the libraries together
+        let mut lipo_cmd = Command::new("lipo");
+        let lib_out = mktemp_local(&build_dir_path).join("libmopro_bindings.a");
+        lipo_cmd
+            .arg("-create")
+            .arg("-output")
+            .arg(lib_out.to_str().unwrap());
+        for p in out_lib_paths {
+            lipo_cmd.arg(p.to_str().unwrap());
+        }
+        lipo_cmd
+            .spawn()
+            .expect("Failed to spawn lipo")
+            .wait()
+            .expect("lipo command failed");
 
-        let libs_out: Vec<_> = out_lib_paths
-            .iter()
-            .map(|p| {
-                let lib_out = mktemp_local(build_dir_path).join("libmopro_bindings.a");
-                
-                let status = Command::new("lipo")
-                    .arg("-create")
-                    .arg("-output")
-                    .arg(lib_out.to_str().expect("Invalid lib_out path"))
-                    .arg(p.to_str().expect("Invalid input path"))
-                    .status()
-                    .expect("Failed to execute lipo command");
-                
-                if !status.success() {
-                    panic!("lipo command failed with status: {:?}", status.code());
-                }
-
-                lib_out
-            })
-            .collect();
-
-        libs_out
+        lib_out
     };
-    
+
     generate_bindings(
         (manifest_dir + "/src/mopro.udl").as_str().into(),
         None,
@@ -106,8 +108,10 @@ pub fn build(target_archs: &[String]) {
     )
     .expect("Failed to move mopro.swift into place");
 
-    // let out_lib_paths: Vec<PathBuf> = build_combined_archs(target_archs);
-    let out_lib_paths: Vec<PathBuf> = build_archs(target_archs);
+    let out_lib_paths: Vec<PathBuf> = group_target_archs(target_archs)
+        .iter()
+        .map(|v| build_combined_archs(v))
+        .collect();
 
     let mut xcbuild_cmd = Command::new("xcodebuild");
     xcbuild_cmd.arg("-create-xcframework");
@@ -141,6 +145,42 @@ pub fn build(target_archs: &[String]) {
     fs::rename(&bindings_out, &bindings_dest).expect("Failed to move framework into place");
     // Copy the mopro.swift file to the output directory
     cleanup_tmp_local(build_dir_path)
+}
+
+// More general cases
+fn group_target_archs(target_archs: &[String]) -> Vec<Vec<&str>> {
+    // Detect the current architecture
+    let current_arch = std::env::consts::ARCH;
+
+    // Determine the device architecture prefix based on the current architecture
+    let device_prefix = match current_arch {
+        arch if arch.starts_with("x86_64") => "x86_64",
+        arch if arch.starts_with("aarch64") => "aarch64",
+        _ => panic!("Unsupported host architecture: {}", current_arch),
+    };
+
+    let mut device_archs = Vec::new();
+    let mut simulator_archs = Vec::new();
+
+    for arch in target_archs.iter().map(String::as_str) {
+        if arch.ends_with("sim") {
+            simulator_archs.push(arch);
+        } else if arch.starts_with(device_prefix) {
+            device_archs.push(arch);
+        } else {
+            simulator_archs.push(arch);
+        }
+    }
+
+    let mut grouped_archs = Vec::new();
+    if !device_archs.is_empty() {
+        grouped_archs.push(device_archs);
+    }
+    if !simulator_archs.is_empty() {
+        grouped_archs.push(simulator_archs);
+    }
+
+    grouped_archs
 }
 
 /// Recursively renames all module maps in the given directory to "module.modulemap".

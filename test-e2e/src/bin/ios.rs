@@ -1,24 +1,17 @@
-fn main() {
-    let available_archs = vec![
-        "aarch64-apple-ios",
-        "aarch64-apple-ios-sim",
-        "x86_64-apple-ios",
-    ];
+use mopro_ffi::app_config::ios::IOS_ARCHS;
 
+fn main() {
     let ios_archs: Vec<String> = if let Ok(ios_archs) = std::env::var("IOS_ARCHS") {
         ios_archs.split(',').map(|arch| arch.to_string()).collect()
     } else {
         // Default case: select all supported architectures if none are provided
-        available_archs
-            .iter()
-            .map(|&arch| arch.to_string())
-            .collect()
+        IOS_ARCHS.iter().map(|&arch| arch.to_string()).collect()
     };
 
     // Check 'IOS_ARCH' input validation
     for arch in &ios_archs {
         assert!(
-            available_archs.contains(&arch.as_str()),
+            IOS_ARCHS.contains(&arch.as_str()),
             "Unsupported architecture: {}",
             arch
         );

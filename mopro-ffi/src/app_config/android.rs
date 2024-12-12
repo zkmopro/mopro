@@ -10,6 +10,14 @@ use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
+// This variable should be align with `cli/build.rs`
+pub const ANDROID_ARCHS: [&str; 4] = [
+    "x86_64-linux-android",
+    "i686-linux-android",
+    "armv7-linux-androideabi",
+    "aarch64-linux-android",
+];
+
 pub fn build(target_archs: &[String]) {
     let cwd = std::env::current_dir().expect("Failed to get current directory");
     let manifest_dir =
