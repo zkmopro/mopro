@@ -1,5 +1,5 @@
-use std::env;
 use std::collections::HashMap;
+use std::env;
 
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::MultiSelect;
@@ -12,7 +12,11 @@ use crate::style::print_green_bold;
 
 const MODES: [&str; 2] = ["debug", "release"];
 const PLATFORMS: [&str; 2] = ["ios", "android"];
-const IOS_ARCHS: [&str; 3] = ["aarch64-apple-ios", "aarch64-apple-ios-sim", "x86_64-apple-ios"];
+const IOS_ARCHS: [&str; 3] = [
+    "aarch64-apple-ios",
+    "aarch64-apple-ios-sim",
+    "x86_64-apple-ios",
+];
 const ANDROID_ARCHS: [&str; 4] = [
     "x86_64-linux-android",
     "i686-linux-android",
@@ -84,7 +88,7 @@ pub fn build_project(
             let arch_key = match platform.as_str() {
                 "ios" => "IOS_ARCH",
                 "android" => "ANDROID_ARCH",
-                _ => unreachable!()
+                _ => unreachable!(),
             };
 
             let selected_arch = selected_architectures
@@ -140,7 +144,10 @@ fn select_architectures(platform: &str, archs: &[&str]) -> anyhow::Result<Vec<St
     // At least one architecture must be selected
     loop {
         let selected_archs = MultiSelect::with_theme(&ColorfulTheme::default())
-            .with_prompt(format!("Select {} architecture(s) to compile (default: all)", platform))
+            .with_prompt(format!(
+                "Select {} architecture(s) to compile (default: all)",
+                platform
+            ))
             .items(archs)
             .defaults(&vec![true; archs.len()])
             .interact()?;
