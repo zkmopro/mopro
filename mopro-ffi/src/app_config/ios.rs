@@ -65,60 +65,30 @@ pub fn build(target_archs: &[String]) {
                 .expect("cargo build errored");
         }
 
-        out_lib_paths
+        let libs_out: Vec<_> = out_lib_paths
+            .iter()
+            .map(|p| {
+                let lib_out = mktemp_local(build_dir_path).join("libmopro_bindings.a");
+                
+                let status = Command::new("lipo")
+                    .arg("-create")
+                    .arg("-output")
+                    .arg(lib_out.to_str().expect("Invalid lib_out path"))
+                    .arg(p.to_str().expect("Invalid input path"))
+                    .status()
+                    .expect("Failed to execute lipo command");
+                
+                if !status.success() {
+                    panic!("lipo command failed with status: {:?}", status.code());
+                }
+
+                lib_out
+            })
+            .collect();
+
+        libs_out
     };
-
-    // // Take a list of architectures, build them, and combine them into
-    // // a single universal binary/archive
-    // let build_combined_archs = |archs: &[&str]| -> Vec<PathBuf> {
-    //     let out_lib_paths: Vec<PathBuf> = archs
-    //         .iter()
-    //         .map(|arch| {
-    //             Path::new(&build_dir).join(Path::new(&format!(
-    //                 "{}/{}/{}/libmopro_bindings.a",
-    //                 build_dir, arch, mode
-    //             )))
-    //         })
-    //         .collect();
-
-    //     for arch in archs {
-    //         install_arch(arch.to_string());
-    //         let mut build_cmd = Command::new("cargo");
-    //         build_cmd.arg("build");
-    //         if mode == "release" {
-    //             build_cmd.arg("--release");
-    //         }
-    //         build_cmd
-    //             .arg("--lib")
-    //             .env("CARGO_BUILD_TARGET_DIR", &build_dir)
-    //             .env("CARGO_BUILD_TARGET", arch)
-    //             .spawn()
-    //             .expect("Failed to spawn cargo build")
-    //             .wait()
-    //             .expect("cargo build errored");
-    //     }
-
-    //     // out_lib_paths
-    //     // TODO: enable made one single lib when release mode
-    //     // now lipo the libraries together
-    //     let mut lipo_cmd = Command::new("lipo");
-    //     let lib_out = mktemp_local(build_dir_path).join("libmopro_bindings.a");
-    //     lipo_cmd
-    //         .arg("-create")
-    //         .arg("-output")
-    //         .arg(lib_out.to_str().unwrap());
-    //     for p in out_lib_paths {
-    //         lipo_cmd.arg(p.to_str().unwrap());
-    //     }
-    //     lipo_cmd
-    //         .spawn()
-    //         .expect("Failed to spawn lipo")
-    //         .wait()
-    //         .expect("lipo command failed");
-
-    //     lib_out
-    // };
-
+    
     generate_bindings(
         (manifest_dir + "/src/mopro.udl").as_str().into(),
         None,
