@@ -9,6 +9,20 @@ pub fn build() {
     let cwd = std::env::current_dir().expect("Failed to get current directory");
     let bindings_dest = Path::new(&cwd).join("MoproWasmBindings");
 
+    // Search the `mopro-wasm` directory
+    let mopro_wasm_dir = if cwd
+        .parent()
+        .map_or(false, |p| p.join("mopro-wasm").exists())
+    {
+        // When running the script from `test-e2e`
+        cwd.parent()
+            .expect("Failed to get parent directory")
+            .join("mopro-wasm")
+    } else {
+        // When running the script from the CLI template
+        cwd.join("mopro-wasm")
+    };
+
     // Check if `wasm-pack` command is available
     let check_status = Command::new("wasm-pack").arg("--version").status();
 
@@ -17,11 +31,8 @@ pub fn build() {
         std::process::exit(1);
     }
 
-    let rust_flags = "-C target-feature=+atomics,+bulk-memory,+mutable-globals -C link-arg=--max-memory=4294967296";
-
     let output = Command::new("rustup")
-        .current_dir("/home/jin/Projects/zkmopro/mopro-cli-web/mopro-wasm")
-        .env("RUSTFLAG", rust_flags)
+        .current_dir(mopro_wasm_dir)
         .args(&[
             "run",
             "nightly-2024-07-18",
@@ -34,10 +45,7 @@ pub fn build() {
         ])
         .args(&["--", "--all-features"]) // feature flags in mopro-wasm
         .output()
-        .expect(&format!(
-            "Failed to execute wasm-pack"
-        ));
-
+        .expect(&format!("Failed to execute wasm-pack"));
 
     if output.status.success() {
         println!("mopro-wasm package build completed successfully.");
