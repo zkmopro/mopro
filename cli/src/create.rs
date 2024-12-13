@@ -105,6 +105,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
                 include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
             copy_embedded_file(&HALO2_KEYS_DIR, &asset_dir)?;
 
+            fs::remove_dir_all(&wasm_bindings_dir)?;
             print_create_web_success_message();
         }
         "flutter" => {
