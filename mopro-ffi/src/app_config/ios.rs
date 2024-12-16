@@ -9,6 +9,13 @@ use super::cleanup_tmp_local;
 use super::install_arch;
 use super::mktemp_local;
 
+// This variable should be align with `cli/build.rs`
+pub const IOS_ARCHS: [&str; 3] = [
+    "aarch64-apple-ios",
+    "aarch64-apple-ios-sim",
+    "x86_64-apple-ios",
+];
+
 // Load environment variables that are specified by by xcode
 pub fn build() {
     let cwd = std::env::current_dir().unwrap();
@@ -23,11 +30,6 @@ pub fn build() {
     let bindings_dest = Path::new(&manifest_dir).join("MoproiOSBindings");
     let framework_out = bindings_out.join("MoproBindings.xcframework");
 
-    let target_archs = vec![
-        vec!["aarch64-apple-ios"],
-        vec!["aarch64-apple-ios-sim", "x86_64-apple-ios"],
-    ];
-
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
     let mode;
     if let Ok(configuration) = std::env::var("CONFIGURATION") {
@@ -40,6 +42,22 @@ pub fn build() {
         };
     } else {
         mode = "debug";
+    }
+
+    let target_archs: Vec<String> = if let Ok(ios_archs) = std::env::var("IOS_ARCHS") {
+        ios_archs.split(',').map(|arch| arch.to_string()).collect()
+    } else {
+        // Default case: select all supported architectures if none are provided
+        IOS_ARCHS.iter().map(|&arch| arch.to_string()).collect()
+    };
+
+    // Check 'IOS_ARCH' input validation
+    for arch in &target_archs {
+        assert!(
+            IOS_ARCHS.contains(&arch.as_str()),
+            "Unsupported architecture: {}",
+            arch
+        );
     }
 
     // Take a list of architectures, build them, and combine them into
@@ -72,7 +90,7 @@ pub fn build() {
         }
         // now lipo the libraries together
         let mut lipo_cmd = Command::new("lipo");
-        let lib_out = mktemp_local(build_dir_path).join("libmopro_bindings.a");
+        let lib_out = mktemp_local(&build_dir_path).join("libmopro_bindings.a");
         lipo_cmd
             .arg("-create")
             .arg("-output")
@@ -106,7 +124,7 @@ pub fn build() {
     )
     .expect("Failed to move mopro.swift into place");
 
-    let out_lib_paths: Vec<PathBuf> = target_archs
+    let out_lib_paths: Vec<PathBuf> = group_target_archs(&target_archs)
         .iter()
         .map(|v| build_combined_archs(v))
         .collect();
@@ -143,6 +161,42 @@ pub fn build() {
     fs::rename(&bindings_out, &bindings_dest).expect("Failed to move framework into place");
     // Copy the mopro.swift file to the output directory
     cleanup_tmp_local(build_dir_path)
+}
+
+// More general cases
+fn group_target_archs(target_archs: &[String]) -> Vec<Vec<&str>> {
+    // Detect the current architecture
+    let current_arch = std::env::consts::ARCH;
+
+    // Determine the device architecture prefix based on the current architecture
+    let device_prefix = match current_arch {
+        arch if arch.starts_with("x86_64") => "x86_64",
+        arch if arch.starts_with("aarch64") => "aarch64",
+        _ => panic!("Unsupported host architecture: {}", current_arch),
+    };
+
+    let mut device_archs = Vec::new();
+    let mut simulator_archs = Vec::new();
+
+    for arch in target_archs.iter().map(String::as_str) {
+        if arch.ends_with("sim") {
+            simulator_archs.push(arch);
+        } else if arch.starts_with(device_prefix) {
+            device_archs.push(arch);
+        } else {
+            simulator_archs.push(arch);
+        }
+    }
+
+    let mut grouped_archs = Vec::new();
+    if !device_archs.is_empty() {
+        grouped_archs.push(device_archs);
+    }
+    if !simulator_archs.is_empty() {
+        grouped_archs.push(simulator_archs);
+    }
+
+    grouped_archs
 }
 
 /// Recursively renames all module maps in the given directory to "module.modulemap".
