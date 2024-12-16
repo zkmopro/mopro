@@ -62,14 +62,13 @@ pub fn build() {
         let cwd = std::env::current_dir().expect("Failed to get current directory");
 
         // This should be align the `mopro-wasm` dependency on `cli/Cargo.toml`
-        let repo_url = "https://github.com/sifnoc/mopro";
-        let branch = "mopro-cli-web";
+        let repo_url = "https://github.com/zkmopro/mopro";
         let repo_dir = cwd.join("mopro");
-        let target_dir = "mopro-wasm";
+        let package_name = "mopro-wasm";
 
-        // Fetch without checkout for avoid download all
+        // Fetch without checkout for avoiding download all
         let status = Command::new("git")
-            .args(["clone", "--no-checkout", repo_url, "--branch", branch])
+            .args(["clone", "--no-checkout", repo_url])
             .status()
             .expect("Failed to execute git clone");
         if !status.success() {
@@ -87,7 +86,7 @@ pub fn build() {
 
         let set_sparse_checkout = Command::new("git")
             .current_dir(repo_dir.clone())
-            .args(["sparse-checkout", "set", target_dir])
+            .args(["sparse-checkout", "set", package_name])
             .status()
             .expect("Failed to set sparse-checkout path");
         if !set_sparse_checkout.success() {
@@ -105,11 +104,11 @@ pub fn build() {
         }
 
         // Move from 'mopro/mopro-wasm' to 'mopro-wasm'
-        let source_path = repo_dir.join(target_dir);
-        let destination_path = cwd.join(target_dir);
+        let source_path = repo_dir.join(package_name);
+        let destination_path = cwd.join(package_name);
         fs::rename(&source_path, &destination_path)
             .expect("Failed to move mopro-wasm directory to the root");
-        let _ = fs::remove_dir_all(&repo_dir);
+        // let _ = fs::remove_dir_all(&repo_dir);
         println!("Fetch 'mopro-wasm' sucessfully")
     }
 }
