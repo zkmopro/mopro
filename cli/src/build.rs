@@ -87,8 +87,8 @@ pub fn build_project(
     } else {
         for platform in platforms.clone() {
             let arch_key = match platform.as_str() {
-                "ios" => "IOS_ARCH",
-                "android" => "ANDROID_ARCH",
+                "ios" => "IOS_ARCHS",
+                "android" => "ANDROID_ARCHS",
                 _ => unreachable!(),
             };
 

@@ -17,7 +17,7 @@ pub const IOS_ARCHS: [&str; 3] = [
 ];
 
 // Load environment variables that are specified by by xcode
-pub fn build(target_archs: &[String]) {
+pub fn build() {
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
@@ -42,6 +42,22 @@ pub fn build(target_archs: &[String]) {
         };
     } else {
         mode = "debug";
+    }
+
+    let target_archs: Vec<String> = if let Ok(ios_archs) = std::env::var("IOS_ARCHS") {
+        ios_archs.split(',').map(|arch| arch.to_string()).collect()
+    } else {
+        // Default case: select all supported architectures if none are provided
+        IOS_ARCHS.iter().map(|&arch| arch.to_string()).collect()
+    };
+
+    // Check 'IOS_ARCH' input validation
+    for arch in &target_archs {
+        assert!(
+            IOS_ARCHS.contains(&arch.as_str()),
+            "Unsupported architecture: {}",
+            arch
+        );
     }
 
     // Take a list of architectures, build them, and combine them into
@@ -108,7 +124,7 @@ pub fn build(target_archs: &[String]) {
     )
     .expect("Failed to move mopro.swift into place");
 
-    let out_lib_paths: Vec<PathBuf> = group_target_archs(target_archs)
+    let out_lib_paths: Vec<PathBuf> = group_target_archs(&target_archs)
         .iter()
         .map(|v| build_combined_archs(v))
         .collect();
