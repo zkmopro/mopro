@@ -12,9 +12,9 @@ hyperplonk = []
 gemini = []
 
 [dependencies]
-plonk-fibonacci = { workspace = true }
-hyperplonk-fibonacci = { workspace = true }
-gemini-fibonacci = { workspace = true }
+plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 rand = "0.8.5"
 
 [target.wasm32-unknown-unknown.dependencies]
@@ -26,6 +26,3 @@ wasm-bindgen-console-logger = "0.1.1"
 wasm-bindgen-futures = "0.4.47"
 wasm-bindgen-rayon = { version = "1.2.2",  features = ["no-bundler"] }
 wasm-bindgen-test = "0.3.42"
-
-# [target.wasm32-unknown-unknown]
-# rustflags = ["-C", "target-feature=+atomics,+bulk-memory,+mutable-globals", "-C", "link-arg=--max-memory=4294967296"]
