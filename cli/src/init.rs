@@ -1,5 +1,6 @@
 use crate::print::print_init_instructions;
 use crate::style;
+use crate::style::create_custom_theme;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Input;
 use dialoguer::MultiSelect;
@@ -24,8 +25,9 @@ pub fn init_project(
 
     let adapters = vec!["circom", "halo2"];
 
+    let theme = create_custom_theme();
     let selection = match arg_adapter.as_deref() {
-        None => MultiSelect::with_theme(&ColorfulTheme::default())
+        None => MultiSelect::with_theme(&theme)
             .with_prompt("Pick the adapters you want to use (multiple selection with space)")
             .items(&adapters)
             .interact()
