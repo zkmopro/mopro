@@ -1,46 +1,23 @@
 # mopro-ffi
 
-Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple.
+mopro-ffi is a tool designed to assist programmable cryptography application developers in efficiently creating bindings for client-side targets.
+
+Key features include:
+
+-   **Function Serialization and Export:** Enables serialization and export of functions within each proving system. To generate FFI bindings for different targets, inputs and outputs must conform to the specific types defined in [uniffi-rs](https://mozilla.github.io/uniffi-rs/latest/udl/builtin_types.html).
+    -   Supported proving systems: `circom`, `halo2`, [`Ashlang`](https://github.com/chancehudson/ashlang).
+-   **Executable Binaries:** Provides pre-built binaries, allowing developers to generate bindings for various targets effortlessly.
+    -   Supported targets: `swift`, `kotlin`.
 
 ## Getting started
 
-- Make sure you've installed the [prerequisites](https://zkmopro.org/docs/prerequisites).
-- Getting started with this [tutorial](https://zkmopro.org/docs/getting-started).
-
-## Run tests
-
-- circom
-  ```sh
-  cargo test --features circom
-  ```
-- halo2
-  ```sh
-  cargo test --features halo2
-  ```
-
-## Bindings
-
-- `SwiftBindings`
-- `KotlinBindings`
-
-The uniffi bindings are precompiled and committed here for a specifically named crate. This avoids the complexity of building/invoking the uniffi cli by dependent packages. Note that dependent crates _must_ have the library name `mopro_bindings`, or rebuild the binding themselves.
-
-## Modules
-
-The root module exports functions for generating proofs. It also exports a macro that can be used to setup uniffi from our provided udl file. User modification to the UDL file is not supported at this time.
-
-### `circom`
-
-Includes all proving and serialization logic for circom proofs. Does _not_ include logic for witness generation.
-
-### `halo2`
-
-Includes all proving logic for halo2. 
+-   Make sure you've installed the [prerequisites](https://zkmopro.org/docs/prerequisites).
+-   Getting started with this [tutorial](https://zkmopro.org/docs/setup/rust-setup).
 
 ## Community
 
-- X account: <a href="https://twitter.com/zkmopro"><img src="https://img.shields.io/twitter/follow/zkmopro?style=flat-square&logo=x&label=zkmopro"></a>
-- Telegram group: <a href="https://t.me/zkmopro"><img src="https://img.shields.io/badge/telegram-@zkmopro-blue.svg?style=flat-square&logo=telegram"></a>
+-   X account: <a href="https://twitter.com/zkmopro"><img src="https://img.shields.io/twitter/follow/zkmopro?style=flat-square&logo=x&label=zkmopro"></a>
+-   Telegram group: <a href="https://t.me/zkmopro"><img src="https://img.shields.io/badge/telegram-@zkmopro-blue.svg?style=flat-square&logo=telegram"></a>
 
 ## Acknowledgements
 

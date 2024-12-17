@@ -7,3 +7,10 @@ exclude = ["mopro-example-app"]
 plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+
+[patch.crates-io]
+ashlang = { git = "https://github.com/chancehudson/ashlang.git", rev = "696960a0c15db47170fdd1ff058682023d904b1b", optional = true, default-features = false, features = [
+    "spartan-prover",
+    "serde",
+] }
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", branch = "wasm-delete", optional = true }
