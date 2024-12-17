@@ -8,6 +8,7 @@ use dialoguer::Select;
 use crate::print::print_build_success_message;
 use crate::style;
 use crate::style::blue_bold;
+use crate::style::create_custom_theme;
 use crate::style::print_green_bold;
 
 const MODES: [&str; 2] = ["debug", "release"];
@@ -130,7 +131,8 @@ fn select_mode() -> anyhow::Result<String> {
 }
 
 fn select_platforms() -> anyhow::Result<Vec<String>> {
-    let selected_platforms = MultiSelect::with_theme(&ColorfulTheme::default())
+    let theme = create_custom_theme();
+    let selected_platforms = MultiSelect::with_theme(&theme)
         .with_prompt("Select platform(s) to build for (multiple selection with space)")
         .items(&PLATFORMS)
         .interact()?;
@@ -144,7 +146,8 @@ fn select_platforms() -> anyhow::Result<Vec<String>> {
 fn select_architectures(platform: &str, archs: &[&str]) -> anyhow::Result<Vec<String>> {
     // At least one architecture must be selected
     loop {
-        let selected_archs = MultiSelect::with_theme(&ColorfulTheme::default())
+        let theme = create_custom_theme();
+        let selected_archs = MultiSelect::with_theme(&theme)
             .with_prompt(format!(
                 "Select {} architecture(s) to compile (default: all)",
                 platform
