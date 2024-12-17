@@ -10,6 +10,14 @@ use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
+// This variable should be align with `cli/build.rs`
+pub const ANDROID_ARCHS: [&str; 4] = [
+    "x86_64-linux-android",
+    "i686-linux-android",
+    "armv7-linux-androideabi",
+    "aarch64-linux-android",
+];
+
 pub fn build() {
     let cwd = std::env::current_dir().expect("Failed to get current directory");
     let manifest_dir =
@@ -19,13 +27,6 @@ pub fn build() {
     let bindings_out = work_dir.join("MoproAndroidBindings");
     let bindings_dest = Path::new(&manifest_dir).join("MoproAndroidBindings");
 
-    let target_archs = vec![
-        "x86_64-linux-android",
-        "i686-linux-android",
-        "armv7-linux-androideabi",
-        "aarch64-linux-android",
-    ];
-
     let mode = std::env::var("CONFIGURATION")
         .unwrap_or_else(|_| "debug".to_string())
         .to_lowercase();
@@ -34,9 +35,28 @@ pub fn build() {
         _ => panic!("Unknown configuration: {}", mode),
     };
 
+    let target_archs: Vec<String> = if let Ok(android_archs) = std::env::var("ANDROID_ARCHS") {
+        android_archs
+            .split(',')
+            .map(|arch| arch.to_string())
+            .collect()
+    } else {
+        // Default case: select all supported architectures if none are provided
+        ANDROID_ARCHS.iter().map(|arch| arch.to_string()).collect()
+    };
+
+    // Check 'ANDRIOD_ARCH' input validation
+    for arch in &target_archs {
+        assert!(
+            ANDROID_ARCHS.contains(&arch.as_str()),
+            "Unsupported architecture: {}",
+            arch
+        );
+    }
+
     install_ndk();
     for arch in target_archs {
-        build_for_arch(arch, &build_dir, &bindings_out, &mode);
+        build_for_arch(&arch, &build_dir, &bindings_out, &mode);
     }
 
     generate_bindings(
