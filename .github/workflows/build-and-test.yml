@@ -281,6 +281,11 @@ jobs:
       if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
       steps:
           - uses: actions/checkout@v4
+          - name: Install Rust toolchain
+            uses: actions-rs/toolchain@v1
+            with:
+              toolchain: nightly-2024-07-18
+              override: true
           - name: Restore cached wasm-pack
             uses: actions/cache@v4
             with:
