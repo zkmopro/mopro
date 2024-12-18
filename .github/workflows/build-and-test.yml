@@ -285,7 +285,6 @@ jobs:
             uses: actions-rs/toolchain@v1
             with:
               toolchain: nightly-2024-07-18
-              override: true
           - name: Restore cached wasm-pack
             uses: actions/cache@v4
             with:
@@ -302,6 +301,8 @@ jobs:
             if: steps.cache-halo2-wasm-circuit.outputs.cache-hit != 'true'
             run: |
               cd test-e2e
+              echo "install rust-src component"
+              rustup component add rust-src --toolchain nightly-2024-07-18
               cargo run --bin web
     test-halo2-wasm-web:
         runs-on: ubuntu-latest
