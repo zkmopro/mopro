@@ -1,3 +1,3 @@
 fn main() {
-    mopro_wasm::app_config::web::build()
+    mopro_wasm_lib::app_config::web::build()
 }

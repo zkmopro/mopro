@@ -18,7 +18,7 @@ name = "web"
 
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom", "ashlang"] }
-mopro-wasm = { path = "../mopro-wasm" }
+mopro-wasm-lib = { path = "./mopro-wasm-lib" }
 uniffi = "0.28.0"
 
 # Circom dependencies

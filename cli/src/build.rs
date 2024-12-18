@@ -146,6 +146,7 @@ pub fn build_project(
             let arch_key = match platform.as_str() {
                 "ios" => "IOS_ARCHS",
                 "android" => "ANDROID_ARCHS",
+                "web" => "",
                 _ => unreachable!(),
             };
 

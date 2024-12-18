@@ -2718,6 +2718,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "mopro-wasm-lib"
+version = "0.1.0"
+dependencies = [
+ "console_error_panic_hook",
+ "getrandom",
+ "mopro-wasm",
+ "serde-wasm-bindgen",
+ "wasm-bindgen",
+ "wasm-bindgen-console-logger",
+ "wasm-bindgen-futures",
+ "wasm-bindgen-rayon",
+ "wasm-bindgen-test",
+]
+
+[[package]]
 name = "native-tls"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4219,7 +4234,7 @@ dependencies = [
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
  "mopro-ffi",
- "mopro-wasm",
+ "mopro-wasm-lib",
  "num-bigint",
  "plonk-fibonacci",
  "rust-witness",

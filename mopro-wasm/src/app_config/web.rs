@@ -1,4 +1,3 @@
-use std::fs;
 use std::path::Path;
 use std::process::Command;
 
@@ -17,23 +16,14 @@ pub fn build() {
         std::process::exit(1);
     }
 
-    // Search the `mopro-wasm` directory
-    let mopro_wasm_dir = if cwd
-        .parent()
-        .map_or(false, |p| p.join("mopro-wasm").exists())
-    {
-        // When running the script from `test-e2e`
-        cwd.parent()
-            .expect("Failed to get parent directory")
-            .join("mopro-wasm")
-    } else {
-        // When running the script from the CLI template or else, download 'mopro-wasm' from repo
-        fetch_mopro_wasm();
-        cwd.join("mopro-wasm")
-    };
+    let mopro_wasm_lib_dir = cwd.join("mopro-wasm-lib");
+    if !mopro_wasm_lib_dir.exists() {
+        eprintln!("Error: `mopro-wasm-lib` directory not found. Please ensure it exists.");
+        std::process::exit(1);
+    }
 
     let output = Command::new("rustup")
-        .current_dir(mopro_wasm_dir)
+        .current_dir(mopro_wasm_lib_dir)
         .args(&[
             "run",
             "nightly-2024-07-18",
@@ -55,60 +45,5 @@ pub fn build() {
         eprintln!("Error details:\n{}", stderr_str);
         eprintln!("mopro-wasm package build failed.");
         std::process::exit(1);
-    }
-
-    // fetches and extract the `mopro-wasm` crate from mopro.
-    fn fetch_mopro_wasm() {
-        let cwd = std::env::current_dir().expect("Failed to get current directory");
-
-        // This should be align the `mopro-wasm` dependency on `cli/Cargo.toml`
-        let repo_url = "https://github.com/zkmopro/mopro";
-        let repo_dir = cwd.join("mopro");
-        let package_name = "mopro-wasm";
-
-        // Fetch without checkout for avoiding download all
-        let status = Command::new("git")
-            .args(["clone", "--no-checkout", repo_url])
-            .status()
-            .expect("Failed to execute git clone");
-        if !status.success() {
-            panic!("Failed to clone the repository.");
-        }
-
-        let sparse_checkout = Command::new("git")
-            .current_dir(repo_dir.clone())
-            .args(["sparse-checkout", "init", "--cone"])
-            .status()
-            .expect("Failed to initialize sparse-checkout");
-        if !sparse_checkout.success() {
-            panic!("Failed to initialize sparse-checkout.");
-        }
-
-        let set_sparse_checkout = Command::new("git")
-            .current_dir(repo_dir.clone())
-            .args(["sparse-checkout", "set", package_name])
-            .status()
-            .expect("Failed to set sparse-checkout path");
-        if !set_sparse_checkout.success() {
-            panic!("Failed to set sparse-checkout path.");
-        }
-
-        // Actual fetch file on 'mopro-wasm' in here
-        let checkout = Command::new("git")
-            .current_dir(repo_dir.clone())
-            .args(["checkout"])
-            .status()
-            .expect("Failed to checkout the files on 'mopro-wasm'");
-        if !checkout.success() {
-            panic!("Failed to checkout the files on 'mopro-wasm.");
-        }
-
-        // Move from 'mopro/mopro-wasm' to 'mopro-wasm'
-        let source_path = repo_dir.join(package_name);
-        let destination_path = cwd.join(package_name);
-        fs::rename(&source_path, &destination_path)
-            .expect("Failed to move mopro-wasm directory to the root");
-        // let _ = fs::remove_dir_all(&repo_dir);
-        println!("Fetch 'mopro-wasm' sucessfully")
     }
 }
