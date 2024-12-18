@@ -4234,7 +4234,7 @@ dependencies = [
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
  "mopro-ffi",
- "mopro-wasm-lib",
+ "mopro-wasm",
  "num-bigint",
  "plonk-fibonacci",
  "rust-witness",
