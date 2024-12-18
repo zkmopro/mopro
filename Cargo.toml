@@ -1,5 +1,11 @@
 [workspace]
-members = ["mopro-ffi", "test-e2e", "cli", "mopro-wasm"]
+members = [
+    "mopro-ffi",
+    "test-e2e",
+    "cli",
+    "mopro-wasm",
+    "test-e2e/mopro-wasm-lib",
+]
 resolver = "2"
 exclude = ["mopro-example-app"]
 
