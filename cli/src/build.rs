@@ -6,8 +6,11 @@ use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
 use dialoguer::MultiSelect;
 use dialoguer::Select;
+use include_dir::include_dir;
+use include_dir::Dir;
 use toml::Value;
 
+use crate::create::copy_embedded_dir;
 use crate::print::print_build_success_message;
 use crate::style;
 use crate::style::blue_bold;
@@ -135,6 +138,11 @@ pub fn build_project(
                 .with_prompt("Halo2 WASM code will only be generated for the web platform. Do you want to continue?")
                 .default(true)
                 .interact()?;
+
+            const WASM_TEMPLATE_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
+            let cwd = std::env::current_dir().unwrap();
+            copy_embedded_dir(&WASM_TEMPLATE_DIR, &cwd.join("mopro-wasm-lib"))?;
 
             if !confirm {
                 style::print_yellow("Aborted build for web platform".to_string());

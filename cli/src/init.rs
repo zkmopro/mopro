@@ -97,7 +97,7 @@ pub fn init_project(
     Ok(())
 }
 
-fn copy_embedded_dir(dir: &Dir, output_dir: &Path, selection: Vec<usize>) -> anyhow::Result<()> {
+pub fn copy_embedded_dir(dir: &Dir, output_dir: &Path, selection: Vec<usize>) -> anyhow::Result<()> {
     for file in dir.entries() {
         let relative_path = file.path();
         let output_path = output_dir.join(relative_path);
