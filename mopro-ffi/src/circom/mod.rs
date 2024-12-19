@@ -161,13 +161,13 @@ pub fn generate_circom_proof_wtns(
         let full_assignment = witness_thread
             .join()
             .map_err(|_e| anyhow::anyhow!("witness thread panicked"))?;
-        return prove(proving_key, matrices, full_assignment);
+        prove(proving_key, matrices, full_assignment)
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
         let (proving_key, matrices) = read_zkey::<_, Bls12_381>(&mut reader)?;
         let full_assignment = witness_thread
             .join()
             .map_err(|_e| anyhow::anyhow!("witness thread panicked"))?;
-        return prove(proving_key, matrices, full_assignment);
+        prove(proving_key, matrices, full_assignment)
     } else {
         // unknown curve
         // wait for the witness thread to finish for consistency
@@ -226,11 +226,11 @@ pub fn verify_circom_proof(
     if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
         let proving_key = read_proving_key::<_, Bn254>(&mut reader)?;
         let p = serialization::deserialize_inputs::<Bn254>(public_input);
-        return verify(proving_key.vk, p.0, proof);
+        verify(proving_key.vk, p.0, proof)
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
         let proving_key = read_proving_key::<_, Bls12_381>(&mut reader)?;
         let p = serialization::deserialize_inputs::<Bls12_381>(public_input);
-        return verify(proving_key.vk, p.0, proof);
+        verify(proving_key.vk, p.0, proof)
     } else {
         // unknown curve
         bail!("unknown curve detected in zkey")
@@ -243,10 +243,7 @@ fn verify<T: Pairing + FieldSerialization>(
     proof: Vec<u8>,
 ) -> Result<bool> {
     let pvk = prepare_verifying_key(&vk);
-    let public_inputs_fr = public_inputs
-        .iter()
-        .map(|v| T::ScalarField::from(v.clone()))
-        .collect::<Vec<_>>();
+    let public_inputs_fr = public_inputs.to_vec();
     let proof_parsed = serialization::deserialize_proof::<T>(proof);
     let verified = Groth16::<T, CircomReduction>::verify_with_processed_vk(
         &pvk,

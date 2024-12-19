@@ -153,7 +153,7 @@ pub fn build_project(
             let selected_arch = selected_architectures
                 .get(&platform)
                 .map(|archs| archs.join(","))
-                .unwrap_or_else(|| "".to_string());
+                .unwrap_or_default();
 
             let status = std::process::Command::new("cargo")
                 .arg("run")

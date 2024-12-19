@@ -90,7 +90,7 @@ pub fn build() {
         }
         // now lipo the libraries together
         let mut lipo_cmd = Command::new("lipo");
-        let lib_out = mktemp_local(&build_dir_path).join("libmopro_bindings.a");
+        let lib_out = mktemp_local(build_dir_path).join("libmopro_bindings.a");
         lipo_cmd
             .arg("-create")
             .arg("-output")

@@ -24,7 +24,7 @@ pub fn build() {
 
     let output = Command::new("rustup")
         .current_dir(mopro_wasm_lib_dir)
-        .args(&[
+        .args([
             "run",
             "nightly-2024-07-18",
             "wasm-pack",
@@ -34,9 +34,9 @@ pub fn build() {
             "--out-dir",
             bindings_dest.to_str().unwrap(),
         ])
-        .args(&["--", "--all-features"]) // feature flags in mopro-wasm
+        .args(["--", "--all-features"]) // feature flags in mopro-wasm
         .output()
-        .expect(&format!("Failed to execute wasm-pack"));
+        .unwrap_or_else(|_| panic!("Failed to execute wasm-pack"));
 
     if output.status.success() {
         println!("mopro-wasm package build completed successfully.");
