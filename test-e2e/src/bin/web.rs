@@ -1,4 +1,3 @@
-// TODO: copying pkg that includes wasm files from mopro-wasm
 fn main() {
-    println!("Perform wasm files from mopro-wasm");
+    mopro_wasm::app_config::web::build()
 }

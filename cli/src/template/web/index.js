@@ -1,7 +1,7 @@
 // Initialize the WASM module and thread pool
 async function initializeWasm() {
     try {
-        const mopro_wasm = await import('../MoproWasmBindings/mopro_wasm_lib.js');
+        const mopro_wasm = await import('./MoproWasmBindings/mopro_wasm.js');
         await mopro_wasm.default();
         await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
         return mopro_wasm;
@@ -93,27 +93,27 @@ function updateResults(testName, data, resultsTable, allPassedRef, error = null)
         {
             name: "Plonk",
             input: { out: ["55"] },
-            srs: './test-vectors/halo2/plonk_fibonacci_srs.bin',
-            pk: './test-vectors/halo2/plonk_fibonacci_pk.bin',
-            vk: './test-vectors/halo2/plonk_fibonacci_vk.bin',
+            srs: './assets/plonk_fibonacci_srs.bin',
+            pk: './assets/plonk_fibonacci_pk.bin',
+            vk: './assets/plonk_fibonacci_vk.bin',
             generateProof: mopro_wasm.generate_plonk_proof,
             verifyProof: mopro_wasm.verify_plonk_proof,
         },
         {
             name: "HyperPlonk",
             input: { out: ["55"] },
-            srs: './test-vectors/halo2/hyperplonk_fibonacci_srs.bin',
-            pk: './test-vectors/halo2/hyperplonk_fibonacci_pk.bin',
-            vk: './test-vectors/halo2/hyperplonk_fibonacci_vk.bin',
+            srs: './assets/hyperplonk_fibonacci_srs.bin',
+            pk: './assets/hyperplonk_fibonacci_pk.bin',
+            vk: './assets/hyperplonk_fibonacci_vk.bin',
             generateProof: mopro_wasm.generate_hyperplonk_proof,
             verifyProof: mopro_wasm.verify_hyperplonk_proof,
         },
         {
             name: "Gemini",
             input: { out: ["55"] },
-            srs: './test-vectors/halo2/gemini_fibonacci_srs.bin',
-            pk: './test-vectors/halo2/gemini_fibonacci_pk.bin',
-            vk: './test-vectors/halo2/gemini_fibonacci_vk.bin',
+            srs: './assets/gemini_fibonacci_srs.bin',
+            pk: './assets/gemini_fibonacci_pk.bin',
+            vk: './assets/gemini_fibonacci_vk.bin',
             generateProof: mopro_wasm.generate_gemini_proof,
             verifyProof: mopro_wasm.verify_gemini_proof,
         }

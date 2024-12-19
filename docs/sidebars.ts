@@ -24,6 +24,7 @@ const sidebars: SidebarsConfig = {
                 'setup/rust-setup',
                 'setup/ios-setup',
                 'setup/android-setup',
+                'setup/web-wasm-setup',
                 'setup/react-native-setup',
                 'setup/flutter-setup'
             ]
@@ -41,6 +42,11 @@ const sidebars: SidebarsConfig = {
             type: 'doc',
             label: 'Mopro FFI',
             id: 'mopro-ffi',
+        },
+        {
+            type: 'doc',
+            label: 'Mopro WASM',
+            id: 'mopro-wasm',
         },
         {
             type: 'doc',

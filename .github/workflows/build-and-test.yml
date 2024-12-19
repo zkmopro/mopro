@@ -281,6 +281,10 @@ jobs:
       if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
       steps:
           - uses: actions/checkout@v4
+          - name: Install Rust toolchain
+            uses: actions-rs/toolchain@v1
+            with:
+              toolchain: nightly-2024-07-18
           - name: Restore cached wasm-pack
             uses: actions/cache@v4
             with:
@@ -291,16 +295,15 @@ jobs:
             uses: actions/cache@v4
             with:
               path: |
-                test-e2e/web/mopro-pkg
-              key: ${{ runner.os }}-halo2-wasm-circuit-${{ hashFiles('mopro-wasm/**/*') }}
+                test-e2e/MoproWasmBindings
+              key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
           - name: Build circuits for Wasm Web app
             if: steps.cache-halo2-wasm-circuit.outputs.cache-hit != 'true'
             run: |
-              cd mopro-wasm 
-              wasm-pack build --target web --out-dir ../test-e2e/web/mopro-pkg -- --all-features
-              cd ..
-              mkdir -p test-e2e/web/mopro-pkg/parameters
-              cp test-vectors/halo2/* test-e2e/web/mopro-pkg/parameters/
+              cd test-e2e
+              echo "install rust-src component"
+              rustup component add rust-src --toolchain nightly-2024-07-18
+              cargo run --bin web
     test-halo2-wasm-web:
         runs-on: ubuntu-latest
         needs:
@@ -325,8 +328,8 @@ jobs:
               uses: actions/cache@v4
               with:
                 path: |
-                  test-e2e/web/mopro-pkg
-                key: ${{ runner.os }}-halo2-wasm-circuit-${{ hashFiles('mopro-wasm/**/*') }}
+                  test-e2e/MoproWasmBindings
+                key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
             - name: Install dependencies
               run: yarn install
             - name: Run halo2-wasm-app server and test it

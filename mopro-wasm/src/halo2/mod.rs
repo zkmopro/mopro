@@ -1,10 +1,10 @@
 pub use wasm_bindgen_rayon::init_thread_pool;
 
 #[cfg(feature = "plonk")]
-mod plonk;
+pub mod plonk;
 
 #[cfg(feature = "hyperplonk")]
-mod hyperplonk;
+pub mod hyperplonk;
 
 #[cfg(feature = "gemini")]
-mod gemini;
+pub mod gemini;

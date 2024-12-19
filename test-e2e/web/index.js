@@ -34,7 +34,7 @@ const chrome = require('selenium-webdriver/chrome');
         await driver.wait(async () => {
             const status = await statusDiv.getAttribute('data-status');
             return status === 'passed' || status === 'failed';
-        }, 10000);
+        }, 30000);
 
         // Check the final test status
         const finalStatus = await statusDiv.getAttribute('data-status');

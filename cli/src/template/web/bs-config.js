@@ -1,10 +1,6 @@
 module.exports = {
   server: {
     baseDir: "./",
-    routes: {
-      "/test-vectors": "../../test-vectors",
-      "/MoproWasmBindings": "../MoproWasmBindings"
-    },
     middleware: [
       // To allow COR for only testing and development
       function (req, res, next) {

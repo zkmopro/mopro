@@ -61,6 +61,18 @@ pub(crate) fn print_create_android_success_message() {
     print_footer_message();
 }
 
+pub(crate) fn print_create_web_success_message() {
+    print_green_bold("Template created successfully!".to_string());
+    println!();
+    print_green_bold("Next steps:".to_string());
+    println!();
+    print_green_bold("  You can now use the following command to start web server:".to_string());
+    println!();
+    print_bold(r"    cd web && yarn && yarn start".to_string());
+    println!();
+    print_green_bold("This will start a simple web server for your browser.".to_string());
+}
+
 pub(crate) fn print_create_flutter_success_message() {
     print_green_bold("Flutter template created successfully!".to_string());
     println!();

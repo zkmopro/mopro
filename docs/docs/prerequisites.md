@@ -14,8 +14,13 @@ Depending on what platforms and adapters you use, there are several prerequisite
 -   Android
     -   [Android Studio](https://developer.android.com/studio)
     -   Also see [configuration](#android-configuration) below
+-   Web(WASM)
+    -   [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
+    -   [Download Chrome/ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/)
 -   Circom
     -   Pre-built `zkey` and `wasm` files for your circuits
+-   Halo2
+    -   Pre-generated SRS (Structured Reference String) file, typically used as the universal setup for your circuits
 
 ## Android configuration
 
