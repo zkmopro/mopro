@@ -33,7 +33,8 @@ pub fn blue_bold(text: String) -> StyledObject<String> {
 }
 
 pub fn create_custom_theme() -> ColorfulTheme {
-    let mut theme = ColorfulTheme::default();
-    theme.unchecked_item_prefix = style("⬚".to_string()).for_stderr().black();
-    theme
+    ColorfulTheme {
+        unchecked_item_prefix: style("⬚".to_string()).for_stderr().black(),
+        ..Default::default()
+    }
 }
