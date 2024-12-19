@@ -174,7 +174,6 @@ macro_rules! app {
 
         mopro_ffi::ashlang_spartan_app!();
 
-        #[allow(clippy::empty_line_after_doc_comments)]
         uniffi::include_scaffolding!("mopro");
     };
 }
