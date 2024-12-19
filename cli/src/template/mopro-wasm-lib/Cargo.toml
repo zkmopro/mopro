@@ -6,12 +6,12 @@ edition = "2021"
 [lib]
 crate-type = ["rlib", "cdylib"]
 
-[dependencies] # back to main branch
-mopro-wasm = { git = "https://github.com/zkmopro/mopro", branch = "mopro-cli-web", features = [
+[dependencies]
+mopro-wasm = { git = "https://github.com/zkmopro/mopro",features = [
     "gemini",
     "hyperplonk",
     "plonk",
-] }
+]}
 
 [target.wasm32-unknown-unknown.dependencies]
 console_error_panic_hook = "0.1.7"

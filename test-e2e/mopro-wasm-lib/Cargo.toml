@@ -7,11 +7,11 @@ edition = "2021"
 crate-type = ["rlib", "cdylib"]
 
 [dependencies]
-mopro-wasm = { path = "../../mopro-wasm", features = [
+mopro-wasm = { git = "https://github.com/zkmopro/mopro",features = [
     "gemini",
     "hyperplonk",
     "plonk",
-] } # TODO: this will be modified with git instead of path
+]}
 
 [target.wasm32-unknown-unknown.dependencies]
 console_error_panic_hook = "0.1.7"
