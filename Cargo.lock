@@ -2718,31 +2718,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "mopro-wasm"
-version = "0.1.0"
-source = "git+https://github.com/zkmopro/mopro#bab2a8d2cac105c0422bee5fef997517054cca18"
-dependencies = [
- "console_error_panic_hook",
- "gemini-fibonacci",
- "getrandom",
- "hyperplonk-fibonacci",
- "plonk-fibonacci",
- "rand",
- "serde-wasm-bindgen",
- "wasm-bindgen",
- "wasm-bindgen-console-logger",
- "wasm-bindgen-futures",
- "wasm-bindgen-rayon",
- "wasm-bindgen-test",
-]
-
-[[package]]
 name = "mopro-wasm-lib"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
  "getrandom",
- "mopro-wasm 0.1.0 (git+https://github.com/zkmopro/mopro)",
+ "mopro-wasm",
  "serde-wasm-bindgen",
  "wasm-bindgen",
  "wasm-bindgen-console-logger",
@@ -4253,7 +4234,7 @@ dependencies = [
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
  "mopro-ffi",
- "mopro-wasm 0.1.0",
+ "mopro-wasm",
  "num-bigint",
  "plonk-fibonacci",
  "rust-witness",
