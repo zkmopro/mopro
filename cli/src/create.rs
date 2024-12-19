@@ -276,7 +276,7 @@ fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> anyhow::Result<()> {
+pub fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> anyhow::Result<()> {
     for file in dir.entries() {
         let relative_path = file.path();
         let output_path = output_dir.join(relative_path);

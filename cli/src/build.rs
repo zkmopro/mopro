@@ -6,8 +6,11 @@ use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
 use dialoguer::MultiSelect;
 use dialoguer::Select;
+use include_dir::include_dir;
+use include_dir::Dir;
 use toml::Value;
 
+use crate::create::copy_embedded_dir;
 use crate::print::print_build_success_message;
 use crate::style;
 use crate::style::blue_bold;
@@ -140,10 +143,18 @@ pub fn build_project(
                 style::print_yellow("Aborted build for web platform".to_string());
                 return Err(anyhow::anyhow!(""));
             }
+
+            let cwd = std::env::current_dir().unwrap();
+            let target_dir = &cwd.join("mopro-wasm-lib");
+            if !target_dir.exists() {
+                const WASM_TEMPLATE_DIR: Dir =
+                    include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
+                copy_embedded_dir(&WASM_TEMPLATE_DIR, &target_dir)?;
+            }
         }
 
         for platform in platforms.clone() {
-            let arch_key = match platform.as_str() {
+            let arch_key: &str = match platform.as_str() {
                 "ios" => "IOS_ARCHS",
                 "android" => "ANDROID_ARCHS",
                 "web" => "",
