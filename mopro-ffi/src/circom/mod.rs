@@ -322,7 +322,7 @@ mod tests {
         let name = std::path::Path::new(zkey_path.as_str())
             .file_name()
             .unwrap();
-        if let Ok(witness_fn) = zkey_witness_map(&name.to_str().unwrap()) {
+        if let Ok(witness_fn) = zkey_witness_map(name.to_str().unwrap()) {
             generate_circom_proof_wtns(zkey_path, inputs, witness_fn)
         } else {
             bail!("unknown zkey");
@@ -340,8 +340,8 @@ mod tests {
         bits
     }
 
-    fn bytes_to_circuit_inputs(input_vec: &Vec<u8>) -> HashMap<String, Vec<String>> {
-        let bits = bytes_to_bits(&input_vec);
+    fn bytes_to_circuit_inputs(input_vec: &[u8]) -> HashMap<String, Vec<String>> {
+        let bits = bytes_to_bits(input_vec);
         let converted_vec: Vec<String> = bits
             .into_iter()
             .map(|bit| (bit as i32).to_string())
@@ -388,7 +388,7 @@ mod tests {
         let serialized_proof = p.proof;
         let serialized_inputs = p.inputs;
 
-        assert!(serialized_proof.len() > 0);
+        assert!(!serialized_proof.is_empty());
         assert_eq!(serialized_inputs, serialized_outputs);
 
         // Step 3: Verify Proof
@@ -402,8 +402,8 @@ mod tests {
         // Step 4: Convert Proof to Ethereum compatible proof
         let proof_calldata = to_ethereum_proof(serialized_proof);
         let inputs_calldata = to_ethereum_inputs(serialized_inputs);
-        assert!(proof_calldata.a.x.len() > 0);
-        assert!(inputs_calldata.len() > 0);
+        assert!(!proof_calldata.a.x.is_empty());
+        assert!(!inputs_calldata.is_empty());
 
         Ok(())
     }
@@ -432,7 +432,7 @@ mod tests {
         let serialized_proof = p.proof;
         let serialized_inputs = p.inputs;
 
-        assert!(serialized_proof.len() > 0);
+        assert!(!serialized_proof.is_empty());
         assert_eq!(serialized_inputs, serialized_outputs);
 
         // Verify Proof
@@ -447,8 +447,8 @@ mod tests {
         // Step 4: Convert Proof to Ethereum compatible proof
         let proof_calldata = to_ethereum_proof(serialized_proof);
         let inputs_calldata = to_ethereum_inputs(serialized_inputs);
-        assert!(proof_calldata.a.x.len() > 0);
-        assert!(inputs_calldata.len() > 0);
+        assert!(!proof_calldata.a.x.is_empty());
+        assert!(!inputs_calldata.is_empty());
 
         Ok(())
     }
@@ -475,7 +475,7 @@ mod tests {
         let serialized_proof = p.proof;
         let serialized_inputs = p.inputs.clone();
 
-        assert!(serialized_proof.len() > 0);
+        assert!(!serialized_proof.is_empty());
 
         let output = serialization::deserialize_inputs::<Bls12_381>(p.inputs).0[0];
         assert_eq!(BigUint::from(output), expected_output);
@@ -516,7 +516,7 @@ mod tests {
         let serialized_proof = p.proof;
         let serialized_inputs = p.inputs;
 
-        assert!(serialized_proof.len() > 0);
+        assert!(!serialized_proof.is_empty());
         assert_eq!(serialized_inputs, serialized_outputs);
 
         // Step 3: Verify Proof

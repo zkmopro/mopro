@@ -155,12 +155,12 @@ mod tests {
         ];
 
         let proof = to_ethereum_proof(raw_proof);
-        assert!(proof.a.x.len() > 0);
-        assert!(proof.a.y.len() > 0);
-        assert!(proof.b.x.len() > 0);
-        assert!(proof.b.y.len() > 0);
-        assert!(proof.c.x.len() > 0);
-        assert!(proof.c.y.len() > 0);
+        assert!(!proof.a.x.is_empty());
+        assert!(!proof.a.y.is_empty());
+        assert!(!proof.b.x.is_empty());
+        assert!(!proof.b.y.is_empty());
+        assert!(!proof.c.x.is_empty());
+        assert!(!proof.c.y.is_empty());
     }
 
     #[test]
