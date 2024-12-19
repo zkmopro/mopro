@@ -139,15 +139,23 @@ pub fn build_project(
                 .default(true)
                 .interact()?;
 
-            const WASM_TEMPLATE_DIR: Dir =
-                include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
-            let cwd = std::env::current_dir().unwrap();
-            copy_embedded_dir(&WASM_TEMPLATE_DIR, &cwd.join("mopro-wasm-lib"))?;
-
             if !confirm {
                 style::print_yellow("Aborted build for web platform".to_string());
                 return Err(anyhow::anyhow!(""));
             }
+
+            let cwd = std::env::current_dir().unwrap();
+            let target_dir = &cwd.join("mopro-wasm-lib");
+            if target_dir.exists() {
+                style::print_yellow(
+                    "'mopro-wasm-lib' already exist, Please remove it and try again".to_string(),
+                );
+                return Err(anyhow::anyhow!(""));
+            }
+
+            const WASM_TEMPLATE_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
+            copy_embedded_dir(&WASM_TEMPLATE_DIR, &target_dir)?;
         }
 
         for platform in platforms.clone() {
