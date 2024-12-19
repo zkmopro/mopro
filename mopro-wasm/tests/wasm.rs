@@ -11,6 +11,7 @@ wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
 #[wasm_bindgen_test]
 #[wasm_bindgen]
+#[cfg(feature = "plonk")]
 pub fn prove_and_verify_plonk_proof() {
     // Read all at once
     pub const SRS_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/plonk_fibonacci_srs.bin");
@@ -36,6 +37,7 @@ pub fn prove_and_verify_plonk_proof() {
 
 #[wasm_bindgen_test]
 #[wasm_bindgen]
+#[cfg(feature = "hyperplonk")]
 pub fn prove_and_verify_hyperplonk_proof() {
     // Read all at once
     pub const SRS_KEY: &[u8] =
@@ -62,6 +64,7 @@ pub fn prove_and_verify_hyperplonk_proof() {
 
 #[wasm_bindgen_test]
 #[wasm_bindgen]
+#[cfg(feature = "gemini")]
 pub fn prove_and_verify_gemini_proof() {
     // Read all at once
     pub const SRS_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/gemini_fibonacci_srs.bin");
