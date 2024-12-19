@@ -11,11 +11,12 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
 
 jobs:
   clippy_check:
     runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
     steps:
       - uses: actions/checkout@v4
       - name: Run Clippy
