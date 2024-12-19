@@ -139,7 +139,8 @@ pub fn build_project(
                 .default(true)
                 .interact()?;
 
-            const WASM_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
+            const WASM_TEMPLATE_DIR: Dir =
+                include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
             let cwd = std::env::current_dir().unwrap();
             copy_embedded_dir(&WASM_TEMPLATE_DIR, &cwd.join("mopro-wasm-lib"))?;
 
