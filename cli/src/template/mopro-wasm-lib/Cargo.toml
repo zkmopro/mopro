@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["rlib", "cdylib"]
 
 [dependencies]
-mopro-wasm = { path = "../../mopro-wasm", features = [
+mopro-wasm = { git = "https://github.com/zkmopro/mopro",features = [
     "gemini",
     "hyperplonk",
     "plonk",
