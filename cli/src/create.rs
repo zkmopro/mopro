@@ -1,8 +1,8 @@
 use std::env;
 use std::path::PathBuf;
 
-use crate::style;
 use anyhow::Error;
+use dialoguer::console::Term;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Select;
 
@@ -15,6 +15,8 @@ use web::Web;
 mod flutter;
 use flutter::Flutter;
 mod react_native;
+use crate::config::read_config;
+use crate::style;
 use react_native::ReactNative;
 pub mod utils;
 
@@ -85,10 +87,63 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 }
 
 fn select_template() -> anyhow::Result<String> {
+    let (items, unselectable) = get_target_platforms_with_status()?;
+
     let idx = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Create template")
-        .items(&TEMPLATES)
-        .interact()?;
+        .items(&items)
+        .interact_on_opt(&Term::stderr())?;
 
-    Ok(TEMPLATES[idx].to_owned())
+    if let Some(selected_idx) = idx {
+        if unselectable[selected_idx] {
+            style::print_yellow(format!(
+                "Cannot create {} teamplte - build binding first",
+                &TEMPLATES[selected_idx]
+            ));
+            return select_template();
+        }
+        Ok(items[selected_idx].to_owned()) // Only available items will be matched with 'platform'
+    } else {
+        Err(Error::msg("Template selection was failed"))
+    }
+}
+
+fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)> {
+    let current_dir = env::current_dir()?;
+    let config = read_config(&current_dir.join("Config.toml"))?;
+
+    let mut items = Vec::new();
+    let mut unselectable = Vec::new();
+
+    for &template in TEMPLATES.iter() {
+        if template == "flutter" || template == "react-native" {
+            // Adding more information on the list
+            let requires = ["ios", "android"];
+            let missing: Vec<&str> = requires
+                .iter()
+                .filter(|&&req| config.target_platforms.contains(&req.to_string()))
+                .cloned()
+                .collect();
+
+            if !missing.is_empty() {
+                items.push(format!(
+                    "{:<12} - Requires {} bindings",
+                    template,
+                    missing.join("/")
+                ));
+                unselectable.push(true);
+                continue;
+            }
+        }
+
+        if config.target_platforms.contains(&template.to_string()) {
+            items.push(template.to_string());
+            unselectable.push(false);
+        } else {
+            items.push(format!("{:<12} - Require bindings", template));
+            unselectable.push(true);
+        }
+    }
+
+    Ok((items, unselectable))
 }
