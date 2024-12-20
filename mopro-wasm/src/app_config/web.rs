@@ -24,7 +24,7 @@ pub fn build() {
 
     let output = Command::new("rustup")
         .current_dir(mopro_wasm_lib_dir)
-        .args(&[
+        .args([
             "run",
             "nightly-2024-07-18",
             "wasm-pack",

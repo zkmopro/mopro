@@ -25,7 +25,7 @@ fn tmp_local(build_path: &Path) -> PathBuf {
 }
 
 pub fn mktemp_local(build_path: &Path) -> PathBuf {
-    let dir = tmp_local(build_path).join(&Uuid::new_v4().to_string());
+    let dir = tmp_local(build_path).join(Uuid::new_v4().to_string());
     fs::create_dir(&dir).expect("Failed to create tmpdir");
     dir
 }
@@ -54,7 +54,7 @@ pub fn install_arch(arch: String) {
         .spawn()
         .expect("Failed to spawn rustup, is it installed?")
         .wait()
-        .expect(format!("Failed to install target architecture {}", arch).as_str());
+        .unwrap_or_else(|_| panic!("Failed to install target architecture {}", arch));
 }
 
 pub fn install_archs() {
