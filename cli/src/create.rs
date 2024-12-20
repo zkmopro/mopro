@@ -7,9 +7,9 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::Error;
+use dialoguer::console::Term;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Select;
-use dialoguer::console::Term;
 use include_dir::include_dir;
 use include_dir::Dir;
 use indicatif::ProgressBar;
@@ -251,7 +251,10 @@ fn select_template() -> anyhow::Result<String> {
 
     if let Some(selected_idx) = idx {
         if unselectable[selected_idx] {
-            style::print_yellow(format!("Cannot create {} teamplte - build binding first", &TEMPLATES[selected_idx]));
+            style::print_yellow(format!(
+                "Cannot create {} teamplte - build binding first",
+                &TEMPLATES[selected_idx]
+            ));
             return select_template();
         }
         Ok(items[selected_idx].to_owned()) // Only available items will be matched with 'platform'
@@ -278,7 +281,11 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
                 .collect();
 
             if !missing.is_empty() {
-                items.push(format!("{:<12} - Requires {} bindings", template, missing.join("/")));
+                items.push(format!(
+                    "{:<12} - Requires {} bindings",
+                    template,
+                    missing.join("/")
+                ));
                 unselectable.push(true);
                 continue;
             }
