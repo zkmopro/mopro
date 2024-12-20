@@ -2,6 +2,7 @@ use clap::Parser;
 use clap::Subcommand;
 
 mod build;
+mod config;
 mod create;
 mod init;
 mod print;

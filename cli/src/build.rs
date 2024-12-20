@@ -1,15 +1,17 @@
 use std::collections::HashMap;
 use std::env;
-use std::fs;
+use std::path::Path;
 
+use anyhow::Error;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
 use dialoguer::MultiSelect;
 use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
-use toml::Value;
 
+use crate::config::read_config;
+use crate::config::write_config;
 use crate::create::utils::copy_embedded_dir;
 use crate::print::print_build_success_message;
 use crate::style;
@@ -59,7 +61,7 @@ pub fn build_project(
         }
     };
 
-    let platforms: Vec<String> = match arg_platforms {
+    let selected_platforms: Vec<String> = match arg_platforms {
         None => select_platforms()?,
         Some(p) => {
             let mut valid_platforms: Vec<String> = p
@@ -87,31 +89,19 @@ pub fn build_project(
         }
     };
 
-    let mut selected_architectures: HashMap<String, Vec<String>> = HashMap::new();
-
-    for platform in &platforms {
-        let archs = match platform.as_str() {
-            "ios" => select_architectures("iOS", &IOS_ARCHS)?,
-            "android" => select_architectures("Android", &ANDROID_ARCHS)?,
-            _ => vec![],
-        };
-
-        selected_architectures.insert(platform.clone(), archs);
-    }
-
-    if platforms.is_empty() {
+    if selected_platforms.is_empty() {
         style::print_yellow("No platform selected. Use space to select platform(s).".to_string());
         build_project(&Some(mode), &None)?;
     } else {
-        // Check 'Cargo.toml' file contains adaptor in the features table.
-        let feature_table = get_table_cargo_toml("features".to_string()).unwrap();
-        let feature_array = feature_table
-            .get("default")
-            .and_then(|v| v.as_array())
-            .unwrap();
+        let config_path = current_dir.join("Config.toml");
 
-        let selected_adaptors: Vec<&str> =
-            feature_array.iter().filter_map(|v| v.as_str()).collect();
+        // Check if the config file exist
+        if !Path::new(&config_path).exists() {
+            return Err(Error::msg(
+                "Config.toml does exists. Please run 'mopro init'",
+            ));
+        }
+        let mut config = read_config(&config_path)?;
 
         // Supported adaptors and platforms:
         // | Platforms | Circom | Halo2 |
@@ -122,17 +112,39 @@ pub fn build_project(
         //
         // Note: 'Yes' indicates that the adaptor is compatible with the platform.
 
+        // Initialize target platform if the user build again
+        config.target_platforms = vec![];
+
+        let selected_adaptors = config.target_adaptors.clone();
+
         // If 'Circom' is the only selected adaptor and 'Web' is the only selected platform,
         // Restart the build step as this combination is not supported.
-        if selected_adaptors == vec!["mopro-ffi/circom"] && platforms == vec!["web"] {
+        if selected_adaptors.as_slice() == ["circom"] && selected_platforms == vec!["web"] {
             style::print_yellow(
                 "Web platform is not support Circom only, choose different platform".to_string(),
             );
             build_project(&Some(mode.clone()), &None)?;
         }
 
-        // Notification when the user selects the 'Halo2' adaptor and the 'Web' platform.
-        if selected_adaptors.contains(&"mopro-ffi/halo2") && platforms.contains(&"web".to_string())
+        // Notification when the user selects the 'circom' adaptor and includes the 'web' platform in the selection.
+        if selected_adaptors.as_slice() == ["circom"]
+            && selected_platforms.contains(&"web".to_string())
+        {
+            let confirm = Confirm::with_theme(&ColorfulTheme::default())
+                .with_prompt("WASM code for Circom will not be generated for the web platform due to lack of support. Do you want to continue?")
+                .default(true)
+                .interact()?;
+
+            if !confirm {
+                build_project(&Some(mode.clone()), &None)?;
+            }
+
+            copy_mopro_wasm_lib()?;
+        }
+
+        // Notification when the user selects the 'halo2' adaptor and includes the 'web' platform in the selection.
+        if selected_adaptors.contains(&"halo2".to_string())
+            && selected_platforms.contains(&"web".to_string())
         {
             let confirm = Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("Halo2 WASM code will only be generated for the web platform. Do you want to continue?")
@@ -141,19 +153,26 @@ pub fn build_project(
 
             if !confirm {
                 style::print_yellow("Aborted build for web platform".to_string());
-                return Err(anyhow::anyhow!(""));
+                std::process::exit(0);
             }
 
-            let cwd = std::env::current_dir().unwrap();
-            let target_dir = &cwd.join("mopro-wasm-lib");
-            if !target_dir.exists() {
-                const WASM_TEMPLATE_DIR: Dir =
-                    include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
-                copy_embedded_dir(&WASM_TEMPLATE_DIR, target_dir)?;
-            }
+            copy_mopro_wasm_lib()?;
         }
 
-        for platform in platforms.clone() {
+        // Archtecture selection for iOS or Andriod
+        let mut selected_architectures: HashMap<String, Vec<String>> = HashMap::new();
+
+        for platform in &selected_platforms {
+            let archs = match platform.as_str() {
+                "ios" => select_architectures("iOS", &IOS_ARCHS)?,
+                "android" => select_architectures("Android", &ANDROID_ARCHS)?,
+                _ => vec![],
+            };
+
+            selected_architectures.insert(platform.clone(), archs);
+        }
+
+        for platform in selected_platforms.clone() {
             let arch_key: &str = match platform.as_str() {
                 "ios" => "IOS_ARCHS",
                 "android" => "ANDROID_ARCHS",
@@ -183,7 +202,13 @@ pub fn build_project(
             }
         }
 
-        print_binding_message(platforms)?;
+        // Write selected platforms for create command
+        for p in &selected_platforms {
+            config.target_platforms.push(p.to_string())
+        }
+        write_config(&config_path, &config)?;
+
+        print_binding_message(selected_platforms)?;
     }
 
     Ok(())
@@ -258,19 +283,15 @@ fn print_binding_message(platforms: Vec<String>) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn get_table_cargo_toml(table_name: String) -> anyhow::Result<Value> {
-    let current_dir: std::path::PathBuf = env::current_dir()?;
-    let cargo_toml_path = current_dir.join("Cargo.toml");
+fn copy_mopro_wasm_lib() -> anyhow::Result<()> {
+    let cwd = std::env::current_dir()?;
+    let target_dir = cwd.join("mopro-wasm-lib");
 
-    let project_toml = fs::read_to_string(cargo_toml_path)?;
-    let parsed_cargo: Value = toml::from_str(&project_toml).unwrap();
-
-    if let Some(features) = parsed_cargo.get(table_name.clone()) {
-        Ok(features.clone())
-    } else {
-        Err(anyhow::anyhow!(
-            "[{:?}] not found in 'Cargo.toml', Check current directory",
-            table_name
-        ))
+    if !target_dir.exists() {
+        const WASM_TEMPLATE_DIR: Dir =
+            include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
+        copy_embedded_dir(&WASM_TEMPLATE_DIR, &target_dir)?;
     }
+
+    Ok(())
 }
