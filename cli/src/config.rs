@@ -8,7 +8,7 @@ use anyhow::Result;
 // Storing user selections while interating with mopro cli
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Config {
-    pub(crate) target_adaptors: Vec<String>,
+    pub(crate) target_adapters: Vec<String>,
     pub(crate) target_platforms: Vec<String>,
 }
 

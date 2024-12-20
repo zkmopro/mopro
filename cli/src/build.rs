@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::env;
-use std::path::Path;
 
 use anyhow::Error;
 use dialoguer::theme::ColorfulTheme;
@@ -96,38 +95,38 @@ pub fn build_project(
         let config_path = current_dir.join("Config.toml");
 
         // Check if the config file exist
-        if !Path::new(&config_path).exists() {
+        if !config_path.exists() {
             return Err(Error::msg(
                 "Config.toml does exists. Please run 'mopro init'",
             ));
         }
         let mut config = read_config(&config_path)?;
 
-        // Supported adaptors and platforms:
+        // Supported adapters and platforms:
         // | Platforms | Circom | Halo2 |
         // |-----------|--------|-------|
         // | iOS       | Yes    | Yes   |
         // | Android   | Yes    | Yes   |
         // | Web       | No     | Yes   |
         //
-        // Note: 'Yes' indicates that the adaptor is compatible with the platform.
+        // Note: 'Yes' indicates that the adapter is compatible with the platform.
 
         // Initialize target platform for preventing add more platforms when the user build again
         config.target_platforms = vec![];
 
-        let selected_adaptors = config.target_adaptors.clone();
+        let selected_adapters = config.target_adapters.clone();
 
-        // If 'Circom' is the only selected adaptor and 'Web' is the only selected platform,
+        // If 'Circom' is the only selected adapter and 'Web' is the only selected platform,
         // Restart the build step as this combination is not supported.
-        if selected_adaptors.as_slice() == ["circom"] && selected_platforms == vec!["web"] {
+        if selected_adapters.as_slice() == ["circom"] && selected_platforms == vec!["web"] {
             style::print_yellow(
                 "Web platform is not support Circom only, choose different platform".to_string(),
             );
             build_project(&Some(mode.clone()), &None)?;
         }
 
-        // Notification when the user selects the 'circom' adaptor and includes the 'web' platform in the selection.
-        if selected_adaptors.as_slice() == ["circom"]
+        // Notification when the user selects the 'circom' adapter and includes the 'web' platform in the selection.
+        if selected_adapters.as_slice() == ["circom"]
             && selected_platforms.contains(&"web".to_string())
         {
             let confirm = Confirm::with_theme(&ColorfulTheme::default())
@@ -142,8 +141,8 @@ pub fn build_project(
             copy_mopro_wasm_lib()?;
         }
 
-        // Notification when the user selects the 'halo2' adaptor and includes the 'web' platform in the selection.
-        if selected_adaptors.contains(&"halo2".to_string())
+        // Notification when the user selects the 'halo2' adapter and includes the 'web' platform in the selection.
+        if selected_adapters.contains(&"halo2".to_string())
             && selected_platforms.contains(&"web".to_string())
         {
             let confirm = Confirm::with_theme(&ColorfulTheme::default())
