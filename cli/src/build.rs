@@ -112,7 +112,7 @@ pub fn build_project(
         //
         // Note: 'Yes' indicates that the adaptor is compatible with the platform.
 
-        // Initialize target platform if the user build again
+        // Initialize target platform for preventing add more platforms when the user build again
         config.target_platforms = vec![];
 
         let selected_adaptors = config.target_adaptors.clone();
