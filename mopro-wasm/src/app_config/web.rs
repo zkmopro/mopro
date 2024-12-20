@@ -34,15 +34,14 @@ pub fn build() {
             "--out-dir",
             bindings_dest.to_str().unwrap(),
         ])
-        .args(["--", "--all-features"]) // feature flags in mopro-wasm
-        .output()
-        .unwrap_or_else(|_| panic!("Failed to execute wasm-pack"));
+        .spawn()
+        .unwrap()
+        .wait()
+        .unwrap();
 
-    if output.status.success() {
+    if output.success() {
         println!("mopro-wasm package build completed successfully.");
     } else {
-        let stderr_str = String::from_utf8_lossy(&output.stderr);
-        eprintln!("Error details:\n{}", stderr_str);
         eprintln!("mopro-wasm package build failed.");
         std::process::exit(1);
     }
