@@ -9,6 +9,7 @@ use std::path::PathBuf;
 use anyhow::Error;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Select;
+use dialoguer::console::Term;
 use include_dir::include_dir;
 use include_dir::Dir;
 use indicatif::ProgressBar;
@@ -16,6 +17,7 @@ use indicatif::ProgressStyle;
 use reqwest::blocking::Client;
 use zip::ZipArchive;
 
+use crate::config::read_config;
 use crate::print::print_create_android_success_message;
 use crate::print::print_create_flutter_success_message;
 use crate::print::print_create_ios_success_message;
@@ -229,7 +231,7 @@ fn copy_android_bindings(
     Ok(())
 }
 
-fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Error> {
+fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> anyhow::Result<(), Error> {
     let ios_bindings_target_dir = output_dir.join("MoproiOSBindings");
     if ios_bindings_target_dir.exists() {
         fs::remove_dir_all(&ios_bindings_target_dir)?;
@@ -240,12 +242,58 @@ fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), Erro
 }
 
 fn select_template() -> anyhow::Result<String> {
+    let (items, unselectable) = get_target_platforms_with_status()?;
+
     let idx = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Create template")
-        .items(&TEMPLATES)
-        .interact()?;
+        .items(&items)
+        .interact_on_opt(&Term::stderr())?;
 
-    Ok(TEMPLATES[idx].to_owned())
+    if let Some(selected_idx) = idx {
+        if unselectable[selected_idx] {
+            style::print_yellow(format!("Cannot create {} teamplte - build binding first", &TEMPLATES[selected_idx]));
+            return select_template();
+        }
+        Ok(items[selected_idx].to_owned()) // Only available items will be matched with 'platform'
+    } else {
+        Err(Error::msg("Template selection was failed"))
+    }
+}
+
+fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)> {
+    let current_dir = env::current_dir()?;
+    let config = read_config(&current_dir.join("Config.toml"))?;
+
+    let mut items = Vec::new();
+    let mut unselectable = Vec::new();
+
+    for &template in TEMPLATES.iter() {
+        if template == "flutter" || template == "react-native" {
+            // Adding more information on the list
+            let requires = ["ios", "android"];
+            let missing: Vec<&str> = requires
+                .iter()
+                .filter(|&&req| config.target_platforms.contains(&req.to_string()))
+                .cloned()
+                .collect();
+
+            if !missing.is_empty() {
+                items.push(format!("{:<12} - Requires {} bindings", template, missing.join("/")));
+                unselectable.push(true);
+                continue;
+            }
+        }
+
+        if config.target_platforms.contains(&template.to_string()) {
+            items.push(template.to_string());
+            unselectable.push(false);
+        } else {
+            items.push(format!("{:<12} - Require bindings", template));
+            unselectable.push(true);
+        }
+    }
+
+    Ok((items, unselectable))
 }
 
 fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> anyhow::Result<()> {
@@ -319,7 +367,7 @@ fn copy_dir(input_dir: &Path, output_dir: &Path) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn copy_keys(target_dir: std::path::PathBuf) -> Result<(), anyhow::Error> {
+fn copy_keys(target_dir: std::path::PathBuf) -> anyhow::Result<(), anyhow::Error> {
     const CIRCOM_KEYS_DIR: Dir =
         include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom");
     const HALO2_KEYS_DIR: Dir =
