@@ -231,7 +231,7 @@ fn copy_android_bindings(
     Ok(())
 }
 
-fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> anyhow::Result<(), Error> {
+fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> anyhow::Result<()> {
     let ios_bindings_target_dir = output_dir.join("MoproiOSBindings");
     if ios_bindings_target_dir.exists() {
         fs::remove_dir_all(&ios_bindings_target_dir)?;
@@ -252,14 +252,14 @@ fn select_template() -> anyhow::Result<String> {
     if let Some(selected_idx) = idx {
         if unselectable[selected_idx] {
             style::print_yellow(format!(
-                "Cannot create {} teamplte - build binding first",
+                "Cannot create {} template - build binding first",
                 &TEMPLATES[selected_idx]
             ));
             return select_template();
         }
         Ok(items[selected_idx].to_owned()) // Only available items will be matched with 'platform'
     } else {
-        Err(Error::msg("Template selection was failed"))
+        Err(Error::msg("Template selection failed"))
     }
 }
 
@@ -276,13 +276,13 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
             let requires = ["ios", "android"];
             let missing: Vec<&str> = requires
                 .iter()
-                .filter(|&&req| config.target_platforms.contains(&req.to_string()))
+                .filter(|&&req| !config.target_platforms.contains(&req.to_string()))
                 .cloned()
                 .collect();
 
             if !missing.is_empty() {
                 items.push(format!(
-                    "{:<12} - Requires {} bindings",
+                    "{:<12} - Requires {} binding(s)",
                     template,
                     missing.join("/")
                 ));
@@ -295,7 +295,7 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
             items.push(template.to_string());
             unselectable.push(false);
         } else {
-            items.push(format!("{:<12} - Require bindings", template));
+            items.push(format!("{:<12} - Require binding", template));
             unselectable.push(true);
         }
     }
@@ -374,7 +374,7 @@ fn copy_dir(input_dir: &Path, output_dir: &Path) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn copy_keys(target_dir: std::path::PathBuf) -> anyhow::Result<(), anyhow::Error> {
+fn copy_keys(target_dir: std::path::PathBuf) -> anyhow::Result<(), Error> {
     const CIRCOM_KEYS_DIR: Dir =
         include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom");
     const HALO2_KEYS_DIR: Dir =
