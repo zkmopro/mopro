@@ -100,19 +100,19 @@ pub fn init_project(
         let config_path = project_dir.join("Config.toml");
 
         // Check if the config file exists, if not create a default one
-        if !Path::new(&config_path).exists() {
+        if !config_path.exists() {
             let default_config = Config {
-                target_adaptors: vec![],
+                target_adapters: vec![],
                 target_platforms: vec![],
             };
             write_config(&config_path, &default_config)?;
         }
-        // Read & Write config for selected adaptor
+        // Read & Write config for selected adapter
         let mut config = read_config(&config_path)?;
-        for adaptor_idx in selection {
+        for adapter_idx in selection {
             config
-                .target_adaptors
-                .push(adapters[adaptor_idx].to_owned());
+                .target_adapters
+                .push(adapters[adapter_idx].to_owned());
         }
         write_config(&config_path, &config)?;
 
