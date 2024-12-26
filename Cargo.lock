@@ -2691,7 +2691,7 @@ dependencies = [
  "num-bigint",
  "num-traits",
  "plonk-fibonacci",
- "rust-witness",
+ "rust-witness 0.1.0 (git+https://github.com/alxkzmn/rust-witness.git)",
  "serde",
  "serde_derive",
  "thiserror 2.0.3",
@@ -3564,6 +3564,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust-witness"
+version = "0.1.0"
+source = "git+https://github.com/alxkzmn/rust-witness.git#132390ed4a79c05eba907c8ed19614f55d36805b"
+dependencies = [
+ "cc",
+ "fnv",
+ "num-bigint",
+ "num-traits",
+ "paste",
+ "walkdir",
+]
+
+[[package]]
 name = "rust_decimal"
 version = "1.36.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4237,7 +4250,7 @@ dependencies = [
  "mopro-wasm",
  "num-bigint",
  "plonk-fibonacci",
- "rust-witness",
+ "rust-witness 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "uniffi",
 ]
 
