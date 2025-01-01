@@ -52,33 +52,33 @@ Check the details here: [performance](https://zkmopro.org/docs/performance).
   </tr>
   <tr>
     <td>Keccak256</td>
-    <td>6.584 s</td>
-    <td>2.55 s (~2.5x)</td>
-    <td>0.867 s (~7.6x)</td>
+    <td>11.388 s</td>
+    <td>2.54 s (~4.4x)</td>
+    <td>0.847 s (~13x)</td>
   </tr>
   <tr>
     <td>SHA256</td>
-    <td>2.499 s</td>
-    <td>1.73 s (~1.4x)</td>
-    <td>0.252 s (~9.9x)</td>
+    <td>3.672 s</td>
+    <td>1.68 s (~2.1x)</td>
+    <td>0.257 s (~14x)</td>
   </tr>
   <tr>
     <td>RSA</td>
-    <td>11.684 s</td>
-    <td>9.53 s (~1.2x)</td>
-    <td>1.1 s (~10.6x)</td>
+    <td>17.4 s</td>
+    <td>9.59 s (~1.8x)</td>
+    <td>1.1 s (~16x)</td>
   </tr>
   <tr>
     <td>Semaphore</td>
-    <td>1.162 s</td>
-    <td>0.331 s (~3.5x)</td>
-    <td>0.188 ms (~6x)</td>
+    <td>2.22 s</td>
+    <td>0.309 s (~7.1x)</td>
+    <td>0.176 ms (~12x)</td>
   </tr>
   <tr>
     <td>Anon Aadhaar</td>
-    <td>36.08 s</td>
-    <td>30.29 s (~1x)</td>
-    <td>3.883 s (~9.3x)</td>
+    <td>54.753 s</td>
+    <td>35.955 s (~1.5x)</td>
+    <td>3.759 s (~14x)</td>
   </tr>
 </table>
 
@@ -91,33 +91,33 @@ Check the details here: [performance](https://zkmopro.org/docs/performance).
   </tr>
   <tr>
     <td>Keccak256</td>
-    <td>5.696 s</td>
-    <td>1.167 s (~5x)</td>
-    <td>0.751 s (~7.5x)</td>
+    <td>5.329 s</td>
+    <td>1.097 s (~5x)</td>
+    <td>0.772 s (~7x)</td>
   </tr>
   <tr>
     <td>SHA256</td>
-    <td>1.694 s</td>
-    <td>0.665 s (~2.5x)</td>
-    <td>0.233 s (~7.2x)</td>
+    <td>1.578 s</td>
+    <td>0.592 s (~2.6x)</td>
+    <td>0.227 s (~6.9x)</td>
   </tr>
   <tr>
     <td>RSA</td>
-    <td>9.794 s</td>
-    <td>4.551 s (~2.1x)</td>
-    <td>0.9 s (~10.8x)</td>
+    <td>9.584 s</td>
+    <td>4.563 s (~2.1x)</td>
+    <td>0.9 s (~10.6x)</td>
   </tr>
   <tr>
     <td>Semaphore</td>
-    <td>1.18 s</td>
-    <td>0.162 s (~7.2x)</td>
-    <td>0.163 ms (~7.2x)</td>
+    <td>1.079 s</td>
+    <td>0.189 s (~5.7x)</td>
+    <td>0.165 ms (~6.5x)</td>
   </tr>
   <tr>
     <td>Anon Aadhaar</td>
     <td>28.679 s</td>
-    <td>8.369 s (~3.4x)</td>
-    <td>3.432 s (~8.3x)</td>
+    <td>12.171 s (~2.3x)</td>
+    <td>3.416 s (~8.3x)</td>
   </tr>
 </table>
 
