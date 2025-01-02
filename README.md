@@ -45,40 +45,79 @@ Check the details here: [performance](https://zkmopro.org/docs/performance).
 
 <table>
   <tr>
-    <th>Circuits</th>
+    <th>Android (Samsung S23U)</th>
     <th>snarkjs groth16 fullprove</th>
     <th>mopro (rust-witness + ark-works)</th>
     <th>witnesscalc + rapidsnark</th>
   </tr>
   <tr>
     <td>Keccak256</td>
-    <td>8406.2 ms</td>
-    <td>1381.8 ms (~6x)</td>
-    <td>2792.6 ms (~3x)</td>
+    <td>11.388 s</td>
+    <td>2.54 s (~4.4x)</td>
+    <td>0.847 s (~13x)</td>
   </tr>
   <tr>
     <td>SHA256</td>
-    <td>2537.6 ms</td>
-    <td>640.7 ms (~4x)</td>
-    <td>817.5 ms (~3.1x)</td>
+    <td>3.672 s</td>
+    <td>1.68 s (~2.1x)</td>
+    <td>0.257 s (~14x)</td>
   </tr>
   <tr>
     <td>RSA</td>
-    <td>15.7 s</td>
-    <td>6.1 s (~2.5x)</td>
-    <td>3.1 s (~5x)</td>
+    <td>17.4 s</td>
+    <td>9.59 s (~1.8x)</td>
+    <td>1.1 s (~16x)</td>
   </tr>
   <tr>
     <td>Semaphore</td>
-    <td>902 ms</td>
-    <td>257 ms (~3.5x)</td>
-    <td>347 ms (~2.5x)</td>
+    <td>2.22 s</td>
+    <td>0.309 s (~7.1x)</td>
+    <td>0.176 ms (~12x)</td>
   </tr>
   <tr>
     <td>Anon Aadhaar</td>
-    <td>26 s</td>
-    <td>17 s (~1.5x)</td>
-    <td>11 s (~2.3x)</td>
+    <td>54.753 s</td>
+    <td>35.955 s (~1.5x)</td>
+    <td>3.759 s (~14x)</td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th>iOS (iPhone 16 Pro)</th>
+    <th>snarkjs groth16 fullprove</th>
+    <th>mopro (rust-witness + ark-works)</th>
+    <th>witnesscalc + rapidsnark</th>
+  </tr>
+  <tr>
+    <td>Keccak256</td>
+    <td>5.329 s</td>
+    <td>1.097 s (~5x)</td>
+    <td>0.772 s (~7x)</td>
+  </tr>
+  <tr>
+    <td>SHA256</td>
+    <td>1.578 s</td>
+    <td>0.592 s (~2.6x)</td>
+    <td>0.227 s (~6.9x)</td>
+  </tr>
+  <tr>
+    <td>RSA</td>
+    <td>9.584 s</td>
+    <td>4.563 s (~2.1x)</td>
+    <td>0.9 s (~10.6x)</td>
+  </tr>
+  <tr>
+    <td>Semaphore</td>
+    <td>1.079 s</td>
+    <td>0.189 s (~5.7x)</td>
+    <td>0.165 ms (~6.5x)</td>
+  </tr>
+  <tr>
+    <td>Anon Aadhaar</td>
+    <td>28.679 s</td>
+    <td>12.171 s (~2.3x)</td>
+    <td>3.416 s (~8.3x)</td>
   </tr>
 </table>
 
