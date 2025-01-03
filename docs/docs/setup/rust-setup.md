@@ -42,13 +42,13 @@ default = ["mopro-ffi/circom"]
 
 [dependencies]
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
-rust-witness = "0.1.0"
+rust-witness = "0.1.1"
 uniffi = { version = "0.28", features = ["cli"] }
 num-bigint = "0.4.0"
 
 [build-dependencies]
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
-rust-witness = "0.1.0"
+rust-witness = "0.1.1"
 uniffi = { version = "0.28", features = ["build"] }
 
 # TODO: fix this

@@ -16,14 +16,14 @@ default = ["<FEATURES>"]
 [dependencies]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro" }
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
-rust-witness = "0.1.0"
+rust-witness = "0.1.1"
 uniffi = { version = "0.28", features = ["cli"] }
 num-bigint = "0.4.0"
 # HALO2_DEPENDENCIES
 
 [build-dependencies]
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
-rust-witness = "0.1.0"
+rust-witness = "0.1.1"
 uniffi = { version = "0.28", features = ["build"] }
 
 # CIRCOM_DEPENDENCIES

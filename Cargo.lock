@@ -3551,9 +3551,9 @@ dependencies = [
 
 [[package]]
 name = "rust-witness"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6bfa72e46b45a7969311cc2780c62b6e41dce9f5d5f84f0af8d84e5516acf88"
+checksum = "c0593811d7a267ce7037c6869cc8437992f3c7c68f388c4f4e34a55c65b3a521"
 dependencies = [
  "cc",
  "fnv",
