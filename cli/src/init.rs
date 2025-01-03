@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::env;
 use std::fs;
 use std::io::Write;
@@ -102,8 +103,8 @@ pub fn init_project(
         // Check if the config file exists, if not create a default one
         if !config_path.exists() {
             let default_config = Config {
-                target_adapters: vec![],
-                target_platforms: vec![],
+                target_adapters: HashSet::new(),
+                target_platforms: HashSet::new(),
             };
             write_config(&config_path, &default_config)?;
         }
@@ -112,7 +113,7 @@ pub fn init_project(
         for adapter_idx in selection {
             config
                 .target_adapters
-                .push(adapters[adapter_idx].to_owned());
+                .insert(adapters[adapter_idx].to_owned());
         }
         write_config(&config_path, &config)?;
 

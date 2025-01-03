@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
@@ -8,8 +9,8 @@ use anyhow::Result;
 // Storing user selections while interating with mopro cli
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Config {
-    pub(crate) target_adapters: Vec<String>,
-    pub(crate) target_platforms: Vec<String>,
+    pub(crate) target_adapters: HashSet<String>,
+    pub(crate) target_platforms: HashSet<String>,
 }
 
 pub fn read_config(file_path: &PathBuf) -> Result<Config> {
