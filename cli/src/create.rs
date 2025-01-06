@@ -23,6 +23,27 @@ use crate::print::print_create_react_native_success_message;
 use crate::print::print_create_web_success_message;
 use crate::style;
 
+pub enum APP {
+    IOS,
+    Android,
+    Web,
+    Flutter,
+    ReactNative,
+}
+
+impl From<String> for APP {
+    fn from(apps: String) -> Self {
+        match apps.to_lowercase().as_str() {
+            "ios" => APP::IOS,
+            "android" => APP::Android,
+            "web" => APP::Web,
+            "flutter" => APP::Flutter,
+            "react-native" => APP::ReactNative,
+            _ => panic!("Unknown platform selected."),
+        }
+    }
+}
+
 const TEMPLATES: [&str; 5] = ["ios", "android", "web", "flutter", "react-native"];
 
 pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
@@ -40,11 +61,11 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
     let project_dir = env::current_dir()?;
 
-    match platform.as_str() {
-        "ios" => {
+    let platform_name = platform.to_lowercase();
+    match platform.clone().into() {
+        APP::IOS => {
             let ios_bindings_dir = check_ios_bindings(&project_dir)?;
 
-            let platform_name = "ios";
             let target_dir = project_dir.join(platform_name);
             if target_dir.exists() {
                 return Err(Error::msg(format!(
@@ -64,10 +85,9 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             print_create_ios_success_message();
         }
-        "android" => {
+        APP::Android => {
             let android_bindings_dir = check_android_bindings(&project_dir)?;
 
-            let platform_name = "android";
             let target_dir = project_dir.join(platform_name);
             fs::create_dir(&target_dir)?;
 
@@ -85,7 +105,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             print_create_android_success_message();
         }
-        "web" => {
+        APP::Web => {
             let wasm_bindings_dir = check_web_bindings(&project_dir)?;
             let target_dir = project_dir.join("web");
             fs::create_dir(&target_dir)?;
@@ -108,7 +128,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             fs::remove_dir_all(&wasm_bindings_dir)?;
             print_create_web_success_message();
         }
-        "flutter" => {
+        APP::Flutter => {
             let ios_bindings_dir = check_ios_bindings(&project_dir)?;
             let android_bindings_dir = check_android_bindings(&project_dir)?;
 
@@ -122,7 +142,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             download_and_extract_template(
                 "https://github.com/zkmopro/flutter-app/archive/refs/heads/main.zip",
                 &project_dir,
-                "flutter",
+                platform_name.as_str(),
             )?;
 
             let flutter_dir = project_dir.join("flutter-app-main");
@@ -157,11 +177,11 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
             print_create_flutter_success_message();
         }
-        "react-native" => {
+        APP::ReactNative => {
             let ios_bindings_dir = check_ios_bindings(&project_dir)?;
             let android_bindings_dir = check_android_bindings(&project_dir)?;
 
-            let target_dir = project_dir.join("react-native-app");
+            let target_dir = project_dir.join(platform_name.as_str());
             if target_dir.exists() {
                 return Err(Error::msg(format!(
                     "The directory {} already exists. Please remove it and try again.",
@@ -171,7 +191,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             download_and_extract_template(
                 "https://codeload.github.com/zkmopro/react-native-app/zip/refs/heads/main",
                 &project_dir,
-                "react-native",
+                platform.as_str(),
             )?;
 
             let react_native_dir = project_dir.join("react-native-app-main");
@@ -193,9 +213,6 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
             copy_keys(assets_dir)?;
 
             print_create_react_native_success_message();
-        }
-        _ => {
-            return Err(Error::msg("Unknown platform selected."));
         }
     }
 
