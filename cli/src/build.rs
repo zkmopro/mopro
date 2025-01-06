@@ -10,7 +10,7 @@ use include_dir::include_dir;
 use include_dir::Dir;
 use toml::Value;
 
-use crate::create::copy_embedded_dir;
+use crate::create::utils::copy_embedded_dir;
 use crate::print::print_build_success_message;
 use crate::style;
 use crate::style::blue_bold;
