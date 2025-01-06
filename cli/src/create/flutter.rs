@@ -1,10 +1,9 @@
 use anyhow::Error;
 use std::{fs, path::PathBuf};
 
-use super::Create;
+use super::{Create, APP};
 use crate::create::utils::{
-    check_android_bindings, check_ios_bindings, copy_android_bindings, copy_dir, copy_keys,
-    download_and_extract_template,
+    check_bindings, copy_android_bindings, copy_dir, copy_keys, download_and_extract_template,
 };
 use crate::print::print_footer_message;
 use crate::style::print_bold;
@@ -16,8 +15,8 @@ impl Create for Flutter {
     const NAME: &'static str = "flutter";
 
     fn create(project_dir: PathBuf) -> Result<(), Error> {
-        let ios_bindings_dir = check_ios_bindings(&project_dir)?;
-        let android_bindings_dir = check_android_bindings(&project_dir)?;
+        let ios_bindings_dir = check_bindings(&project_dir, APP::IOS)?;
+        let android_bindings_dir = check_bindings(&project_dir, APP::Android)?;
 
         let target_dir = project_dir.join("flutter-app");
         if target_dir.exists() {

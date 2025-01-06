@@ -13,6 +13,8 @@ use indicatif::ProgressStyle;
 use reqwest::blocking::Client;
 use zip::ZipArchive;
 
+use super::APP;
+
 pub fn copy_android_bindings(
     android_bindings_dir: &Path,
     target_dir: &Path,
@@ -131,30 +133,28 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn check_ios_bindings(project_dir: &Path) -> Result<PathBuf> {
-    let ios_bindings_dir = project_dir.join("MoproiOSBindings");
+pub fn check_bindings(project_dir: &Path, app: APP) -> Result<PathBuf> {
+    let bindings_nams = match app {
+        APP::IOS => "MoproiOSBindings",
+        APP::Android => "MoproAndroidBindings",
+        APP::Web => "MoproWasmBindings",
+        _ => {
+            let app_str: &str = app.into();
+            return Err(Error::msg(format!(
+                "Unsupported language/app ({}) selected. ",
+                app_str
+            )));
+        }
+    };
+
+    let ios_bindings_dir = project_dir.join(bindings_nams);
     if ios_bindings_dir.exists() && fs::read_dir(&ios_bindings_dir)?.count() > 0 {
         Ok(ios_bindings_dir)
     } else {
-        Err(Error::msg("iOS bindings are required to create the template. Please run 'mopro build' to generate them."))
-    }
-}
-
-pub fn check_android_bindings(project_dir: &Path) -> Result<PathBuf> {
-    let android_bindings_dir = project_dir.join("MoproAndroidBindings");
-    if android_bindings_dir.exists() && fs::read_dir(&android_bindings_dir)?.count() > 0 {
-        Ok(android_bindings_dir)
-    } else {
-        Err(Error::msg("Android bindings are required to create the template. Please run 'mopro build' to generate them."))
-    }
-}
-
-pub fn check_web_bindings(project_dir: &Path) -> Result<PathBuf> {
-    let web_bindings_dir = project_dir.join("MoproWasmBindings");
-    if web_bindings_dir.exists() && fs::read_dir(&web_bindings_dir)?.count() > 0 {
-        Ok(web_bindings_dir)
-    } else {
-        Err(Error::msg("Web(WASM) bindings are required to create the template. Please run 'mopro build' to generate them."))
+        Err(Error::msg(format!(
+            "{} are required to create the template. Please run 'mopro build' to generate them.",
+            bindings_nams
+        )))
     }
 }
 

@@ -23,6 +23,7 @@ trait Create {
     fn create(project_dir: PathBuf) -> Result<(), Error>;
     fn print_message();
 }
+
 pub enum APP {
     IOS,
     Android,
@@ -32,14 +33,26 @@ pub enum APP {
 }
 
 impl From<String> for APP {
-    fn from(apps: String) -> Self {
-        match apps.to_lowercase().as_str() {
+    fn from(app: String) -> Self {
+        match app.to_lowercase().as_str() {
             "ios" => APP::IOS,
             "android" => APP::Android,
             "web" => APP::Web,
             "flutter" => APP::Flutter,
             "react-native" => APP::ReactNative,
             _ => panic!("Unknown platform selected."),
+        }
+    }
+}
+
+impl From<APP> for &str {
+    fn from(app: APP) -> Self {
+        match app {
+            APP::IOS => "ios",
+            APP::Android => "android",
+            APP::Web => "web",
+            APP::Flutter => "flutter",
+            APP::ReactNative => "react-native",
         }
     }
 }
