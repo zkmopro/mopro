@@ -22,6 +22,12 @@ Depending on what platforms and adapters you use, there are several prerequisite
 -   Halo2
     -   Pre-generated SRS (Structured Reference String) file, typically used as the universal setup for your circuits
 
+## iOS configuration
+
+Ensure that the command-line tools path is correctly set in Xcode. You can check this by navigating to Xcode > Settings > Locations.
+
+![xcode - settings - location](/img/xcode-setting.png)
+
 ## Android configuration
 
 Some additional configuration is required for Android.
