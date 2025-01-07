@@ -145,9 +145,7 @@ pub fn build_project(
         }
 
         // Notification when the user selects the 'halo2' adapter and includes the 'web' platform in the selection.
-        if selected_adapters.contains("halo2")
-            && selected_platforms.contains("web")
-        {
+        if selected_adapters.contains("halo2") && selected_platforms.contains("web") {
             let confirm = Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("Halo2 WASM code will only be generated for the web platform. Do you want to continue?")
                 .default(true)
