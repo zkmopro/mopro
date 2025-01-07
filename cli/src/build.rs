@@ -130,7 +130,7 @@ pub fn build_project(
 
         // Notification when the user selects the 'circom' adapter and includes the 'web' platform in the selection.
         if selected_adapters == HashSet::from(["circom".to_string()])
-            && selected_platforms.contains(&"web".to_string())
+            && selected_platforms.contains("web")
         {
             let confirm = Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("WASM code for Circom will not be generated for the web platform due to lack of support. Do you want to continue?")
@@ -145,8 +145,8 @@ pub fn build_project(
         }
 
         // Notification when the user selects the 'halo2' adapter and includes the 'web' platform in the selection.
-        if selected_adapters.contains(&"halo2".to_string())
-            && selected_platforms.contains(&"web".to_string())
+        if selected_adapters.contains("halo2")
+            && selected_platforms.contains("web")
         {
             let confirm = Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("Halo2 WASM code will only be generated for the web platform. Do you want to continue?")
@@ -231,7 +231,7 @@ fn select_platforms(config: &Config) -> anyhow::Result<HashSet<String>> {
     // defaults based on previous selections.
     let defaults: Vec<bool> = PLATFORMS
         .iter()
-        .map(|platform| config.target_platforms.contains(&platform.to_string()))
+        .map(|&platform| config.target_platforms.contains(platform))
         .collect();
 
     let selected_platforms = MultiSelect::with_theme(&theme)

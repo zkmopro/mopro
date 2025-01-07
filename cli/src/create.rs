@@ -121,7 +121,7 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
             let requires = ["ios", "android"];
             let missing: Vec<&str> = requires
                 .iter()
-                .filter(|&&req| !config.target_platforms.contains(&req.to_string()))
+                .filter(|&&req| !config.target_platforms.contains(req))
                 .cloned()
                 .collect();
 
@@ -136,7 +136,7 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
             }
         }
 
-        if config.target_platforms.contains(&template.to_string()) {
+        if config.target_platforms.contains(template) {
             items.push(template.to_string());
             unselectable.push(false);
         } else {
