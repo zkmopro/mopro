@@ -25,7 +25,7 @@ trait Create {
 }
 
 pub enum Framework {
-    IOS,
+    Ios,
     Android,
     Web,
     Flutter,
@@ -35,7 +35,7 @@ pub enum Framework {
 impl From<String> for Framework {
     fn from(app: String) -> Self {
         match app.to_lowercase().as_str() {
-            "ios" => Framework::IOS,
+            "ios" => Framework::Ios,
             "android" => Framework::Android,
             "web" => Framework::Web,
             "flutter" => Framework::Flutter,
@@ -48,7 +48,7 @@ impl From<String> for Framework {
 impl From<Framework> for &str {
     fn from(app: Framework) -> Self {
         match app {
-            Framework::IOS => "ios",
+            Framework::Ios => "ios",
             Framework::Android => "android",
             Framework::Web => "web",
             Framework::Flutter => "flutter",
@@ -74,7 +74,7 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
     let project_dir = env::current_dir()?;
     match platform.into() {
-        Framework::IOS => Ios::create(project_dir)?,
+        Framework::Ios => Ios::create(project_dir)?,
         Framework::Android => Android::create(project_dir)?,
         Framework::Web => Web::create(project_dir)?,
         Framework::Flutter => Flutter::create(project_dir)?,

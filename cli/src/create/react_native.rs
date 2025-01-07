@@ -16,7 +16,7 @@ impl Create for ReactNative {
     const NAME: &'static str = "react-native";
 
     fn create(project_dir: PathBuf) -> Result<()> {
-        let ios_bindings_dir = check_bindings(&project_dir, Framework::IOS)?;
+        let ios_bindings_dir = check_bindings(&project_dir, Framework::Ios)?;
         let android_bindings_dir = check_bindings(&project_dir, Framework::Android)?;
 
         let target_dir = project_dir.join(Self::NAME);
@@ -33,7 +33,7 @@ impl Create for ReactNative {
         )?;
 
         let react_native_dir = project_dir.join("react-native-app-main");
-        fs::rename(&react_native_dir, &target_dir)?;
+        fs::rename(react_native_dir, &target_dir)?;
 
         let mopro_module_dir = target_dir.join("modules/mopro");
         copy_ios_bindings(ios_bindings_dir, mopro_module_dir.join("ios"))?;

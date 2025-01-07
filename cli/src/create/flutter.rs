@@ -15,7 +15,7 @@ impl Create for Flutter {
     const NAME: &'static str = "flutter";
 
     fn create(project_dir: PathBuf) -> Result<(), Error> {
-        let ios_bindings_dir = check_bindings(&project_dir, Framework::IOS)?;
+        let ios_bindings_dir = check_bindings(&project_dir, Framework::Ios)?;
         let android_bindings_dir = check_bindings(&project_dir, Framework::Android)?;
 
         let target_dir = project_dir.join("flutter-app");
@@ -32,7 +32,7 @@ impl Create for Flutter {
         )?;
 
         let flutter_dir = project_dir.join("flutter-app-main");
-        fs::rename(&flutter_dir, &target_dir)?;
+        fs::rename(flutter_dir, &target_dir)?;
 
         let xcframeworks_dir = ios_bindings_dir.join("MoproBindings.xcframework");
         let mopro_swift_file = ios_bindings_dir.join("mopro.swift");
@@ -47,7 +47,7 @@ impl Create for Flutter {
         copy_dir(&xcframeworks_dir, &mopro_bindings_dir)?;
 
         fs::remove_file(classes_dir.join("mopro.swift"))?;
-        fs::copy(&mopro_swift_file, classes_dir.join("mopro.swift"))?;
+        fs::copy(mopro_swift_file, classes_dir.join("mopro.swift"))?;
 
         copy_android_bindings(
             &android_bindings_dir,

@@ -16,7 +16,7 @@ impl Create for Ios {
     const NAME: &'static str = "ios";
 
     fn create(project_dir: PathBuf) -> Result<()> {
-        let ios_bindings_dir = check_bindings(&project_dir, Framework::IOS)?;
+        let ios_bindings_dir = check_bindings(&project_dir, Framework::Ios)?;
 
         let target_dir = project_dir.join(Self::NAME);
         if target_dir.exists() {

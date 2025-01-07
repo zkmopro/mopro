@@ -135,7 +135,7 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
 
 pub fn check_bindings(project_dir: &Path, app: Framework) -> Result<PathBuf> {
     let bindings_nams = match app {
-        Framework::IOS => "MoproiOSBindings",
+        Framework::Ios => "MoproiOSBindings",
         Framework::Android => "MoproAndroidBindings",
         Framework::Web => "MoproWasmBindings",
         _ => {
