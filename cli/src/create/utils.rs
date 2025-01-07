@@ -13,7 +13,7 @@ use indicatif::ProgressStyle;
 use reqwest::blocking::Client;
 use zip::ZipArchive;
 
-use super::APP;
+use super::Framework;
 
 pub fn copy_android_bindings(
     android_bindings_dir: &Path,
@@ -133,11 +133,11 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn check_bindings(project_dir: &Path, app: APP) -> Result<PathBuf> {
+pub fn check_bindings(project_dir: &Path, app: Framework) -> Result<PathBuf> {
     let bindings_nams = match app {
-        APP::IOS => "MoproiOSBindings",
-        APP::Android => "MoproAndroidBindings",
-        APP::Web => "MoproWasmBindings",
+        Framework::IOS => "MoproiOSBindings",
+        Framework::Android => "MoproAndroidBindings",
+        Framework::Web => "MoproWasmBindings",
         _ => {
             let app_str: &str = app.into();
             return Err(Error::msg(format!(

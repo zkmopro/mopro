@@ -5,7 +5,7 @@ use std::{env, fs, path::PathBuf};
 
 use super::Create;
 use crate::create::utils::{check_bindings, copy_dir, copy_embedded_dir, copy_embedded_file};
-use crate::create::APP;
+use crate::create::Framework;
 use crate::style::print_bold;
 use crate::style::print_green_bold;
 
@@ -15,7 +15,7 @@ impl Create for Web {
     const NAME: &'static str = "web";
 
     fn create(project_dir: PathBuf) -> Result<()> {
-        let wasm_bindings_dir = check_bindings(&project_dir, APP::Web)?;
+        let wasm_bindings_dir = check_bindings(&project_dir, Framework::Web)?;
         let target_dir = project_dir.join(Self::NAME);
         fs::create_dir(&target_dir)?;
 

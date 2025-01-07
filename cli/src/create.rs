@@ -24,7 +24,7 @@ trait Create {
     fn print_message();
 }
 
-pub enum APP {
+pub enum Framework {
     IOS,
     Android,
     Web,
@@ -32,27 +32,27 @@ pub enum APP {
     ReactNative,
 }
 
-impl From<String> for APP {
+impl From<String> for Framework {
     fn from(app: String) -> Self {
         match app.to_lowercase().as_str() {
-            "ios" => APP::IOS,
-            "android" => APP::Android,
-            "web" => APP::Web,
-            "flutter" => APP::Flutter,
-            "react-native" => APP::ReactNative,
+            "ios" => Framework::IOS,
+            "android" => Framework::Android,
+            "web" => Framework::Web,
+            "flutter" => Framework::Flutter,
+            "react-native" => Framework::ReactNative,
             _ => panic!("Unknown platform selected."),
         }
     }
 }
 
-impl From<APP> for &str {
-    fn from(app: APP) -> Self {
+impl From<Framework> for &str {
+    fn from(app: Framework) -> Self {
         match app {
-            APP::IOS => "ios",
-            APP::Android => "android",
-            APP::Web => "web",
-            APP::Flutter => "flutter",
-            APP::ReactNative => "react-native",
+            Framework::IOS => "ios",
+            Framework::Android => "android",
+            Framework::Web => "web",
+            Framework::Flutter => "flutter",
+            Framework::ReactNative => "react-native",
         }
     }
 }
@@ -74,11 +74,11 @@ pub fn create_project(arg_platform: &Option<String>) -> anyhow::Result<()> {
 
     let project_dir = env::current_dir()?;
     match platform.into() {
-        APP::IOS => Ios::create(project_dir)?,
-        APP::Android => Android::create(project_dir)?,
-        APP::Web => Web::create(project_dir)?,
-        APP::Flutter => Flutter::create(project_dir)?,
-        APP::ReactNative => ReactNative::create(project_dir)?,
+        Framework::IOS => Ios::create(project_dir)?,
+        Framework::Android => Android::create(project_dir)?,
+        Framework::Web => Web::create(project_dir)?,
+        Framework::Flutter => Flutter::create(project_dir)?,
+        Framework::ReactNative => ReactNative::create(project_dir)?,
     }
 
     Ok(())

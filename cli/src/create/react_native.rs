@@ -1,4 +1,4 @@
-use super::{Create, APP};
+use super::{Create, Framework};
 use crate::create::utils::{
     check_bindings, copy_android_bindings, copy_ios_bindings, copy_keys,
     download_and_extract_template,
@@ -16,8 +16,8 @@ impl Create for ReactNative {
     const NAME: &'static str = "react-native";
 
     fn create(project_dir: PathBuf) -> Result<()> {
-        let ios_bindings_dir = check_bindings(&project_dir, APP::IOS)?;
-        let android_bindings_dir = check_bindings(&project_dir, APP::Android)?;
+        let ios_bindings_dir = check_bindings(&project_dir, Framework::IOS)?;
+        let android_bindings_dir = check_bindings(&project_dir, Framework::Android)?;
 
         let target_dir = project_dir.join(Self::NAME);
         if target_dir.exists() {
