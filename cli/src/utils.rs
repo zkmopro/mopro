@@ -3,42 +3,47 @@ use crate::{
     select::multi_select,
 };
 
-pub struct Platforms {
-    platforms: Vec<Adapter>,
+pub fn contains_circom(path: &str) -> bool {
+    path.to_lowercase().contains("circom")
 }
 
-impl Platforms {
+pub fn contains_halo2(path: &str) -> bool {
+    path.to_lowercase().contains("halo2")
+}
+
+pub struct AdapterSelector {
+    adapters: Vec<Adapter>,
+}
+
+impl AdapterSelector {
     pub fn construct(selections: Vec<usize>) -> Self {
-        let mut platforms: Vec<Adapter> = vec![];
+        let mut adapters: Vec<Adapter> = vec![];
         for s in selections {
-            platforms.push(ADAPTERS[s].into());
+            adapters.push(ADAPTERS[s].into());
         }
-        Self { platforms }
+        Self { adapters }
     }
 
     pub fn select() -> Self {
-        let platforms = multi_select(
+        let adapters = multi_select(
             "Pick the adapters you want to use (multiple selection with space)",
             "No adapters selected. Use space to select an adapter",
             ADAPTERS.to_vec(),
         );
 
         Self {
-            platforms: platforms
-                .iter()
-                .map(|&p| p.into())
-                .collect::<Vec<Adapter>>(),
+            adapters: adapters.iter().map(|&p| p.into()).collect::<Vec<Adapter>>(),
         }
     }
 
     pub fn selections(&self) -> Vec<usize> {
-        self.platforms
+        self.adapters
             .iter()
             .map(|p| p.as_usize())
             .collect::<Vec<usize>>()
     }
 
     pub fn contains(&self, adapter: Adapter) -> bool {
-        self.platforms.iter().any(|p| *p == adapter)
+        self.adapters.iter().any(|p| *p == adapter)
     }
 }
