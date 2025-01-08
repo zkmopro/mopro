@@ -4,9 +4,12 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
+use crate::constants::Adapter;
+use crate::constants::ADAPTERS;
+use crate::print::print_init_instructions;
+use crate::utils::Platforms;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Input;
-use dialoguer::MultiSelect;
 use include_dir::include_dir;
 use include_dir::Dir;
 
@@ -29,106 +32,86 @@ pub fn init_project(
         Some(name) => name.to_string(),
     };
 
-    let adapters = vec!["circom", "halo2"];
-
-    let theme = create_custom_theme();
-    let selection = match arg_adapter.as_deref() {
-        None => MultiSelect::with_theme(&theme)
-            .with_prompt("Pick the adapters you want to use (multiple selection with space)")
-            .items(&adapters)
-            .interact()
-            .unwrap(),
+    let platform = match arg_adapter.as_deref() {
+        None => Platforms::select(),
         Some(a) => {
             let mut selection = vec![];
-            for (i, adapter) in adapters.iter().enumerate() {
+            for (i, adapter) in ADAPTERS.iter().enumerate() {
                 if a.contains(adapter) {
                     selection.push(i);
                 }
             }
-            selection
+            Platforms::construct(selection)
         }
     };
 
-    if selection.is_empty() {
-        style::print_yellow("No adapters selected. Use space to select an adapter".to_string());
-        init_project(arg_adapter, &Some(project_name))?;
-    } else {
-        let current_dir = env::current_dir()?;
+    let current_dir = env::current_dir()?;
+    let project_dir = current_dir.join(&project_name);
+    fs::create_dir(&project_dir)?;
 
-        let project_dir = current_dir.join(&project_name);
-        fs::create_dir(&project_dir)?;
+    // Change directory to the project directory
+    env::set_current_dir(&project_dir)?;
+    const TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/init");
 
-        // Change directory to the project directory
-        env::set_current_dir(&project_dir)?;
-        const TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/init");
+    let selections = platform.selections();
+    copy_embedded_dir(&TEMPLATE_DIR, &project_dir, &platform)?;
 
-        copy_embedded_dir(&TEMPLATE_DIR, &project_dir, selection.clone())?;
-
-        if let Some(cargo_toml_path) = project_dir.join("Cargo.toml").to_str() {
-            replace_project_name(cargo_toml_path, &project_name)?;
-            replace_features(
-                cargo_toml_path,
-                selection.iter().map(|&i| adapters[i]).collect(),
-            )?;
-            if selection.contains(&0) {
-                // circom is selected
-                circom_dependencies_template(cargo_toml_path)?;
-            }
-            if selection.contains(&1) {
-                // halo2 is selected
-                halo2_dependencies_template(cargo_toml_path)?;
-            }
+    if let Some(cargo_toml_path) = project_dir.join("Cargo.toml").to_str() {
+        replace_project_name(cargo_toml_path, &project_name)?;
+        replace_features(
+            cargo_toml_path,
+            selections.iter().map(|&i| ADAPTERS[i]).collect(),
+        )?;
+        if platform.contains(Adapter::Circom) {
+            circom_dependencies_template(cargo_toml_path)?;
         }
-
-        if let Some(build_rs_path) = project_dir.join("build.rs").to_str() {
-            if selection.contains(&0) {
-                circom_build_template(build_rs_path)?;
-            }
+        if platform.contains(Adapter::Halo2) {
+            halo2_dependencies_template(cargo_toml_path)?;
         }
-
-        if let Some(lib_rs_path) = project_dir.join("src").join("lib.rs").to_str() {
-            if selection.contains(&0) {
-                // circom is selected
-                circom_lib_template(lib_rs_path)?;
-            }
-            if selection.contains(&1) {
-                // halo2 is selected
-                halo2_lib_template(lib_rs_path)?;
-            }
-        }
-
-        // Store selection
-        let config_path = project_dir.join("Config.toml");
-
-        // Check if the config file exists, if not create a default one
-        if !config_path.exists() {
-            let default_config = Config {
-                target_adapters: HashSet::new(),
-                target_platforms: HashSet::new(),
-            };
-            write_config(&config_path, &default_config)?;
-        }
-        // Read & Write config for selected adapter
-        let mut config = read_config(&config_path)?;
-        for adapter_idx in selection {
-            config
-                .target_adapters
-                .insert(adapters[adapter_idx].to_owned());
-        }
-        write_config(&config_path, &config)?;
-
-        // Print out the instructions
-        print_init_instructions(project_name);
     }
+
+    if let Some(build_rs_path) = project_dir.join("build.rs").to_str() {
+        if platform.contains(Adapter::Circom) {
+            circom_build_template(build_rs_path)?;
+        }
+    }
+
+    if let Some(lib_rs_path) = project_dir.join("src").join("lib.rs").to_str() {
+        if platform.contains(Adapter::Circom) {
+            circom_lib_template(lib_rs_path)?;
+        }
+        if platform.contains(Adapter::Halo2) {
+            halo2_lib_template(lib_rs_path)?;
+        }
+    }
+
+    // Store selection
+    let config_path = project_dir.join("Config.toml");
+
+    // Check if the config file exists, if not create a default one
+    if !config_path.exists() {
+        let default_config = Config {
+            target_adapters: HashSet::new(),
+            target_platforms: HashSet::new(),
+        };
+        write_config(&config_path, &default_config)?;
+    }
+    // Read & Write config for selected adapter
+    let mut config = read_config(&config_path)?;
+    for adapter_idx in selection {
+        config
+            .target_adapters
+            .insert(adapters[adapter_idx].to_owned());
+    }
+    write_config(&config_path, &config)?;
+
+    // Print out the instructions
+    print_init_instructions(project_name);
 
     Ok(())
 }
 
-pub fn copy_embedded_dir(
-    dir: &Dir,
-    output_dir: &Path,
-    selection: Vec<usize>,
-) -> anyhow::Result<()> {
+pub fn copy_embedded_dir(dir: &Dir, output_dir: &Path, platform: &Platforms) -> anyhow::Result<()> {
     for file in dir.entries() {
         let relative_path = file.path();
         let output_path = output_dir.join(relative_path);
@@ -136,12 +119,12 @@ pub fn copy_embedded_dir(
         // Create directories as needed
         if let Some(parent) = output_path.parent() {
             if let Some(path_str) = parent.to_str() {
-                if path_str.contains("circom") && !selection.contains(&0) {
+                if path_str.contains("circom") && !platform.contains(Adapter::Circom) {
                     return Ok(());
                 }
             }
             if let Some(path_str) = parent.to_str() {
-                if path_str.contains("halo2") && !selection.contains(&1) {
+                if path_str.contains("halo2") && !platform.contains(Adapter::Halo2) {
                     return Ok(());
                 }
             }
@@ -152,12 +135,12 @@ pub fn copy_embedded_dir(
         match file.as_file() {
             Some(file) => {
                 if let Some(path_str) = relative_path.to_str() {
-                    if path_str.contains("circom") && !selection.contains(&0) {
+                    if path_str.contains("circom") && !platform.contains(Adapter::Circom) {
                         return Ok(());
                     }
                 }
                 if let Some(path_str) = relative_path.to_str() {
-                    if path_str.contains("halo2") && !selection.contains(&1) {
+                    if path_str.contains("halo2") && !platform.contains(Adapter::Halo2) {
                         return Ok(());
                     }
                 }
@@ -166,7 +149,7 @@ pub fn copy_embedded_dir(
                 }
             }
             None => {
-                copy_embedded_dir(file.as_dir().unwrap(), output_dir, selection.clone())?;
+                copy_embedded_dir(file.as_dir().unwrap(), output_dir, platform)?;
             }
         }
     }
