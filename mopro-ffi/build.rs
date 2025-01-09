@@ -20,10 +20,13 @@ fn main() {
         "stdc++"
     };
 
-    println!("cargo:rustc-link-search=native={}", absolute_lib_path.clone().display());
+    println!(
+        "cargo:rustc-link-search=native={}",
+        absolute_lib_path.clone().display()
+    );
 
     println!("cargo:rustc-link-lib=static=rapidsnark");
-    println!("cargo:rustc-link-lib={cpp_stdlib}");
+    println!("cargo:rustc-link-lib={}", cpp_stdlib);
     println!("cargo:rustc-link-lib=pthread");
     println!("cargo:rustc-link-lib=fr");
     println!("cargo:rustc-link-lib=fq");

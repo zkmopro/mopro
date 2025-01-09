@@ -1,17 +1,17 @@
 use std::ffi::CString;
+use std::fs::File;
 use std::os::raw::c_char;
 use std::os::raw::c_uint;
 use std::str::FromStr;
-use std::fs::File;
 
-use ark_bn254::Bn254;
-use anyhow::Result;
 use anyhow::Context;
-use num_bigint::BigInt;
+use anyhow::Result;
+use ark_bn254::Bn254;
 use ark_circom::read_proving_key;
 use ark_circom::ZkeyHeaderReader;
-use serde::Serialize;
+use num_bigint::BigInt;
 use serde::Deserialize;
+use serde::Serialize;
 
 use super::WtnsFn;
 
@@ -25,7 +25,7 @@ struct VerificationKey {
     vk_beta_2: [[String; 2]; 3],
     vk_gamma_2: [[String; 2]; 3],
     vk_delta_2: [[String; 2]; 3],
-    IC: Vec<[String; 3]>
+    IC: Vec<[String; 3]>,
 }
 
 #[repr(C)]
@@ -38,20 +38,13 @@ extern "C" {
     fn groth16_api_prove(
         zkeyFilename: *const c_char,
         wtnsData: *mut u8,
-        wtnsDataLen: c_uint
+        wtnsDataLen: c_uint,
     ) -> *mut ProofResult;
-    fn groth16_api_verify(
-        proof: *mut ProofResult,
-        key_json: *const c_char
-    ) -> bool;
+    fn groth16_api_verify(proof: *mut ProofResult, key_json: *const c_char) -> bool;
     fn free_proof_result(result: *mut ProofResult);
 }
 
-pub fn verify_proof(
-    zkey_path: &str,
-    proof: String,
-    public_signals: String,
-) -> Result<bool>{
+pub fn verify_proof(zkey_path: &str, proof: String, public_signals: String) -> Result<bool> {
     let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
     header_reader.read();
     let file = File::open(&zkey_path)?;
@@ -71,45 +64,25 @@ pub fn verify_proof(
             "1".to_string(),
         ],
         vk_beta_2: [
-            [
-                vk.beta_g2.x.c0.to_string(),
-                vk.beta_g2.x.c1.to_string()
-            ],
-            [
-                vk.beta_g2.y.c0.to_string(),
-                vk.beta_g2.y.c1.to_string()
-            ],
-            ["1".to_string(), "0".to_string()]
+            [vk.beta_g2.x.c0.to_string(), vk.beta_g2.x.c1.to_string()],
+            [vk.beta_g2.y.c0.to_string(), vk.beta_g2.y.c1.to_string()],
+            ["1".to_string(), "0".to_string()],
         ],
         vk_gamma_2: [
-            [
-                vk.gamma_g2.x.c0.to_string(),
-                vk.gamma_g2.x.c1.to_string()
-            ],
-            [
-                vk.gamma_g2.y.c0.to_string(),
-                vk.gamma_g2.y.c1.to_string()
-            ],
-            ["1".to_string(), "0".to_string()]
+            [vk.gamma_g2.x.c0.to_string(), vk.gamma_g2.x.c1.to_string()],
+            [vk.gamma_g2.y.c0.to_string(), vk.gamma_g2.y.c1.to_string()],
+            ["1".to_string(), "0".to_string()],
         ],
         vk_delta_2: [
-            [
-                vk.delta_g2.x.c0.to_string(),
-                vk.delta_g2.x.c1.to_string()
-            ],
-            [
-                vk.delta_g2.y.c0.to_string(),
-                vk.delta_g2.y.c1.to_string()
-            ],
-            ["1".to_string(), "0".to_string()]
+            [vk.delta_g2.x.c0.to_string(), vk.delta_g2.x.c1.to_string()],
+            [vk.delta_g2.y.c0.to_string(), vk.delta_g2.y.c1.to_string()],
+            ["1".to_string(), "0".to_string()],
         ],
-        IC: vk.gamma_abc_g1.iter().map(|p| {
-            [
-                p.x.to_string(),
-                p.y.to_string(),
-                "1".to_string(),
-            ]
-        }).collect()
+        IC: vk
+            .gamma_abc_g1
+            .iter()
+            .map(|p| [p.x.to_string(), p.y.to_string(), "1".to_string()])
+            .collect(),
     };
     let vkey_json = serde_json::to_string(&vkey)?;
     unsafe {
@@ -118,7 +91,7 @@ pub fn verify_proof(
                 proof: CString::new(proof).unwrap().into_raw(),
                 public_signals: CString::new(public_signals).unwrap().into_raw(),
             },
-            vkey_json.as_ptr() as *const c_char
+            vkey_json.as_ptr() as *const c_char,
         );
         Ok(result)
     }
@@ -153,17 +126,12 @@ pub fn generate_proof(
         .flatten()
         .collect::<Vec<_>>();
 
-
     // Convert Rust strings to C strings
-    let zkey_cstr = CString::new(zkey_path)
-            .context("Failed to create CString for zkey path")?;
+    let zkey_cstr = CString::new(zkey_path).context("Failed to create CString for zkey path")?;
 
     unsafe {
-        let proof_ptr = groth16_api_prove(
-            zkey_cstr.as_ptr(),
-            wtns.as_mut_ptr(),
-            wtns.len() as c_uint
-        );
+        let proof_ptr =
+            groth16_api_prove(zkey_cstr.as_ptr(), wtns.as_mut_ptr(), wtns.len() as c_uint);
 
         if proof_ptr.is_null() {
             return Err(anyhow::anyhow!("Proof generation failed"));
@@ -179,6 +147,6 @@ pub fn generate_proof(
             .into_owned();
 
         free_proof_result(proof_ptr);
-        Ok((proof,public_signals))
+        Ok((proof, public_signals))
     }
 }
