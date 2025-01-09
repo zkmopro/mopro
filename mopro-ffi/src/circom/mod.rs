@@ -260,7 +260,9 @@ mod tests {
     use std::ops::{Add, Mul};
     use std::str::FromStr;
 
-    use crate::circom::{generate_circom_proof_wtns, rapidsnark, serialization, verify_circom_proof, WtnsFn};
+    use crate::circom::{
+        generate_circom_proof_wtns, rapidsnark, serialization, verify_circom_proof, WtnsFn,
+    };
     use crate::GenerateProofResult;
     use anyhow::bail;
     use anyhow::Result;
@@ -377,7 +379,8 @@ mod tests {
         inputs.insert("a".to_string(), vec![a.to_string()]);
         inputs.insert("b".to_string(), vec![b.to_string()]);
 
-        let (proof_json, public_signals_json) = rapidsnark::generate_proof(&zkey_path, inputs, multiplier2_witness)?;
+        let (proof_json, public_signals_json) =
+            rapidsnark::generate_proof(&zkey_path, inputs, multiplier2_witness)?;
         let valid = rapidsnark::verify_proof(&zkey_path, proof_json, public_signals_json)?;
         if !valid {
             bail!("Proof is invalid");
@@ -398,7 +401,8 @@ mod tests {
         let inputs = bytes_to_circuit_inputs(&input_vec);
 
         // Generate Proof
-        let (proof_json, public_signals_json) = rapidsnark::generate_proof(&zkey_path, inputs, keccak256256test_witness)?;
+        let (proof_json, public_signals_json) =
+            rapidsnark::generate_proof(&zkey_path, inputs, keccak256256test_witness)?;
         let valid = rapidsnark::verify_proof(&zkey_path, proof_json, public_signals_json)?;
         if !valid {
             bail!("Proof is invalid");
