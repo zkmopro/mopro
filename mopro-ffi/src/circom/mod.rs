@@ -1,3 +1,4 @@
+mod rapidsnark;
 pub mod serialization;
 
 use anyhow::bail;
@@ -259,7 +260,7 @@ mod tests {
     use std::ops::{Add, Mul};
     use std::str::FromStr;
 
-    use crate::circom::{generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn};
+    use crate::circom::{generate_circom_proof_wtns, rapidsnark, serialization, verify_circom_proof, WtnsFn};
     use crate::GenerateProofResult;
     use anyhow::bail;
     use anyhow::Result;
@@ -359,6 +360,50 @@ mod tests {
             .collect();
         let circom_outputs = serialization::SerializableInputs::<Bn254>(field_bits);
         serialization::serialize_inputs(&circom_outputs)
+    }
+
+    #[test]
+    fn test_prove_rapidsnark() -> Result<()> {
+        // Create a new MoproCircom instance
+        let zkey_path = "../test-vectors/circom/multiplier2_final.zkey".to_string();
+
+        let mut inputs = HashMap::new();
+        let a = BigInt::from_str(
+            "21888242871839275222246405745257275088548364400416034343698204186575808495616",
+        )
+        .unwrap();
+        let b = BigInt::from(1u8);
+        let c = a.clone() * b.clone();
+        inputs.insert("a".to_string(), vec![a.to_string()]);
+        inputs.insert("b".to_string(), vec![b.to_string()]);
+
+        let (proof_json, public_signals_json) = rapidsnark::generate_proof(&zkey_path, inputs, multiplier2_witness)?;
+        let valid = rapidsnark::verify_proof(&zkey_path, proof_json, public_signals_json)?;
+        if !valid {
+            bail!("Proof is invalid");
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_prove_rapidsnark_keccak() -> Result<()> {
+        // Create a new MoproCircom instance
+        let zkey_path = "../test-vectors/circom/keccak256_256_test_final.zkey".to_string();
+        // Prepare inputs
+        let input_vec = vec![
+            116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+        ];
+
+        let inputs = bytes_to_circuit_inputs(&input_vec);
+
+        // Generate Proof
+        let (proof_json, public_signals_json) = rapidsnark::generate_proof(&zkey_path, inputs, keccak256256test_witness)?;
+        let valid = rapidsnark::verify_proof(&zkey_path, proof_json, public_signals_json)?;
+        if !valid {
+            bail!("Proof is invalid");
+        }
+        Ok(())
     }
 
     #[test]
