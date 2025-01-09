@@ -116,32 +116,37 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
     let mut unselectable = Vec::new();
 
     for &template in TEMPLATES.iter() {
-        if template == "flutter" || template == "react-native" {
-            // Adding more information on the list
-            let requires = ["ios", "android"];
-            let missing: Vec<&str> = requires
-                .iter()
-                .filter(|&&req| !config.target_platforms.contains(req))
-                .cloned()
-                .collect();
+        match template {
+            "flutter" | "react-native" => {
+                // Adding more information to the list
+                let requires = ["ios", "android"];
+                let missing: Vec<&str> = requires
+                    .iter()
+                    .filter(|&&req| !config.target_platforms.contains(req))
+                    .cloned()
+                    .collect();
 
-            if !missing.is_empty() {
-                items.push(format!(
-                    "{:<12} - Requires {} binding(s)",
-                    template,
-                    missing.join("/")
-                ));
-                unselectable.push(true);
-                continue;
+                if !missing.is_empty() {
+                    items.push(format!(
+                        "{:<12} - Requires {} binding(s)",
+                        template,
+                        missing.join("/")
+                    ));
+                    unselectable.push(true);
+                } else {
+                    items.push(template.to_string());
+                    unselectable.push(false);
+                }
             }
-        }
-
-        if config.target_platforms.contains(template) {
-            items.push(template.to_string());
-            unselectable.push(false);
-        } else {
-            items.push(format!("{:<12} - Require binding", template));
-            unselectable.push(true);
+            _ => {
+                if config.target_platforms.contains(template) {
+                    items.push(template.to_string());
+                    unselectable.push(false);
+                } else {
+                    items.push(format!("{:<12} - Require binding", template));
+                    unselectable.push(true);
+                }
+            }
         }
     }
 
