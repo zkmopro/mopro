@@ -14,6 +14,7 @@ Depending on what platforms and adapters you use, there are several prerequisite
 -   Android
     -   [Android Studio](https://developer.android.com/studio)
     -   Also see [configuration](#android-configuration) below
+    -   [JDK(Java Development Kit)](https://www.oracle.com/java/technologies/downloads)
 -   Web(WASM)
     -   [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
     -   [Download Chrome/ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/)
