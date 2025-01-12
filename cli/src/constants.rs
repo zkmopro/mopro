@@ -1,4 +1,9 @@
 pub const MODES: [&str; 2] = ["debug", "release"];
+
+//
+// Architeture Section
+//
+
 // Note that *_ARCH should align with `ios.rs` and `andriod.rs` in "mopro-ffi/src/app_config"
 pub const IOS_ARCHS: [&str; 3] = [
     "aarch64-apple-ios",
@@ -84,6 +89,10 @@ impl From<AndroidArch> for &str {
     }
 }
 
+//
+// Platform Section
+//
+
 pub const PLATFORMS: [&str; 3] = ["ios", "android", "web"];
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Platform {
@@ -141,6 +150,10 @@ impl From<Platform> for &str {
     }
 }
 
+//
+// Adapter Section
+//
+
 pub const ADAPTERS: [&str; 2] = ["circom", "halo2"];
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Adapter {
@@ -167,5 +180,43 @@ impl From<&str> for Adapter {
 impl From<usize> for Adapter {
     fn from(idx: usize) -> Self {
         ADAPTERS[idx].into()
+    }
+}
+
+//
+// Framework Section
+//
+
+pub const FRAMEWORKS: [&str; 5] = ["ios", "android", "web", "flutter", "react-native"];
+pub enum Framework {
+    Ios,
+    Android,
+    Web,
+    Flutter,
+    ReactNative,
+}
+
+impl From<String> for Framework {
+    fn from(app: String) -> Self {
+        match app.to_lowercase().as_str() {
+            "ios" => Framework::Ios,
+            "android" => Framework::Android,
+            "web" => Framework::Web,
+            "flutter" => Framework::Flutter,
+            "react-native" => Framework::ReactNative,
+            _ => panic!("Unknown platform selected."),
+        }
+    }
+}
+
+impl From<Framework> for &str {
+    fn from(app: Framework) -> Self {
+        match app {
+            Framework::Ios => "ios",
+            Framework::Android => "android",
+            Framework::Web => "web",
+            Framework::Flutter => "flutter",
+            Framework::ReactNative => "react-native",
+        }
     }
 }
