@@ -106,6 +106,10 @@ impl Platform {
         *self as usize
     }
 
+    pub fn as_str(&self) -> &str {
+        (*self).into()
+    }
+
     pub fn arch_key(&self) -> &str {
         match self {
             Self::Ios => "IOS_ARCHS",

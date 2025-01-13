@@ -7,11 +7,13 @@ use crate::{
 };
 
 pub fn contains_circom(path: &str) -> bool {
-    path.to_lowercase().contains("circom")
+    path.to_lowercase()
+        .contains(ADAPTERS[Adapter::Circom.as_usize()])
 }
 
 pub fn contains_halo2(path: &str) -> bool {
-    path.to_lowercase().contains("halo2")
+    path.to_lowercase()
+        .contains(ADAPTERS[Adapter::Halo2.as_usize()])
 }
 
 pub struct AdapterSelector {
@@ -104,7 +106,7 @@ impl PlatformSelector {
                     .iter()
                     .map(|&i| IOS_ARCHS[i].to_string())
                     .collect::<Vec<String>>();
-                archs.insert("iOS".to_string(), sel_str);
+                archs.insert(String::from(Platform::Ios.as_str()), sel_str);
             }
             Platform::Android => {
                 let sel = Self::select_multi_archs(p.into(), &ANDROID_ARCHS);
@@ -112,7 +114,7 @@ impl PlatformSelector {
                     .iter()
                     .map(|&i| ANDROID_ARCHS[i].to_string())
                     .collect::<Vec<String>>();
-                archs.insert("Android".to_string(), sel_str);
+                archs.insert(String::from(Platform::Android.as_str()), sel_str);
             }
             Platform::Web => {}
         });
@@ -129,7 +131,7 @@ impl PlatformSelector {
             )
             .as_str(),
             archs.to_vec(),
-            vec![],
+            vec![true; archs.len()],
         )
     }
 }
