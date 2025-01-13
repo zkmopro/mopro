@@ -18,3 +18,4 @@ toml = "0.8.19"
 zip = "2.2.1"
 reqwest = { version= "0.12.9", features = ["blocking"] }
 indicatif = "0.17.9"
+serde = { version = "1.0.216", features = ["derive"] }

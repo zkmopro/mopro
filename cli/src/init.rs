@@ -1,15 +1,21 @@
-use crate::print::print_init_instructions;
-use crate::style;
-use crate::style::create_custom_theme;
+use std::collections::HashSet;
+use std::env;
+use std::fs;
+use std::io::Write;
+use std::path::Path;
+
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Input;
 use dialoguer::MultiSelect;
 use include_dir::include_dir;
 use include_dir::Dir;
-use std::env;
-use std::fs;
-use std::io::Write;
-use std::path::Path;
+
+use crate::config::read_config;
+use crate::config::write_config;
+use crate::config::Config;
+use crate::print::print_init_instructions;
+use crate::style;
+use crate::style::create_custom_theme;
 
 pub fn init_project(
     arg_adapter: &Option<String>,
@@ -91,9 +97,30 @@ pub fn init_project(
             }
         }
 
+        // Store selection
+        let config_path = project_dir.join("Config.toml");
+
+        // Check if the config file exists, if not create a default one
+        if !config_path.exists() {
+            let default_config = Config {
+                target_adapters: HashSet::new(),
+                target_platforms: HashSet::new(),
+            };
+            write_config(&config_path, &default_config)?;
+        }
+        // Read & Write config for selected adapter
+        let mut config = read_config(&config_path)?;
+        for adapter_idx in selection {
+            config
+                .target_adapters
+                .insert(adapters[adapter_idx].to_owned());
+        }
+        write_config(&config_path, &config)?;
+
         // Print out the instructions
         print_init_instructions(project_name);
     }
+
     Ok(())
 }
 
@@ -191,7 +218,9 @@ fn circom_build_template(file_path: &str) -> anyhow::Result<()> {
 
 fn halo2_dependencies_template(file_path: &str) -> anyhow::Result<()> {
     let replacement =
-        "plonk-fibonacci = { package = \"plonk-fibonacci\", git = \"https://github.com/sifnoc/plonkish-fibonacci-sample.git\" }";
+        "plonk-fibonacci = { package = \"plonk-fibonacci\", git = \"https://github.com/sifnoc/plonkish-fibonacci-sample.git\" }
+hyperplonk-fibonacci = { package = \"hyperplonk-fibonacci\", git = \"https://github.com/sifnoc/plonkish-fibonacci-sample.git\" }
+gemini-fibonacci = { package = \"gemini-fibonacci\", git = \"https://github.com/sifnoc/plonkish-fibonacci-sample.git\" }";
     let target = "# HALO2_DEPENDENCIES";
     replace_string_in_file(file_path, target, replacement)
 }
