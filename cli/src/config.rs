@@ -6,11 +6,23 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 
+use crate::constants::Adapter;
+
 // Storing user selections while interating with mopro cli
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Config {
     pub(crate) target_adapters: HashSet<String>,
     pub(crate) target_platforms: HashSet<String>,
+}
+
+impl Config {
+    pub fn adpater_eq(&self, adapter: Adapter) -> bool {
+        self.target_adapters == HashSet::from([String::from(adapter.as_str())])
+    }
+
+    pub fn adpater_contains(&self, adapter: Adapter) -> bool {
+        self.target_adapters.contains(adapter.as_str())
+    }
 }
 
 pub fn read_config(file_path: &PathBuf) -> Result<Config> {

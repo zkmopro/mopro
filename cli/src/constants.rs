@@ -165,6 +165,10 @@ impl Adapter {
     pub fn as_usize(&self) -> usize {
         *self as usize
     }
+
+    pub fn as_str(&self) -> &str {
+        (*self).into()
+    }
 }
 
 impl From<&str> for Adapter {
@@ -173,6 +177,15 @@ impl From<&str> for Adapter {
             "circom" => Adapter::Circom,
             "halo2" => Adapter::Halo2,
             _ => panic!("Unknown adapter selected."),
+        }
+    }
+}
+
+impl From<Adapter> for &str {
+    fn from(adapter: Adapter) -> Self {
+        match adapter {
+            Adapter::Circom => "circom",
+            Adapter::Halo2 => "halo2",
         }
     }
 }
@@ -186,14 +199,27 @@ impl From<usize> for Adapter {
 //
 // Framework Section
 //
-
-pub const FRAMEWORKS: [&str; 5] = ["ios", "android", "web", "flutter", "react-native"];
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Framework {
     Ios,
     Android,
     Web,
     Flutter,
     ReactNative,
+}
+
+pub const FRAMEWORKS: [Framework; 5] = [
+    Framework::Ios,
+    Framework::Android,
+    Framework::Web,
+    Framework::Flutter,
+    Framework::ReactNative,
+];
+
+impl Framework {
+    pub fn as_str(&self) -> &str {
+        (*self).into()
+    }
 }
 
 impl From<String> for Framework {
@@ -210,13 +236,20 @@ impl From<String> for Framework {
 }
 
 impl From<Framework> for &str {
-    fn from(app: Framework) -> Self {
-        match app {
+    fn from(framework: Framework) -> Self {
+        match framework {
             Framework::Ios => "ios",
             Framework::Android => "android",
             Framework::Web => "web",
             Framework::Flutter => "flutter",
             Framework::ReactNative => "react-native",
         }
+    }
+}
+
+impl From<Framework> for String {
+    fn from(framework: Framework) -> Self {
+        let str: &str = framework.into();
+        str.into()
     }
 }

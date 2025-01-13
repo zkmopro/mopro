@@ -19,9 +19,6 @@ use include_dir::Dir;
 use crate::config::read_config;
 use crate::config::write_config;
 use crate::config::Config;
-use crate::print::print_init_instructions;
-use crate::style;
-use crate::style::create_custom_theme;
 
 mod circom;
 use circom::Circom;
@@ -112,10 +109,10 @@ pub fn init_project(
     }
     // Read & Write config for selected adapter
     let mut config = read_config(&config_path)?;
-    for adapter_idx in selection {
+    for adapter_idx in adapter_sel.selections() {
         config
             .target_adapters
-            .insert(adapters[adapter_idx].to_owned());
+            .insert(ADAPTERS[adapter_idx].to_owned());
     }
     write_config(&config_path, &config)?;
 

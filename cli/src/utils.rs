@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
+    config::Config,
     constants::{Adapter, Platform, ADAPTERS, ANDROID_ARCHS, IOS_ARCHS, PLATFORMS},
     select::multi_select,
 };
@@ -31,6 +32,7 @@ impl AdapterSelector {
             "Pick the adapters you want to use (multiple selection with space)",
             "No adapters selected. Use space to select an adapter",
             ADAPTERS.to_vec(),
+            vec![],
         );
 
         Self {
@@ -63,11 +65,18 @@ impl PlatformSelector {
         Self { platforms }
     }
 
-    pub fn select() -> Self {
+    pub fn select(config: &Config) -> Self {
+        // defaults based on previous selections.
+        let defaults: Vec<bool> = PLATFORMS
+            .iter()
+            .map(|&platform| config.target_platforms.contains(platform))
+            .collect();
+
         let platforms = multi_select(
             "Select platform(s) to build for (multiple selection with space)",
             "No platforms selected. Please select at least one platform.",
             PLATFORMS.to_vec(),
+            defaults,
         );
 
         Self {
@@ -76,6 +85,10 @@ impl PlatformSelector {
                 .map(|&p| p.into())
                 .collect::<Vec<Platform>>(),
         }
+    }
+
+    pub fn eq(&self, platforms: &Vec<Platform>) -> bool {
+        self.platforms.eq(platforms)
     }
 
     pub fn contains(&self, platform: Platform) -> bool {
@@ -116,6 +129,7 @@ impl PlatformSelector {
             )
             .as_str(),
             archs.to_vec(),
+            vec![],
         )
     }
 }
