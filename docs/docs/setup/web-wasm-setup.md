@@ -51,11 +51,6 @@ wasm-bindgen-test = "0.3.42"
 
 The `mopro-wasm` crate no longer required for compiling users-defined circuit implementation: **"my-halo2-circuit"** in that case.
 
-```shell
-mopro-wasm-lib $ rustup run nightly-2024-07-18 wasm-pack build --target web --out-dir MoproWasmBindings
-```
-
-
 ### 2. Create Wrapper Functions for Generate/Verify proof method
 
 To compile Wasm code with the circuit, wrapper functions for generating and verifying proof methods in the user-defined circuit implementation must be created in `mopro-wasm-lib/src/lib.rs`, using the example structure provided below:
@@ -78,16 +73,15 @@ pub fn verify_proof(proof: JsValue, public_inputs: JsValue) -> Result<JsValue, J
 }
 ```
 
-### 3. Build the Wasm Package
+### 3. Build again for web
 
-The following command builds the wasm package in "mopro-wasm-lib":
+To ensure a clean build, remove the existing `MoproWasmBindings` directory in the `mopro-example-app`, which was previously generated with `mopro-wasm-lib`.
+Then, execute the `mopro build` command again, selecting the "web" platform in `mopro-example-app`:
 
 ```shell
-mopro-wasm-lib $ wasm-pack build --target web --out-name my-halo2-circuit
+mopro-example-app $ rm -rf MoproWasmBindings
+mopro-example-app $ mopro build
 ```
-
-The generated wasm files will be located in the "pkg" folder. Refer to the [**wasm-pack**](https://rustwasm.github.io/wasm-pack/book/) documentation for more details.
-
 
 ### 4. **Integrate the Wasm Code**:
 
@@ -105,3 +99,5 @@ async function generateProof (input) {
 ```
 
 Initializing with `initThreadPool` is necessary to enable multi-threading n WebAssembly within the browser.
+
+Note that the web template generated using the `mopro create` command is currently built only for example circuit implementations: `plonk-fibonacci`, `hyperplonk-fibonacci` and `gemini-fibonacci`. User should modify `index.js` and `index.html` manually if want to use the web template with users' circuit implementation, such as `my-halo2-circuit` in this tutorial.
