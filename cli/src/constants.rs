@@ -1,4 +1,23 @@
-pub const MODES: [&str; 2] = ["debug", "release"];
+pub enum Mode {
+    Debug,
+    Release,
+}
+
+pub struct ModeInfo {
+    pub mode: Mode,
+    pub str: &'static str,
+}
+
+pub const MODES: [ModeInfo; 2] = [
+    ModeInfo {
+        mode: Mode::Debug,
+        str: "debug",
+    },
+    ModeInfo {
+        mode: Mode::Release,
+        str: "release",
+    },
+];
 
 //
 // Architeture Section
@@ -37,7 +56,15 @@ impl IosArch {
             .iter()
             .find(|info| info.arch == *self)
             .map(|info| info.str)
-            .expect("Unsupported Ios Arch")
+            .expect("Unsupported iOS Arch")
+    }
+
+    pub fn from_str(s: &str) -> Self {
+        IOS_ARCHS
+            .iter()
+            .find(|info| info.str.to_lowercase() == s.to_lowercase())
+            .map(|info| info.arch)
+            .expect("Unsupported iOS String")
     }
 
     pub fn from_idx(idx: usize) -> Self {
@@ -90,12 +117,26 @@ impl AndroidArch {
             .expect("Unsupported Android Arch")
     }
 
+    pub fn from_str(s: &str) -> Self {
+        ANDROID_ARCHS
+            .iter()
+            .find(|info| info.str.to_lowercase() == s.to_lowercase())
+            .map(|info| info.arch)
+            .expect("Unsupported Android String")
+    }
+
     pub fn from_idx(idx: usize) -> Self {
         ANDROID_ARCHS[idx].arch
     }
 
     pub fn all_strings() -> Vec<&'static str> {
         ANDROID_ARCHS.iter().map(|info| info.str).collect()
+    }
+
+    pub fn contains(arch: &str) -> bool {
+        ANDROID_ARCHS
+            .iter()
+            .any(|f| f.str.to_lowercase() == arch.to_lowercase())
     }
 }
 

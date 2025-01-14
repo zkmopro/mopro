@@ -2689,6 +2689,7 @@ dependencies = [
  "color-eyre",
  "gemini-fibonacci",
  "hyperplonk-fibonacci",
+ "mopro-cli",
  "num-bigint",
  "num-traits",
  "plonk-fibonacci",

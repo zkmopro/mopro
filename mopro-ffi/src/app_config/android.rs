@@ -2,6 +2,7 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
+use mopro_cli::AndroidArch;
 use uniffi::generate_bindings;
 use uniffi::KotlinBindingGenerator;
 
@@ -9,14 +10,6 @@ use super::cleanup_tmp_local;
 use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
-
-// This variable should be align with `cli/build.rs`
-pub const ANDROID_ARCHS: [&str; 4] = [
-    "x86_64-linux-android",
-    "i686-linux-android",
-    "armv7-linux-androideabi",
-    "aarch64-linux-android",
-];
 
 pub fn build() {
     let cwd = std::env::current_dir().expect("Failed to get current directory");
@@ -35,28 +28,22 @@ pub fn build() {
         _ => panic!("Unknown configuration: {}", mode),
     };
 
-    let target_archs: Vec<String> = if let Ok(android_archs) = std::env::var("ANDROID_ARCHS") {
-        android_archs
+    let target_archs: Vec<AndroidArch> = if let Ok(archs_str) = std::env::var("ANDROID_ARCHS") {
+        archs_str
             .split(',')
-            .map(|arch| arch.to_string())
+            .map(|arch| AndroidArch::from_str(arch))
             .collect()
     } else {
         // Default case: select all supported architectures if none are provided
-        ANDROID_ARCHS.iter().map(|arch| arch.to_string()).collect()
+        AndroidArch::all_strings()
+            .iter()
+            .map(|s| AndroidArch::from_str(s))
+            .collect()
     };
-
-    // Check 'ANDRIOD_ARCH' input validation
-    for arch in &target_archs {
-        assert!(
-            ANDROID_ARCHS.contains(&arch.as_str()),
-            "Unsupported architecture: {}",
-            arch
-        );
-    }
 
     install_ndk();
     for arch in target_archs {
-        build_for_arch(&arch, &build_dir, &bindings_out, &mode);
+        build_for_arch(arch, &build_dir, &bindings_out, &mode);
     }
 
     generate_bindings(
@@ -74,14 +61,14 @@ pub fn build() {
     cleanup_tmp_local(&build_dir);
 }
 
-fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str) {
-    install_arch(arch.to_string());
+fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode: &str) {
+    install_arch(arch.as_str().to_string());
 
     let mut build_cmd = Command::new("cargo");
     build_cmd
         .arg("ndk")
         .arg("-t")
-        .arg(arch)
+        .arg(arch.as_str())
         .arg("build")
         .arg("--lib");
     if mode == "release" {
@@ -89,24 +76,24 @@ fn build_for_arch(arch: &str, build_dir: &Path, bindings_out: &Path, mode: &str)
     }
     build_cmd
         .env("CARGO_BUILD_TARGET_DIR", build_dir)
-        .env("CARGO_BUILD_TARGET", arch)
+        .env("CARGO_BUILD_TARGET", arch.as_str())
         .spawn()
         .expect("Failed to spawn cargo build")
         .wait()
         .expect("cargo build errored");
 
+    // FIXME move these string to a single file
     let folder = match arch {
-        "x86_64-linux-android" => "x86_64",
-        "i686-linux-android" => "x86",
-        "armv7-linux-androideabi" => "armeabi-v7a",
-        "aarch64-linux-android" => "arm64-v8a",
-        _ => panic!("Unknown target architecture: {}", arch),
+        AndroidArch::X8664Linux => "x86_64",
+        AndroidArch::I686Linux => "x86",
+        AndroidArch::Armv7LinuxAbi => "armeabi-v7a",
+        AndroidArch::Aarch64Linux => "arm64-v8a",
     };
 
     let out_lib_path = build_dir.join(format!(
         "{}/{}/{}/libmopro_bindings.so",
         build_dir.display(),
-        arch,
+        arch.as_str(),
         mode
     ));
     let out_lib_dest = bindings_out.join(format!("jniLibs/{}/libuniffi_mopro.so", folder));

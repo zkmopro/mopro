@@ -2,19 +2,13 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use mopro_cli::IosArch;
 use uniffi::generate_bindings;
 use uniffi::SwiftBindingGenerator;
 
 use super::cleanup_tmp_local;
 use super::install_arch;
 use super::mktemp_local;
-
-// This variable should be align with `cli/build.rs`
-pub const IOS_ARCHS: [&str; 3] = [
-    "aarch64-apple-ios",
-    "aarch64-apple-ios-sim",
-    "x86_64-apple-ios",
-];
 
 // Load environment variables that are specified by by xcode
 pub fn build() {
@@ -44,21 +38,18 @@ pub fn build() {
         mode = "debug";
     }
 
-    let target_archs: Vec<String> = if let Ok(ios_archs) = std::env::var("IOS_ARCHS") {
-        ios_archs.split(',').map(|arch| arch.to_string()).collect()
+    let target_archs: Vec<IosArch> = if let Ok(archs_str) = std::env::var("IOS_ARCHS") {
+        archs_str
+            .split(',')
+            .map(|arch| IosArch::from_str(arch))
+            .collect()
     } else {
         // Default case: select all supported architectures if none are provided
-        IOS_ARCHS.iter().map(|&arch| arch.to_string()).collect()
+        IosArch::all_strings()
+            .iter()
+            .map(|s| IosArch::from_str(s))
+            .collect()
     };
-
-    // Check 'IOS_ARCH' input validation
-    for arch in &target_archs {
-        assert!(
-            IOS_ARCHS.contains(&arch.as_str()),
-            "Unsupported architecture: {}",
-            arch
-        );
-    }
 
     // Take a list of architectures, build them, and combine them into
     // a single universal binary/archive
@@ -164,7 +155,7 @@ pub fn build() {
 }
 
 // More general cases
-fn group_target_archs(target_archs: &[String]) -> Vec<Vec<&str>> {
+fn group_target_archs(target_archs: &Vec<IosArch>) -> Vec<Vec<&str>> {
     // Detect the current architecture
     let current_arch = std::env::consts::ARCH;
 
@@ -178,15 +169,14 @@ fn group_target_archs(target_archs: &[String]) -> Vec<Vec<&str>> {
     let mut device_archs = Vec::new();
     let mut simulator_archs = Vec::new();
 
-    for arch in target_archs.iter().map(String::as_str) {
-        if arch.ends_with("sim") {
-            simulator_archs.push(arch);
-        } else if arch.starts_with(device_prefix) {
-            device_archs.push(arch);
+    target_archs.iter().for_each(|arch| {
+        let arch_str = arch.as_str();
+        if arch_str.starts_with(device_prefix) {
+            device_archs.push(arch_str);
         } else {
-            simulator_archs.push(arch);
+            simulator_archs.push(arch_str);
         }
-    }
+    });
 
     let mut grouped_archs = Vec::new();
     if !device_archs.is_empty() {
