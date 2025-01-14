@@ -1,9 +1,11 @@
 use std::env;
-use std::fmt::Display;
 use std::path::PathBuf;
 
+use crate::config::read_config;
+use crate::constants::{Framework, Platform, FRAMEWORKS};
+use crate::style;
 use anyhow::Error;
-use dialoguer::console::Term;
+use console::Term;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Select;
 
@@ -16,8 +18,6 @@ use web::Web;
 mod flutter;
 use flutter::Flutter;
 mod react_native;
-use crate::config::read_config;
-use crate::style;
 use react_native::ReactNative;
 pub mod utils;
 
@@ -26,61 +26,6 @@ trait Create {
     fn create(project_dir: PathBuf) -> Result<(), Error>;
     fn print_message();
 }
-
-#[derive(Clone, PartialEq, Eq)]
-pub enum Framework {
-    Ios,
-    Android,
-    Web,
-    Flutter,
-    ReactNative,
-}
-
-impl Display for Framework {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let as_str = match self {
-            Framework::Ios => "ios",
-            Framework::Android => "android",
-            Framework::Web => "web",
-            Framework::Flutter => "flutter",
-            Framework::ReactNative => "react-native",
-        };
-        write!(f, "{}", as_str)
-    }
-}
-
-impl From<String> for Framework {
-    fn from(app: String) -> Self {
-        match app.to_lowercase().as_str() {
-            "ios" => Framework::Ios,
-            "android" => Framework::Android,
-            "web" => Framework::Web,
-            "flutter" => Framework::Flutter,
-            "react-native" => Framework::ReactNative,
-            _ => panic!("Unknown platform selected."),
-        }
-    }
-}
-
-impl From<Framework> for &str {
-    fn from(app: Framework) -> Self {
-        match app {
-            Framework::Ios => "ios",
-            Framework::Android => "android",
-            Framework::Web => "web",
-            Framework::Flutter => "flutter",
-            Framework::ReactNative => "react-native",
-        }
-    }
-}
-
-const FRAMEWORKS: [Framework; 5] = [
-    Framework::Ios,
-    Framework::Android,
-    Framework::Web,
-    Framework::Flutter,
-    Framework::ReactNative,
-];
 
 pub fn create_project(arg_framework: &Option<String>) -> anyhow::Result<()> {
     let framework: String = match arg_framework.as_deref() {
@@ -119,7 +64,7 @@ fn select_framework() -> anyhow::Result<String> {
         if unselectable[selected_idx] {
             style::print_yellow(format!(
                 "Cannot create {} template - build binding first",
-                &FRAMEWORKS[selected_idx]
+                FRAMEWORKS[selected_idx].as_str()
             ));
             return select_framework();
         }
@@ -137,34 +82,35 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
     let mut unselectable = Vec::new();
 
     for framework in FRAMEWORKS.iter() {
+        let framework_str: String = (*framework).into();
         match framework {
             Framework::Flutter | Framework::ReactNative => {
                 // Adding more information to the list
-                let requires = ["ios", "android"];
+                let requires = [Platform::Ios, Platform::Android];
                 let missing: Vec<&str> = requires
                     .iter()
-                    .filter(|&&req| !config.target_platforms.contains(req))
-                    .cloned()
+                    .filter(|&&req| !config.target_platforms.contains(req.into()))
+                    .map(|&r| r.into())
                     .collect();
 
                 if !missing.is_empty() {
                     items.push(format!(
                         "{:<12} - Requires {} binding(s)",
-                        framework,
+                        framework_str.as_str(),
                         missing.join("/")
                     ));
                     unselectable.push(true);
                 } else {
-                    items.push(framework.to_string());
+                    items.push(framework_str);
                     unselectable.push(false);
                 }
             }
             _ => {
-                if config.target_platforms.contains(&framework.to_string()) {
-                    items.push(framework.to_string());
+                if config.target_platforms.contains(&framework_str) {
+                    items.push(framework_str);
                     unselectable.push(false);
                 } else {
-                    items.push(format!("{:<12} - Require binding", framework));
+                    items.push(format!("{:<12} - Require binding", framework_str.as_str()));
                     unselectable.push(true);
                 }
             }

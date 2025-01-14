@@ -3,10 +3,13 @@ use clap::Subcommand;
 
 mod build;
 mod config;
+mod constants;
 mod create;
 mod init;
 mod print;
+mod select;
 mod style;
+mod utils;
 
 /// CLI for creating a mopro project.
 #[derive(Parser, Debug)]
