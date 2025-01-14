@@ -133,16 +133,15 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn check_bindings(project_dir: &Path, app: Framework) -> Result<PathBuf> {
-    let bindings_nams = match app {
+pub fn check_bindings(project_dir: &Path, framework: Framework) -> Result<PathBuf> {
+    let bindings_nams = match framework {
         Framework::Ios => "MoproiOSBindings",
         Framework::Android => "MoproAndroidBindings",
         Framework::Web => "MoproWasmBindings",
         _ => {
-            let app_str: &str = app.into();
             return Err(Error::msg(format!(
-                "Unsupported language/app ({}) selected. ",
-                app_str
+                "Unsupported language/framework ({}) selected. ",
+                framework.as_str()
             )));
         }
     };

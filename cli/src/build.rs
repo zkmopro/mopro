@@ -12,7 +12,6 @@ use crate::config::write_config;
 use crate::constants::Adapter;
 use crate::constants::Platform;
 use crate::constants::MODES;
-use crate::constants::PLATFORMS;
 use crate::create::utils::copy_embedded_dir;
 use crate::print::print_build_success_message;
 use crate::style;
@@ -62,7 +61,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
         Some(p) => {
             let valid_platforms: Vec<String> = p
                 .iter()
-                .filter(|&platform| PLATFORMS.contains(&platform.as_str()))
+                .filter(|&platform| Platform::all_strings().contains(&platform.as_str()))
                 .map(|platform| platform.to_owned())
                 .collect();
 
@@ -137,7 +136,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     let selected_architectures = platform.select_archs();
 
     for p in platform.platforms.clone() {
-        let platform_str: &str = p.into();
+        let platform_str: &str = p.as_str();
         let selected_arch = selected_architectures
             .get(platform_str)
             .map(|archs| archs.join(","))
