@@ -88,7 +88,7 @@ mopro-example-app $ mopro build
 The wasm code can be imported and used in a web application, as illustrated below:
 
 ```javascript
-const mopro_wasm = await import('./pkg/my-halo2-circuit.js');
+const mopro_wasm = await import('./MoproWasmBindings/mopro_wasm_lib.js');
 await mopro_wasm.default();
 await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
 

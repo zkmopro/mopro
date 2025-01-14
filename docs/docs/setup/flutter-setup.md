@@ -1,6 +1,6 @@
 # Flutter Setup
 
-Using ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) guide, you can generate the "MoproAndroidBindings" and "MoproIOSBindings" for the ios and android platforms in your project folder, you're ready to create a cross-platform project using [Flutter](https://flutter.dev/). <br/>
+Using ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) guide, you can generate the "MoproAndroidBindings" and "MoproIOSBindings" for the iOS and android platforms in your project folder, you're ready to create a cross-platform project using [Flutter](https://flutter.dev/). <br/>
 Flutter is a framework for building natively compiled, multi-platform applications from a single codebase.
 
 ## 1. Prerequisites

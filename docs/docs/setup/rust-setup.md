@@ -199,14 +199,12 @@ default = ["mopro-ffi/halo2"]
 
 [dependencies]
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
-rust-witness = "0.1.1"
 uniffi = { version = "0.28", features = ["cli"] }
 num-bigint = "0.4.0"
 plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 
 [build-dependencies]
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
-rust-witness = "0.1.1"
 uniffi = { version = "0.28", features = ["build"] }
 ```
 

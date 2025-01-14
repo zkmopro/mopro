@@ -1,6 +1,6 @@
 # React Native Setup
 
-Using ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) guide, you can generate the "MoproAndroidBindings" and "MoproIOSBindings" for the ios and android platforms in your project folder. These bindings allow you to create a cross-platform project using [React Native](https://reactnative.dev/).<br/>
+Using ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) guide, you can generate the "MoproAndroidBindings" and "MoproIOSBindings" for the iOS and android platforms in your project folder. These bindings allow you to create a cross-platform project using [React Native](https://reactnative.dev/).<br/>
 
 React Native is a _JavaScript_ framework that enables developers to build native apps for multiple platforms with a single codebase.
 
@@ -21,7 +21,7 @@ The easiest way to set up your project is by using the mopro cli **create** comm
 mopro-example-app $ mopro create
 ```
 
-Assuming you’ve successfully built the **ios** and **android** bindings: `MoproAndroidBindings` and `MoproIOSBindings` in your project folder, the mopro cli stored some parameters into the `Config.toml` file and reads them during the create command. It will also allow you to select the **react-native** template, as shown below:
+Assuming you’ve successfully built the **iOS** and **android** bindings: `MoproAndroidBindings` and `MoproIOSBindings` in your project folder, the mopro cli stored some parameters into the `Config.toml` file and reads them during the create command. It will also allow you to select the **react-native** template, as shown below:
 
 ```
 ? Create template ›
@@ -34,7 +34,7 @@ Assuming you’ve successfully built the **ios** and **android** bindings: `Mopr
 
 ## Option 2: Clone the Repository and Import the Bindings
 
-This option is a more manual compared to [Option 1](docs/react-native-setup#option-1-use-mopro-cli). You can clone a pre-configured repository and manually import the generated bindings into your React Native project.
+This option is a more manual compared to [Option 1](#option-1-use-mopro-cli). You can clone a pre-configured repository and manually import the generated bindings into your React Native project.
 
 1. Clone the [zkmopro/react-native-app](https://github.com/zkmopro/react-native-app) repository
 
