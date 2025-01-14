@@ -66,7 +66,6 @@ pub fn init_project(
     env::set_current_dir(&project_dir)?;
     const TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/init");
 
-    // let selections = adapter_sel.selections();
     copy_embedded_dir(&TEMPLATE_DIR, &project_dir, &adapter_sel)?;
 
     if let Some(cargo_toml_path) = project_dir.join("Cargo.toml").to_str() {

@@ -1,3 +1,4 @@
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Mode {
     Debug,
     Release,
@@ -19,10 +20,35 @@ pub const MODES: [ModeInfo; 2] = [
     },
 ];
 
+impl Mode {
+    pub fn as_str(&self) -> &'static str {
+        MODES
+            .iter()
+            .find(|info| info.mode == *self)
+            .map(|info| info.str)
+            .expect("Unsupported Mode, only support 'release' and 'debug'")
+    }
+
+    pub fn parse_from_str(s: &str) -> Self {
+        MODES
+            .iter()
+            .find(|info| info.str.to_lowercase() == s.to_lowercase())
+            .map(|info| info.mode)
+            .expect("Unsupported Mode String, only support 'release' and 'debug'")
+    }
+
+    pub fn from_idx(idx: usize) -> Self {
+        MODES[idx].mode
+    }
+
+    pub fn all_strings() -> Vec<&'static str> {
+        MODES.iter().map(|info| info.str).collect()
+    }
+}
+
 //
 // Architeture Section
 //
-
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum IosArch {
     Aarch64Apple,
@@ -59,7 +85,10 @@ impl IosArch {
             .expect("Unsupported iOS Arch")
     }
 
-    pub fn from_str(s: &str) -> Self {
+    // This is only called by mopro-ffi module.
+    // To avoid compliation warning, adding `dead_code`
+    #[allow(dead_code)]
+    pub fn parse_from_str(s: &str) -> Self {
         IOS_ARCHS
             .iter()
             .find(|info| info.str.to_lowercase() == s.to_lowercase())
@@ -117,7 +146,10 @@ impl AndroidArch {
             .expect("Unsupported Android Arch")
     }
 
-    pub fn from_str(s: &str) -> Self {
+    // This is only called by mopro-ffi module.
+    // To avoid compliation warning, adding `dead_code`
+    #[allow(dead_code)]
+    pub fn parse_from_str(s: &str) -> Self {
         ANDROID_ARCHS
             .iter()
             .find(|info| info.str.to_lowercase() == s.to_lowercase())
@@ -132,18 +164,11 @@ impl AndroidArch {
     pub fn all_strings() -> Vec<&'static str> {
         ANDROID_ARCHS.iter().map(|info| info.str).collect()
     }
-
-    pub fn contains(arch: &str) -> bool {
-        ANDROID_ARCHS
-            .iter()
-            .any(|f| f.str.to_lowercase() == arch.to_lowercase())
-    }
 }
 
 //
 // Platform Section
 //
-
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Platform {
     Ios,
@@ -180,7 +205,7 @@ impl Platform {
             .expect("Unsupported Platform")
     }
 
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_from_str(s: &str) -> Self {
         PLATFORMS
             .iter()
             .find(|info| info.str.to_lowercase() == s.to_lowercase())
@@ -216,7 +241,6 @@ impl Platform {
 //
 // Adapter Section
 //
-
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Adapter {
     Circom,
@@ -306,7 +330,7 @@ impl Framework {
             .expect("Unsupported Framework")
     }
 
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_from_str(s: &str) -> Self {
         FRAMEWORKS_INFO
             .iter()
             .find(|info| info.str.to_lowercase() == s.to_lowercase())

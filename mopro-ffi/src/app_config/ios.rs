@@ -2,16 +2,19 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use mopro_cli::IosArch;
+use mopro_cli::{IosArch, Mode};
 use uniffi::generate_bindings;
 use uniffi::SwiftBindingGenerator;
 
 use super::cleanup_tmp_local;
+use super::constants::{ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
 use super::install_arch;
 use super::mktemp_local;
 
 // Load environment variables that are specified by by xcode
 pub fn build() {
+    const BINDING_NAME: &str = "MoproiOSBindings";
+
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
@@ -19,35 +22,25 @@ pub fn build() {
     let build_dir_path = Path::new(&build_dir);
     let work_dir = mktemp_local(build_dir_path);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
-    let bindings_out = work_dir.join("MoproiOSBindings");
+    let bindings_out = work_dir.join(BINDING_NAME);
     fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
-    let bindings_dest = Path::new(&manifest_dir).join("MoproiOSBindings");
+    let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
     let framework_out = bindings_out.join("MoproBindings.xcframework");
 
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
-    let mode;
-    if let Ok(configuration) = std::env::var("CONFIGURATION") {
-        mode = match configuration.as_str() {
-            "Debug" => "debug",
-            "Release" => "release",
-            "debug" => "debug",
-            "release" => "release",
-            _ => panic!("unknown configuration"),
-        };
-    } else {
-        mode = "debug";
-    }
+    let mode = Mode::parse_from_str(
+        std::env::var(ENV_CONFIG)
+            .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
+            .as_str(),
+    );
 
-    let target_archs: Vec<IosArch> = if let Ok(archs_str) = std::env::var("IOS_ARCHS") {
-        archs_str
-            .split(',')
-            .map(|arch| IosArch::from_str(arch))
-            .collect()
+    let target_archs: Vec<IosArch> = if let Ok(archs_str) = std::env::var(ENV_IOS_ARCHS) {
+        archs_str.split(',').map(IosArch::parse_from_str).collect()
     } else {
         // Default case: select all supported architectures if none are provided
         IosArch::all_strings()
             .iter()
-            .map(|s| IosArch::from_str(s))
+            .map(|s| IosArch::parse_from_str(s))
             .collect()
     };
 
@@ -59,7 +52,9 @@ pub fn build() {
             .map(|arch| {
                 Path::new(&build_dir).join(Path::new(&format!(
                     "{}/{}/{}/libmopro_bindings.a",
-                    build_dir, arch, mode
+                    build_dir,
+                    arch,
+                    mode.as_str()
                 )))
             })
             .collect();
@@ -67,7 +62,7 @@ pub fn build() {
             install_arch(arch.to_string());
             let mut build_cmd = Command::new("cargo");
             build_cmd.arg("build");
-            if mode == "release" {
+            if mode == Mode::Release {
                 build_cmd.arg("--release");
             }
             build_cmd
@@ -155,14 +150,14 @@ pub fn build() {
 }
 
 // More general cases
-fn group_target_archs(target_archs: &Vec<IosArch>) -> Vec<Vec<&str>> {
+fn group_target_archs(target_archs: &[IosArch]) -> Vec<Vec<&str>> {
     // Detect the current architecture
     let current_arch = std::env::consts::ARCH;
 
     // Determine the device architecture prefix based on the current architecture
     let device_prefix = match current_arch {
-        arch if arch.starts_with("x86_64") => "x86_64",
-        arch if arch.starts_with("aarch64") => "aarch64",
+        arch if arch.starts_with(ARCH_X86_64) => ARCH_X86_64,
+        arch if arch.starts_with(ARCH_ARM_64) => ARCH_ARM_64,
         _ => panic!("Unsupported host architecture: {}", current_arch),
     };
 

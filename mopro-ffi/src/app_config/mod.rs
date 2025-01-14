@@ -4,6 +4,7 @@ use std::process::Command;
 use uuid::Uuid;
 
 pub mod android;
+pub mod constants;
 pub mod ios;
 
 pub fn mktemp() -> PathBuf {

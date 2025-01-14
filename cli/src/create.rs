@@ -41,7 +41,7 @@ pub fn create_project(arg_framework: &Option<String>) -> anyhow::Result<()> {
     };
 
     let project_dir = env::current_dir()?;
-    match Framework::from_str(&framework) {
+    match Framework::parse_from_str(&framework) {
         Framework::Ios => Ios::create(project_dir)?,
         Framework::Android => Android::create(project_dir)?,
         Framework::Web => Web::create(project_dir)?,
@@ -82,7 +82,7 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
     let mut unselectable = Vec::new();
 
     for framework_str in Framework::all_strings() {
-        let framework = Framework::from_str(framework_str);
+        let framework = Framework::parse_from_str(framework_str);
         match framework {
             Framework::Flutter | Framework::ReactNative => {
                 // Adding more information to the list

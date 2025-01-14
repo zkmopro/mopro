@@ -56,7 +56,7 @@ impl PlatformSelector {
     pub fn construct(selections: Vec<String>) -> Self {
         let mut platforms: Vec<Platform> = vec![];
         for s in selections {
-            platforms.push(Platform::from_str(&s));
+            platforms.push(Platform::parse_from_str(&s));
         }
         Self { platforms }
     }

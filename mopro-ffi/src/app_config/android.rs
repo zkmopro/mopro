@@ -3,47 +3,51 @@ use std::path::Path;
 use std::process::Command;
 
 use mopro_cli::AndroidArch;
+use mopro_cli::Mode;
 use uniffi::generate_bindings;
 use uniffi::KotlinBindingGenerator;
 
 use super::cleanup_tmp_local;
+use super::constants::{
+    ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, ENV_ANDROID_ARCHS, ENV_CONFIG,
+};
 use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
 pub fn build() {
+    const BINDING_NAME: &str = "MoproAndroidBindings";
+
     let cwd = std::env::current_dir().expect("Failed to get current directory");
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());
     let build_dir = Path::new(&manifest_dir).join("build");
     let work_dir = mktemp_local(&build_dir);
-    let bindings_out = work_dir.join("MoproAndroidBindings");
-    let bindings_dest = Path::new(&manifest_dir).join("MoproAndroidBindings");
+    let bindings_out = work_dir.join(BINDING_NAME);
+    let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
 
-    let mode = std::env::var("CONFIGURATION")
-        .unwrap_or_else(|_| "debug".to_string())
-        .to_lowercase();
-    let mode = match mode.as_str() {
-        "debug" | "release" => mode,
-        _ => panic!("Unknown configuration: {}", mode),
-    };
+    let mode = Mode::parse_from_str(
+        std::env::var(ENV_CONFIG)
+            .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
+            .as_str(),
+    );
 
-    let target_archs: Vec<AndroidArch> = if let Ok(archs_str) = std::env::var("ANDROID_ARCHS") {
+    let target_archs: Vec<AndroidArch> = if let Ok(archs_str) = std::env::var(ENV_ANDROID_ARCHS) {
         archs_str
             .split(',')
-            .map(|arch| AndroidArch::from_str(arch))
+            .map(AndroidArch::parse_from_str)
             .collect()
     } else {
         // Default case: select all supported architectures if none are provided
         AndroidArch::all_strings()
             .iter()
-            .map(|s| AndroidArch::from_str(s))
+            .map(|s| AndroidArch::parse_from_str(s))
             .collect()
     };
 
     install_ndk();
     for arch in target_archs {
-        build_for_arch(arch, &build_dir, &bindings_out, &mode);
+        build_for_arch(arch, &build_dir, &bindings_out, mode);
     }
 
     generate_bindings(
@@ -61,7 +65,7 @@ pub fn build() {
     cleanup_tmp_local(&build_dir);
 }
 
-fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode: &str) {
+fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode: Mode) {
     install_arch(arch.as_str().to_string());
 
     let mut build_cmd = Command::new("cargo");
@@ -71,7 +75,7 @@ fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode
         .arg(arch.as_str())
         .arg("build")
         .arg("--lib");
-    if mode == "release" {
+    if mode == Mode::Release {
         build_cmd.arg("--release");
     }
     build_cmd
@@ -82,24 +86,23 @@ fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode
         .wait()
         .expect("cargo build errored");
 
-    // FIXME move these string to a single file
     let folder = match arch {
-        AndroidArch::X8664Linux => "x86_64",
-        AndroidArch::I686Linux => "x86",
-        AndroidArch::Armv7LinuxAbi => "armeabi-v7a",
-        AndroidArch::Aarch64Linux => "arm64-v8a",
+        AndroidArch::X8664Linux => ARCH_X86_64,
+        AndroidArch::I686Linux => ARCH_I686,
+        AndroidArch::Armv7LinuxAbi => ARCH_ARM_V7_ABI,
+        AndroidArch::Aarch64Linux => ARCH_ARM_64_V8,
     };
 
     let out_lib_path = build_dir.join(format!(
         "{}/{}/{}/libmopro_bindings.so",
         build_dir.display(),
         arch.as_str(),
-        mode
+        mode.as_str()
     ));
     let out_lib_dest = bindings_out.join(format!("jniLibs/{}/libuniffi_mopro.so", folder));
 
     fs::create_dir_all(out_lib_dest.parent().unwrap()).expect("Failed to create jniLibs directory");
-    fs::copy(&out_lib_path, &out_lib_dest).expect("Failed to copy file");
+    fs::copy(out_lib_path, &out_lib_dest).expect("Failed to copy file");
 }
 
 fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
