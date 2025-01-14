@@ -124,7 +124,11 @@ impl PlatformSelector {
     fn select_multi_archs(platform: &str, archs: &[&str]) -> Vec<usize> {
         // At least one architecture must be selected
         multi_select(
-            "Select {} architecture(s) to compile (default: all)",
+            format!(
+                "Select {} architecture(s) to compile (default: all)",
+                platform
+            )
+            .as_str(),
             format!(
                 "No architectures selected for {}. Please select at least one architecture.",
                 platform
