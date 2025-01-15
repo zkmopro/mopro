@@ -5,12 +5,12 @@ use dialoguer::Confirm;
 use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
+use mopro_ffi::app_config::constants::Mode;
 use std::env;
 
 use crate::config::read_config;
 use crate::config::write_config;
 use crate::constants::Adapter;
-use crate::constants::Mode;
 use crate::constants::Platform;
 use crate::create::utils::copy_embedded_dir;
 use crate::print::print_build_success_message;

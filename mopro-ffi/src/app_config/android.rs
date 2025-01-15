@@ -2,14 +2,13 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-use mopro_cli::AndroidArch;
-use mopro_cli::Mode;
 use uniffi::generate_bindings;
 use uniffi::KotlinBindingGenerator;
 
 use super::cleanup_tmp_local;
 use super::constants::{
-    ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, ENV_ANDROID_ARCHS, ENV_CONFIG,
+    AndroidArch, Mode, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, ENV_ANDROID_ARCHS,
+    ENV_CONFIG,
 };
 use super::install_arch;
 use super::install_ndk;
@@ -66,13 +65,14 @@ pub fn build() {
 }
 
 fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode: Mode) {
-    install_arch(arch.as_str().to_string());
+    let arch_str = arch.as_str();
+    install_arch(arch_str.to_string());
 
     let mut build_cmd = Command::new("cargo");
     build_cmd
         .arg("ndk")
         .arg("-t")
-        .arg(arch.as_str())
+        .arg(arch_str)
         .arg("build")
         .arg("--lib");
     if mode == Mode::Release {
@@ -80,7 +80,7 @@ fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode
     }
     build_cmd
         .env("CARGO_BUILD_TARGET_DIR", build_dir)
-        .env("CARGO_BUILD_TARGET", arch.as_str())
+        .env("CARGO_BUILD_TARGET", arch_str)
         .spawn()
         .expect("Failed to spawn cargo build")
         .wait()
@@ -96,11 +96,12 @@ fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode
     let out_lib_path = build_dir.join(format!(
         "{}/{}/{}/libmopro_bindings.so",
         build_dir.display(),
-        arch.as_str(),
+        arch_str,
         mode.as_str()
     ));
     let out_lib_dest = bindings_out.join(format!("jniLibs/{}/libuniffi_mopro.so", folder));
 
+    println!("COPY: {:?} -> {:?}", out_lib_path, out_lib_dest);
     fs::create_dir_all(out_lib_dest.parent().unwrap()).expect("Failed to create jniLibs directory");
     fs::copy(out_lib_path, &out_lib_dest).expect("Failed to copy file");
 }

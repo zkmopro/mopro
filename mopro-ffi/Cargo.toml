@@ -36,7 +36,6 @@ circom = [
 [dependencies]
 uniffi = { version = "=0.28.0", features = ["cli", "build"] }
 serde = { version = "1.0", features = ["derive"] }
-mopro-cli = { path = "../cli" }
 
 # Error handling
 thiserror = "=2.0.3"

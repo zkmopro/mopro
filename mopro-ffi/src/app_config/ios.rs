@@ -2,12 +2,11 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use mopro_cli::{IosArch, Mode};
 use uniffi::generate_bindings;
 use uniffi::SwiftBindingGenerator;
 
 use super::cleanup_tmp_local;
-use super::constants::{ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
+use super::constants::{IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
 use super::install_arch;
 use super::mktemp_local;
 
