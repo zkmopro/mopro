@@ -45,7 +45,7 @@ pub fn build() {
 
     // Take a list of architectures, build them, and combine them into
     // a single universal binary/archive
-    let build_combined_archs = |archs: &Vec<IosArch>| -> PathBuf {
+    let build_combined_archs = |archs: &[IosArch]| -> PathBuf {
         let out_lib_paths: Vec<PathBuf> = archs
             .iter()
             .map(|arch| {
