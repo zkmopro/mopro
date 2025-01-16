@@ -46,10 +46,9 @@ extern "C" {
 }
 
 pub fn verify_proof(zkey_path: &str, proof: String) -> Result<bool> {
-
-    let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
+    let mut header_reader = ZkeyHeaderReader::new(zkey_path);
     header_reader.read();
-    let file = File::open(&zkey_path)?;
+    let file = File::open(zkey_path)?;
     let mut reader = std::io::BufReader::new(file);
     let proving_key = read_proving_key::<_, Bn254>(&mut reader)?;
     // convert out proving key to json so we can
@@ -124,12 +123,11 @@ pub fn generate_proof(
     let mut wtns = witness_fn(bigint_inputs)
         .into_iter()
         .map(|w| w.to_biguint().unwrap())
-        .map(|v| {
+        .flat_map(|v| {
             let mut bytes = v.to_bytes_le();
             bytes.resize(32, 0);
             bytes
         })
-        .flatten()
         .collect::<Vec<_>>();
 
     // Convert Rust strings to C strings
@@ -152,6 +150,8 @@ pub fn generate_proof(
             .to_string_lossy()
             .into_owned();
         free_proof_result(proof_ptr);
-        Ok(format!("{{ \"proof\": {proof},\"signals\": {public_signals}}}"))
+        Ok(format!(
+            "{{ \"proof\": {proof},\"signals\": {public_signals}}}"
+        ))
     }
 }
