@@ -166,18 +166,12 @@ pub fn generate_circom_proof_rapidsnark(
 }
 
 #[cfg(not(feature = "rapidsnark"))]
-pub fn verify_circom_proof_rapidsnark(
-    zkey_path: String,
-    proof: String,
-) -> Result<bool> {
+pub fn verify_circom_proof_rapidsnark(zkey_path: String, proof: String) -> Result<bool> {
     anyhow::bail!("rapidsnark feature not enabled")
 }
 
 #[cfg(feature = "rapidsnark")]
-pub fn verify_circom_proof_rapidsnark(
-    zkey_path: String,
-    proof: String,
-) -> Result<bool> {
+pub fn verify_circom_proof_rapidsnark(zkey_path: String, proof: String) -> Result<bool> {
     rapidsnark::verify_proof(&zkey_path, proof)
 }
 
@@ -323,9 +317,7 @@ mod tests {
 
     #[cfg(feature = "rapidsnark")]
     use crate::circom::rapidsnark;
-    use crate::circom::{
-        generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn,
-    };
+    use crate::circom::{generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn};
     use crate::GenerateProofResult;
     use anyhow::bail;
     use anyhow::Result;
@@ -439,12 +431,11 @@ mod tests {
         )
         .unwrap();
         let b = BigInt::from(1u8);
-        let c = a.clone() * b.clone();
+        // let c = a.clone() * b.clone();
         inputs.insert("a".to_string(), vec![a.to_string()]);
         inputs.insert("b".to_string(), vec![b.to_string()]);
 
-        let proof_json =
-            rapidsnark::generate_proof(&zkey_path, inputs, multiplier2_witness)?;
+        let proof_json = rapidsnark::generate_proof(&zkey_path, inputs, multiplier2_witness)?;
         let valid = rapidsnark::verify_proof(&zkey_path, proof_json)?;
         if !valid {
             bail!("Proof is invalid");
@@ -466,8 +457,7 @@ mod tests {
         let inputs = bytes_to_circuit_inputs(&input_vec);
 
         // Generate Proof
-        let proof_json =
-            rapidsnark::generate_proof(&zkey_path, inputs, keccak256256test_witness)?;
+        let proof_json = rapidsnark::generate_proof(&zkey_path, inputs, keccak256256test_witness)?;
         let valid = rapidsnark::verify_proof(&zkey_path, proof_json)?;
         if !valid {
             bail!("Proof is invalid");

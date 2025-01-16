@@ -9,9 +9,9 @@ mod halo2;
 
 #[cfg(feature = "circom")]
 pub use circom::{
-    generate_circom_proof_wtns, serialization::to_ethereum_inputs,
-    generate_circom_proof_rapidsnark, verify_circom_proof_rapidsnark,
-    serialization::to_ethereum_proof, verify_circom_proof, WtnsFn,
+    generate_circom_proof_rapidsnark, generate_circom_proof_wtns,
+    serialization::to_ethereum_inputs, serialization::to_ethereum_proof, verify_circom_proof,
+    verify_circom_proof_rapidsnark, WtnsFn,
 };
 
 #[cfg(feature = "halo2")]
