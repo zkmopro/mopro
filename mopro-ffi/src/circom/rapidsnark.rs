@@ -16,7 +16,7 @@ use serde::Serialize;
 use super::WtnsFn;
 
 // match what rapidsnark expects
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct VerificationKey {
     protocol: String,
     curve: String,
@@ -57,7 +57,7 @@ pub fn verify_proof(zkey_path: &str, proof: String, public_signals: String) -> R
     let vkey = VerificationKey {
         protocol: "groth16".to_string(),
         curve: "bn128".to_string(),
-        nPublic: 2,
+        nPublic: 0, // this is unused in the rapidsnark verifier
         vk_alpha_1: [
             vk.alpha_g1.x.to_string(),
             vk.alpha_g1.y.to_string(),
@@ -85,13 +85,14 @@ pub fn verify_proof(zkey_path: &str, proof: String, public_signals: String) -> R
             .collect(),
     };
     let vkey_json = serde_json::to_string(&vkey)?;
+    let vkey_json_cstr = CString::new(vkey_json)?;
     unsafe {
         let result = groth16_api_verify(
             &mut ProofResult {
                 proof: CString::new(proof).unwrap().into_raw(),
                 public_signals: CString::new(public_signals).unwrap().into_raw(),
             },
-            vkey_json.as_ptr() as *const c_char,
+            vkey_json_cstr.as_ptr(),
         );
         Ok(result)
     }
