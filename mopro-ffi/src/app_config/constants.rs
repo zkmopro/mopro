@@ -14,12 +14,12 @@ pub enum Mode {
     Release,
 }
 
-pub struct ModeInfo {
-    pub mode: Mode,
-    pub str: &'static str,
+struct ModeInfo {
+    mode: Mode,
+    str: &'static str,
 }
 
-pub const MODES: [ModeInfo; 2] = [
+const MODES: [ModeInfo; 2] = [
     ModeInfo {
         mode: Mode::Debug,
         str: "debug",
@@ -66,12 +66,12 @@ pub enum IosArch {
     X8664Apple,
 }
 
-pub struct IosArchInfo {
-    pub arch: IosArch,
-    pub str: &'static str,
+struct IosArchInfo {
+    arch: IosArch,
+    str: &'static str,
 }
 
-pub const IOS_ARCHS: [IosArchInfo; 3] = [
+const IOS_ARCHS: [IosArchInfo; 3] = [
     IosArchInfo {
         arch: IosArch::Aarch64Apple,
         str: "aarch64-apple-ios",
@@ -120,12 +120,12 @@ pub enum AndroidArch {
     Aarch64Linux,
 }
 
-pub struct AndriodArchInfo {
-    pub arch: AndroidArch,
-    pub str: &'static str,
+struct AndriodArchInfo {
+    arch: AndroidArch,
+    str: &'static str,
 }
 
-pub const ANDROID_ARCHS: [AndriodArchInfo; 4] = [
+const ANDROID_ARCHS: [AndriodArchInfo; 4] = [
     AndriodArchInfo {
         arch: AndroidArch::X8664Linux,
         str: "x86_64-linux-android",

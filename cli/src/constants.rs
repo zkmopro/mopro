@@ -8,12 +8,12 @@ pub enum Platform {
     Web,
 }
 
-pub struct PlatformInfo {
-    pub platform: Platform,
-    pub str: &'static str,
+struct PlatformInfo {
+    platform: Platform,
+    str: &'static str,
 }
 
-pub const PLATFORMS: [PlatformInfo; 3] = [
+const PLATFORMS: [PlatformInfo; 3] = [
     PlatformInfo {
         platform: Platform::Ios,
         str: "ios",
@@ -79,12 +79,12 @@ pub enum Adapter {
     Halo2,
 }
 
-pub struct AdapterInfo {
-    pub adapter: Adapter,
-    pub str: &'static str,
+struct AdapterInfo {
+    adapter: Adapter,
+    str: &'static str,
 }
 
-pub const ADAPTERS_INFO: [AdapterInfo; 2] = [
+const ADAPTERS_INFO: [AdapterInfo; 2] = [
     AdapterInfo {
         adapter: Adapter::Circom,
         str: "circom",
@@ -125,12 +125,12 @@ pub enum Framework {
     ReactNative,
 }
 
-pub struct FrameworkInfo {
-    pub framework: Framework,
-    pub str: &'static str,
+struct FrameworkInfo {
+    framework: Framework,
+    str: &'static str,
 }
 
-pub const FRAMEWORKS_INFO: [FrameworkInfo; 5] = [
+const FRAMEWORKS_INFO: [FrameworkInfo; 5] = [
     FrameworkInfo {
         framework: Framework::Ios,
         str: "ios",
