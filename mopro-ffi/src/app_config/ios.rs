@@ -165,7 +165,9 @@ fn group_target_archs(target_archs: &[IosArch]) -> Vec<Vec<&str>> {
 
     target_archs.iter().for_each(|arch| {
         let arch_str = arch.as_str();
-        if arch_str.starts_with(device_prefix) {
+        if arch_str.ends_with("sim") {
+            simulator_archs.push(arch_str);
+        } else if arch_str.starts_with(device_prefix) {
             device_archs.push(arch_str);
         } else {
             simulator_archs.push(arch_str);
