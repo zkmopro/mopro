@@ -6,7 +6,12 @@ fn main() {
     if std::env::var("MOPRO_FFI_LINK_TEST_WITNESS").unwrap_or_default() != "" {
         rust_witness::transpile::transpile_wasm("../test-vectors/circom".to_string());
     }
+    #[cfg(feature = "rapidsnark")]
+    link_rapidsnark();
+}
 
+#[allow(dead_code)]
+fn link_rapidsnark() {
     let target = std::env::var("TARGET").unwrap();
     let arch = target.split('-').next().unwrap();
 
