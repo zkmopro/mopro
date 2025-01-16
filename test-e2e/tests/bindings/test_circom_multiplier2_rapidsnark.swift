@@ -33,18 +33,14 @@ do {
   var inputs = [String: [String]]()
   let a = 3
   let b = 5
-  let c = a * b
   inputs["a"] = [String(a)]
   inputs["b"] = [String(b)]
-
-  // Expected outputs
-  let outputs: [String] = [String(c), String(a)]
 
   // Generate Proof
   let generateProofResult = try generateCircomProofRapidsnark(zkeyPath: zkeyPath, circuitInputs: inputs)
 
   let isValid = try verifyCircomProofRapidsnark(
-    zkeyPath: zkeyPath, proof: generateProofResult.proof)
+    zkeyPath: zkeyPath, proof: generateProofResult)
   assert(isValid, "Proof verification should succeed")
 
 } catch let error as MoproError {
