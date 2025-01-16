@@ -45,20 +45,20 @@ pub fn build() {
 
     // Take a list of architectures, build them, and combine them into
     // a single universal binary/archive
-    let build_combined_archs = |archs: &Vec<&str>| -> PathBuf {
+    let build_combined_archs = |archs: &Vec<IosArch>| -> PathBuf {
         let out_lib_paths: Vec<PathBuf> = archs
             .iter()
             .map(|arch| {
                 Path::new(&build_dir).join(Path::new(&format!(
                     "{}/{}/{}/libmopro_bindings.a",
                     build_dir,
-                    arch,
+                    arch.as_str(),
                     mode.as_str()
                 )))
             })
             .collect();
         for arch in archs {
-            install_arch(arch.to_string());
+            install_arch(arch.as_str().to_string());
             let mut build_cmd = Command::new("cargo");
             build_cmd.arg("build");
             if mode == Mode::Release {
@@ -67,7 +67,7 @@ pub fn build() {
             build_cmd
                 .arg("--lib")
                 .env("CARGO_BUILD_TARGET_DIR", &build_dir)
-                .env("CARGO_BUILD_TARGET", arch)
+                .env("CARGO_BUILD_TARGET", arch.as_str())
                 .spawn()
                 .expect("Failed to spawn cargo build")
                 .wait()
@@ -149,7 +149,7 @@ pub fn build() {
 }
 
 // More general cases
-fn group_target_archs(target_archs: &[IosArch]) -> Vec<Vec<&str>> {
+fn group_target_archs(target_archs: &[IosArch]) -> Vec<Vec<IosArch>> {
     // Detect the current architecture
     let current_arch = std::env::consts::ARCH;
 
@@ -163,14 +163,14 @@ fn group_target_archs(target_archs: &[IosArch]) -> Vec<Vec<&str>> {
     let mut device_archs = Vec::new();
     let mut simulator_archs = Vec::new();
 
-    target_archs.iter().for_each(|arch| {
+    target_archs.iter().for_each(|&arch| {
         let arch_str = arch.as_str();
         if arch_str.ends_with("sim") {
-            simulator_archs.push(arch_str);
+            simulator_archs.push(arch);
         } else if arch_str.starts_with(device_prefix) {
-            device_archs.push(arch_str);
+            device_archs.push(arch);
         } else {
-            simulator_archs.push(arch_str);
+            simulator_archs.push(arch);
         }
     });
 
