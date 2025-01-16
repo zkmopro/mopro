@@ -15,7 +15,7 @@ namespace mopro {
   string generate_circom_proof_rapidsnark(string zkey_path, record<string, sequence<string>> circuit_inputs);
 
   [Throws=MoproError]
-  boolean verify_circom_proof_rapidsnark(string zkey_path, record<string, sequence<string>> circuit_inputs);
+  boolean verify_circom_proof_rapidsnark(string zkey_path, string proof);
 
   [Throws=MoproError]
   GenerateProofResult generate_circom_proof(string zkey_path, record<string, sequence<string>> circuit_inputs);
