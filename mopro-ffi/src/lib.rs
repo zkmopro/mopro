@@ -10,6 +10,7 @@ mod halo2;
 #[cfg(feature = "circom")]
 pub use circom::{
     generate_circom_proof_wtns, serialization::to_ethereum_inputs,
+    generate_circom_proof_rapidsnark, verify_circom_proof_rapidsnark,
     serialization::to_ethereum_proof, verify_circom_proof, WtnsFn,
 };
 
@@ -61,6 +62,20 @@ macro_rules! circom_app {
         }
 
         fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
+            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
+        }
+
+        fn generate_circom_proof_rapidsnark(
+            in0: String,
+            in1: std::collections::HashMap<String, Vec<String>>,
+        ) -> Result<String, mopro_ffi::Error> {
+            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
+        }
+
+        fn verify_circom_proof_rapidsnark(
+            in0: String,
+            in1: String,
+        ) -> Result<bool, mopro_ffi::MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
     };

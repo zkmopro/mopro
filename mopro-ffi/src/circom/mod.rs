@@ -1,3 +1,4 @@
+#[cfg(feature = "rapidsnark")]
 mod rapidsnark;
 pub mod serialization;
 
@@ -32,6 +33,32 @@ pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 #[macro_export]
 macro_rules! circom_app {
     () => {
+        fn generate_circom_proof_rapidsnark(
+            in0: String,
+            in1: std::collections::HashMap<String, Vec<String>>,
+        ) -> Result<String, mopro_ffi::MoproError> {
+            let name = match std::path::Path::new(in0.as_str()).file_name() {
+                Some(v) => v,
+                None => {
+                    return Err(mopro_ffi::MoproError::CircomError(format!(
+                        "failed to parse file name from zkey_path"
+                    )))
+                }
+            };
+            let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
+            mopro_ffi::generate_circom_proof_rapidsnark(in0, in1, witness_fn.clone())
+                .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
+        }
+
+        fn verify_circom_proof_rapidsnark(
+            in0: String,
+            in1: String,
+        ) -> Result<bool, mopro_ffi::MoproError> {
+            mopro_ffi::verify_circom_proof_rapidsnark(in0, in1).map_err(|e| {
+                mopro_ffi::MoproError::CircomError(format!("Verification error: {}", e))
+            })
+        }
+
         fn generate_circom_proof(
             in0: String,
             in1: std::collections::HashMap<String, Vec<String>>,
@@ -120,6 +147,40 @@ macro_rules! set_circom_circuits {
     };
 }
 
+#[cfg(not(feature = "rapidsnark"))]
+pub fn generate_circom_proof_rapidsnark(
+    zkey_path: String,
+    inputs: HashMap<String, Vec<String>>,
+    witness_fn: WtnsFn,
+) -> Result<String> {
+    anyhow::bail!("rapidsnark feature not enabled")
+}
+
+#[cfg(feature = "rapidsnark")]
+pub fn generate_circom_proof_rapidsnark(
+    zkey_path: String,
+    inputs: HashMap<String, Vec<String>>,
+    witness_fn: WtnsFn,
+) -> Result<String> {
+    rapidsnark::generate_proof(&zkey_path, inputs, witness_fn)
+}
+
+#[cfg(not(feature = "rapidsnark"))]
+pub fn verify_circom_proof_rapidsnark(
+    zkey_path: String,
+    proof: String,
+) -> Result<bool> {
+    anyhow::bail!("rapidsnark feature not enabled")
+}
+
+#[cfg(feature = "rapidsnark")]
+pub fn verify_circom_proof_rapidsnark(
+    zkey_path: String,
+    proof: String,
+) -> Result<bool> {
+    rapidsnark::verify_proof(&zkey_path, proof)
+}
+
 // build a proof for a zkey using witness_fn to build
 // the witness
 pub fn generate_circom_proof_wtns(
@@ -162,13 +223,13 @@ pub fn generate_circom_proof_wtns(
         let full_assignment = witness_thread
             .join()
             .map_err(|_e| anyhow::anyhow!("witness thread panicked"))?;
-        prove(proving_key, matrices, full_assignment)
+        prove_ark(proving_key, matrices, full_assignment)
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
         let (proving_key, matrices) = read_zkey::<_, Bls12_381>(&mut reader)?;
         let full_assignment = witness_thread
             .join()
             .map_err(|_e| anyhow::anyhow!("witness thread panicked"))?;
-        prove(proving_key, matrices, full_assignment)
+        prove_ark(proving_key, matrices, full_assignment)
     } else {
         // unknown curve
         // wait for the witness thread to finish for consistency
@@ -180,7 +241,7 @@ pub fn generate_circom_proof_wtns(
 }
 
 // Prove on a generic curve
-fn prove<T: Pairing + FieldSerialization>(
+fn prove_ark<T: Pairing + FieldSerialization>(
     pkey: ProvingKey<T>,
     matrices: ConstraintMatrices<T::ScalarField>,
     witness: Vec<BigUint>,
@@ -260,8 +321,10 @@ mod tests {
     use std::ops::{Add, Mul};
     use std::str::FromStr;
 
+    #[cfg(feature = "rapidsnark")]
+    use crate::circom::rapidsnark;
     use crate::circom::{
-        generate_circom_proof_wtns, rapidsnark, serialization, verify_circom_proof, WtnsFn,
+        generate_circom_proof_wtns, serialization, verify_circom_proof, WtnsFn,
     };
     use crate::GenerateProofResult;
     use anyhow::bail;
@@ -365,6 +428,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "rapidsnark")]
     fn test_prove_rapidsnark() -> Result<()> {
         // Create a new MoproCircom instance
         let zkey_path = "../test-vectors/circom/multiplier2_final.zkey".to_string();
@@ -379,9 +443,9 @@ mod tests {
         inputs.insert("a".to_string(), vec![a.to_string()]);
         inputs.insert("b".to_string(), vec![b.to_string()]);
 
-        let (proof_json, public_signals_json) =
+        let proof_json =
             rapidsnark::generate_proof(&zkey_path, inputs, multiplier2_witness)?;
-        let valid = rapidsnark::verify_proof(&zkey_path, proof_json, public_signals_json)?;
+        let valid = rapidsnark::verify_proof(&zkey_path, proof_json)?;
         if !valid {
             bail!("Proof is invalid");
         }
@@ -389,6 +453,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "rapidsnark")]
     fn test_prove_rapidsnark_keccak() -> Result<()> {
         // Create a new MoproCircom instance
         let zkey_path = "../test-vectors/circom/keccak256_256_test_final.zkey".to_string();
@@ -401,9 +466,9 @@ mod tests {
         let inputs = bytes_to_circuit_inputs(&input_vec);
 
         // Generate Proof
-        let (proof_json, public_signals_json) =
+        let proof_json =
             rapidsnark::generate_proof(&zkey_path, inputs, keccak256256test_witness)?;
-        let valid = rapidsnark::verify_proof(&zkey_path, proof_json, public_signals_json)?;
+        let valid = rapidsnark::verify_proof(&zkey_path, proof_json)?;
         if !valid {
             bail!("Proof is invalid");
         }

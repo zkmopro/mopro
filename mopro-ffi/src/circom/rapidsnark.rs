@@ -17,6 +17,7 @@ use super::WtnsFn;
 
 // match what rapidsnark expects
 #[derive(Debug, Serialize, Deserialize)]
+#[allow(non_snake_case)]
 struct VerificationKey {
     protocol: String,
     curve: String,
@@ -44,7 +45,8 @@ extern "C" {
     fn free_proof_result(result: *mut ProofResult);
 }
 
-pub fn verify_proof(zkey_path: &str, proof: String, public_signals: String) -> Result<bool> {
+pub fn verify_proof(zkey_path: &str, proof: String) -> Result<bool> {
+
     let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
     header_reader.read();
     let file = File::open(&zkey_path)?;
@@ -86,11 +88,14 @@ pub fn verify_proof(zkey_path: &str, proof: String, public_signals: String) -> R
     };
     let vkey_json = serde_json::to_string(&vkey)?;
     let vkey_json_cstr = CString::new(vkey_json)?;
+    let v: serde_json::Value = serde_json::from_str(&proof)?;
+    let proof = v["proof"].to_string();
+    let signals = v["signals"].to_string();
     unsafe {
         let result = groth16_api_verify(
             &mut ProofResult {
                 proof: CString::new(proof).unwrap().into_raw(),
-                public_signals: CString::new(public_signals).unwrap().into_raw(),
+                public_signals: CString::new(signals).unwrap().into_raw(),
             },
             vkey_json_cstr.as_ptr(),
         );
@@ -102,7 +107,7 @@ pub fn generate_proof(
     zkey_path: &str,
     inputs: std::collections::HashMap<String, Vec<String>>,
     witness_fn: WtnsFn,
-) -> Result<(String, String)> {
+) -> Result<String> {
     // Form the inputs
     let bigint_inputs = inputs
         .into_iter()
@@ -146,8 +151,7 @@ pub fn generate_proof(
         let public_signals = std::ffi::CStr::from_ptr(result.public_signals)
             .to_string_lossy()
             .into_owned();
-
         free_proof_result(proof_ptr);
-        Ok((proof, public_signals))
+        Ok(format!("{{ \"proof\": {proof},\"signals\": {public_signals}}}"))
     }
 }
