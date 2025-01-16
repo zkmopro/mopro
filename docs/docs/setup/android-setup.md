@@ -1,6 +1,8 @@
 # Android Setup
 
-After you've completed the [Rust setup](docs/setup/rust-setup.md) you should be able to run `cargo run --bin android`. This will create a new folder called `MoproAndroidBindings`. It should look like the structure
+Before starting, ensure you have completed ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) and selected the android platform during the build process. This step uses the mopro cli to generate the required bindings for your android project.
+
+After successfully completing the build, a folder named **MoproAndroidBindings** will appear in your project directory. The structure of this folder should look like this:
 
 ```sh
 MoproAndroidBindings
