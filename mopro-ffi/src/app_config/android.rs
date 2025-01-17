@@ -101,7 +101,6 @@ fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode
     ));
     let out_lib_dest = bindings_out.join(format!("jniLibs/{}/libuniffi_mopro.so", folder));
 
-    println!("COPY: {:?} -> {:?}", out_lib_path, out_lib_dest);
     fs::create_dir_all(out_lib_dest.parent().unwrap()).expect("Failed to create jniLibs directory");
     fs::copy(out_lib_path, &out_lib_dest).expect("Failed to copy file");
 }
