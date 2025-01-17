@@ -71,6 +71,7 @@ struct IosArchInfo {
     str: &'static str,
 }
 
+// Architecture strings need to be aligned with those in the CLI.
 const IOS_ARCHS: [IosArchInfo; 3] = [
     IosArchInfo {
         arch: IosArch::Aarch64Apple,
@@ -103,10 +104,6 @@ impl IosArch {
             .expect("Unsupported iOS String")
     }
 
-    pub fn from_idx(idx: usize) -> Self {
-        IOS_ARCHS[idx].arch
-    }
-
     pub fn all_strings() -> Vec<&'static str> {
         IOS_ARCHS.iter().map(|info| info.str).collect()
     }
@@ -125,6 +122,7 @@ struct AndriodArchInfo {
     str: &'static str,
 }
 
+// Architecture strings need to be aligned with those in the CLI.
 const ANDROID_ARCHS: [AndriodArchInfo; 4] = [
     AndriodArchInfo {
         arch: AndroidArch::X8664Linux,
@@ -159,10 +157,6 @@ impl AndroidArch {
             .find(|info| info.str.to_lowercase() == s.to_lowercase())
             .map(|info| info.arch)
             .expect("Unsupported Android String")
-    }
-
-    pub fn from_idx(idx: usize) -> Self {
-        ANDROID_ARCHS[idx].arch
     }
 
     pub fn all_strings() -> Vec<&'static str> {

@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
-use mopro_ffi::app_config::constants::{AndroidArch, IosArch};
-
 use crate::{
     config::Config,
-    constants::{Adapter, Platform},
+    constants::{Adapter, AndroidArch, IosArch, Platform},
     select::multi_select,
 };
 

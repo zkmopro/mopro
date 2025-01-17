@@ -1,16 +1,17 @@
 use anyhow::Error;
+use anyhow::Ok;
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
 use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
-use mopro_ffi::app_config::constants::Mode;
 use std::env;
 
 use crate::config::read_config;
 use crate::config::write_config;
 use crate::constants::Adapter;
+use crate::constants::Mode;
 use crate::constants::Platform;
 use crate::create::utils::copy_embedded_dir;
 use crate::print::print_build_success_message;
@@ -101,6 +102,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
             "Web platform is not support Circom only, choose different platform".to_string(),
         );
         build_project(&Some(mode.as_str().to_string()), &None)?;
+        return Ok(());
     }
 
     // Notification when the user selects the 'circom' adapter and includes the 'web' platform in the selection.
@@ -112,6 +114,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
 
         if !confirm {
             build_project(&Some(mode.as_str().to_string()), &None)?;
+            return Ok(());
         }
 
         copy_mopro_wasm_lib()?;
