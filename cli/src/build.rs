@@ -1,4 +1,5 @@
 use anyhow::Error;
+use anyhow::Ok;
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
@@ -10,9 +11,8 @@ use std::env;
 use crate::config::read_config;
 use crate::config::write_config;
 use crate::constants::Adapter;
+use crate::constants::Mode;
 use crate::constants::Platform;
-use crate::constants::MODES;
-use crate::constants::PLATFORMS;
 use crate::create::utils::copy_embedded_dir;
 use crate::print::print_build_success_message;
 use crate::style;
@@ -44,11 +44,11 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     let mut config = read_config(&config_path)?;
 
     // Mode selection, select `release` or `debug`
-    let mode: String = match arg_mode.as_deref() {
+    let mode: Mode = match arg_mode.as_deref() {
         None => select_mode()?,
         Some(m) => {
-            if MODES.contains(&m) {
-                m.to_string()
+            if Mode::all_strings().contains(&m) {
+                Mode::parse_from_str(m)
             } else {
                 style::print_yellow("Invalid mode selected. Please choose a valid mode (e.g., 'release' or 'debug').".to_string());
                 select_mode()?
@@ -62,7 +62,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
         Some(p) => {
             let valid_platforms: Vec<String> = p
                 .iter()
-                .filter(|&platform| PLATFORMS.contains(&platform.as_str()))
+                .filter(|&platform| Platform::all_strings().contains(&platform.as_str()))
                 .map(|platform| platform.to_owned())
                 .collect();
 
@@ -101,7 +101,8 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
         style::print_yellow(
             "Web platform is not support Circom only, choose different platform".to_string(),
         );
-        build_project(&Some(mode.clone()), &None)?;
+        build_project(&Some(mode.as_str().to_string()), &None)?;
+        return Ok(());
     }
 
     // Notification when the user selects the 'circom' adapter and includes the 'web' platform in the selection.
@@ -112,7 +113,8 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
                 .interact()?;
 
         if !confirm {
-            build_project(&Some(mode.clone()), &None)?;
+            build_project(&Some(mode.as_str().to_string()), &None)?;
+            return Ok(());
         }
 
         copy_mopro_wasm_lib()?;
@@ -137,7 +139,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     let selected_architectures = platform.select_archs();
 
     for p in platform.platforms.clone() {
-        let platform_str: &str = p.into();
+        let platform_str: &str = p.as_str();
         let selected_arch = selected_architectures
             .get(platform_str)
             .map(|archs| archs.join(","))
@@ -147,7 +149,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
             .arg("run")
             .arg("--bin")
             .arg(platform_str)
-            .env("CONFIGURATION", mode.clone())
+            .env("CONFIGURATION", mode.as_str())
             .env(p.arch_key(), selected_arch)
             .status()?;
 
@@ -171,13 +173,13 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     Ok(())
 }
 
-fn select_mode() -> Result<String> {
+fn select_mode() -> Result<Mode> {
     let idx = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Build mode")
-        .items(&MODES)
+        .items(Mode::all_strings().as_ref())
         .interact()?;
 
-    Ok(MODES[idx].to_owned())
+    Ok(Mode::from_idx(idx))
 }
 
 fn print_binding_message(platforms: &Vec<Platform>) -> anyhow::Result<()> {

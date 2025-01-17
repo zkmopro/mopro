@@ -5,7 +5,6 @@ use std::io::Write;
 use std::path::Path;
 
 use crate::constants::Adapter;
-use crate::constants::ADAPTERS;
 use crate::print::print_init_instructions;
 use crate::utils::contains_circom;
 use crate::utils::contains_halo2;
@@ -47,11 +46,14 @@ pub fn init_project(
         None => AdapterSelector::select(),
         Some(a) => {
             let mut selection = vec![];
-            for (i, adapter) in ADAPTERS.iter().enumerate() {
-                if a.contains(adapter) {
-                    selection.push(i);
-                }
-            }
+            Adapter::all_strings()
+                .iter()
+                .enumerate()
+                .for_each(|(i, adapter)| {
+                    if a.contains(adapter) {
+                        selection.push(i);
+                    }
+                });
             AdapterSelector::construct(selection)
         }
     };
@@ -64,14 +66,13 @@ pub fn init_project(
     env::set_current_dir(&project_dir)?;
     const TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/init");
 
-    let selections = adapter_sel.selections();
     copy_embedded_dir(&TEMPLATE_DIR, &project_dir, &adapter_sel)?;
 
     if let Some(cargo_toml_path) = project_dir.join("Cargo.toml").to_str() {
         replace_project_name(cargo_toml_path, &project_name)?;
         replace_features(
             cargo_toml_path,
-            selections.iter().map(|&i| ADAPTERS[i]).collect(),
+            adapter_sel.adapters.iter().map(|a| a.as_str()).collect(),
         )?;
         if adapter_sel.contains(Adapter::Circom) {
             Circom::dep_template(cargo_toml_path)?;
@@ -109,10 +110,8 @@ pub fn init_project(
     }
     // Read & Write config for selected adapter
     let mut config = read_config(&config_path)?;
-    for adapter_idx in adapter_sel.selections() {
-        config
-            .target_adapters
-            .insert(ADAPTERS[adapter_idx].to_owned());
+    for adapter in adapter_sel.adapters {
+        config.target_adapters.insert(adapter.as_str().to_string());
     }
     write_config(&config_path, &config)?;
 
