@@ -23,7 +23,7 @@ uniffi = "0.28.0"
 
 # Circom dependencies
 rust-witness = "0.1.1"
-witnesscalc_adapter = { git = "https://github.com/alxkzmn/witnesscalc_adapter.git", package = "witnesscalc-adapter" }
+witnesscalc_adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", package = "witnesscalc-adapter" }
 #witnesscalc_adapter = { path = "../../mopro_witnesscalc/witnesscalc_adapter", package = "witnesscalc-adapter" }
 num-bigint = { version = "0.4.0" }
 
@@ -39,7 +39,7 @@ uniffi = { version = "0.28.0", features = ["build"] }
 
 # Circom dependencies
 rust-witness = "0.1.1"
-witnesscalc_adapter = { git = "https://github.com/alxkzmn/witnesscalc_adapter.git", package = "witnesscalc-adapter" }
+witnesscalc_adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", package = "witnesscalc-adapter" }
 #witnesscalc_adapter = { path = "../../mopro_witnesscalc/witnesscalc_adapter", package = "witnesscalc-adapter" }
 
 [dev-dependencies]

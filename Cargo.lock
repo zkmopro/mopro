@@ -5173,7 +5173,7 @@ dependencies = [
 [[package]]
 name = "witnesscalc-adapter"
 version = "0.1.0"
-source = "git+https://github.com/alxkzmn/witnesscalc_adapter.git#23151ec43c3cc44375e40d6176650bfb879d3d96"
+source = "git+https://github.com/zkmopro/witnesscalc_adapter.git#853c4d850462a7aad483c0fcc011095c1c5ea76f"
 dependencies = [
  "num-bigint",
  "num-traits",
