@@ -45,6 +45,13 @@ pub fn build() {
     };
 
     install_ndk();
+
+    // The generic implementation of Fr in witnesscalc only supports the 64-bit architecture (see witnesscalc/build/fr_generic.cpp, build/fr_raw_generic.cpp)
+    let target_archs = target_archs
+        .into_iter()
+        .filter(|arch| *arch != AndroidArch::I686Linux && *arch != AndroidArch::Armv7LinuxAbi)
+        .collect::<Vec<_>>();
+
     for arch in target_archs {
         build_for_arch(arch, &build_dir, &bindings_out, mode);
     }

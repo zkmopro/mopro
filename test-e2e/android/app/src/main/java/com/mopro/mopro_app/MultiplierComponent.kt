@@ -31,7 +31,7 @@ fun MultiplierComponent() {
     inputs["a"] = listOf("3")
     inputs["b"] = listOf("5")
 
-    val zkeyPath = getFilePathFromAssets("multiplier2_final.zkey")
+    val zkeyPath = getFilePathFromAssets("multiplier2.zkey")
 
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
         Button(

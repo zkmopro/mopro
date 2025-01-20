@@ -4,15 +4,15 @@ extern crate core;
 mopro_ffi::app!();
 
 // --- Circom Example of setting up 4 circuits ---
-rust_witness::witness!(multiplier2);
+witnesscalc_adapter::witness!(multiplier2);
 rust_witness::witness!(multiplier2bls);
-rust_witness::witness!(keccak256256test);
+witnesscalc_adapter::witness!(keccak256_256_test);
 rust_witness::witness!(hashbenchbls);
 
 mopro_ffi::set_circom_circuits! {
-    ("multiplier2_final.zkey", multiplier2_witness),
-    ("multiplier2_bls_final.zkey", multiplier2bls_witness),
-    ("keccak256_256_test_final.zkey", keccak256256test_witness),
+    ("multiplier2.zkey", mopro_ffi::WtnsFn::WithDatArg(multiplier2_witness)),
+    ("multiplier2_bls_final.zkey", mopro_ffi::WtnsFn::NoDatArg(multiplier2bls_witness)),
+    ("keccak256_256_test.zkey", mopro_ffi::WtnsFn::WithDatArg(keccak256_256_test_witness)),
 }
 
 // --- Halo2 Example of using a single proving and verifying circuit ---
