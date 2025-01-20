@@ -79,7 +79,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Run ffi circom tests
-        run: cd mopro-ffi && cargo test --features circom --no-default-features
+        run: cd mopro-ffi && cargo test -vv --features circom --no-default-features
   test-ffi-ashlang:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
