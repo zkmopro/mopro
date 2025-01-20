@@ -65,6 +65,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Run ffi circom tests
+        shell: bash
         run: sudo apt update && sudo apt install -y libc++-dev libc++abi-dev && cd mopro-ffi && cargo test -vv --features circom --no-default-features
   test-ffi-ashlang:
     runs-on: ubuntu-latest
@@ -161,6 +162,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Run e2e circom tests
+        shell: bash
         # TODO: Fix this custom jar thing
         run: |
           sudo apt update && sudo apt install -y libc++-dev libc++abi-dev
@@ -181,6 +183,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Build iOS xcframework
+        shell: bash
         run: sudo apt update && sudo apt install -y libc++-dev libc++abi-dev && cd test-e2e && cargo run --bin ios
       - name: Cache xcframework
         id: cache-xcframework
@@ -255,6 +258,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Build Android bindings
+        shell: bash
         run: sudo apt update && sudo apt install -y libc++-dev libc++abi-dev && cd test-e2e && cargo run --bin android
       - name: Cache android lib
         id: cache-android-lib
@@ -312,6 +316,7 @@ jobs:
             test-e2e/MoproWasmBindings
           key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
       - name: Build circuits for Wasm Web app
+        shell: bash
         if: steps.cache-halo2-wasm-circuit.outputs.cache-hit != 'true'
         run: |
           sudo apt update && sudo apt install -y libc++-dev libc++abi-dev
