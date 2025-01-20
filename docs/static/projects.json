@@ -1,0 +1,67 @@
+[
+    {
+        "name": "World ID",
+        "description": "World ID is a privacy-preserving proof of human for age of AI. It securely and anonymously proves you are human online.",
+        "links": {
+            "github": "https://github.com/worldcoin",
+            "website": "https://world.org/world-id",
+            "ios": "https://apps.apple.com/no/app/world-app-worldcoin-wallet/id1560859847",
+            "android": "https://play.google.com/store/apps/details?id=com.worldcoin"
+        }
+    },
+    {
+        "name": "Privado.iD",
+        "description": "Privado ID enables secure identity data verification everywhere. Any service, any device, any protocol.",
+        "links": {
+            "github": "https://github.com/0xpolygonID",
+            "website": "https://www.privado.id/",
+            "ios": "https://apps.apple.com/us/app/privado-id/id6566184703",
+            "android": "https://play.google.com/store/apps/details?id=id.privado.wallet"
+        }
+    },
+    {
+        "name": "Rarimo",
+        "description": "Rarimo is building a permissionless ZK Registry that redefines how identities, interactions, and social graphs are managed.",
+        "links": {
+            "github": "https://github.com/rarimo",
+            "website": "https://rarimo.com",
+            "ios": "https://apps.apple.com/us/app/rarime/id6503300598",
+            "android": "https://play.google.com/store/apps/details?id=com.rarilabs.rarime&hl=en"
+        }
+    },
+    {
+        "name": "Anon Aadhaar",
+        "description": "Anon Aadhaar is a zero-knowledge protocol that allows Aadhaar ID owners to prove their identity in a privacy-preserving way.",
+        "links": {
+            "github": "https://github.com/anon-aadhaar",
+            "website": "https://documentation.anon-aadhaar.pse.dev",
+            "ios": "https://github.com/anon-aadhaar/anon-aadhaar-react-native",
+            "android": "https://github.com/anon-aadhaar/anon-aadhaar-react-native"
+        }
+    },
+    {
+        "name": "OpenPassport",
+        "description": "OpenPassport is an identity wallet that lets users generate privacy-preserving proofs from government-issued IDs such as passports.",
+        "links": {
+            "github": "https://github.com/zk-passport/openpassport",
+            "website": "https://www.openpassport.app"
+        }
+    },
+    {
+        "name": "ZKPassport",
+        "description": "Generate a zero-knowledge proof on your phone from your passport credentials, then securely verify it using this demo web app.",
+        "links": {
+            "github": "https://github.com/zkpassport",
+            "website": "https://zkpassport.id"
+        }
+    },
+    {
+        "name": "EZKL",
+        "description": "Ezkl is the simplest way to run ML, AI, and other business logic for on-chain applications. This iOS package is a port of the EZKL library, which allows you to generate and verify zero-knowledge proofs (ZKPs) for neural networks.",
+        "links": {
+            "github": "https://github.com/zkonduit",
+            "website": "https://docs.ezkl.xyz",
+            "ios": "https://github.com/zkonduit/ezkl-swift-package"
+        }
+    }
+]

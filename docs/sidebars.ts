@@ -18,6 +18,11 @@ const sidebars: SidebarsConfig = {
             id: 'getting-started',
         },
         {
+            type: 'doc',
+            label: 'Projects',
+            id: 'projects',
+        },
+        {
             type: 'category',
             label: 'Setup',
             items: [
