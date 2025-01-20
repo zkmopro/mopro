@@ -30,12 +30,6 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
-  install-cpp-std-lib:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install libc++ and libc++abi
-        run: sudo apt update && sudo apt install -y libc++-dev libc++abi-dev
-
   cli:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -63,7 +57,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - *install-cpp-std-lib
       - uses: ilammy/setup-nasm@v1
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
@@ -72,7 +65,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Run ffi circom tests
-        run: cd mopro-ffi && cargo test -vv --features circom --no-default-features
+        run: sudo apt update && sudo apt install -y libc++-dev libc++abi-dev && cd mopro-ffi && cargo test -vv --features circom --no-default-features
   test-ffi-ashlang:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -160,7 +153,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - *install-cpp-std-lib
       - uses: ilammy/setup-nasm@v1
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
@@ -171,6 +163,7 @@ jobs:
       - name: Run e2e circom tests
         # TODO: Fix this custom jar thing
         run: |
+          sudo apt update && sudo apt install -y libc++-dev libc++abi-dev
           cd test-e2e
           curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
           CLASSPATH=jna-5.13.0.jar cargo test --test circom -- --nocapture
@@ -180,7 +173,6 @@ jobs:
     runs-on: macos-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - *install-cpp-std-lib
       - uses: ilammy/setup-nasm@v1
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
@@ -189,7 +181,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Build iOS xcframework
-        run: cd test-e2e && cargo run --bin ios
+        run: sudo apt update && sudo apt install -y libc++-dev libc++abi-dev && cd test-e2e && cargo run --bin ios
       - name: Cache xcframework
         id: cache-xcframework
         uses: actions/cache/save@v4
@@ -255,7 +247,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - *install-cpp-std-lib
       - uses: ilammy/setup-nasm@v1
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
@@ -264,7 +255,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Build Android bindings
-        run: cd test-e2e && cargo run --bin android
+        run: sudo apt update && sudo apt install -y libc++-dev libc++abi-dev && cd test-e2e && cargo run --bin android
       - name: Cache android lib
         id: cache-android-lib
         uses: actions/cache/save@v4
@@ -302,7 +293,6 @@ jobs:
       - setup-halo2-wasm-env
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - *install-cpp-std-lib
       - uses: ilammy/setup-nasm@v1
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
@@ -324,6 +314,7 @@ jobs:
       - name: Build circuits for Wasm Web app
         if: steps.cache-halo2-wasm-circuit.outputs.cache-hit != 'true'
         run: |
+          sudo apt update && sudo apt install -y libc++-dev libc++abi-dev
           cd test-e2e
           echo "install rust-src component"
           rustup component add rust-src --toolchain nightly-2024-07-18
