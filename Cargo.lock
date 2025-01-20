@@ -2699,7 +2699,7 @@ dependencies = [
  "thiserror 2.0.3",
  "uniffi",
  "uuid",
- "witnesscalc-adapter 0.1.0",
+ "witnesscalc-adapter",
 ]
 
 [[package]]
@@ -4238,7 +4238,7 @@ dependencies = [
  "plonk-fibonacci",
  "rust-witness",
  "uniffi",
- "witnesscalc-adapter 0.1.0 (git+https://github.com/alxkzmn/witnesscalc_adapter.git)",
+ "witnesscalc-adapter",
 ]
 
 [[package]]
@@ -5168,16 +5168,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8d71a593cc5c42ad7876e2c1fda56f314f3754c084128833e64f1345ff8a03a"
 dependencies = [
  "memchr",
-]
-
-[[package]]
-name = "witnesscalc-adapter"
-version = "0.1.0"
-dependencies = [
- "num-bigint",
- "num-traits",
- "paste",
- "serde_json",
 ]
 
 [[package]]
