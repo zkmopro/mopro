@@ -732,7 +732,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[5];
+FrElement expaux[3];
 FrElement lvar[0];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -772,7 +772,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -896,7 +896,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[4];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -1024,7 +1024,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1080 + Fr_toInt(&lvar[2]))) + 1344)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 0;
@@ -1124,7 +1125,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[12];
+FrElement expaux[10];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -1152,13 +1153,13 @@ Fr_copy(aux_dest,&expaux[0]);
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 0)];
 // load src
-Fr_mul(&expaux[9],&circuitConstants[9],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 128)]); // line circom 43
-Fr_sub(&expaux[7],&circuitConstants[2],&expaux[9]); // line circom 43
-Fr_mul(&expaux[8],&circuitConstants[9],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 192)]); // line circom 43
-Fr_sub(&expaux[6],&expaux[7],&expaux[8]); // line circom 43
-Fr_mul(&expaux[7],&circuitConstants[10],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 256)]); // line circom 43
-Fr_add(&expaux[5],&expaux[6],&expaux[7]); // line circom 43
-Fr_mul(&expaux[3],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 64)],&expaux[5]); // line circom 43
+Fr_mul(&expaux[8],&circuitConstants[9],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 128)]); // line circom 43
+Fr_sub(&expaux[6],&circuitConstants[2],&expaux[8]); // line circom 43
+Fr_mul(&expaux[7],&circuitConstants[9],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 192)]); // line circom 43
+Fr_sub(&expaux[5],&expaux[6],&expaux[7]); // line circom 43
+Fr_mul(&expaux[6],&circuitConstants[10],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 256)]); // line circom 43
+Fr_add(&expaux[4],&expaux[5],&expaux[6]); // line circom 43
+Fr_mul(&expaux[3],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 64)],&expaux[4]); // line circom 43
 Fr_add(&expaux[2],&expaux[3],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 128)]); // line circom 43
 Fr_add(&expaux[1],&expaux[2],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 192)]); // line circom 43
 Fr_mul(&expaux[2],&circuitConstants[9],&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 256)]); // line circom 43
@@ -1202,7 +1203,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[6];
+FrElement expaux[5];
 FrElement lvar[0];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -1243,7 +1244,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -1367,7 +1368,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -1436,7 +1437,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 64)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 0;
@@ -1447,7 +1449,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[1])) + 128)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 0;
@@ -1489,7 +1492,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[1])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -1531,7 +1535,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[1]].signalStart + ((1 * Fr_toInt(&lvar[1])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -1606,7 +1611,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -1683,7 +1688,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -1760,7 +1765,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -1884,7 +1889,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[4];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -2039,7 +2044,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[3])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -2081,7 +2087,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[3])) + 128)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 3;
@@ -2156,7 +2163,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[1];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -2603,7 +2610,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[0])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 0;
@@ -2614,7 +2622,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (320 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 0;
@@ -2625,7 +2634,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (640 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 0;
@@ -2636,7 +2646,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (960 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 0;
@@ -2678,7 +2689,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (64 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -2689,7 +2701,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (384 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -2700,7 +2713,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (704 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -2711,7 +2725,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1024 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -2753,7 +2768,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (128 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -2764,7 +2780,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (448 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -2775,7 +2792,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (768 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -2786,7 +2804,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1088 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -2828,7 +2847,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (192 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 3;
@@ -2839,7 +2859,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (512 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 3;
@@ -2850,7 +2871,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (832 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 3;
@@ -2861,7 +2883,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1152 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 3;
@@ -2903,7 +2926,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (256 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 4;
@@ -2914,7 +2938,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (576 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 4;
@@ -2925,7 +2950,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (896 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 4;
@@ -2936,7 +2962,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1216 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 4;
@@ -2978,7 +3005,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[1]].signalStart + ((1 * Fr_toInt(&lvar[0])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 5;
@@ -3020,7 +3048,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[0])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 6;
@@ -3085,7 +3114,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (320 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 7;
@@ -3150,7 +3180,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (640 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 8;
@@ -3215,7 +3246,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (960 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 9;
@@ -3280,7 +3312,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1280 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 10;
@@ -3345,7 +3378,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[2]].signalStart + ((1 * Fr_toInt(&lvar[0])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 11;
@@ -3387,7 +3421,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (64 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 12;
@@ -3452,7 +3487,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (384 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 13;
@@ -3517,7 +3553,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (704 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 14;
@@ -3582,7 +3619,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1024 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 15;
@@ -3647,7 +3685,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1344 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 16;
@@ -3712,7 +3751,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[3]].signalStart + ((1 * Fr_toInt(&lvar[0])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 17;
@@ -3754,7 +3794,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (128 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 18;
@@ -3819,7 +3860,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (448 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 19;
@@ -3884,7 +3926,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (768 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 20;
@@ -3949,7 +3992,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1088 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 21;
@@ -4014,7 +4058,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1408 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 22;
@@ -4079,7 +4124,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[4]].signalStart + ((1 * Fr_toInt(&lvar[0])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 23;
@@ -4121,7 +4167,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (192 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 24;
@@ -4186,7 +4233,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (512 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 25;
@@ -4251,7 +4299,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (832 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 26;
@@ -4316,7 +4365,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1152 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 27;
@@ -4381,7 +4431,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1472 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 28;
@@ -4446,7 +4497,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[0])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 29;
@@ -4488,7 +4540,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (256 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 30;
@@ -4553,7 +4606,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (576 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 31;
@@ -4618,7 +4672,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (896 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 32;
@@ -4683,7 +4738,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1216 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 33;
@@ -4748,7 +4804,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1536 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 34;
@@ -4823,7 +4880,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -4960,7 +5017,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -5035,7 +5093,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -5112,7 +5170,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -5189,7 +5247,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -5326,7 +5384,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -5401,7 +5460,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -5478,7 +5537,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -5555,7 +5614,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -5692,7 +5751,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -5767,7 +5827,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -5844,7 +5904,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -5921,7 +5981,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -6058,7 +6118,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -6133,7 +6194,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -6210,7 +6271,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -6287,7 +6348,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -6424,7 +6485,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -6499,7 +6561,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -6576,7 +6638,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -6653,7 +6715,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -6790,7 +6852,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -6865,7 +6928,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -6942,7 +7005,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -7019,7 +7082,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -7156,7 +7219,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -7231,7 +7295,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -7308,7 +7372,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -7385,7 +7449,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -7522,7 +7586,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -7597,7 +7662,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -7674,7 +7739,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -7751,7 +7816,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -7888,7 +7953,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -7963,7 +8029,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -8040,7 +8106,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -8117,7 +8183,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -8254,7 +8320,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -8329,7 +8396,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -8406,7 +8473,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -8483,7 +8550,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -8620,7 +8687,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -8695,7 +8763,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -8772,7 +8840,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -8849,7 +8917,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -8986,7 +9054,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -9061,7 +9130,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -9138,7 +9207,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -9215,7 +9284,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -9352,7 +9421,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -9427,7 +9497,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -9504,7 +9574,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -9581,7 +9651,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -9718,7 +9788,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -9793,7 +9864,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -9870,7 +9941,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -9947,7 +10018,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -10084,7 +10155,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -10159,7 +10231,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -10236,7 +10308,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -10313,7 +10385,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -10450,7 +10522,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -10525,7 +10598,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -10602,7 +10675,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -10679,7 +10752,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -10816,7 +10889,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -10891,7 +10965,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -10968,7 +11042,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -11045,7 +11119,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -11182,7 +11256,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -11257,7 +11332,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -11334,7 +11409,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -11411,7 +11486,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -11548,7 +11623,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -11623,7 +11699,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -11700,7 +11776,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -11777,7 +11853,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -11914,7 +11990,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -11989,7 +12066,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -12066,7 +12143,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -12143,7 +12220,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -12280,7 +12357,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -12355,7 +12433,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -12432,7 +12510,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -12509,7 +12587,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -12646,7 +12724,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -12721,7 +12800,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -12798,7 +12877,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -12875,7 +12954,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -13012,7 +13091,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -13087,7 +13167,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -13164,7 +13244,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -13241,7 +13321,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -13378,7 +13458,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[2])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -13453,7 +13534,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[1];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -14689,7 +14770,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -14813,7 +14894,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[1];
 FrElement lvar[0];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -14851,7 +14932,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -14975,7 +15056,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[1];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -15069,7 +15150,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + ((1 * Fr_toInt(&lvar[0])) + 0)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -15111,7 +15193,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[0])) + 64)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -15186,7 +15269,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[1];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -15513,7 +15596,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[0])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 0;
@@ -15524,7 +15608,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (64 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 0;
@@ -15566,7 +15651,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (64 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -15577,7 +15663,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (128 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -15619,7 +15706,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (128 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -15630,7 +15718,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (192 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 2;
@@ -15672,7 +15761,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (192 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 3;
@@ -15683,7 +15773,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (256 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 3;
@@ -15725,7 +15816,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (256 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 4;
@@ -15736,7 +15828,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[0])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 4;
@@ -15778,7 +15871,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (320 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 5;
@@ -15789,7 +15883,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (384 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 5;
@@ -15831,7 +15926,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (384 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 6;
@@ -15842,7 +15938,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (448 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 6;
@@ -15884,7 +15981,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (448 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 7;
@@ -15895,7 +15993,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (512 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 7;
@@ -15937,7 +16036,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (512 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 8;
@@ -15948,7 +16048,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (576 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 8;
@@ -15990,7 +16091,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (576 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 9;
@@ -16001,7 +16103,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (320 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 9;
@@ -16043,7 +16146,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (640 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 10;
@@ -16054,7 +16158,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (704 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 10;
@@ -16096,7 +16201,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (704 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 11;
@@ -16107,7 +16213,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (768 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 11;
@@ -16149,7 +16256,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (768 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 12;
@@ -16160,7 +16268,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (832 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 12;
@@ -16202,7 +16311,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (832 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 13;
@@ -16213,7 +16323,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (896 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 13;
@@ -16255,7 +16366,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (896 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 14;
@@ -16266,7 +16378,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (640 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 14;
@@ -16308,7 +16421,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (960 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 15;
@@ -16319,7 +16433,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1024 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 15;
@@ -16361,7 +16476,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1024 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 16;
@@ -16372,7 +16488,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1088 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 16;
@@ -16414,7 +16531,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1088 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 17;
@@ -16425,7 +16543,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1152 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 17;
@@ -16467,7 +16586,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1152 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 18;
@@ -16478,7 +16598,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1216 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 18;
@@ -16520,7 +16641,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1216 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 19;
@@ -16531,7 +16653,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (960 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 19;
@@ -16573,7 +16696,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1280 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 20;
@@ -16584,7 +16708,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1344 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 20;
@@ -16626,7 +16751,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1344 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 21;
@@ -16637,7 +16763,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1408 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 21;
@@ -16679,7 +16806,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1408 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 22;
@@ -16690,7 +16818,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1472 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 22;
@@ -16732,7 +16861,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1472 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 23;
@@ -16743,7 +16873,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1536 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 23;
@@ -16785,7 +16916,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1536 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 24;
@@ -16796,7 +16928,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * (1280 + Fr_toInt(&lvar[0]))) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 24;
@@ -17016,12 +17149,156 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
 {
 PFrElement aux_dest = &lvar[0];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
 // load src
 // end load src
 Fr_copy(aux_dest,&circuitConstants[1]);
@@ -17036,133 +17313,133 @@ Fr_copy(aux_dest,&circuitConstants[2]);
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -17222,7 +17499,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -17279,7 +17556,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -17377,7 +17655,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -17616,7 +17894,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -17630,139 +17908,283 @@ Fr_copy(aux_dest,&circuitConstants[2]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -17781,7 +18203,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[62],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[70],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -17822,7 +18244,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -17879,7 +18301,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -17977,7 +18400,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -18216,7 +18639,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -18230,139 +18653,283 @@ Fr_copy(aux_dest,&circuitConstants[9]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -18381,7 +18948,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[63],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[71],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -18422,7 +18989,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -18479,7 +19046,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -18577,7 +19145,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -18816,7 +19384,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -18830,139 +19398,283 @@ Fr_copy(aux_dest,&circuitConstants[33]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -18981,7 +19693,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[64],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[72],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -19022,7 +19734,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -19079,7 +19791,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -19177,7 +19890,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -19416,7 +20129,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -19430,139 +20143,283 @@ Fr_copy(aux_dest,&circuitConstants[10]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -19581,7 +20438,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[65],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[73],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -19622,7 +20479,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -19679,7 +20536,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -19777,7 +20635,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -20016,7 +20874,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -20024,7 +20882,151 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[66]);
+Fr_copy(aux_dest,&circuitConstants[62]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
 }
 {
 PFrElement aux_dest = &lvar[1];
@@ -20036,133 +21038,133 @@ Fr_copy(aux_dest,&circuitConstants[2]);
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -20181,7 +21183,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[67],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[74],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -20222,7 +21224,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -20230,7 +21232,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[66]);
+Fr_copy(aux_dest,&circuitConstants[62]);
 }
 {
 uint aux_create = 0;
@@ -20279,7 +21281,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -20377,7 +21380,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -20385,7 +21388,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[66]);
+Fr_copy(aux_dest,&circuitConstants[62]);
 }
 {
 uint aux_create = 0;
@@ -20616,7 +21619,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -20630,139 +21633,283 @@ Fr_copy(aux_dest,&circuitConstants[35]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -20781,7 +21928,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[68],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[75],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -20822,7 +21969,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -20879,7 +22026,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -20977,7 +22125,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -21216,7 +22364,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -21224,7 +22372,151 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[69]);
+Fr_copy(aux_dest,&circuitConstants[63]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
 }
 {
 PFrElement aux_dest = &lvar[1];
@@ -21236,133 +22528,133 @@ Fr_copy(aux_dest,&circuitConstants[2]);
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -21381,7 +22673,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[70],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[76],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -21422,7 +22714,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -21430,7 +22722,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[69]);
+Fr_copy(aux_dest,&circuitConstants[63]);
 }
 {
 uint aux_create = 0;
@@ -21479,7 +22771,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -21577,7 +22870,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -21585,7 +22878,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[69]);
+Fr_copy(aux_dest,&circuitConstants[63]);
 }
 {
 uint aux_create = 0;
@@ -21816,7 +23109,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -21830,139 +23123,283 @@ Fr_copy(aux_dest,&circuitConstants[0]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -21981,7 +23418,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[71],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[77],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -22022,7 +23459,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -22079,7 +23516,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -22177,7 +23615,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -22416,7 +23854,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -22430,139 +23868,283 @@ Fr_copy(aux_dest,&circuitConstants[46]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -22581,7 +24163,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[72],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[78],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -22622,7 +24204,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -22679,7 +24261,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -22777,7 +24360,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -23016,7 +24599,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -23030,139 +24613,283 @@ Fr_copy(aux_dest,&circuitConstants[37]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -23181,7 +24908,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[73],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[79],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -23222,7 +24949,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -23279,7 +25006,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -23377,7 +25105,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -23616,7 +25344,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -23624,7 +25352,151 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[74]);
+Fr_copy(aux_dest,&circuitConstants[64]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
 }
 {
 PFrElement aux_dest = &lvar[1];
@@ -23636,133 +25508,133 @@ Fr_copy(aux_dest,&circuitConstants[2]);
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -23781,7 +25653,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[75],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[80],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -23822,7 +25694,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -23830,7 +25702,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[74]);
+Fr_copy(aux_dest,&circuitConstants[64]);
 }
 {
 uint aux_create = 0;
@@ -23879,7 +25751,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -23977,7 +25850,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -23985,7 +25858,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[74]);
+Fr_copy(aux_dest,&circuitConstants[64]);
 }
 {
 uint aux_create = 0;
@@ -24216,7 +26089,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -24224,7 +26097,151 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[76]);
+Fr_copy(aux_dest,&circuitConstants[65]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
 }
 {
 PFrElement aux_dest = &lvar[1];
@@ -24236,133 +26253,133 @@ Fr_copy(aux_dest,&circuitConstants[2]);
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -24381,7 +26398,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[77],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[81],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -24422,7 +26439,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -24430,7 +26447,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[76]);
+Fr_copy(aux_dest,&circuitConstants[65]);
 }
 {
 uint aux_create = 0;
@@ -24479,7 +26496,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -24577,7 +26595,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -24585,7 +26603,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[76]);
+Fr_copy(aux_dest,&circuitConstants[65]);
 }
 {
 uint aux_create = 0;
@@ -24816,7 +26834,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -24824,7 +26842,151 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[78]);
+Fr_copy(aux_dest,&circuitConstants[66]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
 }
 {
 PFrElement aux_dest = &lvar[1];
@@ -24836,133 +26998,133 @@ Fr_copy(aux_dest,&circuitConstants[2]);
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -24981,7 +27143,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[79],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[82],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -25022,7 +27184,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -25030,7 +27192,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[78]);
+Fr_copy(aux_dest,&circuitConstants[66]);
 }
 {
 uint aux_create = 0;
@@ -25079,7 +27241,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -25177,7 +27340,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -25185,7 +27348,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[78]);
+Fr_copy(aux_dest,&circuitConstants[66]);
 }
 {
 uint aux_create = 0;
@@ -25416,7 +27579,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -25430,139 +27593,283 @@ Fr_copy(aux_dest,&circuitConstants[50]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -25581,7 +27888,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[80],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[83],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -25622,7 +27929,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -25679,7 +27986,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -25777,7 +28085,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -26016,7 +28324,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -26030,139 +28338,283 @@ Fr_copy(aux_dest,&circuitConstants[39]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -26181,7 +28633,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[81],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[84],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -26222,7 +28674,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -26279,7 +28731,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -26377,7 +28830,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -26616,7 +29069,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -26624,7 +29077,151 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[82]);
+Fr_copy(aux_dest,&circuitConstants[67]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
 }
 {
 PFrElement aux_dest = &lvar[1];
@@ -26636,133 +29233,133 @@ Fr_copy(aux_dest,&circuitConstants[2]);
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -26781,7 +29378,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[83],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[85],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -26822,7 +29419,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -26830,7 +29427,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[82]);
+Fr_copy(aux_dest,&circuitConstants[67]);
 }
 {
 uint aux_create = 0;
@@ -26879,7 +29476,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -26977,7 +29575,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -26985,7 +29583,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[82]);
+Fr_copy(aux_dest,&circuitConstants[67]);
 }
 {
 uint aux_create = 0;
@@ -27216,7 +29814,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -27224,7 +29822,151 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[84]);
+Fr_copy(aux_dest,&circuitConstants[68]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
 }
 {
 PFrElement aux_dest = &lvar[1];
@@ -27236,133 +29978,133 @@ Fr_copy(aux_dest,&circuitConstants[2]);
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -27381,7 +30123,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[85],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[86],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -27422,7 +30164,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -27430,7 +30172,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[84]);
+Fr_copy(aux_dest,&circuitConstants[68]);
 }
 {
 uint aux_create = 0;
@@ -27479,7 +30221,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -27577,7 +30320,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -27585,7 +30328,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[84]);
+Fr_copy(aux_dest,&circuitConstants[68]);
 }
 {
 uint aux_create = 0;
@@ -27816,7 +30559,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -27830,139 +30573,283 @@ Fr_copy(aux_dest,&circuitConstants[59]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -27981,7 +30868,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[86],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[87],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -28022,7 +30909,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -28079,7 +30966,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -28177,7 +31065,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -28416,7 +31304,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -28430,139 +31318,283 @@ Fr_copy(aux_dest,&circuitConstants[44]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -28581,7 +31613,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[87],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[88],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -28622,7 +31654,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -28679,7 +31711,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -28777,7 +31810,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -29016,7 +32049,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -29030,139 +32063,283 @@ Fr_copy(aux_dest,&circuitConstants[61]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -29181,7 +32358,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[68],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[75],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -29222,7 +32399,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -29279,7 +32456,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -29377,7 +32555,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -29616,7 +32794,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -29630,139 +32808,283 @@ Fr_copy(aux_dest,&circuitConstants[41]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -29781,7 +33103,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[88],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[89],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -29822,7 +33144,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -29879,7 +33201,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -29977,7 +33300,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -30216,7 +33539,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -30224,7 +33547,151 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[89]);
+Fr_copy(aux_dest,&circuitConstants[69]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
 }
 {
 PFrElement aux_dest = &lvar[1];
@@ -30236,133 +33703,133 @@ Fr_copy(aux_dest,&circuitConstants[2]);
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -30381,7 +33848,7 @@ while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[25])) + 0)];
 // load src
-Fr_shr(&expaux[1],&circuitConstants[67],&lvar[25]); // line circom 776
+Fr_shr(&expaux[1],&circuitConstants[74],&lvar[25]); // line circom 776
 Fr_band(&expaux[0],&expaux[1],&circuitConstants[2]); // line circom 776
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
@@ -30422,7 +33889,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -30430,7 +33897,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[89]);
+Fr_copy(aux_dest,&circuitConstants[69]);
 }
 {
 uint aux_create = 0;
@@ -30479,7 +33946,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -30577,7 +34045,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -30585,7 +34053,7 @@ uint index_multiple_eq;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[89]);
+Fr_copy(aux_dest,&circuitConstants[69]);
 }
 {
 uint aux_create = 0;
@@ -30816,7 +34284,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[4];
+FrElement expaux[3];
 FrElement lvar[26];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -30830,139 +34298,283 @@ Fr_copy(aux_dest,&circuitConstants[53]);
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[2];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[3];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[4];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[5];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[6];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[7];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[8];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[9];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[10];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[11];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[12];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[13];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[14];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[15];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[16];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[17];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[18];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[19];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[20];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[21];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[22];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[23];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[24];
+// load src
+// end load src
+Fr_copy(aux_dest,&circuitConstants[1]);
+}
+{
+PFrElement aux_dest = &lvar[1];
+// load src
+// end load src
 Fr_copy(aux_dest,&circuitConstants[2]);
 }
 {
 PFrElement aux_dest = &lvar[2];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[62]);
+Fr_copy(aux_dest,&circuitConstants[70]);
 }
 {
 PFrElement aux_dest = &lvar[3];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[63]);
+Fr_copy(aux_dest,&circuitConstants[71]);
 }
 {
 PFrElement aux_dest = &lvar[4];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[64]);
+Fr_copy(aux_dest,&circuitConstants[72]);
 }
 {
 PFrElement aux_dest = &lvar[5];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[65]);
+Fr_copy(aux_dest,&circuitConstants[73]);
 }
 {
 PFrElement aux_dest = &lvar[6];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[7];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[8];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[70]);
+Fr_copy(aux_dest,&circuitConstants[76]);
 }
 {
 PFrElement aux_dest = &lvar[9];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[71]);
+Fr_copy(aux_dest,&circuitConstants[77]);
 }
 {
 PFrElement aux_dest = &lvar[10];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[11];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[73]);
+Fr_copy(aux_dest,&circuitConstants[79]);
 }
 {
 PFrElement aux_dest = &lvar[12];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[75]);
+Fr_copy(aux_dest,&circuitConstants[80]);
 }
 {
 PFrElement aux_dest = &lvar[13];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[77]);
+Fr_copy(aux_dest,&circuitConstants[81]);
 }
 {
 PFrElement aux_dest = &lvar[14];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[79]);
+Fr_copy(aux_dest,&circuitConstants[82]);
 }
 {
 PFrElement aux_dest = &lvar[15];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[80]);
+Fr_copy(aux_dest,&circuitConstants[83]);
 }
 {
 PFrElement aux_dest = &lvar[16];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[81]);
+Fr_copy(aux_dest,&circuitConstants[84]);
 }
 {
 PFrElement aux_dest = &lvar[17];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[83]);
+Fr_copy(aux_dest,&circuitConstants[85]);
 }
 {
 PFrElement aux_dest = &lvar[18];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[85]);
+Fr_copy(aux_dest,&circuitConstants[86]);
 }
 {
 PFrElement aux_dest = &lvar[19];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[86]);
+Fr_copy(aux_dest,&circuitConstants[87]);
 }
 {
 PFrElement aux_dest = &lvar[20];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[87]);
+Fr_copy(aux_dest,&circuitConstants[88]);
 }
 {
 PFrElement aux_dest = &lvar[21];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[68]);
+Fr_copy(aux_dest,&circuitConstants[75]);
 }
 {
 PFrElement aux_dest = &lvar[22];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[88]);
+Fr_copy(aux_dest,&circuitConstants[89]);
 }
 {
 PFrElement aux_dest = &lvar[23];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[67]);
+Fr_copy(aux_dest,&circuitConstants[74]);
 }
 {
 PFrElement aux_dest = &lvar[24];
@@ -31022,7 +34634,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -31079,7 +34691,8 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 Fr_copy(aux_dest,&signalValues[mySignalStart + ((1 * Fr_toInt(&lvar[2])) + 1600)]);
 }
 // no need to run sub component
-assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
+ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1;
+assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter > 0);
 }
 {
 uint cmp_index_ref = 1;
@@ -31177,7 +34790,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -31415,7 +35028,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[2];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -31873,7 +35486,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -31906,7 +35519,7 @@ aux_cmp_num += 229273;
 PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
-Fr_copy(aux_dest,&circuitConstants[72]);
+Fr_copy(aux_dest,&circuitConstants[78]);
 }
 {
 PFrElement aux_dest = &lvar[1];
@@ -31926,7 +35539,7 @@ PFrElement aux_dest = &lvar[1];
 // end load src
 Fr_copy(aux_dest,&circuitConstants[1]);
 }
-Fr_lt(&expaux[0],&lvar[1],&circuitConstants[84]); // line circom 80
+Fr_lt(&expaux[0],&lvar[1],&circuitConstants[68]); // line circom 80
 while(Fr_isTrue(&expaux[0])){
 {
 PFrElement aux_dest = &lvar[2];
@@ -32011,7 +35624,7 @@ Fr_add(&expaux[0],&lvar[1],&circuitConstants[2]); // line circom 80
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
 }
-Fr_lt(&expaux[0],&lvar[1],&circuitConstants[84]); // line circom 80
+Fr_lt(&expaux[0],&lvar[1],&circuitConstants[68]); // line circom 80
 }
 {
 PFrElement aux_dest = &lvar[1];
@@ -32094,7 +35707,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -32283,7 +35896,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[5];
+FrElement expaux[4];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
@@ -32377,7 +35990,7 @@ u32* mySubcomponents = ctx->componentMemory[ctx_index].subcomponents;
 bool* mySubcomponentsParallel = ctx->componentMemory[ctx_index].subcomponentsParallel;
 FrElement* circuitConstants = ctx->circuitConstants;
 std::string* listOfTemplateMessages = ctx->listOfTemplateMessages;
-FrElement expaux[3];
+FrElement expaux[2];
 FrElement lvar[3];
 uint sub_component_aux;
 uint index_multiple_eq;
