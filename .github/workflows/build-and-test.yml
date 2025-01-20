@@ -30,12 +30,6 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
-  setup-nasm:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup NASM
-        uses: ilammy/setup-nasm@v1
-
   install-cpp-std-lib:
     runs-on: ubuntu-latest
     steps:
@@ -66,12 +60,11 @@ jobs:
       - name: Run ffi halo2 tests
         run: cd mopro-ffi && cargo test --features halo2 --no-default-features
   test-ffi-circom:
-    needs:
-      - setup-nasm
-      - install-cpp-std-lib
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
+      - *install-cpp-std-lib
+      - uses: ilammy/setup-nasm@v1
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -164,12 +157,11 @@ jobs:
           cd mopro-wasm
           wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
   test-e2e:
-    needs:
-      - setup-nasm
-      - install-cpp-std-lib
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
+      - *install-cpp-std-lib
+      - uses: ilammy/setup-nasm@v1
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -185,12 +177,11 @@ jobs:
       - name: Run e2e halo2 tests
         run: CLASSPATH=jna-5.13.0.jar cargo test --test halo2 -- --nocapture
   build-xcframework:
-    needs:
-      - setup-nasm
-      - install-cpp-std-lib
     runs-on: macos-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
+      - *install-cpp-std-lib
+      - uses: ilammy/setup-nasm@v1
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -261,12 +252,11 @@ jobs:
       - name: Test app in simulator
         run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination 'platform=iOS Simulator,name=iPhone 15' test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
   build-android-lib:
-    needs:
-      - setup-nasm
-      - install-cpp-std-lib
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
+      - *install-cpp-std-lib
+      - uses: ilammy/setup-nasm@v1
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -310,10 +300,10 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - setup-halo2-wasm-env
-      - setup-nasm
-      - install-cpp-std-lib
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
+      - *install-cpp-std-lib
+      - uses: ilammy/setup-nasm@v1
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
