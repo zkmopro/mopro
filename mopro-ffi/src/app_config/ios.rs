@@ -6,18 +6,14 @@ use uniffi::generate_bindings;
 use uniffi::SwiftBindingGenerator;
 
 use super::cleanup_tmp_local;
+use super::constants::{IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
 use super::install_arch;
 use super::mktemp_local;
 
-// This variable should be align with `cli/build.rs`
-pub const IOS_ARCHS: [&str; 3] = [
-    "aarch64-apple-ios",
-    "aarch64-apple-ios-sim",
-    "x86_64-apple-ios",
-];
-
 // Load environment variables that are specified by by xcode
 pub fn build() {
+    const BINDING_NAME: &str = "MoproiOSBindings";
+
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
@@ -25,64 +21,53 @@ pub fn build() {
     let build_dir_path = Path::new(&build_dir);
     let work_dir = mktemp_local(build_dir_path);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
-    let bindings_out = work_dir.join("MoproiOSBindings");
+    let bindings_out = work_dir.join(BINDING_NAME);
     fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
-    let bindings_dest = Path::new(&manifest_dir).join("MoproiOSBindings");
+    let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
     let framework_out = bindings_out.join("MoproBindings.xcframework");
 
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
-    let mode;
-    if let Ok(configuration) = std::env::var("CONFIGURATION") {
-        mode = match configuration.as_str() {
-            "Debug" => "debug",
-            "Release" => "release",
-            "debug" => "debug",
-            "release" => "release",
-            _ => panic!("unknown configuration"),
-        };
-    } else {
-        mode = "debug";
-    }
+    let mode = Mode::parse_from_str(
+        std::env::var(ENV_CONFIG)
+            .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
+            .as_str(),
+    );
 
-    let target_archs: Vec<String> = if let Ok(ios_archs) = std::env::var("IOS_ARCHS") {
-        ios_archs.split(',').map(|arch| arch.to_string()).collect()
+    let target_archs: Vec<IosArch> = if let Ok(archs_str) = std::env::var(ENV_IOS_ARCHS) {
+        archs_str.split(',').map(IosArch::parse_from_str).collect()
     } else {
         // Default case: select all supported architectures if none are provided
-        IOS_ARCHS.iter().map(|&arch| arch.to_string()).collect()
+        IosArch::all_strings()
+            .iter()
+            .map(|s| IosArch::parse_from_str(s))
+            .collect()
     };
-
-    // Check 'IOS_ARCH' input validation
-    for arch in &target_archs {
-        assert!(
-            IOS_ARCHS.contains(&arch.as_str()),
-            "Unsupported architecture: {}",
-            arch
-        );
-    }
 
     // Take a list of architectures, build them, and combine them into
     // a single universal binary/archive
-    let build_combined_archs = |archs: &Vec<&str>| -> PathBuf {
+    let build_combined_archs = |archs: &[IosArch]| -> PathBuf {
         let out_lib_paths: Vec<PathBuf> = archs
             .iter()
             .map(|arch| {
                 Path::new(&build_dir).join(Path::new(&format!(
                     "{}/{}/{}/libmopro_bindings.a",
-                    build_dir, arch, mode
+                    build_dir,
+                    arch.as_str(),
+                    mode.as_str()
                 )))
             })
             .collect();
         for arch in archs {
-            install_arch(arch.to_string());
+            install_arch(arch.as_str().to_string());
             let mut build_cmd = Command::new("cargo");
             build_cmd.arg("build");
-            if mode == "release" {
+            if mode == Mode::Release {
                 build_cmd.arg("--release");
             }
             build_cmd
                 .arg("--lib")
                 .env("CARGO_BUILD_TARGET_DIR", &build_dir)
-                .env("CARGO_BUILD_TARGET", arch)
+                .env("CARGO_BUILD_TARGET", arch.as_str())
                 .spawn()
                 .expect("Failed to spawn cargo build")
                 .wait()
@@ -164,29 +149,30 @@ pub fn build() {
 }
 
 // More general cases
-fn group_target_archs(target_archs: &[String]) -> Vec<Vec<&str>> {
+fn group_target_archs(target_archs: &[IosArch]) -> Vec<Vec<IosArch>> {
     // Detect the current architecture
     let current_arch = std::env::consts::ARCH;
 
     // Determine the device architecture prefix based on the current architecture
     let device_prefix = match current_arch {
-        arch if arch.starts_with("x86_64") => "x86_64",
-        arch if arch.starts_with("aarch64") => "aarch64",
+        arch if arch.starts_with(ARCH_X86_64) => ARCH_X86_64,
+        arch if arch.starts_with(ARCH_ARM_64) => ARCH_ARM_64,
         _ => panic!("Unsupported host architecture: {}", current_arch),
     };
 
     let mut device_archs = Vec::new();
     let mut simulator_archs = Vec::new();
 
-    for arch in target_archs.iter().map(String::as_str) {
-        if arch.ends_with("sim") {
+    target_archs.iter().for_each(|&arch| {
+        let arch_str = arch.as_str();
+        if arch_str.ends_with("sim") {
             simulator_archs.push(arch);
-        } else if arch.starts_with(device_prefix) {
+        } else if arch_str.starts_with(device_prefix) {
             device_archs.push(arch);
         } else {
             simulator_archs.push(arch);
         }
-    }
+    });
 
     let mut grouped_archs = Vec::new();
     if !device_archs.is_empty() {

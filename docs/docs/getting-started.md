@@ -1,6 +1,6 @@
 # Getting started
 
-This tutorial guides you through building a static library with the Circom/Halo2 adapter for Android and iOS and creating example templates for mobile development.
+This tutorial guides you through building a static library with the Circom/Halo2 adapter for Android, iOS and Web and creating example templates for mobile development.
 
 ## 0. Prerequisites
 
@@ -28,7 +28,7 @@ mopro init
 ## 3. Build bindings
 
 Navigate to your project directory. (e.g. `cd mopro-example-app`) <br/>
-Build bindings for specific targets (iOS, Android).
+Build bindings for specific targets (iOS, Android, Web).
 
 ```sh
 mopro build
@@ -58,7 +58,9 @@ For iOS:
 open ios/MoproApp.xcodeproj
 ```
 
-For Android
+For Android:
 ```sh
 open android -a Android\ Studio
 ```
+
+For Web:

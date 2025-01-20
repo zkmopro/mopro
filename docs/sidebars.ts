@@ -21,12 +21,12 @@ const sidebars: SidebarsConfig = {
             type: 'category',
             label: 'Setup',
             items: [
-                'setup/rust-setup',
                 'setup/ios-setup',
                 'setup/android-setup',
                 'setup/web-wasm-setup',
                 'setup/react-native-setup',
-                'setup/flutter-setup'
+                'setup/flutter-setup',
+                'setup/rust-setup'
             ]
         },
         {

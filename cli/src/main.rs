@@ -2,10 +2,14 @@ use clap::Parser;
 use clap::Subcommand;
 
 mod build;
+mod config;
+mod constants;
 mod create;
 mod init;
 mod print;
+mod select;
 mod style;
+mod utils;
 
 /// CLI for creating a mopro project.
 #[derive(Parser, Debug)]
@@ -37,7 +41,7 @@ enum Commands {
     /// Create templates for the specified platform
     Create {
         #[arg(long, help = "Specify the platform")]
-        template: Option<String>,
+        framework: Option<String>,
     },
 }
 
@@ -56,7 +60,7 @@ fn main() {
             Ok(_) => {}
             Err(e) => style::print_red_bold(format!("Failed to build project: {:?}", e)),
         },
-        Commands::Create { template } => match create::create_project(template) {
+        Commands::Create { framework } => match create::create_project(framework) {
             Ok(_) => {}
             Err(e) => style::print_red_bold(format!("Failed to create template: {:?}", e)),
         },

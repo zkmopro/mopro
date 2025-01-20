@@ -1,6 +1,7 @@
 # React Native Setup
 
-After completing the [Rust setup](rust-setup.md) and setting up either [iOS setup](ios-setup.md) or [Android setup](android-setup.md), you're ready to create a cross-platform project using [React Native](https://reactnative.dev/). <br/>
+Using ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) guide, you can generate the "MoproAndroidBindings" and "MoproIOSBindings" for the iOS and android platforms in your project folder. These bindings allow you to create a cross-platform project using [React Native](https://reactnative.dev/).<br/>
+
 React Native is a _JavaScript_ framework that enables developers to build native apps for multiple platforms with a single codebase.
 
 In this tutorial, you will learn how to create a native Mopro module on both Android and iOS simulators. <br/>
@@ -10,9 +11,30 @@ In this tutorial, you will learn how to create a native Mopro module on both And
     <img src="/img/react-native-ios.png" alt="Second Image" width="250"/>
 </div>
 
-You have 2 options to get started with a mopro React Native project:
+You have 3 options to get started with a mopro React Native project:
 
-### Option 1: Clone the Repository and Import the Bindings
+## Option 1: Use Mopro Cli
+
+The easiest way to set up your project is by using the mopro cli **create** command.<br/>This command helps you quickly add templates, similar to the next option, but with fewer manual steps.
+
+```sh
+mopro-example-app $ mopro create
+```
+
+Assuming you’ve successfully built the **iOS** and **android** bindings: `MoproAndroidBindings` and `MoproIOSBindings` in your project folder, the mopro cli stored some parameters into the `Config.toml` file and reads them during the create command. It will also allow you to select the **react-native** template, as shown below:
+
+```
+? Create template ›
+  ios
+  android
+  web          - Require binding
+  flutter
+❯ react-native
+```
+
+## Option 2: Clone the Repository and Import the Bindings
+
+This option is a more manual compared to [Option 1](#option-1-use-mopro-cli). You can clone a pre-configured repository and manually import the generated bindings into your React Native project.
 
 1. Clone the [zkmopro/react-native-app](https://github.com/zkmopro/react-native-app) repository
 
@@ -40,11 +62,11 @@ You have 2 options to get started with a mopro React Native project:
 
 4. Update mopro bindings in [Android](#4-2-include-mopro-bindings-in-the-native-android-module) and [iOS](#51-use-a-framework) native module
 
-### Option 2: Follow the Tutorial and Build a React Native Module
+## Option 3: Follow the Tutorial and Build a React Native Module
 
 If you prefer a more hands-on approach and wish to understand how everything works, you can follow the tutorial to build a React Native module from scratch.
 
-## 1. Initializing a New React Native Project or Using an Existing One
+### 1. Initializing a New React Native Project or Using an Existing One
 
 -   Getting started with React Native: [Official documentation](https://reactnative.dev/docs/environment-setup)
 
@@ -65,7 +87,7 @@ If you prefer a more hands-on approach and wish to understand how everything wor
     ```
     for Android emulators.
 
-## 2. Creating a Native Module
+### 2. Creating a Native Module
 
 -   Creating a native module by the command
 
@@ -80,7 +102,7 @@ If you prefer a more hands-on approach and wish to understand how everything wor
     [Wrap third-party native libraries](https://docs.expo.dev/modules/third-party-library/)
     :::
 
-## 3. Define an API
+### 3. Define an API
 
 -   Define the types for the native module. Add the following types in the file:
 
@@ -122,9 +144,9 @@ If you prefer a more hands-on approach and wish to understand how everything wor
     }
     ```
 
-## 4. Implement the module on Android
+### 4. Implement the module on Android
 
-### 4-1. Add dependency for [jna](https://github.com/java-native-access/jna) in the file `build.gradle`.
+#### 4-1. Add dependency for [jna](https://github.com/java-native-access/jna) in the file `build.gradle`.
 
 ```kotlin title="/modules/mopro/android/build.gradle"
 dependencies {
@@ -132,7 +154,7 @@ dependencies {
 }
 ```
 
-### 4-2. Include Mopro bindings in the native Android module
+#### 4-2. Include Mopro bindings in the native Android module
 
 -   Get the `MoproAndroidBindings` from `cargo run --bin android`.
     :::info
@@ -165,7 +187,7 @@ dependencies {
             └── libuniffi_mopro.so
     ```
 
-### 4-3. Create convertible types for Javascript library with kotlin.
+#### 4-3. Create convertible types for Javascript library with kotlin.
 
 It is a better way to represent a JavaScript object with the native type safety.
 
@@ -230,7 +252,7 @@ class Result : Record {
 Ref: [Records](https://docs.expo.dev/modules/module-api/#records)
 :::
 
-### 4-4. Create native module implementation in `MoproModule.kt`
+#### 4-4. Create native module implementation in `MoproModule.kt`
 
 ```kotlin title="/modules/mopro/android/src/main/java/expo/modules/mopro/MoproModule.kt"
 package expo.modules.mopro
@@ -284,9 +306,9 @@ class MoproModule : Module() {
 }
 ```
 
-## 5. Implement the module on iOS
+### 5. Implement the module on iOS
 
-### 5.1 Use a framework
+#### 5.1 Use a framework
 
 -   Get the `MoproiOSBindings` from `cargo run --bin ios`.
     :::info
@@ -302,7 +324,7 @@ class MoproModule : Module() {
         ...
     ```
 
-### 5.2 Create convertible types for Javascript library with swift.
+#### 5.2 Create convertible types for Javascript library with swift.
 
 -   Create a new file called `MoproType.swift` in the following folder: `modules/mopro/ios`
 
@@ -346,7 +368,7 @@ class MoproModule : Module() {
     }
     ```
 
-### 5-3. Create native module implementation in `MoproModule.swift`
+#### 5-3. Create native module implementation in `MoproModule.swift`
 
 ```swift title="/modules/mopro/ios/MoproModule.swift"
 import ExpoModulesCore
@@ -416,9 +438,9 @@ public class MoproModule: Module {
 }
 ```
 
-## 6. Run the app
+### 6. Run the app
 
-### 6.1 Install expo-asset
+#### 6.1 Install expo-asset
 
 Install `expo-asset` to use assets.
 
@@ -426,7 +448,7 @@ Install `expo-asset` to use assets.
 npx expo install expo-asset
 ```
 
-### 6.2 Check the expo command
+#### 6.2 Check the expo command
 
 The `android` and `ios` script should be as follows:
 
@@ -443,7 +465,7 @@ The `android` and `ios` script should be as follows:
 }
 ```
 
-### 6.3 Create an example view
+#### 6.3 Create an example view
 
 This view enables users to generate `multiplier2` proofs and the public signals.
 
@@ -573,7 +595,7 @@ const styles = StyleSheet.create({
 });
 ```
 
-### 6.4 Run in simulators
+#### 6.4 Run in simulators
 
 -   **Android**
 

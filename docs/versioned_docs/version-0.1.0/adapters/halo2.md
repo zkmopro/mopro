@@ -87,7 +87,7 @@ fn get_halo2_proving_circuit(circuit: &str) -> Result<Halo2ProveFn, MoproError> 
 
 fn get_halo2_verifying_circuit(circuit: &str) -> Result<Halo2VerifyFn, MoproError> {
     match circuit {
-        "fibonacci_vk.bin" => Ok(plonk_fibonacci::verify),
+        "plonk_fibonacci_vk.bin" => Ok(plonk_fibonacci::verify),
         _ => Err(MoproError::CircuitNotFound),
     }
 }

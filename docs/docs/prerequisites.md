@@ -13,6 +13,7 @@ Depending on what platforms and adapters you use, there are several prerequisite
   - [Xcode](https://developer.apple.com/xcode/)
 - Android
   - [Android Studio](https://developer.android.com/studio)
+  - [JDK(Java Development Kit)](https://www.oracle.com/java/technologies/downloads)
   - Also see [configuration](#android-configuration) below
 - Web(WASM)
   - [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
@@ -21,6 +22,12 @@ Depending on what platforms and adapters you use, there are several prerequisite
   - Pre-built `zkey` and `wasm` files for your circuits
 - Halo2
   - Pre-generated SRS (Structured Reference String) file, typically used as the universal setup for your circuits
+
+## iOS configuration
+
+Ensure that the command-line tools path is correctly set in Xcode. You can check this by navigating to Xcode > Settings > Locations.
+
+![xcode - settings - location](/img/xcode-setting.png)
 
 ## Android configuration
 
