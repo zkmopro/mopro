@@ -19,6 +19,7 @@ ashlang = ["dep:ashlang"]
 halo2 = []
 circom = [
     "rust-witness",
+    "witnesscalc_adapter",
     "ark-circom",
     "ark-serialize",
     "ark-ec",
@@ -46,6 +47,8 @@ ashlang = { git = "https://github.com/chancehudson/ashlang.git", rev = "696960a0
 
 # circom deps
 rust-witness = { version = "0.1.1", optional = true }
+#witnesscalc_adapter = { git = "https://github.com/alxkzmn/witnesscalc_adapter.git", package = "witnesscalc-adapter", optional = true }
+witnesscalc_adapter = { path = "../../mopro_witnesscalc/witnesscalc_adapter", package = "witnesscalc-adapter", optional = true }
 ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", version = "0.1.0", branch = "wasm-delete", optional = true }
 ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "0.4.3", default-features = false, features = [
@@ -75,6 +78,8 @@ bincode = "1.3.3"
 
 [build-dependencies]
 rust-witness = { version = "0.1.1", optional = true }
+#witnesscalc_adapter = { git = "https://github.com/alxkzmn/witnesscalc_adapter.git", package = "witnesscalc-adapter", optional = true }
+witnesscalc_adapter = { path = "../../mopro_witnesscalc/witnesscalc_adapter", package = "witnesscalc-adapter", optional = true }
 uniffi = { version = "=0.28.0", features = ["build"] }
 
 [dev-dependencies]

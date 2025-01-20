@@ -6,21 +6,21 @@ sidebar_position: 2
 
 Depending on what platforms and adapters you use, there are several prerequisites to install before getting started.
 
--   General
-    -   [Rust](https://www.rust-lang.org/learn/get-started)
-    -   [Cmake](https://cmake.org/download/)
--   iOS
-    -   [Xcode](https://developer.apple.com/xcode/)
--   Android
-    -   [Android Studio](https://developer.android.com/studio)
-    -   Also see [configuration](#android-configuration) below
--   Web(WASM)
-    -   [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
-    -   [Download Chrome/ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/)
--   Circom
-    -   Pre-built `zkey` and `wasm` files for your circuits
--   Halo2
-    -   Pre-generated SRS (Structured Reference String) file, typically used as the universal setup for your circuits
+- General
+  - [Rust](https://www.rust-lang.org/learn/get-started)
+  - [Cmake](https://cmake.org/download/)
+- iOS
+  - [Xcode](https://developer.apple.com/xcode/)
+- Android
+  - [Android Studio](https://developer.android.com/studio)
+  - Also see [configuration](#android-configuration) below
+- Web(WASM)
+  - [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
+  - [Download Chrome/ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/)
+- Circom
+  - Pre-built `zkey` and `wasm` files for your circuits
+- Halo2
+  - Pre-generated SRS (Structured Reference String) file, typically used as the universal setup for your circuits
 
 ## Android configuration
 
@@ -42,10 +42,26 @@ export ANDROID_HOME="/Users/{USER_NAME}/Library/Android/sdk"
 ls $ANDROID_HOME/ndk # => 26.1.10909125
 ```
 
-3. Set it to your `NDK_PATH` environment variable
+3. Set it to your `ANDROID_NDK` environment variable
 
 ```sh
-NDK_PATH=$ANDROID_HOME/ndk/26.1.10909125
+ANDROID_NDK=$ANDROID_HOME/ndk/26.1.10909125
 ```
 
-> Reference: [Running Rust on Android with UniFFI](https://sal.dev/android/intro-rust-android-uniffi/).
+4. Install `nasm` for your platform
+
+- On macOS, you can install it using Homebrew:
+
+  ```sh
+  brew install nasm
+  ```
+
+- On a unix-based system, first check if `nasm` is already installed:
+
+  ```sh
+  whereis nasm
+  ```
+
+  If you see a path, then it is already installed. If you only see `nasm:`, then you need to install it. Download and install the latest version from the [official website](https://www.nasm.us/pub/nasm/releasebuilds/?C=M;O=D)
+
+- On Windows, download the latest version from the [official website](https://www.nasm.us/pub/nasm/releasebuilds/?C=M;O=D) and add it to your PATH.

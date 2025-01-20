@@ -26,7 +26,15 @@ use ark_std::rand::thread_rng;
 
 use num_bigint::{BigInt, BigUint};
 
-pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
+/// Witness function signature for rust_witness (inputs) -> witness
+pub type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
+/// Witness function signature for witnesscalc_adapter (inputs, .dat file path) -> witness
+pub type WitnesscalcWtnsFn = fn(HashMap<String, Vec<BigInt>>, &str) -> Vec<BigInt>;
+
+pub enum WtnsFn {
+    WithDatArg(WitnesscalcWtnsFn),
+    NoDatArg(RustWitnessWtnsFn),
+}
 
 #[macro_export]
 macro_rules! circom_app {
@@ -44,7 +52,7 @@ macro_rules! circom_app {
                 }
             };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
-            mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn.clone())
+            mopro_ffi::generate_circom_proof_wtns(in0, in1, witness_fn)
                 .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
         }
 
@@ -126,6 +134,9 @@ pub fn generate_circom_proof_wtns(
     inputs: HashMap<String, Vec<String>>,
     witness_fn: WtnsFn,
 ) -> Result<GenerateProofResult> {
+    // .dat file is supposed to be located next to the zkey file and have the same filename
+    let mut dat_file_path = zkey_path.clone();
+    dat_file_path = dat_file_path.replace(".zkey", ".dat");
     // We'll start a background thread building the witness
     let witness_thread = std::thread::spawn(move || {
         // Form the inputs
@@ -141,7 +152,12 @@ pub fn generate_circom_proof_wtns(
             })
             .collect();
 
-        witness_fn(bigint_inputs)
+        let result = match witness_fn {
+            WtnsFn::WithDatArg(witness_fn) => witness_fn(bigint_inputs, dat_file_path.as_str()),
+            WtnsFn::NoDatArg(witness_fn) => witness_fn(bigint_inputs),
+        };
+
+        result
             .into_iter()
             .map(|w| w.to_biguint().unwrap())
             .collect::<Vec<_>>()
@@ -271,9 +287,10 @@ mod tests {
 
     // Only build the witness functions for tests, don't bundle them into
     // the final library
-    rust_witness::witness!(multiplier2);
+    witnesscalc_adapter::witness!(multiplier2);
     rust_witness::witness!(multiplier2bls);
-    rust_witness::witness!(keccak256256test);
+    witnesscalc_adapter::witness!(hashbench_bn);
+    witnesscalc_adapter::witness!(keccak256_256_test);
     rust_witness::witness!(hashbenchbls);
 
     use crate as mopro_ffi;
@@ -284,10 +301,10 @@ mod tests {
         circom_app!();
 
         set_circom_circuits! {
-            ("multiplier2_final.zkey", multiplier2_witness),
+            ("multiplier2.zkey", WtnsFn::WithDatArg(multiplier2_witness)),
         }
 
-        const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
+        const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2.zkey";
 
         let mut inputs = HashMap::new();
         let a = BigInt::from_str(
@@ -307,10 +324,11 @@ mod tests {
     // then we reference it in our build somehow
     fn zkey_witness_map(name: &str) -> Result<WtnsFn> {
         match name {
-            "multiplier2_final.zkey" => Ok(multiplier2_witness),
-            "keccak256_256_test_final.zkey" => Ok(keccak256256test_witness),
-            "hashbench_bls_final.zkey" => Ok(hashbenchbls_witness),
-            "multiplier2_bls_final.zkey" => Ok(multiplier2bls_witness),
+            "multiplier2.zkey" => Ok(WtnsFn::WithDatArg(multiplier2_witness)),
+            "keccak256_256_test.zkey" => Ok(WtnsFn::WithDatArg(keccak256_256_test_witness)),
+            "hashbench_bls_final.zkey" => Ok(WtnsFn::NoDatArg(hashbenchbls_witness)),
+            "multiplier2_bls_final.zkey" => Ok(WtnsFn::NoDatArg(multiplier2bls_witness)),
+            "hashbench_bn.zkey" => Ok(WtnsFn::WithDatArg(hashbench_bn_witness)),
             _ => bail!("Unknown circuit name"),
         }
     }
@@ -364,7 +382,7 @@ mod tests {
     #[test]
     fn test_prove() -> Result<()> {
         // Create a new MoproCircom instance
-        let zkey_path = "../test-vectors/circom/multiplier2_final.zkey".to_string();
+        let zkey_path = "../test-vectors/circom/multiplier2.zkey".to_string();
 
         let mut inputs = HashMap::new();
         let a = BigInt::from_str(
@@ -411,7 +429,7 @@ mod tests {
     #[test]
     fn test_prove_keccak() -> Result<()> {
         // Create a new MoproCircom instance
-        let zkey_path = "../test-vectors/circom/keccak256_256_test_final.zkey".to_string();
+        let zkey_path = "../test-vectors/circom/keccak256_256_test.zkey".to_string();
         // Prepare inputs
         let input_vec = vec![
             116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -477,6 +495,45 @@ mod tests {
 
         assert!(!serialized_proof.is_empty());
 
+        let output = serialization::deserialize_inputs::<Bls12_381>(p.inputs).0[0];
+        assert_eq!(BigUint::from(output), expected_output);
+
+        // Step 3: Verify Proof
+        let is_valid = verify_circom_proof(
+            zkey_path,
+            serialized_proof.clone(),
+            serialized_inputs.clone(),
+        )?;
+        assert!(is_valid);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_prove_bn_hashbench() -> Result<()> {
+        // Create a new MoproCircom instance
+        let zkey_path = "../test-vectors/circom/hashbench_bn.zkey".to_string();
+
+        let mut inputs = HashMap::new();
+        let a = BigInt::from(1);
+        let b = BigInt::from(1);
+        inputs.insert("inputs".to_string(), vec![a.to_string(), b.to_string()]);
+
+        // The hashbench circuit repeatedly calculates poseidon hashes. We'll
+        // hardcode the expected output here
+        let expected_output = BigUint::from_str(
+            "21504899431687784493244593280491628491281645010412964820203063206154229304281",
+        )
+        .unwrap();
+
+        // Generate Proof
+        let p = generate_circom_proof(zkey_path.clone(), inputs)?;
+        let serialized_proof = p.proof;
+        let serialized_inputs = p.inputs.clone();
+
+        assert!(!serialized_proof.is_empty());
+
+        println!("{:?}", p.inputs);
         let output = serialization::deserialize_inputs::<Bls12_381>(p.inputs).0[0];
         assert_eq!(BigUint::from(output), expected_output);
 

@@ -11,11 +11,12 @@ use super::install_ndk;
 use super::mktemp_local;
 
 // This variable should be align with `cli/build.rs`
-pub const ANDROID_ARCHS: [&str; 4] = [
+pub const ANDROID_ARCHS: [&str; 2] = [
     "x86_64-linux-android",
-    "i686-linux-android",
-    "armv7-linux-androideabi",
     "aarch64-linux-android",
+    // The generic implemntation of Fr in witnesscalc only supports the 64-bit architecture (see witnesscalc/build/fr_generic.cpp, build/fr_raw_generic.cpp)
+    //"i686-linux-android",
+    //"armv7-linux-androideabi",
 ];
 
 pub fn build() {
