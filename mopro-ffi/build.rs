@@ -36,6 +36,8 @@ fn link_rapidsnark() {
         absolute_lib_path.clone().display()
     );
 
+    println!("cargo:rustc-link-arg=-Wl,-stack_size,0x1000000");
+
     println!("cargo:rustc-link-lib=static=rapidsnark");
     println!("cargo:rustc-link-lib={}", cpp_stdlib);
     println!("cargo:rustc-link-lib=pthread");
