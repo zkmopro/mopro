@@ -251,6 +251,8 @@ jobs:
         with:
           toolchain: stable
           override: true
+      - name: Install rapidsnark build deps
+        run: sudo apt-get update && sudo apt-get install -y build-essential
       - name: Build Android bindings
         run: cd test-e2e && cargo run --bin android
       - name: Cache android lib
