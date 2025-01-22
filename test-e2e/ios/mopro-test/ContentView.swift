@@ -37,10 +37,13 @@ struct ContentView: View {
     @State private var textViewText = ""
     @State private var isCircomProveButtonEnabled = true
     @State private var isCircomVerifyButtonEnabled = false
+    @State private var isCircomRapidsnarkProveButtonEnabled = true
+    @State private var isCircomRapidsnarkVerifyButtonEnabled = false
     @State private var isHalo2roveButtonEnabled = true
     @State private var isHalo2VerifyButtonEnabled = false
     @State private var isAshlangroveButtonEnabled = true
     @State private var isAshlangVerifyButtonEnabled = false
+    @State private var generatedCircomRapidsnarkProof: String?
     @State private var generatedCircomProof: Data?
     @State private var circomPublicInputs: Data?
     @State private var generatedHalo2Proof: Data?
@@ -60,6 +63,8 @@ struct ContentView: View {
                 .foregroundStyle(.tint)
             Button("Prove Circom", action: runCircomProveAction).disabled(!isCircomProveButtonEnabled).accessibilityIdentifier("proveCircom")
             Button("Verify Circom", action: runCircomVerifyAction).disabled(!isCircomVerifyButtonEnabled).accessibilityIdentifier("verifyCircom")
+            Button("Prove Circom (rapidsnark)", action: runCircomRapidsnarkProveAction).disabled(!isCircomRapidsnarkProveButtonEnabled).accessibilityIdentifier("proveCircomRapidsnark")
+            Button("Verify Circom (rapidsnark)", action: runCircomRapidsnarkVerifyAction).disabled(!isCircomRapidsnarkVerifyButtonEnabled).accessibilityIdentifier("verifyCircomRapidsnark")
             Button("Prove Halo2", action: runHalo2ProveAction).disabled(!isHalo2roveButtonEnabled).accessibilityIdentifier("proveHalo2")
             Button("Verify Halo2", action: runHalo2VerifyAction).disabled(!isHalo2VerifyButtonEnabled).accessibilityIdentifier("verifyHalo2")
             Button("Prove Ashlang", action: runAshlangProveAction).disabled(!isAshlangroveButtonEnabled).accessibilityIdentifier("proveAshlang")
@@ -77,6 +82,63 @@ struct ContentView: View {
 }
 
 extension ContentView {
+    func runCircomRapidsnarkProveAction() {
+        textViewText += "Generating Circom (rapidsnark) proof... "
+        do {
+            // Prepare inputs
+            var inputs = [String: [String]]()
+            let a = 3
+            let b = 5
+            inputs["a"] = [String(a)]
+            inputs["b"] = [String(b)]
+            
+            let start = CFAbsoluteTimeGetCurrent()
+            
+            // Generate Proof
+            let generateProofResult = try generateCircomProofRapidsnark(zkeyPath: zkeyPath, circuitInputs: inputs)
+            assert(!generateProofResult.isEmpty, "Proof should not be empty")
+            
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+            
+            // Store the generated proof and public inputs for later verification
+            generatedCircomRapidsnarkProof = generateProofResult
+            
+            textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
+            
+            isCircomRapidsnarkVerifyButtonEnabled = true
+        } catch {
+            textViewText += "\nProof generation failed: \(error.localizedDescription)\n"
+        }
+    }
+    
+    func runCircomRapidsnarkVerifyAction() {
+        guard let proof = generatedCircomRapidsnarkProof else {
+            textViewText += "Proof has not been generated yet.\n"
+            return
+        }
+        
+        textViewText += "Verifying Circom proof... "
+        do {
+            let start = CFAbsoluteTimeGetCurrent()
+            
+            let isValid = try verifyCircomProofRapidsnark(zkeyPath: zkeyPath, proof: proof)
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+            
+            if isValid {
+                textViewText += "\(String(format: "%.3f", timeTaken))s 2️⃣\n"
+            } else {
+                textViewText += "\nProof verification failed.\n"
+            }
+            isCircomRapidsnarkVerifyButtonEnabled = false
+        } catch let error as MoproError {
+            print("\nMoproError: \(error)")
+        } catch {
+            print("\nUnexpected error: \(error)")
+        }
+    }
+    
     func runCircomProveAction() {
         textViewText += "Generating Circom proof... "
         do {
