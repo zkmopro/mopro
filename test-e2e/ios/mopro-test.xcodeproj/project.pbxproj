@@ -43,9 +43,9 @@
 		4CF977F02C2BCF0000CE1139 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CF977F22C2BCF0300CE1139 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = plonk_fibonacci_srs.bin; path = "../../test-vectors/halo2/plonk_fibonacci_srs.bin"; sourceTree = "<group>"; };
-		60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = plonk_fibonacci_pk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_pk.bin"; sourceTree = "<group>"; };
-		60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = plonk_fibonacci_vk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_vk.bin"; sourceTree = "<group>"; };
+		60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_srs.bin; path = "../../test-vectors/halo2/plonk_fibonacci_srs.bin"; sourceTree = "<group>"; };
+		60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_pk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_pk.bin"; sourceTree = "<group>"; };
+		60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_vk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_vk.bin"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -429,6 +429,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				"OTHER_LDFLAGS[arch=*]" = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mopro.mopro-test";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -458,6 +459,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				"OTHER_LDFLAGS[arch=*]" = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mopro.mopro-test";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
