@@ -1,4 +1,3 @@
-use std::fs;
 use std::path::PathBuf;
 
 fn main() {
@@ -14,11 +13,12 @@ fn main() {
 fn link_rapidsnark() {
     let target = std::env::var("TARGET").unwrap();
     let arch = target.split('-').next().unwrap();
+    println!("cargo:warning={target}");
 
     // Try to list contents of the target directory
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let rapidsnark_dir = manifest_dir.join("rapidsnark");
-    let absolute_lib_path = if fs::exists(rapidsnark_dir.join(&target)).unwrap() {
+    let absolute_lib_path = if rapidsnark_dir.join(&target).exists() {
         rapidsnark_dir.join(target)
     } else {
         rapidsnark_dir.join(arch)
@@ -31,17 +31,26 @@ fn link_rapidsnark() {
         "stdc++"
     };
 
+    // println!("cargo:rustc-link-arg=-Wl,-unexported_symbols_list,/dev/null");
+    // println!("cargo:rustc-link-arg=-Wl,-exported_symbols_list,/dev/null");
+    // println!("cargo:rustc-link-arg=-Wl,-keep_private_externs");
+    // println!("cargo:rustc-link-arg=-Wl,-no_compact_unwind");
+
+    // println!("cargo:rustc-link-arg=-Wl,-keep_private_externs");
+    // println!("cargo:rustc-link-arg=-Wl,-no_dead_strip");
+    // println!("cargo:rustc-link-arg=-Wl,-demangle");
     println!(
         "cargo:rustc-link-search=native={}",
         absolute_lib_path.clone().display()
     );
 
-    println!("cargo:rustc-link-arg=-Wl,-stack_size,0x1000000");
+    // println!("cargo:rustc-link-arg=-Wl,-stack_size,0x1000000");
+    // println!("cargo:rustc-link-arg=-Wl,--whole-archive");
 
     println!("cargo:rustc-link-lib=static=rapidsnark");
-    println!("cargo:rustc-link-lib={}", cpp_stdlib);
-    println!("cargo:rustc-link-lib=pthread");
-    println!("cargo:rustc-link-lib=fr");
-    println!("cargo:rustc-link-lib=fq");
-    println!("cargo:rustc-link-lib=gmp");
+    println!("cargo:rustc-link-lib=static={}", cpp_stdlib);
+    println!("cargo:rustc-link-lib=static=pthread");
+    println!("cargo:rustc-link-lib=static=fr");
+    println!("cargo:rustc-link-lib=static=fq");
+    println!("cargo:rustc-link-lib=static=gmp");
 }
