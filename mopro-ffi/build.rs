@@ -19,7 +19,7 @@ fn link_rapidsnark() {
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let rapidsnark_dir = manifest_dir.join("rapidsnark");
     let absolute_lib_path = if rapidsnark_dir.join(&target).exists() {
-        rapidsnark_dir.join(target)
+        rapidsnark_dir.join(&target)
     } else {
         rapidsnark_dir.join(arch)
     };
@@ -49,7 +49,12 @@ fn link_rapidsnark() {
 
     println!("cargo:rustc-link-lib=static=rapidsnark");
     println!("cargo:rustc-link-lib={}", cpp_stdlib);
-    println!("cargo:rustc-link-lib=pthread");
+    if target.contains("android") {
+        // pthread is included in libc in android
+        println!("cargo:rustc-link-lib=c");
+    } else {
+        println!("cargo:rustc-link-lib=pthread");
+    }
     println!("cargo:rustc-link-lib=static=fr");
     println!("cargo:rustc-link-lib=static=fq");
     println!("cargo:rustc-link-lib=static=gmp");
