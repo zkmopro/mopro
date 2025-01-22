@@ -9,6 +9,7 @@ name = "circom_prover"
 [features]
 default = [
     "rust-witness",
+    "witnesscalc-adapter",
     "ark-circom",
     "ark-serialize",
     "ark-ec",
@@ -29,7 +30,7 @@ num-bigint = { version = "0.4.3", default-features = false, features = [
 ] }
 anyhow = "1.0.95"
 rust-witness = { version = "0.1.2", optional = true }
-witnesscalc_adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", package = "witnesscalc-adapter", optional = true }
+witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", package = "witnesscalc-adapter", optional = true }
 
 # ZKP Generation
 ark-ec = { version = "=0.4.1", default-features = false, features = ["parallel"], optional = true }

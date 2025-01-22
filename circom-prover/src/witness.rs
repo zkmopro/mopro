@@ -2,9 +2,9 @@ use num::{BigInt, BigUint};
 use std::{collections::HashMap, str::FromStr};
 
 /// Witness function signature for rust_witness (inputs) -> witness
-pub type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
+type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 /// Witness function signature for witnesscalc_adapter (inputs, .dat file path) -> witness
-pub type WitnesscalcWtnsFn = fn(HashMap<String, Vec<BigInt>>, &str) -> Vec<BigInt>;
+type WitnesscalcWtnsFn = fn(HashMap<String, Vec<BigInt>>, &str) -> Vec<BigInt>;
 
 pub enum WitnessFn {
     WitnessCalc(WitnesscalcWtnsFn),

@@ -1,5 +1,3 @@
-pub mod serialization;
-
 use crate::GenerateProofResult;
 use anyhow::Ok;
 use anyhow::Result;
@@ -44,12 +42,12 @@ macro_rules! circom_app {
             })
         }
 
-        fn to_ethereum_proof(in0: Vec<u8>) -> mopro_ffi::ProofCalldata {
-            mopro_ffi::to_ethereum_proof(in0)
+        fn to_ethereum_proof(in0: Vec<u8>) -> circom_prover::ProofCalldata {
+            circom_prover::prover::serialization::to_ethereum_proof(in0)
         }
 
         fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
-            mopro_ffi::to_ethereum_inputs(in0)
+            circom_prover::prover::serialization::to_ethereum_inputs(in0)
         }
     };
 }
@@ -140,7 +138,7 @@ mod tests {
     use std::ops::{Add, Mul};
     use std::str::FromStr;
 
-    use crate::circom::{generate_circom_proof_wtns, serialization, verify_circom_proof};
+    use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
     use crate::GenerateProofResult;
     use anyhow::bail;
     use anyhow::Result;
@@ -148,21 +146,23 @@ mod tests {
     use ark_bn254::Bn254;
     use ark_ff::PrimeField;
     use circom_prover::create_witness_fn;
-    use circom_prover::prover::ProofLib;
+    use circom_prover::prover::serialization::{to_ethereum_inputs, to_ethereum_proof};
+    use circom_prover::prover::{serialization, ProofLib};
+    use circom_prover::rust_witness;
     use circom_prover::witness::WitnessFn;
     use num_bigint::{BigInt, BigUint, ToBigInt};
-    use serialization::{to_ethereum_inputs, to_ethereum_proof};
 
     // Only build the witness functions for tests, don't bundle them into
     // the final library
     create_witness_fn!(WitnessLib::RustWitness, multiplier2);
     create_witness_fn!(WitnessLib::RustWitness, multiplier2bls);
-    create_witness_fn!(WitnessLib::RustWitness, keccak256_256_test);
-    create_witness_fn!(WitnessLib::RustWitness, hashbench_bls);
+    create_witness_fn!(WitnessLib::RustWitness, keccak256256test);
+    create_witness_fn!(WitnessLib::RustWitness, hashbenchbls);
 
     use crate as mopro_ffi;
 
     #[test]
+    #[allow(dead_code)]
     fn test_circom_macros() {
         circom_app!();
 
@@ -191,10 +191,8 @@ mod tests {
     fn zkey_witness_map(name: &str) -> Result<WitnessFn> {
         match name {
             "multiplier2_final.zkey" => Ok(WitnessFn::RustWitness(multiplier2_witness)),
-            "keccak256_256_test_final.zkey" => {
-                Ok(WitnessFn::RustWitness(keccak256_256_test_witness))
-            }
-            "hashbench_bls_final.zkey" => Ok(WitnessFn::RustWitness(hashbench_bls_witness)),
+            "keccak256_256_test_final.zkey" => Ok(WitnessFn::RustWitness(keccak256256test_witness)),
+            "hashbench_bls_final.zkey" => Ok(WitnessFn::RustWitness(hashbenchbls_witness)),
             "multiplier2_bls_final.zkey" => Ok(WitnessFn::RustWitness(multiplier2bls_witness)),
             _ => bail!("Unknown circuit name"),
         }
