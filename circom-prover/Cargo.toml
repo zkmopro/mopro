@@ -3,6 +3,8 @@ name = "circom-prover"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "circom_prover"
 
 [dependencies]
 num = { version = "=0.4.0" }

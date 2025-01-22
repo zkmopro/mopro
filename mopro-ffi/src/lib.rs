@@ -10,8 +10,11 @@ mod halo2;
 #[cfg(feature = "circom")]
 pub use circom::{
     generate_circom_proof_wtns, serialization::to_ethereum_inputs,
-    serialization::to_ethereum_proof, verify_circom_proof, WtnsFn,
+    serialization::to_ethereum_proof, verify_circom_proof,
 };
+
+#[cfg(feature = "circom")]
+pub use circom_prover::{prover, witness};
 
 #[cfg(feature = "halo2")]
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
@@ -166,6 +169,10 @@ pub struct ProofCalldata {
 macro_rules! app {
     () => {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
+        use circom_prover::{
+            prover::{ProofLib, ProofResult},
+            witness::{WitnessFn, WitnessLib},
+        };
         use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
 
         mopro_ffi::circom_app!();

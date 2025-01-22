@@ -19,11 +19,14 @@ pub enum WitnessLib {
 /// To create witness functions corresponding to different witness generation libs.
 #[macro_export]
 macro_rules! create_witness_fn {
-    ($witness:expr, $fn:ident) => {
-        match $witness {
-            WitnessLib::RustWitness => rust_witness::witness!($fn),
-            WitnessLib::WitnessCalc => witnesscalc_adapter::witness!($fn),
-        }
+    (WitnessLib::RustWitness, $fn:ident) => {
+        rust_witness::witness!($fn);
+    };
+    (WitnessLib::WitnessCalc, $fn:ident) => {
+        witnesscalc_adapter::witness!($fn);
+    };
+    ($other:tt, $fn:ident) => {
+        compile_error!(concat!("Unknown macro type: ", stringify!($other)));
     };
 }
 

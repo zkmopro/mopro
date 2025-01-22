@@ -51,6 +51,7 @@ ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
 num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
+circom-prover = {path = "../circom-prover"}
 
 # ZKP generation
 ark-ec = { version = "=0.4.1", default-features = false, features = [
