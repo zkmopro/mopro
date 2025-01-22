@@ -176,6 +176,8 @@ jobs:
         with:
           toolchain: stable
           override: true
+      - name: Install iOS target
+        run: rustup target add aarch64-apple-ios
       - name: Build iOS xcframework
         run: cd test-e2e && cargo run --bin ios
       - name: Cache xcframework
