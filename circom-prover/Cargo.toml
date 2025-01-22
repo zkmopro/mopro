@@ -6,6 +6,21 @@ edition = "2021"
 [lib]
 name = "circom_prover"
 
+[features]
+default = [
+    "rust-witness",
+    "ark-circom",
+    "ark-serialize",
+    "ark-ec",
+    "ark-crypto-primitives",
+    "ark-std",
+    "ark-bn254",
+    "ark-groth16",
+    "ark-relations",
+    "ark-ff",
+    "ark-bls12-381",
+]
+
 [dependencies]
 num = { version = "=0.4.0" }
 num-traits = { version = "0.2.15", default-features = false }
@@ -13,18 +28,19 @@ num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
 anyhow = "1.0.95"
-rust-witness = "0.1.2"
-witnesscalc_adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", package = "witnesscalc-adapter" }
+rust-witness = { version = "0.1.2", optional = true }
+witnesscalc_adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", package = "witnesscalc-adapter", optional = true }
 
 # ZKP Generation
-ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", branch = "wasm-delete"}
-ark-crypto-primitives = { version = "0.5.0" }
-ark-ec = { version = "0.4.1", default-features = false, features = ["parallel"] }
-ark-ff = { version = "0.4.0", default-features = false, features = ["parallel", "asm"] }
-ark-std = { version = "0.4.0", default-features = false, features = ["parallel"] }
-ark-bn254 = { version = "0.4.0" }
-ark-groth16 = { version = "0.4.0", default-features = false, features = ["parallel"] }
-ark-poly = { version = "0.4.0", default-features = false, features = ["parallel"] }
-ark-relations = { version = "0.4", default-features = false }
-ark-serialize = { version = "0.4.0", default-features = false }
-ark-bls12-381 =  { version = "0.4.0" }
+ark-ec = { version = "=0.4.1", default-features = false, features = ["parallel"], optional = true }
+ark-crypto-primitives = { version = "=0.4.0", optional = true }
+ark-std = { version = "=0.4.0", default-features = false, features = ["parallel"], optional = true }
+ark-bn254 = { version = "=0.4.0", optional = true }
+ark-groth16 = { version = "=0.4.0", default-features = false, features = ["parallel"], optional = true }
+ark-relations = { version = "0.4", default-features = false, optional = true }
+uuid = { version = "1.9.1", features = ["v4"] }
+byteorder = { version = "1.0.0", optional = true }
+ark-ff = { version = "0.4.0", optional = true }
+ark-bls12-381 = { version = "0.4.0", optional = true }
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", version = "0.1.0", branch = "wasm-delete", optional = true }
+ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }

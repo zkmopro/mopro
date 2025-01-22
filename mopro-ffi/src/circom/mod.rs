@@ -1,25 +1,13 @@
 pub mod serialization;
 
-use anyhow::{bail, Ok};
-use ark_bls12_381::Bls12_381;
-use ark_bn254::Bn254;
-use ark_ec::pairing::Pairing;
-use ark_ff::PrimeField;
-
-use std::collections::HashMap;
-use std::fs::File;
-
 use crate::GenerateProofResult;
-use ark_circom::{read_proving_key, CircomReduction, FieldSerialization, ZkeyHeaderReader};
-use ark_crypto_primitives::snark::SNARK;
-use ark_groth16::{prepare_verifying_key, Groth16, VerifyingKey};
+use anyhow::Ok;
+use anyhow::Result;
 use circom_prover::{
-    prover::{prove, ProofLib},
+    prover::{prove, verify, ProofLib},
     witness::{generate_witness, WitnessFn},
 };
-
-use anyhow::Result;
-use num_bigint::BigUint;
+use std::collections::HashMap;
 
 #[macro_export]
 macro_rules! circom_app {
@@ -141,40 +129,9 @@ pub fn generate_circom_proof_wtns(
 pub fn verify_circom_proof(
     zkey_path: String,
     proof: Vec<u8>,
-    public_input: Vec<u8>,
+    public_inputs: Vec<u8>,
 ) -> Result<bool> {
-    let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
-    header_reader.read();
-    let file = File::open(&zkey_path)?;
-    let mut reader = std::io::BufReader::new(file);
-    if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
-        let proving_key = read_proving_key::<_, Bn254>(&mut reader)?;
-        let p = serialization::deserialize_inputs::<Bn254>(public_input);
-        verify(proving_key.vk, p.0, proof)
-    } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
-        let proving_key = read_proving_key::<_, Bls12_381>(&mut reader)?;
-        let p = serialization::deserialize_inputs::<Bls12_381>(public_input);
-        verify(proving_key.vk, p.0, proof)
-    } else {
-        // unknown curve
-        bail!("unknown curve detected in zkey")
-    }
-}
-
-fn verify<T: Pairing + FieldSerialization>(
-    vk: VerifyingKey<T>,
-    public_inputs: Vec<T::ScalarField>,
-    proof: Vec<u8>,
-) -> Result<bool> {
-    let pvk = prepare_verifying_key(&vk);
-    let public_inputs_fr = public_inputs.to_vec();
-    let proof_parsed = serialization::deserialize_proof::<T>(proof);
-    let verified = Groth16::<T, CircomReduction>::verify_with_processed_vk(
-        &pvk,
-        &public_inputs_fr,
-        &proof_parsed.0,
-    )?;
-    Ok(verified)
+    verify(ProofLib::Arkworks, zkey_path, proof, public_inputs)
 }
 
 #[cfg(test)]

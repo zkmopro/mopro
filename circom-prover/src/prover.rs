@@ -20,3 +20,15 @@ pub fn prove(lib: ProofLib, zkey_path: String, witnesses: Vec<BigUint>) -> Resul
         ProofLib::RapidSnark => panic!("Not supported yet."),
     }
 }
+
+pub fn verify(
+    lib: ProofLib,
+    zkey_path: String,
+    proof: Vec<u8>,
+    public_inputs: Vec<u8>,
+) -> Result<bool> {
+    match lib {
+        ProofLib::Arkworks => arkworks::verify_circom_proof(zkey_path, proof, public_inputs),
+        ProofLib::RapidSnark => panic!("Not supported yet."),
+    }
+}

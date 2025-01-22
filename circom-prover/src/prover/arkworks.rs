@@ -1,15 +1,18 @@
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
-use ark_circom::{read_zkey, CircomReduction, FieldSerialization, ZkeyHeaderReader};
+use ark_circom::{
+    read_proving_key, read_zkey, CircomReduction, FieldSerialization, ZkeyHeaderReader,
+};
+use ark_crypto_primitives::snark::SNARK;
 use ark_ec::pairing::Pairing;
 use ark_ff::PrimeField;
-use ark_groth16::{Groth16, ProvingKey};
+use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey, VerifyingKey};
 use ark_relations::r1cs::ConstraintMatrices;
 use ark_std::rand::thread_rng;
 use ark_std::UniformRand;
 use serialization::{SerializableInputs, SerializableProof};
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use num_bigint::BigUint;
 use std::fs::File;
 
@@ -33,6 +36,28 @@ pub fn generate_circom_proof(zkey_path: String, witnesses: Vec<BigUint>) -> Resu
         prove(proving_key, matrices, witnesses)
     } else {
         panic!("unknown curve detected in zkey");
+    }
+}
+pub fn verify_circom_proof(
+    zkey_path: String,
+    proof: Vec<u8>,
+    public_inputs: Vec<u8>,
+) -> Result<bool> {
+    let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
+    header_reader.read();
+    let file = File::open(&zkey_path)?;
+    let mut reader = std::io::BufReader::new(file);
+    if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
+        let proving_key = read_proving_key::<_, Bn254>(&mut reader)?;
+        let p = serialization::deserialize_inputs::<Bn254>(public_inputs);
+        verify(proving_key.vk, p.0, proof)
+    } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
+        let proving_key = read_proving_key::<_, Bls12_381>(&mut reader)?;
+        let p = serialization::deserialize_inputs::<Bls12_381>(public_inputs);
+        verify(proving_key.vk, p.0, proof)
+    } else {
+        // unknown curve
+        bail!("unknown curve detected in zkey")
     }
 }
 
@@ -68,4 +93,20 @@ fn prove<T: Pairing + FieldSerialization>(
         proof: serialization::serialize_proof(&SerializableProof(proof)),
         pub_inputs: serialization::serialize_inputs(&SerializableInputs::<T>(public_inputs)),
     })
+}
+
+fn verify<T: Pairing + FieldSerialization>(
+    vk: VerifyingKey<T>,
+    public_inputs: Vec<T::ScalarField>,
+    proof: Vec<u8>,
+) -> Result<bool> {
+    let pvk = prepare_verifying_key(&vk);
+    let public_inputs_fr = public_inputs.to_vec();
+    let proof_parsed = serialization::deserialize_proof::<T>(proof);
+    let verified = Groth16::<T, CircomReduction>::verify_with_processed_vk(
+        &pvk,
+        &public_inputs_fr,
+        &proof_parsed.0,
+    )?;
+    Ok(verified)
 }
