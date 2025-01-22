@@ -123,7 +123,7 @@ struct AndriodArchInfo {
 }
 
 // Architecture strings need to be aligned with those in the CLI.
-const ANDROID_ARCHS: [AndriodArchInfo; 3] = [
+const ANDROID_ARCHS: &[AndriodArchInfo] = &[
     AndriodArchInfo {
         arch: AndroidArch::X8664Linux,
         str: "x86_64-linux-android",
@@ -132,10 +132,10 @@ const ANDROID_ARCHS: [AndriodArchInfo; 3] = [
     //     arch: AndroidArch::I686Linux,
     //     str: "i686-linux-android",
     // },
-    AndriodArchInfo {
-        arch: AndroidArch::Armv7LinuxAbi,
-        str: "armv7-linux-androideabi",
-    },
+    // AndriodArchInfo {
+    //     arch: AndroidArch::Armv7LinuxAbi,
+    //     str: "armv7-linux-androideabi",
+    // },
     AndriodArchInfo {
         arch: AndroidArch::Aarch64Linux,
         str: "aarch64-linux-android",
