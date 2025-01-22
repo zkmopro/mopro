@@ -48,8 +48,8 @@ fn link_rapidsnark() {
     // println!("cargo:rustc-link-arg=-Wl,--whole-archive");
 
     println!("cargo:rustc-link-lib=static=rapidsnark");
-    println!("cargo:rustc-link-lib=static={}", cpp_stdlib);
-    println!("cargo:rustc-link-lib=static=pthread");
+    println!("cargo:rustc-link-lib={}", cpp_stdlib);
+    println!("cargo:rustc-link-lib=pthread");
     println!("cargo:rustc-link-lib=static=fr");
     println!("cargo:rustc-link-lib=static=fq");
     println!("cargo:rustc-link-lib=static=gmp");
