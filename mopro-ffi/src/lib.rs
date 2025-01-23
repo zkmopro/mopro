@@ -151,7 +151,7 @@ macro_rules! app {
     () => {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
         use circom_prover::{
-            prover::{ProofLib, ProofResult},
+            prover::{CircomProof, ProofLib},
             witness::{WitnessFn, WitnessLib},
             ProofCalldata, G1, G2,
         };

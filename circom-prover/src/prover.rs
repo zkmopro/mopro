@@ -4,7 +4,7 @@ use num::BigUint;
 pub mod arkworks;
 pub mod serialization;
 
-pub struct ProofResult {
+pub struct CircomProof {
     pub proof: Vec<u8>,
     pub pub_inputs: Vec<u8>,
 }
@@ -14,7 +14,7 @@ pub enum ProofLib {
     RapidSnark,
 }
 
-pub fn prove(lib: ProofLib, zkey_path: String, witnesses: Vec<BigUint>) -> Result<ProofResult> {
+pub fn prove(lib: ProofLib, zkey_path: String, witnesses: Vec<BigUint>) -> Result<CircomProof> {
     match lib {
         ProofLib::Arkworks => arkworks::generate_circom_proof(zkey_path, witnesses),
         ProofLib::RapidSnark => panic!("Not supported yet."),

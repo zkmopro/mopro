@@ -16,9 +16,9 @@ use anyhow::{bail, Result};
 use num_bigint::BigUint;
 use std::fs::File;
 
-use super::{serialization, ProofResult};
+use super::{serialization, CircomProof};
 
-pub fn generate_circom_proof(zkey_path: String, witnesses: Vec<BigUint>) -> Result<ProofResult> {
+pub fn generate_circom_proof(zkey_path: String, witnesses: Vec<BigUint>) -> Result<CircomProof> {
     // here we make a loader just to get the groth16 header
     // this header tells us what curve the zkey was compiled for
     // this loader will only load the first few bytes
@@ -65,7 +65,7 @@ fn prove<T: Pairing + FieldSerialization>(
     pkey: ProvingKey<T>,
     matrices: ConstraintMatrices<T::ScalarField>,
     witness: Vec<BigUint>,
-) -> Result<ProofResult> {
+) -> Result<CircomProof> {
     let witness_fr = witness
         .iter()
         .map(|v| T::ScalarField::from(v.clone()))
@@ -89,7 +89,7 @@ fn prove<T: Pairing + FieldSerialization>(
 
     let proof = ark_proof?;
 
-    Ok(ProofResult {
+    Ok(CircomProof {
         proof: serialization::serialize_proof(&SerializableProof(proof)),
         pub_inputs: serialization::serialize_inputs(&SerializableInputs::<T>(public_inputs)),
     })
