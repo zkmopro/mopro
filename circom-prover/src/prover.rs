@@ -1,5 +1,6 @@
 use anyhow::Result;
 use num::BigUint;
+use std::thread::JoinHandle;
 
 pub mod arkworks;
 pub mod serialization;
@@ -14,7 +15,11 @@ pub enum ProofLib {
     RapidSnark,
 }
 
-pub fn prove(lib: ProofLib, zkey_path: String, witnesses: Vec<BigUint>) -> Result<CircomProof> {
+pub fn prove(
+    lib: ProofLib,
+    zkey_path: String,
+    witnesses: JoinHandle<Vec<BigUint>>,
+) -> Result<CircomProof> {
     match lib {
         ProofLib::Arkworks => arkworks::generate_circom_proof(zkey_path, witnesses),
         ProofLib::RapidSnark => panic!("Not supported yet."),

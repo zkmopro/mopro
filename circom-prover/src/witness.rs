@@ -1,5 +1,5 @@
 use num::{BigInt, BigUint};
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, str::FromStr, thread::JoinHandle};
 
 /// Witness function signature for rust_witness (inputs) -> witness
 type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
@@ -34,7 +34,7 @@ pub fn generate_witness(
     witness_fn: WitnessFn,
     inputs: HashMap<String, Vec<String>>,
     dat_path: String,
-) -> Vec<BigUint> {
+) -> JoinHandle<Vec<BigUint>> {
     std::thread::spawn(move || {
         let bigint_inputs = inputs
             .into_iter()
@@ -57,7 +57,4 @@ pub fn generate_witness(
             .map(|w| w.to_biguint().unwrap())
             .collect::<Vec<_>>()
     })
-    .join()
-    .map_err(|_e| anyhow::anyhow!("witness thread panicked"))
-    .unwrap()
 }

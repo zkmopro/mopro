@@ -114,9 +114,9 @@ pub fn generate_circom_proof_wtns(
     // .dat file is supposed to be located next to the zkey file and have the same filename
     let mut dat_file_path = zkey_path.clone();
     dat_file_path = dat_file_path.replace(".zkey", ".dat");
-    let witnesses = generate_witness(witness_fn, inputs, dat_file_path);
+    let witness_thread = generate_witness(witness_fn, inputs, dat_file_path);
 
-    let ret = prove(proof_lib, zkey_path, witnesses).unwrap();
+    let ret = prove(proof_lib, zkey_path, witness_thread).unwrap();
     Ok(GenerateProofResult {
         proof: ret.proof,
         inputs: ret.pub_inputs,

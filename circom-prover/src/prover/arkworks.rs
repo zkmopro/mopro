@@ -14,11 +14,14 @@ use serialization::{SerializableInputs, SerializableProof};
 
 use anyhow::{bail, Result};
 use num_bigint::BigUint;
-use std::fs::File;
+use std::{fs::File, thread::JoinHandle};
 
 use super::{serialization, CircomProof};
 
-pub fn generate_circom_proof(zkey_path: String, witnesses: Vec<BigUint>) -> Result<CircomProof> {
+pub fn generate_circom_proof(
+    zkey_path: String,
+    witness_thread: JoinHandle<Vec<BigUint>>,
+) -> Result<CircomProof> {
     // here we make a loader just to get the groth16 header
     // this header tells us what curve the zkey was compiled for
     // this loader will only load the first few bytes
@@ -26,13 +29,22 @@ pub fn generate_circom_proof(zkey_path: String, witnesses: Vec<BigUint>) -> Resu
     header_reader.read();
     let file = File::open(&zkey_path)?;
     let mut reader = std::io::BufReader::new(file);
+
     // check the prime in the header
-    // println!("{} {} {}", header.q, header.n8q, ark_bls12_381::Fq::MODULUS);
     if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
         let (proving_key, matrices) = read_zkey::<_, Bn254>(&mut reader)?;
+        // Get the result witness from the background thread
+        let witnesses = witness_thread
+            .join()
+            .map_err(|_e| anyhow::anyhow!("witness thread panicked"))
+            .unwrap();
         prove(proving_key, matrices, witnesses)
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
         let (proving_key, matrices) = read_zkey::<_, Bls12_381>(&mut reader)?;
+        let witnesses = witness_thread
+            .join()
+            .map_err(|_e| anyhow::anyhow!("witness thread panicked"))
+            .unwrap();
         prove(proving_key, matrices, witnesses)
     } else {
         panic!("unknown curve detected in zkey");
