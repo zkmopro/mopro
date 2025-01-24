@@ -143,9 +143,9 @@ jobs:
       - name: Run wasm halo2 tests
         run: |
           echo "Override default chrome path for 'wasm-pack test'"
-          ln -sf $CHROME_BIN /usr/local/bin/google-chrome-stable
+          sudo ln -sf $CHROME_BIN /opt/google/chrome/chrome
           echo "Check override chrome version"
-          google-chrome-stable --version
+          google-chrome --version
           cd mopro-wasm
           wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
   test-e2e:
@@ -341,6 +341,7 @@ jobs:
         run: yarn install
       - name: Run halo2-wasm-app server and test it
         run: |
+          echo "This test will be on latest chrome & chromedriver"
           nohup yarn start &
           for i in {1..30}; do
             if curl --silent http://localhost:3000 > /dev/null; then
