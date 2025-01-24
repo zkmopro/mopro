@@ -1,8 +1,10 @@
 pub mod prover;
 pub mod witness;
 
-pub use rust_witness;
-pub use rust_witness::transpile::transpile_wasm;
+// pub use rust_witness::transpile::transpile_wasm;
+#[cfg(feature = "rustwitness")]
+pub use rust_witness::*;
+#[cfg(feature = "witnesscalc")]
 pub use witnesscalc_adapter;
 
 #[derive(Debug, Clone, Default)]

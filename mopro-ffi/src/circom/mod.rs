@@ -145,19 +145,17 @@ mod tests {
     use ark_bls12_381::Bls12_381;
     use ark_bn254::Bn254;
     use ark_ff::PrimeField;
-    use circom_prover::create_witness_fn;
     use circom_prover::prover::serialization::{to_ethereum_inputs, to_ethereum_proof};
     use circom_prover::prover::{serialization, ProofLib};
-    use circom_prover::rust_witness;
     use circom_prover::witness::WitnessFn;
     use num_bigint::{BigInt, BigUint, ToBigInt};
 
     // Only build the witness functions for tests, don't bundle them into
     // the final library
-    create_witness_fn!(WitnessLib::RustWitness, multiplier2);
-    create_witness_fn!(WitnessLib::RustWitness, multiplier2bls);
-    create_witness_fn!(WitnessLib::RustWitness, keccak256256test);
-    create_witness_fn!(WitnessLib::RustWitness, hashbenchbls);
+    rust_witness::witness!(multiplier2);
+    rust_witness::witness!(multiplier2bls);
+    rust_witness::witness!(keccak256256test);
+    rust_witness::witness!(hashbenchbls);
 
     use crate as mopro_ffi;
 

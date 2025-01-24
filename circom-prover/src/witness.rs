@@ -2,38 +2,23 @@ use num::{BigInt, BigUint};
 use std::{collections::HashMap, str::FromStr, thread::JoinHandle};
 
 /// Witness function signature for rust_witness (inputs) -> witness
+#[cfg(feature = "rustwitness")]
 type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 /// Witness function signature for witnesscalc_adapter (inputs, .dat file path) -> witness
+#[cfg(feature = "witnesscalc")]
 type WitnesscalcWtnsFn = fn(HashMap<String, Vec<BigInt>>, &str) -> Vec<BigInt>;
 
 pub enum WitnessFn {
+    #[cfg(feature = "witnesscalc")]
     WitnessCalc(WitnesscalcWtnsFn),
+    #[cfg(feature = "rustwitness")]
     RustWitness(RustWitnessWtnsFn),
-}
-
-pub enum WitnessLib {
-    WitnessCalc,
-    RustWitness,
-}
-
-/// To create witness functions corresponding to different witness generation libs.
-#[macro_export]
-macro_rules! create_witness_fn {
-    (WitnessLib::RustWitness, $fn:ident) => {
-        rust_witness::witness!($fn);
-    };
-    (WitnessLib::WitnessCalc, $fn:ident) => {
-        witnesscalc_adapter::witness!($fn);
-    };
-    ($other:tt, $fn:ident) => {
-        compile_error!(concat!("Unknown macro type: ", stringify!($other)));
-    };
 }
 
 pub fn generate_witness(
     witness_fn: WitnessFn,
     inputs: HashMap<String, Vec<String>>,
-    dat_path: String,
+    _dat_path: String,
 ) -> JoinHandle<Vec<BigUint>> {
     std::thread::spawn(move || {
         let bigint_inputs = inputs
@@ -49,7 +34,9 @@ pub fn generate_witness(
             .collect();
 
         let witness = match witness_fn {
-            WitnessFn::WitnessCalc(wit_fn) => wit_fn(bigint_inputs, dat_path.as_str()),
+            #[cfg(feature = "witnesscalc")]
+            WitnessFn::WitnessCalc(wit_fn) => wit_fn(bigint_inputs, _dat_path.as_str()),
+            #[cfg(feature = "rustwitness")]
             WitnessFn::RustWitness(wit_fn) => wit_fn(bigint_inputs),
         };
         witness

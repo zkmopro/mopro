@@ -1,14 +1,13 @@
 extern crate core;
-use circom_prover::create_witness_fn;
 
 // First, configure the Mopro FFI library
 mopro_ffi::app!();
 
 // --- Circom Example of setting up 4 circuits ---
-create_witness_fn!(WitnessLib::RustWitness, multiplier2);
-create_witness_fn!(WitnessLib::RustWitness, multiplier2bls);
-create_witness_fn!(WitnessLib::RustWitness, keccak256256test);
-create_witness_fn!(WitnessLib::RustWitness, hashbench_bls);
+rust_witness::witness!(multiplier2);
+rust_witness::witness!(multiplier2bls);
+rust_witness::witness!(keccak256256test);
+rust_witness::witness!(hashbench_bls);
 
 mopro_ffi::set_circom_circuits! {
     ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),

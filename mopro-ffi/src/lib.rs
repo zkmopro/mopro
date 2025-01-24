@@ -152,7 +152,7 @@ macro_rules! app {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
         use circom_prover::{
             prover::{CircomProof, ProofLib},
-            witness::{WitnessFn, WitnessLib},
+            witness::WitnessFn,
             ProofCalldata, G1, G2,
         };
         use mopro_ffi::{GenerateProofResult, MoproError};
