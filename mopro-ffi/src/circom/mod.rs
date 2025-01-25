@@ -22,10 +22,10 @@ macro_rules! circom_app {
             };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
             mopro_ffi::generate_circom_proof_wtns(
+                circom_prover::prover::ProofLib::Arkworks,
                 in0,
                 in1,
                 witness_fn,
-                circom_prover::prover::ProofLib::Arkworks,
             )
             .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
         }
@@ -35,9 +35,10 @@ macro_rules! circom_app {
             in1: Vec<u8>,
             in2: Vec<u8>,
         ) -> Result<bool, mopro_ffi::MoproError> {
-            mopro_ffi::verify_circom_proof(in0, in1, in2).map_err(|e| {
-                mopro_ffi::MoproError::CircomError(format!("Verification error: {}", e))
-            })
+            mopro_ffi::verify_circom_proof(circom_prover::prover::ProofLib::Arkworks, in0, in1, in2)
+                .map_err(|e| {
+                    mopro_ffi::MoproError::CircomError(format!("Verification error: {}", e))
+                })
         }
 
         fn to_ethereum_proof(in0: Vec<u8>) -> circom_prover::ProofCalldata {
@@ -104,10 +105,10 @@ macro_rules! set_circom_circuits {
 // build a proof for a zkey using witness_fn to build
 // the witness
 pub fn generate_circom_proof_wtns(
+    proof_lib: ProofLib,
     zkey_path: String,
     inputs: HashMap<String, Vec<String>>,
     witness_fn: WitnessFn,
-    proof_lib: ProofLib,
 ) -> Result<GenerateProofResult> {
     let ret = CircomPorver::prove(proof_lib, witness_fn, inputs.clone(), zkey_path).unwrap();
     Ok(GenerateProofResult {
@@ -118,11 +119,12 @@ pub fn generate_circom_proof_wtns(
 
 // Prove on a generic curve
 pub fn verify_circom_proof(
+    proof_lib: ProofLib,
     zkey_path: String,
     proof: Vec<u8>,
     public_inputs: Vec<u8>,
 ) -> Result<bool> {
-    CircomPorver::verify(ProofLib::Arkworks, proof, public_inputs, zkey_path)
+    CircomPorver::verify(proof_lib, proof, public_inputs, zkey_path)
 }
 
 #[cfg(test)]
@@ -197,7 +199,7 @@ mod tests {
             .file_name()
             .unwrap();
         if let Ok(witness_fn) = zkey_witness_map(name.to_str().unwrap()) {
-            generate_circom_proof_wtns(zkey_path, inputs, witness_fn, ProofLib::Arkworks)
+            generate_circom_proof_wtns(ProofLib::Arkworks, zkey_path, inputs, witness_fn)
         } else {
             bail!("unknown zkey");
         }
@@ -267,6 +269,7 @@ mod tests {
 
         // Step 3: Verify Proof
         let is_valid = verify_circom_proof(
+            ProofLib::Arkworks,
             zkey_path,
             serialized_proof.clone(),
             serialized_inputs.clone(),
@@ -312,6 +315,7 @@ mod tests {
         // Verify Proof
 
         let is_valid = verify_circom_proof(
+            ProofLib::Arkworks,
             zkey_path,
             serialized_proof.clone(),
             serialized_inputs.clone(),
@@ -356,6 +360,7 @@ mod tests {
 
         // Step 3: Verify Proof
         let is_valid = verify_circom_proof(
+            ProofLib::Arkworks,
             zkey_path,
             serialized_proof.clone(),
             serialized_inputs.clone(),
@@ -395,6 +400,7 @@ mod tests {
 
         // Step 3: Verify Proof
         let is_valid = verify_circom_proof(
+            ProofLib::Arkworks,
             zkey_path,
             serialized_proof.clone(),
             serialized_inputs.clone(),
