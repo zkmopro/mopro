@@ -7,7 +7,6 @@ mopro_ffi::app!();
 rust_witness::witness!(multiplier2);
 rust_witness::witness!(multiplier2bls);
 rust_witness::witness!(keccak256256test);
-rust_witness::witness!(hashbench_bls);
 
 mopro_ffi::set_circom_circuits! {
     ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),
