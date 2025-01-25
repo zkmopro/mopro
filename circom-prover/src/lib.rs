@@ -1,7 +1,6 @@
 pub mod prover;
 pub mod witness;
 
-// pub use rust_witness::transpile::transpile_wasm;
 #[cfg(feature = "rustwitness")]
 pub use rust_witness::*;
 #[cfg(feature = "witnesscalc")]
