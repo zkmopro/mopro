@@ -8,9 +8,12 @@ mod circom;
 mod halo2;
 
 #[cfg(feature = "circom")]
-pub use circom::{
-    generate_circom_proof_wtns, serialization::to_ethereum_inputs,
-    serialization::to_ethereum_proof, verify_circom_proof, WtnsFn,
+pub use circom::{generate_circom_proof_wtns, verify_circom_proof};
+
+#[cfg(feature = "circom")]
+pub use circom_prover::{
+    prover::{self, serialization::to_ethereum_inputs, serialization::to_ethereum_proof},
+    witness,
 };
 
 #[cfg(feature = "halo2")]
@@ -107,25 +110,6 @@ pub struct GenerateProofResult {
     pub inputs: Vec<u8>,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct G1 {
-    pub x: String,
-    pub y: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct G2 {
-    pub x: Vec<String>,
-    pub y: Vec<String>,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct ProofCalldata {
-    pub a: G1,
-    pub b: G2,
-    pub c: G1,
-}
-
 /// This macro is used to setup the Mopro FFI library
 /// It should be included in the `lib.rs` file of the project
 ///
@@ -166,7 +150,12 @@ pub struct ProofCalldata {
 macro_rules! app {
     () => {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
-        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
+        use circom_prover::{
+            prover::{CircomProof, ProofLib},
+            witness::WitnessFn,
+            ProofCalldata, G1, G2,
+        };
+        use mopro_ffi::{GenerateProofResult, MoproError};
 
         mopro_ffi::circom_app!();
 

@@ -1,10 +1,10 @@
 use crate::{ProofCalldata, G1, G2};
+use anyhow::Result;
 use ark_bn254::Bn254;
 use ark_circom::ethereum;
 use ark_ec::pairing::Pairing;
 use ark_groth16::{Proof, ProvingKey};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
-use color_eyre::Result;
 
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug)]
 pub struct SerializableProvingKey<T: Pairing>(pub ProvingKey<T>);
@@ -70,7 +70,6 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::circom::serialization::SerializableProvingKey;
     use anyhow::Result;
     use ark_bn254::Bn254;
     use ark_circom::circom::{r1cs_reader::R1CSFile, CircomCircuit};

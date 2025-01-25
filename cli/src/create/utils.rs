@@ -55,7 +55,7 @@ pub fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> Result<()> 
 pub fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> Result<()> {
     for file in dir.entries() {
         // Skip .wasm files
-        if file.path().extension().map_or(false, |ext| ext == "wasm") {
+        if file.path().extension().is_some_and(|ext| ext == "wasm") {
             continue;
         }
 

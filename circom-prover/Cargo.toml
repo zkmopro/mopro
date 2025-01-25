@@ -1,0 +1,56 @@
+[package]
+name = "circom-prover"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "circom_prover"
+
+[features]
+default = ["rustwitness", "arkworks", "witnesscalc"]
+
+# Witness Generation
+rustwitness = [
+    "rust-witness",
+]
+witnesscalc = [
+    "witnesscalc-adapter",
+]
+
+# Proof Generation
+arkworks = [    
+    "ark-circom",
+    "ark-serialize",
+    "ark-ec",
+    "ark-crypto-primitives",
+    "ark-std",
+    "ark-bn254",
+    "ark-groth16",
+    "ark-relations",
+    "ark-ff",
+    "ark-bls12-381",
+]
+rapidsnark = []
+
+[dependencies]
+num = { version = "0.4.0" }
+num-traits = { version = "0.2.15", default-features = false }
+num-bigint = { version = "0.4.3", default-features = false, features = [
+    "rand",
+] }
+anyhow = "1.0.95"
+rust-witness = { version = "0.1.2", optional = true }
+witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", package = "witnesscalc-adapter", optional = true }
+
+ark-ec = { version = "=0.4.1", default-features = false, features = ["parallel"], optional = true }
+ark-crypto-primitives = { version = "=0.4.0", optional = true }
+ark-std = { version = "=0.4.0", default-features = false, features = ["parallel"], optional = true }
+ark-bn254 = { version = "=0.4.0", optional = true }
+ark-groth16 = { version = "=0.4.0", default-features = false, features = ["parallel"], optional = true }
+ark-relations = { version = "0.4", default-features = false, optional = true }
+uuid = { version = "1.9.1", features = ["v4"] }
+byteorder = { version = "1.0.0", optional = true }
+ark-ff = { version = "0.4.0", optional = true }
+ark-bls12-381 = { version = "0.4.0", optional = true }
+ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", version = "0.1.0", branch = "wasm-delete", optional = true }
+ark-serialize = { version = "=0.4.1", features = ["derive"], optional = true }
