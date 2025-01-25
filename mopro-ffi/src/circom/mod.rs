@@ -1,10 +1,8 @@
 use crate::GenerateProofResult;
 use anyhow::Ok;
 use anyhow::Result;
-use circom_prover::{
-    prover::{prove, verify, ProofLib},
-    witness::{generate_witness, WitnessFn},
-};
+use circom_prover::CircomPorver;
+use circom_prover::{prover::ProofLib, witness::WitnessFn};
 use std::collections::HashMap;
 
 #[macro_export]
@@ -111,12 +109,7 @@ pub fn generate_circom_proof_wtns(
     witness_fn: WitnessFn,
     proof_lib: ProofLib,
 ) -> Result<GenerateProofResult> {
-    // .dat file is supposed to be located next to the zkey file and have the same filename
-    let mut dat_file_path = zkey_path.clone();
-    dat_file_path = dat_file_path.replace(".zkey", ".dat");
-    let witness_thread = generate_witness(witness_fn, inputs, dat_file_path);
-
-    let ret = prove(proof_lib, zkey_path, witness_thread).unwrap();
+    let ret = CircomPorver::prove(proof_lib, witness_fn, inputs.clone(), zkey_path).unwrap();
     Ok(GenerateProofResult {
         proof: ret.proof,
         inputs: ret.pub_inputs,
@@ -129,7 +122,7 @@ pub fn verify_circom_proof(
     proof: Vec<u8>,
     public_inputs: Vec<u8>,
 ) -> Result<bool> {
-    verify(ProofLib::Arkworks, zkey_path, proof, public_inputs)
+    CircomPorver::verify(ProofLib::Arkworks, proof, public_inputs, zkey_path)
 }
 
 #[cfg(test)]
