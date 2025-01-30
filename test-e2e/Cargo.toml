@@ -22,9 +22,9 @@ mopro-wasm = { path = "../mopro-wasm" }
 uniffi = "0.28.0"
 
 # Circom dependencies
-rust-witness = "0.1.1"
 num-bigint = { version = "0.4.0" }
 circom-prover = { path = "../circom-prover" }
+witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter", branch = "fix-android", package = "witnesscalc-adapter" }
 
 # Halo2 dependencies
 halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
@@ -37,7 +37,7 @@ mopro-ffi = { path = "../mopro-ffi" }
 uniffi = { version = "0.28.0", features = ["build"] }
 
 # Circom dependencies
-rust-witness = "0.1.1"
+witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter", branch = "fix-android", package = "witnesscalc-adapter" }
 
 [dev-dependencies]
 uniffi = { version = "0.28.0", features = ["bindgen-tests"] }

@@ -7,7 +7,7 @@ edition = "2021"
 name = "circom_prover"
 
 [features]
-default = ["rustwitness", "arkworks", "witnesscalc"]
+default = ["arkworks", "witnesscalc"]
 
 # Witness Generation
 rustwitness = [

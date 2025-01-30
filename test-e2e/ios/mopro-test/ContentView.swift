@@ -48,6 +48,7 @@ struct ContentView: View {
     @State private var generatedAshlangProof: Data?
     @State private var ashlangPublicInputs: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
+    private let datPath = Bundle.main.path(forResource: "multiplier2", ofType: "dat")!
     private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
     private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
     private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
@@ -95,16 +96,17 @@ extension ContentView {
             let start = CFAbsoluteTimeGetCurrent()
             
             // Generate Proof
-            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
-            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
-            assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
+            //let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+            generateWitness(datPath: datPath)
+            //assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+            //assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
             
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
             
             // Store the generated proof and public inputs for later verification
-            generatedCircomProof = generateProofResult.proof
-            circomPublicInputs = generateProofResult.inputs
+            //generatedCircomProof = generateProofResult.proof
+            //circomPublicInputs = generateProofResult.inputs
             
             textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
             

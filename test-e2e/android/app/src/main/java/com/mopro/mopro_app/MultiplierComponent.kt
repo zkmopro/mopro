@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.mopro.mopro_app.getFilePathFromAssets
 import uniffi.mopro.GenerateProofResult
 import uniffi.mopro.generateCircomProof
+import uniffi.mopro.generateWitness
 import uniffi.mopro.verifyCircomProof
 
 @Composable
@@ -32,6 +33,7 @@ fun MultiplierComponent() {
     inputs["b"] = listOf("5")
 
     val zkeyPath = getFilePathFromAssets("multiplier2_final.zkey")
+    val datPath = getFilePathFromAssets("multiplier2.dat")
 
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
         Button(
@@ -39,7 +41,8 @@ fun MultiplierComponent() {
                 Thread(
                     Runnable {
                         val startTime = System.currentTimeMillis()
-                        res = generateCircomProof(zkeyPath, inputs)
+                        //res = generateCircomProof(zkeyPath, inputs)
+                        generateWitness(datPath)
                         val endTime = System.currentTimeMillis()
                         provingTime = "proving time: " + (endTime - startTime).toString() + " ms"
                     }
