@@ -833,7 +833,7 @@ dependencies = [
  "num-traits",
  "rust-witness",
  "uuid",
- "witnesscalc-adapter",
+ "witnesscalc-adapter 0.1.0 (git+https://github.com/zkmopro/witnesscalc_adapter.git)",
 ]
 
 [[package]]
@@ -4252,8 +4252,8 @@ dependencies = [
  "mopro-wasm",
  "num-bigint",
  "plonk-fibonacci",
- "rust-witness",
  "uniffi",
+ "witnesscalc-adapter 0.1.0 (git+https://github.com/zkmopro/witnesscalc_adapter?branch=fix-android)",
 ]
 
 [[package]]
@@ -5183,6 +5183,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8d71a593cc5c42ad7876e2c1fda56f314f3754c084128833e64f1345ff8a03a"
 dependencies = [
  "memchr",
+]
+
+[[package]]
+name = "witnesscalc-adapter"
+version = "0.1.0"
+source = "git+https://github.com/zkmopro/witnesscalc_adapter?branch=fix-android#80b422295f8337fee2b38341e3a84b8b4d5cd5c4"
+dependencies = [
+ "num-bigint",
+ "num-traits",
+ "paste",
+ "serde_json",
 ]
 
 [[package]]

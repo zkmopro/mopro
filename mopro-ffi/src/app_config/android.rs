@@ -67,6 +67,7 @@ pub fn build() {
 fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode: Mode) {
     let arch_str = arch.as_str();
     install_arch(arch_str.to_string());
+    let cpp_lib_dest = bindings_out.join("jniLibs");
 
     let mut build_cmd = Command::new("cargo");
     build_cmd
@@ -81,6 +82,7 @@ fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode
     build_cmd
         .env("CARGO_BUILD_TARGET_DIR", build_dir)
         .env("CARGO_BUILD_TARGET", arch_str)
+        .env("CARGO_NDK_OUTPUT_PATH", cpp_lib_dest)
         .spawn()
         .expect("Failed to spawn cargo build")
         .wait()
