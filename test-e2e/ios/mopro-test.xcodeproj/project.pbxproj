@@ -11,7 +11,6 @@
 		4CBAB2782C3334B300B536B7 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */; };
 		4CBAB27A2C3334B800B536B7 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAB2792C3334B800B536B7 /* mopro.swift */; };
 		4CCB9BDF2C33C20800C659C4 /* multiplier2_final.zkey in Resources */ = {isa = PBXBuildFile; fileRef = 4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */; };
-		4CDFE7EB2CC844C400A05E76 /* example.ar1cs in Resources */ = {isa = PBXBuildFile; fileRef = 4CDFE7EA2CC844C400A05E76 /* example.ar1cs */; };
 		4CF977EF2C2BCF0000CE1139 /* mopro_testApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF977EE2C2BCF0000CE1139 /* mopro_testApp.swift */; };
 		4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF977F02C2BCF0000CE1139 /* ContentView.swift */; };
 		4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F22C2BCF0300CE1139 /* Assets.xcassets */; };
@@ -37,15 +36,14 @@
 		4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MoproBindings.xcframework; path = ../MoproiOSBindings/MoproBindings.xcframework; sourceTree = "<group>"; };
 		4CBAB2792C3334B800B536B7 /* mopro.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = mopro.swift; path = ../../MoproiOSBindings/mopro.swift; sourceTree = "<group>"; };
 		4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */ = {isa = PBXFileReference; lastKnownFileType = file; name = multiplier2_final.zkey; path = "../../test-vectors/circom/multiplier2_final.zkey"; sourceTree = "<group>"; };
-		4CDFE7EA2CC844C400A05E76 /* example.ar1cs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = example.ar1cs; path = "../../test-vectors/ashlang/example.ar1cs"; sourceTree = "<group>"; };
 		4CF977EB2C2BCF0000CE1139 /* mopro-test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mopro-test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CF977EE2C2BCF0000CE1139 /* mopro_testApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro_testApp.swift; sourceTree = "<group>"; };
 		4CF977F02C2BCF0000CE1139 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CF977F22C2BCF0300CE1139 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = plonk_fibonacci_srs.bin; path = "../../test-vectors/halo2/plonk_fibonacci_srs.bin"; sourceTree = "<group>"; };
-		60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = plonk_fibonacci_pk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_pk.bin"; sourceTree = "<group>"; };
-		60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = plonk_fibonacci_vk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_vk.bin"; sourceTree = "<group>"; };
+		60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_srs.bin; path = "../../test-vectors/halo2/plonk_fibonacci_srs.bin"; sourceTree = "<group>"; };
+		60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_pk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_pk.bin"; sourceTree = "<group>"; };
+		60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_vk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_vk.bin"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,7 +76,6 @@
 		4CF977E22C2BCF0000CE1139 = {
 			isa = PBXGroup;
 			children = (
-				4CDFE7EA2CC844C400A05E76 /* example.ar1cs */,
 				60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */,
 				60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */,
 				60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */,
@@ -221,7 +218,6 @@
 				60A8E4382C40404300D3A953 /* plonk_fibonacci_srs.bin in Resources */,
 				4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */,
 				60A8E4392C40404300D3A953 /* plonk_fibonacci_pk.bin in Resources */,
-				4CDFE7EB2CC844C400A05E76 /* example.ar1cs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

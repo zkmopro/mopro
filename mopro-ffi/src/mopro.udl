@@ -1,11 +1,5 @@
 namespace mopro {
   [Throws=MoproError]
-  GenerateProofResult generate_ashlang_spartan_proof(string ar1cs_path, sequence<string> inputs);
-
-  [Throws=MoproError]
-  boolean verify_ashlang_spartan_proof(string ar1cs_path, bytes proof);
-
-  [Throws=MoproError]
   GenerateProofResult generate_halo2_proof(string srs_path, string pk_path, record<string, sequence<string>> circuit_inputs);
 
   [Throws=MoproError]
@@ -46,5 +40,4 @@ dictionary ProofCalldata {
 enum MoproError {
   "CircomError",
   "Halo2Error",
-  "AshlangError",
 };
