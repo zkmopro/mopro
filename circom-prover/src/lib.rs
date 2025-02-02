@@ -40,7 +40,10 @@ impl CircomPorver {
         inputs: HashMap<String, Vec<String>>,
         zkey_path: String,
     ) -> Result<CircomProof> {
-        let wit_thread = witness::generate_witness(wit_fn, inputs, zkey_path.clone());
+        let mut dat_file_path = zkey_path.clone();
+        dat_file_path = dat_file_path.replace(".zkey", ".dat");
+
+        let wit_thread = witness::generate_witness(wit_fn, inputs, dat_file_path);
         prover::prove(proof_lib, zkey_path.clone(), wit_thread)
     }
 

@@ -19,7 +19,7 @@ pub enum WitnessFn {
 pub fn generate_witness(
     witness_fn: WitnessFn,
     inputs: HashMap<String, Vec<String>>,
-    _zkey_path: String,
+    _data_path: String,
 ) -> JoinHandle<Vec<BigUint>> {
     std::thread::spawn(move || {
         let bigint_inputs = inputs
@@ -36,10 +36,7 @@ pub fn generate_witness(
 
         let witness = match witness_fn {
             #[cfg(feature = "witnesscalc")]
-            WitnessFn::WitnessCalc(wit_fn) => wit_fn(
-                bigint_inputs,
-                _zkey_path.clone().replace(".zkey", ".dat").as_str(),
-            ),
+            WitnessFn::WitnessCalc(wit_fn) => wit_fn(bigint_inputs, _data_path.as_str()),
             #[cfg(feature = "rustwitness")]
             WitnessFn::RustWitness(wit_fn) => wit_fn(bigint_inputs),
         };
