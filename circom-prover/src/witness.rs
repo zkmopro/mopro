@@ -4,9 +4,9 @@ use std::{collections::HashMap, str::FromStr, thread::JoinHandle};
 /// Witness function signature for rust_witness (inputs) -> witness
 #[cfg(feature = "rustwitness")]
 type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
-/// Witness function signature for witnesscalc_adapter (inputs, .dat file path) -> witness
+/// Witness function signature for witnesscalc_adapter (inputs) -> witness
 #[cfg(feature = "witnesscalc")]
-type WitnesscalcWtnsFn = fn(HashMap<String, Vec<BigInt>>, &str) -> Vec<BigInt>;
+type WitnesscalcWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 
 #[derive(Debug, Clone, Copy)]
 pub enum WitnessFn {
@@ -19,7 +19,6 @@ pub enum WitnessFn {
 pub fn generate_witness(
     witness_fn: WitnessFn,
     inputs: HashMap<String, Vec<String>>,
-    _data_path: String,
 ) -> JoinHandle<Vec<BigUint>> {
     std::thread::spawn(move || {
         let bigint_inputs = inputs
@@ -36,7 +35,7 @@ pub fn generate_witness(
 
         let witness = match witness_fn {
             #[cfg(feature = "witnesscalc")]
-            WitnessFn::WitnessCalc(wit_fn) => wit_fn(bigint_inputs, _data_path.as_str()),
+            WitnessFn::WitnessCalc(wit_fn) => wit_fn(bigint_inputs),
             #[cfg(feature = "rustwitness")]
             WitnessFn::RustWitness(wit_fn) => wit_fn(bigint_inputs),
         };

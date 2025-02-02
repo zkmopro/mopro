@@ -45,13 +45,10 @@ struct ContentView: View {
     @State private var circomPublicInputs: Data?
     @State private var generatedHalo2Proof: Data?
     @State private var halo2PublicInputs: Data?
-    @State private var generatedAshlangProof: Data?
-    @State private var ashlangPublicInputs: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
     private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
     private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
     private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
-    private let ar1csPath = Bundle.main.path(forResource: "example.ar1cs", ofType: "")!
     
     var body: some View {
         VStack(spacing: 10) {
@@ -62,8 +59,6 @@ struct ContentView: View {
             Button("Verify Circom", action: runCircomVerifyAction).disabled(!isCircomVerifyButtonEnabled).accessibilityIdentifier("verifyCircom")
             Button("Prove Halo2", action: runHalo2ProveAction).disabled(!isHalo2roveButtonEnabled).accessibilityIdentifier("proveHalo2")
             Button("Verify Halo2", action: runHalo2VerifyAction).disabled(!isHalo2VerifyButtonEnabled).accessibilityIdentifier("verifyHalo2")
-            Button("Prove Ashlang", action: runAshlangProveAction).disabled(!isAshlangroveButtonEnabled).accessibilityIdentifier("proveAshlang")
-            Button("Verify Ashlang", action: runAshlangVerifyAction).disabled(!isAshlangVerifyButtonEnabled).accessibilityIdentifier("verifyAshlang")
 
             ScrollView {
                 Text(textViewText)
@@ -205,65 +200,6 @@ extension ContentView {
                 textViewText += "\nProof verification failed.\n"
             }
             isHalo2VerifyButtonEnabled = false
-        } catch let error as MoproError {
-            print("\nMoproError: \(error)")
-        } catch {
-            print("\nUnexpected error: \(error)")
-        }
-    }
-
-    func runAshlangProveAction() {
-        textViewText += "Generating Ashlang proof... "
-        do {
-            // Prepare inputs
-            var inputs = [String(55)]
-            
-            let start = CFAbsoluteTimeGetCurrent()
-            
-            // Generate Proof
-            let generateProofResult = try generateAshlangSpartanProof( ar1csPath: ar1csPath, inputs: inputs)
-            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
-            assert(!generateProofResult.inputs.isEmpty, "Inputs should not be empty")
-
-            
-            let end = CFAbsoluteTimeGetCurrent()
-            let timeTaken = end - start
-            
-            // Store the generated proof and public inputs for later verification
-            generatedAshlangProof = generateProofResult.proof
-            ashlangPublicInputs = generateProofResult.inputs
-            
-            textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
-            
-            isAshlangVerifyButtonEnabled = true
-        } catch {
-            textViewText += "\nProof generation failed: \(error.localizedDescription)\n"
-        }
-    }
-    
-    func runAshlangVerifyAction() {
-        guard let proof = generatedAshlangProof,
-              let inputs = ashlangPublicInputs else {
-            textViewText += "Proof has not been generated yet.\n"
-            return
-        }
-        
-        textViewText += "Verifying Ashlang proof... "
-        do {
-            let start = CFAbsoluteTimeGetCurrent()
-            
-            let isValid = try verifyAshlangSpartanProof(
-                ar1csPath: ar1csPath, proof: generatedAshlangProof!)
-            let end = CFAbsoluteTimeGetCurrent()
-            let timeTaken = end - start
-
-            
-            if isValid {
-                textViewText += "\(String(format: "%.3f", timeTaken))s 2️⃣\n"
-            } else {
-                textViewText += "\nProof verification failed.\n"
-            }
-            isAshlangVerifyButtonEnabled = false
         } catch let error as MoproError {
             print("\nMoproError: \(error)")
         } catch {
