@@ -1,8 +1,5 @@
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
-use ark_circom::{
-    read_proving_key, read_zkey, CircomReduction, FieldSerialization, ZkeyHeaderReader,
-};
 use ark_crypto_primitives::snark::SNARK;
 use ark_ec::pairing::Pairing;
 use ark_ff::PrimeField;
@@ -16,7 +13,12 @@ use anyhow::{bail, Result};
 use num_bigint::BigUint;
 use std::{fs::File, thread::JoinHandle};
 
-use super::{serialization, CircomProof};
+use super::{
+    ark_circom::{
+        read_proving_key, read_zkey, CircomReduction, FieldSerialization, ZkeyHeaderReader,
+    },
+    serialization, CircomProof,
+};
 
 pub fn generate_circom_proof(
     zkey_path: String,

@@ -3,7 +3,11 @@ use num::BigUint;
 use std::thread::JoinHandle;
 
 #[cfg(feature = "arkworks")]
+pub mod ark_circom;
+#[cfg(feature = "arkworks")]
 pub mod arkworks;
+#[cfg(feature = "arkworks")]
+pub mod ethereum;
 #[cfg(feature = "arkworks")]
 pub mod serialization;
 
