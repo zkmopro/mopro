@@ -12,6 +12,7 @@ pub struct CircomProof {
     pub pub_inputs: Vec<u8>,
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum ProofLib {
     #[cfg(feature = "arkworks")]
     Arkworks,
