@@ -6,11 +6,10 @@ use std::thread::JoinHandle;
 pub mod ark_circom;
 #[cfg(feature = "arkworks")]
 pub mod arkworks;
-#[cfg(feature = "arkworks")]
+#[cfg(feature = "ethereum")]
 pub mod ethereum;
 #[cfg(feature = "arkworks")]
 pub mod serialization;
-
 pub struct CircomProof {
     pub proof: Vec<u8>,
     pub pub_inputs: Vec<u8>,

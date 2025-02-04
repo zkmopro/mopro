@@ -7,7 +7,7 @@ edition = "2021"
 name = "circom_prover"
 
 [features]
-default = ["rustwitness", "arkworks", "witnesscalc"]
+default = ["rustwitness", "arkworks", "ethereum"]
 
 # Witness Generation
 rustwitness = [
@@ -31,6 +31,8 @@ arkworks = [
     "ark-poly",
 ]
 rapidsnark = []
+
+ethereum = []
 
 [dependencies]
 num = { version = "0.4.0" }
