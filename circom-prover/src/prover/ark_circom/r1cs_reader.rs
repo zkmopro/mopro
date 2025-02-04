@@ -1,3 +1,5 @@
+// This file is copied from https://github.dev/zkmopro/circom-compat/tree/wasm-delete
+
 //! R1CS circom file reader
 //! Copied from <https://github.com/poma/zkutil>
 //! Spec: <https://github.com/iden3/r1csfile/blob/master/doc/r1cs_bin_format.md>

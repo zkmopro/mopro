@@ -1,3 +1,5 @@
+// This file is copied from https://github.dev/zkmopro/circom-compat/tree/wasm-delete
+
 use anyhow::Result;
 use ark_ec::pairing::Pairing;
 use ark_relations::r1cs::{

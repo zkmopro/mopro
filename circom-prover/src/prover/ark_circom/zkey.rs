@@ -1,3 +1,5 @@
+// This file is copied from https://github.dev/zkmopro/circom-compat/tree/wasm-delete
+
 //! ZKey Parsing
 //!
 //! Each ZKey file is broken into sections:

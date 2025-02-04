@@ -1,3 +1,5 @@
+// This file is copied from https://github.dev/zkmopro/circom-compat/tree/wasm-delete
+
 use ark_ff::PrimeField;
 use ark_groth16::r1cs_to_qap::{evaluate_constraint, LibsnarkReduction, R1CSToQAP};
 use ark_poly::EvaluationDomain;

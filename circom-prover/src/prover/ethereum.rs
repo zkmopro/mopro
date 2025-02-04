@@ -1,3 +1,5 @@
+// This file is copied from https://github.dev/zkmopro/circom-compat/tree/wasm-delete
+
 //! Helpers for converting Arkworks types to U256-tuples as expected by the
 //! Solidity Groth16 Verifier smart contracts
 use ark_ff::{BigInteger, PrimeField};
