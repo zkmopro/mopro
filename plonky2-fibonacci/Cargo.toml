@@ -1,0 +1,14 @@
+[package]
+name = "plonky2-fibonacci"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "plonky2_fibonacci"
+
+[[bin]]
+name = "compile_circuit"
+
+[dependencies]
+num-bigint = "0.4.6"
+plonky2 = "1.0.2"

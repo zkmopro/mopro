@@ -25,3 +25,8 @@ mopro_ffi::set_halo2_circuits! {
     ("gemini_fibonacci_pk.bin", gemini_fibonacci::prove, "gemini_fibonacci_vk.bin", gemini_fibonacci::verify),
     ("keccak256_pk.bin", halo2_keccak_256::prove, "keccak256_vk.bin", halo2_keccak_256::verify),
 }
+
+// Plonky2 Fibonacci example
+mopro_ffi::set_plonky2_circuits! {
+    ("plonky2_fibonacci_pk.bin", plonky2_fibonacci::plonky2_prove, "plonky2_fibonacci_vk.bin", plonky2_fibonacci::plonky2_verify),
+}

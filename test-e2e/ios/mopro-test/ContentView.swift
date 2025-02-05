@@ -41,17 +41,22 @@ struct ContentView: View {
     @State private var isHalo2VerifyButtonEnabled = false
     @State private var isAshlangroveButtonEnabled = true
     @State private var isAshlangVerifyButtonEnabled = false
+    @State private var isPlonky2ProveButtonEnabled = true
+    @State private var isPlonky2VerifyButtonEnabled = false
     @State private var generatedCircomProof: Data?
     @State private var circomPublicInputs: Data?
     @State private var generatedHalo2Proof: Data?
     @State private var halo2PublicInputs: Data?
     @State private var generatedAshlangProof: Data?
     @State private var ashlangPublicInputs: Data?
+    @State private var generatedPlonky2Proof: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
     private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
     private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
     private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
     private let ar1csPath = Bundle.main.path(forResource: "example.ar1cs", ofType: "")!
+    private let proverDataPath = Bundle.main.path(forResource: "plonky2_fibonacci_pk.bin", ofType: "")!
+    private let verifierDataPath = Bundle.main.path(forResource: "plonky2_fibonacci_vk.bin", ofType: "")!
     
     var body: some View {
         VStack(spacing: 10) {
@@ -64,6 +69,8 @@ struct ContentView: View {
             Button("Verify Halo2", action: runHalo2VerifyAction).disabled(!isHalo2VerifyButtonEnabled).accessibilityIdentifier("verifyHalo2")
             Button("Prove Ashlang", action: runAshlangProveAction).disabled(!isAshlangroveButtonEnabled).accessibilityIdentifier("proveAshlang")
             Button("Verify Ashlang", action: runAshlangVerifyAction).disabled(!isAshlangVerifyButtonEnabled).accessibilityIdentifier("verifyAshlang")
+            Button("Prove Plonky2", action: runPlonky2ProveAction).disabled(!isPlonky2ProveButtonEnabled).accessibilityIdentifier("provePlonky2")
+            Button("Verify Plonky2", action: runPlonky2VerifyAction).disabled(!isPlonky2VerifyButtonEnabled).accessibilityIdentifier("verifyPlonky2")
 
             ScrollView {
                 Text(textViewText)
@@ -264,6 +271,64 @@ extension ContentView {
                 textViewText += "\nProof verification failed.\n"
             }
             isAshlangVerifyButtonEnabled = false
+        } catch let error as MoproError {
+            print("\nMoproError: \(error)")
+        } catch {
+            print("\nUnexpected error: \(error)")
+        }
+    }
+    
+    func runPlonky2ProveAction() {
+        textViewText += "Generating Plonky2 proof... "
+        do {
+            // Prepare inputs
+            var inputs = [String: [String]]()
+            let a = 0
+            let b = 1
+            inputs["a"] = [String(a)]
+            inputs["b"] = [String(b)]
+            
+            let start = CFAbsoluteTimeGetCurrent()
+            
+            // Generate Proof
+            let generateProofResult = try generatePlonky2Proof(pkPath: proverDataPath, circuitInputs: inputs)
+            assert(!generateProofResult.isEmpty, "Proof should not be empty")
+            
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+            
+            // Store the generated proof and public inputs for later verification
+            generatedPlonky2Proof = generateProofResult
+            
+            textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
+            
+            isPlonky2VerifyButtonEnabled = true
+        } catch {
+            textViewText += "\nProof generation failed: \(error.localizedDescription)\n"
+        }
+    }
+    
+    func runPlonky2VerifyAction() {
+        guard let proof = generatedPlonky2Proof else {
+            textViewText += "Proof has not been generated yet.\n"
+            return
+        }
+        
+        textViewText += "Verifying Plonky2 proof... "
+        do {
+            let start = CFAbsoluteTimeGetCurrent()
+            
+            let isValid = try verifyPlonky2Proof(
+                vkPath: verifierDataPath, proof: proof)
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+            
+            if isValid {
+                textViewText += "\(String(format: "%.3f", timeTaken))s 2️⃣\n"
+            } else {
+                textViewText += "\nProof verification failed.\n"
+            }
+            isPlonky2VerifyButtonEnabled = false
         } catch let error as MoproError {
             print("\nMoproError: \(error)")
         } catch {

@@ -19,6 +19,8 @@
 		60A8E4382C40404300D3A953 /* plonk_fibonacci_srs.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */; };
 		60A8E4392C40404300D3A953 /* plonk_fibonacci_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */; };
 		60A8E43A2C40404300D3A953 /* plonk_fibonacci_vk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */; };
+		FD5B8D1B2D534F1600E83778 /* plonky2_fibonacci_vk.bin in Resources */ = {isa = PBXBuildFile; fileRef = FD5B8D1A2D534F1600E83778 /* plonky2_fibonacci_vk.bin */; };
+		FD5B8D1C2D534F1600E83778 /* plonky2_fibonacci_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = FD5B8D192D534F1600E83778 /* plonky2_fibonacci_pk.bin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,9 +45,11 @@
 		4CF977F02C2BCF0000CE1139 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CF977F22C2BCF0300CE1139 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = plonk_fibonacci_srs.bin; path = "../../test-vectors/halo2/plonk_fibonacci_srs.bin"; sourceTree = "<group>"; };
-		60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = plonk_fibonacci_pk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_pk.bin"; sourceTree = "<group>"; };
-		60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = plonk_fibonacci_vk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_vk.bin"; sourceTree = "<group>"; };
+		60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_srs.bin; path = "../../test-vectors/halo2/plonk_fibonacci_srs.bin"; sourceTree = "<group>"; };
+		60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_pk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_pk.bin"; sourceTree = "<group>"; };
+		60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_vk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_vk.bin"; sourceTree = "<group>"; };
+		FD5B8D192D534F1600E83778 /* plonky2_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonky2_fibonacci_pk.bin; path = "/Users/alexkuzmin/development/mopro/test-vectors/plonky2/plonky2_fibonacci_pk.bin"; sourceTree = "<absolute>"; };
+		FD5B8D1A2D534F1600E83778 /* plonky2_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonky2_fibonacci_vk.bin; path = "/Users/alexkuzmin/development/mopro/test-vectors/plonky2/plonky2_fibonacci_vk.bin"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +82,8 @@
 		4CF977E22C2BCF0000CE1139 = {
 			isa = PBXGroup;
 			children = (
+				FD5B8D192D534F1600E83778 /* plonky2_fibonacci_pk.bin */,
+				FD5B8D1A2D534F1600E83778 /* plonky2_fibonacci_vk.bin */,
 				4CDFE7EA2CC844C400A05E76 /* example.ar1cs */,
 				60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */,
 				60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */,
@@ -215,6 +221,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD5B8D1B2D534F1600E83778 /* plonky2_fibonacci_vk.bin in Resources */,
+				FD5B8D1C2D534F1600E83778 /* plonky2_fibonacci_pk.bin in Resources */,
 				4CCB9BDF2C33C20800C659C4 /* multiplier2_final.zkey in Resources */,
 				4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */,
 				60A8E43A2C40404300D3A953 /* plonk_fibonacci_vk.bin in Resources */,

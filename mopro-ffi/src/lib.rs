@@ -6,6 +6,8 @@ pub mod ashlang;
 mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
+#[cfg(feature = "plonky2")]
+mod plonky2;
 
 #[cfg(feature = "circom")]
 pub use circom::{
@@ -89,6 +91,29 @@ macro_rules! halo2_app {
     };
 }
 
+#[cfg(feature = "plonky2")]
+pub use plonky2::{Plonky2ProveFn, Plonky2VerifyFn};
+
+#[cfg(not(feature = "plonky2"))]
+#[macro_export]
+macro_rules! plonky2_app {
+    () => {
+        fn generate_plonky2_proof(
+            in0: String,
+            in1: std::collections::HashMap<String, Vec<String>>,
+        ) -> Result<Vec<u8>, MoproError> {
+            panic!("Plonky2 is not enabled in this build. Please pass `plonky2` feature to `mopro-ffi` to enable Halo2.")
+        }
+
+        fn verify_plonky2_proof(
+            in0: String,
+            in1: Vec<u8>,
+        ) -> Result<bool, MoproError> {
+            panic!("Plonky2 is not enabled in this build. Please pass `plonky2` feature to `mopro-ffi` to enable Halo2.")
+        }
+    };
+}
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -99,6 +124,8 @@ pub enum MoproError {
     Halo2Error(String),
     #[error("AshlangError: {0}")]
     AshlangError(String),
+    #[error("Plonky2Error: {0}")]
+    Plonky2Error(String),
 }
 
 #[derive(Debug, Clone)]
@@ -171,6 +198,8 @@ macro_rules! app {
         mopro_ffi::circom_app!();
 
         mopro_ffi::halo2_app!();
+
+        mopro_ffi::plonky2_app!();
 
         mopro_ffi::ashlang_spartan_app!();
 

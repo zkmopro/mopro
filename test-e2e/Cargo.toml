@@ -17,7 +17,7 @@ name = "android"
 name = "web"
 
 [dependencies]
-mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom", "ashlang"] }
+mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom", "ashlang", "plonky2"] }
 mopro-wasm = { path = "../mopro-wasm" }
 uniffi = "0.28.0"
 
@@ -30,6 +30,10 @@ halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git
 plonk-fibonacci = { workspace = true }
 hyperplonk-fibonacci = { workspace = true }
 gemini-fibonacci = { workspace = true }
+anyhow = "1.0.95"
+
+# Plonky2
+plonky2-fibonacci = { workspace = true }
 
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }

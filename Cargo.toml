@@ -1,5 +1,5 @@
 [workspace]
-members = ["mopro-ffi", "test-e2e", "cli", "mopro-wasm", "test-e2e/mopro-wasm-lib"]
+members = ["mopro-ffi", "test-e2e", "cli", "mopro-wasm", "test-e2e/mopro-wasm-lib", "plonky2-fibonacci"]
 resolver = "2"
 exclude = ["mopro-example-app"]
 
@@ -7,3 +7,4 @@ exclude = ["mopro-example-app"]
 plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+plonky2-fibonacci = { package = "plonky2-fibonacci", path = "./plonky2-fibonacci" }
