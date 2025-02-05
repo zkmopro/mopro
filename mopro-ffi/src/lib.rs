@@ -126,11 +126,9 @@ pub struct GenerateProofResult {
 macro_rules! app {
     () => {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
-        use circom_prover::{
-            prover::{CircomProof, ProofLib},
-            witness::WitnessFn,
+        use mopro_ffi::{
+            witness::WitnessFn, GenerateProofResult, MoproError, ProofCalldata, G1, G2,
         };
-        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
 
         mopro_ffi::circom_app!();
 
