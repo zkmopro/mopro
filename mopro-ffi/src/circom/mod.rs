@@ -1,8 +1,10 @@
+pub mod ethereum;
+pub use ethereum::*;
+
 use crate::GenerateProofResult;
 use anyhow::Ok;
 use anyhow::Result;
-use circom_prover::CircomPorver;
-use circom_prover::{prover::ProofLib, witness::WitnessFn};
+use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomPorver};
 use std::collections::HashMap;
 
 #[macro_export]
@@ -41,12 +43,12 @@ macro_rules! circom_app {
                 })
         }
 
-        fn to_ethereum_proof(in0: Vec<u8>) -> circom_prover::ProofCalldata {
-            circom_prover::prover::serialization::to_ethereum_proof(in0)
+        fn to_ethereum_proof(in0: Vec<u8>) -> mopro_ffi::ProofCalldata {
+            mopro_ffi::to_ethereum_proof(in0)
         }
 
         fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
-            circom_prover::prover::serialization::to_ethereum_inputs(in0)
+            mopro_ffi::to_ethereum_inputs(in0)
         }
     };
 }
@@ -133,6 +135,7 @@ mod tests {
     use std::ops::{Add, Mul};
     use std::str::FromStr;
 
+    use crate::circom::ethereum::{to_ethereum_inputs, to_ethereum_proof};
     use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
     use crate::GenerateProofResult;
     use anyhow::bail;
@@ -140,7 +143,6 @@ mod tests {
     use ark_bls12_381::Bls12_381;
     use ark_bn254::Bn254;
     use ark_ff::PrimeField;
-    use circom_prover::prover::serialization::{to_ethereum_inputs, to_ethereum_proof};
     use circom_prover::prover::{serialization, ProofLib};
     use circom_prover::witness::WitnessFn;
     use num_bigint::{BigInt, BigUint, ToBigInt};

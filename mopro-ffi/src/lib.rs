@@ -6,13 +6,13 @@ mod circom;
 mod halo2;
 
 #[cfg(feature = "circom")]
-pub use circom::{generate_circom_proof_wtns, verify_circom_proof};
+pub use circom::{
+    generate_circom_proof_wtns, to_ethereum_inputs, to_ethereum_proof, verify_circom_proof,
+    ProofCalldata, G1, G2,
+};
 
 #[cfg(feature = "circom")]
-pub use circom_prover::{
-    prover::{self, serialization::to_ethereum_inputs, serialization::to_ethereum_proof},
-    witness,
-};
+pub use circom_prover::{prover, witness};
 
 #[cfg(feature = "halo2")]
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
@@ -129,9 +129,8 @@ macro_rules! app {
         use circom_prover::{
             prover::{CircomProof, ProofLib},
             witness::WitnessFn,
-            ProofCalldata, G1, G2,
         };
-        use mopro_ffi::{GenerateProofResult, MoproError};
+        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
 
         mopro_ffi::circom_app!();
 

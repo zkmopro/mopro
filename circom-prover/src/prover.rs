@@ -10,6 +10,7 @@ pub mod arkworks;
 pub mod ethereum;
 #[cfg(feature = "arkworks")]
 pub mod serialization;
+
 pub struct CircomProof {
     pub proof: Vec<u8>,
     pub pub_inputs: Vec<u8>,
