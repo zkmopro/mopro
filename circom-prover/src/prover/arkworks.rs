@@ -5,12 +5,13 @@ use ark_ec::pairing::Pairing;
 use ark_ff::PrimeField;
 use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey, VerifyingKey};
 use ark_relations::r1cs::ConstraintMatrices;
-use ark_std::{rand::thread_rng, UniformRand};
-use serialization::{SerializableInputs, SerializableProof};
+use ark_std::UniformRand;
+use std::{fs::File, thread::JoinHandle};
 
 use anyhow::{bail, Result};
 use num_bigint::BigUint;
-use std::{fs::File, thread::JoinHandle};
+use rand::prelude::*;
+use serialization::{SerializableInputs, SerializableProof};
 
 use super::{
     ark_circom::{

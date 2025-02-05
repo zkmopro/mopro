@@ -44,7 +44,7 @@ mod tests {
     use anyhow::Result;
     use ark_bn254::Bn254;
     use ark_groth16::Groth16;
-    use ark_std::rand::thread_rng;
+    use rand::thread_rng;
     use std::{fs::File, path::Path};
 
     fn serialize_proving_key<T: Pairing>(pk: &SerializableProvingKey<T>) -> Vec<u8> {
