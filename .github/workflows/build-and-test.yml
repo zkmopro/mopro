@@ -18,6 +18,11 @@ jobs:
     env:
       RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
     steps:
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2024-07-18
+          override: true
       - uses: actions/checkout@v4
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features
@@ -49,7 +54,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly-2024-07-18
           override: true
       - name: Run ffi halo2 tests
         run: cd mopro-ffi && cargo test --features halo2 --no-default-features
@@ -61,7 +66,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly-2024-07-18
           override: true
       - name: Run ffi circom tests
         run: cd mopro-ffi && cargo test --features circom --no-default-features
@@ -73,10 +78,22 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly-2024-07-18
           override: true
       - name: Run ffi ashlang tests
         run: cd mopro-ffi && cargo test --features ashlang --no-default-features
+  test-ffi-plonky2:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2024-07-18
+          override: true
+      - name: Run ffi plonky2 tests
+        run: cd mopro-ffi && cargo test --features plonky2 --no-default-features
   setup-halo2-wasm-env:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -89,7 +106,6 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly-2024-07-18
-          override: true
       - name: Cache wasm-pack
         id: cache-wasm-pack
         uses: actions/cache@v4
@@ -128,6 +144,11 @@ jobs:
       CHROMEDRIVER_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}/chromedriver
     steps:
       - uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2024-07-18
+          override: true
       - name: Restore cached wasm-pack
         uses: actions/cache@v4
         with:
@@ -156,7 +177,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly-2024-07-18
           override: true
       - name: Run e2e circom tests
         # TODO: Fix this custom jar thing
@@ -174,7 +195,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly-2024-07-18
           override: true
       - name: Build iOS xcframework
         run: cd test-e2e && cargo run --bin ios
@@ -192,7 +213,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly-2024-07-18
           override: true
       - name: Restore cached xcframework
         id: cache-restore-xcframework
@@ -210,7 +231,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly-2024-07-18
           override: true
       - name: Restore cached xcframework
         id: cache-restore-xcframework
@@ -228,7 +249,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly-2024-07-18
           override: true
       - name: Restore cached xcframework
         id: cache-restore-xcframework
@@ -247,7 +268,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly-2024-07-18
           override: true
       - name: Build Android bindings
         run: cd test-e2e && cargo run --bin android
@@ -265,8 +286,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
-          override: true
+          toolchain: nightly-2024-07-18
       - name: Restore cached android lib
         id: cache-restore-android-lib
         uses: actions/cache/restore@v4
