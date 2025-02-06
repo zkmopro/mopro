@@ -3,18 +3,71 @@
 Circom prover is a Rust library for generating and verifying proofs for [Circom](https://github.com/iden3/circom) circuits.
 It is designed to be used in cross-platform applications, and is compatible with the [Mopro](https://github.com/zkmopro/mopro) library.
 
+## Usage
+
+Depends on the witness generation method, build the rust witness function first.
+For example, if you use the [Rust Witness](https://github.com/chancehudson/rust-witness), please refer to the [Rust Witness](https://github.com/chancehudson/rust-witness) for more details.
+
+### Proof Generation
+
+```rust
+use std::collections::HashMap;
+rust_witness::witness!(multiplier2);
+use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
+
+// Prepare inputs
+let mut inputs = HashMap::new();
+inputs.insert("a".to_string(), vec!["1".to_string()]);
+inputs.insert("b".to_string(), vec!["2".to_string()]);
+
+// Prepare zkey path
+let zkey_path = "./test-vectors/multiplier2_final.zkey".to_string();
+
+// Generate proof
+let result = CircomProver::prove(
+    ProofLib::Arkworks,
+    WitnessFn::RustWitness(multiplier2_witness),
+    inputs,
+    zkey_path,
+).unwrap();
+```
+
+### Proof Verification
+
+```rust
+// Verify proof
+let valid = CircomProver::verify(
+    ProofLib::Arkworks,
+    result.proof,
+    result.pub_inputs,
+    zkey_path,
+).unwrap();
+```
+
+### Proof Deserialization
+
+```rust
+use circom_prover::{
+    prover::{
+        serialization::{deserialize_inputs, deserialize_proof},
+    },
+};
+let deserialized_proof = deserialize_proof(result.proof);
+let deserialized_pub_inputs = deserialize_inputs(result.pub_inputs);
+```
+
 ## Adapters
 
 ## Witness Generation
 
 -   [x] [Rust Witness](https://github.com/chancehudson/rust-witness)
--   [ ] [Witnesscalc](https://github.com/zkmopro/witnesscalc-adapter)
+-   [ ] [Witnesscalc adapter](https://github.com/zkmopro/witnesscalc_adapter)
 -   [ ] [circom witnesscalc](https://github.com/iden3/circom-witnesscalc)
 
 ## Proof Generation
 
 -   [x] [Arkworks](https://github.com/arkworks-rs)
--   [ ] [Rapidsnark](https://github.com/zkmopro/rust-rapidsnark)
+-   [ ] [Rust rapidsnark](https://github.com/zkmopro/rust-rapidsnark)
 
 ## Performance
 
