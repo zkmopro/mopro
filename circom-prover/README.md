@@ -47,13 +47,14 @@ let valid = CircomProver::verify(
 ### Proof Deserialization
 
 ```rust
+use ark_bn254::Bn254;
 use circom_prover::{
     prover::{
         serialization::{deserialize_inputs, deserialize_proof},
     },
 };
-let deserialized_proof = deserialize_proof(result.proof);
-let deserialized_pub_inputs = deserialize_inputs(result.pub_inputs);
+let deserialized_proof = deserialize_proof::<Bn254>(result.proof);
+let deserialized_pub_inputs = deserialize_inputs::<Bn254>(result.pub_inputs);
 ```
 
 ## Adapters
