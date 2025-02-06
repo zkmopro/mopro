@@ -12,9 +12,9 @@ use witness::WitnessFn;
 pub use witnesscalc_adapter;
 
 #[derive(Debug, Clone)]
-pub struct CircomPorver {}
+pub struct CircomProver {}
 
-impl CircomPorver {
+impl CircomProver {
     pub fn prove(
         proof_lib: ProofLib,
         wit_fn: WitnessFn,

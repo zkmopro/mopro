@@ -4,7 +4,7 @@ pub use ethereum::*;
 use crate::GenerateProofResult;
 use anyhow::Ok;
 use anyhow::Result;
-use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomPorver};
+use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
 use std::collections::HashMap;
 
 #[macro_export]
@@ -112,7 +112,7 @@ pub fn generate_circom_proof_wtns(
     inputs: HashMap<String, Vec<String>>,
     witness_fn: WitnessFn,
 ) -> Result<GenerateProofResult> {
-    let ret = CircomPorver::prove(proof_lib, witness_fn, inputs.clone(), zkey_path).unwrap();
+    let ret = CircomProver::prove(proof_lib, witness_fn, inputs.clone(), zkey_path).unwrap();
     Ok(GenerateProofResult {
         proof: ret.proof,
         inputs: ret.pub_inputs,
@@ -126,7 +126,7 @@ pub fn verify_circom_proof(
     proof: Vec<u8>,
     public_inputs: Vec<u8>,
 ) -> Result<bool> {
-    CircomPorver::verify(proof_lib, proof, public_inputs, zkey_path)
+    CircomProver::verify(proof_lib, proof, public_inputs, zkey_path)
 }
 
 #[cfg(test)]
