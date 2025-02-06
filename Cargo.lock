@@ -732,6 +732,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "circom-prover"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e781acc6dfa85a379ef996e95fbc7a8f3ef915ebba550fdc1d196dd5d3318f6c"
+dependencies = [
+ "anyhow",
+ "ark-bls12-381",
+ "ark-bn254",
+ "ark-crypto-primitives",
+ "ark-ec",
+ "ark-ff",
+ "ark-groth16",
+ "ark-poly",
+ "ark-relations",
+ "ark-serialize",
+ "ark-std",
+ "byteorder",
+ "hex-literal",
+ "num",
+ "num-bigint",
+ "num-traits",
+ "rand",
+ "rayon",
+ "rust-witness",
+ "uuid",
+]
+
+[[package]]
 name = "clap"
 version = "3.2.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2250,14 +2278,14 @@ dependencies = [
 
 [[package]]
 name = "mopro-ffi"
-version = "0.1.0"
+version = "0.1.1-alpha.0"
 dependencies = [
  "anyhow",
  "ark-bls12-381",
  "ark-bn254",
  "ark-ff",
  "bincode",
- "circom-prover",
+ "circom-prover 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "color-eyre",
  "gemini-fibonacci",
  "hyperplonk-fibonacci",
@@ -3491,7 +3519,7 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
- "circom-prover",
+ "circom-prover 0.1.0",
  "gemini-fibonacci",
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
@@ -4393,8 +4421,10 @@ dependencies = [
 [[package]]
 name = "witnesscalc-adapter"
 version = "0.1.0"
-source = "git+https://github.com/zkmopro/witnesscalc_adapter.git#1d514d4fda616362974cae5131a765654cdc2793"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3599d42997739048350a8507c42cf61a5832c940148819ad6e9f7f0d534a2c3b"
 dependencies = [
+ "anyhow",
  "num-bigint",
  "num-traits",
  "paste",
