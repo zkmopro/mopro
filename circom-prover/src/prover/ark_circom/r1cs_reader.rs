@@ -4,7 +4,6 @@
 //! Copied from <https://github.com/poma/zkutil>
 //! Spec: <https://github.com/iden3/r1csfile/blob/master/doc/r1cs_bin_format.md>
 use byteorder::{LittleEndian, ReadBytesExt};
-use ethers_core::utils::hex;
 use std::io::{Error, ErrorKind};
 
 use ark_ec::pairing::Pairing;
@@ -181,8 +180,7 @@ impl Header {
         reader.read_exact(&mut prime_size)?;
 
         if prime_size
-            != hex::decode("010000f093f5e1439170b97948e833285d588181b64550b829a031e1724e6430")
-                .unwrap()
+            != hex_literal::hex!("010000f093f5e1439170b97948e833285d588181b64550b829a031e1724e6430")
         {
             return Err(IoError(Error::new(
                 ErrorKind::InvalidData,
@@ -318,8 +316,7 @@ mod tests {
         assert_eq!(file.header.field_size, 32);
         assert_eq!(
             file.header.prime_size,
-            hex::decode("010000f093f5e1439170b97948e833285d588181b64550b829a031e1724e6430")
-                .unwrap(),
+            hex_literal::hex!("010000f093f5e1439170b97948e833285d588181b64550b829a031e1724e6430")
         );
         assert_eq!(file.header.n_wires, 7);
         assert_eq!(file.header.n_pub_out, 1);
