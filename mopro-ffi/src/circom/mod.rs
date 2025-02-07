@@ -10,6 +10,7 @@ use std::collections::HashMap;
 #[macro_export]
 macro_rules! circom_app {
     () => {
+        use mopro_ffi::witness::WitnessFn;
         fn generate_circom_proof(
             in0: String,
             in1: std::collections::HashMap<String, Vec<String>>,
@@ -24,7 +25,7 @@ macro_rules! circom_app {
             };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
             mopro_ffi::generate_circom_proof_wtns(
-                circom_prover::prover::ProofLib::Arkworks,
+                mopro_ffi::prover::ProofLib::Arkworks,
                 in0,
                 in1,
                 witness_fn,
@@ -37,7 +38,7 @@ macro_rules! circom_app {
             in1: Vec<u8>,
             in2: Vec<u8>,
         ) -> Result<bool, mopro_ffi::MoproError> {
-            mopro_ffi::verify_circom_proof(circom_prover::prover::ProofLib::Arkworks, in0, in1, in2)
+            mopro_ffi::verify_circom_proof(mopro_ffi::prover::ProofLib::Arkworks, in0, in1, in2)
                 .map_err(|e| {
                     mopro_ffi::MoproError::CircomError(format!("Verification error: {}", e))
                 })
@@ -78,12 +79,12 @@ macro_rules! circom_app {
 ///
 /// ## For Advanced Users:
 /// This macro is abstracting away the implementation of
-/// `get_circom_wtns_fn(circuit: &str) -> Result<circom_prover::witness::WitnessFn, mopro_ffi::MoproError>`.
+/// `get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::witness::WitnessFn, mopro_ffi::MoproError>`.
 /// You can choose to implement it directly with your custom logic:
 ///
 /// #### Example:
 /// ```ignore
-/// fn get_circom_wtns_fn(circuit: &str) -> Result<circom_prover::witness::WitnessFn, mopro_ffi::MoproError> {
+/// fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::witness::WitnessFn, mopro_ffi::MoproError> {
 ///    match circuit {
 ///       "circuit1.zkey" => Ok(circuit1_witness_fn),
 ///      _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit).to_string()))
@@ -93,7 +94,7 @@ macro_rules! circom_app {
 #[macro_export]
 macro_rules! set_circom_circuits {
     ($(($key:expr, $func:expr)),+ $(,)?) => {
-        fn get_circom_wtns_fn(circuit: &str) -> Result<circom_prover::witness::WitnessFn, mopro_ffi::MoproError> {
+        fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::witness::WitnessFn, mopro_ffi::MoproError> {
             match circuit {
                 $(
                    $key => Ok($func),

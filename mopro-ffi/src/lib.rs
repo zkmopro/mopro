@@ -90,7 +90,7 @@ pub struct GenerateProofResult {
 /// It should be included in the `lib.rs` file of the project
 ///
 /// This should be used with the adapter-specific macros, such as `set_circom_circuits!(...)`
-/// and `set_halo2_proving_circuits!(...)`, etc.
+/// and `set_halo2_circuits!(...)`, etc.
 ///
 /// # Circom Example
 /// ```ignore
@@ -103,7 +103,7 @@ pub struct GenerateProofResult {
 /// // Add `multiplier2` circom circuit to be exposed to the FFI
 /// mopro_ffi::set_circom_circuits!(
 ///     "multiplier2_final.zkey",
-//     multiplier2_witness,
+///     WitnessFn::RustWitness(multiplier2_witness),
 /// )
 /// ```
 ///
@@ -112,23 +112,19 @@ pub struct GenerateProofResult {
 /// // Setup the Mopro FFI library
 /// mopro_ffi::app!();
 ///
-/// // Import a prepared Halo2 circuit
-/// use crate::halo2::FibonacciMoproCircuit;
-///
-/// // Add `Fibonacci` circuit to generate proofs
-/// mopro_ffi::set_halo2_proving_circuits!("plonk_fibonacci_pk.bin", FibonacciMoproCircuit::prove);
-///
-/// // Add `Fibonacci` circuit to verify proofs
-// mopro_ffi::set_halo2_verifying_circuits!("plonk_fibonacci_vk.bin", FibonacciMoproCircuit::verify);
-///
-///
+/// // Add `Fibonacci` circuit to generate proofs and verify proofs
+/// mopro_ffi::set_halo2_circuits!(
+///     "plonk_fibonacci_pk.bin",
+///     plonk_fibonacci::prove,
+///     "plonk_fibonacci_vk.bin",
+///     plonk_fibonacci::verify
+/// );
+/// ```
 #[macro_export]
 macro_rules! app {
     () => {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
-        use mopro_ffi::{
-            witness::WitnessFn, GenerateProofResult, MoproError, ProofCalldata, G1, G2,
-        };
+        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
 
         mopro_ffi::circom_app!();
 
