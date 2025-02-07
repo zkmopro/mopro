@@ -95,7 +95,7 @@ mod tests {
     fn test_rustwitness_rapidsnark_prove_and_verify() {
         rust_witness::witness!(multiplier2);
 
-        let res = generate_proof(
+        let _ = generate_proof(
             WitnessFn::RustWitness(multiplier2_witness),
             ProofLib::RapidSnark,
         );

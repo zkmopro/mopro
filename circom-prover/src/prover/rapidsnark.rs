@@ -43,11 +43,7 @@ pub fn generate_circom_proof(
     let b2 = Fq2::new(b2_x, b2_y);
     let b = <Bn254 as Pairing>::G2Affine::new_unchecked(b1, b2);
 
-    let ark_proof = Proof::<Bn254> {
-        a: a.into(),
-        b: b.into(),
-        c: c.into(),
-    };
+    let ark_proof = Proof::<Bn254> { a, b, c };
     let public_signals: Vec<Fr> = public_signals_json
         .as_array()
         .unwrap()
