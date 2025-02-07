@@ -36,6 +36,7 @@ pub fn deserialize_inputs<T: Pairing>(data: Vec<u8>) -> SerializableInputs<T> {
     SerializableInputs::deserialize_uncompressed(&mut &data[..]).expect("Deserialization failed")
 }
 
+#[cfg(feature = "arkworks")]
 #[cfg(test)]
 mod tests {
     use crate::prover::ark_circom::{CircomCircuit, R1CSFile};
