@@ -732,34 +732,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "circom-prover"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e781acc6dfa85a379ef996e95fbc7a8f3ef915ebba550fdc1d196dd5d3318f6c"
-dependencies = [
- "anyhow",
- "ark-bls12-381",
- "ark-bn254",
- "ark-crypto-primitives",
- "ark-ec",
- "ark-ff",
- "ark-groth16",
- "ark-poly",
- "ark-relations",
- "ark-serialize",
- "ark-std",
- "byteorder",
- "hex-literal",
- "num",
- "num-bigint",
- "num-traits",
- "rand",
- "rayon",
- "rust-witness",
- "uuid",
-]
-
-[[package]]
 name = "clap"
 version = "3.2.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2285,7 +2257,7 @@ dependencies = [
  "ark-bn254",
  "ark-ff",
  "bincode",
- "circom-prover 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "circom-prover",
  "color-eyre",
  "gemini-fibonacci",
  "hyperplonk-fibonacci",
@@ -3519,7 +3491,6 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
- "circom-prover 0.1.0",
  "gemini-fibonacci",
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
