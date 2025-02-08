@@ -18,7 +18,7 @@ The "mopro-wasm-lib" is the place that compile wasm code eventually. So, it shou
 
 ### 1. Modify 'Cargo.toml' in the "mopro-wasm-lib"
 
-The user-defined circuit implmentation crate should be added as a dependency manually, as illustrated below:
+The user-defined circuit implementation crate should be added as a dependency manually, as illustrated below:
 
 ```rust
 [package]
