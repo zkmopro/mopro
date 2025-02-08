@@ -75,7 +75,7 @@ This only has to be done once when changing the circuit.
 
 ## Build, test and run your project
 
-Depending on what platforms you are targetting, you can run the following commands:
+Depending on what platforms you are targeting, you can run the following commands:
 
 -   Build the project
 
