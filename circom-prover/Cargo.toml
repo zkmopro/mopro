@@ -32,6 +32,9 @@ rapidsnark = [
     "ark-bn254",
     "ark-ec",
     "ark-groth16",
+    "ark-bls12-381",   # TODO: remove this
+    "ark-relations",
+    "ark-poly",
 ]
 
 ethereum = ["ark-std", "ark-serialize", "ark-ff"]

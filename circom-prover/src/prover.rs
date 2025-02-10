@@ -2,7 +2,6 @@ use anyhow::Result;
 use num::BigUint;
 use std::thread::JoinHandle;
 
-#[cfg(feature = "arkworks")]
 pub mod ark_circom;
 #[cfg(feature = "arkworks")]
 pub mod arkworks;
@@ -48,6 +47,6 @@ pub fn verify(
         #[cfg(feature = "arkworks")]
         ProofLib::Arkworks => arkworks::verify_circom_proof(zkey_path, proof, public_inputs),
         #[cfg(feature = "rapidsnark")]
-        ProofLib::RapidSnark => panic!("Not supported yet."),
+        ProofLib::RapidSnark => rapidsnark::verify_circom_proof(zkey_path, proof, public_inputs),
     }
 }

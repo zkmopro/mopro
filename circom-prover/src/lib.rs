@@ -95,11 +95,11 @@ mod tests {
     fn test_rustwitness_rapidsnark_prove_and_verify() {
         rust_witness::witness!(multiplier2);
 
-        let _ = generate_proof(
+        let res = generate_proof(
             WitnessFn::RustWitness(multiplier2_witness),
             ProofLib::RapidSnark,
         );
-        // let res = verify_proof(res.proof, res.pub_inputs, ProofLib::Arkworks);
-        // assert!(res);
+        let res = verify_proof(res.proof, res.pub_inputs, ProofLib::RapidSnark);
+        assert!(res);
     }
 }
