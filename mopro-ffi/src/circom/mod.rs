@@ -10,7 +10,7 @@ use std::collections::HashMap;
 #[macro_export]
 macro_rules! circom_app {
     () => {
-        use mopro_ffi::witness::WitnessFn;
+        #[uniffi::export]
         fn generate_circom_proof(
             in0: String,
             in1: std::collections::HashMap<String, Vec<String>>,
@@ -33,6 +33,7 @@ macro_rules! circom_app {
             .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
         }
 
+        #[uniffi::export]
         fn verify_circom_proof(
             in0: String,
             in1: Vec<u8>,
@@ -44,10 +45,12 @@ macro_rules! circom_app {
                 })
         }
 
+        #[uniffi::export]
         fn to_ethereum_proof(in0: Vec<u8>) -> mopro_ffi::ProofCalldata {
             mopro_ffi::to_ethereum_proof(in0)
         }
 
+        #[uniffi::export]
         fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
             mopro_ffi::to_ethereum_inputs(in0)
         }
