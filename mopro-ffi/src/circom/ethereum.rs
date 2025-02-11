@@ -4,19 +4,19 @@ use circom_prover::prover::{
     serialization::{deserialize_inputs, deserialize_proof},
 };
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, uniffi::Object)]
 pub struct G1 {
     pub x: String,
     pub y: String,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, uniffi::Object)]
 pub struct G2 {
     pub x: Vec<String>,
     pub y: Vec<String>,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, uniffi::Object)]
 pub struct ProofCalldata {
     pub a: G1,
     pub b: G2,

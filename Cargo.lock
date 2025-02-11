@@ -2268,6 +2268,7 @@ dependencies = [
  "serde_derive",
  "thiserror 2.0.3",
  "uniffi",
+ "uniffi_macros",
  "uuid",
 ]
 
