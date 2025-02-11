@@ -94,29 +94,31 @@ pub fn build() {
         .map(|v| build_combined_archs(v))
         .collect();
 
-    // TODO: Should i generate all
-    let generate_binding_cmds = Command::new("cargo")
+    // Uniffi proc-macro require compiled library file
+    Command::new("cargo")
         .args([
             "run",
             "--bin",
             "uniffi-bindgen",
             "generate",
-            "--lib-file",
-            out_lib_paths[0]
+            "--library",
+            // Compiled lib out dir
+            build_dir_path
+                .join(if mode == Mode::Release {
+                    "release"
+                } else {
+                    "debug"
+                })
+                .join("deps/libmopro_ffi.so")
                 .to_str()
                 .expect("Invalid static library path"),
             "--language",
             "swift",
             "--out-dir",
-            swift_bindings_dir
-                .to_str()
-                .expect("Invalid output directory"),
+            bindings_out.to_str().expect("Invalid output directory"),
         ])
         .status()
         .expect("Failed to execute uniffi-bindgen command");
-
-    // TODO: remove cli
-    println!("generate_binding_cmds: {:?}", generate_binding_cmds);
 
     fs::rename(
         swift_bindings_dir.join("mopro.swift"),
