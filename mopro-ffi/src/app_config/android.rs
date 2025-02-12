@@ -2,9 +2,6 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-use uniffi::generate_bindings;
-use uniffi::KotlinBindingGenerator;
-
 use super::cleanup_tmp_local;
 use super::constants::{
     AndroidArch, Mode, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, ENV_ANDROID_ARCHS,
@@ -49,16 +46,31 @@ pub fn build() {
         build_for_arch(arch, &build_dir, &bindings_out, mode);
     }
 
-    generate_bindings(
-        (manifest_dir + "/src/mopro.udl").as_str().into(),
-        None,
-        KotlinBindingGenerator,
-        Some(bindings_out.to_str().unwrap().into()),
-        None,
-        None,
-        false,
-    )
-    .expect("Failed to generate bindings");
+    // Uniffi proc-macro require compiled library file
+    Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "uniffi-bindgen",
+            "generate",
+            "--library",
+            // Compiled lib out dir
+            build_dir
+                .join(if mode == Mode::Release {
+                    "release"
+                } else {
+                    "debug"
+                })
+                .join("deps/libmopro_ffi.so")
+                .to_str()
+                .expect("Invalid static library path"),
+            "--language",
+            "kotlin",
+            "--out-dir",
+            bindings_out.to_str().expect("Invalid output directory"),
+        ])
+        .status()
+        .expect("Failed to execute uniffi-bindgen command");
 
     move_bindings(&bindings_out, &bindings_dest);
     cleanup_tmp_local(&build_dir);

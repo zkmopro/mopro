@@ -2,9 +2,6 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use uniffi::generate_bindings;
-use uniffi::SwiftBindingGenerator;
-
 use super::cleanup_tmp_local;
 use super::constants::{IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
 use super::install_arch;
@@ -92,27 +89,42 @@ pub fn build() {
         lib_out
     };
 
-    generate_bindings(
-        (manifest_dir + "/src/mopro.udl").as_str().into(),
-        None,
-        SwiftBindingGenerator,
-        Some(swift_bindings_dir.to_str().unwrap().into()),
-        None,
-        None,
-        false,
-    )
-    .expect("Failed to generate bindings");
+    let out_lib_paths: Vec<PathBuf> = group_target_archs(&target_archs)
+        .iter()
+        .map(|v| build_combined_archs(v))
+        .collect();
+
+    // Uniffi proc-macro require compiled library file
+    Command::new("cargo")
+        .args([
+            "run",
+            "--bin",
+            "uniffi-bindgen",
+            "generate",
+            "--library",
+            // Compiled lib out dir
+            build_dir_path
+                .join(if mode == Mode::Release {
+                    "release"
+                } else {
+                    "debug"
+                })
+                .join("deps/libmopro_ffi.so")
+                .to_str()
+                .expect("Invalid static library path"),
+            "--language",
+            "swift",
+            "--out-dir",
+            bindings_out.to_str().expect("Invalid output directory"),
+        ])
+        .status()
+        .expect("Failed to execute uniffi-bindgen command");
 
     fs::rename(
         swift_bindings_dir.join("mopro.swift"),
         bindings_out.join("mopro.swift"),
     )
     .expect("Failed to move mopro.swift into place");
-
-    let out_lib_paths: Vec<PathBuf> = group_target_archs(&target_archs)
-        .iter()
-        .map(|v| build_combined_archs(v))
-        .collect();
 
     let mut xcbuild_cmd = Command::new("xcodebuild");
     xcbuild_cmd.arg("-create-xcframework");

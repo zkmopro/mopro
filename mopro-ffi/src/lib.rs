@@ -21,7 +21,6 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 #[macro_export]
 macro_rules! circom_app {
     () => {
-
         fn generate_circom_proof(
             in0: String,
             in1: std::collections::HashMap<String, Vec<String>>,
@@ -70,9 +69,11 @@ macro_rules! halo2_app {
     };
 }
 
+uniffi::setup_scaffolding!();
+
 use thiserror::Error;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, uniffi::Error)]
 pub enum MoproError {
     #[error("CircomError: {0}")]
     CircomError(String),
@@ -80,7 +81,7 @@ pub enum MoproError {
     Halo2Error(String),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, uniffi::Object)]
 pub struct GenerateProofResult {
     pub proof: Vec<u8>,
     pub inputs: Vec<u8>,
@@ -130,10 +131,13 @@ macro_rules! app {
             witness::WitnessFn, GenerateProofResult, MoproError, ProofCalldata, G1, G2,
         };
 
+        uniffi::setup_scaffolding!();
+
         mopro_ffi::circom_app!();
 
         mopro_ffi::halo2_app!();
 
-        uniffi::include_scaffolding!("mopro");
+        // TODO: remove
+        // uniffi::include_scaffolding!("mopro");
     };
 }
