@@ -24,7 +24,6 @@ uniffi = "0.28.0"
 # Circom dependencies
 rust-witness = "0.1.1"
 num-bigint = { version = "0.4.0" }
-circom-prover = { path = "../circom-prover" }
 
 # Halo2 dependencies
 halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }

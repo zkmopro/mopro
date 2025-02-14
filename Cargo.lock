@@ -2250,7 +2250,7 @@ dependencies = [
 
 [[package]]
 name = "mopro-ffi"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "ark-bls12-381",
@@ -3491,7 +3491,6 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
- "circom-prover",
  "gemini-fibonacci",
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
@@ -4393,8 +4392,10 @@ dependencies = [
 [[package]]
 name = "witnesscalc-adapter"
 version = "0.1.0"
-source = "git+https://github.com/zkmopro/witnesscalc_adapter.git#1d514d4fda616362974cae5131a765654cdc2793"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3599d42997739048350a8507c42cf61a5832c940148819ad6e9f7f0d534a2c3b"
 dependencies = [
+ "anyhow",
  "num-bigint",
  "num-traits",
  "paste",
