@@ -43,7 +43,7 @@ num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
 anyhow = "1.0.95"
-rust-witness = { version = "0.1.2", optional = true }
+rust-witness = { version = "0.1", optional = true }
 witnesscalc-adapter = { version = "0.1.0", optional = true }
 byteorder = { version = "1.0.0" }
 uuid = { version = "1.9.1", features = ["v4"] }

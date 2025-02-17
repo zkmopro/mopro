@@ -38,11 +38,11 @@ To use it, you must first add the `rust-witness` crate to your `Cargo.toml` regu
 ```toml
 [dependencies]
 # ...
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+rust-witness = "0.1"
 
 [build-dependencies]
 # ...
-rust-witness = { git = "https://github.com/vimwitch/rust-witness.git" }
+rust-witness = "0.1"
 ```
 
 #### Configuring the path to the `.wasm` circuit files in the `build.rs`

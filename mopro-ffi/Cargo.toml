@@ -38,7 +38,7 @@ thiserror = "=2.0.3"
 color-eyre = "=0.6.2"
 
 # circom deps
-rust-witness = { version = "0.1.1", optional = true }
+rust-witness = { version = "0.1", optional = true }
 ark-ff = { version = "0.4.0", optional = true }
 circom-prover = { path = "../circom-prover", optional = true }
 
@@ -48,7 +48,7 @@ uuid = { version = "1.9.1", features = ["v4"] }
 ark-bls12-381 = { version = "0.4.0", optional = true }
 
 [build-dependencies]
-rust-witness = { version = "0.1.1", optional = true }
+rust-witness = { version = "0.1", optional = true }
 uniffi = { version = "=0.28.0", features = ["build"] }
 
 [dev-dependencies]
