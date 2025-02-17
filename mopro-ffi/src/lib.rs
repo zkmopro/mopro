@@ -86,6 +86,28 @@ pub struct GenerateProofResult {
     pub inputs: Vec<u8>,
 }
 
+#[cfg(not(feature = "circom"))]
+#[derive(Debug, Clone, Default)]
+pub struct G1 {
+    pub x: String,
+    pub y: String,
+}
+
+#[cfg(not(feature = "circom"))]
+#[derive(Debug, Clone, Default)]
+pub struct G2 {
+    pub x: Vec<String>,
+    pub y: Vec<String>,
+}
+
+#[cfg(not(feature = "circom"))]
+#[derive(Debug, Clone, Default)]
+pub struct ProofCalldata {
+    pub a: G1,
+    pub b: G2,
+    pub c: G1,
+}
+
 /// This macro is used to setup the Mopro FFI library
 /// It should be included in the `lib.rs` file of the project
 ///
