@@ -22,7 +22,8 @@ name = "uniffi-bindgen"
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
 mopro-wasm = { path = "../mopro-wasm" }
-uniffi = "0.28.0"
+uniffi = { version = "0.28.0" }
+uniffi_bindgen = { version = "0.28.0" }
 
 # Circom dependencies
 rust-witness = "0.1.1"
@@ -48,4 +49,3 @@ uniffi = { version = "0.28.0", features = ["bindgen-tests"] }
 # remove after uniffi is upgraded (see https://github.com/mozilla/uniffi-rs/issues/2346)
 [lints.clippy]
 empty-line-after-doc-comments = "allow"
-

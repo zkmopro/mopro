@@ -2,6 +2,9 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use uniffi_bindgen::bindings::SwiftBindingGenerator;
+use uniffi_bindgen::library_mode::generate_bindings;
+
 use super::cleanup_tmp_local;
 use super::constants::{IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
 use super::install_arch;
@@ -94,34 +97,27 @@ pub fn build() {
         .map(|v| build_combined_archs(v))
         .collect();
 
-    // Uniffi proc-macro require compiled library file
-    Command::new("cargo")
-        .args([
-            "run",
-            "--bin",
-            "uniffi-bindgen",
-            "generate",
-            "--library",
-            // Compiled lib out dir
-            build_dir_path
-                .join(if mode == Mode::Release {
-                    "release"
-                } else {
-                    "debug"
-                })
-                .join("deps/libmopro_ffi.so")
-                .to_str()
-                .expect("Invalid static library path"),
-            "--language",
-            "swift",
-            "--out-dir",
-            bindings_out.to_str().expect("Invalid output directory"),
-        ])
-        .status()
-        .expect("Failed to execute uniffi-bindgen command");
+    // Generate the path to the built dynamic library (.dylib)
+    let out_dylib_path = Path::new(&build_dir).join(format!(
+        "{}/{}/lib{}.dylib",
+        target_archs[0].as_str(),
+        mode.as_str(),
+        "mopro_bindings"
+    ));
+
+    // Generate the Swift bindings using uniffi_bindgen
+    generate_bindings(
+        out_dylib_path.to_str().unwrap().into(),
+        None,
+        &SwiftBindingGenerator,
+        None,
+        swift_bindings_dir.to_str().unwrap().into(),
+        true,
+    )
+    .expect("Failed to generate bindings");
 
     fs::rename(
-        swift_bindings_dir.join("mopro.swift"),
+        swift_bindings_dir.join(format!("mopro_bindings.swift")),
         bindings_out.join("mopro.swift"),
     )
     .expect("Failed to move mopro.swift into place");

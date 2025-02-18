@@ -2268,6 +2268,7 @@ dependencies = [
  "serde_derive",
  "thiserror 2.0.3",
  "uniffi",
+ "uniffi_bindgen",
  "uniffi_macros",
  "uuid",
 ]
@@ -3502,6 +3503,7 @@ dependencies = [
  "plonk-fibonacci",
  "rust-witness",
  "uniffi",
+ "uniffi_bindgen",
 ]
 
 [[package]]
@@ -3851,8 +3853,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f31bff6daf87277a9014bcdefbc2842b0553392919d1096843c5aad899ca4588"
 dependencies = [
  "anyhow",
- "camino",
- "clap 4.5.27",
  "uniffi_bindgen",
  "uniffi_build",
  "uniffi_core",
