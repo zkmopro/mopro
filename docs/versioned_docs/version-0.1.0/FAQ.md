@@ -35,4 +35,4 @@ Mopro is for both proving and verifying ZKPs on mobile.
 
 ## Does Mopro run natively on a phone?
 
-Yes. Witness and proof generation happens natively in app.
+Yes. Witness and proof generation happen natively in the app.
