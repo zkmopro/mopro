@@ -8,7 +8,7 @@ type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 #[cfg(feature = "witnesscalc")]
 type WitnesscalcWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, uniffi::Enum)]
 pub enum WitnessFn {
     #[cfg(feature = "witnesscalc")]
     WitnessCalc(WitnesscalcWtnsFn),

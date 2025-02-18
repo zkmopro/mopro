@@ -71,9 +71,7 @@ macro_rules! halo2_app {
 
 uniffi::setup_scaffolding!();
 
-use thiserror::Error;
-
-#[derive(Debug, Error, uniffi::Error)]
+#[derive(Debug, thiserror::Error, uniffi::Error)]
 pub enum MoproError {
     #[error("CircomError: {0}")]
     CircomError(String),

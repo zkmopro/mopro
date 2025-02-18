@@ -4,6 +4,7 @@ use std::error::Error;
 #[macro_export]
 macro_rules! halo2_app {
     () => {
+        #[uniffi::export]
         fn generate_halo2_proof(
             in0: String,
             in1: String,
@@ -18,6 +19,7 @@ macro_rules! halo2_app {
                 .map_err(|e| mopro_ffi::MoproError::Halo2Error(format!("halo2 error: {}", e)))
         }
 
+        #[uniffi::export]
         fn verify_halo2_proof(
             in0: String,
             in1: String,
@@ -95,6 +97,7 @@ macro_rules! halo2_app {
 #[macro_export]
 macro_rules! set_halo2_circuits {
     ($(($prove_key:expr, $prove_fn:expr, $verify_key:expr, $verify_fn:expr)),+ $(,)?) => {
+        #[uniffi::export]
         fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError> {
             match circuit_pk {
                 $(
@@ -104,6 +107,7 @@ macro_rules! set_halo2_circuits {
             }
         }
 
+        #[uniffi::export]
         fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError> {
             match circuit_vk {
                 $(

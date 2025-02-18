@@ -728,6 +728,7 @@ dependencies = [
  "rust-rapidsnark",
  "rust-witness",
  "serde_json",
+ "uniffi",
  "uuid",
  "witnesscalc-adapter",
 ]

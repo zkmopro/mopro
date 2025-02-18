@@ -97,7 +97,8 @@ macro_rules! circom_app {
 #[macro_export]
 macro_rules! set_circom_circuits {
     ($(($key:expr, $func:expr)),+ $(,)?) => {
-        fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::witness::WitnessFn, mopro_ffi::MoproError> {
+        // #[uniffi::export]
+        fn get_circom_wtns_fn(circuit: &str) -> Result<circom_prover::witness::WitnessFn, mopro_ffi::MoproError> {
             match circuit {
                 $(
                    $key => Ok($func),

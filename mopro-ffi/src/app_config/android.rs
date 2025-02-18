@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use super::cleanup_tmp_local;
@@ -42,28 +42,28 @@ pub fn build() {
     };
 
     install_ndk();
+    let mut latest_out_lib_path = PathBuf::new();
     for arch in target_archs {
-        build_for_arch(arch, &build_dir, &bindings_out, mode);
+        latest_out_lib_path = build_for_arch(arch, &build_dir, &bindings_out, mode);
     }
+
+    println!("latest_out_lib_path: {:?}", latest_out_lib_path);
 
     // Uniffi proc-macro require compiled library file
     Command::new("cargo")
+        .current_dir(Path::new("..").join("mopro-ffi"))
         .args([
             "run",
+            "--features",
+            "circom,halo2",
             "--bin",
             "uniffi-bindgen",
             "generate",
             "--library",
             // Compiled lib out dir
-            build_dir
-                .join(if mode == Mode::Release {
-                    "release"
-                } else {
-                    "debug"
-                })
-                .join("deps/libmopro_ffi.so")
+            latest_out_lib_path
                 .to_str()
-                .expect("Invalid static library path"),
+                .expect("Invalid C dynamic library path"),
             "--language",
             "kotlin",
             "--out-dir",
@@ -76,7 +76,7 @@ pub fn build() {
     cleanup_tmp_local(&build_dir);
 }
 
-fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode: Mode) {
+fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode: Mode) -> PathBuf {
     let arch_str = arch.as_str();
     install_arch(arch_str.to_string());
 
@@ -114,7 +114,9 @@ fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode
     let out_lib_dest = bindings_out.join(format!("jniLibs/{}/libuniffi_mopro.so", folder));
 
     fs::create_dir_all(out_lib_dest.parent().unwrap()).expect("Failed to create jniLibs directory");
-    fs::copy(out_lib_path, &out_lib_dest).expect("Failed to copy file");
+    fs::copy(&out_lib_path, &out_lib_dest).expect("Failed to copy file");
+
+    out_lib_path
 }
 
 fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
