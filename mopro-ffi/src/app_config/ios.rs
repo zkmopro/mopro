@@ -117,7 +117,7 @@ pub fn build() {
     .expect("Failed to generate bindings");
 
     fs::rename(
-        swift_bindings_dir.join(format!("mopro_bindings.swift")),
+        swift_bindings_dir.join("mopro_bindings.swift"),
         bindings_out.join("mopro.swift"),
     )
     .expect("Failed to move mopro.swift into place");

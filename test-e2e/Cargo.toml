@@ -16,9 +16,6 @@ name = "android"
 [[bin]]
 name = "web"
 
-[[bin]]
-name = "uniffi-bindgen"
-
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
 mopro-wasm = { path = "../mopro-wasm" }
