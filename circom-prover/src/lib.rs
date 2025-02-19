@@ -71,7 +71,8 @@ mod tests {
     fn test_witnesscalc_arkworks_prove_and_verify() {
         use num_bigint::BigInt;
         witnesscalc_adapter::witness!(multiplier2);
-        // TODO: The conversion should be exported in witness.rs
+        // TODO: The conversion should be exported in witness.rs 
+        // https://github.com/zkmopro/mopro/issues/331
         fn create_multiplier2_witness(inputs: HashMap<String, Vec<BigInt>>) -> Vec<BigInt> {
             let inputs_str: HashMap<String, Vec<String>> = inputs
                 .into_iter()

@@ -32,7 +32,7 @@ rapidsnark = [
     "ark-bn254",
     "ark-ec",
     "ark-groth16",
-    "ark-bls12-381",   # TODO: remove this
+    "ark-bls12-381",   # TODO: remove this See https://github.com/zkmopro/mopro/issues/329
     "ark-relations",
     "ark-poly",
 ]
