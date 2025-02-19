@@ -9,7 +9,7 @@ macro_rules! halo2_app {
             in0: String,
             in1: String,
             in2: std::collections::HashMap<String, Vec<String>>,
-        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
+        ) -> uniffi::deps::anyhow::Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
             let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap()).map_err(|e| {
                 mopro_ffi::MoproError::Halo2Error(format!("error getting proving circuit: {}", e))
@@ -25,7 +25,7 @@ macro_rules! halo2_app {
             in1: String,
             in2: Vec<u8>,
             in3: Vec<u8>,
-        ) -> Result<bool, mopro_ffi::MoproError> {
+        ) -> uniffi::deps::anyhow::Result<bool, mopro_ffi::MoproError> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
             let verifying_fn =
                 get_halo2_verifying_circuit(name.to_str().unwrap()).map_err(|e| {
@@ -71,49 +71,47 @@ macro_rules! halo2_app {
 ///
 /// ## For Advanced Users:
 /// This macro abstracts away the implementation of:
-/// - `get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError>`
-/// - `get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError>`
+/// - `get_halo2_proving_circuit(circuit_pk: &str) -> uniffi::deps::anyhow::Result<mopro_ffi::Halo2ProveFn>`
+/// - `get_halo2_verifying_circuit(circuit_vk: &str) -> uniffi::deps::anyhow::Result<mopro_ffi::Halo2VerifyFn>`
 ///
 /// You can choose to implement these functions directly with your custom logic:
 ///
 /// #### Example:
 /// ```ignore
-/// fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError> {
+/// fn get_halo2_proving_circuit(circuit_pk: &str) -> uniffi::deps::anyhow::Result<mopro_ffi::Halo2ProveFn> {
 ///    match circuit_pk {
 ///       "circuit1_proving_key" => Ok(circuit1_prove_function),
 ///       "circuit2_proving_key" => Ok(circuit1_prove_function),
-///       _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk).to_string()))
+///       _ => Err(mopro_ffi::Halo2CircuitError::UnknownProvingKey(format!("Unknown proving key: {}", circuit_pk).to_string()))
 ///    }
 /// }
 ///
-/// fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError> {
+/// fn get_halo2_verifying_circuit(circuit_vk: &str) -> uniffi::deps::anyhow::Result<mopro_ffi::Halo2VerifyFn> {
 ///    match circuit_vk {
 ///       "circuit1_verifying_key" => Ok(circuit1_verify_function),
 ///       "circuit2_verifying_key" => Ok(circuit2_verify_function),
-///       _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk).to_string()))
+///       _ => Err(mopro_ffi::Halo2CircuitError::UnknownVerifyingKey(format!("Unknown verifying key: {}", circuit_vk).to_string()))
 ///    }
 /// }
 /// ```
 #[macro_export]
 macro_rules! set_halo2_circuits {
     ($(($prove_key:expr, $prove_fn:expr, $verify_key:expr, $verify_fn:expr)),+ $(,)?) => {
-        #[uniffi::export]
-        fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError> {
+        fn get_halo2_proving_circuit(circuit_pk: &str) -> uniffi::deps::anyhow::Result<mopro_ffi::Halo2ProveFn> {
             match circuit_pk {
                 $(
-                    $prove_key => Ok($prove_fn),
+                    $prove_key =>  uniffi::deps::anyhow::Ok($prove_fn),
                 )+
-                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk)))
+                _ => Err(mopro_ffi::Halo2CircuitError::UnknownProvingKey(format!("Unknown proving key: {}", circuit_pk)).into())
             }
         }
 
-        #[uniffi::export]
-        fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError> {
+        fn get_halo2_verifying_circuit(circuit_vk: &str) -> uniffi::deps::anyhow::Result<mopro_ffi::Halo2VerifyFn> {
             match circuit_vk {
                 $(
-                    $verify_key => Ok($verify_fn),
+                    $verify_key => uniffi::deps::anyhow::Ok($verify_fn),
                 )+
-                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk)))
+                _ => Err(mopro_ffi::Halo2CircuitError::UnknownVerifyingKey(format!("Unknown verifying key: {}", circuit_vk)).into())
             }
         }
     };

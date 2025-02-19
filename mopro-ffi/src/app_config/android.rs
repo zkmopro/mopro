@@ -47,8 +47,6 @@ pub fn build() {
         latest_out_lib_path = build_for_arch(arch, &build_dir, &bindings_out, mode);
     }
 
-    println!("latest_out_lib_path: {:?}", latest_out_lib_path);
-
     // Uniffi proc-macro require compiled library file
     Command::new("cargo")
         .current_dir(Path::new("..").join("mopro-ffi"))

@@ -69,6 +69,25 @@ macro_rules! halo2_app {
     };
 }
 
+// Declare internal Error type for internal functions:
+#[derive(Debug, thiserror::Error)]
+pub enum CircomCircuitError {
+    #[error("Unknown ZKEY: {0}")]
+    UnknownZKey(String),
+    #[error("File Error: {0}")]
+    FileError(String),
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum Halo2CircuitError {
+    #[error("Unknown Proving Key: {0}")]
+    UnknownProvingKey(String),
+    #[error("Unknown Verifying Key: {0}")]
+    UnknownVerifyingKey(String),
+    #[error("File Error: {0}")]
+    FileError(String),
+}
+
 uniffi::setup_scaffolding!();
 
 #[derive(Debug, thiserror::Error, uniffi::Error)]
@@ -77,6 +96,18 @@ pub enum MoproError {
     CircomError(String),
     #[error("Halo2Error: {0}")]
     Halo2Error(String),
+}
+
+impl From<uniffi::deps::anyhow::Error> for MoproError {
+    fn from(err: uniffi::deps::anyhow::Error) -> Self {
+        if err.downcast_ref::<CircomCircuitError>().is_some() {
+            MoproError::CircomError(err.to_string())
+        } else if err.downcast_ref::<Halo2CircuitError>().is_some() {
+            MoproError::Halo2Error(err.to_string())
+        } else {
+            panic!("Unhandled error type: {}", err)
+        }
+    }
 }
 
 #[derive(Debug, Clone, uniffi::Object)]

@@ -2,10 +2,11 @@ pub mod ethereum;
 pub use ethereum::*;
 
 use crate::GenerateProofResult;
-use anyhow::Ok;
-use anyhow::Result;
+// use anyhow::Ok;
+// use anyhow::Result;
 use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
 use std::collections::HashMap;
+use uniffi::deps::anyhow::{Ok, Result};
 
 #[macro_export]
 macro_rules! circom_app {
@@ -97,13 +98,12 @@ macro_rules! circom_app {
 #[macro_export]
 macro_rules! set_circom_circuits {
     ($(($key:expr, $func:expr)),+ $(,)?) => {
-        // #[uniffi::export]
-        fn get_circom_wtns_fn(circuit: &str) -> Result<circom_prover::witness::WitnessFn, mopro_ffi::MoproError> {
+        fn get_circom_wtns_fn(circuit: &str) ->  uniffi::deps::anyhow::Result<circom_prover::witness::WitnessFn> {
             match circuit {
                 $(
-                   $key => Ok($func),
+                   $key =>  uniffi::deps::anyhow::Ok($func),
                 )+
-                _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit)))
+                _ => Err(mopro_ffi::CircomCircuitError::UnknownZKey(format!("Unknown ZKEY: {}", circuit)).into())
             }
         }
     };
