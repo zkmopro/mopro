@@ -8,7 +8,7 @@ use anyhow::Result;
 
 use crate::constants::Adapter;
 
-// Storing user selections while interating with mopro cli
+// Storing user selections while iterating with mopro cli
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Config {
     pub(crate) target_adapters: HashSet<String>,
