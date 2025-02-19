@@ -15,6 +15,7 @@ env:
 jobs:
   clippy_check:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     env:
       RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
     steps:
@@ -29,6 +30,21 @@ jobs:
 
       - name: Check formatting
         run: cargo fmt --all -- --check
+
+  circom-prover:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    steps:
+      - uses: actions/checkout@v4
+      - name: install requirements
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+          version: 1.0
+      - name: Circom prover tests
+        run: |
+          cd circom-prover
+          cargo test --all-features
 
   cli:
     runs-on: ubuntu-latest

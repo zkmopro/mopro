@@ -725,6 +725,7 @@ dependencies = [
  "num-traits",
  "rand",
  "rayon",
+ "rust-rapidsnark",
  "rust-witness",
  "serde_json",
  "uuid",
@@ -2932,6 +2933,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "rust-rapidsnark"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "429a05824adf465be27dfca3e74d006e940ad79eb1f14ec856104ea700fd46e8"
+dependencies = [
+ "anyhow",
+ "cc",
+ "num-bigint",
+ "num-traits",
 ]
 
 [[package]]
