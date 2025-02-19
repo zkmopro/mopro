@@ -303,7 +303,7 @@ impl<'a, R: Read + Seek, P: Pairing + FieldSerialization> BinFile<'a, R, P> {
         self.reader.seek(SeekFrom::Start(section.position))?;
         let num_coeffs: u32 = self.reader.read_u32::<LittleEndian>()?;
 
-        // insantiate AB
+        // instantiate AB
         let mut matrices = vec![vec![vec![]; header.domain_size as usize]; 2];
         let mut max_constraint_index = 0;
         for _ in 0..num_coeffs {
