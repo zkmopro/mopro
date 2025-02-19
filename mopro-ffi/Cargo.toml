@@ -10,7 +10,7 @@ homepage = "https://zkmopro.org/"
 exclude = ["target/*"]
 
 [lib]
-crate-type = ["lib", "cdylib"]
+crate-type = ["lib", "cdylib", "staticlib"]
 name = "mopro_ffi"
 
 [features]

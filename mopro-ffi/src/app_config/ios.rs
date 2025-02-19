@@ -96,8 +96,11 @@ pub fn build() {
 
     // Uniffi proc-macro require compiled library file
     Command::new("cargo")
+        .current_dir(Path::new("..").join("mopro-ffi"))
         .args([
             "run",
+            "--features",
+            "circom,halo2",
             "--bin",
             "uniffi-bindgen",
             "generate",
@@ -109,19 +112,21 @@ pub fn build() {
                 } else {
                     "debug"
                 })
-                .join("deps/libmopro_ffi.so")
+                .join("deps/libmopro_ffi.dylib")
                 .to_str()
                 .expect("Invalid static library path"),
             "--language",
             "swift",
             "--out-dir",
-            bindings_out.to_str().expect("Invalid output directory"),
+            swift_bindings_dir
+                .to_str()
+                .expect("Invalid output directory"),
         ])
         .status()
         .expect("Failed to execute uniffi-bindgen command");
 
     fs::rename(
-        swift_bindings_dir.join("mopro.swift"),
+        swift_bindings_dir.join("mopro_ffi.swift"),
         bindings_out.join("mopro.swift"),
     )
     .expect("Failed to move mopro.swift into place");
