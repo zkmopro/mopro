@@ -69,13 +69,10 @@ macro_rules! halo2_app {
     };
 }
 
-// Declare internal Error type for internal functions:
 #[derive(Debug, thiserror::Error)]
 pub enum CircomCircuitError {
     #[error("Unknown ZKEY: {0}")]
     UnknownZKey(String),
-    #[error("File Error: {0}")]
-    FileError(String),
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -84,8 +81,6 @@ pub enum Halo2CircuitError {
     UnknownProvingKey(String),
     #[error("Unknown Verifying Key: {0}")]
     UnknownVerifyingKey(String),
-    #[error("File Error: {0}")]
-    FileError(String),
 }
 
 uniffi::setup_scaffolding!();
@@ -183,8 +178,5 @@ macro_rules! app {
         mopro_ffi::circom_app!();
 
         mopro_ffi::halo2_app!();
-
-        // TODO: remove
-        // uniffi::include_scaffolding!("mopro");
     };
 }
