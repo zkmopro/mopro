@@ -1,6 +1,6 @@
 [package]
 name = "mopro-ffi"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple."
 license = "MIT OR Apache-2.0"
@@ -29,16 +29,18 @@ uniffi = { version = "=0.28.0", features = ["cli", "build"] }
 serde = { version = "1.0", features = ["derive"] }
 anyhow = "1.0.86"
 bincode = "1.3.3"
-num-bigint = { version = "0.4.3", default-features = false, features = ["rand",] }
+num-bigint = { version = "0.4.3", default-features = false, features = [
+    "rand",
+] }
 
 # Error handling
 thiserror = "=2.0.3"
 color-eyre = "=0.6.2"
 
 # circom deps
-rust-witness = { version = "0.1.1", optional = true }
+rust-witness = { version = "0.1", optional = true }
 ark-ff = { version = "0.4.0", optional = true }
-circom-prover = {path = "../circom-prover", optional = true}
+circom-prover = { path = "../circom-prover", optional = true }
 
 # ZKP generation
 ark-bn254 = { version = "=0.4.0", optional = true }
@@ -46,7 +48,7 @@ uuid = { version = "1.9.1", features = ["v4"] }
 ark-bls12-381 = { version = "0.4.0", optional = true }
 
 [build-dependencies]
-rust-witness = { version = "0.1.1", optional = true }
+rust-witness = { version = "0.1", optional = true }
 uniffi = { version = "=0.28.0", features = ["build"] }
 
 [dev-dependencies]

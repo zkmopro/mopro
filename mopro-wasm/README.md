@@ -18,7 +18,7 @@ from: [Rayon - github](https://github.com/rayon-rs/rayon#usage-with-webassembly)
 
 ## Run tests
 
-Run the fibonacci circuit tests for all backends—"plonk," "hyperplonk," and "gemini"—in the browser in a headless.
+Run the fibonacci circuit tests for all backends—"plonk," "hyperplonk," and "gemini"— in a headless browser.
 
 ```bash
 wasm-pack test --chrome --headless -- --all-features

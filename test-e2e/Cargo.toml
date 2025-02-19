@@ -22,9 +22,8 @@ mopro-wasm = { path = "../mopro-wasm" }
 uniffi = "0.28.0"
 
 # Circom dependencies
-rust-witness = "0.1.1"
+rust-witness = "0.1"
 num-bigint = { version = "0.4.0" }
-circom-prover = { path = "../circom-prover" }
 
 # Halo2 dependencies
 halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
@@ -37,7 +36,7 @@ mopro-ffi = { path = "../mopro-ffi" }
 uniffi = { version = "0.28.0", features = ["build"] }
 
 # Circom dependencies
-rust-witness = "0.1.1"
+rust-witness = "0.1"
 
 [dev-dependencies]
 uniffi = { version = "0.28.0", features = ["bindgen-tests"] }
@@ -45,4 +44,3 @@ uniffi = { version = "0.28.0", features = ["bindgen-tests"] }
 # remove after uniffi is upgraded (see https://github.com/mozilla/uniffi-rs/issues/2346)
 [lints.clippy]
 empty-line-after-doc-comments = "allow"
-

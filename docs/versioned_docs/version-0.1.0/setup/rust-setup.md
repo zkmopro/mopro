@@ -42,13 +42,13 @@ default = ["mopro-ffi/circom"]
 
 [dependencies]
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
-rust-witness = "0.1.1"
+rust-witness = "0.1"
 uniffi = { version = "0.28", features = ["cli"] }
 num-bigint = "0.4.0"
 
 [build-dependencies]
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
-rust-witness = "0.1.1"
+rust-witness = "0.1"
 uniffi = { version = "0.28", features = ["build"] }
 
 # TODO: fix this
@@ -108,7 +108,7 @@ mopro_ffi::app!();
 
 // This macro is used to define the `get_circom_wtns_fn` function
 // which defines a mapping between zkey filename and witness generator.
-// You can pass multiple comma seperated `(filename, witness_function)` pairs to it.
+// You can pass multiple comma separated `(filename, witness_function)` pairs to it.
 // You can read in the `circom` doc section how you can manually set this function.
 // One way to create the witness generator function is to use the `rust_witness!` above.
 mopro_ffi::set_circom_circuits! {

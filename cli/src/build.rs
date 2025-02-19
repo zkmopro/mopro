@@ -135,7 +135,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
         copy_mopro_wasm_lib()?;
     }
 
-    // Archtecture selection for iOS or Andriod
+    // Architecture selection for iOS or Android
     let selected_architectures = platform.select_archs();
 
     for p in platform.platforms.clone() {

@@ -4,7 +4,7 @@ sidebar_position: 6
 
 # Community and Talks
 
-Join the Telegram group [here](https://t.me/zkmopro). This is the main place where coordination around development takes places.
+Join the Telegram group [here](https://t.me/zkmopro). This is the main place where coordination around development takes place.
 
 ## Talks
 
