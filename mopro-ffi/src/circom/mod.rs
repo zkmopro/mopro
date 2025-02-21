@@ -1,12 +1,11 @@
 pub mod ethereum;
 pub use ethereum::*;
 
-use crate::GenerateProofResult;
-// use anyhow::Ok;
-// use anyhow::Result;
 use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
 use std::collections::HashMap;
 use uniffi::deps::anyhow::{Ok, Result};
+
+use crate::GenerateProofResult;
 
 #[macro_export]
 macro_rules! circom_app {
@@ -15,11 +14,11 @@ macro_rules! circom_app {
         fn generate_circom_proof(
             in0: String,
             in1: std::collections::HashMap<String, Vec<String>>,
-        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
+        ) -> Result<mopro_ffi::GenerateProofResult, MoproError> {
             let name = match std::path::Path::new(in0.as_str()).file_name() {
                 Some(v) => v,
                 None => {
-                    return Err(mopro_ffi::MoproError::CircomError(format!(
+                    return Err(MoproError::CircomError(format!(
                         "failed to parse file name from zkey_path"
                     )))
                 }
@@ -31,7 +30,7 @@ macro_rules! circom_app {
                 in1,
                 witness_fn,
             )
-            .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
+            .map_err(|e| MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
         }
 
         #[uniffi::export]
@@ -39,11 +38,9 @@ macro_rules! circom_app {
             in0: String,
             in1: Vec<u8>,
             in2: Vec<u8>,
-        ) -> Result<bool, mopro_ffi::MoproError> {
-            mopro_ffi::verify_circom_proof(mopro_ffi::prover::ProofLib::Arkworks, in0, in1, in2)
-                .map_err(|e| {
-                    mopro_ffi::MoproError::CircomError(format!("Verification error: {}", e))
-                })
+        ) -> Result<bool, MoproError> {
+            mopro_ffi::verify_circom_proof(circom_prover::prover::ProofLib::Arkworks, in0, in1, in2)
+                .map_err(|e| MoproError::CircomError(format!("Verification error: {}", e)))
         }
 
         #[uniffi::export]
@@ -83,15 +80,15 @@ macro_rules! circom_app {
 ///
 /// ## For Advanced Users:
 /// This macro is abstracting away the implementation of
-/// `get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::witness::WitnessFn, mopro_ffi::MoproError>`.
+/// `get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::witness::WitnessFn>`.
 /// You can choose to implement it directly with your custom logic:
 ///
 /// #### Example:
 /// ```ignore
-/// fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::witness::WitnessFn, mopro_ffi::MoproError> {
+/// fn get_circom_wtns_fn(circuit: &str) -> Result<circom_prover::witness::WitnessFn> {
 ///    match circuit {
 ///       "circuit1.zkey" => Ok(circuit1_witness_fn),
-///      _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit).to_string()))
+///      _ => Err(MoproError::CircomError(format!("Unknown ZKEY: {}", circuit).to_string()))
 ///   }
 /// }
 /// ```

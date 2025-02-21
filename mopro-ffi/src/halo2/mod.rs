@@ -9,14 +9,14 @@ macro_rules! halo2_app {
             in0: String,
             in1: String,
             in2: std::collections::HashMap<String, Vec<String>>,
-        ) -> uniffi::deps::anyhow::Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
+        ) -> uniffi::deps::anyhow::Result<mopro_ffi::GenerateProofResult, MoproError> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
             let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap()).map_err(|e| {
-                mopro_ffi::MoproError::Halo2Error(format!("error getting proving circuit: {}", e))
+                MoproError::Halo2Error(format!("error getting proving circuit: {}", e))
             })?;
             proving_fn(&in0, &in1, in2)
                 .map(|(proof, inputs)| mopro_ffi::GenerateProofResult { proof, inputs })
-                .map_err(|e| mopro_ffi::MoproError::Halo2Error(format!("halo2 error: {}", e)))
+                .map_err(|e| MoproError::Halo2Error(format!("halo2 error: {}", e)))
         }
 
         #[uniffi::export]
@@ -25,18 +25,14 @@ macro_rules! halo2_app {
             in1: String,
             in2: Vec<u8>,
             in3: Vec<u8>,
-        ) -> uniffi::deps::anyhow::Result<bool, mopro_ffi::MoproError> {
+        ) -> uniffi::deps::anyhow::Result<bool, MoproError> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
             let verifying_fn =
                 get_halo2_verifying_circuit(name.to_str().unwrap()).map_err(|e| {
-                    mopro_ffi::MoproError::Halo2Error(format!(
-                        "error getting verification circuit: {}",
-                        e
-                    ))
+                    MoproError::Halo2Error(format!("error getting verification circuit: {}", e))
                 })?;
-            verifying_fn(&in0, &in1, in2, in3).map_err(|e| {
-                mopro_ffi::MoproError::Halo2Error(format!("error verifying proof: {}", e))
-            })
+            verifying_fn(&in0, &in1, in2, in3)
+                .map_err(|e| MoproError::Halo2Error(format!("error verifying proof: {}", e)))
         }
     };
 }

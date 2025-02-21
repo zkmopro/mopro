@@ -83,9 +83,7 @@ pub enum Halo2CircuitError {
     UnknownVerifyingKey(String),
 }
 
-uniffi::setup_scaffolding!();
-
-#[derive(Debug, thiserror::Error, uniffi::Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum MoproError {
     #[error("CircomError: {0}")]
     CircomError(String),
@@ -93,17 +91,7 @@ pub enum MoproError {
     Halo2Error(String),
 }
 
-impl From<uniffi::deps::anyhow::Error> for MoproError {
-    fn from(err: uniffi::deps::anyhow::Error) -> Self {
-        if err.downcast_ref::<CircomCircuitError>().is_some() {
-            MoproError::CircomError(err.to_string())
-        } else if err.downcast_ref::<Halo2CircuitError>().is_some() {
-            MoproError::Halo2Error(err.to_string())
-        } else {
-            panic!("Unhandled error type: {}", err)
-        }
-    }
-}
+uniffi::setup_scaffolding!();
 
 #[derive(Debug, Clone, uniffi::Object)]
 pub struct GenerateProofResult {
@@ -174,6 +162,27 @@ macro_rules! app {
         use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
 
         uniffi::setup_scaffolding!();
+
+        // This should be declared into this macro due to Uniffi's limitation
+        #[derive(Debug, thiserror::Error, uniffi::Error)]
+        pub enum MoproError {
+            #[error("CircomError: {0}")]
+            CircomError(String),
+            #[error("Halo2Error: {0}")]
+            Halo2Error(String),
+        }
+
+        impl From<uniffi::deps::anyhow::Error> for MoproError {
+            fn from(err: uniffi::deps::anyhow::Error) -> Self {
+                if err.downcast_ref::<CircomCircuitError>().is_some() {
+                    MoproError::CircomError(err.to_string())
+                } else if err.downcast_ref::<Halo2CircuitError>().is_some() {
+                    MoproError::Halo2Error(err.to_string())
+                } else {
+                    panic!("Unhandled error type: {}", err)
+                }
+            }
+        }
 
         mopro_ffi::circom_app!();
 

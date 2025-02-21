@@ -1,6 +1,11 @@
 use std::fs;
+use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
+
+use camino::Utf8Path;
+use uniffi_bindgen::bindings::SwiftBindingGenerator;
+use uniffi_bindgen::library_mode::generate_bindings;
 
 use super::cleanup_tmp_local;
 use super::constants::{IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
@@ -94,36 +99,14 @@ pub fn build() {
         .map(|v| build_combined_archs(v))
         .collect();
 
-    // Uniffi proc-macro require compiled library file
-    Command::new("cargo")
-        .current_dir(Path::new("..").join("mopro-ffi"))
-        .args([
-            "run",
-            "--features",
-            "circom,halo2",
-            "--bin",
-            "uniffi-bindgen",
-            "generate",
-            "--library",
-            // Compiled lib out dir
-            build_dir_path
-                .join(if mode == Mode::Release {
-                    "release"
-                } else {
-                    "debug"
-                })
-                .join("deps/libmopro_ffi.dylib")
-                .to_str()
-                .expect("Invalid static library path"),
-            "--language",
-            "swift",
-            "--out-dir",
-            swift_bindings_dir
-                .to_str()
-                .expect("Invalid output directory"),
-        ])
-        .status()
-        .expect("Failed to execute uniffi-bindgen command");
+    let out_dylib_path = build_dir_path.join(format!(
+        "{}/{}/libmopro_bindings.dylib",
+        target_archs[0].as_str(),
+        mode.as_str()
+    ));
+
+    generate_ios_bindings(&out_dylib_path, &swift_bindings_dir)
+        .expect("Failed to generate bindings for iOS");
 
     fs::rename(
         swift_bindings_dir.join("mopro_ffi.swift"),
@@ -217,4 +200,25 @@ fn rename_module_maps_recursively(bindings_out: &PathBuf) {
             rename_module_maps_recursively(&path);
         }
     }
+}
+
+fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Error> {
+    if binding_dir.exists() {
+        fs::remove_dir_all(binding_dir)?;
+    }
+
+    generate_bindings(
+        Utf8Path::from_path(&dylib_path)
+            .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?,
+        None,
+        &SwiftBindingGenerator,
+        None,
+        Utf8Path::from_path(&binding_dir).ok_or(Error::new(
+            ErrorKind::InvalidInput,
+            "Invalid swift files directory",
+        ))?,
+        true,
+    )
+    .map_err(|e| Error::new(ErrorKind::Other, e.to_string()))?;
+    Ok(())
 }

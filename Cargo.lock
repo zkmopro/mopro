@@ -2259,6 +2259,7 @@ dependencies = [
  "ark-bn254",
  "ark-ff",
  "bincode",
+ "camino",
  "circom-prover",
  "color-eyre",
  "gemini-fibonacci",
@@ -2270,6 +2271,7 @@ dependencies = [
  "serde_derive",
  "thiserror 2.0.3",
  "uniffi",
+ "uniffi_bindgen",
  "uniffi_macros",
  "uuid",
 ]
@@ -3506,6 +3508,7 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
+ "camino",
  "gemini-fibonacci",
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
@@ -3514,6 +3517,7 @@ dependencies = [
  "num-bigint",
  "plonk-fibonacci",
  "rust-witness",
+ "thiserror 2.0.3",
  "uniffi",
 ]
 

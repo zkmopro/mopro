@@ -1,6 +1,11 @@
 use std::fs;
+use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
+
+use camino::Utf8Path;
+use uniffi_bindgen::bindings::KotlinBindingGenerator;
+use uniffi_bindgen::library_mode::generate_bindings;
 
 use super::cleanup_tmp_local;
 use super::constants::{
@@ -47,28 +52,7 @@ pub fn build() {
         latest_out_lib_path = build_for_arch(arch, &build_dir, &bindings_out, mode);
     }
 
-    // Uniffi proc-macro require compiled library file
-    Command::new("cargo")
-        .current_dir(Path::new("..").join("mopro-ffi"))
-        .args([
-            "run",
-            "--features",
-            "circom,halo2",
-            "--bin",
-            "uniffi-bindgen",
-            "generate",
-            "--library",
-            // Compiled lib out dir
-            latest_out_lib_path
-                .to_str()
-                .expect("Invalid C dynamic library path"),
-            "--language",
-            "kotlin",
-            "--out-dir",
-            bindings_out.to_str().expect("Invalid output directory"),
-        ])
-        .status()
-        .expect("Failed to execute uniffi-bindgen command");
+    generate_android_bindings(&latest_out_lib_path, &bindings_out).expect("Failed to generate bindings");
 
     move_bindings(&bindings_out, &bindings_dest);
     cleanup_tmp_local(&build_dir);
@@ -125,4 +109,30 @@ fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
         fs::remove_dir_all(bindings_dest).expect("Failed to remove bindings directory");
     }
     fs::rename(bindings_out, bindings_dest).expect("Failed to move bindings into place");
+}
+
+fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Error> {
+    let content = "[bindings.kotlin]\nandroid = true";
+    let config_path = binding_dir.parent().unwrap().join("uniffi_config.toml");
+    fs::write(&config_path, content).expect("Failed to write uniffi_config.toml");
+
+    generate_bindings(
+        Utf8Path::from_path(&dylib_path).ok_or(Error::new(
+            ErrorKind::InvalidInput,
+            "Invalid dylib path",
+        ))?,
+        None,
+        &KotlinBindingGenerator,
+        Option::from(Utf8Path::from_path(&config_path).ok_or(Error::new(
+            ErrorKind::InvalidInput,
+            "Invalid uniffi_config path",
+        ))?),
+        Utf8Path::from_path(&binding_dir).ok_or(Error::new(
+            ErrorKind::InvalidInput,
+            "Invalid kotlin files directory",
+        ))?,
+        true,
+    )
+    .map_err(|e| Error::new(ErrorKind::Other, e.to_string()))?;
+    Ok(())
 }
