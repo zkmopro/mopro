@@ -32,11 +32,11 @@ To compile the WASM module for all supported backends-"plonk," "hyperplonk," and
 wasm-pack build --target web -- --all-features
 ```
 
-This commands output files into the **pkg** directory, includes the generated WASM file, JavaScript bindings, and metadata required for integration with web applications.
+This command output files into the **pkg** directory, including the generated WASM file, JavaScript bindings, and metadata required for integration with web applications.
 
 ### Testing
 
-Run the fibonacci circuit tests for all the backends in the browser in headless mode.
+Run the Fibonacci circuit tests for all the backends in the browser in headless mode.
 
 ```bash
 wasm-pack test --chrome --headless -- --all-features
