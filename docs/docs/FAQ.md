@@ -15,7 +15,7 @@ See one of the recent [talks](/docs/community) for more details.
 
 ## What proof systems does Mopro support?
 
-Currently Circom/Groth16, Halo2 and Ashlang, but due to its modular architecture it is easy to add support for new proof systems.
+Currently Circom/Groth16, Halo2, and Ashlang, but due to its modular architecture it is easy to add support for new proof systems.
 
 There's experimental support for GKR in this [PR](https://github.com/zkmopro/mopro/pull/241/files).
 
@@ -25,7 +25,7 @@ We welcome people to contribute support for [more proof systems](https://github.
 
 ## What platforms does Mopro support?
 
-Mopro is multi-platform and aims to support as many platforms as possible. iOS, Android and Desktop (through Rust/CLI) are the main platforms supported. *Website support is currently under development.* (See [#202](https://github.com/zkmopro/mopro/issues/202))
+Mopro is multi-platform and aims to support as many platforms as possible. iOS, Android, and Desktop (through Rust/CLI) are the main platforms supported. *Website support is currently under development.* (See [#202](https://github.com/zkmopro/mopro/issues/202))
 
 Please refer to the [Getting Started](getting-started.md) guide for instructions on integrating mopro into iOS and Android apps, as well as examples for [React Native](https://github.com/zkmopro/react-native-app) and [Flutter](https://github.com/zkmopro/flutter-app) applications.
 
