@@ -123,7 +123,7 @@ Check the details here: [performance](https://zkmopro.org/docs/performance).
 
 ### Halo2
 
-The performance of the Mopro build is comparable to the native Halo2 build.
+The performance of the Mopro build is comparable to that of the native Halo2 build.
 
 <table>
   <tr>
@@ -150,4 +150,4 @@ The performance of the Mopro build is comparable to the native Halo2 build.
 
 ## Acknowledgements
 
-This work was initially sponsored by a joint grant from [PSE](https://pse.dev/) and [0xPARC](https://0xparc.org/). It is currently incubated by PSE.
+This work was initially sponsored by a joint grant from [PSE](https://pse.dev/) and [0xPARC](https://0xparc.org/). PSE currently incubates it.
