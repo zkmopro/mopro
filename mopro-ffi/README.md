@@ -17,7 +17,7 @@ Key features include:
 ## Usage for general Rust application
 
 -   Integrate the `mopro-ffi` like the above tutorial.
--   Update the `src/mopro.udl` file to add the functions you want to export. Check out how to define the functions in UDL file: [UniFFI: The UDL file](https://mozilla.github.io/uniffi-rs/0.28/udl_file_spec.html)
+-   Update the `src/mopro.udl` file to add the functions you want to export. Check out how to define the functions in the UDL file: [UniFFI: The UDL file](https://mozilla.github.io/uniffi-rs/0.28/udl_file_spec.html)
 
     -   E.g.
         export Rust function like
