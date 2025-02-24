@@ -19,7 +19,8 @@ name = "web"
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
 mopro-wasm = { path = "../mopro-wasm" }
-uniffi = "0.28.0"
+uniffi = "=0.28.0"
+uniffi_macros = "=0.28.0"
 
 # Circom dependencies
 rust-witness = "0.1"
@@ -32,6 +33,7 @@ hyperplonk-fibonacci = { workspace = true }
 gemini-fibonacci = { workspace = true }
 camino = "1.1.9"
 thiserror = "=2.0.3"
+circom-prover = { version = "0.1.0", path = "../circom-prover" }
 
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
@@ -43,3 +45,7 @@ rust-witness = "0.1"
 # remove after uniffi is upgraded (see https://github.com/mozilla/uniffi-rs/issues/2346)
 [lints.clippy]
 empty-line-after-doc-comments = "allow"
+
+[dev-dependencies]
+uniffi = { version = "=0.28.0", features = ["bindgen-tests"] }
+

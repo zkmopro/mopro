@@ -109,7 +109,7 @@ pub fn build() {
         .expect("Failed to generate bindings for iOS");
 
     fs::rename(
-        swift_bindings_dir.join("mopro_ffi.swift"),
+        swift_bindings_dir.join("mopro.swift"),
         bindings_out.join("mopro.swift"),
     )
     .expect("Failed to move mopro.swift into place");
@@ -208,12 +208,12 @@ fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Er
     }
 
     generate_bindings(
-        Utf8Path::from_path(&dylib_path)
+        Utf8Path::from_path(dylib_path)
             .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?,
         None,
         &SwiftBindingGenerator,
         None,
-        Utf8Path::from_path(&binding_dir).ok_or(Error::new(
+        Utf8Path::from_path(binding_dir).ok_or(Error::new(
             ErrorKind::InvalidInput,
             "Invalid swift files directory",
         ))?,

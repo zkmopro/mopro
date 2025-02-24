@@ -1,3 +1,6 @@
+// Explicitly declare funtion to avoid Uniffi's limitation
+use circom_prover::witness::WitnessFn;
+
 extern crate core;
 
 // First, configure the Mopro FFI library

@@ -3,20 +3,19 @@ use std::error::Error;
 
 #[macro_export]
 macro_rules! halo2_app {
-    () => {
+    ($err:ty) => {
         #[uniffi::export]
         fn generate_halo2_proof(
             in0: String,
             in1: String,
             in2: std::collections::HashMap<String, Vec<String>>,
-        ) -> uniffi::deps::anyhow::Result<mopro_ffi::GenerateProofResult, MoproError> {
+        ) -> uniffi::deps::anyhow::Result<mopro_ffi::GenerateProofResult, $err> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
-            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap()).map_err(|e| {
-                MoproError::Halo2Error(format!("error getting proving circuit: {}", e))
-            })?;
+            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())
+                .map_err(|e| <$err>::Halo2Error(format!("error getting proving circuit: {}", e)))?;
             proving_fn(&in0, &in1, in2)
                 .map(|(proof, inputs)| mopro_ffi::GenerateProofResult { proof, inputs })
-                .map_err(|e| MoproError::Halo2Error(format!("halo2 error: {}", e)))
+                .map_err(|e| <$err>::Halo2Error(format!("halo2 error: {}", e)))
         }
 
         #[uniffi::export]
@@ -25,14 +24,14 @@ macro_rules! halo2_app {
             in1: String,
             in2: Vec<u8>,
             in3: Vec<u8>,
-        ) -> uniffi::deps::anyhow::Result<bool, MoproError> {
+        ) -> uniffi::deps::anyhow::Result<bool, $err> {
             let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
             let verifying_fn =
                 get_halo2_verifying_circuit(name.to_str().unwrap()).map_err(|e| {
-                    MoproError::Halo2Error(format!("error getting verification circuit: {}", e))
+                    <$err>::Halo2Error(format!("error getting verification circuit: {}", e))
                 })?;
             verifying_fn(&in0, &in1, in2, in3)
-                .map_err(|e| MoproError::Halo2Error(format!("error verifying proof: {}", e)))
+                .map_err(|e| <$err>::Halo2Error(format!("error verifying proof: {}", e)))
         }
     };
 }
@@ -125,14 +124,38 @@ mod test {
     use crate as mopro_ffi;
     use std::collections::HashMap;
 
+    #[derive(Debug, thiserror::Error, uniffi::Error)]
+    pub enum MoproError {
+        #[error("CircomError: {0}")]
+        CircomError(String),
+        #[error("Halo2Error: {0}")]
+        Halo2Error(String),
+    }
+
+    impl From<uniffi::deps::anyhow::Error> for MoproError {
+        fn from(err: uniffi::deps::anyhow::Error) -> Self {
+            if err
+                .downcast_ref::<mopro_ffi::CircomCircuitError>()
+                .is_some()
+            {
+                MoproError::CircomError(err.to_string())
+            } else if err.downcast_ref::<mopro_ffi::Halo2CircuitError>().is_some() {
+                MoproError::Halo2Error(err.to_string())
+            } else {
+                panic!("Unhandled error type: {}", err)
+            }
+        }
+    }
+
+    halo2_app!(MoproError);
+    set_halo2_circuits! {
+        ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
+        ("gemini_fibonacci_pk.bin", gemini_fibonacci::prove, "gemini_fibonacci_vk.bin", gemini_fibonacci::verify),
+        ("hyperplonk_fibonacci_pk.bin", hyperplonk_fibonacci::prove, "hyperplonk_fibonacci_vk.bin", hyperplonk_fibonacci::verify),
+    }
+
     #[test]
     fn test_generate_and_verify_plonk_proof() {
-        halo2_app!();
-
-        set_halo2_circuits! {
-            ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
-        }
-
         const SRS_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_srs.bin";
         const PROVING_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_pk.bin";
         const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_vk.bin";
@@ -159,11 +182,9 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_hyperplonk_proof() {
-        halo2_app!();
-
-        set_halo2_circuits! {
-            ("hyperplonk_fibonacci_pk.bin", hyperplonk_fibonacci::prove, "hyperplonk_fibonacci_vk.bin", hyperplonk_fibonacci::verify),
-        }
+        // set_halo2_circuits! {
+        //     ("hyperplonk_fibonacci_pk.bin", hyperplonk_fibonacci::prove, "hyperplonk_fibonacci_vk.bin", hyperplonk_fibonacci::verify),
+        // }
 
         const SRS_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_srs.bin";
         const PROVING_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_pk.bin";
@@ -191,11 +212,9 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_gemini_proof() {
-        halo2_app!();
-
-        set_halo2_circuits! {
-            ("gemini_fibonacci_pk.bin", gemini_fibonacci::prove, "gemini_fibonacci_vk.bin", gemini_fibonacci::verify),
-        }
+        // set_halo2_circuits! {
+        //     ("gemini_fibonacci_pk.bin", gemini_fibonacci::prove, "gemini_fibonacci_vk.bin", gemini_fibonacci::verify),
+        // }
 
         const SRS_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_srs.bin";
         const PROVING_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_pk.bin";

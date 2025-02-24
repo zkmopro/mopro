@@ -52,7 +52,8 @@ pub fn build() {
         latest_out_lib_path = build_for_arch(arch, &build_dir, &bindings_out, mode);
     }
 
-    generate_android_bindings(&latest_out_lib_path, &bindings_out).expect("Failed to generate bindings");
+    generate_android_bindings(&latest_out_lib_path, &bindings_out)
+        .expect("Failed to generate bindings");
 
     move_bindings(&bindings_out, &bindings_dest);
     cleanup_tmp_local(&build_dir);
@@ -117,17 +118,15 @@ fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<()
     fs::write(&config_path, content).expect("Failed to write uniffi_config.toml");
 
     generate_bindings(
-        Utf8Path::from_path(&dylib_path).ok_or(Error::new(
-            ErrorKind::InvalidInput,
-            "Invalid dylib path",
-        ))?,
+        Utf8Path::from_path(dylib_path)
+            .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?,
         None,
         &KotlinBindingGenerator,
         Option::from(Utf8Path::from_path(&config_path).ok_or(Error::new(
             ErrorKind::InvalidInput,
             "Invalid uniffi_config path",
         ))?),
-        Utf8Path::from_path(&binding_dir).ok_or(Error::new(
+        Utf8Path::from_path(binding_dir).ok_or(Error::new(
             ErrorKind::InvalidInput,
             "Invalid kotlin files directory",
         ))?,

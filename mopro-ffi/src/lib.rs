@@ -83,14 +83,6 @@ pub enum Halo2CircuitError {
     UnknownVerifyingKey(String),
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum MoproError {
-    #[error("CircomError: {0}")]
-    CircomError(String),
-    #[error("Halo2Error: {0}")]
-    Halo2Error(String),
-}
-
 uniffi::setup_scaffolding!();
 
 #[derive(Debug, Clone, uniffi::Object)]
@@ -159,11 +151,14 @@ pub struct ProofCalldata {
 macro_rules! app {
     () => {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
-        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
+        use mopro_ffi::{
+            CircomCircuitError, GenerateProofResult, Halo2CircuitError, ProofCalldata, G1, G2,
+        };
 
-        uniffi::setup_scaffolding!();
+        uniffi::setup_scaffolding!("mopro");
 
         // This should be declared into this macro due to Uniffi's limitation
+        // Please refer this comment: https://github.com/mozilla/uniffi-rs/issues/2257#issuecomment-2395668332
         #[derive(Debug, thiserror::Error, uniffi::Error)]
         pub enum MoproError {
             #[error("CircomError: {0}")]
@@ -184,8 +179,8 @@ macro_rules! app {
             }
         }
 
-        mopro_ffi::circom_app!();
+        mopro_ffi::circom_app!(MoproError);
 
-        mopro_ffi::halo2_app!();
+        mopro_ffi::halo2_app!(MoproError);
     };
 }
