@@ -24,7 +24,7 @@ macro_rules! circom_app {
 
         fn generate_circom_proof(
             zkey_path: String,
-            witness_inputs: std::collections::HashMap<String, Vec<String>>,
+            inputs: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
