@@ -52,7 +52,7 @@ macro_rules! circom_app {
 macro_rules! halo2_app {
     () => {
         fn generate_halo2_proof(
-            pk_path: String,
+            srs_path: String,
             circuit_config: String,
             witness_inputs: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
