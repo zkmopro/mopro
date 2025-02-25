@@ -61,7 +61,7 @@ macro_rules! halo2_app {
 
         fn verify_halo2_proof(
             srs_path: String,
-            circuit_config: String,
+            vk_path: String,
             proof_data: Vec<u8>,
             public_inputs: Vec<u8>,
         ) -> Result<bool, MoproError> {
