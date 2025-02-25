@@ -17,7 +17,8 @@ default = []
 
 halo2 = []
 circom = [
-    "circom-prover",
+    "circom-prover/rapidsnark",
+    "circom-prover/witnesscalc",
     "rust-witness",
     "ark-bn254",
     "ark-bls12-381",

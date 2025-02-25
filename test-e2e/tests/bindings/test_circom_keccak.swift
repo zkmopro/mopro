@@ -59,7 +59,7 @@ do {
   let expectedOutput: [UInt8] = serializeOutputs(outputBits)
 
   // Generate Proof
-  let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+  let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs, proofLib: ProofLib.arkworks)
   assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
 
   // Verify Proof
@@ -68,7 +68,7 @@ do {
     "Circuit outputs mismatch the expected outputs")
 
   let isValid = try verifyCircomProof(
-    zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
+    zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs, proofLib: ProofLib.arkworks)
   assert(isValid, "Proof verification should succeed")
 
 } catch let error as MoproError {

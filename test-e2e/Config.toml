@@ -1,0 +1,9 @@
+target_adapters = [
+    "circom",
+    "halo2",
+]
+target_platforms = [
+    "ios",
+    "android",
+    "web",
+]

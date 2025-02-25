@@ -6,10 +6,10 @@ namespace mopro {
   boolean verify_halo2_proof(string srs_path, string vk_path, bytes proof, bytes public_input);
 
   [Throws=MoproError]
-  GenerateProofResult generate_circom_proof(string zkey_path, record<string, sequence<string>> circuit_inputs);
+  GenerateProofResult generate_circom_proof(string zkey_path, record<string, sequence<string>> circuit_inputs, ProofLib proof_lib);
 
   [Throws=MoproError]
-  boolean verify_circom_proof(string zkey_path, bytes proof, bytes public_input);
+  boolean verify_circom_proof(string zkey_path, bytes proof, bytes public_input, ProofLib proof_lib);
 
   ProofCalldata to_ethereum_proof(bytes proof);
   sequence<string> to_ethereum_inputs(bytes inputs);
@@ -40,4 +40,9 @@ dictionary ProofCalldata {
 enum MoproError {
   "CircomError",
   "Halo2Error",
+};
+
+enum ProofLib {
+  "Arkworks",
+  "Rapidsnark",
 };
