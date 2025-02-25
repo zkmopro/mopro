@@ -23,8 +23,6 @@ uniffi = "0.28.0"
 
 # Circom dependencies
 rust-witness = "0.1"
-witnesscalc-adapter = "0.1"
-circom-prover = { path = "../circom-prover", features = ["rapidsnark"] }
 num-bigint = { version = "0.4.0" }
 anyhow = "1.0"
 
@@ -40,8 +38,6 @@ uniffi = { version = "0.28.0", features = ["build"] }
 
 # Circom dependencies
 rust-witness = "0.1"
-witnesscalc-adapter = "0.1"
-circom-prover = { path = "../circom-prover", features = ["rapidsnark"] }
 
 [dev-dependencies]
 uniffi = { version = "0.28.0", features = ["bindgen-tests"] }
