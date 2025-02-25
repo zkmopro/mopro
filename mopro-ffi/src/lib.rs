@@ -60,7 +60,7 @@ macro_rules! halo2_app {
         }
 
         fn verify_halo2_proof(
-            vk_path: String,
+            srs_path: String,
             circuit_config: String,
             proof_data: Vec<u8>,
             public_inputs: Vec<u8>,
