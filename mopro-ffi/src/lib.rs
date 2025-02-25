@@ -30,7 +30,7 @@ macro_rules! circom_app {
         }
 
         fn verify_circom_proof(
-            vkey_path: String,
+            zkey_path: String,
             proof_data: Vec<u8>,
             public_inputs: Vec<u8>,
         ) -> Result<bool, MoproError> {
