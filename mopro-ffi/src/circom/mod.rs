@@ -2,9 +2,10 @@ pub mod ethereum;
 pub use ethereum::*;
 
 use crate::GenerateProofResult;
+use crate::ProofLib;
 use anyhow::Ok;
 use anyhow::Result;
-use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
+use circom_prover::{witness::WitnessFn, CircomProver};
 use std::collections::HashMap;
 
 #[macro_export]
@@ -25,11 +26,7 @@ macro_rules! circom_app {
                 }
             };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
-            let proof_lib = match in2 {
-                mopro_ffi::ProofLib::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
-                mopro_ffi::ProofLib::Rapidsnark => mopro_ffi::prover::ProofLib::RapidSnark,
-            };
-            mopro_ffi::generate_circom_proof_wtns(proof_lib, in0, in1, witness_fn)
+            mopro_ffi::generate_circom_proof_wtns(in2, in0, in1, witness_fn)
                 .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
         }
 
@@ -39,11 +36,7 @@ macro_rules! circom_app {
             in2: Vec<u8>,
             in3: mopro_ffi::ProofLib,
         ) -> Result<bool, mopro_ffi::MoproError> {
-            let proof_lib = match in3 {
-                mopro_ffi::ProofLib::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
-                mopro_ffi::ProofLib::Rapidsnark => mopro_ffi::prover::ProofLib::RapidSnark,
-            };
-            mopro_ffi::verify_circom_proof(proof_lib, in0, in1, in2).map_err(|e| {
+            mopro_ffi::verify_circom_proof(in3, in0, in1, in2).map_err(|e| {
                 mopro_ffi::MoproError::CircomError(format!("Verification error: {}", e))
             })
         }
@@ -109,6 +102,13 @@ macro_rules! set_circom_circuits {
     };
 }
 
+fn select_proof_lib(proof_lib: ProofLib) -> circom_prover::prover::ProofLib {
+    match proof_lib {
+        ProofLib::Arkworks => circom_prover::prover::ProofLib::Arkworks,
+        ProofLib::Rapidsnark => circom_prover::prover::ProofLib::RapidSnark,
+    }
+}
+
 // build a proof for a zkey using witness_fn to build
 // the witness
 pub fn generate_circom_proof_wtns(
@@ -117,7 +117,8 @@ pub fn generate_circom_proof_wtns(
     inputs: HashMap<String, Vec<String>>,
     witness_fn: WitnessFn,
 ) -> Result<GenerateProofResult> {
-    let ret = CircomProver::prove(proof_lib, witness_fn, inputs.clone(), zkey_path).unwrap();
+    let lib = select_proof_lib(proof_lib);
+    let ret = CircomProver::prove(lib, witness_fn, inputs.clone(), zkey_path).unwrap();
     Ok(GenerateProofResult {
         proof: ret.proof,
         inputs: ret.pub_inputs,
@@ -131,7 +132,8 @@ pub fn verify_circom_proof(
     proof: Vec<u8>,
     public_inputs: Vec<u8>,
 ) -> Result<bool> {
-    CircomProver::verify(proof_lib, proof, public_inputs, zkey_path)
+    let lib = select_proof_lib(proof_lib);
+    CircomProver::verify(lib, proof, public_inputs, zkey_path)
 }
 
 #[cfg(test)]
@@ -143,12 +145,13 @@ mod tests {
     use crate::circom::ethereum::{to_ethereum_inputs, to_ethereum_proof};
     use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
     use crate::GenerateProofResult;
+    use crate::ProofLib;
     use anyhow::bail;
     use anyhow::Result;
     use ark_bls12_381::Bls12_381;
     use ark_bn254::Bn254;
     use ark_ff::PrimeField;
-    use circom_prover::prover::{serialization, ProofLib};
+    use circom_prover::prover::serialization;
     use circom_prover::witness::WitnessFn;
     use num_bigint::{BigInt, BigUint, ToBigInt};
 
