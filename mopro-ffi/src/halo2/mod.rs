@@ -5,26 +5,26 @@ use std::error::Error;
 macro_rules! halo2_app {
     () => {
         fn generate_halo2_proof(
-            in0: String,
-            in1: String,
-            in2: std::collections::HashMap<String, Vec<String>>,
+            srs_path: String,
+            pk_path: String,
+            inputs: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
-            let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
+            let name = std::path::Path::new(pk_path.as_str()).file_name().unwrap();
             let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap()).map_err(|e| {
                 mopro_ffi::MoproError::Halo2Error(format!("error getting proving circuit: {}", e))
             })?;
-            proving_fn(&in0, &in1, in2)
+            proving_fn(&srs_path, &pk_path, inputs)
                 .map(|(proof, inputs)| mopro_ffi::GenerateProofResult { proof, inputs })
                 .map_err(|e| mopro_ffi::MoproError::Halo2Error(format!("halo2 error: {}", e)))
         }
 
         fn verify_halo2_proof(
-            in0: String,
-            in1: String,
-            in2: Vec<u8>,
-            in3: Vec<u8>,
+            srs_path: String,
+            vk_path: String,
+            proof_data: Vec<u8>,
+            public_inputs: Vec<u8>,
         ) -> Result<bool, mopro_ffi::MoproError> {
-            let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
+            let name = std::path::Path::new(vk_path.as_str()).file_name().unwrap();
             let verifying_fn =
                 get_halo2_verifying_circuit(name.to_str().unwrap()).map_err(|e| {
                     mopro_ffi::MoproError::Halo2Error(format!(
@@ -32,7 +32,7 @@ macro_rules! halo2_app {
                         e
                     ))
                 })?;
-            verifying_fn(&in0, &in1, in2, in3).map_err(|e| {
+            verifying_fn(&srs_path, &vk_path, proof_data, public_inputs).map_err(|e| {
                 mopro_ffi::MoproError::Halo2Error(format!("error verifying proof: {}", e))
             })
         }

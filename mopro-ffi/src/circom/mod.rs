@@ -12,10 +12,10 @@ macro_rules! circom_app {
     () => {
         use mopro_ffi::witness::WitnessFn;
         fn generate_circom_proof(
-            in0: String,
-            in1: std::collections::HashMap<String, Vec<String>>,
+            zkey_path: String,
+            inputs: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
-            let name = match std::path::Path::new(in0.as_str()).file_name() {
+            let name = match std::path::Path::new(zkey_path.as_str()).file_name() {
                 Some(v) => v,
                 None => {
                     return Err(mopro_ffi::MoproError::CircomError(format!(
@@ -26,30 +26,33 @@ macro_rules! circom_app {
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
             mopro_ffi::generate_circom_proof_wtns(
                 mopro_ffi::prover::ProofLib::Arkworks,
-                in0,
-                in1,
+                zkey_path,
+                inputs,
                 witness_fn,
             )
             .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
         }
 
         fn verify_circom_proof(
-            in0: String,
-            in1: Vec<u8>,
-            in2: Vec<u8>,
+            zkey_path: String,
+            proof_data: Vec<u8>,
+            public_inputs: Vec<u8>,
         ) -> Result<bool, mopro_ffi::MoproError> {
-            mopro_ffi::verify_circom_proof(mopro_ffi::prover::ProofLib::Arkworks, in0, in1, in2)
-                .map_err(|e| {
-                    mopro_ffi::MoproError::CircomError(format!("Verification error: {}", e))
-                })
+            mopro_ffi::verify_circom_proof(
+                mopro_ffi::prover::ProofLib::Arkworks,
+                zkey_path,
+                proof_data,
+                public_inputs,
+            )
+            .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Verification error: {}", e)))
         }
 
-        fn to_ethereum_proof(in0: Vec<u8>) -> mopro_ffi::ProofCalldata {
-            mopro_ffi::to_ethereum_proof(in0)
+        fn to_ethereum_proof(proof_data: Vec<u8>) -> mopro_ffi::ProofCalldata {
+            mopro_ffi::to_ethereum_proof(proof_data)
         }
 
-        fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
-            mopro_ffi::to_ethereum_inputs(in0)
+        fn to_ethereum_inputs(public_inputs: Vec<u8>) -> Vec<String> {
+            mopro_ffi::to_ethereum_inputs(public_inputs)
         }
     };
 }
