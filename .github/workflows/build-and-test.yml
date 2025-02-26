@@ -178,7 +178,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: 1.81.0
           override: true
       - name: Build iOS xcframework
         run: cd test-e2e && cargo run --bin ios
