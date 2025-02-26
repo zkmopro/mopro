@@ -18,9 +18,7 @@ pub struct CircomProof {
 
 #[derive(Debug, Clone, Copy)]
 pub enum ProofLib {
-    #[cfg(feature = "arkworks")]
     Arkworks,
-    #[cfg(feature = "rapidsnark")]
     RapidSnark,
 }
 
@@ -34,6 +32,8 @@ pub fn prove(
         ProofLib::Arkworks => arkworks::generate_circom_proof(zkey_path, witnesses),
         #[cfg(feature = "rapidsnark")]
         ProofLib::RapidSnark => rapidsnark::generate_circom_proof(zkey_path, witnesses),
+        #[allow(unreachable_patterns)]
+        _ => panic!("Unsupported proof library"),
     }
 }
 
@@ -48,5 +48,7 @@ pub fn verify(
         ProofLib::Arkworks => arkworks::verify_circom_proof(zkey_path, proof, public_inputs),
         #[cfg(feature = "rapidsnark")]
         ProofLib::RapidSnark => rapidsnark::verify_circom_proof(zkey_path, proof, public_inputs),
+        #[allow(unreachable_patterns)]
+        _ => panic!("Unsupported proof library"),
     }
 }

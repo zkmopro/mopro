@@ -81,6 +81,12 @@ pub enum MoproError {
 }
 
 #[derive(Debug, Clone)]
+pub enum ProofLib {
+    Arkworks,
+    Rapidsnark,
+}
+
+#[derive(Debug, Clone)]
 pub struct GenerateProofResult {
     pub proof: Vec<u8>,
     pub inputs: Vec<u8>,
@@ -146,7 +152,7 @@ pub struct ProofCalldata {
 macro_rules! app {
     () => {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
-        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
+        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, ProofLib, G1, G2};
 
         mopro_ffi::circom_app!();
 

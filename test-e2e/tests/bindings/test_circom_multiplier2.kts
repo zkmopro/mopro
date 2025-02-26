@@ -9,11 +9,11 @@ try {
     inputs["b"] = listOf("5")
 
     // Generate proof
-    var generateProofResult = generateCircomProof(zkeyPath, inputs)
+    var generateProofResult = generateCircomProof(zkeyPath, inputs, ProofLib.ARKWORKS)
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
 
     // Verify proof
-    var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs)
+    var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs, ProofLib.ARKWORKS)
     assert(isValid) { "Proof is invalid" }
 
     // Convert proof to Ethereum compatible proof

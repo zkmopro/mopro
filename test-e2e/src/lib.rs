@@ -8,8 +8,30 @@ rust_witness::witness!(multiplier2);
 rust_witness::witness!(multiplier2bls);
 rust_witness::witness!(keccak256256test);
 
+// witnesscalc only works in ios and Android but not uniffi::build_foreign_language_testcases!
+// use anyhow::Result;
+// use num_bigint::BigInt;
+// use std::collections::HashMap;
+// witnesscalc_adapter::witness!(multiplier2_cpp);
+
+// // TODO: The conversion should be exported in witness.rs https://github.com/zkmopro/mopro/issues/331
+// fn multiplier2_cpp_witness_function(inputs: HashMap<String, Vec<BigInt>>) -> Vec<BigInt> {
+//     let inputs: HashMap<String, Vec<String>> = inputs
+//         .into_iter()
+//         .map(|(k, v)| {
+//             let v: Vec<String> = v.into_iter().map(|b| b.to_string()).collect();
+//             (k, v)
+//         })
+//         .collect();
+//     let json_input = witnesscalc_adapter::convert_inputs_to_json(inputs);
+//     let witnesscalc_result = multiplier2_cpp_witness(&json_input).unwrap();
+//     let witness = witnesscalc_adapter::parse_witness_to_bigints(&witnesscalc_result);
+//     witness.unwrap()
+// }
+
 mopro_ffi::set_circom_circuits! {
     ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),
+    // ("multiplier2_final.zkey", WitnessFn::WitnessCalc(multiplier2_cpp_witness_function)),
     ("multiplier2_bls_final.zkey", WitnessFn::RustWitness(multiplier2bls_witness)),
     ("keccak256_256_test_final.zkey", WitnessFn::RustWitness(keccak256256test_witness)),
 }
