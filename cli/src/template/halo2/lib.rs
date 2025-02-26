@@ -1,4 +1,5 @@
-// --- Halo2 Example of using a single proving and verifying circuit ---
+// --- Halo2 Example of using Plonk proving and verifying circuits ---
+
 
 // Module containing the Halo2 circuit logic (FibonacciMoproCircuit)
 
