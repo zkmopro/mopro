@@ -70,22 +70,14 @@ macro_rules! halo2_app {
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum CircomCircuitError {
-    #[error("Unknown ZKEY: {0}")]
-    UnknownZKey(String),
+pub enum MoproError {
+    #[error("CircomError: {0}")]
+    CircomError(String),
+    #[error("Halo2Error: {0}")]
+    Halo2Error(String),
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum Halo2CircuitError {
-    #[error("Unknown Proving Key: {0}")]
-    UnknownProvingKey(String),
-    #[error("Unknown Verifying Key: {0}")]
-    UnknownVerifyingKey(String),
-}
-
-uniffi::setup_scaffolding!();
-
-#[derive(Debug, Clone, uniffi::Object)]
+#[derive(Debug, Clone)]
 pub struct GenerateProofResult {
     pub proof: Vec<u8>,
     pub inputs: Vec<u8>,
@@ -151,10 +143,6 @@ pub struct ProofCalldata {
 macro_rules! app {
     () => {
         // These are mandatory imports for the uniffi to pick them up and match with UDL
-        use mopro_ffi::{
-            CircomCircuitError, GenerateProofResult, Halo2CircuitError, ProofCalldata, G1, G2,
-        };
-
         uniffi::setup_scaffolding!("mopro");
 
         // This should be declared into this macro due to Uniffi's limitation
@@ -167,20 +155,71 @@ macro_rules! app {
             Halo2Error(String),
         }
 
-        impl From<uniffi::deps::anyhow::Error> for MoproError {
-            fn from(err: uniffi::deps::anyhow::Error) -> Self {
-                if err.downcast_ref::<CircomCircuitError>().is_some() {
-                    MoproError::CircomError(err.to_string())
-                } else if err.downcast_ref::<Halo2CircuitError>().is_some() {
-                    MoproError::Halo2Error(err.to_string())
-                } else {
-                    panic!("Unhandled error type: {}", err)
+        impl From<mopro_ffi::MoproError> for MoproError {
+            fn from(err: mopro_ffi::MoproError) -> Self {
+                match err {
+                    mopro_ffi::MoproError::CircomError(e) => Self::CircomError(e),
+                    mopro_ffi::MoproError::Halo2Error(e) => Self::Halo2Error(e),
+                    _ => panic!("Unhandled error type: {}", err),
                 }
             }
         }
 
-        mopro_ffi::circom_app!(MoproError);
+        #[derive(Debug, Clone, uniffi::Object)]
+        pub struct GenerateProofResult {
+            pub proof: Vec<u8>,
+            pub inputs: Vec<u8>,
+        }
 
-        mopro_ffi::halo2_app!(MoproError);
+        impl From<mopro_ffi::GenerateProofResult> for GenerateProofResult {
+            fn from(result: mopro_ffi::GenerateProofResult) -> Self {
+                Self {
+                    proof: result.proof,
+                    inputs: result.inputs,
+                }
+            }
+        }
+
+        #[derive(Debug, Clone, Default, uniffi::Object)]
+        pub struct G1 {
+            pub x: String,
+            pub y: String,
+        }
+
+        #[derive(Debug, Clone, Default, uniffi::Object)]
+        pub struct G2 {
+            pub x: Vec<String>,
+            pub y: Vec<String>,
+        }
+
+        #[derive(Debug, Clone, Default, uniffi::Object)]
+        pub struct ProofCalldata {
+            pub a: G1,
+            pub b: G2,
+            pub c: G1,
+        }
+
+        impl From<mopro_ffi::ProofCalldata> for ProofCalldata {
+            fn from(result: mopro_ffi::ProofCalldata) -> Self {
+                ProofCalldata {
+                    a: G1 {
+                        x: result.a.x,
+                        y: result.a.y,
+                    },
+                    b: G2 {
+                        x: result.b.x,
+                        y: result.b.y,
+                    },
+                    c: G1 {
+                        x: result.c.x,
+                        y: result.c.y,
+                    },
+                }
+            }
+        }
+
+        mopro_ffi::circom_app!(GenerateProofResult, ProofCalldata, MoproError);
+
+        mopro_ffi::halo2_app!(GenerateProofResult, MoproError);
     };
 }

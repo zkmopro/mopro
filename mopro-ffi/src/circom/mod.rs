@@ -1,21 +1,21 @@
 use std::collections::HashMap;
 
 pub mod ethereum;
+use anyhow::{Ok, Result};
 pub use ethereum::*;
-use uniffi::deps::anyhow::{Ok, Result};
 
 use crate::GenerateProofResult;
 use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
 
 #[macro_export]
 macro_rules! circom_app {
-    ($err:ty) => {
-        #[uniffi::export]
+    ($result:ty, $proof_call_data:ty, $err:ty) => {
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn generate_circom_proof(
-            in0: String,
-            in1: std::collections::HashMap<String, Vec<String>>,
-        ) -> Result<mopro_ffi::GenerateProofResult, $err> {
-            let name = match std::path::Path::new(in0.as_str()).file_name() {
+            zkey_path: String,
+            circuit_inputs: std::collections::HashMap<String, Vec<String>>,
+        ) -> Result<$result, $err> {
+            let name = match std::path::Path::new(zkey_path.as_str()).file_name() {
                 Some(v) => v,
                 None => {
                     return Err(<$err>::CircomError(format!(
@@ -24,29 +24,41 @@ macro_rules! circom_app {
                 }
             };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
-            mopro_ffi::generate_circom_proof_wtns(
+            let result = mopro_ffi::generate_circom_proof_wtns(
                 mopro_ffi::prover::ProofLib::Arkworks,
-                in0,
-                in1,
+                zkey_path,
+                circuit_inputs,
                 witness_fn,
             )
             .map_err(|e| <$err>::CircomError(format!("Unknown ZKEY: {}", e)))
+            .unwrap();
+
+            Ok(result.into())
         }
 
-        #[uniffi::export]
-        fn verify_circom_proof(in0: String, in1: Vec<u8>, in2: Vec<u8>) -> Result<bool, $err> {
-            mopro_ffi::verify_circom_proof(mopro_ffi::prover::ProofLib::Arkworks, in0, in1, in2)
-                .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        fn verify_circom_proof(
+            zkey_path: String,
+            proof: Vec<u8>,
+            public_input: Vec<u8>,
+        ) -> Result<bool, $err> {
+            mopro_ffi::verify_circom_proof(
+                mopro_ffi::prover::ProofLib::Arkworks,
+                zkey_path,
+                proof,
+                public_input,
+            )
+            .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
         }
 
-        #[uniffi::export]
-        fn to_ethereum_proof(in0: Vec<u8>) -> mopro_ffi::ProofCalldata {
-            mopro_ffi::to_ethereum_proof(in0)
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        fn to_ethereum_proof(proof: Vec<u8>) -> $proof_call_data {
+            mopro_ffi::to_ethereum_proof(proof).into()
         }
 
-        #[uniffi::export]
-        fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
-            mopro_ffi::to_ethereum_inputs(in0)
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
+            mopro_ffi::to_ethereum_inputs(inputs)
         }
     };
 }
@@ -91,19 +103,35 @@ macro_rules! circom_app {
 #[macro_export]
 macro_rules! set_circom_circuits {
     ($(($key:expr, $func:expr)),+ $(,)?) => {
-        fn get_circom_wtns_fn(circuit: &str) ->  uniffi::deps::anyhow::Result<mopro_ffi::witness::WitnessFn> {
+        fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::witness::WitnessFn, mopro_ffi::MoproError> {
             match circuit {
                 $(
-                   $key =>  uniffi::deps::anyhow::Ok($func),
+                   $key => Ok($func),
                 )+
-                _ => Err(mopro_ffi::CircomCircuitError::UnknownZKey(format!("Unknown ZKEY: {}", circuit)).into())
+                _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit)))
             }
         }
     };
 }
 
-// build a proof for a zkey using witness_fn to build
-// the witness
+// // build a proof for a zkey using witness_fn to build
+// // the witness
+// pub fn generate_circom_proof_wtns<T>(
+//     proof_lib: ProofLib,
+//     zkey_path: String,
+//     inputs: HashMap<String, Vec<String>>,
+//     witness_fn: WitnessFn,
+// ) -> Result<T>
+// where
+//     T: From<GenerateProofResult>,
+// {
+//     let ret = CircomProver::prove(proof_lib, witness_fn, inputs.clone(), zkey_path)?;
+//     let result = GenerateProofResult {
+//         proof: ret.proof,
+//         inputs: ret.pub_inputs,
+//     };
+//     Ok(T::from(result))
+// }
 pub fn generate_circom_proof_wtns(
     proof_lib: ProofLib,
     zkey_path: String,
@@ -133,9 +161,6 @@ mod tests {
     use std::ops::{Add, Mul};
     use std::str::FromStr;
 
-    use crate::circom::ethereum::{to_ethereum_inputs, to_ethereum_proof};
-    use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
-    use crate::GenerateProofResult;
     use anyhow::bail;
     use anyhow::Result;
     use ark_bls12_381::Bls12_381;
@@ -144,6 +169,9 @@ mod tests {
     use circom_prover::prover::{serialization, ProofLib};
     use circom_prover::witness::WitnessFn;
     use num_bigint::{BigInt, BigUint, ToBigInt};
+
+    use crate::circom::ethereum::{to_ethereum_inputs, to_ethereum_proof};
+    use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
 
     // Only build the witness functions for tests, don't bundle them into
     // the final library
@@ -154,33 +182,14 @@ mod tests {
 
     use crate as mopro_ffi;
 
-    #[derive(Debug, thiserror::Error, uniffi::Error)]
-    pub enum MoproError {
-        #[error("CircomError: {0}")]
-        CircomError(String),
-        #[error("Halo2Error: {0}")]
-        Halo2Error(String),
-    }
-
-    impl From<uniffi::deps::anyhow::Error> for MoproError {
-        fn from(err: uniffi::deps::anyhow::Error) -> Self {
-            if err
-                .downcast_ref::<mopro_ffi::CircomCircuitError>()
-                .is_some()
-            {
-                MoproError::CircomError(err.to_string())
-            } else if err.downcast_ref::<mopro_ffi::Halo2CircuitError>().is_some() {
-                MoproError::Halo2Error(err.to_string())
-            } else {
-                panic!("Unhandled error type: {}", err)
-            }
-        }
-    }
-
     #[test]
     #[allow(dead_code)]
     fn test_circom_macros() {
-        circom_app!(MoproError);
+        circom_app!(
+            mopro_ffi::GenerateProofResult,
+            mopro_ffi::ProofCalldata,
+            mopro_ffi::MoproError
+        );
 
         set_circom_circuits! {
             ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),
@@ -217,7 +226,7 @@ mod tests {
     fn generate_circom_proof(
         zkey_path: String,
         inputs: HashMap<String, Vec<String>>,
-    ) -> Result<GenerateProofResult> {
+    ) -> Result<mopro_ffi::GenerateProofResult> {
         let name = std::path::Path::new(zkey_path.as_str())
             .file_name()
             .unwrap();
