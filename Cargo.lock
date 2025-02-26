@@ -3505,7 +3505,6 @@ name = "test-e2e"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "circom-prover",
  "gemini-fibonacci",
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
@@ -3515,7 +3514,6 @@ dependencies = [
  "plonk-fibonacci",
  "rust-witness",
  "uniffi",
- "witnesscalc-adapter",
 ]
 
 [[package]]
