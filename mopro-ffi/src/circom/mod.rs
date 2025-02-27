@@ -151,43 +151,41 @@ mod tests {
     use num_bigint::{BigInt, BigUint, ToBigInt};
 
     mod witnesscalc {
-        // use circom_prover::witnesscalc_adapter;
+        use circom_prover::witnesscalc_adapter;
 
-        // use super::*;
-        // // Only build the witness functions for tests, don't bundle them into
-        // // the final library
-        // witnesscalc_adapter::witness!(multiplier2);
-        // witnesscalc_adapter::witness!(multiplier2bls);
-        // witnesscalc_adapter::witness!(keccak256256test);
-        // witnesscalc_adapter::witness!(hashbenchbls);
+        use super::*;
+        // Only build the witness functions for tests, don't bundle them into
+        // the final library
+        witnesscalc_adapter::witness!(multiplier2);
 
-        // use crate as mopro_ffi;
+        use crate as mopro_ffi;
 
-        // #[test]
-        // fn test_circom_macros() {
-        //     circom_app!();
+        #[test]
+        fn test_circom_macros() {
+            circom_app!();
 
-        //     set_circom_circuits! {
-        //         ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),
-        //     }
+            set_circom_circuits! {
+                ("multiplier2_final.zkey", WitnessFn::WitnessCalc(multiplier2_witness)),
+            }
 
-        //     const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
+            const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
 
-        //     let mut inputs = HashMap::new();
-        //     let a = BigInt::from_str(
-        //         "21888242871839275222246405745257275088548364400416034343698204186575808495616",
-        //     )
-        //     .unwrap();
-        //     let b = BigInt::from(1u8);
-        //     inputs.insert("a".to_string(), vec![a.to_string()]);
-        //     inputs.insert("b".to_string(), vec![b.to_string()]);
+            let mut inputs = HashMap::new();
+            let a = BigInt::from_str(
+                "21888242871839275222246405745257275088548364400416034343698204186575808495616",
+            )
+            .unwrap();
+            let b = BigInt::from(1u8);
+            inputs.insert("a".to_string(), vec![a.to_string()]);
+            inputs.insert("b".to_string(), vec![b.to_string()]);
 
-        //     let input_str = serde_json::to_string(&inputs).unwrap();
-        //     let result = generate_circom_proof(ZKEY_PATH.to_string(), input_str);
+            let input_str = serde_json::to_string(&inputs).unwrap();
+            let result = generate_circom_proof(ZKEY_PATH.to_string(), input_str);
 
-        //     assert!(result.is_ok());
-        // }
+            assert!(result.is_ok());
+        }
     }
+
     mod rustwitness {
         use super::*;
         // Only build the witness functions for tests, don't bundle them into

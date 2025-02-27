@@ -7,7 +7,7 @@ use witnesscalc_adapter::parse_witness_to_bigints;
 type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 /// Witness function signature for witnesscalc_adapter (inputs) -> witness
 #[cfg(feature = "witnesscalc")]
-type WitnesscalcWtnsFn = fn(&str) -> io::Result<Vec<u8>>;
+type WitnesscalcWtnsFn = fn(&str) -> anyhow::Result<Vec<u8>>;
 
 #[derive(Debug, Clone, Copy)]
 pub enum WitnessFn {
