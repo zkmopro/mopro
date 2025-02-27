@@ -5,7 +5,6 @@ use crate::GenerateProofResult;
 use anyhow::Ok;
 use anyhow::Result;
 use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
-use std::collections::HashMap;
 
 #[macro_export]
 macro_rules! circom_app {
@@ -13,7 +12,7 @@ macro_rules! circom_app {
         use mopro_ffi::witness::WitnessFn;
         fn generate_circom_proof(
             zkey_path: String,
-            inputs: std::collections::HashMap<String, Vec<String>>,
+            inputs: String,
         ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             let name = match std::path::Path::new(zkey_path.as_str()).file_name() {
                 Some(v) => v,
@@ -113,10 +112,10 @@ macro_rules! set_circom_circuits {
 pub fn generate_circom_proof_wtns(
     proof_lib: ProofLib,
     zkey_path: String,
-    inputs: HashMap<String, Vec<String>>,
+    input_str: String,
     witness_fn: WitnessFn,
 ) -> Result<GenerateProofResult> {
-    let ret = CircomProver::prove(proof_lib, witness_fn, inputs.clone(), zkey_path).unwrap();
+    let ret = CircomProver::prove(proof_lib, witness_fn, input_str, zkey_path).unwrap();
     Ok(GenerateProofResult {
         proof: ret.proof,
         inputs: ret.pub_inputs,
@@ -151,6 +150,44 @@ mod tests {
     use circom_prover::witness::WitnessFn;
     use num_bigint::{BigInt, BigUint, ToBigInt};
 
+    mod witnesscalc {
+        // use circom_prover::witnesscalc_adapter;
+
+        // use super::*;
+        // // Only build the witness functions for tests, don't bundle them into
+        // // the final library
+        // witnesscalc_adapter::witness!(multiplier2);
+        // witnesscalc_adapter::witness!(multiplier2bls);
+        // witnesscalc_adapter::witness!(keccak256256test);
+        // witnesscalc_adapter::witness!(hashbenchbls);
+
+        // use crate as mopro_ffi;
+
+        // #[test]
+        // fn test_circom_macros() {
+        //     circom_app!();
+
+        //     set_circom_circuits! {
+        //         ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),
+        //     }
+
+        //     const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
+
+        //     let mut inputs = HashMap::new();
+        //     let a = BigInt::from_str(
+        //         "21888242871839275222246405745257275088548364400416034343698204186575808495616",
+        //     )
+        //     .unwrap();
+        //     let b = BigInt::from(1u8);
+        //     inputs.insert("a".to_string(), vec![a.to_string()]);
+        //     inputs.insert("b".to_string(), vec![b.to_string()]);
+
+        //     let input_str = serde_json::to_string(&inputs).unwrap();
+        //     let result = generate_circom_proof(ZKEY_PATH.to_string(), input_str);
+
+        //     assert!(result.is_ok());
+        // }
+    }
     mod rustwitness {
         use super::*;
         // Only build the witness functions for tests, don't bundle them into
@@ -181,7 +218,8 @@ mod tests {
             inputs.insert("a".to_string(), vec![a.to_string()]);
             inputs.insert("b".to_string(), vec![b.to_string()]);
 
-            let result = generate_circom_proof(ZKEY_PATH.to_string(), inputs);
+            let input_str = serde_json::to_string(&inputs).unwrap();
+            let result = generate_circom_proof(ZKEY_PATH.to_string(), input_str);
 
             assert!(result.is_ok());
         }
@@ -202,13 +240,13 @@ mod tests {
 
         fn generate_circom_proof(
             zkey_path: String,
-            inputs: HashMap<String, Vec<String>>,
+            input_str: String,
         ) -> Result<GenerateProofResult> {
             let name = std::path::Path::new(zkey_path.as_str())
                 .file_name()
                 .unwrap();
             if let Ok(witness_fn) = zkey_witness_map(name.to_str().unwrap()) {
-                generate_circom_proof_wtns(ProofLib::Arkworks, zkey_path, inputs, witness_fn)
+                generate_circom_proof_wtns(ProofLib::Arkworks, zkey_path, input_str, witness_fn)
             } else {
                 bail!("unknown zkey");
             }
@@ -269,7 +307,8 @@ mod tests {
             let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
 
             // Generate Proof
-            let p = generate_circom_proof(zkey_path.clone(), inputs)?;
+            let input_str = serde_json::to_string(&inputs).unwrap();
+            let p = generate_circom_proof(zkey_path.clone(), input_str)?;
             let serialized_proof = p.proof;
             let serialized_inputs = p.inputs;
 
@@ -314,7 +353,8 @@ mod tests {
             let serialized_outputs = bytes_to_circuit_outputs(&expected_output_vec);
 
             // Generate Proof
-            let p = generate_circom_proof(zkey_path.clone(), inputs)?;
+            let input_str = serde_json::to_string(&inputs).unwrap();
+            let p = generate_circom_proof(zkey_path.clone(), input_str)?;
             let serialized_proof = p.proof;
             let serialized_inputs = p.inputs;
 
@@ -358,7 +398,8 @@ mod tests {
             .unwrap();
 
             // Generate Proof
-            let p = generate_circom_proof(zkey_path.clone(), inputs)?;
+            let input_str = serde_json::to_string(&inputs).unwrap();
+            let p = generate_circom_proof(zkey_path.clone(), input_str)?;
             let serialized_proof = p.proof;
             let serialized_inputs = p.inputs.clone();
 
@@ -400,7 +441,8 @@ mod tests {
             let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
 
             // Generate Proof
-            let p = generate_circom_proof(zkey_path.clone(), inputs)?;
+            let input_str = serde_json::to_string(&inputs).unwrap();
+            let p = generate_circom_proof(zkey_path.clone(), input_str)?;
             let serialized_proof = p.proof;
             let serialized_inputs = p.inputs;
 
