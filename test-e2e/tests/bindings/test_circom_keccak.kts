@@ -265,7 +265,9 @@ try {
                     "0"
             )
 
-    var generateProofResult = generateCircomProof(zkeyPath, inputs)
+    val gson = Gson() 
+    val input_str: String = gson.toJson(inputs)
+    var generateProofResult = generateCircomProof(zkeyPath, input_str)
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
     var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs)
     assert(isValid) { "Proof is invalid" }

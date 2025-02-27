@@ -6,7 +6,7 @@ namespace mopro {
   boolean verify_halo2_proof(string srs_path, string vk_path, bytes proof, bytes public_input);
 
   [Throws=MoproError]
-  GenerateProofResult generate_circom_proof(string zkey_path, record<string, sequence<string>> circuit_inputs);
+  GenerateProofResult generate_circom_proof(string zkey_path, string circuit_inputs);
 
   [Throws=MoproError]
   boolean verify_circom_proof(string zkey_path, bytes proof, bytes public_input);

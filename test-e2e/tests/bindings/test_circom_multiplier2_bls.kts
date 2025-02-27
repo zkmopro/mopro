@@ -7,9 +7,11 @@ try {
     val inputs = mutableMapOf<String, List<String>>()
     inputs["a"] = listOf("3")
     inputs["b"] = listOf("5")
+    val gson = Gson() 
+    val input_str: String = gson.toJson(inputs)
 
     // Generate proof
-    var generateProofResult = generateCircomProof(zkeyPath, inputs)
+    var generateProofResult = generateCircomProof(zkeyPath, input_str)
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
 
     // Verify proof

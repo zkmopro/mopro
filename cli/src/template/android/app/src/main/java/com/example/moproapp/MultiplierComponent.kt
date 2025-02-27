@@ -30,6 +30,8 @@ fun MultiplierComponent() {
     val inputs = mutableMapOf<String, List<String>>()
     inputs["a"] = listOf("3")
     inputs["b"] = listOf("5")
+    val gson = Gson() 
+    val input_str: String = gson.toJson(inputs)
 
     val zkeyPath = getFilePathFromAssets("multiplier2_final.zkey")
 
@@ -39,7 +41,7 @@ fun MultiplierComponent() {
                 Thread(
                     Runnable {
                         val startTime = System.currentTimeMillis()
-                        res = generateCircomProof(zkeyPath, inputs)
+                        res = generateCircomProof(zkeyPath, input_str)
                         val endTime = System.currentTimeMillis()
                         provingTime = "proving time: " + (endTime - startTime).toString() + " ms"
                     }
