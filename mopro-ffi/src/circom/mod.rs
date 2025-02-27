@@ -150,6 +150,7 @@ mod tests {
     use circom_prover::witness::WitnessFn;
     use num_bigint::{BigInt, BigUint, ToBigInt};
 
+    #[cfg(feature = "circom-witness-calc")]
     mod witnesscalc {
         use circom_prover::witnesscalc_adapter;
 
@@ -186,6 +187,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "circom-rust-witness")]
     mod rustwitness {
         use super::*;
         // Only build the witness functions for tests, don't bundle them into

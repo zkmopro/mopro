@@ -1,5 +1,7 @@
 use num::{BigInt, BigUint};
 use std::{collections::HashMap, str::FromStr, thread::JoinHandle};
+
+#[cfg(feature = "witnesscalc")]
 use witnesscalc_adapter::parse_witness_to_bigints;
 
 /// Witness function signature for rust_witness (inputs) -> witness
