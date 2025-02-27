@@ -90,7 +90,6 @@ serde_json = { version = "1.0.94", optional = true }
 # ethereum
 rayon = { version = "1.10.0" }
 hex-literal = "0.4.1"
-uniffi = { version = "=0.28.0" }
 
 [build-dependencies]
 # rust-witness
@@ -99,8 +98,6 @@ rust-witness = { version = "0.1.3", optional = true }
 witnesscalc-adapter = { version = "0.1.0", optional = true }
 # rapidsnark
 rust-rapidsnark = { version = "0.1.0", optional = true }
-
-uniffi = { version = "=0.28.0", features = ["build"] }
 
 [dev-dependencies]
 serde_json = "1.0.94"

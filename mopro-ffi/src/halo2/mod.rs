@@ -12,9 +12,7 @@ macro_rules! halo2_app {
             pk_path: String,
             circuit_inputs: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<$result, $err> {
-            let name = std::path::Path::new(pk_path.as_str())
-                .file_name()
-                .unwrap();
+            let name = std::path::Path::new(pk_path.as_str()).file_name().unwrap();
             let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())
                 .map_err(|e| <$err>::Halo2Error(format!("error getting proving circuit: {}", e)))?;
             let result = proving_fn(&srs_path, &pk_path, circuit_inputs)

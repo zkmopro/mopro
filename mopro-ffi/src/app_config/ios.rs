@@ -4,8 +4,9 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use camino::Utf8Path;
-use uniffi_bindgen::bindings::SwiftBindingGenerator;
-use uniffi_bindgen::library_mode::generate_bindings;
+use uniffi::generate_bindings_library_mode;
+use uniffi::CargoMetadataConfigSupplier;
+use uniffi::SwiftBindingGenerator;
 
 use super::cleanup_tmp_local;
 use super::constants::{IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
@@ -207,11 +208,12 @@ fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Er
         fs::remove_dir_all(binding_dir)?;
     }
 
-    generate_bindings(
+    generate_bindings_library_mode(
         Utf8Path::from_path(dylib_path)
             .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?,
         None,
         &SwiftBindingGenerator,
+        &CargoMetadataConfigSupplier::default(),
         None,
         Utf8Path::from_path(binding_dir).ok_or(Error::new(
             ErrorKind::InvalidInput,

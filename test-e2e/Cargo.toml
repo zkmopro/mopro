@@ -19,8 +19,8 @@ name = "web"
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
 mopro-wasm = { path = "../mopro-wasm" }
-uniffi = "=0.28.0"
-uniffi_macros = "=0.28.0"
+uniffi = { workspace = true } 
+uniffi_macros = { workspace = true } 
 
 # Circom dependencies
 rust-witness = "0.1"
@@ -37,7 +37,7 @@ circom-prover = { version = "0.1.0", path = "../circom-prover" }
 
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
-uniffi = { version = "0.28.0", features = ["build"] }
+uniffi = { workspace = true, features = ["build"] }
 
 # Circom dependencies
 rust-witness = "0.1"
@@ -47,5 +47,5 @@ rust-witness = "0.1"
 empty-line-after-doc-comments = "allow"
 
 [dev-dependencies]
-uniffi = { version = "=0.28.0", features = ["bindgen-tests"] }
+uniffi = {  workspace = true, features = ["bindgen-tests"] }
 

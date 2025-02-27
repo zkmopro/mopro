@@ -4,8 +4,9 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use camino::Utf8Path;
-use uniffi_bindgen::bindings::KotlinBindingGenerator;
-use uniffi_bindgen::library_mode::generate_bindings;
+use uniffi::generate_bindings_library_mode;
+use uniffi::CargoMetadataConfigSupplier;
+use uniffi::KotlinBindingGenerator;
 
 use super::cleanup_tmp_local;
 use super::constants::{
@@ -117,15 +118,17 @@ fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<()
     let config_path = binding_dir.parent().unwrap().join("uniffi_config.toml");
     fs::write(&config_path, content).expect("Failed to write uniffi_config.toml");
 
-    generate_bindings(
+    generate_bindings_library_mode(
         Utf8Path::from_path(dylib_path)
             .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?,
         None,
         &KotlinBindingGenerator,
-        Option::from(Utf8Path::from_path(&config_path).ok_or(Error::new(
-            ErrorKind::InvalidInput,
-            "Invalid uniffi_config path",
-        ))?),
+        &CargoMetadataConfigSupplier::default(),
+        // Option::from(Utf8Path::from_path(&config_path).ok_or(Error::new(
+        //     ErrorKind::InvalidInput,
+        //     "Invalid uniffi_config path",
+        // ))?),
+        None,
         Utf8Path::from_path(binding_dir).ok_or(Error::new(
             ErrorKind::InvalidInput,
             "Invalid kotlin files directory",
