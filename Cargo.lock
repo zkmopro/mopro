@@ -2938,7 +2938,8 @@ dependencies = [
 [[package]]
 name = "rust-rapidsnark"
 version = "0.1.0"
-source = "git+https://github.com/zkmopro/rust-rapidsnark?branch=dylib#0ef167f8a4c2686b287042058e7d1d015ac09327"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "429a05824adf465be27dfca3e74d006e940ad79eb1f14ec856104ea700fd46e8"
 dependencies = [
  "anyhow",
  "cc",
