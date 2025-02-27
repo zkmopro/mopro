@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mopro.mopro_app.getFilePathFromAssets
@@ -46,7 +47,7 @@ fun MultiplierComponent() {
                     }
                 ).start()
             },
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 20.dp).testTag("circomGenerateProofButton")
         ) { Text(text = "generate proof") }
         Button(
             onClick = {
@@ -56,7 +57,7 @@ fun MultiplierComponent() {
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
                 output = "output: " + uniffi.mopro.toEthereumInputs(res.inputs)
             },
-            modifier = Modifier.padding(top = 120.dp)
+            modifier = Modifier.padding(top = 120.dp).testTag("circomVerifyProofButton")
         ) { Text(text = "verify proof") }
         Text(
             text = "Multiplier proof",

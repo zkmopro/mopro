@@ -286,6 +286,8 @@ jobs:
         uses: android-actions/setup-android@v2.0.10
       - name: Build android app
         run: cd test-e2e/android && ./gradlew build
+      - name: Test android app
+        run: cd test-e2e/android && ./gradlew connectedAndroidTest
   build-halo2-wasm-web:
     runs-on: ubuntu-latest
     needs: setup-halo2-wasm-env
