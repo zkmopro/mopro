@@ -142,7 +142,6 @@ pub struct ProofCalldata {
 #[macro_export]
 macro_rules! app {
     () => {
-        // These are mandatory imports for the uniffi to pick them up and match with UDL
         uniffi::setup_scaffolding!("mopro");
 
         // This should be declared into this macro due to Uniffi's limitation
@@ -165,7 +164,7 @@ macro_rules! app {
             }
         }
 
-        #[derive(Debug, Clone, uniffi::Object)]
+        #[derive(Debug, Clone, uniffi::Record)]
         pub struct GenerateProofResult {
             pub proof: Vec<u8>,
             pub inputs: Vec<u8>,
@@ -180,19 +179,19 @@ macro_rules! app {
             }
         }
 
-        #[derive(Debug, Clone, Default, uniffi::Object)]
+        #[derive(Debug, Clone, Default, uniffi::Record)]
         pub struct G1 {
             pub x: String,
             pub y: String,
         }
 
-        #[derive(Debug, Clone, Default, uniffi::Object)]
+        #[derive(Debug, Clone, Default, uniffi::Record)]
         pub struct G2 {
             pub x: Vec<String>,
             pub y: Vec<String>,
         }
 
-        #[derive(Debug, Clone, Default, uniffi::Object)]
+        #[derive(Debug, Clone, Default, uniffi::Record)]
         pub struct ProofCalldata {
             pub a: G1,
             pub b: G2,
