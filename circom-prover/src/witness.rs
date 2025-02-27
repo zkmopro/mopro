@@ -1,5 +1,5 @@
 use num::{BigInt, BigUint};
-use std::{collections::HashMap, io, str::FromStr, thread::JoinHandle};
+use std::{collections::HashMap, str::FromStr, thread::JoinHandle};
 use witnesscalc_adapter::parse_witness_to_bigints;
 
 /// Witness function signature for rust_witness (inputs) -> witness
@@ -17,11 +17,7 @@ pub enum WitnessFn {
     RustWitness(RustWitnessWtnsFn),
 }
 
-pub fn generate_witness(
-    witness_fn: WitnessFn,
-    // inputs: HashMap<String, Vec<String>>,
-    input_str: String,
-) -> JoinHandle<Vec<BigUint>> {
+pub fn generate_witness(witness_fn: WitnessFn, input_str: String) -> JoinHandle<Vec<BigUint>> {
     #[cfg(feature = "rustwitness")]
     let witness_map = json_to_hashmap(input_str.as_str()).unwrap();
 
