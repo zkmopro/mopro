@@ -10,6 +10,7 @@ use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
 macro_rules! circom_app {
     () => {
         use mopro_ffi::witness::WitnessFn;
+        #[allow(dead_code)]
         fn generate_circom_proof(
             zkey_path: String,
             inputs: String,
@@ -32,6 +33,7 @@ macro_rules! circom_app {
             .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
         }
 
+        #[allow(dead_code)]
         fn verify_circom_proof(
             zkey_path: String,
             proof_data: Vec<u8>,
@@ -46,10 +48,12 @@ macro_rules! circom_app {
             .map_err(|e| mopro_ffi::MoproError::CircomError(format!("Verification error: {}", e)))
         }
 
+        #[allow(dead_code)]
         fn to_ethereum_proof(proof_data: Vec<u8>) -> mopro_ffi::ProofCalldata {
             mopro_ffi::to_ethereum_proof(proof_data)
         }
 
+        #[allow(dead_code)]
         fn to_ethereum_inputs(public_inputs: Vec<u8>) -> Vec<String> {
             mopro_ffi::to_ethereum_inputs(public_inputs)
         }
