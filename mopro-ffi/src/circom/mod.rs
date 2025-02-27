@@ -223,6 +223,7 @@ mod tests {
             inputs.insert("b".to_string(), vec![b.to_string()]);
 
             let input_str = serde_json::to_string(&inputs).unwrap();
+            println!("*** {:?}", input_str.as_str());
             let result = generate_circom_proof(ZKEY_PATH.to_string(), input_str);
 
             assert!(result.is_ok());

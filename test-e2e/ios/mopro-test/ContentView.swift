@@ -82,6 +82,10 @@ extension ContentView {
             let c = a*b
             inputs["a"] = [String(a)]
             inputs["b"] = [String(b)]
+
+            let input_str: String = 
+                (try? JSONSerialization.data(withJSONObject: inputs, options: .prettyPrinted))
+                .flatMap { String(data: $0, encoding: .utf8) } ?? ""
             
             // Expected outputs
             let outputs: [String] = [String(c), String(a)]
@@ -90,7 +94,7 @@ extension ContentView {
             let start = CFAbsoluteTimeGetCurrent()
             
             // Generate Proof
-            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str)
             assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
             assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
             
