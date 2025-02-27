@@ -37,8 +37,10 @@ pub fn prove_and_verify_plonk_proof() {
 pub fn prove_and_verify_hyperplonk_proof() {
     // Read all at once
     const SRS_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/hyperplonk_fibonacci_srs.bin");
-    const PROVING_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/hyperplonk_fibonacci_pk.bin");
-    const VERIFYING_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/hyperplonk_fibonacci_vk.bin");
+    const PROVING_KEY: &[u8] =
+        include_bytes!("../../test-vectors/halo2/hyperplonk_fibonacci_pk.bin");
+    const VERIFYING_KEY: &[u8] =
+        include_bytes!("../../test-vectors/halo2/hyperplonk_fibonacci_vk.bin");
 
     // Test input
     let mut input = HashMap::new();
