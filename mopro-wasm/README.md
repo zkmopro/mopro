@@ -14,11 +14,11 @@ from: [Rayon - github](https://github.com/rayon-rs/rayon#usage-with-webassembly)
 ## Getting started
 
 - Install [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
-- Install `chrome` and `chromedriver` with same version, Refer to [Download Chrome/ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/).
+- Install `chrome` and `chromedriver` with the same version, Refer to [Download Chrome/ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/).
 
 ## Run tests
 
-Run the fibonacci circuit tests for all backends—"plonk," "hyperplonk," and "gemini"— in a headless browser.
+Run the Fibonacci circuit tests for all backends—"plonk," "hyperplonk," and "gemini"— in a headless browser.
 
 ```bash
 wasm-pack test --chrome --headless -- --all-features

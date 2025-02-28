@@ -22,25 +22,25 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 macro_rules! circom_app {
     () => {
         fn generate_circom_proof(
-            in0: String,
-            in1: std::collections::HashMap<String, Vec<String>>,
+            zkey_path: String,
+            inputs: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
         fn verify_circom_proof(
-            in0: String,
-            in1: Vec<u8>,
-            in2: Vec<u8>,
+            zkey_path: String,
+            proof_data: Vec<u8>,
+            public_inputs: Vec<u8>,
         ) -> Result<bool, MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
-        fn to_ethereum_proof(in0: Vec<u8>) -> ProofCalldata {
+        fn to_ethereum_proof(proof_data: Vec<u8>) -> ProofCalldata {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
-        fn to_ethereum_inputs(in0: Vec<u8>) -> Vec<String> {
+        fn to_ethereum_inputs(public_inputs: Vec<u8>) -> Vec<String> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
     };
@@ -51,18 +51,18 @@ macro_rules! circom_app {
 macro_rules! halo2_app {
     () => {
         fn generate_halo2_proof(
-            in0: String,
-            in1: String,
-            in2: std::collections::HashMap<String, Vec<String>>,
+            srs_path: String,
+            pk_path: String,
+            inputs: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<GenerateProofResult, MoproError> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
 
         fn verify_halo2_proof(
-            in0: String,
-            in1: String,
-            in2: Vec<u8>,
-            in3: Vec<u8>,
+            srs_path: String,
+            vk_path: String,
+            proof_data: Vec<u8>,
+            public_inputs: Vec<u8>,
         ) -> Result<bool, MoproError> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }

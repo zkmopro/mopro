@@ -51,7 +51,7 @@ Create templates for developing your mobile app.
 mopro create
 ```
 
-Follow the instructions to open development tools
+Follow the instructions to open the development tools
 
 For iOS:
 ```sh

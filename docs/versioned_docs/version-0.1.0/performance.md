@@ -314,7 +314,7 @@ Benchmarks on an Macbook Pro M1 Max (2021).
 ## Halo2
 
 In summary: <br/>
-The performance of the Mopro build is comparable to the native Halo2 build. <br/>
+The performance of the Mopro build is comparable to that of native Halo2 build. <br/>
 
 The below tests were run on a Macbook Pro M1 Pro (2021) as well as an iPhone 15 Pro (2023).
 

@@ -11,7 +11,7 @@ Once the iOS bindings have been built successfully, you will find a folder named
 <iframe width="560" height="315" src="https://www.youtube.com/embed/6TydXwYMQCU?si=TDw5qkbWSs-Uhw5E" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </p>
 
-First let's make a new iOS app Xcode project. If you already have an app project you can skip this step. We'll do File -> New -> Project and create a iOS App. Make sure the language is Swift. We suggest putting this iOS project inside the rust project folder created above.
+First let's make a new iOS app Xcode project. If you already have an app project you can skip this step. We'll do File -> New -> Project and create an iOS App. Make sure the language is Swift. We suggest putting this iOS project inside the rust project folder created above.
 
 ![create an ios app project](/img/ios-example-1.png)
 
