@@ -14,16 +14,18 @@ name = "mopro_bindings"
 default = ["<FEATURES>"]
 
 [dependencies]
-mopro-wasm = { git = "https://github.com/zkmopro/mopro" }
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
+mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["halo2", "circom"] }
+circom-prover = { git = "https://github.com/zkmopro/mopro.git" }
 rust-witness = "0.1"
-uniffi = { version = "0.28", features = ["cli"] }
+uniffi = { version = "=0.29.0" }
 num-bigint = "0.4.0"
+thiserror= "=2.0.3"
 # HALO2_DEPENDENCIES
 
 [build-dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
 rust-witness = "0.1"
-uniffi = { version = "0.28", features = ["build"] }
+uniffi = { version = "=0.29.0", features = ["build"] }
 
 # CIRCOM_DEPENDENCIES

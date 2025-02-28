@@ -30,7 +30,6 @@ halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git
 plonk-fibonacci = { workspace = true }
 hyperplonk-fibonacci = { workspace = true }
 gemini-fibonacci = { workspace = true }
-camino = "1.1.9"
 thiserror = "=2.0.3"
 circom-prover = { version = "0.1.0", path = "../circom-prover" }
 
