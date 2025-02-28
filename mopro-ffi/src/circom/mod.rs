@@ -114,24 +114,6 @@ macro_rules! set_circom_circuits {
     };
 }
 
-// // build a proof for a zkey using witness_fn to build
-// // the witness
-// pub fn generate_circom_proof_wtns<T>(
-//     proof_lib: ProofLib,
-//     zkey_path: String,
-//     inputs: HashMap<String, Vec<String>>,
-//     witness_fn: WitnessFn,
-// ) -> Result<T>
-// where
-//     T: From<GenerateProofResult>,
-// {
-//     let ret = CircomProver::prove(proof_lib, witness_fn, inputs.clone(), zkey_path)?;
-//     let result = GenerateProofResult {
-//         proof: ret.proof,
-//         inputs: ret.pub_inputs,
-//     };
-//     Ok(T::from(result))
-// }
 pub fn generate_circom_proof_wtns(
     proof_lib: ProofLib,
     zkey_path: String,

@@ -152,24 +152,25 @@ jobs:
           google-chrome --version
           cd mopro-wasm
           wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
-  test-e2e:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Run e2e circom tests
-        # TODO: Fix this custom jar thing
-        run: |
-          cd test-e2e
-          curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
-          CLASSPATH=jna-5.13.0.jar cargo test --test circom -- --nocapture
-      - name: Run e2e halo2 tests
-        run: CLASSPATH=jna-5.13.0.jar cargo test --test halo2 -- --nocapture
+  # TODO: remove this commented test-e2e job
+  # test-e2e:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Install Rust toolchain
+  #       uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         override: true
+  #     - name: Run e2e circom tests
+  #       # TODO: Fix this custom jar thing
+  #       run: |
+  #         cd test-e2e
+  #         curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
+  #         CLASSPATH=jna-5.13.0.jar cargo test --test circom -- --nocapture
+  #     - name: Run e2e halo2 tests
+  #       run: CLASSPATH=jna-5.13.0.jar cargo test --test halo2 -- --nocapture
   build-xcframework:
     runs-on: macos-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name

@@ -124,10 +124,6 @@ fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<()
         None,
         &KotlinBindingGenerator,
         &CargoMetadataConfigSupplier::default(),
-        // Option::from(Utf8Path::from_path(&config_path).ok_or(Error::new(
-        //     ErrorKind::InvalidInput,
-        //     "Invalid uniffi_config path",
-        // ))?),
         None,
         Utf8Path::from_path(binding_dir).ok_or(Error::new(
             ErrorKind::InvalidInput,

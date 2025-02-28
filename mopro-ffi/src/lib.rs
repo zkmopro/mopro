@@ -145,7 +145,7 @@ macro_rules! app {
         uniffi::setup_scaffolding!("mopro");
 
         // This should be declared into this macro due to Uniffi's limitation
-        // Please refer this comment: https://github.com/mozilla/uniffi-rs/issues/2257#issuecomment-2395668332
+        // Please refer this issue: https://github.com/mozilla/uniffi-rs/issues/2257
         #[derive(Debug, thiserror::Error, uniffi::Error)]
         pub enum MoproError {
             #[error("CircomError: {0}")]

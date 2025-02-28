@@ -20,7 +20,6 @@ name = "web"
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
 mopro-wasm = { path = "../mopro-wasm" }
 uniffi = { workspace = true } 
-uniffi_macros = { workspace = true } 
 
 # Circom dependencies
 rust-witness = "0.1"

@@ -29,7 +29,7 @@ macro_rules! halo2_app {
             vk_path: String,
             proof: Vec<u8>,
             public_input: Vec<u8>,
-        ) -> uniffi::deps::anyhow::Result<bool, $err> {
+        ) -> Result<bool, $err> {
             let name = std::path::Path::new(vk_path.as_str()).file_name().unwrap();
             let verifying_fn =
                 get_halo2_verifying_circuit(name.to_str().unwrap()).map_err(|e| {
@@ -71,14 +71,14 @@ macro_rules! halo2_app {
 ///
 /// ## For Advanced Users:
 /// This macro abstracts away the implementation of:
-/// - `get_halo2_proving_circuit(circuit_pk: &str) -> uniffi::deps::anyhow::Result<mopro_ffi::Halo2ProveFn>`
-/// - `get_halo2_verifying_circuit(circuit_vk: &str) -> uniffi::deps::anyhow::Result<mopro_ffi::Halo2VerifyFn>`
+/// - `get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn>`
+/// - `get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn>`
 ///
 /// You can choose to implement these functions directly with your custom logic:
 ///
 /// #### Example:
 /// ```ignore
-/// fn get_halo2_proving_circuit(circuit_pk: &str) -> uniffi::deps::anyhow::Result<mopro_ffi::Halo2ProveFn> {
+/// fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn> {
 ///    match circuit_pk {
 ///       "circuit1_proving_key" => Ok(circuit1_prove_function),
 ///       "circuit2_proving_key" => Ok(circuit1_prove_function),
@@ -86,7 +86,7 @@ macro_rules! halo2_app {
 ///    }
 /// }
 ///
-/// fn get_halo2_verifying_circuit(circuit_vk: &str) -> uniffi::deps::anyhow::Result<mopro_ffi::Halo2VerifyFn> {
+/// fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn> {
 ///    match circuit_vk {
 ///       "circuit1_verifying_key" => Ok(circuit1_verify_function),
 ///       "circuit2_verifying_key" => Ok(circuit2_verify_function),
