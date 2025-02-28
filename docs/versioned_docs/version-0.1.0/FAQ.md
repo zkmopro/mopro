@@ -21,8 +21,6 @@ There's experimental support for GKR in this [PR](https://github.com/zkmopro/mop
 
 We welcome people to contribute support for [more proof systems](https://github.com/zkmopro/mopro/issues/15).
 
-<!-- TODO: custom UDL doc -->
-
 ## What platforms does Mopro support?
 
 Mopro is multi-platform and aims to support as many platforms as possible. iOS, Android and Desktop (through Rust/CLI) are the main platforms supported. *Website support is currently under development.* (See [#202](https://github.com/zkmopro/mopro/issues/202))

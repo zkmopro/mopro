@@ -41,15 +41,17 @@ name = "mopro_bindings"
 default = ["mopro-ffi/circom"]
 
 [dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["circom"] }
+circom-prover = { git = "https://github.com/zkmopro/mopro.git" }
 rust-witness = "0.1"
-uniffi = { version = "0.28", features = ["cli"] }
+uniffi = { version = "=0.29.0" }
 num-bigint = "0.4.0"
+thiserror = "=2.0.3"
 
 [build-dependencies]
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
 rust-witness = "0.1"
-uniffi = { version = "0.28", features = ["build"] }
+uniffi = { version = "=0.29.0", features = ["build"] }
 
 # TODO: fix this
 [patch.crates-io]
@@ -69,27 +71,26 @@ Download example multiplier2 wasm and zkey here:
 Now we need to add four rust files. First we'll add a `build.rs` in the main project folder. This file should contain the following:
 
 ```rust
-use std::path::Path;
 fn main() {
-    // We're going to transpile the wasm witness generators to C
-    // Change this to where you put your zkeys and wasm files
+    fn main() {
+    // For removing warnings
+    println!("cargo::rustc-check-cfg=cfg(disable_uniffi_export)");
+    
     rust_witness::transpile::transpile_wasm("./test-vectors/circom".to_string());
-    // This is writing the UDL file which defines the functions exposed
-    // to your app. We have pre-generated this file for you
-    // This file must be written to ./src
-    let udl_path = Path::new("src/mopro.udl");
-    if !udl_path.exists() {
-        std::fs::write(udl_path, mopro_ffi::app_config::UDL).expect("Failed to write UDL");
-    }
-    // Finally initialize uniffi and build the scaffolding into the
-    // rust binary
-    uniffi::generate_scaffolding(udl_path.to_str().unwrap()).unwrap();
+}
 }
 ```
 
 Second we'll change the file at `./src/lib.rs` to look like the following:
 
 ```rust
+use circom_prover::witness::WitnessFn;
+
+// Here we're calling a macro exported with Uniffi. This macro will
+// write some functions and bind them to FFI type. These
+// functions will invoke the `get_circom_wtns_fn` generated below.
+mopro_ffi::app!();
+
 // Here we're generating the C witness generator functions
 // for a circuit named `multiplier2`.
 // Your circuit name will be the name of the wasm file all lowercase
@@ -100,11 +101,6 @@ Second we'll change the file at `./src/lib.rs` to look like the following:
 // keccak_256_256_main -> keccak256256main
 // aadhaar-verifier -> aadhaarverifier
 rust_witness::witness!(multiplier2);
-
-// Here we're calling a macro exported by uniffi. This macro will
-// write some functions and bind them to the uniffi UDL file. These
-// functions will invoke the `get_circom_wtns_fn` generated below.
-mopro_ffi::app!();
 
 // This macro is used to define the `get_circom_wtns_fn` function
 // which defines a mapping between zkey filename and witness generator.
@@ -220,30 +216,26 @@ Download example SRS and key files :
 :::
 
 
-Now, add four rust files, just as in the Circom-based Rust project setup.
+The first step is optional, but if not included, a warning will appear while compiling. 
 
-First, add a `build.rs` in the main project folder. This file should contain the following:
+Optionally, add a `build.rs` file in the main project folder with the following content:
 
 ```rust
 fn main() {
-    // This is writing the UDL file which defines the functions exposed
-    // to your app. We have pre-generated this file for you.
-    // Feel free to modify it to suit your needs.
-    let udl_path = Path::new("src/mopro.udl");
-    if !udl_path.exists() {
-        std::fs::write(udl_path, mopro_ffi::app_config::UDL).expect("Failed to write UDL");
-    }
-    // Finally initialize uniffi and build the scaffolding into the
-    // rust binary
-    uniffi::generate_scaffolding(udl_path.to_str().unwrap()).unwrap();
+    // For removing warnings
+    println!("cargo::rustc-check-cfg=cfg(disable_uniffi_export)");
 }
 ```
 
-Next, update the `./src/lib.rs` file to look like the following:
+
+
+Now, add three rust files, just as in the Circom-based Rust project setup.
+
+Update the `./src/lib.rs` file to look like the following:
 
 ```rust
-// Here we're calling a macro exported by uniffi. This macro will
-// write some functions and bind them to the uniffi UDL file.
+// Here we're calling a macro exported with Uniffi. This macro will
+// write some functions and bind them to FFI type.
 mopro_ffi::app!();
 
 mopro_ffi::set_halo2_circuits! {
