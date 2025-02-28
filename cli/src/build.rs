@@ -97,7 +97,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
 
     // If 'Circom' is the only selected adapter and 'Web' is the only selected platform,
     // Restart the build step as this combination is not supported.
-    if config.adpater_eq(Adapter::Circom) && platform.eq(&vec![Platform::Web]) {
+    if config.adapter_eq(Adapter::Circom) && platform.eq(&vec![Platform::Web]) {
         style::print_yellow(
             "Web platform is not support Circom only, choose different platform".to_string(),
         );
@@ -106,7 +106,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     }
 
     // Notification when the user selects the 'circom' adapter and includes the 'web' platform in the selection.
-    if config.adpater_eq(Adapter::Circom) && platform.contains(Platform::Web) {
+    if config.adapter_eq(Adapter::Circom) && platform.contains(Platform::Web) {
         let confirm = Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("WASM code for Circom will not be generated for the web platform due to lack of support. Do you want to continue?")
                 .default(true)
@@ -121,7 +121,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     }
 
     // Notification when the user selects the 'halo2' adapter and includes the 'web' platform in the selection.
-    if config.adpater_contains(Adapter::Halo2) && platform.contains(Platform::Web) {
+    if config.adapter_contains(Adapter::Halo2) && platform.contains(Platform::Web) {
         let confirm = Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("Halo2 WASM code will only be generated for the web platform. Do you want to continue?")
                 .default(true)
