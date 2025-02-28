@@ -33,7 +33,7 @@ hyperplonk-fibonacci = { workspace = true }
 gemini-fibonacci = { workspace = true }
 
 [build-dependencies]
-mopro-ffi = { path = "../mopro-ffi" }
+mopro-ffi = { path = "../mopro-ffi", features = ["circom"] }
 uniffi = { version = "0.28.0", features = ["build"] }
 
 # Circom dependencies

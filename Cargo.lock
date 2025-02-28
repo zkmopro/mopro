@@ -2245,7 +2245,7 @@ dependencies = [
  "indicatif",
  "reqwest",
  "serde",
- "toml 0.8.19",
+ "toml 0.8.20",
  "zip",
 ]
 
@@ -2938,8 +2938,7 @@ dependencies = [
 [[package]]
 name = "rust-rapidsnark"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "429a05824adf465be27dfca3e74d006e940ad79eb1f14ec856104ea700fd46e8"
+source = "git+https://github.com/zkmopro/rust-rapidsnark.git?branch=dylib#145cc0a2624af00a65571a2e06daea46051ae009"
 dependencies = [
  "anyhow",
  "cc",
@@ -3687,9 +3686,9 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "0.8.19"
+version = "0.8.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1ed1f98e3fdc28d6d910e6737ae6ab1a93bf1985935a1193e68f93eeb68d24e"
+checksum = "cd87a5cdd6ffab733b2f74bc4fd7ee5fff6634124999ac278c35fc78c6120148"
 dependencies = [
  "serde",
  "serde_spanned",
