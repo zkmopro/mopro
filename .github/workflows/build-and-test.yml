@@ -294,7 +294,8 @@ jobs:
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: 35
+          target: google_apis
           script: cd test-e2e/android && ./gradlew connectedAndroidTest
   build-halo2-wasm-web:
     runs-on: ubuntu-latest
