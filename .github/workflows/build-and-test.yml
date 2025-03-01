@@ -254,7 +254,7 @@ jobs:
           toolchain: 1.81.0
           override: true
       - name: Build Android bindings
-        run: cd test-e2e && ANDROID_ARCHS=aarch64-linux-android cargo run --bin android
+        run: cd test-e2e && ANDROID_ARCHS=aarch64-linux-android,x86_64-linux-android cargo run --bin android
       - name: Cache android lib
         id: cache-android-lib
         uses: actions/cache/save@v4
@@ -295,8 +295,6 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          arch: arm64-v8a
-          target: google_apis
           script: cd test-e2e/android && ./gradlew connectedAndroidTest
   build-halo2-wasm-web:
     runs-on: ubuntu-latest
