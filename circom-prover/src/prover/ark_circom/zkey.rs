@@ -70,7 +70,7 @@ impl FieldSerialization for Bn254 {
     type Fq2 = ark_bn254::Fq2;
 
     // need to divide by R, since snarkjs outputs the zkey with coefficients
-    // multiplieid by R^2
+    // multiplied by R^2
     fn deserialize_field_fr<R: Read>(reader: &mut R) -> IoResult<Self::Fr> {
         let bigint = BigInteger256::deserialize_uncompressed(reader)?;
         Ok(Self::Fr::new_unchecked(
@@ -128,7 +128,7 @@ impl FieldSerialization for Bls12_381 {
     type Fq2 = ark_bls12_381::Fq2;
 
     // need to divide by R, since snarkjs outputs the zkey with coefficients
-    // multiplieid by R^2
+    // multiplied by R^2
     fn deserialize_field_fr<R: Read>(reader: &mut R) -> IoResult<Self::Fr> {
         let bigint = BigInteger256::deserialize_uncompressed(reader)?;
         Ok(Self::Fr::new_unchecked(
