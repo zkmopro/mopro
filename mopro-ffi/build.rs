@@ -1,7 +1,4 @@
 fn main() {
-    // For removing warnings
-    println!("cargo::rustc-check-cfg=cfg(disable_uniffi_export)");
-
     #[cfg(feature = "circom")]
     if std::env::var("MOPRO_FFI_LINK_TEST_WITNESS").unwrap_or_default() != "" {
         rust_witness::transpile::transpile_wasm("../test-vectors/circom".to_string());

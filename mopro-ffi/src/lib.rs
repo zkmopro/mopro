@@ -1,3 +1,4 @@
+#![allow(unexpected_cfgs)]
 pub mod app_config;
 
 #[cfg(feature = "circom")]
