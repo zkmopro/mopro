@@ -21,11 +21,11 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 #[cfg(not(feature = "circom"))]
 #[macro_export]
 macro_rules! circom_app {
-    () => {
+    ($result:ty, $proof_call_data:ty, $err:ty) => {
         fn generate_circom_proof(
             zkey_path: String,
             inputs: std::collections::HashMap<String, Vec<String>>,
-        ) -> Result<GenerateProofResult, MoproError> {
+        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
@@ -33,11 +33,11 @@ macro_rules! circom_app {
             zkey_path: String,
             proof_data: Vec<u8>,
             public_inputs: Vec<u8>,
-        ) -> Result<bool, MoproError> {
+        ) -> Result<bool, mopro_ffi::MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
-        fn to_ethereum_proof(proof_data: Vec<u8>) -> ProofCalldata {
+        fn to_ethereum_proof(proof_data: Vec<u8>) -> mopro_ffi::ProofCalldata {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
@@ -50,12 +50,12 @@ macro_rules! circom_app {
 #[cfg(not(feature = "halo2"))]
 #[macro_export]
 macro_rules! halo2_app {
-    () => {
+    ($result:ty, $err:ty) => {
         fn generate_halo2_proof(
             srs_path: String,
             pk_path: String,
             inputs: std::collections::HashMap<String, Vec<String>>,
-        ) -> Result<GenerateProofResult, MoproError> {
+        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
 
@@ -64,7 +64,7 @@ macro_rules! halo2_app {
             vk_path: String,
             proof_data: Vec<u8>,
             public_inputs: Vec<u8>,
-        ) -> Result<bool, MoproError> {
+        ) -> Result<bool, mopro_ffi::MoproError> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
     };
