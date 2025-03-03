@@ -38,6 +38,8 @@ pub fn generate_witness(
             WitnessFn::WitnessCalc(wit_fn) => wit_fn(bigint_inputs),
             #[cfg(feature = "rustwitness")]
             WitnessFn::RustWitness(wit_fn) => wit_fn(bigint_inputs),
+            #[allow(unreachable_patterns)]
+            _ => panic!("Unsupported witness generation library"),
         };
         witness
             .into_iter()

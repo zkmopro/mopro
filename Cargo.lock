@@ -3513,6 +3513,7 @@ dependencies = [
  "plonk-fibonacci",
  "rust-witness",
  "uniffi",
+ "witnesscalc-adapter",
 ]
 
 [[package]]

@@ -1,6 +1,5 @@
 fn main() {
-    let crate_name = std::env::var("CARGO_PKG_NAME").unwrap();
-    if crate_name == "circom-prover" {
+    if std::env::var("CIRCOM_PROVER_TEST_WITNESS").unwrap_or_default() != "" {
         #[cfg(feature = "rustwitness")]
         rust_witness::transpile::transpile_wasm("./test-vectors".to_string());
         #[cfg(feature = "witnesscalc")]
