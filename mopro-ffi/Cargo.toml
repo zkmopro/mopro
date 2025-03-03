@@ -17,18 +17,24 @@ default = []
 
 halo2 = []
 circom = [
-    "circom-rust-witness",
-    "rust-witness",
-    "witnesscalc-adapter",
+    "circom-wit-rustwitness",
+    "circom-proof-arkworks",
     "ark-bn254",
     "ark-bls12-381",
     "ark-ff",
 ]
 
 # circom features
-circom-rust-witness = ["circom-prover/rustwitness"]
-circom-witness-calc = ["circom-prover/witnesscalc"]
-circom-all = ["circom-rust-witness", "circom-witness-calc"]
+## witness
+circom-wit-rustwitness = ["circom-prover/rustwitness", "rust-witness"]
+circom-wit-witnesscalc = ["circom-prover/witnesscalc", "witnesscalc-adapter"]
+## proof
+circom-proof-arkworks = ["circom-prover/arkworks"]
+circom-proof-rapidsnark = ["circom-prover/rapidsnark"]
+## include all circom features
+circom-all = ["circom-wit-rustwitness", "circom-wit-witnesscalc", "circom-proof-arkworks", "circom-proof-rapidsnark"]
+
+
 
 [dependencies]
 uniffi = { version = "=0.28.0", features = ["cli", "build"] }

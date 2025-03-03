@@ -138,32 +138,20 @@ pub fn verify_circom_proof(
 
 #[cfg(test)]
 mod tests {
+    use anyhow::Result;
+    use num_bigint::BigInt;
     use std::collections::HashMap;
-    use std::ops::{Add, Mul};
     use std::str::FromStr;
 
-    use crate::circom::ethereum::{to_ethereum_inputs, to_ethereum_proof};
-    use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
-    use crate::GenerateProofResult;
-    use anyhow::bail;
-    use anyhow::Result;
-    use ark_bls12_381::Bls12_381;
-    use ark_bn254::Bn254;
-    use ark_ff::PrimeField;
-    use circom_prover::prover::{serialization, ProofLib};
-    use circom_prover::witness::WitnessFn;
-    use num_bigint::{BigInt, BigUint, ToBigInt};
-
-    #[cfg(feature = "circom-witness-calc")]
+    #[cfg(feature = "circom-wit-witnesscalc")]
     mod witnesscalc {
+        use super::*;
+        use crate as mopro_ffi;
         use circom_prover::witnesscalc_adapter;
 
-        use super::*;
         // Only build the witness functions for tests, don't bundle them into
         // the final library
         witnesscalc_adapter::witness!(multiplier2);
-
-        use crate as mopro_ffi;
 
         #[test]
         fn test_circom_macros() {
@@ -191,9 +179,21 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "circom-rust-witness")]
+    #[cfg(feature = "circom-wit-rustwitness")]
     mod rustwitness {
         use super::*;
+        use crate::circom::ethereum::{to_ethereum_inputs, to_ethereum_proof};
+        use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
+        use crate::GenerateProofResult;
+        use anyhow::bail;
+        use ark_bls12_381::Bls12_381;
+        use ark_bn254::Bn254;
+        use ark_ff::PrimeField;
+        use circom_prover::prover::{serialization, ProofLib};
+        use circom_prover::witness::WitnessFn;
+        use num_bigint::{BigUint, ToBigInt};
+        use std::ops::{Add, Mul};
+
         // Only build the witness functions for tests, don't bundle them into
         // the final library
         rust_witness::witness!(multiplier2);
