@@ -116,10 +116,10 @@ macro_rules! set_circom_circuits {
 pub fn generate_circom_proof_wtns(
     proof_lib: ProofLib,
     zkey_path: String,
-    input_str: String,
+    json_input_str: String,
     witness_fn: WitnessFn,
 ) -> Result<GenerateProofResult> {
-    let ret = CircomProver::prove(proof_lib, witness_fn, input_str, zkey_path).unwrap();
+    let ret = CircomProver::prove(proof_lib, witness_fn, json_input_str, zkey_path).unwrap();
     Ok(GenerateProofResult {
         proof: ret.proof,
         inputs: ret.pub_inputs,
@@ -244,13 +244,18 @@ mod tests {
 
         fn generate_circom_proof(
             zkey_path: String,
-            input_str: String,
+            json_input_str: String,
         ) -> Result<GenerateProofResult> {
             let name = std::path::Path::new(zkey_path.as_str())
                 .file_name()
                 .unwrap();
             if let Ok(witness_fn) = zkey_witness_map(name.to_str().unwrap()) {
-                generate_circom_proof_wtns(ProofLib::Arkworks, zkey_path, input_str, witness_fn)
+                generate_circom_proof_wtns(
+                    ProofLib::Arkworks,
+                    zkey_path,
+                    json_input_str,
+                    witness_fn,
+                )
             } else {
                 bail!("unknown zkey");
             }

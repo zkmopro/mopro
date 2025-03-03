@@ -19,10 +19,10 @@ impl CircomProver {
     pub fn prove(
         proof_lib: ProofLib,
         wit_fn: WitnessFn,
-        input_str: String,
+        json_input_str: String,
         zkey_path: String,
     ) -> Result<CircomProof> {
-        let wit_thread = witness::generate_witness(wit_fn, input_str);
+        let wit_thread = witness::generate_witness(wit_fn, json_input_str);
         prover::prove(proof_lib, zkey_path.clone(), wit_thread)
     }
 

@@ -19,15 +19,15 @@ pub enum WitnessFn {
     RustWitness(RustWitnessWtnsFn),
 }
 
-pub fn generate_witness(witness_fn: WitnessFn, input_str: String) -> JoinHandle<Vec<BigUint>> {
+pub fn generate_witness(witness_fn: WitnessFn, json_input_str: String) -> JoinHandle<Vec<BigUint>> {
     #[cfg(feature = "rustwitness")]
-    let witness_map = json_to_hashmap(input_str.as_str()).unwrap();
+    let witness_map = json_to_hashmap(json_input_str.as_str()).unwrap();
 
     std::thread::spawn(move || {
         let witness = match witness_fn {
             #[cfg(feature = "witnesscalc")]
             WitnessFn::WitnessCalc(wit_fn) => {
-                let witness = wit_fn(input_str.as_str()).unwrap();
+                let witness = wit_fn(json_input_str.as_str()).unwrap();
                 parse_witness_to_bigints(&witness).unwrap()
             }
             #[cfg(feature = "rustwitness")]

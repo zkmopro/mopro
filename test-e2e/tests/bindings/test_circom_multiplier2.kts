@@ -3,7 +3,7 @@ import uniffi.mopro.*
 try {
     var zkeyPath = "../test-vectors/circom/multiplier2_final.zkey"
 
-    val input_str: String = "{\"b\":[\"1\"],\"a\":[\"21888242871839275222246405745257275088548364400416034343698204186575808495616\"]}"
+    val input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
 
     // Generate proof
     var generateProofResult = generateCircomProof(zkeyPath, input_str)
