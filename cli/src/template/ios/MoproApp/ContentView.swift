@@ -72,13 +72,11 @@ extension ContentView {
         textViewText += "Generating Circom proof... "
         do {
             // Prepare inputs
-            var inputs = [String: [String]]()
             let a = 3
             let b = 5
             let c = a*b
-            inputs["a"] = [String(a)]
-            inputs["b"] = [String(b)]
-            
+            let input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
+
             // Expected outputs
             let outputs: [String] = [String(c), String(a)]
             let expectedOutput: [UInt8] = serializeOutputs(outputs)
@@ -86,7 +84,7 @@ extension ContentView {
             let start = CFAbsoluteTimeGetCurrent()
             
             // Generate Proof
-            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str)
             assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
             assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
             

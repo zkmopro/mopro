@@ -3,13 +3,10 @@ import uniffi.mopro.*
 try {
     var zkeyPath = "../test-vectors/circom/multiplier2_final.zkey"
 
-    // Prepare inputs
-    val inputs = mutableMapOf<String, List<String>>()
-    inputs["a"] = listOf("3")
-    inputs["b"] = listOf("5")
+    val input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
 
     // Generate proof
-    var generateProofResult = generateCircomProof(zkeyPath, inputs)
+    var generateProofResult = generateCircomProof(zkeyPath, input_str)
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
 
     // Verify proof

@@ -1,6 +1,5 @@
 import uniffi.mopro.*
 
-
 try {
     var zkeyPath = "../test-vectors/circom/keccak256_256_test_final.zkey"
     
@@ -265,7 +264,7 @@ try {
                     "0"
             )
 
-    var generateProofResult = generateCircomProof(zkeyPath, inputs)
+    var generateProofResult = generateCircomProof(zkeyPath, inputs.toString())
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
     var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs)
     assert(isValid) { "Proof is invalid" }
