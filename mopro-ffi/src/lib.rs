@@ -21,7 +21,6 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 #[macro_export]
 macro_rules! circom_app {
     () => {
-
         fn generate_circom_proof(
             zkey_path: String,
             inputs: std::collections::HashMap<String, Vec<String>>,
@@ -70,9 +69,7 @@ macro_rules! halo2_app {
     };
 }
 
-use thiserror::Error;
-
-#[derive(Debug, Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum MoproError {
     #[error("CircomError: {0}")]
     CircomError(String),
@@ -145,13 +142,83 @@ pub struct ProofCalldata {
 #[macro_export]
 macro_rules! app {
     () => {
-        // These are mandatory imports for the uniffi to pick them up and match with UDL
-        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
+        uniffi::setup_scaffolding!("mopro");
 
-        mopro_ffi::circom_app!();
+        // This should be declared into this macro due to Uniffi's limitation
+        // Please refer this issue: https://github.com/mozilla/uniffi-rs/issues/2257
+        #[derive(Debug, thiserror::Error, uniffi::Error)]
+        pub enum MoproError {
+            #[error("CircomError: {0}")]
+            CircomError(String),
+            #[error("Halo2Error: {0}")]
+            Halo2Error(String),
+        }
 
-        mopro_ffi::halo2_app!();
+        impl From<mopro_ffi::MoproError> for MoproError {
+            fn from(err: mopro_ffi::MoproError) -> Self {
+                match err {
+                    mopro_ffi::MoproError::CircomError(e) => Self::CircomError(e),
+                    mopro_ffi::MoproError::Halo2Error(e) => Self::Halo2Error(e),
+                    _ => panic!("Unhandled error type: {}", err),
+                }
+            }
+        }
 
-        uniffi::include_scaffolding!("mopro");
+        #[derive(Debug, Clone, uniffi::Record)]
+        pub struct GenerateProofResult {
+            pub proof: Vec<u8>,
+            pub inputs: Vec<u8>,
+        }
+
+        impl From<mopro_ffi::GenerateProofResult> for GenerateProofResult {
+            fn from(result: mopro_ffi::GenerateProofResult) -> Self {
+                Self {
+                    proof: result.proof,
+                    inputs: result.inputs,
+                }
+            }
+        }
+
+        #[derive(Debug, Clone, Default, uniffi::Record)]
+        pub struct G1 {
+            pub x: String,
+            pub y: String,
+        }
+
+        #[derive(Debug, Clone, Default, uniffi::Record)]
+        pub struct G2 {
+            pub x: Vec<String>,
+            pub y: Vec<String>,
+        }
+
+        #[derive(Debug, Clone, Default, uniffi::Record)]
+        pub struct ProofCalldata {
+            pub a: G1,
+            pub b: G2,
+            pub c: G1,
+        }
+
+        impl From<mopro_ffi::ProofCalldata> for ProofCalldata {
+            fn from(result: mopro_ffi::ProofCalldata) -> Self {
+                ProofCalldata {
+                    a: G1 {
+                        x: result.a.x,
+                        y: result.a.y,
+                    },
+                    b: G2 {
+                        x: result.b.x,
+                        y: result.b.y,
+                    },
+                    c: G1 {
+                        x: result.c.x,
+                        y: result.c.y,
+                    },
+                }
+            }
+        }
+
+        mopro_ffi::circom_app!(GenerateProofResult, ProofCalldata, MoproError);
+
+        mopro_ffi::halo2_app!(GenerateProofResult, MoproError);
     };
 }

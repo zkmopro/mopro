@@ -1,0 +1,2 @@
+[env]
+DISABLE_UNIFFI_EXPORT = "1"

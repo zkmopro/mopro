@@ -35,8 +35,6 @@ pub fn cleanup_tmp_local(build_path: &Path) {
     fs::remove_dir_all(tmp_local(build_path)).expect("Failed to remove tmpdir");
 }
 
-pub const UDL: &str = include_str!("../mopro.udl");
-
 pub fn install_ndk() {
     Command::new("cargo")
         .arg("install")

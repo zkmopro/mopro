@@ -7,6 +7,7 @@ use std::collections::HashMap;
 
 #[cfg(feature = "rapidsnark")]
 pub use prover::rapidsnark;
+
 #[cfg(feature = "rustwitness")]
 pub use rust_witness::*;
 use witness::WitnessFn;

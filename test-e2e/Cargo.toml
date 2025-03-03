@@ -19,7 +19,7 @@ name = "web"
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
 mopro-wasm = { path = "../mopro-wasm" }
-uniffi = "0.28.0"
+uniffi = { workspace = true } 
 
 # Circom dependencies
 rust-witness = "0.1"
@@ -30,17 +30,20 @@ halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git
 plonk-fibonacci = { workspace = true }
 hyperplonk-fibonacci = { workspace = true }
 gemini-fibonacci = { workspace = true }
+thiserror = "=2.0.3"
+circom-prover = { version = "0.1.0", path = "../circom-prover" }
 
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
-uniffi = { version = "0.28.0", features = ["build"] }
+uniffi = { workspace = true, features = ["build"] }
 
 # Circom dependencies
 rust-witness = "0.1"
 
-[dev-dependencies]
-uniffi = { version = "0.28.0", features = ["bindgen-tests"] }
-
 # remove after uniffi is upgraded (see https://github.com/mozilla/uniffi-rs/issues/2346)
 [lints.clippy]
 empty-line-after-doc-comments = "allow"
+
+[dev-dependencies]
+uniffi = {  workspace = true, features = ["bindgen-tests"] }
+
