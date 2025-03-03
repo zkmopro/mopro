@@ -203,7 +203,7 @@ fn rename_module_maps_recursively(bindings_out: &PathBuf) {
     }
 }
 
-fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Error> {
+fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Result<()> {
     if binding_dir.exists() {
         fs::remove_dir_all(binding_dir)?;
     }

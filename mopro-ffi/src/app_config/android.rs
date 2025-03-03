@@ -115,7 +115,7 @@ fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
     fs::rename(bindings_out, bindings_dest).expect("Failed to move bindings into place");
 }
 
-fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> Result<(), Error> {
+fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Result<()> {
     let content = "[bindings.kotlin]\nandroid = true";
     let config_path = binding_dir.parent().unwrap().join("uniffi_config.toml");
     fs::write(&config_path, content).expect("Failed to write uniffi_config.toml");

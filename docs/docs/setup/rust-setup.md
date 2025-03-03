@@ -108,7 +108,7 @@ rust_witness::witness!(multiplier2);
 // You can read in the `circom` doc section how you can manually set this function.
 // One way to create the witness generator function is to use the `rust_witness!` above.
 mopro_ffi::set_circom_circuits! {
-    ("multiplier2_final.zkey", multiplier2_witness),
+    ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),
 }
 ```
 
