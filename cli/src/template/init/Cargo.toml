@@ -15,7 +15,7 @@ default = ["<FEATURES>"]
 
 [dependencies]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["halo2", "circom"] }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
 circom-prover = { git = "https://github.com/zkmopro/mopro.git" }
 rust-witness = "0.1"
 uniffi = { version = "=0.29.0" }
