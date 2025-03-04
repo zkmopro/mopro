@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 pub mod ethereum;
 use anyhow::{Ok, Result};
 pub use ethereum::*;
@@ -152,6 +150,7 @@ mod tests {
     mod witnesscalc {
         use super::*;
         use crate as mopro_ffi;
+        use circom_prover::witness::WitnessFn;
         use circom_prover::witnesscalc_adapter;
 
         // Only build the witness functions for tests, don't bundle them into

@@ -11,7 +11,7 @@ exclude = ["test-vectors/*"]
 
 [lib]
 name = "circom_prover"
- 
+
 [features]
 default = ["rustwitness", "arkworks", "ethereum"]
 
