@@ -20,6 +20,11 @@ jobs:
       RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
     steps:
       - uses: actions/checkout@v4
+      - name: install requirements
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+          version: 1.0
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features
   lint:
@@ -180,6 +185,8 @@ jobs:
         with:
           toolchain: 1.81.0
           override: true
+      - name: install dependencies
+        run: brew install nasm
       - name: Build iOS xcframework
         run: cd test-e2e && cargo run --bin ios
       - name: Cache xcframework
@@ -253,6 +260,11 @@ jobs:
         with:
           toolchain: 1.81.0
           override: true
+      - name: install requirements
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+          version: 1.0
       - name: Build Android bindings
         run: cd test-e2e && ANDROID_ARCHS=aarch64-linux-android,x86_64-linux-android cargo run --bin android
       - name: Cache android lib
@@ -308,6 +320,11 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly-2024-07-18
+      - name: install requirements
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+          version: 1.0
       - name: Restore cached wasm-pack
         uses: actions/cache@v4
         with:
