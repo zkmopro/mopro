@@ -17,8 +17,8 @@ default = []
 
 halo2 = []
 circom = [
-    "circom-wit-rustwitness",
-    "circom-proof-arkworks",
+    "rustwitness",
+    "arkworks",
     "ark-bn254",
     "ark-bls12-381",
     "ark-ff",
@@ -26,13 +26,13 @@ circom = [
 
 # circom features
 ## witness
-circom-wit-rustwitness = ["circom-prover/rustwitness", "rust-witness"]
-circom-wit-witnesscalc = ["circom-prover/witnesscalc", "witnesscalc-adapter"]
+rustwitness = ["circom-prover/rustwitness", "rust-witness"]
+witnesscalc = ["circom-prover/witnesscalc", "witnesscalc-adapter"]
 ## proof
-circom-proof-arkworks = ["circom-prover/arkworks"]
-circom-proof-rapidsnark = ["circom-prover/rapidsnark"]
+arkworks = ["circom-prover/arkworks"]
+rapidsnark = ["circom-prover/rapidsnark"]
 ## include all circom features
-circom-all = ["circom-wit-rustwitness", "circom-wit-witnesscalc", "circom-proof-arkworks", "circom-proof-rapidsnark"]
+circom-all = ["rustwitness", "witnesscalc", "arkworks", "rapidsnark"]
 
 
 

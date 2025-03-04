@@ -143,7 +143,7 @@ mod tests {
     use std::collections::HashMap;
     use std::str::FromStr;
 
-    #[cfg(feature = "circom-wit-witnesscalc")]
+    #[cfg(feature = "witnesscalc")]
     mod witnesscalc {
         use super::*;
         use crate as mopro_ffi;
@@ -179,7 +179,7 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "circom-wit-rustwitness")]
+    #[cfg(feature = "rustwitness")]
     mod rustwitness {
         use super::*;
         use crate::circom::ethereum::{to_ethereum_inputs, to_ethereum_proof};
