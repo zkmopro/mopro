@@ -9,4 +9,8 @@ fn main() {
             witnesscalc_adapter::build_and_link("../test-vectors/circom/witnesscalc");
         }
     }
+
+    if std::env::var("DISABLE_UNIFFI_EXPORT").is_ok() {
+        println!("cargo:rustc-cfg=disable_uniffi_export");
+    }
 }
