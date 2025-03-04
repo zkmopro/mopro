@@ -3,7 +3,6 @@ pub mod witness;
 
 use anyhow::Result;
 use prover::{CircomProof, ProofLib};
-use std::collections::HashMap;
 
 #[cfg(feature = "rapidsnark")]
 pub use prover::rapidsnark;
@@ -21,10 +20,10 @@ impl CircomProver {
     pub fn prove(
         proof_lib: ProofLib,
         wit_fn: WitnessFn,
-        inputs: HashMap<String, Vec<String>>,
+        json_input_str: String,
         zkey_path: String,
     ) -> Result<CircomProof> {
-        let wit_thread = witness::generate_witness(wit_fn, inputs);
+        let wit_thread = witness::generate_witness(wit_fn, json_input_str);
         prover::prove(proof_lib, zkey_path.clone(), wit_thread)
     }
 
@@ -40,6 +39,8 @@ impl CircomProver {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use super::*;
     const ZKEY_PATH: &str = "./test-vectors/multiplier2_final.zkey";
 
@@ -48,7 +49,8 @@ mod tests {
             ("a".to_string(), vec!["1".to_string()]),
             ("b".to_string(), vec!["2".to_string()]),
         ]);
-        CircomProver::prove(proof_lib, witness_fn, inputs, ZKEY_PATH.to_string()).unwrap()
+        let input_str = serde_json::to_string(&inputs).unwrap();
+        CircomProver::prove(proof_lib, witness_fn, input_str, ZKEY_PATH.to_string()).unwrap()
     }
 
     fn verify_proof(proof: Vec<u8>, public_inputs: Vec<u8>, proof_lib: ProofLib) -> bool {
@@ -70,21 +72,9 @@ mod tests {
     #[cfg(all(feature = "witnesscalc", feature = "arkworks"))]
     #[test]
     fn test_witnesscalc_arkworks_prove_and_verify() {
-        use num_bigint::BigInt;
         witnesscalc_adapter::witness!(multiplier2);
-        // TODO: The conversion should be exported in witness.rs https://github.com/zkmopro/mopro/issues/331
-        fn create_multiplier2_witness(inputs: HashMap<String, Vec<BigInt>>) -> Vec<BigInt> {
-            let inputs_str: HashMap<String, Vec<String>> = inputs
-                .into_iter()
-                .map(|(k, v)| (k, v.into_iter().map(|i| i.to_string()).collect()))
-                .collect();
-            let wtns =
-                multiplier2_witness(&witnesscalc_adapter::convert_inputs_to_json(inputs_str))
-                    .unwrap();
-            witnesscalc_adapter::parse_witness_to_bigints(&wtns).unwrap()
-        }
         let res = generate_proof(
-            WitnessFn::WitnessCalc(create_multiplier2_witness),
+            WitnessFn::WitnessCalc(multiplier2_witness),
             ProofLib::Arkworks,
         );
         let res = verify_proof(res.proof, res.pub_inputs, ProofLib::Arkworks);

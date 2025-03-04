@@ -49,6 +49,9 @@ do {
   let bits = bytesToBits(bytes: inputVec)
   var inputs = [String: [String]]()
   inputs["in"] = bits
+  let input_str: String = 
+    (try? JSONSerialization.data(withJSONObject: inputs, options: .prettyPrinted))
+      .flatMap { String(data: $0, encoding: .utf8) } ?? ""
 
   // Expected outputs
   let outputVec: [UInt8] = [
@@ -59,7 +62,7 @@ do {
   let expectedOutput: [UInt8] = serializeOutputs(outputBits)
 
   // Generate Proof
-  let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+  let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str)
   assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
 
   // Verify Proof

@@ -2227,9 +2227,11 @@ dependencies = [
  "rust-witness",
  "serde",
  "serde_derive",
+ "serde_json",
  "thiserror 2.0.3",
  "uniffi",
  "uuid",
+ "witnesscalc-adapter",
 ]
 
 [[package]]

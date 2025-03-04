@@ -24,7 +24,7 @@ macro_rules! circom_app {
     ($result:ty, $proof_call_data:ty, $err:ty) => {
         fn generate_circom_proof(
             zkey_path: String,
-            inputs: std::collections::HashMap<String, Vec<String>>,
+            circuit_inputs: String,
         ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }

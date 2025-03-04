@@ -39,7 +39,7 @@ fun MultiplierComponent() {
                 Thread(
                     Runnable {
                         val startTime = System.currentTimeMillis()
-                        res = generateCircomProof(zkeyPath, inputs)
+                        res = generateCircomProof(zkeyPath, inputs.toString())
                         val endTime = System.currentTimeMillis()
                         provingTime = "proving time: " + (endTime - startTime).toString() + " ms"
                     }

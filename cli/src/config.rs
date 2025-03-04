@@ -16,11 +16,11 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn adpater_eq(&self, adapter: Adapter) -> bool {
+    pub fn adapter_eq(&self, adapter: Adapter) -> bool {
         self.target_adapters == HashSet::from([String::from(adapter.as_str())])
     }
 
-    pub fn adpater_contains(&self, adapter: Adapter) -> bool {
+    pub fn adapter_contains(&self, adapter: Adapter) -> bool {
         self.target_adapters.contains(adapter.as_str())
     }
 }
