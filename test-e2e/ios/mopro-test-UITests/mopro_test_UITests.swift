@@ -31,6 +31,10 @@ final class mopro_test_UITests: XCTestCase {
         var predicate = NSPredicate(format: "label CONTAINS[c] %@", "1️⃣")
         var elementQuery = app.staticTexts.containing(predicate)
         XCTAssert(elementQuery.count == 1)
+        
+        // Wait for 2 seconds (or any suitable delay).
+        Thread.sleep(forTimeInterval: 2.0)
+        
         app.buttons["verifyCircom"].tap()
         predicate = NSPredicate(format: "label CONTAINS[c] %@", "2️⃣")
         elementQuery = app.staticTexts.containing(predicate)
