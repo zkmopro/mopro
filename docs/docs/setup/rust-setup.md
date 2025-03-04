@@ -72,12 +72,7 @@ Now we need to add four rust files. First we'll add a `build.rs` in the main pro
 
 ```rust
 fn main() {
-    fn main() {
-    // For removing warnings
-    println!("cargo::rustc-check-cfg=cfg(disable_uniffi_export)");
-    
     rust_witness::transpile::transpile_wasm("./test-vectors/circom".to_string());
-}
 }
 ```
 
@@ -214,20 +209,6 @@ Download example SRS and key files :
 - [plonk_fibonacci_vk.bin](https://github.com/zkmopro/mopro/blob/dfb9b286c63f6b418fe27465796c818996558bf7/test-vectors/halo2/plonk_fibonacci_vk.bin)
 
 :::
-
-
-The first step is optional, but if not included, a warning will appear while compiling. 
-
-Optionally, add a `build.rs` file in the main project folder with the following content:
-
-```rust
-fn main() {
-    // For removing warnings
-    println!("cargo::rustc-check-cfg=cfg(disable_uniffi_export)");
-}
-```
-
-
 
 Now, add three rust files, just as in the Circom-based Rust project setup.
 
