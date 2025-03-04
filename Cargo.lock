@@ -4405,9 +4405,8 @@ dependencies = [
 
 [[package]]
 name = "witnesscalc-adapter"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3599d42997739048350a8507c42cf61a5832c940148819ad6e9f7f0d534a2c3b"
+version = "0.1.1"
+source = "git+https://github.com/zkmopro/witnesscalc_adapter.git?branch=dylib#da89a28c579d22c85462dfb2033e3281498fa00b"
 dependencies = [
  "anyhow",
  "num-bigint",
