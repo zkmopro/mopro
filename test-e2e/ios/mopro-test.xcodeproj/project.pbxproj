@@ -15,9 +15,9 @@
 		4CF977F12C2BCF0000CE1139 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF977F02C2BCF0000CE1139 /* ContentView.swift */; };
 		4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F22C2BCF0300CE1139 /* Assets.xcassets */; };
 		4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */; };
-		60A8E4382C40404300D3A953 /* fibonacci_srs.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4352C40404200D3A953 /* fibonacci_srs.bin */; };
-		60A8E4392C40404300D3A953 /* fibonacci_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4362C40404300D3A953 /* fibonacci_pk.bin */; };
-		60A8E43A2C40404300D3A953 /* fibonacci_vk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4372C40404300D3A953 /* fibonacci_vk.bin */; };
+		60A8E4382C40404300D3A953 /* plonk_fibonacci_srs.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */; };
+		60A8E4392C40404300D3A953 /* plonk_fibonacci_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */; };
+		60A8E43A2C40404300D3A953 /* plonk_fibonacci_vk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,9 +41,9 @@
 		4CF977F02C2BCF0000CE1139 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CF977F22C2BCF0300CE1139 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4CF977F52C2BCF0300CE1139 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		60A8E4352C40404200D3A953 /* fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_srs.bin; path = "../../test-vectors/halo2/fibonacci_srs.bin"; sourceTree = "<group>"; };
-		60A8E4362C40404300D3A953 /* fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_pk.bin; path = "../../test-vectors/halo2/fibonacci_pk.bin"; sourceTree = "<group>"; };
-		60A8E4372C40404300D3A953 /* fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = file; name = fibonacci_vk.bin; path = "../../test-vectors/halo2/fibonacci_vk.bin"; sourceTree = "<group>"; };
+		60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_srs.bin; path = "../../test-vectors/halo2/plonk_fibonacci_srs.bin"; sourceTree = "<group>"; };
+		60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_pk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_pk.bin"; sourceTree = "<group>"; };
+		60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_vk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_vk.bin"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,9 +76,9 @@
 		4CF977E22C2BCF0000CE1139 = {
 			isa = PBXGroup;
 			children = (
-				60A8E4362C40404300D3A953 /* fibonacci_pk.bin */,
-				60A8E4352C40404200D3A953 /* fibonacci_srs.bin */,
-				60A8E4372C40404300D3A953 /* fibonacci_vk.bin */,
+				60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */,
+				60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */,
+				60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */,
 				4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */,
 				4CF977ED2C2BCF0000CE1139 /* mopro-test */,
 				4C05CDB02C327C4F00BEBACD /* mopro-test-UITests */,
@@ -214,10 +214,10 @@
 			files = (
 				4CCB9BDF2C33C20800C659C4 /* multiplier2_final.zkey in Resources */,
 				4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */,
-				60A8E43A2C40404300D3A953 /* fibonacci_vk.bin in Resources */,
-				60A8E4382C40404300D3A953 /* fibonacci_srs.bin in Resources */,
+				60A8E43A2C40404300D3A953 /* plonk_fibonacci_vk.bin in Resources */,
+				60A8E4382C40404300D3A953 /* plonk_fibonacci_srs.bin in Resources */,
 				4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */,
-				60A8E4392C40404300D3A953 /* fibonacci_pk.bin in Resources */,
+				60A8E4392C40404300D3A953 /* plonk_fibonacci_pk.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,7 +412,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"mopro-test/Preview Content\"";
-				DEVELOPMENT_TEAM = R92BA9L62G;
+				DEVELOPMENT_TEAM = N3ESL929H7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -441,7 +441,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"mopro-test/Preview Content\"";
-				DEVELOPMENT_TEAM = R92BA9L62G;
+				DEVELOPMENT_TEAM = N3ESL929H7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

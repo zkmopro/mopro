@@ -4,6 +4,7 @@ use std::process::Command;
 use uuid::Uuid;
 
 pub mod android;
+pub mod constants;
 pub mod ios;
 
 pub fn mktemp() -> PathBuf {
@@ -25,7 +26,7 @@ fn tmp_local(build_path: &Path) -> PathBuf {
 }
 
 pub fn mktemp_local(build_path: &Path) -> PathBuf {
-    let dir = tmp_local(build_path).join(&Uuid::new_v4().to_string());
+    let dir = tmp_local(build_path).join(Uuid::new_v4().to_string());
     fs::create_dir(&dir).expect("Failed to create tmpdir");
     dir
 }
@@ -33,8 +34,6 @@ pub fn mktemp_local(build_path: &Path) -> PathBuf {
 pub fn cleanup_tmp_local(build_path: &Path) {
     fs::remove_dir_all(tmp_local(build_path)).expect("Failed to remove tmpdir");
 }
-
-pub const UDL: &str = include_str!("../mopro.udl");
 
 pub fn install_ndk() {
     Command::new("cargo")
@@ -54,20 +53,5 @@ pub fn install_arch(arch: String) {
         .spawn()
         .expect("Failed to spawn rustup, is it installed?")
         .wait()
-        .expect(format!("Failed to install target architecture {}", arch).as_str());
-}
-
-pub fn install_archs() {
-    let archs = vec![
-        "x86_64-apple-ios",
-        "aarch64-apple-ios",
-        "aarch64-apple-ios-sim",
-        "aarch64-linux-android",
-        "armv7-linux-androideabi",
-        "i686-linux-android",
-        "x86_64-linux-android",
-    ];
-    for arch in archs {
-        install_arch(arch.to_string());
-    }
+        .unwrap_or_else(|_| panic!("Failed to install target architecture {}", arch));
 }

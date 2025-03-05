@@ -1,46 +1,46 @@
-# mopro-ffi
+# Mopro FFI
 
-Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple.
+`mopro-ffi` is a tool designed to assist programmable cryptography application or rust application developers in efficiently creating bindings for client-side targets.
 
-## Getting started
+Key features include:
 
-- Make sure you've installed the [prerequisites](https://zkmopro.org/docs/prerequisites).
-- Getting started with this [tutorial](https://zkmopro.org/docs/getting-started/rust-setup).
+-   **Function Serialization and Export:** Enables serialization and export of functions within each proving system. To generate FFI bindings for different targets, inputs and outputs must conform to the specific types defined in [uniffi](https://mozilla.github.io/uniffi-rs/latest/udl/builtin_types.html).
+    -   Supported proving systems: `circom`, `halo2`.
+-   **Executable Binaries:** Provides pre-built binaries, allowing developers to generate bindings for various targets effortlessly.
+    -   Supported targets: `swift`, `kotlin`.
+-   **Customize Exported Functions:** Supports the ability to customize the exported functions. Users can define the functions in the `src/mopro.udl` file.
 
-## Run tests
+## Usage
 
-- circom
-  ```sh
-  cargo test --features circom
-  ```
-- halo2
-  ```sh
-  cargo test --features halo2
-  ```
+-   Please check the [Manual Setup for Android/iOS Bindings](https://zkmopro.org/docs/setup/rust-setup) for integrating `mopro-ffi` into your project.
 
-## Bindings
+## Usage for general Rust application
 
-- `SwiftBindings`
-- `KotlinBindings`
+-   Integrate the `mopro-ffi` like the above tutorial.
+-   Update the `src/mopro.udl` file to add the functions you want to export. Check out how to define the functions in the UDL file: [UniFFI: The UDL file](https://mozilla.github.io/uniffi-rs/0.28/udl_file_spec.html)
 
-The uniffi bindings are precompiled and committed here for a specifically named crate. This avoids the complexity of building/invoking the uniffi cli by dependent packages. Note that dependent crates _must_ have the library name `mopro_bindings`, or rebuild the binding themselves.
+    -   E.g.
+        export Rust function like
+        ```rust
+        pub fn hello_world() -> String {
+          "Hello World!".to_string()
+        }
+        ```
+        and define the function in the UDL file like:
+        ```udl
+        namespace mopro {
+          // ...
+          string hello_world();
+        }
+        ```
 
-## Modules
-
-The root module exports functions for generating proofs. It also exports a macro that can be used to setup uniffi from our provided udl file. User modification to the UDL file is not supported at this time.
-
-### `circom`
-
-Includes all proving and serialization logic for circom proofs. Does _not_ include logic for witness generation.
-
-### `halo2`
-
-Includes all proving logic for halo2. 
+-   Run `cargo run --bin ios` or `cargo run --bin android` again.
 
 ## Community
 
-- X account: <a href="https://twitter.com/zkmopro"><img src="https://img.shields.io/twitter/follow/zkmopro?style=flat-square&logo=x&label=zkmopro"></a>
-- Telegram group: <a href="https://t.me/zkmopro"><img src="https://img.shields.io/badge/telegram-@zkmopro-blue.svg?style=flat-square&logo=telegram"></a>
+-   X account: <a href="https://twitter.com/zkmopro"><img src="https://img.shields.io/twitter/follow/zkmopro?style=flat-square&logo=x&label=zkmopro"></a>
+-   Telegram group: <a href="https://t.me/zkmopro"><img src="https://img.shields.io/badge/telegram-@zkmopro-blue.svg?style=flat-square&logo=telegram"></a>
+-   Mopro Documentation: https://zkmopro.org
 
 ## Acknowledgements
 

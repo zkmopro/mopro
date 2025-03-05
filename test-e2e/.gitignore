@@ -1,4 +1,4 @@
-*.udl
 build/
 MoproAndroidBindings/
 MoproiOSBindings/
+MoproWasmBindings/

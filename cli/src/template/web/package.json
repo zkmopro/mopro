@@ -1,0 +1,14 @@
+{
+  "name": "mopro-wasm-web",
+  "version": "1.0.0",
+  "description": "Simple web page for testing mopro wasm",
+  "main": "index.js",
+  "author": "Jinhwan",
+  "license": "MIT",
+  "scripts": {
+    "start": "yarn lite-server"
+  },
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}

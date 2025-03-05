@@ -1,8 +1,15 @@
-use clap::{Parser, Subcommand};
+use clap::Parser;
+use clap::Subcommand;
 
 mod build;
+mod config;
+mod constants;
+mod create;
 mod init;
+mod print;
+mod select;
 mod style;
+mod utils;
 
 /// CLI for creating a mopro project.
 #[derive(Parser, Debug)]
@@ -14,6 +21,7 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Initialize the project for specified adapters
     Init {
         #[arg(
             long,
@@ -30,6 +38,11 @@ enum Commands {
         #[arg(long, num_args = 1.., help = "Specify the platforms to build for (e.g., 'ios', 'android').")]
         platforms: Option<Vec<String>>,
     },
+    /// Create templates for the specified platform
+    Create {
+        #[arg(long, help = "Specify the platform")]
+        framework: Option<String>,
+    },
 }
 
 fn main() {
@@ -41,11 +54,15 @@ fn main() {
             project_name,
         } => match init::init_project(adapter, project_name) {
             Ok(_) => {}
-            Err(e) => style::print_read_bold(format!("Failed to initialize project {:?}", e)),
+            Err(e) => style::print_red_bold(format!("Failed to initialize project: {:?}", e)),
         },
         Commands::Build { mode, platforms } => match build::build_project(mode, platforms) {
             Ok(_) => {}
-            Err(e) => style::print_read_bold(format!("Failed to build project {:?}", e)),
+            Err(e) => style::print_red_bold(format!("Failed to build project: {:?}", e)),
+        },
+        Commands::Create { framework } => match create::create_project(framework) {
+            Ok(_) => {}
+            Err(e) => style::print_red_bold(format!("Failed to create template: {:?}", e)),
         },
     }
 }

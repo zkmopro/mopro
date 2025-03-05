@@ -27,6 +27,11 @@ const config: Config = {
           includeCurrentVersion: true,
           lastVersion: '0.1.0',
         },
+        blog: {
+          showReadingTime: true,
+          editUrl:
+            'https://github.com/zkmopro/mopro/tree/main/docs',
+        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -41,7 +46,7 @@ const config: Config = {
       respectPrefersColorScheme: false,
     },
     prism: {
-      additionalLanguages: ['powershell', 'bash', 'toml'],
+      additionalLanguages: ['powershell', 'bash', 'toml', 'diff', 'yaml'],
     },
     algolia: {
       appId: '57U3VFSJ7M',
@@ -71,6 +76,7 @@ const config: Config = {
           position: 'right',
           label: 'Docs',
         },
+        { to: '/blog', label: 'Blog', position: 'right' },
         {
           type: 'html',
           position: 'right',

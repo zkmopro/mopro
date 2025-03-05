@@ -1,0 +1,162 @@
+---
+sidebar_position: 3
+title: Projects
+---
+
+import React from 'react';
+
+export function ProjectExamples() {
+  const projects = require('/static/projects.json');
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+      {projects.map((project, index) => (
+        <div
+          key={index}
+          style={{
+            border: '1px solid',
+            borderRadius: '8px',
+            padding: '16px',
+            width: '300px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <h3>{project.name}</h3>
+          <p>{project.description}</p>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+            {project.links.website && <a href={project.links.website} target="_blank" rel="noopener noreferrer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+            </a>
+            }
+            {project.links.github && <a href={project.links.github} target="_blank" rel="noopener noreferrer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 1024 1024"
+                fill="currentColor"
+              >
+                <path d="M511.6 76c-238.7 0-433 193.7-433 432.4 0 191.4 124 353.7 296 410.8 21.7 3.9 29.6-9.4 29.6-20.9v-75.4c-120.4 26.1-145.9-58-145.9-58-19.7-50.1-48.2-63.4-48.2-63.4-39.5-27 3-26.5 3-26.5 43.6 3 66.5 44.7 66.5 44.7 38.8 66.5 101.8 47.3 126.6 36.2 3.9-28.1 15.2-47.3 27.5-58.2-96.2-10.9-197.2-48.2-197.2-214.3 0-47.3 16.9-86.2 44.7-116.2-4.5-10.9-19.8-54.5 4.5-113.1 0 0 36.4-11.4 119.7 44.7 34.8-9.7 72.1-14.6 109.3-14.6 37.1 0 74.5 4.9 109.3 14.6 83.3-56.5 119.7-44.7 119.7-44.7 24.3 58.6 9 102.2 4.5 113.1 27.9 30 44.7 69.4 44.7 116.2 0 166.5-101.6 203.1-198.2 213.6 15.6 13.4 29.9 39.5 29.9 79.5v118.1c0 11.5 7.9 25.3 29.6 20.9 172.4-57.1 296.5-219.4 296.5-410.8C944.6 269.7 750.2 76 511.6 76z" />
+              </svg>
+            </a>
+            }
+            {project.links.ios && <a href={project.links.ios} target="_blank" rel="noopener noreferrer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 1024 1024"
+                fill="currentColor"
+              >
+                <path d="M788 520c-10-119 95-176 100-179-55-81-141-92-172-94-72-7-140 42-176 42-36 0-93-41-153-40-78 1-150 45-190 114-82 143-21 354 59 470 39 57 85 120 146 118 58-2 80-37 150-37 71 0 89 36 150 36 62-1 101-58 139-115 45-66 63-129 64-132-1-1-123-47-133-186zM677 186c31-38 52-90 46-143-45 2-98 30-129 68-28 34-53 88-47 139 49 4 98-25 130-64z" />
+              </svg></a>
+            }
+            {project.links.android && <a href={project.links.android} target="_blank" rel="noopener noreferrer">
+              <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 48 48" fill="currentColor" >
+                <path d="M24,14.088C11.427,14.088,1.108,23.716,0,36h48C46.892,23.716,36.573,14.088,24,14.088z M33.179,27.079c0-1.104,0.895-1.999,1.999-1.999c1.104,0,1.999,0.895,1.999,1.999c0,1.104-0.895,1.999-1.999,1.999	C34.074,29.078,33.179,28.183,33.179,27.079z M12.822,29.078c-1.104,0-1.999-0.895-1.999-1.999c0-1.104,0.895-1.999,1.999-1.999	s1.999,0.895,1.999,1.999C14.821,28.183,13.926,29.078,12.822,29.078z"></path><path d="M34.038,19.313c-0.14,0-0.281-0.035-0.41-0.11c-0.393-0.227-0.527-0.729-0.301-1.122l5.197-9.008	c0.227-0.394,0.729-0.529,1.122-0.301c0.393,0.227,0.527,0.729,0.301,1.122l-5.197,9.008C34.598,19.166,34.322,19.313,34.038,19.313	z"></path><path d="M13.962,19.313c-0.284,0-0.56-0.148-0.712-0.411L8.054,9.894C7.827,9.501,7.962,8.999,8.354,8.772	c0.392-0.228,0.895-0.093,1.122,0.301l5.197,9.008c0.227,0.394,0.092,0.896-0.301,1.122C14.243,19.278,14.102,19.313,13.962,19.313z"></path>
+              </svg>
+            </a>
+            }
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+# Projects
+
+Mopro is a versatile tool that can be used to build any client-side application. On this page, we showcase examples of existing projects and provide inspiration for what you can create with Mopro.
+
+## Example Projects
+
+The examples provided are implemented with native ZK provers and may not utilize the Mopro stack. However, we believe they can serve as valuable references for developers. If you think your project would make a great addition to [the list](https://github.com/zkmopro/mopro/tree/main/docs/static/projects.json), feel free to submit a pull request to include it.
+
+<ProjectExamples />
+
+## Inspiration
+
+Here are some examples of projects you can build using Mopro.
+
+### Identity
+
+Represents any form of citizenship, membership, ID card, or proof of attendance.
+- **Examples**: 
+  - Luma
+  - POAP
+- **ZK Applications**: 
+  - Semaphore
+  - Anon Aadhaar
+  - Privado ID
+  - proof of passport
+  - Worldcoin ID
+
+### Reputation/Attestations
+
+Tracks reputation within applications or systems.
+- **Examples**: 
+  - X followers
+  - YouTube views
+  - Reddit upvotes/downvotes
+  - LinkedIn connections
+  - GitHub stars
+- **ZK Applications**: 
+  - Rarimo
+  - UniRep
+  - TLSNotary
+  - zkTLS
+  - potentially EAS with ZK in the future
+
+### Social
+
+Refers to social media platforms and forums.
+- **Examples**: 
+  - X (formerly Twitter)
+  - Telegram
+  - Discord
+  - Facebook
+  - Farcaster
+  - Slack
+  - forums
+- **ZK Applications**: 
+  - Rarimo
+  - ZK-Chat
+  - zkitter
+  - UniRep Social
+  - Cursive
+
+### Transactions/Trading
+
+Covers both on-chain and off-chain transactions.
+- **Examples**: 
+  - Booking an Airbnb
+  - Buying a computer from Amazon
+  - Purchasing concert or train tickets
+- **ZK Applications**: 
+  - Tornado Cash
+  - ZKP2P
+
+### Gaming
+
+Includes any type of mobile or desktop game.
+- **Examples**: 
+  - Board games
+  - Strategy games
+  - MMORPGs
+- **ZK Applications**: 
+  - Dark Forest
+  - ZuPass Frog Game
+

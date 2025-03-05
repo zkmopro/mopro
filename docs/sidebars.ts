@@ -1,4 +1,4 @@
-import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 const sidebars: SidebarsConfig = {
     docsSidebar: [
@@ -13,12 +13,25 @@ const sidebars: SidebarsConfig = {
             id: 'prerequisites',
         },
         {
-            type: 'category',
+            type: 'doc',
             label: 'Getting Started',
+            id: 'getting-started',
+        },
+        {
+            type: 'doc',
+            label: 'Projects',
+            id: 'projects',
+        },
+        {
+            type: 'category',
+            label: 'Setup',
             items: [
-                'getting-started/rust-setup',
-                'getting-started/ios-setup',
-                'getting-started/android-setup'
+                'setup/ios-setup',
+                'setup/android-setup',
+                'setup/web-wasm-setup',
+                'setup/react-native-setup',
+                'setup/flutter-setup',
+                'setup/rust-setup'
             ]
         },
         {
@@ -34,6 +47,11 @@ const sidebars: SidebarsConfig = {
             type: 'doc',
             label: 'Mopro FFI',
             id: 'mopro-ffi',
+        },
+        {
+            type: 'doc',
+            label: 'Mopro WASM',
+            id: 'mopro-wasm',
         },
         {
             type: 'doc',

@@ -39,14 +39,16 @@ struct ContentView: View {
     @State private var isCircomVerifyButtonEnabled = false
     @State private var isHalo2roveButtonEnabled = true
     @State private var isHalo2VerifyButtonEnabled = false
+    @State private var isAshlangroveButtonEnabled = true
+    @State private var isAshlangVerifyButtonEnabled = false
     @State private var generatedCircomProof: Data?
     @State private var circomPublicInputs: Data?
     @State private var generatedHalo2Proof: Data?
     @State private var halo2PublicInputs: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
-    private let srsPath = Bundle.main.path(forResource: "fibonacci_srs.bin", ofType: "")!
-    private let vkPath = Bundle.main.path(forResource: "fibonacci_vk.bin", ofType: "")!
-    private let pkPath = Bundle.main.path(forResource: "fibonacci_pk.bin", ofType: "")!
+    private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
+    private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
+    private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
     
     var body: some View {
         VStack(spacing: 10) {
@@ -74,12 +76,10 @@ extension ContentView {
         textViewText += "Generating Circom proof... "
         do {
             // Prepare inputs
-            var inputs = [String: [String]]()
             let a = 3
             let b = 5
             let c = a*b
-            inputs["a"] = [String(a)]
-            inputs["b"] = [String(b)]
+            let input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
             
             // Expected outputs
             let outputs: [String] = [String(c), String(a)]
@@ -88,7 +88,7 @@ extension ContentView {
             let start = CFAbsoluteTimeGetCurrent()
             
             // Generate Proof
-            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str)
             assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
             assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
             

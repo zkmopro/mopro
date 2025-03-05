@@ -1,40 +1,42 @@
 use std::collections::HashMap;
 use std::error::Error;
 
+use anyhow::Result;
+
 #[macro_export]
 macro_rules! halo2_app {
-    () => {
+    ($result:ty, $err:ty) => {
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn generate_halo2_proof(
-            in0: String,
-            in1: String,
-            in2: std::collections::HashMap<String, Vec<String>>,
-        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
-            let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
-            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap()).map_err(|e| {
-                mopro_ffi::MoproError::Halo2Error(format!("error getting proving circuit: {}", e))
-            })?;
-            proving_fn(&in0, &in1, in2)
+            srs_path: String,
+            pk_path: String,
+            circuit_inputs: std::collections::HashMap<String, Vec<String>>,
+        ) -> Result<$result, $err> {
+            let name = std::path::Path::new(pk_path.as_str()).file_name().unwrap();
+            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())
+                .map_err(|e| <$err>::Halo2Error(format!("error getting proving circuit: {}", e)))?;
+            let result = proving_fn(&srs_path, &pk_path, circuit_inputs)
                 .map(|(proof, inputs)| mopro_ffi::GenerateProofResult { proof, inputs })
                 .map_err(|e| mopro_ffi::MoproError::Halo2Error(format!("halo2 error: {}", e)))
+                .unwrap();
+
+            Ok(result.into())
         }
 
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn verify_halo2_proof(
-            in0: String,
-            in1: String,
-            in2: Vec<u8>,
-            in3: Vec<u8>,
-        ) -> Result<bool, mopro_ffi::MoproError> {
-            let name = std::path::Path::new(in1.as_str()).file_name().unwrap();
+            srs_path: String,
+            vk_path: String,
+            proof: Vec<u8>,
+            public_input: Vec<u8>,
+        ) -> Result<bool, $err> {
+            let name = std::path::Path::new(vk_path.as_str()).file_name().unwrap();
             let verifying_fn =
                 get_halo2_verifying_circuit(name.to_str().unwrap()).map_err(|e| {
-                    mopro_ffi::MoproError::Halo2Error(format!(
-                        "error getting verification circuit: {}",
-                        e
-                    ))
+                    <$err>::Halo2Error(format!("error getting verification circuit: {}", e))
                 })?;
-            verifying_fn(&in0, &in1, in2, in3).map_err(|e| {
-                mopro_ffi::MoproError::Halo2Error(format!("error verifying proof: {}", e))
-            })
+            verifying_fn(&srs_path, &vk_path, proof, public_input)
+                .map_err(|e| <$err>::Halo2Error(format!("error verifying proof: {}", e)))
         }
     };
 }
@@ -69,23 +71,25 @@ macro_rules! halo2_app {
 ///
 /// ## For Advanced Users:
 /// This macro abstracts away the implementation of:
-/// - `get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError>`
-/// - `get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError>`
+/// - `get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn>`
+/// - `get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn>`
 ///
 /// You can choose to implement these functions directly with your custom logic:
 ///
 /// #### Example:
 /// ```ignore
-/// fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError> {
+/// fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn> {
 ///    match circuit_pk {
 ///       "circuit1_proving_key" => Ok(circuit1_prove_function),
+///       "circuit2_proving_key" => Ok(circuit1_prove_function),
 ///       _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk).to_string()))
 ///    }
 /// }
 ///
-/// fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError> {
+/// fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn> {
 ///    match circuit_vk {
 ///       "circuit1_verifying_key" => Ok(circuit1_verify_function),
+///       "circuit2_verifying_key" => Ok(circuit2_verify_function),
 ///       _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk).to_string()))
 ///    }
 /// }
@@ -113,10 +117,8 @@ macro_rules! set_halo2_circuits {
     };
 }
 
-type GenerateProofResult = (Vec<u8>, Vec<u8>);
-
 pub type Halo2ProveFn =
-    fn(&str, &str, HashMap<String, Vec<String>>) -> Result<GenerateProofResult, Box<dyn Error>>;
+    fn(&str, &str, HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
 
 pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
 
@@ -125,18 +127,82 @@ mod test {
     use crate as mopro_ffi;
     use std::collections::HashMap;
 
-    halo2_app!();
+    #[test]
+    fn test_generate_and_verify_plonk_proof() {
+        halo2_app!(mopro_ffi::GenerateProofResult, mopro_ffi::MoproError);
 
-    set_halo2_circuits! {
-        ("fibonacci_pk.bin", halo2_fibonacci::prove, "fibonacci_vk.bin", halo2_fibonacci::verify),
+        set_halo2_circuits! {
+            ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
+        }
+
+        const SRS_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_srs.bin";
+        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_vk.bin";
+
+        let mut input = HashMap::new();
+        input.insert("out".to_string(), vec!["55".to_string()]);
+
+        if let Ok(proof_result) = generate_halo2_proof(
+            SRS_KEY_PATH.to_string(),
+            PROVING_KEY_PATH.to_string(),
+            input,
+        ) {
+            let result = verify_halo2_proof(
+                SRS_KEY_PATH.to_string(),
+                VERIFYING_KEY_PATH.to_string(),
+                proof_result.proof,
+                proof_result.inputs,
+            );
+            assert!(result.is_ok());
+        } else {
+            panic!("Failed to generate the proof!")
+        }
     }
 
-    const SRS_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_srs.bin";
-    const PROVING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_pk.bin";
-    const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/fibonacci_vk.bin";
+    #[test]
+    fn test_generate_and_verify_hyperplonk_proof() {
+        halo2_app!(mopro_ffi::GenerateProofResult, mopro_ffi::MoproError);
+
+        set_halo2_circuits! {
+            ("hyperplonk_fibonacci_pk.bin", hyperplonk_fibonacci::prove, "hyperplonk_fibonacci_vk.bin", hyperplonk_fibonacci::verify),
+        }
+
+        const SRS_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_srs.bin";
+        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_vk.bin";
+
+        let mut input = HashMap::new();
+        input.insert("out".to_string(), vec!["55".to_string()]);
+
+        if let Ok(proof_result) = generate_halo2_proof(
+            SRS_KEY_PATH.to_string(),
+            PROVING_KEY_PATH.to_string(),
+            input,
+        ) {
+            let result = verify_halo2_proof(
+                SRS_KEY_PATH.to_string(),
+                VERIFYING_KEY_PATH.to_string(),
+                proof_result.proof,
+                proof_result.inputs,
+            );
+            assert!(result.is_ok());
+        } else {
+            panic!("Failed to generate the proof!")
+        }
+    }
 
     #[test]
-    fn test_generate_and_verify_halo2_proof() {
+    fn test_generate_and_verify_gemini_proof() {
+        halo2_app!(mopro_ffi::GenerateProofResult, mopro_ffi::MoproError);
+
+        set_halo2_circuits! {
+            ("gemini_fibonacci_pk.bin", gemini_fibonacci::prove, "gemini_fibonacci_vk.bin", gemini_fibonacci::verify),
+        }
+
+        const SRS_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_srs.bin";
+        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_vk.bin";
+
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec!["55".to_string()]);
 

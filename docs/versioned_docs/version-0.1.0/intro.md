@@ -10,9 +10,9 @@ How? Mopro connects different adapters with different platforms. You can think o
 
 ![mopro adapters and platforms](/img/roadmap.png)
 
-Note that above is a work in progress, and the dashed lines indicate things that are still experimental and/or in an an early stage.
+Note that the above is a work in progress, and the dashed lines indicate things that are still experimental and/or in an early stage.
 
-If you just want to get started using mopro, see [getting started](getting-started/rust-setup).
+If you just want to get started using mopro, see [getting started](getting-started).
 
 ## Overview
 
@@ -21,6 +21,7 @@ Mopro consists of a set of libraries and utilities. The following subprojects ar
 Primary libraries and utilities of interest:
 
 -   `mopro-ffi` - main package, exposes macros for configuring and building projects.
+-   `mopro-wasm` - enables the compilation of Halo2 circuits into wasm modules.
 -   `test-e2e` - example implementation of mopro in Android and iOS apps, used for testing.
 
 Secondary subprojects:
