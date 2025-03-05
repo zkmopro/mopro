@@ -264,9 +264,9 @@ try {
                     "0"
             )
 
-    var generateProofResult = generateCircomProof(zkeyPath, inputs.toString())
+    var generateProofResult = generateCircomProof(zkeyPath, inputs.toString(), ProofLib.ARKWORKS)
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
-    var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs)
+    var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs, ProofLib.ARKWORKS)
     assert(isValid) { "Proof is invalid" }
 } catch (e: Exception) {
     println(e)

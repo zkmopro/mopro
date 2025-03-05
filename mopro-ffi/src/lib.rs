@@ -21,10 +21,11 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 #[cfg(not(feature = "circom"))]
 #[macro_export]
 macro_rules! circom_app {
-    ($result:ty, $proof_call_data:ty, $err:ty) => {
+    ($result:ty, $proof_call_data:ty, $err:ty, $proof_lib:ty) => {
         fn generate_circom_proof(
             zkey_path: String,
             circuit_inputs: String,
+            proof_lib: $proof_lib,
         ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
@@ -33,6 +34,7 @@ macro_rules! circom_app {
             zkey_path: String,
             proof_data: Vec<u8>,
             public_inputs: Vec<u8>,
+            proof_lib: $proof_lib,
         ) -> Result<bool, mopro_ffi::MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
@@ -104,6 +106,13 @@ pub struct ProofCalldata {
     pub a: G1,
     pub b: G2,
     pub c: G1,
+}
+
+#[derive(Debug, Clone, Default)]
+pub enum ProofLib {
+    #[default]
+    Arkworks,
+    Rapidsnark,
 }
 
 /// This macro is used to setup the Mopro FFI library
@@ -218,7 +227,14 @@ macro_rules! app {
             }
         }
 
-        mopro_ffi::circom_app!(GenerateProofResult, ProofCalldata, MoproError);
+        #[derive(Debug, Clone, Default, uniffi::Enum)]
+        pub enum ProofLib {
+            #[default]
+            Arkworks,
+            Rapidsnark,
+        }
+
+        mopro_ffi::circom_app!(GenerateProofResult, ProofCalldata, MoproError, ProofLib);
 
         mopro_ffi::halo2_app!(GenerateProofResult, MoproError);
     };

@@ -688,7 +688,7 @@ dependencies = [
  "rust-witness",
  "serde_json",
  "uuid",
- "witnesscalc-adapter",
+ "witnesscalc-adapter 0.1.1",
 ]
 
 [[package]]
@@ -2231,7 +2231,7 @@ dependencies = [
  "thiserror 2.0.3",
  "uniffi",
  "uuid",
- "witnesscalc-adapter",
+ "witnesscalc-adapter 0.1.0",
 ]
 
 [[package]]
@@ -2939,8 +2939,7 @@ dependencies = [
 [[package]]
 name = "rust-rapidsnark"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "429a05824adf465be27dfca3e74d006e940ad79eb1f14ec856104ea700fd46e8"
+source = "git+https://github.com/zkmopro/rust-rapidsnark.git?branch=dylib#145cc0a2624af00a65571a2e06daea46051ae009"
 dependencies = [
  "anyhow",
  "cc",
@@ -4410,6 +4409,18 @@ name = "witnesscalc-adapter"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3599d42997739048350a8507c42cf61a5832c940148819ad6e9f7f0d534a2c3b"
+dependencies = [
+ "anyhow",
+ "num-bigint",
+ "num-traits",
+ "paste",
+ "serde_json",
+]
+
+[[package]]
+name = "witnesscalc-adapter"
+version = "0.1.1"
+source = "git+https://github.com/zkmopro/witnesscalc_adapter.git?branch=dylib#da89a28c579d22c85462dfb2033e3281498fa00b"
 dependencies = [
  "anyhow",
  "num-bigint",
