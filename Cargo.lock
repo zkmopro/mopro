@@ -688,7 +688,7 @@ dependencies = [
  "rust-witness",
  "serde_json",
  "uuid",
- "witnesscalc-adapter 0.1.1",
+ "witnesscalc-adapter",
 ]
 
 [[package]]
@@ -2231,7 +2231,7 @@ dependencies = [
  "thiserror 2.0.3",
  "uniffi",
  "uuid",
- "witnesscalc-adapter 0.1.0",
+ "witnesscalc-adapter",
 ]
 
 [[package]]
@@ -4402,19 +4402,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3268f3d866458b787f390cf61f4bbb563b922d091359f9608842999eaee3943c"
 dependencies = [
  "bitflags 2.8.0",
-]
-
-[[package]]
-name = "witnesscalc-adapter"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3599d42997739048350a8507c42cf61a5832c940148819ad6e9f7f0d534a2c3b"
-dependencies = [
- "anyhow",
- "num-bigint",
- "num-traits",
- "paste",
- "serde_json",
 ]
 
 [[package]]
