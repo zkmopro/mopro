@@ -4,7 +4,7 @@ pub mod app_config;
 mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
-#[cfg(feature = "nova_scotia")]
+#[cfg(feature = "nova-scotia")]
 mod nova_scotia;
 
 #[cfg(feature = "circom")]
@@ -68,7 +68,7 @@ macro_rules! halo2_app {
     };
 }
 
-#[cfg(not(feature = "nova_scotia"))]
+#[cfg(not(feature = "nova-scotia"))]
 #[macro_export]
 macro_rules! nova_scotia_app {
     () => {

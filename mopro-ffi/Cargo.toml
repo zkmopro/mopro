@@ -35,8 +35,8 @@ circom = [
     "num-traits",
     "byteorder",
 ]
-nova_scotia = [
-    "nova-scotia",
+nova-scotia = [
+    "dep:nova-scotia",
     "serde_json",
     "nova-snark",
     "pasta_curves"

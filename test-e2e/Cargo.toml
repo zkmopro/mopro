@@ -25,10 +25,6 @@ num-bigint = { version = "0.4.0" }
 halo2-fibonacci = { git = "https://github.com/ElusAegis/halo2-fibonacci-sample.git" }
 halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
 
-# Nova Scotia dependencies
-nova-scotia = { version = "0.5.0" }
-nova-snark = { version="0.23.0" }
-serde_json = { version="1.0.85" }
 
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
