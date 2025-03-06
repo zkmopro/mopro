@@ -1,7 +1,7 @@
 #![allow(unexpected_cfgs)]
 // Explicitly declare funtion to avoid Uniffi's limitation
-use circom_prover::{witness::WitnessFn, witnesscalc_adapter};
 use anyhow::Result;
+use circom_prover::{witness::WitnessFn, witnesscalc_adapter};
 
 // First, configure the Mopro FFI library
 mopro_ffi::app!();
