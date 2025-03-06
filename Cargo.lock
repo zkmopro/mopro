@@ -3510,6 +3510,7 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "circom-prover",
  "gemini-fibonacci",
  "halo2-keccak-256",
@@ -3521,6 +3522,7 @@ dependencies = [
  "rust-witness",
  "thiserror 2.0.3",
  "uniffi",
+ "witnesscalc-adapter",
 ]
 
 [[package]]

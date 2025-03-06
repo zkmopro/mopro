@@ -17,12 +17,14 @@ name = "android"
 name = "web"
 
 [dependencies]
-mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom", "rapidsnark"] }
+mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom", "rapidsnark", "witnesscalc"] }
 mopro-wasm = { path = "../mopro-wasm" }
 uniffi = { workspace = true } 
 
 # Circom dependencies
 rust-witness = "0.1"
+witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", branch = "dylib" }
+anyhow = "1.0.74"
 num-bigint = { version = "0.4.0" }
 
 # Halo2 dependencies
@@ -34,11 +36,12 @@ thiserror = "=2.0.3"
 circom-prover = { version = "0.1.0", path = "../circom-prover" }
 
 [build-dependencies]
-mopro-ffi = { path = "../mopro-ffi", features = ["rapidsnark"] }
+mopro-ffi = { path = "../mopro-ffi", features = ["rapidsnark", "witnesscalc"] }
 uniffi = { workspace = true, features = ["build"] }
 
 # Circom dependencies
 rust-witness = "0.1"
+witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", branch = "dylib" }
 
 # remove after uniffi is upgraded (see https://github.com/mozilla/uniffi-rs/issues/2346)
 [lints.clippy]

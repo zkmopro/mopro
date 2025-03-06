@@ -1,17 +1,19 @@
 #![allow(unexpected_cfgs)]
 // Explicitly declare funtion to avoid Uniffi's limitation
-use circom_prover::witness::WitnessFn;
+use circom_prover::{witness::WitnessFn, witnesscalc_adapter};
+use anyhow::Result;
 
 // First, configure the Mopro FFI library
 mopro_ffi::app!();
 
 // --- Circom Example of setting up 4 circuits ---
-rust_witness::witness!(multiplier2);
+// rust_witness::witness!(multiplier2);
+witnesscalc_adapter::witness!(multiplier2);
 rust_witness::witness!(multiplier2bls);
 rust_witness::witness!(keccak256256test);
 
 mopro_ffi::set_circom_circuits! {
-    ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),
+    ("multiplier2_final.zkey", WitnessFn::WitnessCalc(multiplier2_witness)),
     ("multiplier2_bls_final.zkey", WitnessFn::RustWitness(multiplier2bls_witness)),
     ("keccak256_256_test_final.zkey", WitnessFn::RustWitness(keccak256256test_witness)),
 }
