@@ -58,7 +58,7 @@ mopro_ffi::set_halo2_circuits! {
 In the iOS project, you can utilize both adapters:
 
 ```swift
-let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs, proofLib: ProofLib.arkworks)
 
 let generateProofResult = try generateHalo2Proof(srsPath: srsPath, pkPath: pkPath, circuitInputs: inputs)
 ```

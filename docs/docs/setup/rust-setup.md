@@ -53,9 +53,6 @@ mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
 rust-witness = "0.1"
 uniffi = { version = "=0.29.0", features = ["build"] }
 
-# TODO: fix this
-[patch.crates-io]
-ark-circom = { git = "https://github.com/zkmopro/circom-compat.git", version = "0.1.0", branch = "wasm-delete" }
 ```
 
 Now you should copy your wasm and zkey files somewhere in the project folder. For this tutorial we'll assume you placed them in `test-vectors/circom`.

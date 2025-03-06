@@ -4,6 +4,6 @@ target_adapters = [
 ]
 target_platforms = [
     "android",
-    "web",
     "ios",
+    "web",
 ]
