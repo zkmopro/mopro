@@ -17,7 +17,7 @@ name = "android"
 name = "web"
 
 [dependencies]
-mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom"] }
+mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom", "rapidsnark"] }
 mopro-wasm = { path = "../mopro-wasm" }
 uniffi = { workspace = true } 
 
@@ -34,7 +34,7 @@ thiserror = "=2.0.3"
 circom-prover = { version = "0.1.0", path = "../circom-prover" }
 
 [build-dependencies]
-mopro-ffi = { path = "../mopro-ffi" }
+mopro-ffi = { path = "../mopro-ffi", features = ["rapidsnark"] }
 uniffi = { workspace = true, features = ["build"] }
 
 # Circom dependencies

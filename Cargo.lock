@@ -2939,7 +2939,7 @@ dependencies = [
 [[package]]
 name = "rust-rapidsnark"
 version = "0.1.0"
-source = "git+https://github.com/zkmopro/rust-rapidsnark.git?branch=dylib#145cc0a2624af00a65571a2e06daea46051ae009"
+source = "git+https://github.com/zkmopro/rust-rapidsnark.git?branch=dylib#f1e9597e767660553ea464d02382058551635ffe"
 dependencies = [
  "anyhow",
  "cc",

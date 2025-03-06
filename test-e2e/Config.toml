@@ -1,6 +1,6 @@
 target_adapters = [
-    "circom",
     "halo2",
+    "circom",
 ]
 target_platforms = [
     "android",

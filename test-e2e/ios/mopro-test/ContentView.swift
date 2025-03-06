@@ -39,8 +39,6 @@ struct ContentView: View {
     @State private var isCircomVerifyButtonEnabled = false
     @State private var isHalo2roveButtonEnabled = true
     @State private var isHalo2VerifyButtonEnabled = false
-    @State private var isAshlangroveButtonEnabled = true
-    @State private var isAshlangVerifyButtonEnabled = false
     @State private var generatedCircomProof: Data?
     @State private var circomPublicInputs: Data?
     @State private var generatedHalo2Proof: Data?
@@ -88,7 +86,8 @@ extension ContentView {
             let start = CFAbsoluteTimeGetCurrent()
             
             // Generate Proof
-            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
+            // TODO: run both rapidsnark and arkworks prove
+            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.rapidsnark)
             assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
             assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
             
@@ -118,7 +117,8 @@ extension ContentView {
         do {
             let start = CFAbsoluteTimeGetCurrent()
             
-            let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proof: proof, publicInput: inputs, proofLib: ProofLib.arkworks)
+            // TODO: run both rapidsnark and arkworks prove
+            let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proof: proof, publicInput: inputs, proofLib: ProofLib.rapidsnark)
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
             
