@@ -87,8 +87,8 @@ macro_rules! circom_app {
 /// mopro_ffi::app!();
 ///
 /// set_circom_circuits! {
-///   ("circuit1.zkey", circuit1_witness_fn),
-///   ("circuit2.zkey", circuit2_witness_fn),
+///   ("circuit1.zkey",  WitnessFn::RustWitness(circuit1_witness_fn)),
+///   ("circuit2.zkey", WitnessFn::RustWitness(circuit2_witness_fn)),
 /// }
 /// ```
 ///
