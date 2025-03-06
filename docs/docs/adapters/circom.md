@@ -130,12 +130,12 @@ The Circom adapter exposes the following functions to be used in the iOS project
 ```swift
 // Generate a proof for a given circuit zkey, as well as the circuit inputs
 // Make sure that the name of the zkey file matches the one you set in the `set_circom_circuits!` macro
-generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs) -> GenerateProofResult
+generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input, proofLib: proofLib) -> GenerateProofResult
 
 // Verify a proof for a given circuit zkey
 // This works for arbitrary circuits, as long as the zkey file is valid
 verifyCircomProof(
-    zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs) -> Bool
+    zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs, proofLib: proofLib) -> Bool
 
 // Convert a Circom proof to an Ethereum compatible proof
 toEthereumProof(proof: generateProofResult.proof) -> ProofCalldata
@@ -166,6 +166,11 @@ public struct ProofCalldata {
 public struct GenerateProofResult {
     public var proof: Data
     public var inputs: Data
+}
+
+public enum ProofLib {
+    case arkworks
+    case rapidsnark
 }
 ```
 

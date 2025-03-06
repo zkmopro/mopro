@@ -36,16 +36,17 @@ do {
   let c = a * b
   inputs["a"] = [String(a)]
   inputs["b"] = [String(b)]
-  let input_str: String = 
+  let input_str: String =
     (try? JSONSerialization.data(withJSONObject: inputs, options: .prettyPrinted))
-      .flatMap { String(data: $0, encoding: .utf8) } ?? ""
+    .flatMap { String(data: $0, encoding: .utf8) } ?? ""
 
   // Expected outputs
   let outputs: [String] = [String(c)]
   let expectedOutput: [UInt8] = serializeOutputs(outputs)
 
   // Generate Proof
-  let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str)
+  let generateProofResult = try generateCircomProof(
+    zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
   assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
 
   // Verify Proof
@@ -54,7 +55,8 @@ do {
     "Circuit outputs mismatch the expected outputs")
 
   let isValid = try verifyCircomProof(
-    zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
+    zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs,
+    proofLib: ProofLib.arkworks)
   assert(isValid, "Proof verification should succeed")
 
 } catch let error as MoproError {

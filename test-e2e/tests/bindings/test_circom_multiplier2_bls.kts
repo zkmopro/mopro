@@ -6,11 +6,11 @@ try {
     val input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
 
     // Generate proof
-    var generateProofResult = generateCircomProof(zkeyPath, input_str)
+    var generateProofResult = generateCircomProof(zkeyPath, input_str, ProofLib.ARKWORKS)
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
 
     // Verify proof
-    var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs)
+    var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs, ProofLib.ARKWORKS)
     assert(isValid) { "Proof is invalid" }
 
 

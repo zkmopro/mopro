@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import uniffi.mopro.GenerateProofResult
@@ -52,7 +53,7 @@ fun FibonacciComponent() {
                 }
                     .start()
             },
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 20.dp).testTag("halo2GenerateProofButton")
         ) { Text(text = "generate proof") }
         Button(
             onClick = {
@@ -61,7 +62,7 @@ fun FibonacciComponent() {
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
             },
-            modifier = Modifier.padding(top = 120.dp)
+            modifier = Modifier.padding(top = 120.dp).testTag("halo2VerifyProofButton")
         ) { Text(text = "verify proof") }
         Text(
             text = "Halo2 Fibonacci proof",

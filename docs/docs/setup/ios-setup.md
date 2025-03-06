@@ -64,18 +64,14 @@ extension ContentView {
         // This is a mapping of input names to values. Note that if
         // the input is not an array, it will still be specified as
         // and array of length 1.
-        var inputs = [String: [String]]()
-        let a = 3 // First input
-        let b = 5 // Second input
-        inputs["a"] = [String(a)] // Numbers should be passed as strings
-        inputs["b"] = [String(b)]
+        let input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
         
         // Begin timing our proof generation
         let start = CFAbsoluteTimeGetCurrent()
         
         // Call into the compiled static library
         do {
-            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+            let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
         } catch {
             print("Error generate a proof: \(error)")
         }

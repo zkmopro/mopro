@@ -13,6 +13,7 @@ import com.example.moproapp.getFilePathFromAssets
 import uniffi.mopro.GenerateProofResult
 import uniffi.mopro.generateCircomProof
 import uniffi.mopro.verifyCircomProof
+import uniffi.mopro.ProofLib
 
 @Composable
 fun MultiplierComponent() {
@@ -27,9 +28,7 @@ fun MultiplierComponent() {
         )
     }
 
-    val inputs = mutableMapOf<String, List<String>>()
-    inputs["a"] = listOf("3")
-    inputs["b"] = listOf("5")
+    val input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
 
     val zkeyPath = getFilePathFromAssets("multiplier2_final.zkey")
 
@@ -39,7 +38,7 @@ fun MultiplierComponent() {
                 Thread(
                     Runnable {
                         val startTime = System.currentTimeMillis()
-                        res = generateCircomProof(zkeyPath, inputs.toString())
+                        res = generateCircomProof(zkeyPath, input_str, ProofLib.ARKWORKS)
                         val endTime = System.currentTimeMillis()
                         provingTime = "proving time: " + (endTime - startTime).toString() + " ms"
                     }
@@ -50,7 +49,7 @@ fun MultiplierComponent() {
         Button(
             onClick = {
                 val startTime = System.currentTimeMillis()
-                valid = "valid: " + verifyCircomProof(zkeyPath, res.proof, res.inputs).toString()
+                valid = "valid: " + verifyCircomProof(zkeyPath, res.proof, res.inputs, ProofLib.ARKWORKS).toString()
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
                 output = "output: " + uniffi.mopro.toEthereumInputs(res.inputs)

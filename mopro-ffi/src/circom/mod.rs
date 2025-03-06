@@ -7,12 +7,13 @@ use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
 
 #[macro_export]
 macro_rules! circom_app {
-    ($result:ty, $proof_call_data:ty, $err:ty) => {
+    ($result:ty, $proof_call_data:ty, $err:ty, $proof_lib:ty) => {
         #[allow(dead_code)]
         #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn generate_circom_proof(
             zkey_path: String,
             circuit_inputs: String,
+            proof_lib: $proof_lib,
         ) -> Result<$result, $err> {
             let name = match std::path::Path::new(zkey_path.as_str()).file_name() {
                 Some(v) => v,
@@ -23,8 +24,12 @@ macro_rules! circom_app {
                 }
             };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
+            let chosen_proof_lib = match proof_lib {
+                <$proof_lib>::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
+                <$proof_lib>::Rapidsnark => mopro_ffi::prover::ProofLib::RapidSnark,
+            };
             let result = mopro_ffi::generate_circom_proof_wtns(
-                mopro_ffi::prover::ProofLib::Arkworks,
+                chosen_proof_lib,
                 zkey_path,
                 circuit_inputs,
                 witness_fn,
@@ -41,14 +46,14 @@ macro_rules! circom_app {
             zkey_path: String,
             proof: Vec<u8>,
             public_input: Vec<u8>,
+            proof_lib: $proof_lib,
         ) -> Result<bool, $err> {
-            mopro_ffi::verify_circom_proof(
-                mopro_ffi::prover::ProofLib::Arkworks,
-                zkey_path,
-                proof,
-                public_input,
-            )
-            .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
+            let chosen_proof_lib = match proof_lib {
+                <$proof_lib>::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
+                <$proof_lib>::Rapidsnark => mopro_ffi::prover::ProofLib::RapidSnark,
+            };
+            mopro_ffi::verify_circom_proof(chosen_proof_lib, zkey_path, proof, public_input)
+                .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
         }
 
         #[allow(dead_code)]
@@ -162,7 +167,8 @@ mod tests {
             circom_app!(
                 mopro_ffi::GenerateProofResult,
                 mopro_ffi::ProofCalldata,
-                mopro_ffi::MoproError
+                mopro_ffi::MoproError,
+                mopro_ffi::ProofLib
             );
 
             set_circom_circuits! {
@@ -181,7 +187,11 @@ mod tests {
             inputs.insert("b".to_string(), vec![b.to_string()]);
 
             let input_str = serde_json::to_string(&inputs).unwrap();
-            let result = generate_circom_proof(ZKEY_PATH.to_string(), input_str);
+            let result = generate_circom_proof(
+                ZKEY_PATH.to_string(),
+                input_str,
+                mopro_ffi::ProofLib::Arkworks,
+            );
 
             assert!(result.is_ok());
         }
@@ -216,7 +226,8 @@ mod tests {
             circom_app!(
                 mopro_ffi::GenerateProofResult,
                 mopro_ffi::ProofCalldata,
-                mopro_ffi::MoproError
+                mopro_ffi::MoproError,
+                mopro_ffi::ProofLib
             );
 
             set_circom_circuits! {
@@ -235,7 +246,11 @@ mod tests {
             inputs.insert("b".to_string(), vec![b.to_string()]);
 
             let input_str = serde_json::to_string(&inputs).unwrap();
-            let result = generate_circom_proof(ZKEY_PATH.to_string(), input_str);
+            let result = generate_circom_proof(
+                ZKEY_PATH.to_string(),
+                input_str,
+                mopro_ffi::ProofLib::Arkworks,
+            );
 
             assert!(result.is_ok());
         }
