@@ -88,6 +88,7 @@ extension ContentView {
             // Generate Proof
             // TODO: run both rapidsnark and arkworks prove
             let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.rapidsnark)
+            //let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
             assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
             assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
             
@@ -119,6 +120,7 @@ extension ContentView {
             
             // TODO: run both rapidsnark and arkworks prove
             let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proof: proof, publicInput: inputs, proofLib: ProofLib.rapidsnark)
+            //let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proof: proof, publicInput: inputs, proofLib: ProofLib.arkworks)
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
             

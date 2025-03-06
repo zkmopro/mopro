@@ -40,6 +40,7 @@ fun MultiplierComponent() {
                     Runnable {
                         val startTime = System.currentTimeMillis()
                         res = generateCircomProof(zkeyPath, input_str, ProofLib.RAPIDSNARK)
+                        // res = generateCircomProof(zkeyPath, input_str, ProofLib.ARKWORKS)
                         val endTime = System.currentTimeMillis()
                         provingTime = "proving time: " + (endTime - startTime).toString() + " ms"
                     }
@@ -51,6 +52,7 @@ fun MultiplierComponent() {
             onClick = {
                 val startTime = System.currentTimeMillis()
                 valid = "valid: " + verifyCircomProof(zkeyPath, res.proof, res.inputs, ProofLib.RAPIDSNARK).toString()
+                //valid = "valid: " + verifyCircomProof(zkeyPath, res.proof, res.inputs, ProofLib.ARKWORKS).toString()
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
                 output = "output: " + uniffi.mopro.toEthereumInputs(res.inputs)
