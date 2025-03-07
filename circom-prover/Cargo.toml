@@ -81,10 +81,10 @@ ark-poly = { version = "=0.5.0", default-features = false, features = [
 rand = { version = "0.8", features = ["std"] }
 
 # witnesscalc-adapter
-witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", branch = "dylib", optional = true }
+witnesscalc-adapter = { version = "0.1", optional = true }
 
 # rapidsnark
-rust-rapidsnark = { git = "https://github.com/zkmopro/rust-rapidsnark.git", branch = "dylib", optional = true }
+rust-rapidsnark = { version = "0.1", optional = true }
 
 
 # ethereum
@@ -95,9 +95,9 @@ hex-literal = "0.4.1"
 # rust-witness
 rust-witness = { version = "0.1", optional = true }
 # witnesscalc-adapter
-witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter.git", branch = "dylib", optional = true }
+witnesscalc-adapter = { version = "0.1", optional = true }
 # rapidsnark
-rust-rapidsnark = { git = "https://github.com/zkmopro/rust-rapidsnark.git", branch = "dylib", optional = true }
+rust-rapidsnark = { version = "0.1", optional = true }
 
 [dev-dependencies]
 hex-literal = "0.4.1"

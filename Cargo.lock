@@ -3015,8 +3015,9 @@ dependencies = [
 
 [[package]]
 name = "rust-rapidsnark"
-version = "0.1.0"
-source = "git+https://github.com/zkmopro/rust-rapidsnark.git?branch=dylib#145cc0a2624af00a65571a2e06daea46051ae009"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ccf47a6aedd44c85537d9e1ca6255cda1503720e80ff61613372e8694ec783c5"
 dependencies = [
  "anyhow",
  "cc",
@@ -4474,8 +4475,9 @@ dependencies = [
 
 [[package]]
 name = "witnesscalc-adapter"
-version = "0.1.1"
-source = "git+https://github.com/zkmopro/witnesscalc_adapter.git?branch=dylib#da89a28c579d22c85462dfb2033e3281498fa00b"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "60f543496383052e42bbc8cb96adf5aeef7964d207b7e267a081371e44aa009d"
 dependencies = [
  "anyhow",
  "num-bigint",

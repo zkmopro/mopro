@@ -62,13 +62,13 @@ let deserialized_pub_inputs = deserialize_inputs::<Bn254>(result.pub_inputs);
 ## Witness Generation
 
 -   [x] [Rust Witness](https://github.com/chancehudson/rust-witness)
--   [ ] [Witnesscalc adapter](https://github.com/zkmopro/witnesscalc_adapter)
+-   [x] [Witnesscalc adapter](https://github.com/zkmopro/witnesscalc_adapter)
 -   [ ] [circom witnesscalc](https://github.com/iden3/circom-witnesscalc)
 
 ## Proof Generation
 
 -   [x] [Arkworks](https://github.com/arkworks-rs)
--   [ ] [Rust rapidsnark](https://github.com/zkmopro/rust-rapidsnark)
+-   [x] [Rust rapidsnark](https://github.com/zkmopro/rust-rapidsnark)
 
 ## Performance
 
