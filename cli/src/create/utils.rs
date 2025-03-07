@@ -134,7 +134,7 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
 }
 
 pub fn check_bindings(project_dir: &Path, framework: Framework) -> Result<PathBuf> {
-    let bindings_nams = match framework {
+    let bindings_name = match framework {
         Framework::Ios => "MoproiOSBindings",
         Framework::Android => "MoproAndroidBindings",
         Framework::Web => "MoproWasmBindings",
@@ -146,13 +146,13 @@ pub fn check_bindings(project_dir: &Path, framework: Framework) -> Result<PathBu
         }
     };
 
-    let ios_bindings_dir = project_dir.join(bindings_nams);
+    let ios_bindings_dir = project_dir.join(bindings_name);
     if ios_bindings_dir.exists() && fs::read_dir(&ios_bindings_dir)?.count() > 0 {
         Ok(ios_bindings_dir)
     } else {
         Err(Error::msg(format!(
             "{} are required to create the template. Please run 'mopro build' to generate them.",
-            bindings_nams
+            bindings_name
         )))
     }
 }
