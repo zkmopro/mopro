@@ -1,5 +1,5 @@
 [package]
-name = "<PROJECT_NAME>"
+name = "MOPRO_TEMPLATE_PROJECT_NAME"
 version = "0.1.0"
 edition = "2021"
 

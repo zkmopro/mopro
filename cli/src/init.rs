@@ -171,7 +171,7 @@ pub fn copy_embedded_dir(
 }
 
 fn replace_project_name(file_path: &str, project_name: &str) -> Result<()> {
-    let target = "<PROJECT_NAME>";
+    let target = "MOPRO_TEMPLATE_PROJECT_NAME";
     replace_string_in_file(file_path, target, project_name)
 }
 
