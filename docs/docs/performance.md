@@ -2,6 +2,9 @@
 sidebar_position: 5
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Performance and Benchmarks
 
 ## Circom
@@ -26,7 +29,14 @@ We _recommend_ developers benchmark their custom circuits before selecting tools
 
 Benchmarks on an iPhone 16 Pro (2024).
 
-<img src="/img/circom.ios.wit.gen.png" alt="iOS Witness Generation Performance Chart" />
+<Tabs>
+  <TabItem value="bench" label="By Bench">
+    <img src="/img/circom.ios.wit.gen_by.bench.png" alt="iOS Witness Generation Performance Chart" />
+  </TabItem>
+  <TabItem value="project" label="By Project">
+    <img src="/img/circom.ios.wit.gen_by.project.png" alt="iOS Witness Generation Performance Chart" />
+  </TabItem>
+</Tabs>
 
 <details>
   <summary>Data</summary>
@@ -82,7 +92,14 @@ Benchmarks on an iPhone 16 Pro (2024).
   </table>
 </details>
 
-<img src="/img/circom.ios.proof.gen.png" alt="iOS Witness Generation Performance Chart" />
+<Tabs>
+  <TabItem value="bench" label="By Bench">
+    <img src="/img/circom.ios.proof.gen_by.bench.png" alt="iOS Witness Generation Performance Chart" />
+  </TabItem>
+  <TabItem value="project" label="By Project">
+    <img src="/img/circom.ios.proof.gen_by.project.png" alt="iOS Witness Generation Performance Chart" />
+  </TabItem>
+</Tabs>
 
 <details>
   <summary>Data</summary>
@@ -134,7 +151,14 @@ Benchmarks on an iPhone 16 Pro (2024).
 
 Benchmarks on an Samsung S23 Ultra (2023).
 
-<img src="/img/circom.android.wit.gen.png" alt="Circom Anddroid Witness Generation Performance Chart" />
+<Tabs>
+  <TabItem value="bench" label="By Bench">
+    <img src="/img/circom.android.wit.gen_by.bench.png" alt="Circom Android Witness Generation Performance Chart" />
+  </TabItem>
+  <TabItem value="project" label="By Project">
+    <img src="/img/circom.android.wit.gen_by.project.png" alt="Circom Android Witness Generation Performance Chart" />
+  </TabItem>
+</Tabs>
 
 <details>
   <summary>Data</summary>
@@ -190,7 +214,14 @@ Benchmarks on an Samsung S23 Ultra (2023).
   </table>
 </details>
 
-<img src="/img/circom.android.proof.gen.png" alt="Circom Android Proof Generation Performance Chart" />
+<Tabs>
+  <TabItem value="bench" label="By Bench">
+    <img src="/img/circom.android.proof.gen_by.bench.png" alt="Circom Android Proof Generation Performance Chart" />
+  </TabItem>
+  <TabItem value="project" label="By Project">
+    <img src="/img/circom.android.proof.gen_by.project.png" alt="Circom Android Proof Generation Performance Chart" />
+  </TabItem>
+</Tabs>
 
 <details>
   <summary>Data</summary>
@@ -242,7 +273,14 @@ Benchmarks on an Samsung S23 Ultra (2023).
 
 Benchmarks on an Macbook Pro M1 Max (2021).
 
-<img src="/img/circom.macos.wit.gen.png" alt="Circom macOS Witness Generation Performance Chart" />
+<Tabs>
+  <TabItem value="bench" label="By Bench">
+    <img src="/img/circom.macos.wit.gen_by.bench.png" alt="Circom macOS Witness Generation Performance Chart" />
+  </TabItem>
+  <TabItem value="project" label="By Project">
+    <img src="/img/circom.macos.wit.gen_by.project.png" alt="Circom macOS Witness Generation Performance Chart" />
+  </TabItem>
+</Tabs>
 
 <details>
   <summary>Data</summary>
@@ -298,7 +336,14 @@ Benchmarks on an Macbook Pro M1 Max (2021).
   </table>
 </details>
 
-<img src="/img/circom.macos.proof.gen.png" alt="Circom macOS Proof Generation Performance Chart" />
+<Tabs>
+  <TabItem value="bench" label="By Bench">
+    <img src="/img/circom.macos.proof.gen_by.bench.png" alt="Circom macOS Proof Generation Performance Chart" />
+  </TabItem>
+  <TabItem value="project" label="By Project">
+    <img src="/img/circom.macos.proof.gen_by.project.png" alt="Circom macOS Proof Generation Performance Chart" />
+  </TabItem>
+</Tabs>
 
 <details>
   <summary>Data</summary>
