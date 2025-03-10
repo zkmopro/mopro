@@ -1,8 +1,11 @@
 use std::fs;
+use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use uniffi::generate_bindings;
+use camino::Utf8Path;
+use uniffi::generate_bindings_library_mode;
+use uniffi::CargoMetadataConfigSupplier;
 use uniffi::SwiftBindingGenerator;
 
 use super::cleanup_tmp_local;
@@ -92,27 +95,25 @@ pub fn build() {
         lib_out
     };
 
-    generate_bindings(
-        (manifest_dir + "/src/mopro.udl").as_str().into(),
-        None,
-        SwiftBindingGenerator,
-        Some(swift_bindings_dir.to_str().unwrap().into()),
-        None,
-        None,
-        false,
-    )
-    .expect("Failed to generate bindings");
+    let out_lib_paths: Vec<PathBuf> = group_target_archs(&target_archs)
+        .iter()
+        .map(|v| build_combined_archs(v))
+        .collect();
+
+    let out_dylib_path = build_dir_path.join(format!(
+        "{}/{}/libmopro_bindings.dylib",
+        target_archs[0].as_str(),
+        mode.as_str()
+    ));
+
+    generate_ios_bindings(&out_dylib_path, &swift_bindings_dir)
+        .expect("Failed to generate bindings for iOS");
 
     fs::rename(
         swift_bindings_dir.join("mopro.swift"),
         bindings_out.join("mopro.swift"),
     )
     .expect("Failed to move mopro.swift into place");
-
-    let out_lib_paths: Vec<PathBuf> = group_target_archs(&target_archs)
-        .iter()
-        .map(|v| build_combined_archs(v))
-        .collect();
 
     let mut xcbuild_cmd = Command::new("xcodebuild");
     xcbuild_cmd.arg("-create-xcframework");
@@ -200,4 +201,26 @@ fn rename_module_maps_recursively(bindings_out: &PathBuf) {
             rename_module_maps_recursively(&path);
         }
     }
+}
+
+fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Result<()> {
+    if binding_dir.exists() {
+        fs::remove_dir_all(binding_dir)?;
+    }
+
+    generate_bindings_library_mode(
+        Utf8Path::from_path(dylib_path)
+            .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?,
+        None,
+        &SwiftBindingGenerator,
+        &CargoMetadataConfigSupplier::default(),
+        None,
+        Utf8Path::from_path(binding_dir).ok_or(Error::new(
+            ErrorKind::InvalidInput,
+            "Invalid swift files directory",
+        ))?,
+        true,
+    )
+    .map_err(|e| Error::new(ErrorKind::Other, e.to_string()))?;
+    Ok(())
 }

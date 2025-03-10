@@ -84,6 +84,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import kotlinx.coroutines.launch
 import uniffi.mopro.generateCircomProof
+import uniffi.mopro.ProofLib
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -147,10 +148,8 @@ fun MainScreen(context: Context) {
             coroutineScope.launch {
                 val assetFilePath = copyAssetToInternalStorage(context, "multiplier2_final.zkey")
                 assetFilePath?.let { path ->
-                    val inputs = mutableMapOf<String, List<String>>()
-                    inputs["a"] = listOf("3")
-                    inputs["b"] = listOf("5")
-                    val res = generateCircomProof(path, inputs)
+                    val input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
+                    val res = generateCircomProof(path, input_str, ProofLib.ARKWORKS)
                     println(res)
                 }
             }
@@ -187,6 +186,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import kotlinx.coroutines.launch
 import uniffi.mopro.generateCircomProof
+import uniffi.mopro.ProofLib
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -212,10 +212,8 @@ fun MainScreen(context: Context) {
                         val assetFilePath =
                                 copyAssetToInternalStorage(context, "multiplier2_final.zkey")
                         assetFilePath?.let { path ->
-                            val inputs = mutableMapOf<String, List<String>>()
-                            inputs["a"] = listOf("3")
-                            inputs["b"] = listOf("5")
-                            val res = generateCircomProof(path, inputs)
+                            val input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
+                            val res = generateCircomProof(path, input_str, ProofLib.ARKWORKS)
                             println(res)
                         }
                     }

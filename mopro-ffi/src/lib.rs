@@ -1,3 +1,4 @@
+#![allow(unexpected_cfgs)]
 pub mod app_config;
 
 #[cfg(feature = "circom")]
@@ -20,12 +21,12 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 #[cfg(not(feature = "circom"))]
 #[macro_export]
 macro_rules! circom_app {
-    () => {
-
+    ($result:ty, $proof_call_data:ty, $err:ty, $proof_lib:ty) => {
         fn generate_circom_proof(
             zkey_path: String,
-            inputs: std::collections::HashMap<String, Vec<String>>,
-        ) -> Result<GenerateProofResult, MoproError> {
+            circuit_inputs: String,
+            proof_lib: $proof_lib,
+        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
@@ -33,11 +34,12 @@ macro_rules! circom_app {
             zkey_path: String,
             proof_data: Vec<u8>,
             public_inputs: Vec<u8>,
-        ) -> Result<bool, MoproError> {
+            proof_lib: $proof_lib,
+        ) -> Result<bool, mopro_ffi::MoproError> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
-        fn to_ethereum_proof(proof_data: Vec<u8>) -> ProofCalldata {
+        fn to_ethereum_proof(proof_data: Vec<u8>) -> mopro_ffi::ProofCalldata {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
@@ -50,12 +52,12 @@ macro_rules! circom_app {
 #[cfg(not(feature = "halo2"))]
 #[macro_export]
 macro_rules! halo2_app {
-    () => {
+    ($result:ty, $err:ty) => {
         fn generate_halo2_proof(
             srs_path: String,
             pk_path: String,
             inputs: std::collections::HashMap<String, Vec<String>>,
-        ) -> Result<GenerateProofResult, MoproError> {
+        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
 
@@ -64,15 +66,13 @@ macro_rules! halo2_app {
             vk_path: String,
             proof_data: Vec<u8>,
             public_inputs: Vec<u8>,
-        ) -> Result<bool, MoproError> {
+        ) -> Result<bool, mopro_ffi::MoproError> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
     };
 }
 
-use thiserror::Error;
-
-#[derive(Debug, Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum MoproError {
     #[error("CircomError: {0}")]
     CircomError(String),
@@ -106,6 +106,13 @@ pub struct ProofCalldata {
     pub a: G1,
     pub b: G2,
     pub c: G1,
+}
+
+#[derive(Debug, Clone, Default)]
+pub enum ProofLib {
+    #[default]
+    Arkworks,
+    Rapidsnark,
 }
 
 /// This macro is used to setup the Mopro FFI library
@@ -145,13 +152,90 @@ pub struct ProofCalldata {
 #[macro_export]
 macro_rules! app {
     () => {
-        // These are mandatory imports for the uniffi to pick them up and match with UDL
-        use mopro_ffi::{GenerateProofResult, MoproError, ProofCalldata, G1, G2};
+        uniffi::setup_scaffolding!("mopro");
 
-        mopro_ffi::circom_app!();
+        // This should be declared into this macro due to Uniffi's limitation
+        // Please refer this issue: https://github.com/mozilla/uniffi-rs/issues/2257
+        #[derive(Debug, thiserror::Error, uniffi::Error)]
+        pub enum MoproError {
+            #[error("CircomError: {0}")]
+            CircomError(String),
+            #[error("Halo2Error: {0}")]
+            Halo2Error(String),
+        }
 
-        mopro_ffi::halo2_app!();
+        impl From<mopro_ffi::MoproError> for MoproError {
+            fn from(err: mopro_ffi::MoproError) -> Self {
+                match err {
+                    mopro_ffi::MoproError::CircomError(e) => Self::CircomError(e),
+                    mopro_ffi::MoproError::Halo2Error(e) => Self::Halo2Error(e),
+                    _ => panic!("Unhandled error type: {}", err),
+                }
+            }
+        }
 
-        uniffi::include_scaffolding!("mopro");
+        #[derive(Debug, Clone, uniffi::Record)]
+        pub struct GenerateProofResult {
+            pub proof: Vec<u8>,
+            pub inputs: Vec<u8>,
+        }
+
+        impl From<mopro_ffi::GenerateProofResult> for GenerateProofResult {
+            fn from(result: mopro_ffi::GenerateProofResult) -> Self {
+                Self {
+                    proof: result.proof,
+                    inputs: result.inputs,
+                }
+            }
+        }
+
+        #[derive(Debug, Clone, Default, uniffi::Record)]
+        pub struct G1 {
+            pub x: String,
+            pub y: String,
+        }
+
+        #[derive(Debug, Clone, Default, uniffi::Record)]
+        pub struct G2 {
+            pub x: Vec<String>,
+            pub y: Vec<String>,
+        }
+
+        #[derive(Debug, Clone, Default, uniffi::Record)]
+        pub struct ProofCalldata {
+            pub a: G1,
+            pub b: G2,
+            pub c: G1,
+        }
+
+        impl From<mopro_ffi::ProofCalldata> for ProofCalldata {
+            fn from(result: mopro_ffi::ProofCalldata) -> Self {
+                ProofCalldata {
+                    a: G1 {
+                        x: result.a.x,
+                        y: result.a.y,
+                    },
+                    b: G2 {
+                        x: result.b.x,
+                        y: result.b.y,
+                    },
+                    c: G1 {
+                        x: result.c.x,
+                        y: result.c.y,
+                    },
+                }
+            }
+        }
+
+        #[derive(Debug, Clone, Default, uniffi::Enum)]
+        pub enum ProofLib {
+            #[default]
+            Arkworks,
+            Rapidsnark,
+        }
+
+        mopro_ffi::circom_app!(GenerateProofResult, ProofCalldata, MoproError, ProofLib);
+
+        mopro_ffi::halo2_app!(GenerateProofResult, MoproError);
     };
 }

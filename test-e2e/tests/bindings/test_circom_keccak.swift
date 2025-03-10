@@ -49,6 +49,9 @@ do {
   let bits = bytesToBits(bytes: inputVec)
   var inputs = [String: [String]]()
   inputs["in"] = bits
+  let input_str: String =
+    (try? JSONSerialization.data(withJSONObject: inputs, options: .prettyPrinted))
+    .flatMap { String(data: $0, encoding: .utf8) } ?? ""
 
   // Expected outputs
   let outputVec: [UInt8] = [
@@ -59,7 +62,8 @@ do {
   let expectedOutput: [UInt8] = serializeOutputs(outputBits)
 
   // Generate Proof
-  let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs)
+  let generateProofResult = try generateCircomProof(
+    zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
   assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
 
   // Verify Proof
@@ -68,7 +72,8 @@ do {
     "Circuit outputs mismatch the expected outputs")
 
   let isValid = try verifyCircomProof(
-    zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs)
+    zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs,
+    proofLib: ProofLib.arkworks)
   assert(isValid, "Proof verification should succeed")
 
 } catch let error as MoproError {

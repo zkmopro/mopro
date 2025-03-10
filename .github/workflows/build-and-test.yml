@@ -20,6 +20,11 @@ jobs:
       RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
     steps:
       - uses: actions/checkout@v4
+      - name: install requirements
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+          version: 1.0
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features
   lint:
@@ -56,31 +61,23 @@ jobs:
           cd cli
           cargo install --path .
           mopro --help
-
-  test-ffi-halo2:
+  test-ffi-all:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+      - name: install requirements
+        uses: awalsh128/cache-apt-pkgs-action@v1
         with:
-          toolchain: stable
-          override: true
-      - name: Run ffi halo2 tests
-        run: cd mopro-ffi && cargo test --features halo2 --no-default-features
-  test-ffi-circom:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/checkout@v4
+          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+          version: 1.0
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
       - name: Run ffi circom tests
-        run: cd mopro-ffi && cargo test --features circom --no-default-features
+        run: cd mopro-ffi && cargo test --all-features
   setup-halo2-wasm-env:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -152,24 +149,25 @@ jobs:
           google-chrome --version
           cd mopro-wasm
           wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
-  test-e2e:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Run e2e circom tests
-        # TODO: Fix this custom jar thing
-        run: |
-          cd test-e2e
-          curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
-          CLASSPATH=jna-5.13.0.jar cargo test --test circom -- --nocapture
-      - name: Run e2e halo2 tests
-        run: CLASSPATH=jna-5.13.0.jar cargo test --test halo2 -- --nocapture
+  # TODO: remove this commented test-e2e job
+  # test-e2e:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Install Rust toolchain
+  #       uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         override: true
+  #     - name: Run e2e circom tests
+  #       # TODO: Fix this custom jar thing
+  #       run: |
+  #         cd test-e2e
+  #         curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
+  #         CLASSPATH=jna-5.13.0.jar cargo test --test circom -- --nocapture
+  #     - name: Run e2e halo2 tests
+  #       run: CLASSPATH=jna-5.13.0.jar cargo test --test halo2 -- --nocapture
   build-xcframework:
     runs-on: macos-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -178,8 +176,10 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: 1.81.0
           override: true
+      - name: install dependencies
+        run: brew install nasm
       - name: Build iOS xcframework
         run: cd test-e2e && cargo run --bin ios
       - name: Cache xcframework
@@ -251,10 +251,15 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: 1.81.0
           override: true
+      - name: install requirements
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+          version: 1.0
       - name: Build Android bindings
-        run: cd test-e2e && cargo run --bin android
+        run: cd test-e2e && ANDROID_ARCHS=aarch64-linux-android,x86_64-linux-android cargo run --bin android
       - name: Cache android lib
         id: cache-android-lib
         uses: actions/cache/save@v4
@@ -286,6 +291,18 @@ jobs:
         uses: android-actions/setup-android@v2.0.10
       - name: Build android app
         run: cd test-e2e/android && ./gradlew build
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: google_apis
+          arch: x86_64
+          script: cd test-e2e/android && ./gradlew connectedAndroidTest
   build-halo2-wasm-web:
     runs-on: ubuntu-latest
     needs: setup-halo2-wasm-env
@@ -296,6 +313,11 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly-2024-07-18
+      - name: install requirements
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+          version: 1.0
       - name: Restore cached wasm-pack
         uses: actions/cache@v4
         with:

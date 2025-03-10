@@ -18,10 +18,7 @@ impl ProvingSystem for Circom {
     }
 
     fn dep_template(file_path: &str) -> Result<()> {
-        let replacement =
-        "# TODO: fix this
-[patch.crates-io]
-ark-circom = { git = \"https://github.com/zkmopro/circom-compat.git\", version = \"0.1.0\", branch = \"wasm-delete\" }";
+        let replacement = "";
         let target = "# CIRCOM_DEPENDENCIES";
         replace_string_in_file(file_path, target, replacement)
     }
