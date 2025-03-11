@@ -1,4 +1,5 @@
 use anyhow::Result;
+use ethereum::Proof;
 use num::BigUint;
 use std::thread::JoinHandle;
 
@@ -12,7 +13,7 @@ pub mod rapidsnark;
 pub mod serialization;
 
 pub struct CircomProof {
-    pub proof: Vec<u8>,
+    pub proof: Proof,
     pub pub_inputs: Vec<u8>,
 }
 

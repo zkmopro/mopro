@@ -6,6 +6,7 @@ use ark_bls12_381::{
     Bls12_381, Fq as bls12_381_fq, Fq2 as bls12_381_Fq2, G1Affine as bls12_381_G1Affine,
     G2Affine as bls12_381_G2Affine,
 };
+use ark_ec::AffineRepr;
 use ark_ff::{BigInteger, PrimeField};
 use num::BigUint;
 use num_traits::Zero;
@@ -18,6 +19,11 @@ use ark_serialize::CanonicalDeserialize;
 
 const BN254_BUF_SIZE: usize = 32;
 const BLS12_381_BUF_SIZE: usize = 48;
+
+pub const PROTOCOL_GROTH16: &str = "groth16";
+pub const CURVE_BN254: &str = "bn128";
+pub const CURVE_BLS12_381: &str = "bls12-381";
+
 pub struct Inputs(pub Vec<BigUint>);
 
 impl From<&[Fr]> for Inputs {
@@ -28,17 +34,19 @@ impl From<&[Fr]> for Inputs {
     }
 }
 
+// Follow the interface: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/snarkjs/index.d.cts
 #[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct G1 {
     pub x: BigUint,
     pub y: BigUint,
+    pub z: BigUint,
 }
 
-type G1Tup = (BigUint, BigUint);
+type G1Tup = (BigUint, BigUint, BigUint);
 
 impl G1 {
-    pub fn as_tuple(&self) -> (BigUint, BigUint) {
-        (self.x.clone(), self.y.clone())
+    pub fn as_tuple(&self) -> (BigUint, BigUint, BigUint) {
+        (self.x.clone(), self.y.clone(), self.z.clone())
     }
 
     // BN254
@@ -53,9 +61,11 @@ impl G1 {
     }
 
     pub fn from_bn254(p: &bn254_G1Affine) -> Self {
+        let p_z = p.into_group();
         Self {
             x: point_to_biguint(p.x),
             y: point_to_biguint(p.y),
+            z: point_to_biguint(p_z.z),
         }
     }
 
@@ -71,9 +81,11 @@ impl G1 {
     }
 
     pub fn from_bls12_381(p: &bls12_381_G1Affine) -> Self {
+        let p_z = p.into_group();
         Self {
             x: point_to_biguint(p.x),
             y: point_to_biguint(p.y),
+            z: point_to_biguint(p_z.z),
         }
     }
 }
@@ -82,9 +94,10 @@ impl G1 {
 pub struct G2 {
     pub x: [BigUint; 2],
     pub y: [BigUint; 2],
+    pub z: [BigUint; 2],
 }
 
-type G2Tup = ([BigUint; 2], [BigUint; 2]);
+type G2Tup = ([BigUint; 2], [BigUint; 2], [BigUint; 2]);
 
 impl G2 {
     // NB: Serialize the c1 limb first.
@@ -92,6 +105,7 @@ impl G2 {
         (
             [self.x[1].clone(), self.x[0].clone()],
             [self.y[1].clone(), self.y[0].clone()],
+            [self.z[1].clone(), self.z[0].clone()],
         )
     }
 
@@ -113,9 +127,11 @@ impl G2 {
     }
 
     pub fn from_bn254(p: &bn254_G2Affine) -> Self {
+        let p_z = p.into_group();
         Self {
             x: [point_to_biguint(p.x.c0), point_to_biguint(p.x.c1)],
             y: [point_to_biguint(p.y.c0), point_to_biguint(p.y.c1)],
+            z: [point_to_biguint(p_z.z.c0), point_to_biguint(p_z.z.c1)],
         }
     }
 
@@ -137,9 +153,11 @@ impl G2 {
     }
 
     pub fn from_bls12_381(p: &bls12_381_G2Affine) -> Self {
+        let p_z = p.into_group();
         Self {
             x: [point_to_biguint(p.x.c0), point_to_biguint(p.x.c1)],
             y: [point_to_biguint(p.y.c0), point_to_biguint(p.y.c1)],
+            z: [point_to_biguint(p_z.z.c0), point_to_biguint(p_z.z.c1)],
         }
     }
 }
@@ -149,6 +167,8 @@ pub struct Proof {
     pub a: G1,
     pub b: G2,
     pub c: G1,
+    pub protocol: String,
+    pub curve: String,
 }
 
 impl Proof {
@@ -163,6 +183,8 @@ impl From<ark_groth16::Proof<Bn254>> for Proof {
             a: G1::from_bn254(&proof.a),
             b: G2::from_bn254(&proof.b),
             c: G1::from_bn254(&proof.c),
+            protocol: PROTOCOL_GROTH16.to_string(),
+            curve: CURVE_BN254.to_string(),
         }
     }
 }
@@ -173,6 +195,8 @@ impl From<ark_groth16::Proof<Bls12_381>> for Proof {
             a: G1::from_bls12_381(&proof.a),
             b: G2::from_bls12_381(&proof.b),
             c: G1::from_bls12_381(&proof.c),
+            protocol: PROTOCOL_GROTH16.to_string(),
+            curve: CURVE_BLS12_381.to_string(),
         }
     }
 }

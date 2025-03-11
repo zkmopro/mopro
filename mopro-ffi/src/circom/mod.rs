@@ -1,9 +1,19 @@
 pub mod ethereum;
-use anyhow::{Ok, Result};
+use anyhow::{bail, Ok, Result};
+use ark_bls12_381::Bls12_381;
+use ark_bn254::Bn254;
 pub use ethereum::*;
 
 use crate::GenerateProofResult;
-use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
+use circom_prover::{
+    prover::{
+        ethereum::{CURVE_BLS12_381, CURVE_BN254},
+        serialization::{self, SerializableProof},
+        ProofLib,
+    },
+    witness::WitnessFn,
+    CircomProver,
+};
 
 #[macro_export]
 macro_rules! circom_app {
@@ -128,8 +138,17 @@ pub fn generate_circom_proof_wtns(
     witness_fn: WitnessFn,
 ) -> Result<GenerateProofResult> {
     let ret = CircomProver::prove(proof_lib, witness_fn, json_input_str, zkey_path).unwrap();
+    let proof = match ret.proof.curve.as_ref() {
+        CURVE_BN254 => {
+            serialization::serialize_proof(&SerializableProof::<Bn254>(ret.proof.into()))
+        }
+        CURVE_BLS12_381 => {
+            serialization::serialize_proof(&SerializableProof::<Bls12_381>(ret.proof.into()))
+        }
+        _ => bail!("Not uspported curve"),
+    };
     Ok(GenerateProofResult {
-        proof: ret.proof,
+        proof,
         inputs: ret.pub_inputs,
     })
 }

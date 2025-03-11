@@ -11,7 +11,7 @@ use std::{fs::File, thread::JoinHandle};
 use anyhow::{bail, Result};
 use num_bigint::BigUint;
 use rand::prelude::*;
-use serialization::{SerializableInputs, SerializableProof};
+use serialization::SerializableInputs;
 
 use super::{
     ark_circom::{
@@ -33,25 +33,30 @@ pub fn generate_circom_proof(
     let mut reader = std::io::BufReader::new(file);
 
     // check the prime in the header
-    if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
+    let (proof, pub_inputs) = if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
         let (proving_key, matrices) = read_zkey::<_, Bn254>(&mut reader)?;
         // Get the result witness from the background thread
         let witnesses = witness_thread
             .join()
             .map_err(|_e| anyhow::anyhow!("witness thread panicked"))
             .unwrap();
-        prove(proving_key, matrices, witnesses)
+        let (ark_proof, public_inputs) = prove(proving_key, matrices, witnesses).unwrap();
+        (ark_proof.into(), public_inputs)
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
         let (proving_key, matrices) = read_zkey::<_, Bls12_381>(&mut reader)?;
         let witnesses = witness_thread
             .join()
             .map_err(|_e| anyhow::anyhow!("witness thread panicked"))
             .unwrap();
-        prove(proving_key, matrices, witnesses)
+        let (ark_proof, public_inputs) = prove(proving_key, matrices, witnesses).unwrap();
+        (ark_proof.into(), public_inputs)
     } else {
-        panic!("unknown curve detected in zkey");
-    }
+        bail!("unknown curve detected in zkey")
+    };
+
+    Ok(CircomProof { proof, pub_inputs })
 }
+
 pub fn verify_circom_proof(
     zkey_path: String,
     proof: Vec<u8>,
@@ -79,7 +84,7 @@ fn prove<T: Pairing + FieldSerialization>(
     pkey: ProvingKey<T>,
     matrices: ConstraintMatrices<T::ScalarField>,
     witness: Vec<BigUint>,
-) -> Result<CircomProof> {
+) -> Result<(ark_groth16::Proof<T>, Vec<u8>)> {
     let witness_fr = witness
         .iter()
         .map(|v| T::ScalarField::from(v.clone()))
@@ -99,14 +104,11 @@ fn prove<T: Pairing + FieldSerialization>(
         matrices.num_instance_variables,
         matrices.num_constraints,
         witness_fr.as_slice(),
-    );
-
-    let proof = ark_proof?;
-
-    Ok(CircomProof {
-        proof: serialization::serialize_proof(&SerializableProof(proof)),
-        pub_inputs: serialization::serialize_inputs(&SerializableInputs::<T>(public_inputs)),
-    })
+    )?;
+    Ok((
+        ark_proof,
+        serialization::serialize_inputs(&SerializableInputs::<T>(public_inputs)),
+    ))
 }
 
 fn verify<T: Pairing + FieldSerialization>(

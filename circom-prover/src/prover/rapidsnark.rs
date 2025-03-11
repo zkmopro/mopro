@@ -11,7 +11,7 @@ use std::{fs::File, str::FromStr};
 
 use super::{
     ark_circom::read_proving_key,
-    serialization::{self, SerializableInputs, SerializableProof},
+    serialization::{self, SerializableInputs},
 };
 
 type Fq = ark_bn254::Fq;
@@ -56,7 +56,7 @@ pub fn generate_circom_proof(
         .collect();
 
     Ok(CircomProof {
-        proof: serialization::serialize_proof(&SerializableProof(ark_proof)),
+        proof: ark_proof.into(),
         pub_inputs: serialization::serialize_inputs(&SerializableInputs::<Bn254>(public_signals)),
     })
 }
