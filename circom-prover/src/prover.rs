@@ -1,4 +1,5 @@
 use anyhow::Result;
+use ethereum::Proof;
 use num::BigUint;
 use std::thread::JoinHandle;
 
@@ -12,7 +13,7 @@ pub mod rapidsnark;
 pub mod serialization;
 
 pub struct CircomProof {
-    pub proof: Vec<u8>,
+    pub proof: Proof,
     pub pub_inputs: Vec<u8>,
 }
 
@@ -37,17 +38,12 @@ pub fn prove(
     }
 }
 
-pub fn verify(
-    lib: ProofLib,
-    zkey_path: String,
-    proof: Vec<u8>,
-    public_inputs: Vec<u8>,
-) -> Result<bool> {
+pub fn verify(lib: ProofLib, zkey_path: String, proof: CircomProof) -> Result<bool> {
     match lib {
         #[cfg(feature = "arkworks")]
-        ProofLib::Arkworks => arkworks::verify_circom_proof(zkey_path, proof, public_inputs),
+        ProofLib::Arkworks => arkworks::verify_circom_proof(zkey_path, proof),
         #[cfg(feature = "rapidsnark")]
-        ProofLib::RapidSnark => rapidsnark::verify_circom_proof(zkey_path, proof, public_inputs),
+        ProofLib::RapidSnark => rapidsnark::verify_circom_proof(zkey_path, proof),
         #[allow(unreachable_patterns)]
         _ => panic!("Unsupported proof library"),
     }

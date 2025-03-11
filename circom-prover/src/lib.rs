@@ -27,13 +27,8 @@ impl CircomProver {
         prover::prove(proof_lib, zkey_path.clone(), wit_thread)
     }
 
-    pub fn verify(
-        proof_lib: ProofLib,
-        proof: Vec<u8>,
-        public_inputs: Vec<u8>,
-        zkey_path: String,
-    ) -> Result<bool> {
-        prover::verify(proof_lib, zkey_path, proof, public_inputs)
+    pub fn verify(proof_lib: ProofLib, proof: CircomProof, zkey_path: String) -> Result<bool> {
+        prover::verify(proof_lib, zkey_path, proof)
     }
 }
 
@@ -53,32 +48,30 @@ mod tests {
         CircomProver::prove(proof_lib, witness_fn, input_str, ZKEY_PATH.to_string()).unwrap()
     }
 
-    fn verify_proof(proof: Vec<u8>, public_inputs: Vec<u8>, proof_lib: ProofLib) -> bool {
-        CircomProver::verify(proof_lib, proof, public_inputs, ZKEY_PATH.to_string()).unwrap()
+    fn verify_proof(proof: CircomProof, proof_lib: ProofLib) -> bool {
+        CircomProver::verify(proof_lib, proof, ZKEY_PATH.to_string()).unwrap()
     }
 
     #[cfg(all(feature = "rustwitness", feature = "arkworks"))]
     #[test]
     fn test_rustwitness_arkworks_prove_and_verify() {
         rust_witness::witness!(multiplier2);
-        let res = generate_proof(
+        let proof = generate_proof(
             WitnessFn::RustWitness(multiplier2_witness),
             ProofLib::Arkworks,
         );
-        let res = verify_proof(res.proof, res.pub_inputs, ProofLib::Arkworks);
-        assert!(res);
+        assert!(verify_proof(proof, ProofLib::Arkworks));
     }
 
     #[cfg(all(feature = "witnesscalc", feature = "arkworks"))]
     #[test]
     fn test_witnesscalc_arkworks_prove_and_verify() {
         witnesscalc_adapter::witness!(multiplier2);
-        let res = generate_proof(
+        let proof = generate_proof(
             WitnessFn::WitnessCalc(multiplier2_witness),
             ProofLib::Arkworks,
         );
-        let res = verify_proof(res.proof, res.pub_inputs, ProofLib::Arkworks);
-        assert!(res);
+        assert!(verify_proof(proof, ProofLib::Arkworks));
     }
 
     #[cfg(all(feature = "rustwitness", feature = "rapidsnark"))]
@@ -86,11 +79,10 @@ mod tests {
     fn test_rustwitness_rapidsnark_prove_and_verify() {
         rust_witness::witness!(multiplier2);
 
-        let res = generate_proof(
+        let proof = generate_proof(
             WitnessFn::RustWitness(multiplier2_witness),
             ProofLib::RapidSnark,
         );
-        let res = verify_proof(res.proof, res.pub_inputs, ProofLib::RapidSnark);
-        assert!(res);
+        assert!(verify_proof(proof, ProofLib::RapidSnark));
     }
 }

@@ -11,7 +11,7 @@ use std::{fs::File, thread::JoinHandle};
 use anyhow::{bail, Result};
 use num_bigint::BigUint;
 use rand::prelude::*;
-use serialization::{SerializableInputs, SerializableProof};
+use serialization::SerializableInputs;
 
 use super::{
     ark_circom::{
@@ -33,42 +33,45 @@ pub fn generate_circom_proof(
     let mut reader = std::io::BufReader::new(file);
 
     // check the prime in the header
-    if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
+    let (proof, pub_inputs) = if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
         let (proving_key, matrices) = read_zkey::<_, Bn254>(&mut reader)?;
         // Get the result witness from the background thread
         let witnesses = witness_thread
             .join()
             .map_err(|_e| anyhow::anyhow!("witness thread panicked"))
             .unwrap();
-        prove(proving_key, matrices, witnesses)
+        let (ark_proof, public_inputs) = prove(proving_key, matrices, witnesses).unwrap();
+        (ark_proof.into(), public_inputs)
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
         let (proving_key, matrices) = read_zkey::<_, Bls12_381>(&mut reader)?;
         let witnesses = witness_thread
             .join()
             .map_err(|_e| anyhow::anyhow!("witness thread panicked"))
             .unwrap();
-        prove(proving_key, matrices, witnesses)
+        let (ark_proof, public_inputs) = prove(proving_key, matrices, witnesses).unwrap();
+        (ark_proof.into(), public_inputs)
     } else {
-        panic!("unknown curve detected in zkey");
-    }
+        bail!("unknown curve detected in zkey")
+    };
+
+    Ok(CircomProof { proof, pub_inputs })
 }
-pub fn verify_circom_proof(
-    zkey_path: String,
-    proof: Vec<u8>,
-    public_inputs: Vec<u8>,
-) -> Result<bool> {
+
+pub fn verify_circom_proof(zkey_path: String, proof: CircomProof) -> Result<bool> {
     let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
     header_reader.read();
     let file = File::open(&zkey_path)?;
     let mut reader = std::io::BufReader::new(file);
     if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
         let proving_key = read_proving_key::<_, Bn254>(&mut reader)?;
-        let p = serialization::deserialize_inputs::<Bn254>(public_inputs);
-        verify(proving_key.vk, p.0, proof)
+        let p = serialization::deserialize_inputs::<Bn254>(proof.pub_inputs);
+        let ark_proof: ark_groth16::Proof<Bn254> = proof.proof.into();
+        verify(proving_key.vk, p.0, ark_proof)
     } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
         let proving_key = read_proving_key::<_, Bls12_381>(&mut reader)?;
-        let p = serialization::deserialize_inputs::<Bls12_381>(public_inputs);
-        verify(proving_key.vk, p.0, proof)
+        let p = serialization::deserialize_inputs::<Bls12_381>(proof.pub_inputs);
+        let ark_proof: ark_groth16::Proof<Bls12_381> = proof.proof.into();
+        verify(proving_key.vk, p.0, ark_proof)
     } else {
         // unknown curve
         bail!("unknown curve detected in zkey")
@@ -79,7 +82,7 @@ fn prove<T: Pairing + FieldSerialization>(
     pkey: ProvingKey<T>,
     matrices: ConstraintMatrices<T::ScalarField>,
     witness: Vec<BigUint>,
-) -> Result<CircomProof> {
+) -> Result<(ark_groth16::Proof<T>, Vec<u8>)> {
     let witness_fr = witness
         .iter()
         .map(|v| T::ScalarField::from(v.clone()))
@@ -99,28 +102,21 @@ fn prove<T: Pairing + FieldSerialization>(
         matrices.num_instance_variables,
         matrices.num_constraints,
         witness_fr.as_slice(),
-    );
-
-    let proof = ark_proof?;
-
-    Ok(CircomProof {
-        proof: serialization::serialize_proof(&SerializableProof(proof)),
-        pub_inputs: serialization::serialize_inputs(&SerializableInputs::<T>(public_inputs)),
-    })
+    )?;
+    Ok((
+        ark_proof,
+        serialization::serialize_inputs(&SerializableInputs::<T>(public_inputs)),
+    ))
 }
 
 fn verify<T: Pairing + FieldSerialization>(
     vk: VerifyingKey<T>,
     public_inputs: Vec<T::ScalarField>,
-    proof: Vec<u8>,
+    proof: ark_groth16::Proof<T>,
 ) -> Result<bool> {
     let pvk = prepare_verifying_key(&vk);
     let public_inputs_fr = public_inputs.to_vec();
-    let proof_parsed = serialization::deserialize_proof::<T>(proof);
-    let verified = Groth16::<T, CircomReduction>::verify_with_processed_vk(
-        &pvk,
-        &public_inputs_fr,
-        &proof_parsed.0,
-    )?;
+    let verified =
+        Groth16::<T, CircomReduction>::verify_with_processed_vk(&pvk, &public_inputs_fr, &proof)?;
     Ok(verified)
 }
