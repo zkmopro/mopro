@@ -16,7 +16,7 @@ cd mopro/cli
 cargo install --path .
 ```
 
-### 1. Initialize adapter
+### 2. Initialize adapter
 
 Navigate to the Mopro example app directory and initialize setup by running:
 
