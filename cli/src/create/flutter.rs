@@ -71,7 +71,8 @@ impl Create for Flutter {
         print_green_bold("Next steps:".to_string());
         println!();
         print_green_bold(
-            "  Refer to the README.md in the `flutter` folder for instructions on running the app.".to_string(),
+            "  Refer to the README.md in the `flutter` folder for instructions on running the app."
+                .to_string(),
         );
         print_footer_message();
     }
