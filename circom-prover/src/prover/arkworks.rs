@@ -95,8 +95,7 @@ fn prove<T: Pairing + FieldSerialization>(
     let r = T::ScalarField::rand(rng);
     let s = T::ScalarField::rand(rng);
     let public_inputs = witness_fr.as_slice()[1..matrices.num_instance_variables]
-        .to_vec()
-        .into_iter()
+        .iter()
         .map(|scalar| BigUint::from_bytes_le(scalar.into_bigint().to_bytes_le().as_ref()))
         .collect::<Vec<BigUint>>();
     // build the proof

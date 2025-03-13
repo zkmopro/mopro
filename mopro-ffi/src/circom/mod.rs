@@ -1,5 +1,4 @@
 pub mod ethereum;
-use std::fs::File;
 
 use anyhow::{bail, Ok, Result};
 use ark_bls12_381::Bls12_381;
