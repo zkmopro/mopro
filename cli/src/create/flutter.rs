@@ -6,7 +6,6 @@ use crate::create::utils::{
     check_bindings, copy_android_bindings, copy_dir, copy_keys, download_and_extract_template,
 };
 use crate::print::print_footer_message;
-use crate::style::print_bold;
 use crate::style::print_green_bold;
 
 pub struct Flutter;

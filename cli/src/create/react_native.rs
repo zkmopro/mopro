@@ -4,7 +4,6 @@ use crate::create::utils::{
     download_and_extract_template,
 };
 use crate::print::print_footer_message;
-use crate::style::print_bold;
 use crate::style::print_green_bold;
 
 use anyhow::{Error, Result};
