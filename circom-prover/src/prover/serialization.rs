@@ -1,8 +1,11 @@
 use anyhow::Result;
 use ark_ec::pairing::Pairing;
+use ark_ff::{BigInteger, PrimeField};
 use ark_groth16::{Proof, ProvingKey};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
+use num::BigUint;
 
+use super::PublicInputs;
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug)]
 pub struct SerializableProvingKey<T: Pairing>(pub ProvingKey<T>);
 
@@ -34,6 +37,33 @@ pub fn serialize_inputs<T: Pairing>(inputs: &SerializableInputs<T>) -> Vec<u8> {
 
 pub fn deserialize_inputs<T: Pairing>(data: Vec<u8>) -> SerializableInputs<T> {
     SerializableInputs::deserialize_uncompressed(&mut &data[..]).expect("Deserialization failed")
+}
+
+impl<T: Pairing> From<PublicInputs> for SerializableInputs<T> {
+    fn from(src: PublicInputs) -> SerializableInputs<T> {
+        let si = src
+            .0
+            .iter()
+            .map(|n| {
+                if *n > BigUint::from_bytes_le(T::ScalarField::MODULUS.to_bytes_le().as_ref()) {
+                    panic!("Invalid input, lager than MODULUS")
+                }
+                T::ScalarField::from_le_bytes_mod_order(n.to_bytes_le().as_ref())
+            })
+            .collect();
+        SerializableInputs(si)
+    }
+}
+
+impl<T: Pairing> From<SerializableInputs<T>> for PublicInputs {
+    fn from(src: SerializableInputs<T>) -> PublicInputs {
+        let pi = src
+            .0
+            .iter()
+            .map(|&si| BigUint::from_bytes_le(si.into_bigint().to_bytes_le().as_ref()))
+            .collect();
+        PublicInputs(pi)
+    }
 }
 
 #[cfg(feature = "arkworks")]

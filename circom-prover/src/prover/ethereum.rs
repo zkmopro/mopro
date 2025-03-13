@@ -22,7 +22,7 @@ const BLS12_381_BUF_SIZE: usize = 48;
 
 pub const PROTOCOL_GROTH16: &str = "groth16";
 pub const CURVE_BN254: &str = "bn128";
-pub const CURVE_BLS12_381: &str = "bls12-381";
+pub const CURVE_BLS12_381: &str = "bls12381";
 
 pub struct Inputs(pub Vec<BigUint>);
 

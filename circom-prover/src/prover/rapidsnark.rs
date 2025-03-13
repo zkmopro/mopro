@@ -2,6 +2,7 @@ use crate::CircomProof;
 use anyhow::Result;
 use ark_bn254::{Bn254, Fr};
 use ark_ec::pairing::Pairing;
+use ark_ff::PrimeField;
 use ark_groth16::{prepare_verifying_key, Proof};
 use num::BigUint;
 use num_bigint::BigInt;
@@ -12,6 +13,7 @@ use std::{fs::File, str::FromStr};
 use super::{
     ark_circom::read_proving_key,
     serialization::{self, SerializableInputs},
+    PublicInputs,
 };
 
 type Fq = ark_bn254::Fq;
@@ -48,27 +50,27 @@ pub fn generate_circom_proof(
     let b = <Bn254 as Pairing>::G2Affine::new_unchecked(b1, b2);
 
     let ark_proof = Proof::<Bn254> { a, b, c };
-    let public_signals: Vec<Fr> = public_signals_json
+    let public_signals: Vec<BigUint> = public_signals_json
         .as_array()
         .unwrap()
         .iter()
         .map(|v| Fr::from_str(v.as_str().unwrap()).unwrap())
+        .map(|fr| BigUint::from(fr.into_bigint()))
         .collect();
 
     Ok(CircomProof {
         proof: ark_proof.into(),
-        pub_inputs: serialization::serialize_inputs(&SerializableInputs::<Bn254>(public_signals)),
+        pub_inputs: PublicInputs(public_signals),
     })
 }
 
 pub fn verify_circom_proof(
     zkey_path: String,
     proof: Vec<u8>,
-    public_inputs: Vec<u8>,
+    public_inputs: PublicInputs,
 ) -> Result<bool> {
     let proof_parsed = serialization::deserialize_proof::<Bn254>(proof);
-    let public_inputs_parsed = serialization::deserialize_inputs::<Bn254>(public_inputs);
-
+    let public_inputs_parsed: SerializableInputs<Bn254> = public_inputs.into();
     let pi_a: Vec<String> = vec![
         proof_parsed.0.a.x.to_string(),
         proof_parsed.0.a.y.to_string(),

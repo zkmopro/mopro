@@ -2,7 +2,7 @@ pub mod prover;
 pub mod witness;
 
 use anyhow::Result;
-use prover::{CircomProof, ProofLib};
+use prover::{CircomProof, ProofLib, PublicInputs};
 
 #[cfg(feature = "rapidsnark")]
 pub use prover::rapidsnark;
@@ -30,7 +30,7 @@ impl CircomProver {
     pub fn verify(
         proof_lib: ProofLib,
         proof: Vec<u8>,
-        public_inputs: Vec<u8>,
+        public_inputs: PublicInputs,
         zkey_path: String,
     ) -> Result<bool> {
         prover::verify(proof_lib, zkey_path, proof, public_inputs)

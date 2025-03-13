@@ -12,9 +12,11 @@ pub mod ethereum;
 pub mod rapidsnark;
 pub mod serialization;
 
+pub struct PublicInputs(pub Vec<BigUint>);
+
 pub struct CircomProof {
     pub proof: Proof,
-    pub pub_inputs: Vec<u8>,
+    pub pub_inputs: PublicInputs,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -42,7 +44,7 @@ pub fn verify(
     lib: ProofLib,
     zkey_path: String,
     proof: Vec<u8>,
-    public_inputs: Vec<u8>,
+    public_inputs: PublicInputs,
 ) -> Result<bool> {
     match lib {
         #[cfg(feature = "arkworks")]
