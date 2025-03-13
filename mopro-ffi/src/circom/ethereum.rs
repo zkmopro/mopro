@@ -61,7 +61,7 @@ pub fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
         .map(|x| BigUint::from_str(x).unwrap())
         .collect::<Vec<BigUint>>();
     let fr_inputs: Vec<Fr> = ethereum::Inputs(inputs).into();
-    serialization::serialize_inputs(&SerializableInputs::<Bn254>(fr_inputs.into()))
+    serialization::serialize_inputs(&SerializableInputs::<Bn254>(fr_inputs))
 }
 
 pub fn from_ethereum_proof(proof: ProofCalldata) -> Vec<u8> {
