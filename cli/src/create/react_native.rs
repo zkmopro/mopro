@@ -60,15 +60,8 @@ impl Create for ReactNative {
         print_green_bold("Next steps:".to_string());
         println!();
         print_green_bold(
-            "  You can now use the following command to open the app in VS Code:".to_string(),
+            "  Refer to the README.md in the `react-native` folder for instructions on running the app.".to_string(),
         );
-        println!();
-        print_bold(r"    code react-native-app".to_string());
-        println!();
-        print_green_bold(
-            "To learn more about setting up the React Native app with mopro, visit https://zkmopro.org/docs/setup/react-native-setup/".to_string(),
-        );
-
         print_footer_message();
     }
 }
