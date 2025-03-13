@@ -1,9 +1,23 @@
 pub mod ethereum;
-use anyhow::{Ok, Result};
+
+use anyhow::{bail, Ok, Result};
+use ark_bls12_381::Bls12_381;
+use ark_bn254::Bn254;
+use ark_ff::PrimeField;
 pub use ethereum::*;
+use num_bigint::BigUint;
 
 use crate::GenerateProofResult;
-use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
+use circom_prover::{
+    prover::{
+        ark_circom::ZkeyHeaderReader,
+        ethereum::{CURVE_BLS12_381, CURVE_BN254},
+        serialization::{self, SerializableProof},
+        ProofLib,
+    },
+    witness::WitnessFn,
+    CircomProver,
+};
 
 #[macro_export]
 macro_rules! circom_app {
@@ -128,9 +142,20 @@ pub fn generate_circom_proof_wtns(
     witness_fn: WitnessFn,
 ) -> Result<GenerateProofResult> {
     let ret = CircomProver::prove(proof_lib, witness_fn, json_input_str, zkey_path).unwrap();
+    let (proof, public_inputs) = match ret.proof.curve.as_ref() {
+        CURVE_BN254 => (
+            serialization::serialize_proof(&SerializableProof::<Bn254>(ret.proof.into())),
+            serialization::serialize_inputs::<Bn254>(&ret.pub_inputs.into()),
+        ),
+        CURVE_BLS12_381 => (
+            serialization::serialize_proof(&SerializableProof::<Bls12_381>(ret.proof.into())),
+            serialization::serialize_inputs::<Bls12_381>(&ret.pub_inputs.into()),
+        ),
+        _ => bail!("Not uspported curve"),
+    };
     Ok(GenerateProofResult {
-        proof: ret.proof,
-        inputs: ret.pub_inputs,
+        proof,
+        inputs: public_inputs,
     })
 }
 
@@ -141,6 +166,18 @@ pub fn verify_circom_proof(
     proof: Vec<u8>,
     public_inputs: Vec<u8>,
 ) -> Result<bool> {
+    // TODO fix this workaround, change `public_inputs: Vec<u8>` to `public_inputs: Vec<String>`
+    let mut header_reader = ZkeyHeaderReader::new(&zkey_path);
+    header_reader.read();
+    let public_inputs = if header_reader.r == BigUint::from(ark_bn254::Fr::MODULUS) {
+        serialization::deserialize_inputs::<Bn254>(public_inputs).into()
+    } else if header_reader.r == BigUint::from(ark_bls12_381::Fr::MODULUS) {
+        serialization::deserialize_inputs::<Bls12_381>(public_inputs).into()
+    } else {
+        // unknown curve
+        bail!("unknown curve detected in zkey")
+    };
+
     CircomProver::verify(proof_lib, proof, public_inputs, zkey_path)
 }
 
