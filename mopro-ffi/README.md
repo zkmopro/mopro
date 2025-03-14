@@ -4,7 +4,7 @@
 
 Key features include:
 
--   **Function Serialization and Export:** Enables serialization and export of functions within each proving system. To generate FFI bindings for different targets, inputs and outputs must conform to the specific types defined in [uniffi](https://mozilla.github.io/uniffi-rs/latest/udl/builtin_types.html).
+-   **Function Serialization and Export:** Enables serialization and export of functions within each proving system. To generate FFI bindings for different targets, inputs and outputs must conform to the specific types defined in [uniffi](https://mozilla.github.io/uniffi-rs/next/types/builtin_types.html).
     -   Supported proving systems: `circom`, `halo2`.
 -   **Executable Binaries:** Provides pre-built binaries, allowing developers to generate bindings for various targets effortlessly.
     -   Supported targets: `swift`, `kotlin`.
