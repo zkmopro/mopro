@@ -55,6 +55,7 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
     inputs
 }
 
+// Only supports bn254 for now
 pub fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
     let inputs = inputs
         .iter()
@@ -64,6 +65,7 @@ pub fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
     serialization::serialize_inputs(&SerializableInputs::<Bn254>(fr_inputs))
 }
 
+// Only supports bn254 for now
 pub fn from_ethereum_proof(proof: ProofCalldata) -> Vec<u8> {
     let a_x = Fq::from_str(&proof.a.x).unwrap();
     let a_y = Fq::from_str(&proof.a.y).unwrap();
