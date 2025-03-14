@@ -64,3 +64,6 @@ open android -a Android\ Studio
 ```
 
 For Web:
+```sh
+cd web && yarn && yarn start
+```
