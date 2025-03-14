@@ -18,7 +18,6 @@ import uniffi.mopro.verifyCircomProof
 
 @Composable
 fun MultiplierComponent() {
-    var initTime by remember { mutableStateOf("init time:") }
     var provingTime by remember { mutableStateOf("proving time:") }
     var verifyingTime by remember { mutableStateOf("verifying time: ") }
     var valid by remember { mutableStateOf("valid:") }
@@ -49,8 +48,12 @@ fun MultiplierComponent() {
         ) { Text(text = "generate proof") }
         Button(
             onClick = {
+                val ethereumProof = uniffi.mopro.toEthereumProof(res.proof)
+                val ethereumInputs = uniffi.mopro.toEthereumInputs(res.inputs)
+                val moproProof = uniffi.mopro.fromEthereumProof(ethereumProof)
+                val moproInputs = uniffi.mopro.fromEthereumInputs(ethereumInputs)
                 val startTime = System.currentTimeMillis()
-                valid = "valid: " + verifyCircomProof(zkeyPath, res.proof, res.inputs, ProofLib.ARKWORKS).toString()
+                valid = "valid: " + verifyCircomProof(zkeyPath, moproProof, moproInputs, ProofLib.ARKWORKS).toString()
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
                 output = "output: " + uniffi.mopro.toEthereumInputs(res.inputs)
@@ -63,7 +66,6 @@ fun MultiplierComponent() {
             fontWeight = FontWeight.Bold
         )
 
-        Text(text = initTime, modifier = Modifier.padding(top = 200.dp).width(200.dp))
         Text(text = provingTime, modifier = Modifier.padding(top = 250.dp).width(200.dp))
         Text(text = valid, modifier = Modifier.padding(top = 300.dp).width(200.dp))
         Text(text = verifyingTime, modifier = Modifier.padding(top = 350.dp).width(200.dp))

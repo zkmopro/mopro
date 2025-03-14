@@ -81,6 +81,18 @@ macro_rules! circom_app {
         fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
             mopro_ffi::to_ethereum_inputs(inputs)
         }
+
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        fn from_ethereum_proof(proof: $proof_call_data) -> Vec<u8> {
+            mopro_ffi::from_ethereum_proof(proof.into())
+        }
+
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
+            mopro_ffi::from_ethereum_inputs(inputs)
+        }
     };
 }
 

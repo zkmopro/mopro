@@ -3,8 +3,8 @@
 //! Helpers for converting Arkworks types to BigUint-tuples as expected by the
 //! Solidity Groth16 Verifier smart contracts
 use ark_bls12_381::{
-    Bls12_381, Fq as bls12_381_fq, Fq2 as bls12_381_Fq2, G1Affine as bls12_381_G1Affine,
-    G2Affine as bls12_381_G2Affine,
+    Bls12_381, Fq as bls12_381_fq, Fq2 as bls12_381_Fq2, Fr as bls12_381_Fr,
+    G1Affine as bls12_381_G1Affine, G2Affine as bls12_381_G2Affine,
 };
 use ark_ec::AffineRepr;
 use ark_ff::{BigInteger, PrimeField};
@@ -12,13 +12,10 @@ use num::BigUint;
 use num_traits::Zero;
 
 use ark_bn254::{
-    Bn254, Fq as bn254_Fq, Fq2 as bn254_Fq2, Fr, G1Affine as bn254_G1Affine,
+    Bn254, Fq as bn254_Fq, Fq2 as bn254_Fq2, Fr as bn254_Fr, G1Affine as bn254_G1Affine,
     G2Affine as bn254_G2Affine,
 };
 use ark_serialize::CanonicalDeserialize;
-
-const BN254_BUF_SIZE: usize = 32;
-const BLS12_381_BUF_SIZE: usize = 48;
 
 pub const PROTOCOL_GROTH16: &str = "groth16";
 pub const CURVE_BN254: &str = "bn128";
@@ -26,11 +23,37 @@ pub const CURVE_BLS12_381: &str = "bls12381";
 
 pub struct Inputs(pub Vec<BigUint>);
 
-impl From<&[Fr]> for Inputs {
-    fn from(src: &[Fr]) -> Self {
+impl From<&[bn254_Fr]> for Inputs {
+    fn from(src: &[bn254_Fr]) -> Self {
         let els = src.iter().map(|point| point_to_biguint(*point)).collect();
-
         Self(els)
+    }
+}
+
+impl From<&[bls12_381_Fr]> for Inputs {
+    fn from(src: &[bls12_381_Fr]) -> Self {
+        let els = src.iter().map(|point| point_to_biguint(*point)).collect();
+        Self(els)
+    }
+}
+
+impl From<Inputs> for Vec<bn254_Fr> {
+    fn from(inputs: Inputs) -> Self {
+        inputs
+            .0
+            .iter()
+            .map(|biguint| biguint_to_point(biguint.clone()))
+            .collect()
+    }
+}
+
+impl From<Inputs> for Vec<bls12_381_Fr> {
+    fn from(inputs: Inputs) -> Self {
+        inputs
+            .0
+            .iter()
+            .map(|biguint| biguint_to_point(biguint.clone()))
+            .collect()
     }
 }
 
@@ -51,8 +74,8 @@ impl G1 {
 
     // BN254
     pub fn to_bn254(self) -> bn254_G1Affine {
-        let x: bn254_Fq = biguint_to_point(self.x, BN254_BUF_SIZE);
-        let y: bn254_Fq = biguint_to_point(self.y, BN254_BUF_SIZE);
+        let x: bn254_Fq = biguint_to_point(self.x);
+        let y: bn254_Fq = biguint_to_point(self.y);
         if x.is_zero() && y.is_zero() {
             bn254_G1Affine::identity()
         } else {
@@ -71,8 +94,8 @@ impl G1 {
 
     // BLS12-381
     pub fn to_bls12_381(self) -> bls12_381_G1Affine {
-        let x: bls12_381_fq = biguint_to_point(self.x, BLS12_381_BUF_SIZE);
-        let y: bls12_381_fq = biguint_to_point(self.y, BLS12_381_BUF_SIZE);
+        let x: bls12_381_fq = biguint_to_point(self.x);
+        let y: bls12_381_fq = biguint_to_point(self.y);
         if x.is_zero() && y.is_zero() {
             bls12_381_G1Affine::identity()
         } else {
@@ -111,12 +134,12 @@ impl G2 {
 
     // BN254
     pub fn to_bn254(self) -> bn254_G2Affine {
-        let c0 = biguint_to_point(self.x[0].clone(), BN254_BUF_SIZE);
-        let c1 = biguint_to_point(self.x[1].clone(), BN254_BUF_SIZE);
+        let c0 = biguint_to_point(self.x[0].clone());
+        let c1 = biguint_to_point(self.x[1].clone());
         let x = bn254_Fq2::new(c0, c1);
 
-        let c0 = biguint_to_point(self.y[0].clone(), BN254_BUF_SIZE);
-        let c1 = biguint_to_point(self.y[1].clone(), BN254_BUF_SIZE);
+        let c0 = biguint_to_point(self.y[0].clone());
+        let c1 = biguint_to_point(self.y[1].clone());
         let y = bn254_Fq2::new(c0, c1);
 
         if x.is_zero() && y.is_zero() {
@@ -137,12 +160,12 @@ impl G2 {
 
     // BLS12-381
     pub fn to_bls12_381(self) -> bls12_381_G2Affine {
-        let c0 = biguint_to_point(self.x[0].clone(), BLS12_381_BUF_SIZE);
-        let c1 = biguint_to_point(self.x[1].clone(), BLS12_381_BUF_SIZE);
+        let c0 = biguint_to_point(self.x[0].clone());
+        let c1 = biguint_to_point(self.x[1].clone());
         let x = bls12_381_Fq2::new(c0, c1);
 
-        let c0 = biguint_to_point(self.y[0].clone(), BLS12_381_BUF_SIZE);
-        let c1 = biguint_to_point(self.y[1].clone(), BLS12_381_BUF_SIZE);
+        let c0 = biguint_to_point(self.y[0].clone());
+        let c1 = biguint_to_point(self.y[1].clone());
         let y = bls12_381_Fq2::new(c0, c1);
 
         if x.is_zero() && y.is_zero() {
@@ -222,7 +245,8 @@ impl From<Proof> for ark_groth16::Proof<Bls12_381> {
 }
 
 // Helper for converting a PrimeField to its BigUint representation for Ethereum compatibility
-fn biguint_to_point<F: PrimeField>(point: BigUint, buf_size: usize) -> F {
+fn biguint_to_point<F: PrimeField>(point: BigUint) -> F {
+    let buf_size: usize = ((F::MODULUS_BIT_SIZE + 7) / 8).try_into().unwrap(); // Rounds up the division
     let mut buf = point.to_bytes_le();
     buf.resize(buf_size, 0u8);
     let bigint = F::BigInt::deserialize_uncompressed(&buf[..]).expect("always works");
@@ -239,9 +263,8 @@ fn point_to_biguint<F: PrimeField>(point: F) -> BigUint {
 
 #[cfg(test)]
 mod tests {
-    use crate::prover::ethereum::{
-        biguint_to_point, point_to_biguint, Proof, BLS12_381_BUF_SIZE, BN254_BUF_SIZE, G1, G2,
-    };
+    use crate::prover::ethereum::{biguint_to_point, point_to_biguint, Inputs, Proof, G1, G2};
+    use num::BigUint;
 
     mod bn254 {
         use super::*;
@@ -270,7 +293,7 @@ mod tests {
         fn convert_fq() {
             let el = fq();
             let el2 = point_to_biguint(el);
-            let el3: Fq = biguint_to_point(el2.clone(), BN254_BUF_SIZE);
+            let el3: Fq = biguint_to_point(el2.clone());
             let el4 = point_to_biguint(el3);
             assert_eq!(el, el3);
             assert_eq!(el2, el4);
@@ -280,7 +303,7 @@ mod tests {
         fn convert_fr() {
             let el = fr();
             let el2 = point_to_biguint(el);
-            let el3: Fr = biguint_to_point(el2.clone(), BN254_BUF_SIZE);
+            let el3: Fr = biguint_to_point(el2.clone());
             let el4 = point_to_biguint(el3);
             assert_eq!(el, el3);
             assert_eq!(el2, el4);
@@ -317,6 +340,40 @@ mod tests {
             let p3 = ark_groth16::Proof::from(p2);
             assert_eq!(p, p3);
         }
+
+        #[test]
+        fn convert_fr_inputs_to_biguint() {
+            let bn254_1 = Fr::from(1u32);
+            let bn254_2 = Fr::from(2u32);
+            let bn254_3 = Fr::from(3u32);
+
+            let bn254_slice: &[Fr] = &[bn254_1, bn254_2, bn254_3];
+
+            let result: Inputs = bn254_slice.into();
+
+            assert_eq!(result.0.len(), 3);
+
+            assert_eq!(result.0[0], BigUint::from(1u32));
+            assert_eq!(result.0[1], BigUint::from(2u32));
+            assert_eq!(result.0[2], BigUint::from(3u32));
+        }
+
+        #[test]
+        fn convert_biguint_to_fr_inputs() {
+            let biguint1 = BigUint::from(1u32);
+            let biguint2 = BigUint::from(2u32);
+            let biguint3 = BigUint::from(3u32);
+
+            let inputs = Inputs(vec![biguint1, biguint2, biguint3]);
+
+            let result: Vec<Fr> = inputs.into();
+
+            assert_eq!(result.len(), 3);
+
+            assert_eq!(result[0], Fr::from(BigUint::from(1u32)));
+            assert_eq!(result[1], Fr::from(BigUint::from(2u32)));
+            assert_eq!(result[2], Fr::from(BigUint::from(3u32)));
+        }
     }
 
     mod bls12_381 {
@@ -346,7 +403,7 @@ mod tests {
         fn convert_fq() {
             let el = fq();
             let el2 = point_to_biguint(el);
-            let el3: Fq = biguint_to_point(el2.clone(), BLS12_381_BUF_SIZE);
+            let el3: Fq = biguint_to_point(el2.clone());
             let el4 = point_to_biguint(el3);
             assert_eq!(el, el3);
             assert_eq!(el2, el4);
@@ -356,7 +413,7 @@ mod tests {
         fn convert_fr() {
             let el = fr();
             let el2 = point_to_biguint(el);
-            let el3: Fr = biguint_to_point(el2.clone(), BLS12_381_BUF_SIZE);
+            let el3: Fr = biguint_to_point(el2.clone());
             let el4 = point_to_biguint(el3);
             assert_eq!(el, el3);
             assert_eq!(el2, el4);
@@ -392,6 +449,40 @@ mod tests {
             let p2 = Proof::from(p.clone());
             let p3 = ark_groth16::Proof::from(p2);
             assert_eq!(p, p3);
+        }
+
+        #[test]
+        fn convert_fr_inputs_to_biguint() {
+            let bn254_1 = Fr::from(1u32);
+            let bn254_2 = Fr::from(2u32);
+            let bn254_3 = Fr::from(3u32);
+
+            let bn254_slice: &[Fr] = &[bn254_1, bn254_2, bn254_3];
+
+            let result: Inputs = bn254_slice.into();
+
+            assert_eq!(result.0.len(), 3);
+
+            assert_eq!(result.0[0], BigUint::from(1u32));
+            assert_eq!(result.0[1], BigUint::from(2u32));
+            assert_eq!(result.0[2], BigUint::from(3u32));
+        }
+
+        #[test]
+        fn convert_biguint_to_fr_inputs() {
+            let biguint1 = BigUint::from(1u32);
+            let biguint2 = BigUint::from(2u32);
+            let biguint3 = BigUint::from(3u32);
+
+            let inputs = Inputs(vec![biguint1, biguint2, biguint3]);
+
+            let result: Vec<Fr> = inputs.into();
+
+            assert_eq!(result.len(), 3);
+
+            assert_eq!(result[0], Fr::from(BigUint::from(1u32)));
+            assert_eq!(result[1], Fr::from(BigUint::from(2u32)));
+            assert_eq!(result[2], Fr::from(BigUint::from(3u32)));
         }
     }
 }
