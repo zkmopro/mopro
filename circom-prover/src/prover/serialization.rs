@@ -46,7 +46,7 @@ impl<T: Pairing> From<PublicInputs> for SerializableInputs<T> {
             .iter()
             .map(|n| {
                 if *n > BigUint::from_bytes_le(T::ScalarField::MODULUS.to_bytes_le().as_ref()) {
-                    panic!("Invalid input, lager than MODULUS")
+                    panic!("Invalid input, larger than MODULUS")
                 }
                 T::ScalarField::from_le_bytes_mod_order(n.to_bytes_le().as_ref())
             })
