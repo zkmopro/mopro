@@ -16,7 +16,7 @@ cd mopro/cli
 cargo install --path .
 ```
 
-### 1. Initialize adapter
+### 2. Initialize adapter
 
 Navigate to the Mopro example app directory and initialize setup by running:
 
@@ -39,6 +39,31 @@ To generate templates tailored to your target platform, use:
 ```sh
 mopro create
 ```
+
+### 5. Open the project
+
+Follow the instructions to open the development tools
+
+For iOS:
+```sh
+open ios/MoproApp.xcodeproj
+```
+
+For Android:
+```sh
+open android -a Android\ Studio
+```
+
+For Web:
+```sh
+cd web && yarn && yarn start
+```
+
+For React Native:
+Follow the README in the `react-native` directory. Or [zkmopro/react-native-app/README.md](https://github.com/zkmopro/react-native-app/blob/main/README.md)
+
+For Flutter:
+Follow the README in the `flutter` directory. Or [zkmopro/flutter-app/README.md](https://github.com/zkmopro/flutter-app/blob/main/README.md)
 
 ## Advanced: Customize Builds Using Rust
 

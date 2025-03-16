@@ -6,7 +6,6 @@ use crate::create::utils::{
     check_bindings, copy_android_bindings, copy_dir, copy_keys, download_and_extract_template,
 };
 use crate::print::print_footer_message;
-use crate::style::print_bold;
 use crate::style::print_green_bold;
 
 pub struct Flutter;
@@ -71,20 +70,9 @@ impl Create for Flutter {
         print_green_bold("Next steps:".to_string());
         println!();
         print_green_bold(
-            "  You can now use the following command to open the app in Android Studio:"
+            "  Refer to the README.md in the `flutter` folder for instructions on running the app."
                 .to_string(),
         );
-        println!();
-        print_bold(r"    open flutter-app -a Android\ Studio ".to_string());
-        println!();
-        print_green_bold("  or VS Code::".to_string());
-        println!();
-        print_bold(r"    code flutter-app".to_string());
-        println!();
-        print_green_bold(
-            "To learn more about setting up the Flutter app with mopro, visit https://zkmopro.org/docs/setup/flutter-setup/".to_string(),
-        );
-
         print_footer_message();
     }
 }

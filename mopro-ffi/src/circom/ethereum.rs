@@ -1,8 +1,12 @@
-use ark_bn254::Bn254;
+use ark_bn254::{Bn254, Fq, Fq2, Fr, G1Affine, G2Affine};
 use circom_prover::prover::{
-    ethereum,
-    serialization::{deserialize_inputs, deserialize_proof},
+    ethereum::{self, CURVE_BN254, PROTOCOL_GROTH16},
+    serialization::{
+        self, deserialize_inputs, deserialize_proof, SerializableInputs, SerializableProof,
+    },
 };
+use num_bigint::BigUint;
+use std::str::FromStr;
 
 #[derive(Debug, Clone, Default)]
 pub struct G1 {
@@ -51,6 +55,44 @@ pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
     inputs
 }
 
+// Only supports bn254 for now
+pub fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
+    let inputs = inputs
+        .iter()
+        .map(|x| BigUint::from_str(x).unwrap())
+        .collect::<Vec<BigUint>>();
+    let fr_inputs: Vec<Fr> = ethereum::Inputs(inputs).into();
+    serialization::serialize_inputs(&SerializableInputs::<Bn254>(fr_inputs))
+}
+
+// Only supports bn254 for now
+pub fn from_ethereum_proof(proof: ProofCalldata) -> Vec<u8> {
+    let a_x = Fq::from_str(&proof.a.x).unwrap();
+    let a_y = Fq::from_str(&proof.a.y).unwrap();
+    let a = G1Affine::new_unchecked(a_x, a_y);
+    let a_biguint = ethereum::G1::from_bn254(&a);
+    let c_x = Fq::from_str(&proof.c.x).unwrap();
+    let c_y = Fq::from_str(&proof.c.y).unwrap();
+    let c = G1Affine::new_unchecked(c_x, c_y);
+    let c_biguint = ethereum::G1::from_bn254(&c);
+    let b1_x = Fq::from_str(&proof.b.x[0]).unwrap();
+    let b1_y = Fq::from_str(&proof.b.x[1]).unwrap();
+    let b1 = Fq2::new(b1_x, b1_y);
+    let b2_x = Fq::from_str(&proof.b.y[0]).unwrap();
+    let b2_y = Fq::from_str(&proof.b.y[1]).unwrap();
+    let b2 = Fq2::new(b2_x, b2_y);
+    let b = G2Affine::new_unchecked(b1, b2);
+    let b_biguint = ethereum::G2::from_bn254(&b);
+    let proof = ethereum::Proof {
+        a: a_biguint,
+        b: b_biguint,
+        c: c_biguint,
+        protocol: PROTOCOL_GROTH16.to_string(),
+        curve: CURVE_BN254.to_string(),
+    };
+    serialization::serialize_proof(&SerializableProof::<Bn254>(proof.into()))
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -79,13 +121,16 @@ mod tests {
                 109, 154,
             ];
 
-            let proof = to_ethereum_proof(raw_proof);
+            let proof = to_ethereum_proof(raw_proof.clone());
             assert!(!proof.a.x.is_empty());
             assert!(!proof.a.y.is_empty());
             assert!(!proof.b.x.is_empty());
             assert!(!proof.b.y.is_empty());
             assert!(!proof.c.x.is_empty());
             assert!(!proof.c.y.is_empty());
+
+            let converted_proof = from_ethereum_proof(proof);
+            assert_eq!(raw_proof, converted_proof);
         }
 
         #[test]
@@ -96,23 +141,29 @@ mod tests {
                 48, 0, 0, 0, 240, 147, 245, 225, 67, 145, 112, 185, 121, 72, 232, 51, 40, 93, 88,
                 129, 129, 182, 69, 80, 184, 41, 160, 49, 225, 114, 78, 100, 48,
             ];
-            let inputs = to_ethereum_inputs(raw_inputs);
+            let inputs = to_ethereum_inputs(raw_inputs.clone());
             let expected_inputs = vec![
                 "21888242871839275222246405745257275088548364400416034343698204186575808495616",
                 "21888242871839275222246405745257275088548364400416034343698204186575808495616",
             ];
             assert_eq!(inputs, expected_inputs);
+
+            let converted_inputs = from_ethereum_inputs(inputs);
+            assert_eq!(raw_inputs, converted_inputs);
         }
 
         #[test]
         fn test_to_ethereum_inputs_with_zero() {
             let raw_inputs = vec![
                 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             ];
-            let inputs = to_ethereum_inputs(raw_inputs);
+            let inputs = to_ethereum_inputs(raw_inputs.clone());
             let expected_inputs = vec!["0".to_string()];
             assert_eq!(inputs, expected_inputs);
+
+            let converted_inputs = from_ethereum_inputs(expected_inputs);
+            assert_eq!(raw_inputs, converted_inputs);
         }
     }
 }

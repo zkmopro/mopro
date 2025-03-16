@@ -8,8 +8,8 @@ mod halo2;
 
 #[cfg(feature = "circom")]
 pub use circom::{
-    generate_circom_proof_wtns, to_ethereum_inputs, to_ethereum_proof, verify_circom_proof,
-    ProofCalldata, G1, G2,
+    from_ethereum_inputs, from_ethereum_proof, generate_circom_proof_wtns, to_ethereum_inputs,
+    to_ethereum_proof, verify_circom_proof, ProofCalldata, G1, G2,
 };
 
 #[cfg(feature = "circom")]
@@ -222,6 +222,25 @@ macro_rules! app {
                     c: G1 {
                         x: result.c.x,
                         y: result.c.y,
+                    },
+                }
+            }
+        }
+
+        impl Into<mopro_ffi::ProofCalldata> for ProofCalldata {
+            fn into(self) -> mopro_ffi::ProofCalldata {
+                mopro_ffi::ProofCalldata {
+                    a: mopro_ffi::G1 {
+                        x: self.a.x,
+                        y: self.a.y,
+                    },
+                    b: mopro_ffi::G2 {
+                        x: self.b.x,
+                        y: self.b.y,
+                    },
+                    c: mopro_ffi::G1 {
+                        x: self.c.x,
+                        y: self.c.y,
                     },
                 }
             }

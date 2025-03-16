@@ -96,6 +96,7 @@ extension ContentView {
             let timeTaken = end - start
             
             // Store the generated proof and public inputs for later verification
+
             generatedCircomProof = generateProofResult.proof
             circomPublicInputs = generateProofResult.inputs
             
@@ -116,15 +117,17 @@ extension ContentView {
         
         textViewText += "Verifying Circom proof... "
         do {
-            let start = CFAbsoluteTimeGetCurrent()
-            
-            let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proof: proof, publicInput: inputs, proofLib: ProofLib.arkworks)
-            let end = CFAbsoluteTimeGetCurrent()
-            let timeTaken = end - start
-            
             // Convert proof to Ethereum compatible proof
             let ethereumProof = toEthereumProof(proof: proof)
             let ethereumInputs = toEthereumInputs(inputs: inputs)
+            let moproProof = fromEthereumProof(proof: ethereumProof)
+            let moproInputs = fromEthereumInputs(inputs: ethereumInputs)
+            let start = CFAbsoluteTimeGetCurrent()
+            
+            let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proof: moproProof, publicInput: moproInputs, proofLib: ProofLib.arkworks)
+            let end = CFAbsoluteTimeGetCurrent()
+            let timeTaken = end - start
+            
             assert(ethereumProof.a.x.count > 0, "Proof should not be empty")
             assert(ethereumInputs.count > 0, "Inputs should not be empty")
             
