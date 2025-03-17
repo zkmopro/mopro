@@ -10,6 +10,7 @@ use serde_json::json;
 use std::thread::JoinHandle;
 use std::{fs::File, str::FromStr};
 
+use super::serialization::SerializableProof;
 use super::{
     ark_circom::read_proving_key,
     serialization::{self, SerializableInputs},
@@ -64,13 +65,12 @@ pub fn generate_circom_proof(
     })
 }
 
-pub fn verify_circom_proof(
-    zkey_path: String,
-    proof: Vec<u8>,
-    public_inputs: PublicInputs,
-) -> Result<bool> {
-    let proof_parsed = serialization::deserialize_proof::<Bn254>(proof);
-    let public_inputs_parsed: SerializableInputs<Bn254> = public_inputs.into();
+pub fn verify_circom_proof(zkey_path: String, proof: CircomProof) -> Result<bool> {
+    let serialized_proof =
+        serialization::serialize_proof::<Bn254>(&SerializableProof(proof.proof.into()));
+    let proof_parsed = serialization::deserialize_proof::<Bn254>(serialized_proof);
+    let public_inputs_parsed: SerializableInputs<Bn254> = proof.pub_inputs.into();
+
     let pi_a: Vec<String> = vec![
         proof_parsed.0.a.x.to_string(),
         proof_parsed.0.a.y.to_string(),

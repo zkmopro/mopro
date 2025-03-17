@@ -13,7 +13,7 @@ exclude = ["test-vectors/*"]
 name = "circom_prover"
 
 [features]
-default = ["rustwitness", "arkworks", "ethereum"]
+default = ["rustwitness", "witnesscalc", "arkworks", "ethereum"]
 
 # Witness Generation
 rustwitness = ["rust-witness"]

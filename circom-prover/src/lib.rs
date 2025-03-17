@@ -2,7 +2,7 @@ pub mod prover;
 pub mod witness;
 
 use anyhow::Result;
-use prover::{CircomProof, ProofLib, PublicInputs};
+use prover::{CircomProof, ProofLib};
 
 #[cfg(feature = "rapidsnark")]
 pub use prover::rapidsnark;
@@ -27,25 +27,16 @@ impl CircomProver {
         prover::prove(proof_lib, zkey_path.clone(), wit_thread)
     }
 
-    pub fn verify(
-        proof_lib: ProofLib,
-        proof: Vec<u8>,
-        public_inputs: PublicInputs,
-        zkey_path: String,
-    ) -> Result<bool> {
-        prover::verify(proof_lib, zkey_path, proof, public_inputs)
+    pub fn verify(proof_lib: ProofLib, proof: CircomProof, zkey_path: String) -> Result<bool> {
+        prover::verify(proof_lib, zkey_path, proof)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use std::collections::HashMap;
 
-    use ark_bn254::Bn254;
-
-    use crate::prover::serialization::{self, SerializableProof};
-
-    use super::*;
     const ZKEY_PATH: &str = "./test-vectors/multiplier2_final.zkey";
 
     fn generate_proof(witness_fn: WitnessFn, proof_lib: ProofLib) -> CircomProof {
@@ -58,14 +49,7 @@ mod tests {
     }
 
     fn verify_proof(proof: CircomProof, proof_lib: ProofLib) -> bool {
-        let ark_proof: ark_groth16::Proof<Bn254> = proof.proof.into();
-        CircomProver::verify(
-            proof_lib,
-            serialization::serialize_proof(&SerializableProof(ark_proof)),
-            proof.pub_inputs,
-            ZKEY_PATH.to_string(),
-        )
-        .unwrap()
+        CircomProver::verify(proof_lib, proof, ZKEY_PATH.to_string()).unwrap()
     }
 
     #[cfg(all(feature = "rustwitness", feature = "arkworks"))]
