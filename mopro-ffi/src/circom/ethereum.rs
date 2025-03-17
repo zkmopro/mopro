@@ -1,9 +1,8 @@
+use crate::CircomProof;
 use ark_bn254::{Bn254, Fq, Fq2, Fr, G1Affine, G2Affine};
 use circom_prover::prover::{
     ethereum::{self, CURVE_BN254, PROTOCOL_GROTH16},
-    serialization::{
-        self, deserialize_inputs, deserialize_proof, SerializableInputs, SerializableProof,
-    },
+    serialization::{self, deserialize_inputs, SerializableInputs},
 };
 use num_bigint::BigUint;
 use std::str::FromStr;
@@ -29,9 +28,7 @@ pub struct ProofCalldata {
 
 // Convert proof to U256-tuples as expected by the Solidity Groth16 Verifier
 // Only supports bn254 for now
-pub fn to_ethereum_proof(proof: Vec<u8>) -> ProofCalldata {
-    let deserialized_proof = deserialize_proof::<Bn254>(proof);
-    let proof = ethereum::Proof::from(deserialized_proof.0);
+pub fn to_ethereum_proof(proof: CircomProof) -> ProofCalldata {
     let a = G1 {
         x: proof.a.x.to_string(),
         y: proof.a.y.to_string(),
@@ -66,7 +63,7 @@ pub fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
 }
 
 // Only supports bn254 for now
-pub fn from_ethereum_proof(proof: ProofCalldata) -> Vec<u8> {
+pub fn from_ethereum_proof(proof: ProofCalldata) -> CircomProof {
     let a_x = Fq::from_str(&proof.a.x).unwrap();
     let a_y = Fq::from_str(&proof.a.y).unwrap();
     let a = G1Affine::new_unchecked(a_x, a_y);
@@ -83,14 +80,13 @@ pub fn from_ethereum_proof(proof: ProofCalldata) -> Vec<u8> {
     let b2 = Fq2::new(b2_x, b2_y);
     let b = G2Affine::new_unchecked(b1, b2);
     let b_biguint = ethereum::G2::from_bn254(&b);
-    let proof = ethereum::Proof {
-        a: a_biguint,
-        b: b_biguint,
-        c: c_biguint,
+    CircomProof {
+        a: a_biguint.into(),
+        b: b_biguint.into(),
+        c: c_biguint.into(),
         protocol: PROTOCOL_GROTH16.to_string(),
         curve: CURVE_BN254.to_string(),
-    };
-    serialization::serialize_proof(&SerializableProof::<Bn254>(proof.into()))
+    }
 }
 
 #[cfg(test)]
@@ -100,6 +96,13 @@ mod tests {
 
     mod ethereum {
         use super::*;
+        use circom_prover::prover::{
+            ethereum::{
+                Proof as CircomProverProof, CURVE_BN254, G1 as CircomProverG1,
+                G2 as CircomProverG2, PROTOCOL_GROTH16,
+            },
+            serialization::{deserialize_proof, serialize_proof, SerializableProof},
+        };
 
         #[test]
         fn test_to_ethereum_proof() {
@@ -121,7 +124,16 @@ mod tests {
                 109, 154,
             ];
 
-            let proof = to_ethereum_proof(raw_proof.clone());
+            let deserialized_proof = deserialize_proof::<Bn254>(raw_proof.clone());
+            let circom_proof = CircomProof {
+                a: CircomProverG1::from_bn254(&deserialized_proof.0.a).into(),
+                b: CircomProverG2::from_bn254(&deserialized_proof.0.b).into(),
+                c: CircomProverG1::from_bn254(&deserialized_proof.0.c).into(),
+                protocol: PROTOCOL_GROTH16.to_string(),
+                curve: CURVE_BN254.to_string(),
+            };
+
+            let proof = to_ethereum_proof(circom_proof.clone());
             assert!(!proof.a.x.is_empty());
             assert!(!proof.a.y.is_empty());
             assert!(!proof.b.x.is_empty());
@@ -129,8 +141,10 @@ mod tests {
             assert!(!proof.c.x.is_empty());
             assert!(!proof.c.y.is_empty());
 
-            let converted_proof = from_ethereum_proof(proof);
-            assert_eq!(raw_proof, converted_proof);
+            let converted_proof: CircomProverProof = from_ethereum_proof(proof).into();
+            let serialized_proof =
+                serialize_proof::<Bn254>(&SerializableProof(converted_proof.into()));
+            assert_eq!(raw_proof, serialized_proof);
         }
 
         #[test]

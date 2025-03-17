@@ -16,7 +16,7 @@ macro_rules! halo2_app {
             let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())
                 .map_err(|e| <$err>::Halo2Error(format!("error getting proving circuit: {}", e)))?;
             let result = proving_fn(&srs_path, &pk_path, circuit_inputs)
-                .map(|(proof, inputs)| mopro_ffi::GenerateProofResult { proof, inputs })
+                .map(|(proof, inputs)| mopro_ffi::Halo2ProofResult { proof, inputs })
                 .map_err(|e| mopro_ffi::MoproError::Halo2Error(format!("halo2 error: {}", e)))
                 .unwrap();
 
@@ -129,7 +129,7 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_plonk_proof() {
-        halo2_app!(mopro_ffi::GenerateProofResult, mopro_ffi::MoproError);
+        halo2_app!(mopro_ffi::Halo2ProofResult, mopro_ffi::MoproError);
 
         set_halo2_circuits! {
             ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
@@ -161,7 +161,7 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_hyperplonk_proof() {
-        halo2_app!(mopro_ffi::GenerateProofResult, mopro_ffi::MoproError);
+        halo2_app!(mopro_ffi::Halo2ProofResult, mopro_ffi::MoproError);
 
         set_halo2_circuits! {
             ("hyperplonk_fibonacci_pk.bin", hyperplonk_fibonacci::prove, "hyperplonk_fibonacci_vk.bin", hyperplonk_fibonacci::verify),
@@ -193,7 +193,7 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_gemini_proof() {
-        halo2_app!(mopro_ffi::GenerateProofResult, mopro_ffi::MoproError);
+        halo2_app!(mopro_ffi::Halo2ProofResult, mopro_ffi::MoproError);
 
         set_halo2_circuits! {
             ("gemini_fibonacci_pk.bin", gemini_fibonacci::prove, "gemini_fibonacci_vk.bin", gemini_fibonacci::verify),

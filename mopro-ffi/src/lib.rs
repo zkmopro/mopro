@@ -9,7 +9,7 @@ mod halo2;
 #[cfg(feature = "circom")]
 pub use circom::{
     from_ethereum_inputs, from_ethereum_proof, generate_circom_proof_wtns, to_ethereum_inputs,
-    to_ethereum_proof, verify_circom_proof, ProofCalldata, G1, G2,
+    to_ethereum_proof, verify_circom_proof, ProofCalldata,
 };
 
 #[cfg(feature = "circom")]
@@ -26,7 +26,7 @@ macro_rules! circom_app {
             zkey_path: String,
             circuit_inputs: String,
             proof_lib: $proof_lib,
-        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
+        ) -> Result<$result, $err> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
@@ -35,11 +35,11 @@ macro_rules! circom_app {
             proof_data: Vec<u8>,
             public_inputs: Vec<u8>,
             proof_lib: $proof_lib,
-        ) -> Result<bool, mopro_ffi::MoproError> {
+        ) -> Result<bool, $err> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
-        fn to_ethereum_proof(proof_data: Vec<u8>) -> mopro_ffi::ProofCalldata {
+        fn to_ethereum_proof(proof_data: Vec<u8>) -> $proof_call_data {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
@@ -57,7 +57,7 @@ macro_rules! halo2_app {
             srs_path: String,
             pk_path: String,
             inputs: std::collections::HashMap<String, Vec<String>>,
-        ) -> Result<mopro_ffi::GenerateProofResult, mopro_ffi::MoproError> {
+        ) -> Result<$result, $err> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
 
@@ -66,7 +66,7 @@ macro_rules! halo2_app {
             vk_path: String,
             proof_data: Vec<u8>,
             public_inputs: Vec<u8>,
-        ) -> Result<bool, mopro_ffi::MoproError> {
+        ) -> Result<bool, $err> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
     };
@@ -80,34 +80,49 @@ pub enum MoproError {
     Halo2Error(String),
 }
 
+//
+// Circom Proof
+//
 #[derive(Debug, Clone)]
-pub struct GenerateProofResult {
-    pub proof: Vec<u8>,
-    pub inputs: Vec<u8>,
+pub struct CircomProofResult {
+    pub proof: CircomProof,
+    pub inputs: Vec<String>,
 }
 
-#[cfg(not(feature = "circom"))]
+#[derive(Debug, Clone, Default)]
+pub struct CircomProof {
+    pub a: G1,
+    pub b: G2,
+    pub c: G1,
+    pub protocol: String,
+    pub curve: String,
+}
 #[derive(Debug, Clone, Default)]
 pub struct G1 {
     pub x: String,
     pub y: String,
+    pub z: String,
 }
 
-#[cfg(not(feature = "circom"))]
 #[derive(Debug, Clone, Default)]
 pub struct G2 {
     pub x: Vec<String>,
     pub y: Vec<String>,
+    pub z: Vec<String>,
 }
 
-#[cfg(not(feature = "circom"))]
-#[derive(Debug, Clone, Default)]
-pub struct ProofCalldata {
-    pub a: G1,
-    pub b: G2,
-    pub c: G1,
+//
+// Halo2 Proof
+//
+#[derive(Debug, Clone)]
+pub struct Halo2ProofResult {
+    pub proof: Vec<u8>,
+    pub inputs: Vec<u8>,
 }
 
+//
+// Proof Libs
+//
 #[derive(Debug, Clone, Default)]
 pub enum ProofLib {
     #[default]
@@ -174,14 +189,36 @@ macro_rules! app {
             }
         }
 
-        #[derive(Debug, Clone, uniffi::Record)]
-        pub struct GenerateProofResult {
+        //
+        // Halo2 Section
+        //
+        #[derive(Debug, Clone)]
+        pub struct Halo2ProofResult {
             pub proof: Vec<u8>,
             pub inputs: Vec<u8>,
         }
 
-        impl From<mopro_ffi::GenerateProofResult> for GenerateProofResult {
-            fn from(result: mopro_ffi::GenerateProofResult) -> Self {
+        impl From<mopro_ffi::Halo2ProofResult> for Halo2ProofResult {
+            fn from(result: mopro_ffi::Halo2ProofResult) -> Self {
+                Self {
+                    proof: result.proof,
+                    inputs: result.inputs,
+                }
+            }
+        }
+        // End of Halo2 Section
+
+        //
+        // Circom Section
+        //
+        #[derive(Debug, Clone)]
+        pub struct CircomProofResult {
+            pub proof: CircomProof,
+            pub inputs: Vec<u8>,
+        }
+
+        impl From<mopro_ffi::CircomProofResult> for CircomProofResult {
+            fn from(result: mopro_ffi::CircomProofResult) -> Self {
                 Self {
                     proof: result.proof,
                     inputs: result.inputs,
@@ -193,36 +230,45 @@ macro_rules! app {
         pub struct G1 {
             pub x: String,
             pub y: String,
+            pub z: String,
         }
 
         #[derive(Debug, Clone, Default, uniffi::Record)]
         pub struct G2 {
             pub x: Vec<String>,
             pub y: Vec<String>,
+            pub z: Vec<String>,
         }
 
         #[derive(Debug, Clone, Default, uniffi::Record)]
-        pub struct ProofCalldata {
+        pub struct CircomProof {
             pub a: G1,
             pub b: G2,
             pub c: G1,
+            pub protocol: String,
+            pub curve: String,
         }
 
-        impl From<mopro_ffi::ProofCalldata> for ProofCalldata {
-            fn from(result: mopro_ffi::ProofCalldata) -> Self {
-                ProofCalldata {
+        impl From<mopro_ffi::CircomProof> for CircomProof {
+            fn from(result: mopro_ffi::CircomProof) -> Self {
+                CircomProof {
                     a: G1 {
                         x: result.a.x,
                         y: result.a.y,
+                        z: result.a.z,
                     },
                     b: G2 {
                         x: result.b.x,
                         y: result.b.y,
+                        z: result.b.z,
                     },
                     c: G1 {
                         x: result.c.x,
                         y: result.c.y,
+                        z: result.c.z,
                     },
+                    protocol: result.protocol,
+                    curve: result.curve,
                 }
             }
         }
@@ -245,6 +291,7 @@ macro_rules! app {
                 }
             }
         }
+        // End of Circom Section
 
         #[derive(Debug, Clone, Default, uniffi::Enum)]
         pub enum ProofLib {
@@ -253,8 +300,14 @@ macro_rules! app {
             Rapidsnark,
         }
 
-        mopro_ffi::circom_app!(GenerateProofResult, ProofCalldata, MoproError, ProofLib);
+        mopro_ffi::circom_app!(
+            CircomProofResult,
+            CircomProof,
+            ProofCalldata,
+            MoproError,
+            ProofLib
+        );
 
-        mopro_ffi::halo2_app!(GenerateProofResult, MoproError);
+        mopro_ffi::halo2_app!(Halo2ProofResult, MoproError);
     };
 }
