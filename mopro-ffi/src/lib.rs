@@ -32,18 +32,25 @@ macro_rules! circom_app {
 
         fn verify_circom_proof(
             zkey_path: String,
-            proof_data: Vec<u8>,
-            public_inputs: Vec<u8>,
+            proof_ret: $result,
             proof_lib: $proof_lib,
         ) -> Result<bool, $err> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
-        fn to_ethereum_proof(proof_data: Vec<u8>) -> $proof_call_data {
+        fn to_ethereum_proof(proof: $proof) -> $proof_call_data {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
-        fn to_ethereum_inputs(public_inputs: Vec<u8>) -> Vec<String> {
+        fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
+            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
+        }
+
+        fn from_ethereum_proof(proof: $proof_call_data) -> $proof {
+            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
+        }
+
+        fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
     };
@@ -97,18 +104,19 @@ pub struct CircomProof {
     pub protocol: String,
     pub curve: String,
 }
+
 #[derive(Debug, Clone, Default)]
 pub struct G1 {
     pub x: String,
     pub y: String,
-    pub z: String,
+    pub z: Option<String>,
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct G2 {
     pub x: Vec<String>,
     pub y: Vec<String>,
-    pub z: Vec<String>,
+    pub z: Option<Vec<String>>,
 }
 
 //
@@ -123,12 +131,12 @@ pub struct Halo2ProofResult {
 //
 // Proof Libs
 //
-#[derive(Debug, Clone, Default)]
-pub enum ProofLib {
-    #[default]
-    Arkworks,
-    Rapidsnark,
-}
+// #[derive(Debug, Clone, Default)]
+// pub enum ProofLib {
+//     #[default]
+//     Arkworks,
+//     Rapidsnark,
+// }
 
 /// This macro is used to setup the Mopro FFI library
 /// It should be included in the `lib.rs` file of the project
@@ -192,7 +200,7 @@ macro_rules! app {
         //
         // Halo2 Section
         //
-        #[derive(Debug, Clone)]
+        #[derive(Debug, Clone, uniffi::Record)]
         pub struct Halo2ProofResult {
             pub proof: Vec<u8>,
             pub inputs: Vec<u8>,
@@ -211,10 +219,10 @@ macro_rules! app {
         //
         // Circom Section
         //
-        #[derive(Debug, Clone)]
+        #[derive(Debug, Clone, uniffi::Record)]
         pub struct CircomProofResult {
             pub proof: CircomProof,
-            pub inputs: Vec<u8>,
+            pub inputs: Vec<String>,
         }
 
         impl From<mopro_ffi::CircomProofResult> for CircomProofResult {
@@ -230,14 +238,14 @@ macro_rules! app {
         pub struct G1 {
             pub x: String,
             pub y: String,
-            pub z: String,
+            pub z: Option<String>,
         }
 
         #[derive(Debug, Clone, Default, uniffi::Record)]
         pub struct G2 {
             pub x: Vec<String>,
             pub y: Vec<String>,
-            pub z: Vec<String>,
+            pub z: Option<Vec<String>>,
         }
 
         #[derive(Debug, Clone, Default, uniffi::Record)]
@@ -272,6 +280,17 @@ macro_rules! app {
                 }
             }
         }
+        // End of Circom Section
+
+        //
+        // Ethereum calldata Section
+        //
+        #[derive(Debug, Clone, Default, uniffi::Record)]
+        pub struct ProofCalldata {
+            pub a: G1,
+            pub b: G2,
+            pub c: G1,
+        }
 
         impl Into<mopro_ffi::ProofCalldata> for ProofCalldata {
             fn into(self) -> mopro_ffi::ProofCalldata {
@@ -279,19 +298,22 @@ macro_rules! app {
                     a: mopro_ffi::G1 {
                         x: self.a.x,
                         y: self.a.y,
+                        z: None,
                     },
                     b: mopro_ffi::G2 {
                         x: self.b.x,
                         y: self.b.y,
+                        z: None,
                     },
                     c: mopro_ffi::G1 {
                         x: self.c.x,
                         y: self.c.y,
+                        z: None,
                     },
                 }
             }
         }
-        // End of Circom Section
+        // End of Ethereum calldata Section
 
         #[derive(Debug, Clone, Default, uniffi::Enum)]
         pub enum ProofLib {

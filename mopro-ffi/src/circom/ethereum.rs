@@ -1,4 +1,4 @@
-use crate::CircomProof;
+use crate::{CircomProof, G1, G2};
 use ark_bn254::{Bn254, Fq, Fq2, Fr, G1Affine, G2Affine};
 use circom_prover::prover::{
     ethereum::{self, CURVE_BN254, PROTOCOL_GROTH16},
@@ -6,18 +6,6 @@ use circom_prover::prover::{
 };
 use num_bigint::BigUint;
 use std::str::FromStr;
-
-#[derive(Debug, Clone, Default)]
-pub struct G1 {
-    pub x: String,
-    pub y: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct G2 {
-    pub x: Vec<String>,
-    pub y: Vec<String>,
-}
 
 #[derive(Debug, Clone, Default)]
 pub struct ProofCalldata {
@@ -32,14 +20,17 @@ pub fn to_ethereum_proof(proof: CircomProof) -> ProofCalldata {
     let a = G1 {
         x: proof.a.x.to_string(),
         y: proof.a.y.to_string(),
+        z: None,
     };
     let b = G2 {
         x: proof.b.x.iter().map(|x| x.to_string()).collect(),
         y: proof.b.y.iter().map(|x| x.to_string()).collect(),
+        z: None,
     };
     let c = G1 {
         x: proof.c.x.to_string(),
         y: proof.c.y.to_string(),
+        z: None,
     };
     ProofCalldata { a, b, c }
 }
