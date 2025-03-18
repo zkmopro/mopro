@@ -228,8 +228,17 @@ macro_rules! app {
         impl From<mopro_ffi::CircomProofResult> for CircomProofResult {
             fn from(result: mopro_ffi::CircomProofResult) -> Self {
                 Self {
-                    proof: result.proof,
+                    proof: result.proof.into(),
                     inputs: result.inputs,
+                }
+            }
+        }
+
+        impl Into<mopro_ffi::CircomProofResult> for CircomProofResult {
+            fn into(self) -> mopro_ffi::CircomProofResult {
+                mopro_ffi::CircomProofResult {
+                    proof: self.proof.into(),
+                    inputs: self.inputs,
                 }
             }
         }
@@ -258,25 +267,49 @@ macro_rules! app {
         }
 
         impl From<mopro_ffi::CircomProof> for CircomProof {
-            fn from(result: mopro_ffi::CircomProof) -> Self {
+            fn from(proof: mopro_ffi::CircomProof) -> Self {
                 CircomProof {
                     a: G1 {
-                        x: result.a.x,
-                        y: result.a.y,
-                        z: result.a.z,
+                        x: proof.a.x,
+                        y: proof.a.y,
+                        z: proof.a.z,
                     },
                     b: G2 {
-                        x: result.b.x,
-                        y: result.b.y,
-                        z: result.b.z,
+                        x: proof.b.x,
+                        y: proof.b.y,
+                        z: proof.b.z,
                     },
                     c: G1 {
-                        x: result.c.x,
-                        y: result.c.y,
-                        z: result.c.z,
+                        x: proof.c.x,
+                        y: proof.c.y,
+                        z: proof.c.z,
                     },
-                    protocol: result.protocol,
-                    curve: result.curve,
+                    protocol: proof.protocol,
+                    curve: proof.curve,
+                }
+            }
+        }
+
+        impl Into<mopro_ffi::CircomProof> for CircomProof {
+            fn into(self) -> mopro_ffi::CircomProof {
+                mopro_ffi::CircomProof {
+                    a: mopro_ffi::G1 {
+                        x: self.a.x,
+                        y: self.a.y,
+                        z: self.a.z,
+                    },
+                    b: mopro_ffi::G2 {
+                        x: self.b.x,
+                        y: self.b.y,
+                        z: self.b.z,
+                    },
+                    c: mopro_ffi::G1 {
+                        x: self.c.x,
+                        y: self.c.y,
+                        z: self.c.z,
+                    },
+                    protocol: self.protocol,
+                    curve: self.curve,
                 }
             }
         }
@@ -290,6 +323,28 @@ macro_rules! app {
             pub a: G1,
             pub b: G2,
             pub c: G1,
+        }
+
+        impl From<mopro_ffi::ProofCalldata> for ProofCalldata {
+            fn from(proof: mopro_ffi::ProofCalldata) -> Self {
+                ProofCalldata {
+                    a: G1 {
+                        x: proof.a.x,
+                        y: proof.a.y,
+                        z: None,
+                    },
+                    b: G2 {
+                        x: proof.b.x,
+                        y: proof.b.y,
+                        z: None,
+                    },
+                    c: G1 {
+                        x: proof.c.x,
+                        y: proof.c.y,
+                        z: None,
+                    },
+                }
+            }
         }
 
         impl Into<mopro_ffi::ProofCalldata> for ProofCalldata {
@@ -319,7 +374,7 @@ macro_rules! app {
         pub enum ProofLib {
             #[default]
             Arkworks,
-            Rapidsnark,
+            RapidSnark,
         }
 
         mopro_ffi::circom_app!(

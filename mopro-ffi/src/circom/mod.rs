@@ -27,6 +27,10 @@ macro_rules! circom_app {
             circuit_inputs: String,
             proof_lib: $proof_lib,
         ) -> Result<$result, $err> {
+            let chosen_proof_lib = match proof_lib {
+                <$proof_lib>::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
+                <$proof_lib>::RapidSnark => mopro_ffi::prover::ProofLib::RapidSnark,
+            };
             let name = match std::path::Path::new(zkey_path.as_str()).file_name() {
                 Some(v) => v,
                 None => {
@@ -37,7 +41,7 @@ macro_rules! circom_app {
             };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
             let result = mopro_ffi::generate_circom_proof_wtns(
-                proof_lib,
+                chosen_proof_lib,
                 zkey_path,
                 circuit_inputs,
                 witness_fn,
@@ -45,7 +49,7 @@ macro_rules! circom_app {
             .map_err(|e| <$err>::CircomError(format!("Unknown ZKEY: {}", e)))
             .unwrap();
 
-            Ok(result)
+            Ok(result.into())
         }
 
         #[allow(dead_code)]
@@ -55,33 +59,37 @@ macro_rules! circom_app {
             proof_ret: $result,
             proof_lib: $proof_lib,
         ) -> Result<bool, $err> {
-            mopro_ffi::verify_circom_proof(proof_lib, zkey_path, proof_ret)
+            let chosen_proof_lib = match proof_lib {
+                <$proof_lib>::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
+                <$proof_lib>::RapidSnark => mopro_ffi::prover::ProofLib::RapidSnark,
+            };
+            mopro_ffi::verify_circom_proof(chosen_proof_lib, zkey_path, proof_ret.into())
                 .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
         }
 
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn to_ethereum_proof(proof: $proof) -> $proof_call_data {
-            mopro_ffi::to_ethereum_proof(proof).into()
-        }
+        // #[allow(dead_code)]
+        // #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        // fn to_ethereum_proof(proof: $proof) -> $proof_call_data {
+        //     mopro_ffi::to_ethereum_proof(proof.into()).into()
+        // }
 
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
-            mopro_ffi::to_ethereum_inputs(inputs)
-        }
+        // #[allow(dead_code)]
+        // #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        // fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
+        //     mopro_ffi::to_ethereum_inputs(inputs)
+        // }
 
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn from_ethereum_proof(proof: $proof_call_data) -> $proof {
-            mopro_ffi::from_ethereum_proof(proof)
-        }
+        // #[allow(dead_code)]
+        // #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        // fn from_ethereum_proof(proof: $proof_call_data) -> $proof {
+        //     mopro_ffi::from_ethereum_proof(proof.into()).into()
+        // }
 
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
-            mopro_ffi::from_ethereum_inputs(inputs)
-        }
+        // #[allow(dead_code)]
+        // #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        // fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
+        //     mopro_ffi::from_ethereum_inputs(inputs)
+        // }
     };
 }
 
@@ -597,8 +605,8 @@ mod tests {
             // Step 4: Convert Proof to Ethereum compatible proof
             let proof_calldata = to_ethereum_proof(proof);
             let inputs_calldata = to_ethereum_inputs(serialized_inputs);
-            assert!(proof_calldata.a.x.len() > 0);
-            assert!(inputs_calldata.len() > 0);
+            assert!(!proof_calldata.a.x.is_empty());
+            assert!(!inputs_calldata.is_empty());
 
             Ok(())
         }
