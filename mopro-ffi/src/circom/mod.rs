@@ -5,7 +5,7 @@ use crate::{CircomProof, CircomProofResult, G1, G2};
 use anyhow::{bail, Ok, Result};
 use circom_prover::{
     prover::{
-        ethereum::{
+        circom::{
             Proof as CircomProverProof, CURVE_BLS12_381, CURVE_BN254, G1 as CircomProverG1,
             G2 as CircomProverG2,
         },
@@ -36,12 +36,8 @@ macro_rules! circom_app {
                 }
             };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
-            let chosen_proof_lib = match proof_lib {
-                <$proof_lib>::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
-                <$proof_lib>::Rapidsnark => mopro_ffi::prover::ProofLib::RapidSnark,
-            };
             let result = mopro_ffi::generate_circom_proof_wtns(
-                chosen_proof_lib,
+                proof_lib,
                 zkey_path,
                 circuit_inputs,
                 witness_fn,
@@ -59,11 +55,7 @@ macro_rules! circom_app {
             proof_ret: $result,
             proof_lib: $proof_lib,
         ) -> Result<bool, $err> {
-            let chosen_proof_lib = match proof_lib {
-                <$proof_lib>::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
-                <$proof_lib>::Rapidsnark => mopro_ffi::prover::ProofLib::RapidSnark,
-            };
-            mopro_ffi::verify_circom_proof(chosen_proof_lib, zkey_path, proof_ret)
+            mopro_ffi::verify_circom_proof(proof_lib, zkey_path, proof_ret)
                 .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
         }
 
@@ -286,7 +278,7 @@ mod tests {
                 mopro_ffi::CircomProof,
                 mopro_ffi::ProofCalldata,
                 mopro_ffi::MoproError,
-                mopro_ffi::ProofLib
+                circom_prover::prover::ProofLib
             );
 
             set_circom_circuits! {
@@ -308,7 +300,7 @@ mod tests {
             let result = generate_circom_proof(
                 ZKEY_PATH.to_string(),
                 input_str,
-                mopro_ffi::ProofLib::Arkworks,
+                circom_prover::prover::ProofLib::Arkworks,
             );
 
             assert!(result.is_ok());
@@ -346,7 +338,7 @@ mod tests {
                 mopro_ffi::CircomProof,
                 mopro_ffi::ProofCalldata,
                 mopro_ffi::MoproError,
-                mopro_ffi::ProofLib
+                circom_prover::prover::ProofLib
             );
 
             set_circom_circuits! {
@@ -368,7 +360,7 @@ mod tests {
             let result = generate_circom_proof(
                 ZKEY_PATH.to_string(),
                 input_str,
-                mopro_ffi::ProofLib::Arkworks,
+                circom_prover::prover::ProofLib::Arkworks,
             );
 
             assert!(result.is_ok());

@@ -262,7 +262,7 @@ fn point_to_biguint<F: PrimeField>(point: F) -> BigUint {
 
 #[cfg(test)]
 mod tests {
-    use crate::prover::ethereum::{biguint_to_point, point_to_biguint, Inputs, Proof, G1, G2};
+    use crate::prover::circom::{biguint_to_point, point_to_biguint, Inputs, Proof, G1, G2};
     use num::BigUint;
 
     mod bn254 {

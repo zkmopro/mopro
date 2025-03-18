@@ -1,19 +1,19 @@
 use anyhow::Result;
 use ark_ec::pairing::Pairing;
 use ark_ff::{BigInteger, PrimeField};
-use ethereum::Proof;
+use circom::Proof;
 use num::BigUint;
 use serialization::SerializableInputs;
 use std::{str::FromStr, thread::JoinHandle};
 
 pub mod ark_circom;
+pub mod circom;
+pub mod serialization;
+
 #[cfg(feature = "arkworks")]
 pub mod arkworks;
-#[cfg(feature = "ethereum")]
-pub mod ethereum;
 #[cfg(feature = "rapidsnark")]
 pub mod rapidsnark;
-pub mod serialization;
 
 pub struct PublicInputs(pub Vec<BigUint>);
 
@@ -54,6 +54,9 @@ pub fn verify(lib: ProofLib, zkey_path: String, proof: CircomProof) -> Result<bo
     }
 }
 
+//
+// Helper functions to convert PublicInputs to other types we need
+//
 impl From<Vec<String>> for PublicInputs {
     fn from(src: Vec<String>) -> Self {
         let pi = src

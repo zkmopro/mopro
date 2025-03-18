@@ -1,7 +1,7 @@
 use crate::{CircomProof, G1, G2};
 use ark_bn254::{Bn254, Fq, Fq2, Fr, G1Affine, G2Affine};
 use circom_prover::prover::{
-    ethereum::{self, CURVE_BN254, PROTOCOL_GROTH16},
+    circom::{self, CURVE_BN254, PROTOCOL_GROTH16},
     serialization::{self, deserialize_inputs, SerializableInputs},
 };
 use num_bigint::BigUint;
@@ -38,7 +38,7 @@ pub fn to_ethereum_proof(proof: CircomProof) -> ProofCalldata {
 // Only supports bn254 for now
 pub fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
     let deserialized_inputs = deserialize_inputs::<Bn254>(inputs);
-    let inputs = ethereum::Inputs::from(&deserialized_inputs.0[..]);
+    let inputs = circom::Inputs::from(&deserialized_inputs.0[..]);
     let inputs = inputs.0.iter().map(|x| x.to_string()).collect();
     inputs
 }
@@ -49,7 +49,7 @@ pub fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
         .iter()
         .map(|x| BigUint::from_str(x).unwrap())
         .collect::<Vec<BigUint>>();
-    let fr_inputs: Vec<Fr> = ethereum::Inputs(inputs).into();
+    let fr_inputs: Vec<Fr> = circom::Inputs(inputs).into();
     serialization::serialize_inputs(&SerializableInputs::<Bn254>(fr_inputs))
 }
 
@@ -58,11 +58,11 @@ pub fn from_ethereum_proof(proof: ProofCalldata) -> CircomProof {
     let a_x = Fq::from_str(&proof.a.x).unwrap();
     let a_y = Fq::from_str(&proof.a.y).unwrap();
     let a = G1Affine::new_unchecked(a_x, a_y);
-    let a_biguint = ethereum::G1::from_bn254(&a);
+    let a_biguint = circom::G1::from_bn254(&a);
     let c_x = Fq::from_str(&proof.c.x).unwrap();
     let c_y = Fq::from_str(&proof.c.y).unwrap();
     let c = G1Affine::new_unchecked(c_x, c_y);
-    let c_biguint = ethereum::G1::from_bn254(&c);
+    let c_biguint = circom::G1::from_bn254(&c);
     let b1_x = Fq::from_str(&proof.b.x[0]).unwrap();
     let b1_y = Fq::from_str(&proof.b.x[1]).unwrap();
     let b1 = Fq2::new(b1_x, b1_y);
@@ -70,7 +70,7 @@ pub fn from_ethereum_proof(proof: ProofCalldata) -> CircomProof {
     let b2_y = Fq::from_str(&proof.b.y[1]).unwrap();
     let b2 = Fq2::new(b2_x, b2_y);
     let b = G2Affine::new_unchecked(b1, b2);
-    let b_biguint = ethereum::G2::from_bn254(&b);
+    let b_biguint = circom::G2::from_bn254(&b);
     CircomProof {
         a: a_biguint.into(),
         b: b_biguint.into(),
@@ -88,7 +88,7 @@ mod tests {
     mod ethereum {
         use super::*;
         use circom_prover::prover::{
-            ethereum::{
+            circom::{
                 Proof as CircomProverProof, CURVE_BN254, G1 as CircomProverG1,
                 G2 as CircomProverG2, PROTOCOL_GROTH16,
             },
