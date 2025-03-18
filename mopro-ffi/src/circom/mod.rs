@@ -67,29 +67,29 @@ macro_rules! circom_app {
                 .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
         }
 
-        // #[allow(dead_code)]
-        // #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        // fn to_ethereum_proof(proof: $proof) -> $proof_call_data {
-        //     mopro_ffi::to_ethereum_proof(proof.into()).into()
-        // }
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        fn to_ethereum_proof(proof: $proof) -> $proof_call_data {
+            mopro_ffi::to_ethereum_proof(proof.into()).into()
+        }
 
-        // #[allow(dead_code)]
-        // #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        // fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
-        //     mopro_ffi::to_ethereum_inputs(inputs)
-        // }
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
+            mopro_ffi::to_ethereum_inputs(inputs)
+        }
 
-        // #[allow(dead_code)]
-        // #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        // fn from_ethereum_proof(proof: $proof_call_data) -> $proof {
-        //     mopro_ffi::from_ethereum_proof(proof.into()).into()
-        // }
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        fn from_ethereum_proof(proof: $proof_call_data) -> $proof {
+            mopro_ffi::from_ethereum_proof(proof.into()).into()
+        }
 
-        // #[allow(dead_code)]
-        // #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        // fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
-        //     mopro_ffi::from_ethereum_inputs(inputs)
-        // }
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
+            mopro_ffi::from_ethereum_inputs(inputs)
+        }
     };
 }
 

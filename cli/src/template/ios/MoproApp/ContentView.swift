@@ -37,8 +37,8 @@ struct ContentView: View {
     @State private var isCircomVerifyButtonEnabled = false
     @State private var isHalo2roveButtonEnabled = true
     @State private var isHalo2VerifyButtonEnabled = false
-    @State private var generatedCircomProof: Data?
-    @State private var circomPublicInputs: Data?
+    @State private var generatedCircomProof: CircomProof?
+    @State private var circomPublicInputs: [String]?
     @State private var generatedHalo2Proof: Data?
     @State private var halo2PublicInputs: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
@@ -85,9 +85,10 @@ extension ContentView {
             
             // Generate Proof
             let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
-            assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
-            assert(Data(expectedOutput) == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
-            
+            let public_inputs = serializeOutputs(generateProofResult.inputs)
+            assert(!generateProofResult.proof.a.x.isEmpty, "Proof should not be empty")
+            assert(expectedOutput == public_inputs, "Circuit outputs mismatch the expected outputs")
+
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
             
@@ -109,23 +110,20 @@ extension ContentView {
             textViewText += "Proof has not been generated yet.\n"
             return
         }
-        
+
         textViewText += "Verifying Circom proof... "
         do {
             let start = CFAbsoluteTimeGetCurrent()
             
-            let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proof: proof, publicInput: inputs, proofLib: ProofLib.arkworks)
+            let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proofRet: CircomProofResult(proof: proof, inputs: inputs), proofLib: ProofLib.arkworks)
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
             
-            // Convert proof to Ethereum compatible proof
-            let ethereumProof = toEthereumProof(proof: proof)
-            let ethereumInputs = toEthereumInputs(inputs: inputs)
-            assert(ethereumProof.a.x.count > 0, "Proof should not be empty")
-            assert(ethereumInputs.count > 0, "Inputs should not be empty")
+            assert(proof.a.x.count > 0, "Proof should not be empty")
+            assert(inputs.count > 0, "Inputs should not be empty")
             
-            print("Ethereum Proof: \(ethereumProof)\n")
-            print("Ethereum Inputs: \(ethereumInputs)\n")
+            print("Ethereum Proof: \(proof)\n")
+            print("Ethereum Inputs: \(inputs)\n")
             
             if isValid {
                 textViewText += "\(String(format: "%.3f", timeTaken))s 2️⃣\n"

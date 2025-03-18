@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import uniffi.mopro.GenerateProofResult
+import uniffi.mopro.Halo2ProofResult
 import uniffi.mopro.generateHalo2Proof
 import uniffi.mopro.verifyHalo2Proof
 
@@ -25,8 +25,8 @@ fun FibonacciComponent() {
     var verifyingTime by remember { mutableStateOf("verifying time: ") }
     var valid by remember { mutableStateOf("valid:") }
     var res by remember {
-        mutableStateOf<GenerateProofResult>(
-            GenerateProofResult(proof = ByteArray(size = 0), inputs = ByteArray(size = 0))
+        mutableStateOf<Halo2ProofResult>(
+            Halo2ProofResult(proof = ByteArray(size = 0), inputs = ByteArray(size = 0))
         )
     }
 

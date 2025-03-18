@@ -10,14 +10,11 @@ try {
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
 
     // Verify proof
-    var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs, ProofLib.ARKWORKS)
+    var isValid = verifyCircomProof(zkeyPath, generateProofResult, ProofLib.ARKWORKS)
     assert(isValid) { "Proof is invalid" }
 
-    // Convert proof to Ethereum compatible proof
-    var convertProofResult = toEthereumProof(generateProofResult.proof)
-    var convertInputsResult = toEthereumInputs(generateProofResult.inputs)
-    assert(convertProofResult.a.x.isNotEmpty()) { "Proof is empty" }
-    assert(convertInputsResult.size > 0) { "Inputs are empty" }
+    assert(generateProofResult.proof.a.x.isNotEmpty()) { "Proof is empty" }
+    assert(generateProofResult.inputs.size > 0) { "Inputs are empty" }
 
 
 } catch (e: Exception) {
