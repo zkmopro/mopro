@@ -35,7 +35,7 @@ fun MultiplierComponent() {
                     protocol = "",
                     curve = ""
                 ),
-                inputs = listOf() // inputs 現在是 List<String>
+                inputs = listOf()
             )
         )
     }

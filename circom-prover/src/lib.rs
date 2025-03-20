@@ -81,8 +81,8 @@ mod tests {
 
         let proof = generate_proof(
             WitnessFn::RustWitness(multiplier2_witness),
-            ProofLib::RapidSnark,
+            ProofLib::Rapidsnark,
         );
-        assert!(verify_proof(proof, ProofLib::RapidSnark));
+        assert!(verify_proof(proof, ProofLib::Rapidsnark));
     }
 }

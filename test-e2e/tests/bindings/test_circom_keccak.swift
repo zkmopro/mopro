@@ -72,7 +72,7 @@ do {
     "Circuit outputs mismatch the expected outputs")
 
   let isValid = 
-    try verifyCircomProof(zkeyPath: zkeyPath, proofRet: generateProofResult, proofLib: ProofLib.arkworks)
+    try verifyCircomProof(zkeyPath: zkeyPath, proofResult: generateProofResult, proofLib: ProofLib.arkworks)
   assert(isValid, "Proof verification should succeed")
 
 } catch let error as MoproError {

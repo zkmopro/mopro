@@ -32,7 +32,7 @@ macro_rules! circom_app {
 
         fn verify_circom_proof(
             zkey_path: String,
-            proof_ret: $result,
+            proof_result: $result,
             proof_lib: $proof_lib,
         ) -> Result<bool, $err> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
@@ -127,16 +127,6 @@ pub struct Halo2ProofResult {
     pub proof: Vec<u8>,
     pub inputs: Vec<u8>,
 }
-
-//
-// Proof Libs
-//
-// #[derive(Debug, Clone, Default)]
-// pub enum ProofLib {
-//     #[default]
-//     Arkworks,
-//     Rapidsnark,
-// }
 
 /// This macro is used to setup the Mopro FFI library
 /// It should be included in the `lib.rs` file of the project
@@ -374,7 +364,7 @@ macro_rules! app {
         pub enum ProofLib {
             #[default]
             Arkworks,
-            RapidSnark,
+            Rapidsnark,
         }
 
         mopro_ffi::circom_app!(

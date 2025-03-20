@@ -83,15 +83,15 @@ extension ContentView {
             
             // Expected outputs
             let outputs: [String] = [String(c), String(a)]
-            let expectedOutput: [UInt8] = serializeOutputs(outputs)
+            // let expectedOutput: [UInt8] = serializeOutputs(outputs)
             
             let start = CFAbsoluteTimeGetCurrent()
             
             // Generate Proof
             let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
-            let public_inputs = serializeOutputs(generateProofResult.inputs)
+            // let public_inputs = serializeOutputs(generateProofResult.inputs)
             assert(!generateProofResult.proof.a.x.isEmpty, "Proof should not be empty")
-            assert(expectedOutput == public_inputs, "Circuit outputs mismatch the expected outputs")
+            assert(outputs == generateProofResult.inputs, "Circuit outputs mismatch the expected outputs")
             
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
@@ -119,7 +119,7 @@ extension ContentView {
         do {
             let start = CFAbsoluteTimeGetCurrent()
             
-            let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proofRet: CircomProofResult(proof: proof, inputs: inputs), proofLib: ProofLib.arkworks)
+            let isValid = try verifyCircomProof(zkeyPath: zkeyPath, proofResult: CircomProofResult(proof: proof, inputs: inputs), proofLib: ProofLib.arkworks)
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
             

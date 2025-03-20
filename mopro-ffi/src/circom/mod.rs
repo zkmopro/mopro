@@ -29,7 +29,7 @@ macro_rules! circom_app {
         ) -> Result<$result, $err> {
             let chosen_proof_lib = match proof_lib {
                 <$proof_lib>::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
-                <$proof_lib>::RapidSnark => mopro_ffi::prover::ProofLib::RapidSnark,
+                <$proof_lib>::Rapidsnark => mopro_ffi::prover::ProofLib::Rapidsnark,
             };
             let name = match std::path::Path::new(zkey_path.as_str()).file_name() {
                 Some(v) => v,
@@ -56,14 +56,14 @@ macro_rules! circom_app {
         #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn verify_circom_proof(
             zkey_path: String,
-            proof_ret: $result,
+            proof_result: $result,
             proof_lib: $proof_lib,
         ) -> Result<bool, $err> {
             let chosen_proof_lib = match proof_lib {
                 <$proof_lib>::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
-                <$proof_lib>::RapidSnark => mopro_ffi::prover::ProofLib::RapidSnark,
+                <$proof_lib>::Rapidsnark => mopro_ffi::prover::ProofLib::Rapidsnark,
             };
-            mopro_ffi::verify_circom_proof(chosen_proof_lib, zkey_path, proof_ret.into())
+            mopro_ffi::verify_circom_proof(chosen_proof_lib, zkey_path, proof_result.into())
                 .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
         }
 
