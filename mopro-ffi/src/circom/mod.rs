@@ -69,26 +69,32 @@ macro_rules! circom_app {
 
         #[allow(dead_code)]
         #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn to_ethereum_proof(proof: $proof) -> $proof_call_data {
-            mopro_ffi::to_ethereum_proof(proof.into()).into()
+        fn to_ethereum_proof(proof: $proof) -> Result<$proof_call_data, $err> {
+            mopro_ffi::to_ethereum_proof(proof.into())
+                .map(|p| p.into())
+                .map_err(|e| <$err>::CircomError(format!("to_ethereum_inputs error: {}", e)))
         }
 
         #[allow(dead_code)]
         #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
-            mopro_ffi::to_ethereum_inputs(inputs)
+        fn to_ethereum_inputs(inputs: Vec<u8>, curve: String) -> Result<Vec<String>, $err> {
+            mopro_ffi::to_ethereum_inputs(inputs, curve)
+                .map_err(|e| <$err>::CircomError(format!("to_ethereum_inputs error: {}", e)))
         }
 
         #[allow(dead_code)]
         #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn from_ethereum_proof(proof: $proof_call_data) -> $proof {
-            mopro_ffi::from_ethereum_proof(proof.into()).into()
+        fn from_ethereum_proof(proof: $proof_call_data, curve: String) -> Result<$proof, $err> {
+            mopro_ffi::from_ethereum_proof(proof.into(), curve)
+                .map(|p| p.into())
+                .map_err(|e| <$err>::CircomError(format!("from_ethereum_proof error: {}", e)))
         }
 
         #[allow(dead_code)]
         #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
-            mopro_ffi::from_ethereum_inputs(inputs)
+        fn from_ethereum_inputs(inputs: Vec<String>, curve: String) -> Result<Vec<u8>, $err> {
+            mopro_ffi::from_ethereum_inputs(inputs, curve)
+                .map_err(|e| <$err>::CircomError(format!("from_ethereum_inputs error: {}", e)))
         }
     };
 }
@@ -325,6 +331,7 @@ mod tests {
         use ark_bls12_381::Bls12_381;
         use ark_bn254::Bn254;
         use ark_ff::PrimeField;
+        use circom_prover::prover::circom::{CURVE_BLS12_381, CURVE_BN254};
         use circom_prover::prover::{serialization, ProofLib, PublicInputs};
         use circom_prover::witness::WitnessFn;
         use num_bigint::{BigUint, ToBigInt};
@@ -477,8 +484,9 @@ mod tests {
             assert!(is_valid);
 
             // Step 4: Convert Proof to Ethereum compatible proof
-            let proof_calldata = to_ethereum_proof(proof);
-            let inputs_calldata = to_ethereum_inputs(serialized_inputs);
+            let proof_calldata = to_ethereum_proof(proof).unwrap();
+            let inputs_calldata =
+                to_ethereum_inputs(serialized_inputs, CURVE_BN254.to_string()).unwrap();
             assert!(!proof_calldata.a.x.is_empty());
             assert!(!inputs_calldata.is_empty());
 
@@ -520,8 +528,9 @@ mod tests {
             assert!(is_valid);
 
             // Step 4: Convert Proof to Ethereum compatible proof
-            let proof_calldata = to_ethereum_proof(proof);
-            let inputs_calldata = to_ethereum_inputs(serialized_inputs);
+            let proof_calldata = to_ethereum_proof(proof).unwrap();
+            let inputs_calldata =
+                to_ethereum_inputs(serialized_inputs, CURVE_BN254.to_string()).unwrap();
             assert!(!proof_calldata.a.x.is_empty());
             assert!(!inputs_calldata.is_empty());
 
@@ -603,8 +612,9 @@ mod tests {
             // revisit this
             //
             // Step 4: Convert Proof to Ethereum compatible proof
-            let proof_calldata = to_ethereum_proof(proof);
-            let inputs_calldata = to_ethereum_inputs(serialized_inputs);
+            let proof_calldata = to_ethereum_proof(proof).unwrap();
+            let inputs_calldata =
+                to_ethereum_inputs(serialized_inputs, CURVE_BLS12_381.to_string()).unwrap();
             assert!(!proof_calldata.a.x.is_empty());
             assert!(!inputs_calldata.is_empty());
 
