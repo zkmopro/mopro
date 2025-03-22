@@ -9,7 +9,7 @@ mod halo2;
 #[cfg(feature = "circom")]
 pub use circom::{
     from_ethereum_inputs, from_ethereum_proof, generate_circom_proof_wtns, to_ethereum_inputs,
-    to_ethereum_proof, verify_circom_proof, ProofCalldata,
+    to_ethereum_proof, verify_circom_proof,
 };
 
 #[cfg(feature = "circom")]
@@ -21,7 +21,7 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 #[cfg(not(feature = "circom"))]
 #[macro_export]
 macro_rules! circom_app {
-    ($result:ty, $proof_call_data:ty, $err:ty, $proof_lib:ty) => {
+    ($result:ty, $proof:ty, $proof_call_data:ty, $err:ty, $proof_lib:ty) => {
         fn generate_circom_proof(
             zkey_path: String,
             circuit_inputs: String,
@@ -117,6 +117,13 @@ pub struct G2 {
     pub x: Vec<String>,
     pub y: Vec<String>,
     pub z: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ProofCalldata {
+    pub a: G1,
+    pub b: G2,
+    pub c: G1,
 }
 
 //
