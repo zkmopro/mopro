@@ -13,7 +13,7 @@ exclude = ["test-vectors/*"]
 name = "circom_prover"
 
 [features]
-default = ["rustwitness", "arkworks", "ethereum"]
+default = ["rustwitness", "arkworks", "circom-proof"]
 
 # Witness Generation
 rustwitness = ["rust-witness"]
@@ -42,7 +42,7 @@ rapidsnark = [
     "ark-poly",
 ]
 
-ethereum = ["ark-std", "ark-serialize", "ark-ff"]
+circom-proof = ["ark-std", "ark-serialize", "ark-ff"]
 
 [dependencies]
 num = { version = "0.4.0" }

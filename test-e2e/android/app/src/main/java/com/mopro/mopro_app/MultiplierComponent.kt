@@ -11,7 +11,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mopro.mopro_app.getFilePathFromAssets
-import uniffi.mopro.GenerateProofResult
+import uniffi.mopro.CircomProofResult
+import uniffi.mopro.CircomProof
+import uniffi.mopro.G1
+import uniffi.mopro.G2
 import uniffi.mopro.ProofLib
 import uniffi.mopro.generateCircomProof
 import uniffi.mopro.verifyCircomProof
@@ -23,8 +26,17 @@ fun MultiplierComponent() {
     var valid by remember { mutableStateOf("valid:") }
     var output by remember { mutableStateOf("output:") }
     var res by remember {
-        mutableStateOf<GenerateProofResult>(
-            GenerateProofResult(proof = ByteArray(size = 0), inputs = ByteArray(size = 0))
+        mutableStateOf(
+            CircomProofResult(
+                proof = CircomProof(
+                    a = G1(x = "", y = "", z = null),
+                    b = G2(x = listOf(), y = listOf(), z = null),
+                    c = G1(x = "", y = "", z = null),
+                    protocol = "",
+                    curve = ""
+                ),
+                inputs = listOf()
+            )
         )
     }
 
@@ -48,15 +60,11 @@ fun MultiplierComponent() {
         ) { Text(text = "generate proof") }
         Button(
             onClick = {
-                val ethereumProof = uniffi.mopro.toEthereumProof(res.proof)
-                val ethereumInputs = uniffi.mopro.toEthereumInputs(res.inputs)
-                val moproProof = uniffi.mopro.fromEthereumProof(ethereumProof)
-                val moproInputs = uniffi.mopro.fromEthereumInputs(ethereumInputs)
                 val startTime = System.currentTimeMillis()
-                valid = "valid: " + verifyCircomProof(zkeyPath, moproProof, moproInputs, ProofLib.ARKWORKS).toString()
+                valid = "valid: " + verifyCircomProof(zkeyPath, res, ProofLib.ARKWORKS).toString()
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
-                output = "output: " + uniffi.mopro.toEthereumInputs(res.inputs)
+                output = "output: " + res.inputs
             },
             modifier = Modifier.padding(top = 120.dp).testTag("circomVerifyProofButton")
         ) { Text(text = "verify proof") }

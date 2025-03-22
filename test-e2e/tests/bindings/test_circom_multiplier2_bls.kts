@@ -10,7 +10,7 @@ try {
     assert(generateProofResult.proof.size > 0) { "Proof is empty" }
 
     // Verify proof
-    var isValid = verifyCircomProof(zkeyPath, generateProofResult.proof, generateProofResult.inputs, ProofLib.ARKWORKS)
+    var isValid = verifyCircomProof(zkeyPath, generateProofResult, ProofLib.ARKWORKS)
     assert(isValid) { "Proof is invalid" }
 
 

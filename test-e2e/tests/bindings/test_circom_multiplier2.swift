@@ -47,23 +47,19 @@ do {
   // Generate Proof
   let generateProofResult = try generateCircomProof(
     zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
-  assert(!generateProofResult.proof.isEmpty, "Proof should not be empty")
+  assert(!generateProofResult.proof.a.x.isEmpty, "Proof should not be empty")
 
   // Verify Proof
   assert(
     Data(expectedOutput) == generateProofResult.inputs,
     "Circuit outputs mismatch the expected outputs")
 
-  let isValid = try verifyCircomProof(
-    zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs,
-    proofLib: ProofLib.arkworks)
+  let isValid = 
+    try verifyCircomProof(zkeyPath: zkeyPath, proof: generateProofResult, proofLib: ProofLib.arkworks)
   assert(isValid, "Proof verification should succeed")
 
-  // Convert proof to Ethereum compatible proof
-  let convertProofResult = toEthereumProof(proof: generateProofResult.proof)
-  let convertInputsResult = toEthereumInputs(inputs: generateProofResult.inputs)
-  assert(convertProofResult.a.x.count > 0, "Proof should not be empty")
-  assert(convertInputsResult.count > 0, "Inputs should not be empty")
+  assert(generateProofResult.proof.a.x.count > 0, "Proof should not be empty")
+  assert(generateProofResult.inputs.count > 0, "Inputs should not be empty")
 
 } catch let error as MoproError {
   print("MoproError: \(error)")

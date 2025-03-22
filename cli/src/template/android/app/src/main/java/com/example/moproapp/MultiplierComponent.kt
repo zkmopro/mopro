@@ -10,7 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.moproapp.getFilePathFromAssets
-import uniffi.mopro.GenerateProofResult
+import uniffi.mopro.CircomProofResult
+import uniffi.mopro.CircomProof
+import uniffi.mopro.G1
+import uniffi.mopro.G2
 import uniffi.mopro.generateCircomProof
 import uniffi.mopro.verifyCircomProof
 import uniffi.mopro.ProofLib
@@ -23,8 +26,17 @@ fun MultiplierComponent() {
     var valid by remember { mutableStateOf("valid:") }
     var output by remember { mutableStateOf("output:") }
     var res by remember {
-        mutableStateOf<GenerateProofResult>(
-            GenerateProofResult(proof = ByteArray(size = 0), inputs = ByteArray(size = 0))
+        mutableStateOf(
+            CircomProofResult(
+                proof = CircomProof(
+                    a = G1(x = "", y = "", z = null),
+                    b = G2(x = listOf(), y = listOf(), z = null),
+                    c = G1(x = "", y = "", z = null),
+                    protocol = "",
+                    curve = ""
+                ),
+                inputs = listOf()
+            )
         )
     }
 
@@ -49,7 +61,7 @@ fun MultiplierComponent() {
         Button(
             onClick = {
                 val startTime = System.currentTimeMillis()
-                valid = "valid: " + verifyCircomProof(zkeyPath, res.proof, res.inputs, ProofLib.ARKWORKS).toString()
+                valid = "valid: " + verifyCircomProof(zkeyPath, res, ProofLib.ARKWORKS).toString()
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
                 output = "output: " + uniffi.mopro.toEthereumInputs(res.inputs)

@@ -6,16 +6,15 @@ use ark_bls12_381::{
     Bls12_381, Fq as bls12_381_fq, Fq2 as bls12_381_Fq2, Fr as bls12_381_Fr,
     G1Affine as bls12_381_G1Affine, G2Affine as bls12_381_G2Affine,
 };
-use ark_ec::AffineRepr;
-use ark_ff::{BigInteger, PrimeField};
-use num::BigUint;
-use num_traits::Zero;
-
 use ark_bn254::{
     Bn254, Fq as bn254_Fq, Fq2 as bn254_Fq2, Fr as bn254_Fr, G1Affine as bn254_G1Affine,
     G2Affine as bn254_G2Affine,
 };
+use ark_ec::AffineRepr;
+use ark_ff::{BigInteger, PrimeField};
 use ark_serialize::CanonicalDeserialize;
+use num::BigUint;
+use num_traits::Zero;
 
 pub const PROTOCOL_GROTH16: &str = "groth16";
 pub const CURVE_BN254: &str = "bn128";
@@ -225,7 +224,7 @@ impl From<ark_groth16::Proof<Bls12_381>> for Proof {
 }
 
 impl From<Proof> for ark_groth16::Proof<Bn254> {
-    fn from(src: Proof) -> ark_groth16::Proof<Bn254> {
+    fn from(src: Proof) -> Self {
         ark_groth16::Proof {
             a: src.a.to_bn254(),
             b: src.b.to_bn254(),
@@ -235,7 +234,7 @@ impl From<Proof> for ark_groth16::Proof<Bn254> {
 }
 
 impl From<Proof> for ark_groth16::Proof<Bls12_381> {
-    fn from(src: Proof) -> ark_groth16::Proof<Bls12_381> {
+    fn from(src: Proof) -> Self {
         ark_groth16::Proof {
             a: src.a.to_bls12_381(),
             b: src.b.to_bls12_381(),
@@ -263,7 +262,7 @@ fn point_to_biguint<F: PrimeField>(point: F) -> BigUint {
 
 #[cfg(test)]
 mod tests {
-    use crate::prover::ethereum::{biguint_to_point, point_to_biguint, Inputs, Proof, G1, G2};
+    use crate::prover::circom::{biguint_to_point, point_to_biguint, Inputs, Proof, G1, G2};
     use num::BigUint;
 
     mod bn254 {
