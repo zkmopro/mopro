@@ -1,14 +1,10 @@
 use anyhow::Result;
-use ark_ec::pairing::Pairing;
-use ark_ff::{BigInteger, PrimeField};
 use circom::Proof;
 use num::BigUint;
-use serialization::SerializableInputs;
 use std::{str::FromStr, thread::JoinHandle};
 
 pub mod ark_circom;
 pub mod circom;
-pub mod serialization;
 
 #[cfg(feature = "arkworks")]
 pub mod arkworks;
@@ -72,32 +68,5 @@ impl From<Vec<String>> for PublicInputs {
 impl From<PublicInputs> for Vec<String> {
     fn from(src: PublicInputs) -> Self {
         src.0.iter().map(|p| p.to_string()).collect()
-    }
-}
-
-impl<T: Pairing> From<PublicInputs> for SerializableInputs<T> {
-    fn from(src: PublicInputs) -> SerializableInputs<T> {
-        let si = src
-            .0
-            .iter()
-            .map(|n| {
-                if *n > BigUint::from_bytes_le(T::ScalarField::MODULUS.to_bytes_le().as_ref()) {
-                    panic!("Invalid input, lager than MODULUS")
-                }
-                T::ScalarField::from_le_bytes_mod_order(n.to_bytes_le().as_ref())
-            })
-            .collect();
-        SerializableInputs(si)
-    }
-}
-
-impl<T: Pairing> From<SerializableInputs<T>> for PublicInputs {
-    fn from(src: SerializableInputs<T>) -> PublicInputs {
-        let pi = src
-            .0
-            .iter()
-            .map(|&si| BigUint::from_bytes_le(si.into_bigint().to_bytes_le().as_ref()))
-            .collect();
-        PublicInputs(pi)
     }
 }

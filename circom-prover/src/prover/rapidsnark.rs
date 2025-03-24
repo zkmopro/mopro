@@ -1,5 +1,5 @@
 use super::circom::{CURVE_BLS12_381, CURVE_BN254};
-use super::{ark_circom::read_proving_key, serialization::SerializableInputs, PublicInputs};
+use super::{ark_circom::read_proving_key, PublicInputs};
 use crate::prover::circom::PROTOCOL_GROTH16;
 use crate::CircomProof;
 use anyhow::{bail, Result};
@@ -63,7 +63,7 @@ pub fn verify_circom_proof(zkey_path: String, proof: CircomProof) -> Result<bool
         bail!("Not support {} yet", CURVE_BLS12_381)
     }
 
-    let public_inputs_parsed: SerializableInputs<Bn254> = proof.pub_inputs.into();
+    let public_inputs_parsed: Vec<String> = proof.pub_inputs.into();
     let pi_a: Vec<String> = vec![
         proof.proof.a.x.to_string(),
         proof.proof.a.y.to_string(),
@@ -98,12 +98,7 @@ pub fn verify_circom_proof(zkey_path: String, proof: CircomProof) -> Result<bool
         "protocol": PROTOCOL_GROTH16,
     });
 
-    let inputs_json = json!(public_inputs_parsed
-        .clone()
-        .0
-        .into_iter()
-        .map(|i| i.to_string())
-        .collect::<Vec<String>>());
+    let inputs_json = json!(public_inputs_parsed);
 
     let file = File::open(&zkey_path)?;
     let mut reader = std::io::BufReader::new(file);
@@ -115,7 +110,7 @@ pub fn verify_circom_proof(zkey_path: String, proof: CircomProof) -> Result<bool
         .iter()
         .map(|g| vec![g.x.to_string(), g.y.to_string(), "1".to_string()])
         .collect::<Vec<Vec<String>>>();
-    let vkey_json = prepare_vkey(pvk, ic, public_inputs_parsed.0.len(), CURVE_BN254);
+    let vkey_json = prepare_vkey(pvk, ic, public_inputs_parsed.len(), CURVE_BN254);
     let valid = rust_rapidsnark::groth16_verify_wrapper(
         &proof_json.to_string(),
         &inputs_json.to_string(),

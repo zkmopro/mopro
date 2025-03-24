@@ -293,11 +293,8 @@ mod tests {
         use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
         use crate::CircomProofResult;
         use anyhow::bail;
-        use ark_bls12_381::Bls12_381;
-        use ark_bn254::Bn254;
         use ark_ff::PrimeField;
-        use circom_prover::prover::circom::{CURVE_BLS12_381, CURVE_BN254};
-        use circom_prover::prover::{serialization, ProofLib, PublicInputs};
+        use circom_prover::prover::{ProofLib, PublicInputs};
         use circom_prover::witness::WitnessFn;
         use num_bigint::{BigUint, ToBigInt};
         use std::ops::{Add, Mul};
@@ -400,14 +397,13 @@ mod tests {
             inputs
         }
 
-        fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<u8> {
+        fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<BigUint> {
             let bits = bytes_to_bits(bytes);
             let field_bits = bits
                 .into_iter()
-                .map(|bit| ark_bn254::Fr::from(bit as u8))
+                .map(|bit| BigUint::from(bit as u8))
                 .collect();
-            let circom_outputs = serialization::SerializableInputs::<Bn254>(field_bits);
-            serialization::serialize_inputs(&circom_outputs)
+            field_bits
         }
 
         #[test]
@@ -426,11 +422,9 @@ mod tests {
             inputs.insert("b".to_string(), vec![b.to_string()]);
             // output = [public output c, public input a]
             let expected_output = vec![
-                ark_bn254::Fr::from(c.clone().to_biguint().unwrap()),
-                ark_bn254::Fr::from(a.clone().to_biguint().unwrap()),
+                BigUint::from(c.clone().to_biguint().unwrap()),
+                BigUint::from(a.clone().to_biguint().unwrap()),
             ];
-            let circom_outputs = serialization::SerializableInputs::<Bn254>(expected_output);
-            let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
 
             // Generate Proof
             let input_str = serde_json::to_string(&inputs).unwrap();
@@ -438,10 +432,9 @@ mod tests {
             let proof = p.proof.clone();
             let pub_inputs: PublicInputs = p.inputs.clone().into();
 
-            let serialized_inputs = serialization::serialize_inputs::<Bn254>(&pub_inputs.into());
             assert!(!proof.protocol.is_empty());
             assert!(!proof.curve.is_empty());
-            assert_eq!(serialized_inputs, serialized_outputs);
+            assert_eq!(pub_inputs.0, expected_output);
 
             // Step 3: Verify Proof
             let is_valid = verify_circom_proof(ProofLib::Arkworks, zkey_path, p)?;
@@ -475,10 +468,9 @@ mod tests {
             let proof = p.proof.clone();
             let pub_inputs: PublicInputs = p.inputs.clone().into();
 
-            let serialized_inputs = serialization::serialize_inputs::<Bn254>(&pub_inputs.into());
             assert!(!proof.protocol.is_empty());
             assert!(!proof.curve.is_empty());
-            assert_eq!(serialized_inputs, serialized_outputs);
+            assert_eq!(pub_inputs.0, serialized_outputs);
 
             // Verify Proof
             let is_valid = verify_circom_proof(ProofLib::Arkworks, zkey_path, p)?;
@@ -537,9 +529,7 @@ mod tests {
             inputs.insert("a".to_string(), vec![a.to_string()]);
             inputs.insert("b".to_string(), vec![b.to_string()]);
             // output = [public output c, public input a]
-            let expected_output = vec![ark_bls12_381::Fr::from(c.to_biguint().unwrap())];
-            let circom_outputs = serialization::SerializableInputs::<Bls12_381>(expected_output);
-            let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
+            let expected_output = vec![BigUint::from(c.to_biguint().unwrap())];
 
             // Generate Proof
             let input_str = serde_json::to_string(&inputs).unwrap();
@@ -547,11 +537,9 @@ mod tests {
             let proof = p.proof.clone();
             let pub_inputs: PublicInputs = p.inputs.clone().into();
 
-            let serialized_inputs =
-                serialization::serialize_inputs::<Bls12_381>(&pub_inputs.into());
             assert!(!proof.protocol.is_empty());
             assert!(!proof.curve.is_empty());
-            assert_eq!(serialized_inputs, serialized_outputs);
+            assert_eq!(pub_inputs.0, expected_output);
 
             // Step 3: Verify Proof
             let is_valid = verify_circom_proof(ProofLib::Arkworks, zkey_path, p)?;
