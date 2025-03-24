@@ -7,9 +7,7 @@ mod circom;
 mod halo2;
 
 #[cfg(feature = "circom")]
-pub use circom::{
-    generate_circom_proof_wtns, verify_circom_proof,
-};
+pub use circom::{generate_circom_proof_wtns, verify_circom_proof};
 
 #[cfg(feature = "circom")]
 pub use circom_prover::{prover, witness};
@@ -21,6 +19,9 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 #[macro_export]
 macro_rules! circom_app {
     ($result:ty, $proof:ty, $err:ty, $proof_lib:ty) => {
+        // TODO: fix this if CLI template can be customized
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn generate_circom_proof(
             zkey_path: String,
             circuit_inputs: String,
@@ -29,6 +30,9 @@ macro_rules! circom_app {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
 
+        // TODO: fix this if CLI template can be customized
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn verify_circom_proof(
             zkey_path: String,
             proof_result: $result,
@@ -43,6 +47,9 @@ macro_rules! circom_app {
 #[macro_export]
 macro_rules! halo2_app {
     ($result:ty, $err:ty) => {
+        // TODO: fix this if CLI template can be customized
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn generate_halo2_proof(
             srs_path: String,
             pk_path: String,
@@ -51,6 +58,9 @@ macro_rules! halo2_app {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
 
+        // TODO: fix this if CLI template can be customized
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn verify_halo2_proof(
             srs_path: String,
             vk_path: String,
@@ -294,12 +304,7 @@ macro_rules! app {
             Rapidsnark,
         }
 
-        mopro_ffi::circom_app!(
-            CircomProofResult,
-            CircomProof,
-            MoproError,
-            ProofLib
-        );
+        mopro_ffi::circom_app!(CircomProofResult, CircomProof, MoproError, ProofLib);
 
         mopro_ffi::halo2_app!(Halo2ProofResult, MoproError);
     };
