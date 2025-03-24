@@ -399,11 +399,9 @@ mod tests {
 
         fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<BigUint> {
             let bits = bytes_to_bits(bytes);
-            let field_bits = bits
-                .into_iter()
+            bits.into_iter()
                 .map(|bit| BigUint::from(bit as u8))
-                .collect();
-            field_bits
+                .collect()
         }
 
         #[test]
@@ -422,8 +420,8 @@ mod tests {
             inputs.insert("b".to_string(), vec![b.to_string()]);
             // output = [public output c, public input a]
             let expected_output = vec![
-                BigUint::from(c.clone().to_biguint().unwrap()),
-                BigUint::from(a.clone().to_biguint().unwrap()),
+                c.clone().to_biguint().unwrap(),
+                a.clone().to_biguint().unwrap(),
             ];
 
             // Generate Proof
@@ -529,7 +527,7 @@ mod tests {
             inputs.insert("a".to_string(), vec![a.to_string()]);
             inputs.insert("b".to_string(), vec![b.to_string()]);
             // output = [public output c, public input a]
-            let expected_output = vec![BigUint::from(c.to_biguint().unwrap())];
+            let expected_output = vec![c.to_biguint().unwrap()];
 
             // Generate Proof
             let input_str = serde_json::to_string(&inputs).unwrap();
