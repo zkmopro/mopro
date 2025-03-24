@@ -1,6 +1,3 @@
-pub mod ethereum;
-pub use ethereum::*;
-
 use crate::{CircomProof, CircomProofResult, G1, G2};
 use anyhow::{bail, Ok, Result};
 use circom_prover::{
@@ -19,7 +16,7 @@ use std::str::FromStr;
 
 #[macro_export]
 macro_rules! circom_app {
-    ($result:ty, $proof:ty, $proof_call_data:ty, $err:ty, $proof_lib:ty) => {
+    ($result:ty, $proof:ty, $err:ty, $proof_lib:ty) => {
         #[allow(dead_code)]
         #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn generate_circom_proof(
@@ -65,30 +62,6 @@ macro_rules! circom_app {
             };
             mopro_ffi::verify_circom_proof(chosen_proof_lib, zkey_path, proof_result.into())
                 .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
-        }
-
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn to_ethereum_proof(proof: $proof) -> $proof_call_data {
-            mopro_ffi::to_ethereum_proof(proof.into()).into()
-        }
-
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
-            mopro_ffi::to_ethereum_inputs(inputs)
-        }
-
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn from_ethereum_proof(proof: $proof_call_data) -> $proof {
-            mopro_ffi::from_ethereum_proof(proof.into()).into()
-        }
-
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
-            mopro_ffi::from_ethereum_inputs(inputs)
         }
     };
 }
@@ -284,7 +257,6 @@ mod tests {
             circom_app!(
                 mopro_ffi::CircomProofResult,
                 mopro_ffi::CircomProof,
-                mopro_ffi::ProofCalldata,
                 mopro_ffi::MoproError,
                 circom_prover::prover::ProofLib
             );
@@ -318,7 +290,6 @@ mod tests {
     #[cfg(feature = "rustwitness")]
     mod rustwitness {
         use super::*;
-        use crate::circom::ethereum::{to_ethereum_inputs, to_ethereum_proof};
         use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
         use crate::CircomProofResult;
         use anyhow::bail;
@@ -344,7 +315,6 @@ mod tests {
             circom_app!(
                 mopro_ffi::CircomProofResult,
                 mopro_ffi::CircomProof,
-                mopro_ffi::ProofCalldata,
                 mopro_ffi::MoproError,
                 circom_prover::prover::ProofLib
             );
@@ -476,12 +446,6 @@ mod tests {
             let is_valid = verify_circom_proof(ProofLib::Arkworks, zkey_path, p)?;
             assert!(is_valid);
 
-            // Step 4: Convert Proof to Ethereum compatible proof
-            let proof_calldata = to_ethereum_proof(proof);
-            let inputs_calldata = to_ethereum_inputs(serialized_inputs);
-            assert!(!proof_calldata.a.x.is_empty());
-            assert!(!inputs_calldata.is_empty());
-
             Ok(())
         }
 
@@ -518,12 +482,6 @@ mod tests {
             // Verify Proof
             let is_valid = verify_circom_proof(ProofLib::Arkworks, zkey_path, p)?;
             assert!(is_valid);
-
-            // Step 4: Convert Proof to Ethereum compatible proof
-            let proof_calldata = to_ethereum_proof(proof);
-            let inputs_calldata = to_ethereum_inputs(serialized_inputs);
-            assert!(!proof_calldata.a.x.is_empty());
-            assert!(!inputs_calldata.is_empty());
 
             Ok(())
         }
@@ -602,11 +560,6 @@ mod tests {
             // Once the hardfork enables the bls precompile we should
             // revisit this
             //
-            // Step 4: Convert Proof to Ethereum compatible proof
-            let proof_calldata = to_ethereum_proof(proof);
-            let inputs_calldata = to_ethereum_inputs(serialized_inputs);
-            assert!(!proof_calldata.a.x.is_empty());
-            assert!(!inputs_calldata.is_empty());
 
             Ok(())
         }

@@ -8,8 +8,7 @@ mod halo2;
 
 #[cfg(feature = "circom")]
 pub use circom::{
-    from_ethereum_inputs, from_ethereum_proof, generate_circom_proof_wtns, to_ethereum_inputs,
-    to_ethereum_proof, verify_circom_proof,
+    generate_circom_proof_wtns, verify_circom_proof,
 };
 
 #[cfg(feature = "circom")]
@@ -21,7 +20,7 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 #[cfg(not(feature = "circom"))]
 #[macro_export]
 macro_rules! circom_app {
-    ($result:ty, $proof:ty, $proof_call_data:ty, $err:ty, $proof_lib:ty) => {
+    ($result:ty, $proof:ty, $err:ty, $proof_lib:ty) => {
         fn generate_circom_proof(
             zkey_path: String,
             circuit_inputs: String,
@@ -35,22 +34,6 @@ macro_rules! circom_app {
             proof_result: $result,
             proof_lib: $proof_lib,
         ) -> Result<bool, $err> {
-            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
-        }
-
-        fn to_ethereum_proof(proof: $proof) -> $proof_call_data {
-            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
-        }
-
-        fn to_ethereum_inputs(inputs: Vec<u8>) -> Vec<String> {
-            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
-        }
-
-        fn from_ethereum_proof(proof: $proof_call_data) -> $proof {
-            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
-        }
-
-        fn from_ethereum_inputs(inputs: Vec<String>) -> Vec<u8> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
     };
@@ -118,14 +101,6 @@ pub struct G2 {
     pub y: Vec<String>,
     pub z: Option<Vec<String>>,
 }
-
-#[derive(Debug, Clone, Default)]
-pub struct ProofCalldata {
-    pub a: G1,
-    pub b: G2,
-    pub c: G1,
-}
-
 //
 // Halo2 Proof
 //
@@ -312,61 +287,6 @@ macro_rules! app {
         }
         // End of Circom Section
 
-        //
-        // Ethereum calldata Section
-        //
-        #[derive(Debug, Clone, Default, uniffi::Record)]
-        pub struct ProofCalldata {
-            pub a: G1,
-            pub b: G2,
-            pub c: G1,
-        }
-
-        impl From<mopro_ffi::ProofCalldata> for ProofCalldata {
-            fn from(proof: mopro_ffi::ProofCalldata) -> Self {
-                ProofCalldata {
-                    a: G1 {
-                        x: proof.a.x,
-                        y: proof.a.y,
-                        z: None,
-                    },
-                    b: G2 {
-                        x: proof.b.x,
-                        y: proof.b.y,
-                        z: None,
-                    },
-                    c: G1 {
-                        x: proof.c.x,
-                        y: proof.c.y,
-                        z: None,
-                    },
-                }
-            }
-        }
-
-        impl Into<mopro_ffi::ProofCalldata> for ProofCalldata {
-            fn into(self) -> mopro_ffi::ProofCalldata {
-                mopro_ffi::ProofCalldata {
-                    a: mopro_ffi::G1 {
-                        x: self.a.x,
-                        y: self.a.y,
-                        z: None,
-                    },
-                    b: mopro_ffi::G2 {
-                        x: self.b.x,
-                        y: self.b.y,
-                        z: None,
-                    },
-                    c: mopro_ffi::G1 {
-                        x: self.c.x,
-                        y: self.c.y,
-                        z: None,
-                    },
-                }
-            }
-        }
-        // End of Ethereum calldata Section
-
         #[derive(Debug, Clone, Default, uniffi::Enum)]
         pub enum ProofLib {
             #[default]
@@ -377,7 +297,6 @@ macro_rules! app {
         mopro_ffi::circom_app!(
             CircomProofResult,
             CircomProof,
-            ProofCalldata,
             MoproError,
             ProofLib
         );
