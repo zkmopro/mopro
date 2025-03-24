@@ -15,8 +15,10 @@ pub mod arkworks;
 #[cfg(feature = "rapidsnark")]
 pub mod rapidsnark;
 
+#[derive(Debug, Clone)]
 pub struct PublicInputs(pub Vec<BigUint>);
 
+#[derive(Debug, Clone)]
 pub struct CircomProof {
     pub proof: Proof,
     pub pub_inputs: PublicInputs,
