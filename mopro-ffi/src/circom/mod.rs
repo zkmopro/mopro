@@ -296,6 +296,7 @@ mod tests {
         use ark_bls12_381::Bls12_381;
         use ark_bn254::Bn254;
         use ark_ff::PrimeField;
+        use circom_prover::prover::circom::{CURVE_BLS12_381, CURVE_BN254};
         use circom_prover::prover::{serialization, ProofLib, PublicInputs};
         use circom_prover::witness::WitnessFn;
         use num_bigint::{BigUint, ToBigInt};
@@ -555,11 +556,6 @@ mod tests {
             // Step 3: Verify Proof
             let is_valid = verify_circom_proof(ProofLib::Arkworks, zkey_path, p)?;
             assert!(is_valid);
-
-            // We don't support formatting for ethereum for the BLS curve.
-            // Once the hardfork enables the bls precompile we should
-            // revisit this
-            //
 
             Ok(())
         }
