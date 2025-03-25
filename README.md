@@ -47,189 +47,41 @@ Check the details here: [performance](https://zkmopro.org/docs/performance).
 
 Benchmarks on an iPhone 16 Pro (2024).
 
-<table>
-  <tr>
-    <th>Witness generation</th>
-    <th>[witnesscalc](https://github.com/0xPolygonID/witnesscalc)</th>
-    <th>[circom-witnesscalc](https://github.com/iden3/circom-witnesscalc)</th>
-    <th>[wasmer](https://github.com/arkworks-rs/circom-compat)</th>
-    <th>[w2c](https://github.com/vimwitch/rust-witness)</th>
-    <th>[snarkjs](https://github.com/iden3/snarkjs)</th>
-  </tr>
-  <tr>
-    <td>Keccak256</td>
-    <td>142.1 ms (~1x)</td>
-    <td>75.4 ms (<font color="FFB546">**~2x**</font>)</td>
-    <td>287.7 ms (slower)</td>
-    <td>140 ms (~1x)</td>
-    <td>147.1 ms </td>
-  </tr>
-  <tr>
-    <td>SHA256</td>
-    <td>41 ms (<font color="FFB546">**~2x**</font>)</td>
-    <td>51.3 ms (~1.7x)</td>
-    <td>171.3  ms (slower)</td>
-    <td>93.9 ms (~1x)</td>
-    <td>91.8 ms </td>
-  </tr>
-  <tr>
-    <td>RSA</td>
-    <td>153 ms (<font color="FFB546">**~19x**</font>)</td>
-    <td>-</td>
-    <td>2937.5 ms (~1x)</td>
-    <td>2312.3 ms (~1.2x)</td>
-    <td>2979.5 ms </td>
-  </tr>
-  <tr>
-    <td>Semaphore</td>
-    <td>22 ms (~3.5x)</td>
-    <td>14.6 ms (<font color="FFB546">**~5.3x**</font>)</td>
-    <td>266.5 ms (slower)</td>
-    <td>38.9 ms (~2x)</td>
-    <td>77.6 ms</td>
-  </tr>
-  <tr>
-    <td>Anon Aadhaar</td>
-    <td>285.1 ms</td>
-    <td>-</td>
-    <td>3284.7 ms</td>
-    <td>1490.8 ms</td>
-    <td>-</td>
-  </tr>
-</table>
+| Witness generation | [witnesscalc](https://github.com/0xPolygonID/witnesscalc) | [circom-witnesscalc](https://github.com/iden3/circom-witnesscalc) | [wasmer](https://github.com/arkworks-rs/circom-compat) | [w2c](https://github.com/vimwitch/rust-witness) | [snarkjs](https://github.com/iden3/snarkjs) |
+|-------------------|-----------------------------------------------------------|------------------------------------------------------------------|-----------------------------------------------------|------------------------------------------------|---------------------------------------------|
+| Keccak256 | 142.1 ms (~1x) | 75.4 ms (**~2x**) | 287.7 ms (slower) | 140 ms (~1x) | 147.1 ms |
+| SHA256 | 41 ms (**~2x**) | 51.3 ms (~1.7x) | 171.3 ms (slower) | 93.9 ms (~1x) | 91.8 ms |
+| RSA | 153 ms (**~19x**) | - | 2937.5 ms (~1x) | 2312.3 ms (~1.2x) | 2979.5 ms |
+| Semaphore | 22 ms (~3.5x) | 14.6 ms (**~5.3x**) | 266.5 ms (slower) | 38.9 ms (~2x) | 77.6 ms |
+| Anon Aadhaar | 285.1 ms | - | 3284.7 ms | 1490.8 ms | - |
 
-<table>
-  <tr>
-    <th>Proof generation</th>
-    <th>[rapidsnark](https://github.com/iden3/rapidsnark)</th>
-    <th>[ark-works](https://github.com/arkworks-rs/circom-compat)</th>
-    <th>[snarkjs](https://github.com/iden3/snarkjs)</th>
-  </tr>
-  <tr>
-    <td>Keccak256</td>
-    <td>630.3 ms (<font color="FFB546">**~8.2x**</font>)</td>
-    <td>956.9 ms (~5.4x)</td>
-    <td>5182.1 ms</td>
-  </tr>
-  <tr>
-    <td>SHA256</td>
-    <td>186.7 ms (<font color="FFB546">**~8.2x**</font>)</td>
-    <td>498.6 ms (~3x)</td>
-    <td>1487  ms</td>
-  </tr>
-  <tr>
-    <td>RSA</td>
-    <td>749.1 ms (<font color="FFB546">**~8.8x**</font>)</td>
-    <td>2250.8 ms (~3x)</td>
-    <td>6604.5 ms</td>
-  </tr>
-  <tr>
-    <td>Semaphore</td>
-    <td>143.3 ms (<font color="FFB546">**~6.9x**</font>)</td>
-    <td>151.4 ms (~6.6x)</td>
-    <td>1001.6 ms</td>
-  </tr>
-  <tr>
-    <td>Anon Aadhaar</td>
-    <td>3131.7 ms</td>
-    <td>10681.6 ms</td>
-    <td>-</td>
-  </tr>
-</table>
+| Proof generation | [rapidsnark](https://github.com/iden3/rapidsnark) | [ark-works](https://github.com/arkworks-rs/circom-compat) | [snarkjs](https://github.com/iden3/snarkjs) |
+|-----------------|---------------------------------------------------|-------------------------------------------------------|---------------------------------------------|
+| Keccak256 | 630.3 ms (**~8.2x**) | 956.9 ms (~5.4x) | 5182.1 ms |
+| SHA256 | 186.7 ms (**~8.2x**) | 498.6 ms (~3x) | 1487 ms |
+| RSA | 749.1 ms (**~8.8x**) | 2250.8 ms (~3x) | 6604.5 ms |
+| Semaphore | 143.3 ms (**~6.9x**) | 151.4 ms (~6.6x) | 1001.6 ms |
+| Anon Aadhaar | 3131.7 ms | 10681.6 ms | - |
 
 ### Android
 
 Benchmarks on an Samsung S23 Ultra (2023).
 
-<table>
-  <tr>
-    <th>Witness generation</th>
-    <th>[witnesscalc](https://github.com/0xPolygonID/witnesscalc)</th>
-    <th>[circom-witnesscalc](https://github.com/iden3/circom-witnesscalc)</th>
-    <th>[wasmer](https://github.com/arkworks-rs/circom-compat)</th>
-    <th>[w2c](https://github.com/vimwitch/rust-witness)</th>
-    <th>[snarkjs](https://github.com/iden3/snarkjs)</th>
-  </tr>
-  <tr>
-    <td>Keccak256</td>
-    <td>101.4 ms (~3x)</td>
-    <td>71 ms (<font color="FFB546">**~4x**</font>)</td>
-    <td>507.3 ms (slower)</td>
-    <td>210.5 ms (~1.3x)</td>
-    <td>292.3 ms</td>
-  </tr>
-  <tr>
-    <td>SHA256</td>
-    <td>29 ms (<font color="FFB546">**~5x**</font>)</td>
-    <td>44 ms (~3.5x)</td>
-    <td>271.6 ms (slower)</td>
-    <td>106.9 ms (~1.4x)</td>
-    <td>157.9 ms</td>
-  </tr>
-  <tr>
-    <td>RSA</td>
-    <td>155 ms (<font color="FFB546">**~25x**</font>)</td>
-    <td>-</td>
-    <td>4723 ms (slower)</td>
-    <td>3751 ms (~1x)</td>
-    <td>3958 ms</td>
-  </tr>
-  <tr>
-    <td>Semaphore</td>
-    <td>10.3 ms (<font color="FFB546">**~7x**</font>)</td>
-    <td>14.7 ms (~5x)</td>
-    <td>416.9 ms (slower)</td>
-    <td>32.8 ms (~2x)</td>
-    <td>74.1 ms</td>
-  </tr>
-  <tr>
-    <td>Anon Aadhaar</td>
-    <td>365.1 ms (<font color="FFB546">**~8.7x**</font>)</td>
-    <td>-</td>
-    <td>5359.6 ms (slower)</td>
-    <td>2716.4 ms (~1.1x)</td>
-    <td>3207.5 ms</td>
-  </tr>
-</table>
+| Witness generation | [witnesscalc](https://github.com/0xPolygonID/witnesscalc) | [circom-witnesscalc](https://github.com/iden3/circom-witnesscalc) | [wasmer](https://github.com/arkworks-rs/circom-compat) | [w2c](https://github.com/vimwitch/rust-witness) | [snarkjs](https://github.com/iden3/snarkjs) |
+|-------------------|-----------------------------------------------------------|------------------------------------------------------------------|-----------------------------------------------------|------------------------------------------------|---------------------------------------------|
+| Keccak256 | 101.4 ms (~3x) | 71 ms (**~4x**) | 507.3 ms (slower) | 210.5 ms (~1.3x) | 292.3 ms |
+| SHA256 | 29 ms (**~5x**) | 44 ms (~3.5x) | 271.6 ms (slower) | 106.9 ms (~1.4x) | 157.9 ms |
+| RSA | 155 ms (**~25x**) | - | 4723 ms (slower) | 3751 ms (~1x) | 3958 ms |
+| Semaphore | 10.3 ms (**~7x**) | 14.7 ms (~5x) | 416.9 ms (slower) | 32.8 ms (~2x) | 74.1 ms |
+| Anon Aadhaar | 365.1 ms (**~8.7x**) | - | 5359.6 ms (slower) | 2716.4 ms (~1.1x) | 3207.5 ms |
 
-<table>
-  <tr>
-    <th>Proof generation</th>
-    <th>[rapidsnark](https://github.com/iden3/rapidsnark)</th>
-    <th>[ark-works](https://github.com/arkworks-rs/circom-compat)</th>
-    <th>[snarkjs](https://github.com/iden3/snarkjs)</th>
-  </tr>
-  <tr>
-    <td>Keccak256</td>
-    <td>743.7 ms (<font color="FFB546">**~14x**</font>)</td>
-    <td>2330.4 ms (~4.7x)</td>
-    <td>11096.4 ms</td>
-  </tr>
-  <tr>
-    <td>SHA256</td>
-    <td>228.4 ms (<font color="FFB546">**~15x**</font>) </td>
-    <td>1575.2 ms (~2x)</td>
-    <td>3514.8 ms</td>
-  </tr>
-  <tr>
-    <td>RSA</td>
-    <td>950 ms (<font color="FFB546">**~14x**</font>)</td>
-    <td>5839 ms (~2.3x)</td>
-    <td>13442 ms</td>
-  </tr>
-  <tr>
-    <td>Semaphore</td>
-    <td>165.8 ms (<font color="FFB546">**~13x**</font>)</td>
-    <td>276.9 ms (~7.7x)</td>
-    <td>2146 ms</td>
-  </tr>
-  <tr>
-    <td>Anon Aadhaar</td>
-    <td>3394.5 ms (<font color="FFB546">**~15x**</font>)</td>
-    <td>33239.2 ms (~1.5x)</td>
-    <td>51546.3 ms</td>
-  </tr>
-</table>
+| Proof generation | [rapidsnark](https://github.com/iden3/rapidsnark) | [ark-works](https://github.com/arkworks-rs/circom-compat) | [snarkjs](https://github.com/iden3/snarkjs) |
+|-----------------|---------------------------------------------------|-------------------------------------------------------|---------------------------------------------|
+| Keccak256 | 743.7 ms (**~14x**) | 2330.4 ms (~4.7x) | 11096.4 ms |
+| SHA256 | 228.4 ms (**~15x**) | 1575.2 ms (~2x) | 3514.8 ms |
+| RSA | 950 ms (**~14x**) | 5839 ms (~2.3x) | 13442 ms |
+| Semaphore | 165.8 ms (**~13x**) | 276.9 ms (~7.7x) | 2146 ms |
+| Anon Aadhaar | 3394.5 ms (**~15x**) | 33239.2 ms (~1.5x) | 51546.3 ms |
 
 ### Halo2
 
