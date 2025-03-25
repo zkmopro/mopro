@@ -1,6 +1,3 @@
-pub mod ethereum;
-pub use ethereum::*;
-
 use crate::{CircomProof, CircomProofResult, G1, G2};
 use anyhow::{bail, Ok, Result};
 use circom_prover::{
@@ -19,7 +16,7 @@ use std::str::FromStr;
 
 #[macro_export]
 macro_rules! circom_app {
-    ($result:ty, $proof:ty, $proof_call_data:ty, $err:ty, $proof_lib:ty) => {
+    ($result:ty, $proof:ty, $err:ty, $proof_lib:ty) => {
         #[allow(dead_code)]
         #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
         fn generate_circom_proof(
@@ -65,36 +62,6 @@ macro_rules! circom_app {
             };
             mopro_ffi::verify_circom_proof(chosen_proof_lib, zkey_path, proof_result.into())
                 .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
-        }
-
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn to_ethereum_proof(proof: $proof) -> Result<$proof_call_data, $err> {
-            mopro_ffi::to_ethereum_proof(proof.into())
-                .map(|p| p.into())
-                .map_err(|e| <$err>::CircomError(format!("to_ethereum_inputs error: {}", e)))
-        }
-
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn to_ethereum_inputs(inputs: Vec<u8>, curve: String) -> Result<Vec<String>, $err> {
-            mopro_ffi::to_ethereum_inputs(inputs, curve)
-                .map_err(|e| <$err>::CircomError(format!("to_ethereum_inputs error: {}", e)))
-        }
-
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn from_ethereum_proof(proof: $proof_call_data, curve: String) -> Result<$proof, $err> {
-            mopro_ffi::from_ethereum_proof(proof.into(), curve)
-                .map(|p| p.into())
-                .map_err(|e| <$err>::CircomError(format!("from_ethereum_proof error: {}", e)))
-        }
-
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        fn from_ethereum_inputs(inputs: Vec<String>, curve: String) -> Result<Vec<u8>, $err> {
-            mopro_ffi::from_ethereum_inputs(inputs, curve)
-                .map_err(|e| <$err>::CircomError(format!("from_ethereum_inputs error: {}", e)))
         }
     };
 }
@@ -290,7 +257,6 @@ mod tests {
             circom_app!(
                 mopro_ffi::CircomProofResult,
                 mopro_ffi::CircomProof,
-                mopro_ffi::ProofCalldata,
                 mopro_ffi::MoproError,
                 circom_prover::prover::ProofLib
             );
@@ -324,15 +290,11 @@ mod tests {
     #[cfg(feature = "rustwitness")]
     mod rustwitness {
         use super::*;
-        use crate::circom::ethereum::{to_ethereum_inputs, to_ethereum_proof};
         use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
         use crate::CircomProofResult;
         use anyhow::bail;
-        use ark_bls12_381::Bls12_381;
-        use ark_bn254::Bn254;
         use ark_ff::PrimeField;
-        use circom_prover::prover::circom::{CURVE_BLS12_381, CURVE_BN254};
-        use circom_prover::prover::{serialization, ProofLib, PublicInputs};
+        use circom_prover::prover::{ProofLib, PublicInputs};
         use circom_prover::witness::WitnessFn;
         use num_bigint::{BigUint, ToBigInt};
         use std::ops::{Add, Mul};
@@ -351,7 +313,6 @@ mod tests {
             circom_app!(
                 mopro_ffi::CircomProofResult,
                 mopro_ffi::CircomProof,
-                mopro_ffi::ProofCalldata,
                 mopro_ffi::MoproError,
                 circom_prover::prover::ProofLib
             );
@@ -436,14 +397,11 @@ mod tests {
             inputs
         }
 
-        fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<u8> {
+        fn bytes_to_circuit_outputs(bytes: &[u8]) -> Vec<BigUint> {
             let bits = bytes_to_bits(bytes);
-            let field_bits = bits
-                .into_iter()
-                .map(|bit| ark_bn254::Fr::from(bit as u8))
-                .collect();
-            let circom_outputs = serialization::SerializableInputs::<Bn254>(field_bits);
-            serialization::serialize_inputs(&circom_outputs)
+            bits.into_iter()
+                .map(|bit| BigUint::from(bit as u8))
+                .collect()
         }
 
         #[test]
@@ -462,11 +420,9 @@ mod tests {
             inputs.insert("b".to_string(), vec![b.to_string()]);
             // output = [public output c, public input a]
             let expected_output = vec![
-                ark_bn254::Fr::from(c.clone().to_biguint().unwrap()),
-                ark_bn254::Fr::from(a.clone().to_biguint().unwrap()),
+                c.clone().to_biguint().unwrap(),
+                a.clone().to_biguint().unwrap(),
             ];
-            let circom_outputs = serialization::SerializableInputs::<Bn254>(expected_output);
-            let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
 
             // Generate Proof
             let input_str = serde_json::to_string(&inputs).unwrap();
@@ -474,21 +430,13 @@ mod tests {
             let proof = p.proof.clone();
             let pub_inputs: PublicInputs = p.inputs.clone().into();
 
-            let serialized_inputs = serialization::serialize_inputs::<Bn254>(&pub_inputs.into());
             assert!(!proof.protocol.is_empty());
             assert!(!proof.curve.is_empty());
-            assert_eq!(serialized_inputs, serialized_outputs);
+            assert_eq!(pub_inputs.0, expected_output);
 
             // Step 3: Verify Proof
             let is_valid = verify_circom_proof(ProofLib::Arkworks, zkey_path, p)?;
             assert!(is_valid);
-
-            // Step 4: Convert Proof to Ethereum compatible proof
-            let proof_calldata = to_ethereum_proof(proof).unwrap();
-            let inputs_calldata =
-                to_ethereum_inputs(serialized_inputs, CURVE_BN254.to_string()).unwrap();
-            assert!(!proof_calldata.a.x.is_empty());
-            assert!(!inputs_calldata.is_empty());
 
             Ok(())
         }
@@ -518,21 +466,13 @@ mod tests {
             let proof = p.proof.clone();
             let pub_inputs: PublicInputs = p.inputs.clone().into();
 
-            let serialized_inputs = serialization::serialize_inputs::<Bn254>(&pub_inputs.into());
             assert!(!proof.protocol.is_empty());
             assert!(!proof.curve.is_empty());
-            assert_eq!(serialized_inputs, serialized_outputs);
+            assert_eq!(pub_inputs.0, serialized_outputs);
 
             // Verify Proof
             let is_valid = verify_circom_proof(ProofLib::Arkworks, zkey_path, p)?;
             assert!(is_valid);
-
-            // Step 4: Convert Proof to Ethereum compatible proof
-            let proof_calldata = to_ethereum_proof(proof).unwrap();
-            let inputs_calldata =
-                to_ethereum_inputs(serialized_inputs, CURVE_BN254.to_string()).unwrap();
-            assert!(!proof_calldata.a.x.is_empty());
-            assert!(!inputs_calldata.is_empty());
 
             Ok(())
         }
@@ -587,9 +527,7 @@ mod tests {
             inputs.insert("a".to_string(), vec![a.to_string()]);
             inputs.insert("b".to_string(), vec![b.to_string()]);
             // output = [public output c, public input a]
-            let expected_output = vec![ark_bls12_381::Fr::from(c.to_biguint().unwrap())];
-            let circom_outputs = serialization::SerializableInputs::<Bls12_381>(expected_output);
-            let serialized_outputs = serialization::serialize_inputs(&circom_outputs);
+            let expected_output = vec![c.to_biguint().unwrap()];
 
             // Generate Proof
             let input_str = serde_json::to_string(&inputs).unwrap();
@@ -597,26 +535,13 @@ mod tests {
             let proof = p.proof.clone();
             let pub_inputs: PublicInputs = p.inputs.clone().into();
 
-            let serialized_inputs =
-                serialization::serialize_inputs::<Bls12_381>(&pub_inputs.into());
             assert!(!proof.protocol.is_empty());
             assert!(!proof.curve.is_empty());
-            assert_eq!(serialized_inputs, serialized_outputs);
+            assert_eq!(pub_inputs.0, expected_output);
 
             // Step 3: Verify Proof
             let is_valid = verify_circom_proof(ProofLib::Arkworks, zkey_path, p)?;
             assert!(is_valid);
-
-            // We don't support formatting for ethereum for the BLS curve.
-            // Once the hardfork enables the bls precompile we should
-            // revisit this
-            //
-            // Step 4: Convert Proof to Ethereum compatible proof
-            let proof_calldata = to_ethereum_proof(proof).unwrap();
-            let inputs_calldata =
-                to_ethereum_inputs(serialized_inputs, CURVE_BLS12_381.to_string()).unwrap();
-            assert!(!proof_calldata.a.x.is_empty());
-            assert!(!inputs_calldata.is_empty());
 
             Ok(())
         }

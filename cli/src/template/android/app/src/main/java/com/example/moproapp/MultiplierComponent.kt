@@ -64,7 +64,7 @@ fun MultiplierComponent() {
                 valid = "valid: " + verifyCircomProof(zkeyPath, res, ProofLib.ARKWORKS).toString()
                 val endTime = System.currentTimeMillis()
                 verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
-                output = "output: " + uniffi.mopro.toEthereumInputs(res.inputs)
+                output = "output: " + res.inputs
             },
             modifier = Modifier.padding(top = 120.dp)
         ) { Text(text = "verify proof") }

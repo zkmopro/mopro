@@ -10,14 +10,13 @@ use ark_relations::r1cs::ConstraintMatrices;
 use ark_std::UniformRand;
 use num_bigint::BigUint;
 use rand::prelude::*;
-use serialization::SerializableInputs;
 use std::{fs::File, thread::JoinHandle};
 
 use super::{
     ark_circom::{
         read_proving_key, read_zkey, CircomReduction, FieldSerialization, ZkeyHeaderReader,
     },
-    serialization, CircomProof, PublicInputs,
+    CircomProof, PublicInputs,
 };
 
 pub fn generate_circom_proof(
@@ -110,8 +109,12 @@ fn verify<T: Pairing + FieldSerialization>(
     pub_inputs: PublicInputs,
 ) -> Result<bool> {
     let pvk = prepare_verifying_key(&vk);
-    let serialized_inputs: SerializableInputs<T> = pub_inputs.into();
-    let public_inputs_fr = serialized_inputs.0.to_vec();
+    let serialized_inputs = pub_inputs
+        .0
+        .iter()
+        .map(|v| T::ScalarField::from(v.clone()))
+        .collect::<Vec<_>>();
+    let public_inputs_fr = serialized_inputs.to_vec();
     let verified =
         Groth16::<T, CircomReduction>::verify_with_processed_vk(&pvk, &public_inputs_fr, &proof)?;
     Ok(verified)
