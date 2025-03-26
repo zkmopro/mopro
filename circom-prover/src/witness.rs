@@ -1,24 +1,24 @@
 use num::{BigInt, BigUint};
-use std::{collections::HashMap, str::FromStr, thread::JoinHandle};
+use std::{collections::HashMap, thread::JoinHandle};
+
+#[cfg(feature = "rustwitness")]
+use std::str::FromStr;
 
 #[cfg(feature = "witnesscalc")]
 use witnesscalc_adapter::parse_witness_to_bigints;
 
 /// Witness function signature for rust_witness (inputs) -> witness
-#[cfg(feature = "rustwitness")]
 type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 /// Witness function signature for witnesscalc_adapter (inputs) -> witness
-#[cfg(feature = "witnesscalc")]
 type WitnesscalcWtnsFn = fn(&str) -> anyhow::Result<Vec<u8>>;
 
 #[derive(Debug, Clone, Copy)]
 pub enum WitnessFn {
-    #[cfg(feature = "witnesscalc")]
     WitnessCalc(WitnesscalcWtnsFn),
-    #[cfg(feature = "rustwitness")]
     RustWitness(RustWitnessWtnsFn),
 }
 
+#[allow(unused_variables)]
 pub fn generate_witness(witness_fn: WitnessFn, json_input_str: String) -> JoinHandle<Vec<BigUint>> {
     #[cfg(feature = "rustwitness")]
     let witness_map = json_to_hashmap(json_input_str.as_str()).unwrap();
@@ -45,8 +45,7 @@ pub fn generate_witness(witness_fn: WitnessFn, json_input_str: String) -> JoinHa
                     .collect();
                 wit_fn(bigint_inputs)
             }
-            #[allow(unreachable_patterns)]
-            _ => panic!("Unsupported witness generation library"),
+            _ => Vec::new(),
         };
         witness
             .into_iter()

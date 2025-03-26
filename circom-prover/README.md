@@ -38,8 +38,10 @@ rust_witness::transpile::transpile_wasm("../path to directory containing your wa
 
 ```rust
 use std::collections::HashMap;
-rust_witness::witness!(multiplier2);
 use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
+
+// Prepare witness generator
+rust_witness::witness!(multiplier2);
 
 // Prepare inputs
 let inputs = HashMap::from([
@@ -113,10 +115,12 @@ witnesscalc_adapter::build_and_link("../path to directory containing your C++ so
 ### Proof Generation
 
 ```rust
-witnesscalc_adapter::witness!(multiplier2);
 use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
 use std::collections::HashMap;
 use anyhow::Result;
+
+// Prepare witness generator
+witnesscalc_adapter::witness!(multiplier2);
 
 // Prepare inputs
 let inputs = HashMap::from([
