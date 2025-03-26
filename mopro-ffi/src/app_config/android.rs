@@ -133,6 +133,6 @@ fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::R
         ))?,
         true,
     )
-    .map_err(|e| Error::new(ErrorKind::Other, e.to_string()))?;
+    .map_err(|e| Error::other(e.to_string()))?;
     Ok(())
 }

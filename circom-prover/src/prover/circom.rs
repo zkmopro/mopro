@@ -245,7 +245,7 @@ impl From<Proof> for ark_groth16::Proof<Bls12_381> {
 
 // Helper for converting a PrimeField to its BigUint representation for Ethereum compatibility
 fn biguint_to_point<F: PrimeField>(point: BigUint) -> F {
-    let buf_size: usize = ((F::MODULUS_BIT_SIZE + 7) / 8).try_into().unwrap(); // Rounds up the division
+    let buf_size: usize = F::MODULUS_BIT_SIZE.div_ceil(8).try_into().unwrap(); // Rounds up the division
     let mut buf = point.to_bytes_le();
     buf.resize(buf_size, 0u8);
     let bigint = F::BigInt::deserialize_uncompressed(&buf[..]).expect("always works");
