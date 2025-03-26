@@ -44,7 +44,7 @@ impl AdapterSelector {
     }
 
     pub fn contains(&self, adapter: Adapter) -> bool {
-        self.adapters.iter().any(|p| *p == adapter)
+        self.adapters.contains(&adapter)
     }
 }
 
@@ -89,7 +89,7 @@ impl PlatformSelector {
     }
 
     pub fn contains(&self, platform: Platform) -> bool {
-        self.platforms.iter().any(|p| *p == platform)
+        self.platforms.contains(&platform)
     }
 
     pub fn select_archs(&self) -> HashMap<String, Vec<String>> {
