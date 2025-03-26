@@ -24,7 +24,7 @@ pub fn generate_witness(witness_fn: WitnessFn, json_input_str: String) -> JoinHa
     let witness_map = json_to_hashmap(json_input_str.as_str()).unwrap();
 
     std::thread::spawn(move || {
-        let witness = match witness_fn {
+        let witness: Vec<BigInt> = match witness_fn {
             #[cfg(feature = "witnesscalc")]
             WitnessFn::WitnessCalc(wit_fn) => {
                 let witness = wit_fn(json_input_str.as_str()).unwrap();
