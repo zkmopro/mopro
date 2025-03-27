@@ -5,20 +5,50 @@ It is designed to be used in cross-platform applications, and is compatible with
 
 ## Usage
 
+Install `circom-prover`
+
+```sh
+cargo add circom-prover
+```
+
 Depends on the witness generation method, build the rust witness function first.
-For example, if you use the [Rust Witness](https://github.com/chancehudson/rust-witness), please refer to the [Rust Witness](https://github.com/chancehudson/rust-witness) for more details.
+Here is how to use the [rust-witness](https://github.com/chancehudson/rust-witness) generator.
+
+Include the crate in your Cargo.toml:
+
+```toml
+[dependencies]
+rust-witness = "0.1"
+num-bigint = "0.4"
+
+[build-dependencies]
+rust-witness = "0.1"
+```
+
+In build.rs, add the following code to compile the witness generator wasm sources (<circuit name>.wasm) into a native library and link to it:
+
+```rs
+rust_witness::transpile::transpile_wasm("../path to directory containing your wasm sources");
+// e.g. rust_witness::transpile::transpile_wasm("./test-vectors".to_string());
+// The directory should contain the following files:
+// - <circuit name>.wasm
+```
 
 ### Proof Generation
 
 ```rust
 use std::collections::HashMap;
-rust_witness::witness!(multiplier2);
 use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
 
+// Prepare witness generator
+rust_witness::witness!(multiplier2);
+
 // Prepare inputs
-let mut inputs = HashMap::new();
-inputs.insert("a".to_string(), vec!["1".to_string()]);
-inputs.insert("b".to_string(), vec!["2".to_string()]);
+let inputs = HashMap::from([
+    ("a".to_string(), vec!["1".to_string()]),
+    ("b".to_string(), vec!["2".to_string()]),
+]);
+let input_str = serde_json::to_string(&inputs).unwrap();
 
 // Prepare zkey path
 let zkey_path = "./test-vectors/multiplier2_final.zkey".to_string();
@@ -27,8 +57,8 @@ let zkey_path = "./test-vectors/multiplier2_final.zkey".to_string();
 let result = CircomProver::prove(
     ProofLib::Arkworks,
     WitnessFn::RustWitness(multiplier2_witness),
-    inputs,
-    zkey_path,
+    input_str,
+    zkey_path.clone(),
 ).unwrap();
 ```
 
@@ -38,12 +68,90 @@ let result = CircomProver::prove(
 // Verify proof
 let valid = CircomProver::verify(
     ProofLib::Arkworks,
-    result.proof,
-    result.pub_inputs,
+    result,
     zkey_path,
 ).unwrap();
 ```
 
+## Advanced usage
+
+`circom-prover` also supports [`witnesscalc`](https://github.com/0xPolygonID/witnesscalc) and [`rapidsnark`](https://github.com/iden3/rapidsnark) for advanced users. These tools offer better performance but may not be entirely stable.
+
+Below is a tutorial on how to enable `witnesscalc` and `rapidsnark`.
+
+### Set feature flags
+
+```toml
+[dependencies]
+circom-prover = {
+    version = "0.1",
+    default-features = false, 
+    features = ["witnesscalc", "rapidsnark"]
+}
+witnesscalc-adapter = "0.1"
+anyhow = "1.0"
+
+[build-dependencies]
+witnesscalc-adapter = "0.1"
+circom-prover = {
+    version = "0.1",
+    default-features = false, 
+    features = ["rapidsnark"]
+}
+```
+
+### `witnesscalc`
+
+In build.rs, add the following code to compile the witness generator wasm sources (<circuit name>.wasm) into a native library and link to it:
+
+```rs
+witnesscalc_adapter::build_and_link("../path to directory containing your C++ sources");
+// e.g. witnesscalc_adapter::build_and_link("../testdata");
+// The directory should contain the following files:
+// - <circuit name>.cpp
+// - <circuit name>.dat
+```
+
+### Proof Generation
+
+```rust
+use circom_prover::{prover::ProofLib, witness::WitnessFn, CircomProver};
+use std::collections::HashMap;
+use anyhow::Result;
+
+// Prepare witness generator
+witnesscalc_adapter::witness!(multiplier2);
+
+// Prepare inputs
+let inputs = HashMap::from([
+    ("a".to_string(), vec!["1".to_string()]),
+    ("b".to_string(), vec!["2".to_string()]),
+]);
+let input_str = serde_json::to_string(&inputs).unwrap();
+
+// Prepare zkey path
+let zkey_path = "./test-vectors/multiplier2_final.zkey".to_string();
+
+// Generate proof
+let result = CircomProver::prove(
+    ProofLib::Rapidsnark,
+    WitnessFn::WitnessCalc(multiplier2_witness),
+    input_str,
+    zkey_path.clone(),
+)
+.unwrap();
+```
+
+### Proof Verification
+
+```rust
+// Verify proof
+let valid = CircomProver::verify(
+    ProofLib::Rapidsnark,
+    result,
+    zkey_path,
+).unwrap();
+```
 ## Adapters
 
 ## Witness Generation

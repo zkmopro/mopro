@@ -102,14 +102,14 @@ pub struct CircomProof {
 pub struct G1 {
     pub x: String,
     pub y: String,
-    pub z: Option<String>,
+    pub z: String,
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct G2 {
     pub x: Vec<String>,
     pub y: Vec<String>,
-    pub z: Option<Vec<String>>,
+    pub z: Vec<String>,
 }
 //
 // Halo2 Proof
@@ -229,14 +229,14 @@ macro_rules! app {
         pub struct G1 {
             pub x: String,
             pub y: String,
-            pub z: Option<String>,
+            pub z: String,
         }
 
         #[derive(Debug, Clone, Default, uniffi::Record)]
         pub struct G2 {
             pub x: Vec<String>,
             pub y: Vec<String>,
-            pub z: Option<Vec<String>>,
+            pub z: Vec<String>,
         }
 
         #[derive(Debug, Clone, Default, uniffi::Record)]

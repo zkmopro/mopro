@@ -183,7 +183,7 @@ impl From<CircomProverG1> for G1 {
         G1 {
             x: g1.x.to_string(),
             y: g1.y.to_string(),
-            z: Some(g1.z.to_string()),
+            z: g1.z.to_string(),
         }
     }
 }
@@ -193,11 +193,7 @@ impl From<G1> for CircomProverG1 {
         CircomProverG1 {
             x: BigUint::from_str(g1.x.as_str()).unwrap(),
             y: BigUint::from_str(g1.y.as_str()).unwrap(),
-            z: BigUint::from_str(
-                g1.z.expect("coord z is not assigned correctly in G1.")
-                    .as_str(),
-            )
-            .unwrap(),
+            z: BigUint::from_str(g1.z.as_str()).unwrap(),
         }
     }
 }
@@ -206,7 +202,7 @@ impl From<CircomProverG2> for G2 {
     fn from(g2: CircomProverG2) -> Self {
         let x = vec![g2.x[0].to_string(), g2.x[1].to_string()];
         let y = vec![g2.y[0].to_string(), g2.y[1].to_string()];
-        let z = Some(vec![g2.z[0].to_string(), g2.z[1].to_string()]);
+        let z = vec![g2.z[0].to_string(), g2.z[1].to_string()];
         G2 { x, y, z }
     }
 }
@@ -222,8 +218,7 @@ impl From<G2> for CircomProverG2 {
                 .map(|p| BigUint::from_str(p.as_str()).unwrap())
                 .collect::<Vec<BigUint>>();
         let z =
-            g2.z.expect("coord z are not assigned correctly in G2")
-                .iter()
+            g2.z.iter()
                 .map(|p| BigUint::from_str(p.as_str()).unwrap())
                 .collect::<Vec<BigUint>>();
         CircomProverG2 {

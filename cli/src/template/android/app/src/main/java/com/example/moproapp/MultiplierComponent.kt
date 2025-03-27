@@ -29,9 +29,9 @@ fun MultiplierComponent() {
         mutableStateOf(
             CircomProofResult(
                 proof = CircomProof(
-                    a = G1(x = "", y = "", z = null),
-                    b = G2(x = listOf(), y = listOf(), z = null),
-                    c = G1(x = "", y = "", z = null),
+                    a = G1(x = "", y = "", z = ""),
+                    b = G2(x = listOf(), y = listOf(), z = ""),
+                    c = G1(x = "", y = "", z = ""),
                     protocol = "",
                     curve = ""
                 ),
