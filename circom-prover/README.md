@@ -83,24 +83,32 @@ Below is a tutorial on how to enable `witnesscalc` and `rapidsnark`.
 
 ```toml
 [dependencies]
-circom-prover = {
-    version = "0.1",
-    default-features = false, 
-    features = ["witnesscalc", "rapidsnark"]
-}
+circom-prover = { version = "0.1", default-features = false, features = ["witnesscalc", "rapidsnark"] }
 witnesscalc-adapter = "0.1"
 anyhow = "1.0"
 
 [build-dependencies]
 witnesscalc-adapter = "0.1"
-circom-prover = {
-    version = "0.1",
-    default-features = false, 
-    features = ["rapidsnark"]
-}
+circom-prover = { version = "0.1", default-features = false, features = ["rapidsnark"] }
 ```
 
 ### `witnesscalc`
+
+Install dependencies:
+
+-   Linux:
+
+```sh
+sudo apt install build-essential cmake m4 nasm libstdc++6
+```
+
+-   MacOS
+
+```sh
+brew install nasm
+```
+
+Rust toolchain: `cargo 1.81.0 (2dbb1af80 2024-08-20)`
 
 In build.rs, add the following code to compile the witness generator wasm sources (<circuit name>.wasm) into a native library and link to it:
 
