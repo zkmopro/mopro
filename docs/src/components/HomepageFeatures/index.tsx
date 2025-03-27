@@ -12,7 +12,7 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/gold_arch.svg').default,
     description: (
       <>
-        mopro simplifies the complexity of integrating zk-proofs into mobile apps, making it accessible even for developers new to mobile development.
+        mopro simplifies the complexity of integrating zk proofs into mobile apps, making it accessible even for developers new to mobile development.
       </>
     ),
   },
@@ -30,7 +30,7 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/blue_angle.svg').default,
     description: (
       <>
-        Designed to scale with your needs, mopro supports a wide range of proving systems, facilitating the development of versatile, high-performance applications.
+        Designed to scale with your needs, mopro supports a broad range of proving systems and seamlessly integrates with any Rust crate, enabling the development of versatile, high-performance applications.
       </>
     ),
   },
@@ -48,7 +48,7 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/yellow_drop.svg').default,
     description: (
       <>
-        Whether you're developing for iOS, Android, Windows, or Mac, mopro supports you with a unified toolkit that works seamlessly across all platforms.
+        Whether you're developing for iOS, Android, web, desktop operating systems, or even game consoles, mopro supports you with a unified toolkit that works seamlessly across all platforms.
       </>
     ),
   },
