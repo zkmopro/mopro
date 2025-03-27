@@ -46,8 +46,9 @@ pub fn generate_witness(witness_fn: WitnessFn, json_input_str: String) -> JoinHa
                 wit_fn(bigint_inputs)
             }
             #[allow(unreachable_patterns)]
-            _ => Vec::new(),
+            _ => panic!("Unsupported witness function"),
         };
+        #[allow(unreachable_code)]
         witness
             .into_iter()
             .map(|w| w.to_biguint().unwrap())
