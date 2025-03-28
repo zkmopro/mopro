@@ -53,7 +53,7 @@ macro_rules! halo2_app {
         fn generate_halo2_proof(
             srs_path: String,
             pk_path: String,
-            inputs: std::collections::HashMap<String, Vec<String>>,
+            circuit_inputs: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<$result, $err> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
@@ -64,8 +64,8 @@ macro_rules! halo2_app {
         fn verify_halo2_proof(
             srs_path: String,
             vk_path: String,
-            proof_data: Vec<u8>,
-            public_inputs: Vec<u8>,
+            proof: Vec<u8>,
+            public_input: Vec<u8>,
         ) -> Result<bool, $err> {
             panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
         }
@@ -102,14 +102,14 @@ pub struct CircomProof {
 pub struct G1 {
     pub x: String,
     pub y: String,
-    pub z: String,
+    pub z: Option<String>,
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct G2 {
     pub x: Vec<String>,
     pub y: Vec<String>,
-    pub z: Vec<String>,
+    pub z: Option<Vec<String>>,
 }
 //
 // Halo2 Proof
@@ -229,14 +229,14 @@ macro_rules! app {
         pub struct G1 {
             pub x: String,
             pub y: String,
-            pub z: String,
+            pub z: Option<String>,
         }
 
         #[derive(Debug, Clone, Default, uniffi::Record)]
         pub struct G2 {
             pub x: Vec<String>,
             pub y: Vec<String>,
-            pub z: Vec<String>,
+            pub z: Option<Vec<String>>,
         }
 
         #[derive(Debug, Clone, Default, uniffi::Record)]
