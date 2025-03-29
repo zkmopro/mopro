@@ -24,7 +24,7 @@ This tutorial guides developers through getting started with Mopro and building 
 -   Additionally, we'll integrate the [semaphore-rs](https://github.com/worldcoin/semaphore-rs) Rust crate to generate native bindings and run the implementation on both iOS and Android.
 
 :::info
-This is a workshop tutorial from [ETHTaipei](https://ethtaipei.org/) 2025 in April. If you'd like to follow along and build a native mobile app, please check out this commit: [eab28f](https://github.com/zkmopro/mopro/tree/eab28f8e318ff0afc053c2c004c58afe2f34fdb7).
+This is a workshop tutorial from [ETHTaipei](https://ethtaipei.org/) 2025 in April. If you'd like to follow along and build a native mobile app, please check out this commit: [c092d0d](https://github.com/zkmopro/mopro/tree/c092d0daa08e684bbd61782f8148ddabbcb86c55).
 :::
 
 ## 0. Prerequisites
