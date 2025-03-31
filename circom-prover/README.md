@@ -110,7 +110,7 @@ brew install nasm
 
 Rust toolchain: `cargo 1.81.0 (2dbb1af80 2024-08-20)`
 
-In build.rs, add the following code to compile the witness generator wasm sources (<circuit name>.wasm) into a native library and link to it:
+In build.rs, add the following code to compile the witness generator cpp and dat sources (<circuit name>.cpp, <circuit name>.dat) into a native library and link to it:
 
 ```rs
 witnesscalc_adapter::build_and_link("../path to directory containing your C++ sources");
