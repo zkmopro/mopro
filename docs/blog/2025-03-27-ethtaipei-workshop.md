@@ -272,18 +272,18 @@ This section explains how to update circuits with alternative witness generators
 
         Alternatively, you can watch this video to see how to copy zkey in XCode.
 
-            <p align="center">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/6TydXwYMQCU?si=QvOxlfbOOyX3GpcM&amp;start=53" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </p>
+        <p align="center">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/6TydXwYMQCU?si=QvOxlfbOOyX3GpcM&amp;start=53" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </p>
 
     -   **Android**<br/>
         Paste the zkey in the assets folder: `android/app/src/main/assets`.
 
         Alternatively, you can watch this video to see how to copy zkey in XCode.
 
-            <p align="center">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/r6WolEEHuMw?si=aOs7SPz4ajtE1hMP&amp;start=141" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </p>
+        <p align="center">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/r6WolEEHuMw?si=aOs7SPz4ajtE1hMP&amp;start=141" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </p>
 
 6.  Update circuit input and zkey path
 
