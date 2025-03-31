@@ -17,7 +17,7 @@ impl Create for Flutter {
         let ios_bindings_dir = check_bindings(&project_dir, Framework::Ios)?;
         let android_bindings_dir = check_bindings(&project_dir, Framework::Android)?;
 
-        let target_dir = project_dir.join("flutter-app");
+        let target_dir = project_dir.join(Self::NAME);
         if target_dir.exists() {
             return Err(Error::msg(format!(
                 "The directory {} already exists. Please remove it and try again.",
