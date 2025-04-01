@@ -12,23 +12,7 @@ Key features include:
 
 ## Usage
 
--   Please check the [Manual Setup for Android/iOS Bindings](https://zkmopro.org/docs/setup/rust-setup) for integrating `mopro-ffi` into your project.
-
-## Usage for general Rust application
-
--   Integrate the `mopro-ffi` like the above tutorial.
--   Add `#[uniffi::export]` attribute to add the functions you want to export. Check out the built-in types in: [UniFFI: Built-in types](https://mozilla.github.io/uniffi-rs/0.29/types/builtin_types.html)
-
-    -   E.g.
-        export Rust function like
-        ```rust
-        #[uniffi::export]
-        pub fn hello_world() -> String {
-          "Hello World!".to_string()
-        }
-        ```
-
--   Run `cargo run --bin ios` or `cargo run --bin android` again.
+-   Please check out the [Rust Setup for Android/iOS Bindings](https://zkmopro.org/docs/setup/rust-setup) for integrating `mopro-ffi` into your project.
 
 ## Community
 
