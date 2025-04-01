@@ -24,8 +24,20 @@ This tutorial guides developers through getting started with Mopro and building 
 -   Additionally, we'll integrate the [semaphore-rs](https://github.com/worldcoin/semaphore-rs) Rust crate to generate native bindings and run the implementation on both iOS and Android.
 
 :::info
-This is a workshop tutorial from [ETHTaipei](https://ethtaipei.org/) 2025 in April. If you'd like to follow along and build a native mobile app, please check out this commit: [c092d0d](https://github.com/zkmopro/mopro/tree/c092d0daa08e684bbd61782f8148ddabbcb86c55).
+This is a workshop tutorial from [ETHTaipei](https://ethtaipei.org/) 2025 in April. If you'd like to follow along and build a native mobile app, please check out this commit: [085fa41](https://github.com/zkmopro/mopro/tree/085fa41e2e2d0c76036cffceed3661ecd15c5fe7).
 :::
+
+-   We also offer comprehensive iOS and Android tutorials to guide you through the entire process, ensuring you don’t miss anything!
+
+    -   **iOS**
+    <p align="center">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/qPtKTJU1Xfo?si=1a2sh7t24u17lS4r" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </p>
+
+    -   **Android**
+    <p align="center">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/P2Cwqrir_4o?si=ta30AFEf1yBA6MAP" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </p>
 
 ## 0. Prerequisites
 
@@ -331,8 +343,12 @@ Here is an example demonstrating how to use the Semaphore crate.
 
     Import semaphore crate from: https://github.com/worldcoin/semaphore-rs
 
+    :::info
+    We are using this specific commit [340d4ad](https://github.com/worldcoin/semaphore-rs/tree/340d4ada82da830b07041cf2185aa6fd1c4e2967) for `semaphore-rs`.
+    :::
+
     ```toml title="Cargo.toml"
-    semaphore-rs = { git = "https://github.com/worldcoin/semaphore-rs", features = ["depth_16"]}
+    semaphore-rs = { git = "https://github.com/worldcoin/semaphore-rs", features = ["depth_16"], rev = "340d4ad"}
     ```
 
 2. Define a function to generate semaphore proof
@@ -344,7 +360,6 @@ Here is an example demonstrating how to use the Semaphore crate.
     ```rust title="src/lib.rs"
     use semaphore_rs::{get_supported_depths, hash_to_field, Field, identity::Identity,
                 poseidon_tree::LazyPoseidonTree, protocol::*};
-    use num_bigint::BigInt;
 
     pub fn semaphore() {
         // generate identity
