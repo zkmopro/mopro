@@ -1,8 +1,16 @@
-# Manual Setup for Android/iOS Bindings
+# Rust Setup for Android/iOS Bindings
 
 This tutorial provides step-by-step instructions to manually build static libraries with Circom and Halo2 adapters for Android and iOS. It focuses on a hands-on approach for developers who prefer or require manual setup.
 
 Make sure you've installed the [prerequisites](/docs/prerequisites).
+
+This tutorial will cover:
+
+1. [Circom prover](#setup-circom-based-rust-project)
+
+2. [Halo2 prover](#setup-halo2-based-rust-project)
+
+3. [Universal Rust crate integration](#setup-any-rust-project)
 
 ## Setup Circom-Based rust project
 
@@ -49,7 +57,7 @@ Each witness generator must be built within a project. You need to supply the re
 Here, we used [rust-witness](https://github.com/chancehudson/rust-witness) as an example.
 
 :::info
-To learn more about witnesscalc for Mopro, please check out [circom-prover](https://github.com/zkmopro/mopro/blob/main/circom-prover/README.md#advanced-usage).
+To learn more about `witnesscalc` for Mopro, please check out [circom-prover](https://github.com/zkmopro/mopro/blob/main/circom-prover/README.md#advanced-usage).
 :::
 
 Include the `rust-witness` in your Cargo.toml
@@ -140,7 +148,6 @@ target_platforms = [
     "android",
     "ios",
 ]
-
 ```
 
 To install the Mopro CLI, please refer to the [Getting Started](/docs/getting-started) guide.
@@ -259,3 +266,80 @@ Similar to Circom-based Rust project setup [5. Define the binaries](#5-define-th
 ### 6. Generate bindings for iOS and Android
 
 Similar to Circom-based Rust project setup [6. Generate bindings for iOS and Android](#6-generate-bindings-for-ios-and-android)
+
+However, creating a `Config.toml` like
+
+```toml title="Config.toml"
+target_adapters = [
+    "halo2",
+]
+target_platforms = [
+    "android",
+    "ios",
+]
+```
+
+## Setup any rust project
+
+In addition to supporting Circom and Halo2 circuits, `mopro-ffi` allows integration with any Rust crate, enabling developers to define custom functions for iOS and Android. This ensures that Rust developers can leverage their existing expertise while seamlessly building comprehensive packages for mobile development.
+
+### 1. Add dependencies
+
+Include the crate in your Cargo.toml:
+
+```toml title="Cargo.toml"
+[dependencies]
+mopro-ffi = { version = "0.2" }
+uniffi = "0.29"
+
+[build-dependencies]
+mopro-ffi = "0.2"
+uniffi = { version = "0.29", features = ["build"] }
+```
+
+### 2. Setup the lib
+
+Similar to [Setup the lib](#2-setup-the-lib), define the name and type for the UniFFI build process configuration.
+
+```toml title="Cargo.toml"
+[lib]
+name = "mopro_bindings"
+crate-type = ["lib", "cdylib", "staticlib"]
+```
+
+### 3. Define exported functions
+
+Export Rust functions using a procedural macro, as shown below:
+
+```rust title="src/lib.rs"
+mopro_ffi::app!();
+
+#[uniffi::export]
+pub fn hello_world() -> String {
+    "Hello, World!".to_string()
+}
+```
+
+For more examples and detailed references, check the [UniFFI documentation](https://mozilla.github.io/uniffi-rs/0.29).
+
+:::info
+Enable the `mopro-ffi` macro to generate UniFFI scaffolding.
+:::
+
+### 4. Define the binaries
+
+Similar to Circom-based Rust project setup [5. Define the binaries](#5-define-the-binaries)
+
+### 5. Generate bindings for iOS and Android
+
+Similar to Circom-based Rust project setup [6. Generate bindings for iOS and Android](#6-generate-bindings-for-ios-and-android)
+
+However, creating a `Config.toml` like
+
+```toml title="Config.toml"
+target_adapters = []
+target_platforms = [
+    "android",
+    "ios",
+]
+```
