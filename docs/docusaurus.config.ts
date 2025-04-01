@@ -25,7 +25,12 @@ const config: Config = {
           editUrl:
             'https://github.com/zkmopro/mopro/tree/main/docs',
           includeCurrentVersion: true,
-          lastVersion: '0.1.0',
+          lastVersion: 'current',
+          versions: {
+            current: {
+              label: '0.2.0',
+            },
+          },
         },
         blog: {
           showReadingTime: true,

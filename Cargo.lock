@@ -794,9 +794,9 @@ checksum = "f46ad14479a25103f283c0f10005961cf086d8dc42205bb44c46ac563475dca6"
 
 [[package]]
 name = "color-eyre"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a667583cca8c4f8436db8de46ea8233c42a7d9ae424a82d338f2e4675229204"
+checksum = "55146f5e46f237f7423d74111267d4597b59b0dad0ffaf7303bce9945d843ad5"
 dependencies = [
  "backtrace",
  "color-spantrace",
@@ -2305,13 +2305,12 @@ dependencies = [
 
 [[package]]
 name = "mopro-ffi"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "ark-bls12-381",
  "ark-bn254",
  "ark-ff",
- "bincode",
  "camino",
  "circom-prover",
  "color-eyre",
@@ -2323,7 +2322,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "thiserror 2.0.3",
+ "thiserror 2.0.12",
  "uniffi",
  "uuid",
  "witnesscalc-adapter",
@@ -3607,7 +3606,7 @@ dependencies = [
  "num-bigint",
  "plonk-fibonacci",
  "rust-witness",
- "thiserror 2.0.3",
+ "thiserror 2.0.12",
  "uniffi",
 ]
 
@@ -3631,11 +3630,11 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "2.0.3"
+version = "2.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c006c85c7651b3cf2ada4584faa36773bd07bac24acfb39f3c431b36d7e667aa"
+checksum = "567b8a2dae586314f7be2a752ec7474332959c6460e02bde30d702a66d488708"
 dependencies = [
- "thiserror-impl 2.0.3",
+ "thiserror-impl 2.0.12",
 ]
 
 [[package]]
@@ -3651,9 +3650,9 @@ dependencies = [
 
 [[package]]
 name = "thiserror-impl"
-version = "2.0.3"
+version = "2.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f077553d607adc1caf65430528a576c757a71ed73944b66ebb58ef2bbd243568"
+checksum = "7f7cf42b4507d8ea322120659672cf1b9dbb93f8f2d4ecfd6e51350ff5b17a1d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4656,7 +4655,7 @@ dependencies = [
  "pbkdf2",
  "rand",
  "sha1",
- "thiserror 2.0.3",
+ "thiserror 2.0.12",
  "time",
  "zeroize",
  "zopfli",
