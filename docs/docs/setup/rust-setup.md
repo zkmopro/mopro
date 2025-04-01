@@ -16,7 +16,7 @@ cargo init --lib
 
 Include the crate in your Cargo.toml:
 
-```toml
+```toml title="Cargo.toml"
 [dependencies]
 mopro-ffi = { version = "0.2", features = ["circom"] }
 uniffi = "0.29"
@@ -32,7 +32,7 @@ uniffi = { version = "0.29", features = ["build"] }
 
 Define the name and type for the UniFFI build process configuration.
 
-```toml
+```toml title="Cargo.toml"
 [lib]
 name = "mopro_bindings"
 crate-type = ["lib", "cdylib", "staticlib"]
@@ -54,7 +54,7 @@ To learn more about witnesscalc for Mopro, please check out [circom-prover](http
 
 Include the `rust-witness` in your Cargo.toml
 
-```toml
+```toml title="Cargo.toml"
 [dependencies]
 rust-witness = "0.1"
 num-bigint = "0.4"
@@ -65,7 +65,7 @@ rust-witness = "0.1"
 
 In `build.rs`, add the following code to compile the witness generator wasm sources (.wasm) into a native library and link to it:
 
-```rust
+```rust title="build.rs"
 fn main() {
     rust_witness::transpile::transpile_wasm("../path to directory containing your wasm sources");
     // e.g. rust_witness::transpile::transpile_wasm("./test-vectors".to_string());
@@ -82,17 +82,17 @@ Here are the example WASM and Zkey files to be downloaded.
 
 :::
 
-### 3. Use `mopro-ffi` macro
+### 4. Use `mopro-ffi` macro
 
 The `mopro-ffi` macro exports the default Circom prover interfaces. To enable it, activate the mopro-ffi macro in `src/lib.rs`.
 
-```rust
+```rust title="src/lib.rs"
 mopro_ffi::app!();
 ```
 
 Bind the corresponding WASM and Zkey files together using mopro-ffi.
 
-```rust
+```rust title="src/lib.rs"
 use circom_prover::witness::WitnessFn;
 
 // Activate rust-witness function
@@ -104,13 +104,13 @@ mopro_ffi::set_circom_circuits! {
 }
 ```
 
-### 4. Define the binaries
+### 5. Define the binaries
 
 The binaries are used to generate bindings for both iOS and Android platforms.
 
 We'll add a new file at `src/bin/ios.rs`:
 
-```rust
+```rust title="src/bin/ios.rs"
 fn main() {
     mopro_ffi::app_config::ios::build();
 }
@@ -118,13 +118,13 @@ fn main() {
 
 and another at `src/bin/android.rs`:
 
-```rust
+```rust title="src/bin/android.rs"
 fn main() {
     mopro_ffi::app_config::android::build();
 }
 ```
 
-### 5. Generate bindings for iOS and Android
+### 6. Generate bindings for iOS and Android
 
 Now you're ready to build your static library! You should be able to run either the Mopro CLI or the binaries.
 
@@ -132,7 +132,7 @@ Now you're ready to build your static library! You should be able to run either 
 
 Create a `Config.toml` configuration file like:
 
-```toml
+```toml title="Config.toml"
 target_adapters = [
     "circom",
 ]
@@ -152,7 +152,6 @@ mopro build
 ```
 
 Then, you can select the target mode and architectures with greater flexibility.
-
 
 **2. Execute the process using the defined binaries.**
 
@@ -180,42 +179,53 @@ Running your project in release mode significantly enhances performance compared
 
 ## Setup Halo2-Based rust project
 
-Similar to the [Setup Circom-based Rust project](#setup-circom-based-rust-project), start by running the following commands in your terminal:
+Similar to the [Setup Circom-based Rust project](#setup-circom-based-rust-project), you can integrate `mopro-ffi` into your own Rust crate, or alternatively, initialize a new project using
 
 ```sh
-mkdir mopro-example-app
-cd mopro-example-app
 cargo init --lib
 ```
 
-This will create a new Rust project in the current directory. Next, add the required dependencies to the project. Edit your `Cargo.toml` to match the following:
+### 1. Add dependencies
 
-```toml
-[package]
-name = "mopro-example-app"
-version = "0.1.0"
-edition = "2021"
+Include the crate in your Cargo.toml:
 
-# We're going to build a static library named mopro_bindings
-# This library name should not be changed
-[lib]
-crate-type = ["lib", "cdylib", "staticlib"]
-name = "mopro_bindings"
-
-# Adapters for different proof systems
-[features]
-default = ["mopro-ffi/halo2"]
-
+```toml title="Cargo.toml"
 [dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
-uniffi = { version = "0.28", features = ["cli"] }
-num-bigint = "0.4.0"
-plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+mopro-ffi = { version = "0.2", features = ["halo2"] }
+uniffi = "0.29"
+thiserror = "2.0.12"
 
 [build-dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "main" }
-uniffi = { version = "0.28", features = ["build"] }
+mopro-ffi = "0.2"
+uniffi = { version = "0.29", features = ["build"] }
 ```
+
+### 2. Setup the lib
+
+Similar to [Setup the lib](#2-setup-the-lib), define the name and type for the UniFFI build process configuration.
+
+```toml title="Cargo.toml"
+[lib]
+name = "mopro_bindings"
+crate-type = ["lib", "cdylib", "staticlib"]
+```
+
+:::warning
+The name of the lib could be fixed in the future. See: [#387](https://github.com/zkmopro/mopro/issues/387)
+:::
+
+### 3. Add Halo2 circuits
+
+Import the Halo2 prover as a Rust crate using:
+
+```toml title="Cargo.toml"
+[dependencies]
+plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+```
+
+:::info
+See how to define a Halo2 prover crate here: [plonkish-fibonacci-sample](https://github.com/sifnoc/plonkish-fibonacci-sample)
+:::
 
 Next, copy your SRS and key files into the project folder. For this tutorial, we'll assume you place them in `test-vectors/halo2`.
 
@@ -228,13 +238,13 @@ Download example SRS and key files :
 
 :::
 
-Now, add three rust files, just as in the Circom-based Rust project setup.
+### 4. Use `mopro-ffi` macro
 
-Update the `./src/lib.rs` file to look like the following:
+Now, add three rust files, just as in the Circom-based Rust project setup [4. Use `mopro-ffi` macro](#4-use-mopro-ffi-macro).
 
-```rust
-// Here we're calling a macro exported with Uniffi. This macro will
-// write some functions and bind them to FFI type.
+Update the `src/lib.rs` file to look like the following:
+
+```rust title="src/lib.rs"
 mopro_ffi::app!();
 
 mopro_ffi::set_halo2_circuits! {
@@ -242,36 +252,10 @@ mopro_ffi::set_halo2_circuits! {
 }
 ```
 
-Similar to the Circom-based Rust setup, add `ios.rs` and `android.rs` for binary execution.
+### 5. Define the binaries
 
-Create the file `src/bin/ios.rs` as shown below:
+Similar to Circom-based Rust project setup [5. Define the binaries](#5-define-the-binaries)
 
-```rust
-fn main() {
-    // A simple wrapper around a build command provided by mopro.
-    // In the future this will likely be published in the mopro crate itself.
-    mopro_ffi::app_config::ios::build();
-}
-```
+### 6. Generate bindings for iOS and Android
 
-Create another file `src/bin/android.rs` as shown below:
-
-```rust
-fn main() {
-    // A simple wrapper around a build command provided by mopro.
-    // In the future this will likely be published in the mopro crate itself.
-    mopro_ffi::app_config::android::build();
-}
-```
-
-Now you're ready to build your static library! You should be able to run either
-
-```sh
-cargo run --bin ios
-```
-
-or
-
-```sh
-cargo run --bin android
-```
+Similar to Circom-based Rust project setup [6. Generate bindings for iOS and Android](#6-generate-bindings-for-ios-and-android)
