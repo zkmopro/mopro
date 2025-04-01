@@ -30,7 +30,7 @@ fun MultiplierComponent() {
             CircomProofResult(
                 proof = CircomProof(
                     a = G1(x = "", y = "", z = ""),
-                    b = G2(x = listOf(), y = listOf(), z = ""),
+                    b = G2(x = listOf(), y = listOf(), z = listOf()),
                     c = G1(x = "", y = "", z = ""),
                     protocol = "",
                     curve = ""

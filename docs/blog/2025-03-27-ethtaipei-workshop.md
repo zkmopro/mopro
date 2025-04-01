@@ -382,7 +382,7 @@ Here is an example demonstrating how to use the Semaphore crate.
     ```rust
     pub fn semaphore() -> bool {
         // ...
-        return success
+        return success;
     }
     ```
 
