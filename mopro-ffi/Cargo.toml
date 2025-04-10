@@ -13,7 +13,7 @@ exclude = ["target/*"]
 name = "mopro_ffi"
 
 [features]
-default = []
+default = ["noir"]
 
 halo2 = []
 circom = ["rustwitness", "arkworks"]
@@ -45,9 +45,14 @@ rust-witness = { version = "0.1", optional = true }
 witnesscalc-adapter = { version = "0.1", optional = true }
 circom-prover = { path = "../circom-prover", optional = true }
 
+# noir deps
+noir = { git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg", "android-compat"], optional = true }
+# noir = { git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg"], optional = true }
+
 # ZKP generation
 uuid = { version = "1.9.1", features = ["v4"] }
 camino = "1.1.9"
+serde_json = "1.0.94"
 
 [build-dependencies]
 rust-witness = { version = "0.1", optional = true }
