@@ -6,6 +6,9 @@ mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
 
+#[cfg(feature = "noir")]
+mod noir;
+
 #[cfg(feature = "circom")]
 pub use circom::{generate_circom_proof_wtns, verify_circom_proof};
 
@@ -14,6 +17,9 @@ pub use circom_prover::{prover, witness};
 
 #[cfg(feature = "halo2")]
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
+
+#[cfg(feature = "noir")]
+pub use noir::{generate_noir_proof, verify_noir_proof};
 
 #[cfg(not(feature = "circom"))]
 #[macro_export]
@@ -72,12 +78,42 @@ macro_rules! halo2_app {
     };
 }
 
+#[cfg(not(feature = "noir"))]
+#[macro_export]
+macro_rules! noir_app {
+    ($err:ty) => {
+        // TODO: fix this if CLI template can be customized
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        fn generate_noir_proof(
+            circuit_path: String,
+            srs_path: Option<String>,
+            inputs: Vec<&str>,
+        ) -> Result<Vec<u8>, $err> {
+            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
+        }
+
+        // TODO: fix this if CLI template can be customized
+        #[allow(dead_code)]
+        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        pub fn generate_noir_proof(
+            circuit_path: &str,
+            srs_path: Option<&str>,
+            inputs: Vec<&str>,
+        ) -> Result<Vec<u8>, String> {
+            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
+        }
+    };
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum MoproError {
     #[error("CircomError: {0}")]
     CircomError(String),
     #[error("Halo2Error: {0}")]
     Halo2Error(String),
+    #[error("NoirError: {0}")]
+    NoirError(String),
 }
 
 //
@@ -167,6 +203,8 @@ macro_rules! app {
             CircomError(String),
             #[error("Halo2Error: {0}")]
             Halo2Error(String),
+            #[error("NoirError: {0}")]
+            NoirError(String),
         }
 
         impl From<mopro_ffi::MoproError> for MoproError {
@@ -174,6 +212,7 @@ macro_rules! app {
                 match err {
                     mopro_ffi::MoproError::CircomError(e) => Self::CircomError(e),
                     mopro_ffi::MoproError::Halo2Error(e) => Self::Halo2Error(e),
+                    mopro_ffi::MoproError::NoirError(e) => Self::NoirError(e),
                     _ => panic!("Unhandled error type: {}", err),
                 }
             }
@@ -307,5 +346,7 @@ macro_rules! app {
         mopro_ffi::circom_app!(CircomProofResult, CircomProof, MoproError, ProofLib);
 
         mopro_ffi::halo2_app!(Halo2ProofResult, MoproError);
+
+        mopro_ffi::noir_app!(MoproError);
     };
 }

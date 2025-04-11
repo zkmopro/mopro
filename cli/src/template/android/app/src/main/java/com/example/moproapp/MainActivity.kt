@@ -1,4 +1,4 @@
-package com.example.moproapp
+package com.mopro.mopro_app
 
 import MultiplierComponent
 import android.os.Bundle
@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.mopro.mopro_app.ui.theme.MoproappTheme
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -44,7 +45,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen()
+            MoproappTheme {
+                MainScreen()
+            }
         }
     }
 }
@@ -52,7 +55,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Circom", "Halo2")
+    val tabs = listOf("Circom", "Halo2", "Noir(Zkemail)")
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(modifier = Modifier
@@ -72,6 +75,7 @@ fun MainScreen() {
             when (selectedTab) {
                 0 -> MultiplierComponent()
                 1 -> FibonacciComponent()
+                2 -> ZKEmailComponent()
             }
         }
     }
