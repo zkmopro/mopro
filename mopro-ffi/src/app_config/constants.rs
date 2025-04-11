@@ -117,26 +117,26 @@ pub enum AndroidArch {
     Aarch64Linux,
 }
 
-struct AndriodArchInfo {
+struct AndroidArchInfo {
     arch: AndroidArch,
     str: &'static str,
 }
 
 // Architecture strings need to be aligned with those in the CLI.
-const ANDROID_ARCHS: [AndriodArchInfo; 4] = [
-    AndriodArchInfo {
+const ANDROID_ARCHS: [AndroidArchInfo; 4] = [
+    AndroidArchInfo {
         arch: AndroidArch::X8664Linux,
         str: "x86_64-linux-android",
     },
-    AndriodArchInfo {
+    AndroidArchInfo {
         arch: AndroidArch::I686Linux,
         str: "i686-linux-android",
     },
-    AndriodArchInfo {
+    AndroidArchInfo {
         arch: AndroidArch::Armv7LinuxAbi,
         str: "armv7-linux-androideabi",
     },
-    AndriodArchInfo {
+    AndroidArchInfo {
         arch: AndroidArch::Aarch64Linux,
         str: "aarch64-linux-android",
     },

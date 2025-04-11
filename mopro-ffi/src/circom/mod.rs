@@ -127,7 +127,7 @@ pub fn generate_circom_proof_wtns(
     let (proof, public_inputs) = match ret.proof.curve.as_ref() {
         CURVE_BN254 => (ret.proof.into(), ret.pub_inputs.into()),
         CURVE_BLS12_381 => (ret.proof.into(), ret.pub_inputs.into()),
-        _ => bail!("Not uspported curve"),
+        _ => bail!("Not unsupported curve"),
     };
     Ok(CircomProofResult {
         proof,

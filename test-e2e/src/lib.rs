@@ -1,5 +1,5 @@
 #![allow(unexpected_cfgs)]
-// Explicitly declare funtion to avoid Uniffi's limitation
+// Explicitly declare function to avoid Uniffi's limitation
 use circom_prover::witness::WitnessFn;
 
 // First, configure the Mopro FFI library
