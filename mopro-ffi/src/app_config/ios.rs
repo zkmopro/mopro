@@ -66,6 +66,10 @@ pub fn build() {
             build_cmd.arg("build");
             if mode == Mode::Release {
                 build_cmd.arg("--release");
+                build_cmd.env(
+                    "RUSTFLAGS",
+                    "-C opt-level=z -C panic=abort -C strip=symbols",
+                );
             }
             build_cmd
                 .arg("--lib")
