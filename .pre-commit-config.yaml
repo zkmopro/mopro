@@ -1,0 +1,23 @@
+fail_fast: true
+default_install_hook_types: [pre-commit]
+default_stages: [pre-commit]
+repos:
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.31.1
+    hooks:
+      - id: typos
+  - repo: local
+    hooks:
+      - id: fmt
+        name: fmt
+        language: system
+        types: [file, rust]
+        entry: cargo fmt -- --check
+        pass_filenames: false
+
+      - id: clippy
+        name: clippy
+        language: system
+        types: [file, rust]
+        entry: cargo clippy --locked --all -- -D warnings # Use -D warnings option to ensure the job fails when encountering warnings
+        pass_filenames: false
