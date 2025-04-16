@@ -19,7 +19,7 @@
  }
 
 .featureSvg svg {
-  width: 120;
+  width: 120px;
   height: 110px;
 }
 
@@ -50,7 +50,7 @@
   
   .featureSvg svg {
     width: 70px;
-    height: 60px
+    height: 60px;
   }
   
   .featureHeading {
