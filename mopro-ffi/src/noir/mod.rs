@@ -1,4 +1,4 @@
-use noir::{
+use noir_rs::{
     barretenberg::{
         prove::prove_ultra_honk, srs::setup_srs_from_bytecode, utils::get_honk_verification_key,
         verify::verify_ultra_honk,
@@ -16,10 +16,8 @@ macro_rules! noir_app {
             srs_path: Option<String>,
             inputs: Vec<String>,
         ) -> Result<Vec<u8>, $err> {
-            let result = mopro_ffi::generate_noir_proof(circuit_path, srs_path, inputs)
+            mopro_ffi::generate_noir_proof(circuit_path, srs_path, inputs)
                 .map_err(|e| <$err>::NoirError(format!("Generate Proof error: {}", e)))
-                .unwrap();
-            Ok(result)
         }
 
         #[allow(dead_code)]
@@ -67,15 +65,15 @@ mod tests {
     use serde::Deserialize;
     use std::{collections::HashMap, fs};
 
+    const CIRCUIT_FILE: &str = "../test-vectors/noir/zkemail.json";
+    const INPUT_FILE: &str = "../test-vectors/noir/zkemail_input.json";
+    const SRS_FILE: &str = "../test-vectors/noir/zkemail_srs.local";
+
     // TODO add tests with simpler circuits, eg. `multiplier2`
     #[test]
     fn test_proof_zkemail() {
-        const CIRCUIT_FILE: &str = "../test-vectors/noir/zkemail.json";
-        const INPUT_FILE: &str = "../test-vectors/noir/zkemail_input.json";
-        const SRS_FILE: &str = "../test-vectors/noir/zkemail_srs.local";
-
         // Load input data from the JSON file for the test case
-        let json_str = fs::read_to_string(INPUT_FILE.to_string()).unwrap();
+        let json_str = fs::read_to_string(INPUT_FILE).unwrap();
         let witness = to_zkemail_witness(json_str.as_str());
 
         let proof = generate_noir_proof(
@@ -92,12 +90,8 @@ mod tests {
     fn test_macro_proof_zkemail() {
         noir_app!(mopro_ffi::MoproError);
 
-        const CIRCUIT_FILE: &str = "../test-vectors/noir/zkemail.json";
-        const INPUT_FILE: &str = "../test-vectors/noir/zkemail_input.json";
-        const SRS_FILE: &str = "../test-vectors/noir/zkemail_srs.local";
-
         // Load input data from the JSON file for the test case
-        let json_str = fs::read_to_string(INPUT_FILE.to_string()).unwrap();
+        let json_str = fs::read_to_string(INPUT_FILE).unwrap();
         let witness = to_zkemail_witness(json_str.as_str());
 
         let proof = generate_noir_proof(

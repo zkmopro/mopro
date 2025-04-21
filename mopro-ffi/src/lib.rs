@@ -88,7 +88,7 @@ macro_rules! noir_app {
         fn generate_noir_proof(
             circuit_path: String,
             srs_path: Option<String>,
-            inputs: Vec<&str>,
+            inputs: Vec<String>,
         ) -> Result<Vec<u8>, $err> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
@@ -96,11 +96,7 @@ macro_rules! noir_app {
         // TODO: fix this if CLI template can be customized
         #[allow(dead_code)]
         #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
-        pub fn generate_noir_proof(
-            circuit_path: &str,
-            srs_path: Option<&str>,
-            inputs: Vec<&str>,
-        ) -> Result<Vec<u8>, String> {
+        fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> Result<Vec<u8>, $err> {
             panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
         }
     };
