@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F1DDA042DB7676400561102 /* zkemail.json in Resources */ = {isa = PBXBuildFile; fileRef = 3F1DDA022DB7676400561102 /* zkemail.json */; };
+		3F1DDA052DB7676400561102 /* zkemail_srs.local in Resources */ = {isa = PBXBuildFile; fileRef = 3F1DDA032DB7676400561102 /* zkemail_srs.local */; };
+		3F1DDA072DB768E800561102 /* zkemail_input.json in Resources */ = {isa = PBXBuildFile; fileRef = 3F1DDA062DB768E800561102 /* zkemail_input.json */; };
 		4C05CDB22C327C4F00BEBACD /* mopro_test_UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C05CDB12C327C4F00BEBACD /* mopro_test_UITests.swift */; };
 		4CBAB2782C3334B300B536B7 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */; };
 		4CBAB27A2C3334B800B536B7 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAB2792C3334B800B536B7 /* mopro.swift */; };
@@ -31,6 +34,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3F1DDA022DB7676400561102 /* zkemail.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = zkemail.json; path = "../../test-vectors/noir/zkemail.json"; sourceTree = "<absolute>"; };
+		3F1DDA032DB7676400561102 /* zkemail_srs.local */ = {isa = PBXFileReference; lastKnownFileType = file; name = zkemail_srs.local; path = "../../test-vectors/noir/zkemail_srs.local"; sourceTree = "<absolute>"; };
+		3F1DDA062DB768E800561102 /* zkemail_input.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = zkemail_input.json; path = "../../test-vectors/noir/zkemail_input.json"; sourceTree = "<absolute>"; };
 		4C05CDAF2C327C4F00BEBACD /* mopro-test-UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mopro-test-UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C05CDB12C327C4F00BEBACD /* mopro_test_UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro_test_UITests.swift; sourceTree = "<group>"; };
 		4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MoproBindings.xcframework; path = ../MoproiOSBindings/MoproBindings.xcframework; sourceTree = "<group>"; };
@@ -76,6 +82,9 @@
 		4CF977E22C2BCF0000CE1139 = {
 			isa = PBXGroup;
 			children = (
+				3F1DDA022DB7676400561102 /* zkemail.json */,
+				3F1DDA062DB768E800561102 /* zkemail_input.json */,
+				3F1DDA032DB7676400561102 /* zkemail_srs.local */,
 				60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */,
 				60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */,
 				60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */,
@@ -214,6 +223,9 @@
 			files = (
 				4CCB9BDF2C33C20800C659C4 /* multiplier2_final.zkey in Resources */,
 				4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */,
+				3F1DDA042DB7676400561102 /* zkemail.json in Resources */,
+				3F1DDA072DB768E800561102 /* zkemail_input.json in Resources */,
+				3F1DDA052DB7676400561102 /* zkemail_srs.local in Resources */,
 				60A8E43A2C40404300D3A953 /* plonk_fibonacci_vk.bin in Resources */,
 				60A8E4382C40404300D3A953 /* plonk_fibonacci_srs.bin in Resources */,
 				4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */,

@@ -73,7 +73,7 @@ class ExampleInstrumentedTest {
     fun testNoirButtonClick() {
         // Set up the Compose UI
         composeTestRule.setContent {
-            ZkemailComponent() // Replace with the actual Composable function
+            ZkEmailComponent() // Replace with the actual Composable function
         }
 
         // Test click circom generate proof button

@@ -26,7 +26,7 @@ import com.mopro.mopro_app.getFilePathFromAssets
 import java.io.InputStream
 
 @Composable
-fun ZKEmailComponent() {
+fun ZkEmailComponent() {
     val context = LocalContext.current
     var provingTime by remember { mutableStateOf("") }
     var proofResult by remember { mutableStateOf("") }

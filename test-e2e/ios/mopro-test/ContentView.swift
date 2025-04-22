@@ -32,6 +32,32 @@ func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
     return bytesArray
 }
 
+struct HeaderTest: Decodable {
+    let storage: [UInt8]
+    let len: UInt32
+}
+
+struct PubKeyTest: Decodable {
+    let modulus: [String]
+    let redc: [String]
+}
+
+struct SequenceTest: Decodable {
+    let index: UInt32
+    let length: UInt32
+}
+
+// Structs for decoding zkemail_input.json
+struct ZkEmailInputTest: Decodable {
+    let header: HeaderTest
+    let pubkey: PubKeyTest
+    let signature: [String]
+    let date_index: UInt32
+    let subject_sequence: SequenceTest
+    let from_header_sequence: SequenceTest
+    let from_address_sequence: SequenceTest
+}
+
 
 struct ContentView: View {
     @State private var textViewText = ""
@@ -50,8 +76,8 @@ struct ContentView: View {
     private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
     private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
     private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
-    private let zkemailSrsPath = Bundle.main.path(forResource: "zkemail_srs.local", ofType: "")!
-    private let zkemailCircuitPath = Bundle.main.path(forResource: "zkemail.json", ofType: "")!
+    private let zkemailSrsPath = Bundle.main.path(forResource: "zkemail_srs", ofType: "local")!
+    private let zkemailCircuitPath = Bundle.main.path(forResource: "zkemail", ofType: "json")!
     
     var body: some View {
         VStack(spacing: 10) {
@@ -210,7 +236,7 @@ extension ContentView {
         textViewText += "Generating zkEmail proof...\n"
         
         // Get the path to the SRS file in the app bundle
-        guard let srsPath = Bundle.main.path(forResource: "srs", ofType: "local") else {
+        guard let srsPath = Bundle.main.path(forResource: "zkemail_srs", ofType: "local") else {
             textViewText += "Error: Could not find SRS file in app bundle\n"
             return
         }
@@ -276,7 +302,7 @@ extension ContentView {
         textViewText += "Verifying zkEmail proof...\n"
         
         // Get the path to the SRS file in the app bundle
-        guard let srsPath = Bundle.main.path(forResource: "srs", ofType: "local") else {
+        guard let srsPath = Bundle.main.path(forResource: "zkemail_srs", ofType: "local") else {
             textViewText += "Error: Could not find SRS file in app bundle\n"
             return
         }
@@ -285,7 +311,7 @@ extension ContentView {
             let start = CFAbsoluteTimeGetCurrent()
             do {
                 // Verify the proof
-                let isValid = try! verify_noir_proof(circuitPath: zkemailCircuitPath, proof: proofData)
+                let isValid = try! verifyNoirProof(circuitPath: zkemailCircuitPath, proof: proofData)
 
                 let end = CFAbsoluteTimeGetCurrent()
                 let timeTaken = end - start

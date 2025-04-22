@@ -17,7 +17,7 @@ default = []
 
 halo2 = []
 circom = ["rustwitness", "arkworks"]
-noir = []
+noir = ["noir_rs"]
 
 # circom features
 ## witness

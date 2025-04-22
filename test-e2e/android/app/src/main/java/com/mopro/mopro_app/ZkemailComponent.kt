@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,7 @@ import com.mopro.mopro_app.getFilePathFromAssets
 import java.io.InputStream
 
 @Composable
-fun ZKEmailComponent() {
+fun ZkEmailComponent() {
     val context = LocalContext.current
     var provingTime by remember { mutableStateOf("") }
     var proofResult by remember { mutableStateOf("") }
@@ -181,7 +182,7 @@ fun ZKEmailComponent() {
                         }
                     ).start()
                 },
-                modifier = Modifier.padding(top = 8.dp).width(220.dp),
+                modifier = Modifier.padding(top = 20.dp).testTag("noirGenerateProofButton"),
                 enabled = !isGeneratingProof && !isVerifyingProof
             ) { 
                 Text(text = "Generate zkEmail Proof")
@@ -209,7 +210,10 @@ fun ZKEmailComponent() {
                                     
                                     verificationTime = "Verification time: $duration ms"
                                     verificationResult = "Verification result: $result"
-                                    statusMessage = if (result) "Proof verified successfully!" else "Proof verification failed!"
+                                    if (result)
+                                        statusMessage = "Proof verified successfully!" 
+                                    else 
+                                        statusMessage = "Proof verification failed!"
                                 } ?: run {
                                     verificationResult = "No proof available"
                                     statusMessage = "Please generate a proof first"
@@ -225,7 +229,7 @@ fun ZKEmailComponent() {
                         }
                     ).start()
                 },
-                modifier = Modifier.padding(top = 8.dp).width(220.dp),
+                modifier = Modifier.padding(top = 20.dp).testTag("noirVerifyProofButton"),
                 enabled = !isGeneratingProof && !isVerifyingProof && proofBytes != null
             ) { 
                 Text(text = "Verify zkEmail Proof") 
