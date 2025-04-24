@@ -1,12 +1,11 @@
+use anyhow::Result;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 use std::path::PathBuf;
 
-use anyhow::Result;
-
-use crate::constants::Adapter;
+use crate::init::adapter::Adapter;
 
 // Storing user selections while iterating with mopro cli
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

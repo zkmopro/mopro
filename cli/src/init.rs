@@ -1,28 +1,18 @@
-use std::collections::HashSet;
-use std::env;
-use std::fs;
-use std::io::Write;
-use std::path::Path;
-
-use crate::constants::Adapter;
+use crate::config::{read_config, write_config, Config};
 use crate::print::print_init_instructions;
-use crate::utils::contains_circom;
-use crate::utils::contains_halo2;
-use crate::utils::AdapterSelector;
+use crate::utils::contains_adapter;
+use adapter::{Adapter, AdapterSelector};
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Input;
-use include_dir::include_dir;
-use include_dir::Dir;
+use include_dir::{include_dir, Dir};
+use std::collections::HashSet;
+use std::{env, fs, io::Write, path::Path};
 
-use crate::config::read_config;
-use crate::config::write_config;
-use crate::config::Config;
-
+pub mod adapter;
 mod circom;
-use circom::Circom;
 mod halo2;
-use halo2::Halo2;
+mod noir;
 
 trait ProvingSystem {
     fn dep_template(file_path: &str) -> Result<()>;
@@ -74,27 +64,15 @@ pub fn init_project(
             cargo_toml_path,
             adapter_sel.adapters.iter().map(|a| a.as_str()).collect(),
         )?;
-        if adapter_sel.contains(Adapter::Circom) {
-            Circom::dep_template(cargo_toml_path)?;
-        }
-        if adapter_sel.contains(Adapter::Halo2) {
-            Halo2::dep_template(cargo_toml_path)?;
-        }
+        adapter_sel.dep_template(cargo_toml_path);
     }
 
     if let Some(build_rs_path) = project_dir.join("build.rs").to_str() {
-        if adapter_sel.contains(Adapter::Circom) {
-            Circom::build_template(build_rs_path)?;
-        }
+        adapter_sel.build_template(build_rs_path);
     }
 
     if let Some(lib_rs_path) = project_dir.join("src").join("lib.rs").to_str() {
-        if adapter_sel.contains(Adapter::Circom) {
-            Circom::lib_template(lib_rs_path)?;
-        }
-        if adapter_sel.contains(Adapter::Halo2) {
-            Halo2::lib_template(lib_rs_path)?;
-        }
+        adapter_sel.lib_template(lib_rs_path);
     }
 
     // Store selection
@@ -133,12 +111,22 @@ pub fn copy_embedded_dir(
         // Create directories as needed
         if let Some(parent) = output_path.parent() {
             if let Some(path_str) = parent.to_str() {
-                if contains_circom(path_str) && !adapter_sel.contains(Adapter::Circom) {
+                if contains_adapter(path_str, Adapter::Circom)
+                    && !adapter_sel.contains(Adapter::Circom)
+                {
                     return Ok(());
                 }
             }
             if let Some(path_str) = parent.to_str() {
-                if contains_halo2(path_str) && !adapter_sel.contains(Adapter::Halo2) {
+                if contains_adapter(path_str, Adapter::Halo2)
+                    && !adapter_sel.contains(Adapter::Halo2)
+                {
+                    return Ok(());
+                }
+            }
+            if let Some(path_str) = parent.to_str() {
+                if contains_adapter(path_str, Adapter::Noir) && !adapter_sel.contains(Adapter::Noir)
+                {
                     return Ok(());
                 }
             }
@@ -149,12 +137,23 @@ pub fn copy_embedded_dir(
         match file.as_file() {
             Some(file) => {
                 if let Some(path_str) = relative_path.to_str() {
-                    if contains_circom(path_str) && !adapter_sel.contains(Adapter::Circom) {
+                    if contains_adapter(path_str, Adapter::Circom)
+                        && !adapter_sel.contains(Adapter::Circom)
+                    {
                         return Ok(());
                     }
                 }
                 if let Some(path_str) = relative_path.to_str() {
-                    if contains_halo2(path_str) && !adapter_sel.contains(Adapter::Halo2) {
+                    if contains_adapter(path_str, Adapter::Halo2)
+                        && !adapter_sel.contains(Adapter::Halo2)
+                    {
+                        return Ok(());
+                    }
+                }
+                if let Some(path_str) = relative_path.to_str() {
+                    if contains_adapter(path_str, Adapter::Noir)
+                        && !adapter_sel.contains(Adapter::Noir)
+                    {
                         return Ok(());
                     }
                 }

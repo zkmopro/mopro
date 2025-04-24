@@ -2,50 +2,13 @@ use std::collections::HashMap;
 
 use crate::{
     config::Config,
-    constants::{Adapter, AndroidArch, IosArch, Platform},
+    constants::{AndroidArch, IosArch, Platform},
+    init::adapter::Adapter,
     select::multi_select,
 };
 
-pub fn contains_circom(path: &str) -> bool {
-    path.to_lowercase().contains(Adapter::Circom.as_str())
-}
-
-pub fn contains_halo2(path: &str) -> bool {
-    path.to_lowercase().contains(Adapter::Halo2.as_str())
-}
-
-pub struct AdapterSelector {
-    pub adapters: Vec<Adapter>,
-}
-
-impl AdapterSelector {
-    pub fn construct(selections: Vec<usize>) -> Self {
-        let mut adapters: Vec<Adapter> = vec![];
-        for s in selections {
-            adapters.push(Adapter::from_idx(s));
-        }
-        Self { adapters }
-    }
-
-    pub fn select() -> Self {
-        let adapters = multi_select(
-            "Pick the adapters you want to use (multiple selection with space)",
-            "No adapters selected. Use space to select an adapter",
-            Adapter::all_strings(),
-            vec![],
-        );
-
-        Self {
-            adapters: adapters
-                .iter()
-                .map(|&i| Adapter::from_idx(i))
-                .collect::<Vec<Adapter>>(),
-        }
-    }
-
-    pub fn contains(&self, adapter: Adapter) -> bool {
-        self.adapters.contains(&adapter)
-    }
+pub fn contains_adapter(path: &str, adapter: Adapter) -> bool {
+    path.to_lowercase().contains(adapter.as_str())
 }
 
 pub struct PlatformSelector {

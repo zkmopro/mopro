@@ -10,10 +10,10 @@ use std::env;
 
 use crate::config::read_config;
 use crate::config::write_config;
-use crate::constants::Adapter;
 use crate::constants::Mode;
 use crate::constants::Platform;
 use crate::create::utils::copy_embedded_dir;
+use crate::init::adapter::Adapter;
 use crate::print::print_build_success_message;
 use crate::style;
 use crate::style::blue_bold;
