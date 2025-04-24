@@ -48,9 +48,9 @@ circom-prover = { path = "../circom-prover", optional = true }
 
 # noir deps
 # build for Android
-noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg", "android-compat"], optional = true }
+# noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg", "android-compat"], optional = true }
 # build for iOS
-# noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg"], optional = true }
+noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg"], optional = true }
 
 # ZKP generation
 uuid = { version = "1.9.1", features = ["v4"] }
