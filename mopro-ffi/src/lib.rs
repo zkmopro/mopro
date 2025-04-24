@@ -186,6 +186,17 @@ pub struct Halo2ProofResult {
 ///     plonk_fibonacci::verify
 /// );
 /// ```
+///
+/// # Noir Example
+/// You don't need to generate Witness Generation functions first, like `Circom` or `Halo2` does.
+/// All you need to do is to setup the Mopro FFi library as below.
+///
+/// ```ignore
+/// // Setup the Mopro FFI library
+/// mopro_ffi::app!();
+///
+/// ```
+///
 #[macro_export]
 macro_rules! app {
     () => {
