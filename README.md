@@ -113,3 +113,8 @@ around 5GB of memory to run, while the iPhone 15 Pro usually limits the applicat
 ## Acknowledgements
 
 This work was initially sponsored by a joint grant from [PSE](https://pse.dev/) and [0xPARC](https://0xparc.org/). It is currently incubated by PSE.
+
+
+> [!IMPORTANT]
+> We do not accept minor grammatical fixes (e.g., correcting typos, rewording sentences) unless they significantly improve clarity in technical documentation. These contributions, while appreciated, are not a priority for merging. If there is a grammatical error feel free to message the team.
+
