@@ -80,9 +80,7 @@ jobs:
         with:
             toolchain: 1.0.0-beta.1
       - name: Run ffi tests
-        run: cd mopro-ffi && cargo test --release --all-features -- --skip test_macro_proof_zkemail
-      - name: Run ffi Noir tests
-        run: cargo test --release --package mopro-ffi --lib -- noir::tests::test_macro_proof_zkemail --exact
+        run: cd mopro-ffi && cargo test --release --all-features
   setup-halo2-wasm-env:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name

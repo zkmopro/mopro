@@ -71,6 +71,7 @@ mod tests {
 
     // TODO add tests with simpler circuits, eg. `multiplier2`
     #[test]
+    #[serial_test::serial]
     fn test_proof_zkemail() {
         // Load input data from the JSON file for the test case
         let json_str = fs::read_to_string(INPUT_FILE).unwrap();
@@ -87,6 +88,7 @@ mod tests {
     }
 
     #[test]
+    #[serial_test::serial]
     fn test_macro_proof_zkemail() {
         noir_app!(mopro_ffi::MoproError);
 
