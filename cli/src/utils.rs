@@ -13,6 +13,7 @@ pub fn contains_adapter(path: &str, adapter: Adapter) -> bool {
 
 pub struct PlatformSelector {
     pub platforms: Vec<Platform>,
+    pub archs: Vec<String>,
 }
 
 impl PlatformSelector {
@@ -21,7 +22,10 @@ impl PlatformSelector {
         for s in selections {
             platforms.push(Platform::parse_from_str(&s));
         }
-        Self { platforms }
+        Self {
+            platforms,
+            archs: vec![],
+        }
     }
 
     pub fn select(config: &Config) -> Self {
@@ -44,6 +48,7 @@ impl PlatformSelector {
                 .iter()
                 .map(|&i| Platform::from_idx(i))
                 .collect::<Vec<Platform>>(),
+            archs: vec![],
         }
     }
 
@@ -55,7 +60,7 @@ impl PlatformSelector {
         self.platforms.contains(&platform)
     }
 
-    pub fn select_archs(&self) -> HashMap<String, Vec<String>> {
+    pub fn select_archs(&mut self) -> HashMap<String, Vec<String>> {
         let mut archs: HashMap<String, Vec<String>> = HashMap::new();
         self.platforms.iter().for_each(|&p| match p {
             Platform::Ios => {
@@ -64,7 +69,8 @@ impl PlatformSelector {
                     .iter()
                     .map(|&i| IosArch::from_idx(i).as_str().to_string())
                     .collect::<Vec<String>>();
-                archs.insert(String::from(Platform::Ios.as_str()), sel_str);
+                archs.insert(String::from(Platform::Ios.as_str()), sel_str.clone());
+                self.archs.extend_from_slice(&sel_str);
             }
             Platform::Android => {
                 let sel = Self::select_multi_archs(p.as_str(), &AndroidArch::all_strings());
@@ -72,7 +78,8 @@ impl PlatformSelector {
                     .iter()
                     .map(|&i| AndroidArch::from_idx(i).as_str().to_string())
                     .collect::<Vec<String>>();
-                archs.insert(String::from(Platform::Android.as_str()), sel_str);
+                archs.insert(String::from(Platform::Android.as_str()), sel_str.clone());
+                self.archs.extend_from_slice(&sel_str);
             }
             Platform::Web => {}
         });
@@ -95,5 +102,11 @@ impl PlatformSelector {
             archs.to_vec(),
             vec![true; archs.len()],
         )
+    }
+
+    pub fn contains_archs(&self, arch_strs: &[&str]) -> bool {
+        arch_strs
+            .iter()
+            .any(|&arch| self.archs.contains(&arch.to_string()))
     }
 }

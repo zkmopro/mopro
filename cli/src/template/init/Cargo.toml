@@ -23,6 +23,8 @@ num-bigint = "0.4.0"
 thiserror = "2.0.12"
 # HALO2_DEPENDENCIES
 
+# NOIR_DEPENDENCIES
+
 [build-dependencies]
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
 rust-witness = "0.1"

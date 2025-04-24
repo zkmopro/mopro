@@ -10,6 +10,8 @@ use std::env;
 
 use crate::config::read_config;
 use crate::config::write_config;
+use crate::constants::AndroidArch;
+use crate::constants::IosArch;
 use crate::constants::Mode;
 use crate::constants::Platform;
 use crate::create::utils::copy_embedded_dir;
@@ -57,7 +59,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     };
 
     // Platform selection
-    let platform: PlatformSelector = match arg_platforms {
+    let mut platform: PlatformSelector = match arg_platforms {
         None => PlatformSelector::select(&config),
         Some(p) => {
             let valid_platforms: Vec<String> = p
@@ -87,19 +89,28 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     };
 
     // Supported adapters and platforms:
-    // | Platforms | Circom | Halo2 |
-    // |-----------|--------|-------|
-    // | iOS       | Yes    | Yes   |
-    // | Android   | Yes    | Yes   |
-    // | Web       | No     | Yes   |
+    // | Platforms | Circom | Halo2 | Noir |
+    // |-----------|--------|-------|------|
+    // | iOS       | Yes    | Yes   | Yes  |
+    // | Android   | Yes    | Yes   | Yes  |
+    // | Web       | No     | Yes   | No   |
     //
     // Note: 'Yes' indicates that the adapter is compatible with the platform.
+
+    // Noir only supports `iOS` and `Android` platform.
+    if config.adapter_contains(Adapter::Noir) && platform.contains(Platform::Web) {
+        style::print_yellow(
+            "Noir doesn't support Web platform, choose different platform".to_string(),
+        );
+        build_project(&Some(mode.as_str().to_string()), &None)?;
+        return Ok(());
+    }
 
     // If 'Circom' is the only selected adapter and 'Web' is the only selected platform,
     // Restart the build step as this combination is not supported.
     if config.adapter_eq(Adapter::Circom) && platform.eq(&vec![Platform::Web]) {
         style::print_yellow(
-            "Web platform is not support Circom only, choose different platform".to_string(),
+            "Circom doesn't support Web platform, choose different platform".to_string(),
         );
         build_project(&Some(mode.as_str().to_string()), &None)?;
         return Ok(());
@@ -137,6 +148,29 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
 
     // Architecture selection for iOS or Android
     let selected_architectures = platform.select_archs();
+
+    // Noir only supports `aarch64-apple-ios` and `aarch64-linux-android`
+    if config.adapter_contains(Adapter::Noir) {
+        let not_allowed_archs = vec![
+            AndroidArch::X8664Linux.as_str(),
+            AndroidArch::I686Linux.as_str(),
+            AndroidArch::Armv7LinuxAbi.as_str(),
+            IosArch::X8664Apple.as_str(),
+            IosArch::Aarch64AppleSim.as_str(),
+        ];
+
+        if platform.contains_archs(not_allowed_archs.as_slice()) {
+            style::print_yellow(
+                format!(
+                    "Noir doesn't support following architectures: {:?}, choose other architectures",
+                    not_allowed_archs
+                )
+                .to_string(),
+            );
+            build_project(&Some(mode.as_str().to_string()), &None)?;
+            return Ok(());
+        }
+    }
 
     for p in platform.platforms.clone() {
         let platform_str: &str = p.as_str();
