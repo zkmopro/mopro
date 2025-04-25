@@ -179,13 +179,20 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
             .map(|archs| archs.join(","))
             .unwrap_or_default();
 
-        let status = std::process::Command::new("cargo")
+        let mut command = std::process::Command::new("cargo");
+        command
             .arg("run")
             .arg("--bin")
             .arg(platform_str)
             .env("CONFIGURATION", mode.as_str())
-            .env(p.arch_key(), selected_arch)
-            .status()?;
+            .env(p.arch_key(), selected_arch);
+
+        // The dependencies of Noir libraries need iOS 15 and above.
+        let status = if config.adapter_contains(Adapter::Noir) && p.eq(&Platform::Ios) {
+            command.env("IPHONEOS_DEPLOYMENT_TARGET", "15").status()?
+        } else {
+            command.status()?
+        };
 
         // Add only successfully compiled platforms to the config.
         if status.success() {
