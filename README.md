@@ -26,7 +26,7 @@ To learn more about mopro, please refer to the documentation at [zkmopro](https:
 -   noir
     ```sh
     cd mopro-ffi
-    cargo test --features noir
+    cargo test --features noir --release
     ```
 -   circom-e2e
     ```sh
@@ -39,12 +39,6 @@ To learn more about mopro, please refer to the documentation at [zkmopro](https:
     cd test-e2e
     curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
     CLASSPATH=jna-5.13.0.jar cargo test --test halo2 -- --nocapture
-    ```
--   noir-e2e
-    ```sh
-    cd test-e2e
-    curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
-    CLASSPATH=jna-5.13.0.jar cargo test --test noir -- --nocapture
     ```
 
 ## Performance
