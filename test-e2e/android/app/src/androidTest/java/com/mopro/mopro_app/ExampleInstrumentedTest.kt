@@ -68,24 +68,4 @@ class ExampleInstrumentedTest {
         composeTestRule.onNodeWithTag("halo2VerifyProofButton").performClick()
         composeTestRule.onNodeWithTag("halo2VerifyProofButton").assertIsDisplayed()
     }
-
-    @Test
-    fun testNoirButtonClick() {
-        // Set up the Compose UI
-        composeTestRule.setContent {
-            ZkEmailComponent() // Replace with the actual Composable function
-        }
-
-        // Test click circom generate proof button
-        composeTestRule.onNodeWithTag("noirGenerateProofButton").performClick()
-        composeTestRule.onNodeWithTag("noirGenerateProofButton").assertIsDisplayed()
-
-        // Test click circom verify proof button
-        // Wait until the second button is enabled
-        Thread.sleep(500)
-
-        composeTestRule.onNodeWithTag("noirVerifyProofButton").performClick()
-        composeTestRule.onNodeWithTag("noirVerifyProofButton").assertIsDisplayed()
-    }
-
 }

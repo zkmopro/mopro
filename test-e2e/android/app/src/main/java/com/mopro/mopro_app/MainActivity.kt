@@ -75,7 +75,6 @@ fun MainScreen() {
             when (selectedTab) {
                 0 -> MultiplierComponent()
                 1 -> FibonacciComponent()
-                2 -> ZkEmailComponent()
             }
         }
     }
