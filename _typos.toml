@@ -1,4 +1,5 @@
 [default]
-extend-ignore-re = [
-    "(?i).*groth.*"
-]
+extend-ignore-re = ["(?i).*groth.*"]
+
+[files]
+extend-exclude = ["**/zkemail.json"]
