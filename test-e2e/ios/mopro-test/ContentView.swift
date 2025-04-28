@@ -39,8 +39,6 @@ struct ContentView: View {
     @State private var isCircomVerifyButtonEnabled = false
     @State private var isHalo2roveButtonEnabled = true
     @State private var isHalo2VerifyButtonEnabled = false
-    @State private var isAshlangroveButtonEnabled = true
-    @State private var isAshlangVerifyButtonEnabled = false
     @State private var generatedCircomProof: CircomProof?
     @State private var circomPublicInputs: [String]?
     @State private var generatedHalo2Proof: Data?
@@ -49,7 +47,7 @@ struct ContentView: View {
     private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
     private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
     private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
-    
+   
     var body: some View {
         VStack(spacing: 10) {
             Image(systemName: "globe")

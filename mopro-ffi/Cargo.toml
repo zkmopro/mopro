@@ -17,6 +17,7 @@ default = []
 
 halo2 = []
 circom = ["rustwitness", "arkworks"]
+noir = ["noir_rs"]
 
 # circom features
 ## witness
@@ -45,9 +46,16 @@ rust-witness = { version = "0.1", optional = true }
 witnesscalc-adapter = { version = "0.1", optional = true }
 circom-prover = { path = "../circom-prover", optional = true }
 
+# noir deps
+# build for Android
+noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg", "android-compat"], optional = true }
+# build for iOS
+# noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg"], optional = true }
+
 # ZKP generation
 uuid = { version = "1.9.1", features = ["v4"] }
 camino = "1.1.9"
+serde_json = "1.0.94"
 
 [build-dependencies]
 rust-witness = { version = "0.1", optional = true }
@@ -59,6 +67,7 @@ color-eyre = "0.6"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"
 serde_json = "1.0.94"
+serial_test = "3.0.0"
 
 # circom deps
 ark-ff = { version = "0.5.0" }

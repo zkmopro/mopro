@@ -79,9 +79,9 @@ extension ContentView {
 
             // Expected outputs
             let outputs: [String] = [String(c), String(a)]
-            
+
             let start = CFAbsoluteTimeGetCurrent()
-            
+
             // Generate Proof
             let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
             assert(!generateProofResult.proof.a.x.isEmpty, "Proof should not be empty")
@@ -89,13 +89,13 @@ extension ContentView {
 
             let end = CFAbsoluteTimeGetCurrent()
             let timeTaken = end - start
-            
+
             // Store the generated proof and public inputs for later verification
             generatedCircomProof = generateProofResult.proof
             circomPublicInputs = generateProofResult.inputs
-            
+
             textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
-            
+
             isCircomVerifyButtonEnabled = true
         } catch {
             textViewText += "\nProof generation failed: \(error.localizedDescription)\n"

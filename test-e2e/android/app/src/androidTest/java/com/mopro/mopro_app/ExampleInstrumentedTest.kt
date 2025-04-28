@@ -68,5 +68,4 @@ class ExampleInstrumentedTest {
         composeTestRule.onNodeWithTag("halo2VerifyProofButton").performClick()
         composeTestRule.onNodeWithTag("halo2VerifyProofButton").assertIsDisplayed()
     }
-
 }
