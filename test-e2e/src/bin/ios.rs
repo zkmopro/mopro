@@ -1,3 +1,3 @@
 fn main() {
-    mopro_ffi::app_config::ios::build();
+    mopro_ffi::app_config::ios::build(None);
 }

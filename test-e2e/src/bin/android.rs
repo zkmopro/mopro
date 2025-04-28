@@ -1,3 +1,3 @@
 fn main() {
-    mopro_ffi::app_config::android::build();
+    mopro_ffi::app_config::android::build(None);
 }

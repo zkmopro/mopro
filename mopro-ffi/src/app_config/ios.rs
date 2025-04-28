@@ -14,7 +14,7 @@ use super::install_arch;
 use super::mktemp_local;
 
 // Load environment variables that are specified by by xcode
-pub fn build() {
+pub fn build(library_name: Option<&str>) {
     const BINDING_NAME: &str = "MoproiOSBindings";
 
     let cwd = std::env::current_dir().unwrap();
@@ -28,6 +28,7 @@ pub fn build() {
     fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
     let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
     let framework_out = bindings_out.join("MoproBindings.xcframework");
+    let lib_name = library_name.unwrap_or("libmopro_bindings.a");
 
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
     let mode = Mode::parse_from_str(
@@ -53,10 +54,11 @@ pub fn build() {
             .iter()
             .map(|arch| {
                 Path::new(&build_dir).join(Path::new(&format!(
-                    "{}/{}/{}/libmopro_bindings.a",
+                    "{}/{}/{}/{}",
                     build_dir,
                     arch.as_str(),
-                    mode.as_str()
+                    mode.as_str(),
+                    lib_name
                 )))
             })
             .collect();
@@ -78,7 +80,7 @@ pub fn build() {
         }
         // now lipo the libraries together
         let mut lipo_cmd = Command::new("lipo");
-        let lib_out = mktemp_local(build_dir_path).join("libmopro_bindings.a");
+        let lib_out = mktemp_local(build_dir_path).join(lib_name);
         lipo_cmd
             .arg("-create")
             .arg("-output")
@@ -101,9 +103,10 @@ pub fn build() {
         .collect();
 
     let out_dylib_path = build_dir_path.join(format!(
-        "{}/{}/libmopro_bindings.dylib",
+        "{}/{}/{}",
         target_archs[0].as_str(),
-        mode.as_str()
+        mode.as_str(),
+        lib_name.replace("a", "dylib")
     ));
 
     generate_ios_bindings(&out_dylib_path, &swift_bindings_dir)
