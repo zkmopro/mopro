@@ -2,9 +2,6 @@
 sidebar_position: 5
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 # Performance and Benchmarks
 
 ## Circom
@@ -14,29 +11,16 @@ Both native witness generation and proof generation are generally faster than `s
 However, performance varies across different circuits.
 We _recommend_ developers benchmark their custom circuits before selecting tools for app development.
 
-
-
 :::warning
 
 -   [circom-witness-rs](https://github.com/philsippl/circom-witness-rs) is not fully compatible with circom circuits. See: [zkmopro/mopro#32](https://github.com/zkmopro/mopro/issues/32).
 -   [wasmer](https://github.com/arkworks-rs/circom-compat) doesn't work in iOS. See: [zkmopro/mopro#109](https://github.com/zkmopro/mopro/issues/109).
-:::
+    :::
 
 ### iOS
 
 Benchmarks on an iPhone 16 Pro (2024).
 
-<Tabs>
-  <TabItem value="bench" label="By Bench">
-    <img src="/img/circom.ios.wit.gen_by.bench.png" alt="iOS Witness Generation Performance Chart" />
-  </TabItem>
-  <TabItem value="project" label="By Project">
-    <img src="/img/circom.ios.wit.gen_by.project.png" alt="iOS Witness Generation Performance Chart" />
-  </TabItem>
-</Tabs>
-
-<details>
-  <summary>Data</summary>
   <table>
     <tr>
       <th>Witness generation</th>
@@ -87,22 +71,7 @@ Benchmarks on an iPhone 16 Pro (2024).
       <td>-</td>
     </tr>
   </table>
-</details>
 
-<Tabs>
-  <TabItem value="bench" label="By Bench">
-    <img src="/img/circom.ios.proof.gen_by.bench.png" alt="iOS Witness Generation Performance Chart" />
-  </TabItem>
-  <TabItem value="project" label="By Project">
-    <img src="/img/circom.ios.proof.gen_by.project.png" alt="iOS Witness Generation Performance Chart" />
-  </TabItem>
-</Tabs>
-
-<details>
-  <summary>Data</summary>
-  :::info
-  **Details:** [Spreadsheet of Circom benchmark (iOS)](https://docs.google.com/spreadsheets/d/1MFABmsYSUsWDmhbjleqhBXk7nkYwhu589yK-CHtRkNI/edit?usp=sharing)
-  :::
   <table>
     <tr>
       <th>Proof generation</th>
@@ -141,24 +110,15 @@ Benchmarks on an iPhone 16 Pro (2024).
       <td>-</td>
     </tr>
   </table>
-</details>
 
+:::info
+**Details:** [Spreadsheet of Circom benchmark (iOS)](https://docs.google.com/spreadsheets/d/1MFABmsYSUsWDmhbjleqhBXk7nkYwhu589yK-CHtRkNI/edit?usp=sharing)
+:::
 
 ### Android
 
 Benchmarks on an Samsung S23 Ultra (2023).
 
-<Tabs>
-  <TabItem value="bench" label="By Bench">
-    <img src="/img/circom.android.wit.gen_by.bench.png" alt="Circom Android Witness Generation Performance Chart" />
-  </TabItem>
-  <TabItem value="project" label="By Project">
-    <img src="/img/circom.android.wit.gen_by.project.png" alt="Circom Android Witness Generation Performance Chart" />
-  </TabItem>
-</Tabs>
-
-<details>
-  <summary>Data</summary>
   <table>
     <tr>
       <th>Witness generation</th>
@@ -209,22 +169,7 @@ Benchmarks on an Samsung S23 Ultra (2023).
       <td>3207.5 ms</td>
     </tr>
   </table>
-</details>
 
-<Tabs>
-  <TabItem value="bench" label="By Bench">
-    <img src="/img/circom.android.proof.gen_by.bench.png" alt="Circom Android Proof Generation Performance Chart" />
-  </TabItem>
-  <TabItem value="project" label="By Project">
-    <img src="/img/circom.android.proof.gen_by.project.png" alt="Circom Android Proof Generation Performance Chart" />
-  </TabItem>
-</Tabs>
-
-<details>
-  <summary>Data</summary>
-  :::info
-  **Details:** [Spreadsheet of Circom benchmark (Android)](https://docs.google.com/spreadsheets/d/1TDgL2NXxYl8UH-RZPWfWdawY0tjxf3c6l8B11_FG7Kg/edit?usp=sharing)
-  :::
   <table>
     <tr>
       <th>Proof generation</th>
@@ -263,24 +208,15 @@ Benchmarks on an Samsung S23 Ultra (2023).
       <td>51546.3 ms</td>
     </tr>
   </table>
-</details>
 
+:::info
+**Details:** [Spreadsheet of Circom benchmark (Android)](https://docs.google.com/spreadsheets/d/1TDgL2NXxYl8UH-RZPWfWdawY0tjxf3c6l8B11_FG7Kg/edit?usp=sharing)
+:::
 
 ### macOS
 
 Benchmarks on an Macbook Pro M1 Max (2021).
 
-<Tabs>
-  <TabItem value="bench" label="By Bench">
-    <img src="/img/circom.macos.wit.gen_by.bench.png" alt="Circom macOS Witness Generation Performance Chart" />
-  </TabItem>
-  <TabItem value="project" label="By Project">
-    <img src="/img/circom.macos.wit.gen_by.project.png" alt="Circom macOS Witness Generation Performance Chart" />
-  </TabItem>
-</Tabs>
-
-<details>
-  <summary>Data</summary>
   <table>
     <tr>
       <th>Witness generation</th>
@@ -331,22 +267,7 @@ Benchmarks on an Macbook Pro M1 Max (2021).
       <td>3437 ms</td>
     </tr>
   </table>
-</details>
 
-<Tabs>
-  <TabItem value="bench" label="By Bench">
-    <img src="/img/circom.macos.proof.gen_by.bench.png" alt="Circom macOS Proof Generation Performance Chart" />
-  </TabItem>
-  <TabItem value="project" label="By Project">
-    <img src="/img/circom.macos.proof.gen_by.project.png" alt="Circom macOS Proof Generation Performance Chart" />
-  </TabItem>
-</Tabs>
-
-<details>
-  <summary>Data</summary>
-  :::info
-  **Details:** [Spreadsheet of Circom benchmark (host)](https://docs.google.com/spreadsheets/d/1irKg_TOP-yXms8igwCN_3OjVrtFe5gTHkuF0RbrVuho/edit?usp=sharing)
-  :::
   <table>
     <tr>
       <th>Proof generation</th>
@@ -385,9 +306,88 @@ Benchmarks on an Macbook Pro M1 Max (2021).
       <td>19794 ms</td>
     </tr>
   </table>
-</details>
 
+:::info
+**Details:** [Spreadsheet of Circom benchmark (host)](https://docs.google.com/spreadsheets/d/1irKg_TOP-yXms8igwCN_3OjVrtFe5gTHkuF0RbrVuho/edit?usp=sharing)
+:::
 
+### Web
+
+We have enabled `wasm-bindgen-rayon` for multithreading in the browser. Below is a benchmark comparing arkworks with `wasm-bindgen-rayon` against `snarkjs`.
+
+-   **iPhone 16 Pro**
+
+    <table>
+      <tr>
+        <th>Proof generation</th>
+        <th>[ark-works with `rayon`](https://github.com/RReverser/wasm-bindgen-rayon)</th>
+        <th>[snarkjs](https://github.com/iden3/snarkjs)</th>
+      </tr>
+      <tr>
+        <td>Keccak256</td>
+        <td>1717.81 ms	 (<font color="FFB546">**~3x**</font>)</td>
+        <td>5166.02 ms</td>
+      </tr>
+      <tr>
+        <td>SHA256</td>
+        <td>601.32 ms	</td>
+        <td>380.61 ms (<font color="FFB546">**~1.5x**</font>) </td>
+      </tr>
+      <tr>
+        <td>RSA</td>
+        <td>7152.85 ms (<font color="FFB546">**~1.1x**</font>)</td>
+        <td>8473.58 ms</td>
+      </tr>
+      <tr>
+        <td>Semaphore</td>
+        <td>652.07 ms (<font color="FFB546">**~1.4x**</font>)</td>
+        <td>919.54 ms</td>
+      </tr>
+      <tr>
+        <td>Anon Aadhaar</td>
+        <td>- ms</td>
+        <td>- ms</td>
+      </tr>
+    </table>
+
+-   **Android Samsung S23U**
+
+    <table>
+      <tr>
+        <th>Proof generation</th>
+        <th>[ark-works with `rayon`](https://github.com/RReverser/wasm-bindgen-rayon)</th>
+        <th>[snarkjs](https://github.com/iden3/snarkjs)</th>
+      </tr>
+      <tr>
+        <td>Keccak256</td>
+        <td>2733.15 ms	 (<font color="FFB546">**~2.7x**</font>)</td>
+        <td>7412.39 ms</td>
+      </tr>
+      <tr>
+        <td>SHA256</td>
+        <td>980.64 ms	(<font color="FFB546">**~2.4x**</font>) </td>
+        <td>2379.58 ms</td>
+      </tr>
+      <tr>
+        <td>RSA</td>
+        <td>9313.07 ms (<font color="FFB546">**~1.1x**</font>)</td>
+        <td>10725.49 ms</td>
+      </tr>
+      <tr>
+        <td>Semaphore</td>
+        <td>792.87 ms	(<font color="FFB546">**~1.3x**</font>)</td>
+        <td>1045.34 ms</td>
+      </tr>
+      <tr>
+        <td>Anon Aadhaar</td>
+        <td>- ms</td>
+        <td>- ms</td>
+      </tr>
+    </table>
+
+:::info
+Details: [zkmopro/mopro#290](https://github.com/zkmopro/mopro/issues/290)
+:::
 
 ## Halo2
 
@@ -396,30 +396,17 @@ The performance of the Mopro build is comparable to that of native Halo2 build. 
 
 The below tests were run on a Macbook Pro M1 Pro (2021) as well as an iPhone 15 Pro (2023).
 
-<img src="/img/halo2.keccak.proof.gen.png" alt="Halo2 Keccak Proving" />
+| [Keccak256](https://github.com/ElusAegis/halo2-keccak-stable.git) | Prove Time (s) | Verify Time (s) |
+| :---------------------------------------------------------------: | :------------: | :-------------: |
+|                          Native (M1 Pro)                          |     10.3 s     |     0.15 s      |
+|                         Emulator (M1 Pro)                         |     10.1 s     |     0.13 s      |
+|                           iPhone 15 Pro                           |     11.0 s     |     0.12 s      |
 
-<details>
-<summary>Data</summary>
-
-  | [Keccak256](https://github.com/ElusAegis/halo2-keccak-stable.git) | Prove Time (s) | Verify Time (s) |
-  | :---------------------------------------------------------------: | :------------: | :-------------: |
-  |                          Native (M1 Pro)                          |     10.3 s     |     0.15 s      |
-  |                         Emulator (M1 Pro)                         |     10.1 s     |     0.13 s      |
-  |                           iPhone 15 Pro                           |     11.0 s     |     0.12 s      |
-</details>
-
-<img src="/img/halo2.rsa.proof.gen.png" alt="Halo2 RSA Proving" />
-
-<details>
-  <summary>Data</summary>
-
-  | [RSA](https://github.com/ElusAegis/halo2-rsa-mopro.git) | Prove Time (s) | Verify Time (s) |
-  | :-----------------------------------------------------: | :------------: | :-------------: |
-  |                     Native (M1 Pro)                     |     76.5 s     |     11.1 s      |
-  |                    Emulator (M1 Pro)                    |     64.5 s     |      9.0 s      |
-  |                      iPhone 15 Pro                      |    crashes     |     crashes     |
-</details>
-
+| [RSA](https://github.com/ElusAegis/halo2-rsa-mopro.git) | Prove Time (s) | Verify Time (s) |
+| :-----------------------------------------------------: | :------------: | :-------------: |
+|                     Native (M1 Pro)                     |     76.5 s     |     11.1 s      |
+|                    Emulator (M1 Pro)                    |     64.5 s     |      9.0 s      |
+|                      iPhone 15 Pro                      |    crashes     |     crashes     |
 
 Note that the iPhone 15 Pro crashes when running the RSA circuit due to the large memory requirements. The circuit needs
 around 5GB of memory to run, while the iPhone 15 Pro usually limits the application memory usage to 3GB.
