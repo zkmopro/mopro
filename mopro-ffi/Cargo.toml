@@ -36,6 +36,7 @@ anyhow = "1.0.86"
 num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
+toml = "0.8.22"
 
 # Error handling
 thiserror = "2.0.12"

@@ -1,12 +1,13 @@
+use camino::Utf8Path;
 use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
-
-use camino::Utf8Path;
 use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
+
+use crate::app_config::toml_lib_name;
 
 use super::cleanup_tmp_local;
 use super::constants::{
@@ -17,7 +18,7 @@ use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
-pub fn build(library_name: Option<&str>) {
+pub fn build() {
     const BINDING_NAME: &str = "MoproAndroidBindings";
 
     let cwd = std::env::current_dir().expect("Failed to get current directory");
@@ -27,7 +28,7 @@ pub fn build(library_name: Option<&str>) {
     let work_dir = mktemp_local(&build_dir);
     let bindings_out = work_dir.join(BINDING_NAME);
     let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
-    let lib_name = library_name.unwrap_or("libmopro_bindings.so");
+    let lib_name = toml_lib_name("so").unwrap_or("libmopro_bindings.so".to_string());
 
     let mode = Mode::parse_from_str(
         std::env::var(ENV_CONFIG)
@@ -51,7 +52,7 @@ pub fn build(library_name: Option<&str>) {
     install_ndk();
     let mut latest_out_lib_path = PathBuf::new();
     for arch in target_archs {
-        latest_out_lib_path = build_for_arch(arch, lib_name, &build_dir, &bindings_out, mode);
+        latest_out_lib_path = build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode);
     }
 
     generate_android_bindings(&latest_out_lib_path, &bindings_out)
