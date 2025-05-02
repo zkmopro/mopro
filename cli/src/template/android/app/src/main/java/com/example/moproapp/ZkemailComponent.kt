@@ -1,4 +1,4 @@
-package com.mopro.mopro_app
+package com.example.moproapp
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +23,6 @@ import org.json.JSONObject
 import uniffi.mopro.generateNoirProof
 import uniffi.mopro.verifyNoirProof
 import java.io.File
-import com.mopro.mopro_app.getFilePathFromAssets
 import java.io.InputStream
 
 @Composable

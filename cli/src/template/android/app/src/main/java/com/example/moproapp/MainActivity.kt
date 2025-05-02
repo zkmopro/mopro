@@ -1,4 +1,4 @@
-package com.mopro.mopro_app
+package com.example.moproapp
 
 import MultiplierComponent
 import android.os.Bundle
@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.mopro.mopro_app.ui.theme.MoproappTheme
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -45,9 +44,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MoproappTheme {
-                MainScreen()
-            }
+            MainScreen()
         }
     }
 }

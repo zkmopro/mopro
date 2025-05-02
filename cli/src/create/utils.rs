@@ -1,5 +1,6 @@
 use std::fs;
 use std::fs::File;
+use std::io::ErrorKind;
 use std::io::Read;
 use std::io::Write;
 use std::path::Path;
@@ -31,12 +32,12 @@ pub fn copy_android_bindings(
     if target_jni_libs_path.exists() {
         fs::remove_dir_all(target_jni_libs_path.clone())?;
     }
-    fs::create_dir(&target_jni_libs_path)?;
+    fs::create_dir_all(&target_jni_libs_path)?;
     copy_dir(&jni_libs_path, &target_jni_libs_path)?;
     if target_uniffi_path.exists() {
         fs::remove_dir_all(target_uniffi_path.clone())?;
     }
-    fs::create_dir(&target_uniffi_path)?;
+    fs::create_dir_all(&target_uniffi_path)?;
     copy_dir(&uniffi_path, &target_uniffi_path)?;
 
     Ok(())
@@ -47,7 +48,7 @@ pub fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> Result<()> 
     if ios_bindings_target_dir.exists() {
         fs::remove_dir_all(&ios_bindings_target_dir)?;
     }
-    fs::create_dir(&ios_bindings_target_dir)?;
+    fs::create_dir_all(&ios_bindings_target_dir)?;
     copy_dir(&input_dir, &ios_bindings_target_dir)?;
     Ok(())
 }
@@ -94,7 +95,11 @@ pub fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> Result<()> {
         match file.as_file() {
             Some(file) => {
                 if let Err(e) = fs::write(&output_path, file.contents()) {
-                    return Err(e.into());
+                    if e.kind() == ErrorKind::AlreadyExists {
+                        println!("File already exists: {:?}", output_path);
+                    } else {
+                        return Err(e.into());
+                    }
                 }
             }
             None => {
@@ -112,7 +117,7 @@ pub fn copy_dir(input_dir: &Path, output_dir: &Path) -> Result<()> {
         if path.is_dir() {
             let dir_name = path.file_name().unwrap();
             let new_output_dir = output_dir.join(dir_name);
-            fs::create_dir(&new_output_dir)?;
+            fs::create_dir_all(&new_output_dir)?;
             copy_dir(&path, &new_output_dir)?;
         } else {
             let file_name = path.file_name().unwrap();
@@ -124,12 +129,14 @@ pub fn copy_dir(input_dir: &Path, output_dir: &Path) -> Result<()> {
 }
 
 pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
-    const CIRCOM_KEYS_DIR: Dir =
-        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom");
-    const HALO2_KEYS_DIR: Dir =
-        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
-    copy_embedded_file(&CIRCOM_KEYS_DIR, &target_dir)?;
-    copy_embedded_file(&HALO2_KEYS_DIR, &target_dir)?;
+    let key_dirs = vec![
+        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom"),
+        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2"),
+        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/noir"),
+    ];
+    key_dirs
+        .iter()
+        .try_for_each(|dir| copy_embedded_file(dir, &target_dir))?;
     Ok(())
 }
 
