@@ -12,6 +12,8 @@ use crate::init::adapter::Adapter;
 pub struct Config {
     pub(crate) target_adapters: HashSet<String>,
     pub(crate) target_platforms: HashSet<String>,
+    pub(crate) ios: HashSet<String>,
+    pub(crate) android: HashSet<String>,
 }
 
 impl Config {

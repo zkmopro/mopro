@@ -60,7 +60,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
 
     // Platform selection
     let mut platform: PlatformSelector = match arg_platforms {
-        None => PlatformSelector::select(&config),
+        None => PlatformSelector::select(&mut config),
         Some(p) => {
             let valid_platforms: Vec<String> = p
                 .iter()
@@ -72,7 +72,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
                 style::print_yellow(
                     "No platforms selected. Please select at least one platform.".to_string(),
                 );
-                PlatformSelector::select(&config)
+                PlatformSelector::select(&mut config)
             } else {
                 if valid_platforms.len() != p.len() {
                     style::print_yellow(
@@ -147,7 +147,8 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     }
 
     // Architecture selection for iOS or Android
-    let selected_architectures = platform.select_archs();
+    let selected_architectures = platform.select_archs(&mut config);
+    write_config(&config_path, &config)?;
 
     // Noir only supports `aarch64-apple-ios` and `aarch64-linux-android`
     if config.adapter_contains(Adapter::Noir) {
@@ -194,10 +195,7 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
             command.status()?
         };
 
-        // Add only successfully compiled platforms to the config.
-        if status.success() {
-            config.target_platforms.insert(platform_str.into());
-        } else {
+        if !status.success() {
             // Return a custom error if the command fails
             return Err(anyhow::anyhow!(
                 "Output with status code {}",
@@ -205,9 +203,6 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
             ));
         }
     }
-
-    // Save the updated config to the file
-    write_config(&config_path, &config)?;
 
     print_binding_message(&platform.platforms)?;
 

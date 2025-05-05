@@ -7,7 +7,6 @@ edition = "2021"
 # This library name should not be changed
 [lib]
 crate-type = ["lib", "cdylib", "staticlib"]
-name = "mopro_bindings"
 
 # Adapters for different proof systems
 [features]

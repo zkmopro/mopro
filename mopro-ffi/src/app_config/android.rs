@@ -1,12 +1,13 @@
+use camino::Utf8Path;
 use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
-
-use camino::Utf8Path;
 use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
+
+use crate::app_config::toml_lib_name;
 
 use super::cleanup_tmp_local;
 use super::constants::{
@@ -27,6 +28,7 @@ pub fn build() {
     let work_dir = mktemp_local(&build_dir);
     let bindings_out = work_dir.join(BINDING_NAME);
     let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
+    let lib_name = toml_lib_name("so");
 
     let mode = Mode::parse_from_str(
         std::env::var(ENV_CONFIG)
@@ -50,7 +52,7 @@ pub fn build() {
     install_ndk();
     let mut latest_out_lib_path = PathBuf::new();
     for arch in target_archs {
-        latest_out_lib_path = build_for_arch(arch, &build_dir, &bindings_out, mode);
+        latest_out_lib_path = build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode);
     }
 
     generate_android_bindings(&latest_out_lib_path, &bindings_out)
@@ -60,7 +62,13 @@ pub fn build() {
     cleanup_tmp_local(&build_dir);
 }
 
-fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode: Mode) -> PathBuf {
+fn build_for_arch(
+    arch: AndroidArch,
+    lib_name: &str,
+    build_dir: &Path,
+    bindings_out: &Path,
+    mode: Mode,
+) -> PathBuf {
     let arch_str = arch.as_str();
     install_arch(arch_str.to_string());
     let cpp_lib_dest = bindings_out.join("jniLibs");
@@ -92,12 +100,13 @@ fn build_for_arch(arch: AndroidArch, build_dir: &Path, bindings_out: &Path, mode
     };
 
     let out_lib_path = build_dir.join(format!(
-        "{}/{}/{}/libmopro_bindings.so",
+        "{}/{}/{}/{}",
         build_dir.display(),
         arch_str,
-        mode.as_str()
+        mode.as_str(),
+        lib_name
     ));
-    let out_lib_dest = bindings_out.join(format!("jniLibs/{}/libmopro_bindings.so", folder));
+    let out_lib_dest = bindings_out.join(format!("jniLibs/{}/{}", folder, lib_name));
 
     fs::create_dir_all(out_lib_dest.parent().unwrap()).expect("Failed to create jniLibs directory");
     fs::copy(&out_lib_path, &out_lib_dest).expect("Failed to copy file");
