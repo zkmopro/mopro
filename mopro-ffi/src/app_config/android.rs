@@ -28,7 +28,7 @@ pub fn build() {
     let work_dir = mktemp_local(&build_dir);
     let bindings_out = work_dir.join(BINDING_NAME);
     let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
-    let lib_name = toml_lib_name("so").unwrap_or("libmopro_bindings.so".to_string());
+    let lib_name = toml_lib_name("so");
 
     let mode = Mode::parse_from_str(
         std::env::var(ENV_CONFIG)

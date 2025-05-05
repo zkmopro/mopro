@@ -28,7 +28,7 @@ pub fn build() {
     fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
     let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
     let framework_out = bindings_out.join("MoproBindings.xcframework");
-    let lib_name = toml_lib_name("a").unwrap_or("libmopro_bindings.a".to_string());
+    let lib_name = toml_lib_name("a");
 
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
     let mode = Mode::parse_from_str(
@@ -106,7 +106,7 @@ pub fn build() {
         "{}/{}/{}",
         target_archs[0].as_str(),
         mode.as_str(),
-        lib_name.replace("a", "dylib")
+        lib_name.replace(".a", ".dylib")
     ));
 
     generate_ios_bindings(&out_dylib_path, &swift_bindings_dir)

@@ -83,6 +83,8 @@ pub fn init_project(
         let default_config = Config {
             target_adapters: HashSet::new(),
             target_platforms: HashSet::new(),
+            ios: HashSet::new(),
+            android: HashSet::new(),
         };
         write_config(&config_path, &default_config)?;
     }

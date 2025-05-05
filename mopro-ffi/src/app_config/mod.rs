@@ -57,15 +57,27 @@ pub fn install_arch(arch: String) {
         .unwrap_or_else(|_| panic!("Failed to install target architecture {}", arch));
 }
 
-pub fn toml_lib_name(ext_name: &str) -> Option<String> {
+pub fn toml_lib_name(ext_name: &str) -> String {
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let cargo_toml_path = std::path::Path::new(&manifest_dir).join("Cargo.toml");
     let cargo_toml_content = std::fs::read_to_string(cargo_toml_path).unwrap();
     let cargo_toml: Value = cargo_toml_content.parse::<Value>().unwrap();
 
-    cargo_toml
+    // If the `name` under [lib] section is set, using the `name` as library name.
+    // Otherwise, using the package name.
+    let lib_name = cargo_toml
         .get("lib")
         .and_then(|lib| lib.get("name"))
-        .and_then(|name| name.as_str())
-        .map(|name_str| format!("lib{}.{}", name_str, ext_name))
+        .and_then(|lib| lib.as_str())
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| {
+            // '-' in the package name is replaced with '_' if we don't specify the lib name
+            // So we need to replace '-' with '_' as below
+            cargo_toml
+                .get("package")
+                .and_then(|pkg| pkg.get("name"))
+                .and_then(|pkg| pkg.as_str().map(|s| s.replace("-", "_")))
+                .expect("Cannot find package name")
+        });
+    format!("lib{}.{}", lib_name.as_str(), ext_name)
 }
