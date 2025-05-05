@@ -219,49 +219,6 @@ impl Platform {
 }
 
 //
-// Adapter Section
-//
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum Adapter {
-    Circom,
-    Halo2,
-}
-
-struct AdapterInfo {
-    adapter: Adapter,
-    str: &'static str,
-}
-
-const ADAPTERS_INFO: [AdapterInfo; 2] = [
-    AdapterInfo {
-        adapter: Adapter::Circom,
-        str: "circom",
-    },
-    AdapterInfo {
-        adapter: Adapter::Halo2,
-        str: "halo2",
-    },
-];
-
-impl Adapter {
-    pub fn as_str(&self) -> &'static str {
-        ADAPTERS_INFO
-            .iter()
-            .find(|info| info.adapter == *self)
-            .map(|info| info.str)
-            .expect("Unsupported Adapter")
-    }
-
-    pub fn all_strings() -> Vec<&'static str> {
-        ADAPTERS_INFO.iter().map(|info| info.str).collect()
-    }
-
-    pub fn from_idx(idx: usize) -> Self {
-        ADAPTERS_INFO[idx].adapter
-    }
-}
-
-//
 // Framework Section
 //
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

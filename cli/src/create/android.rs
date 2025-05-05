@@ -20,7 +20,7 @@ impl Create for Android {
         let android_bindings_dir = check_bindings(&project_dir, Framework::Android)?;
 
         let target_dir = project_dir.join(Self::NAME);
-        fs::create_dir(&target_dir)?;
+        fs::create_dir_all(&target_dir)?;
 
         env::set_current_dir(&target_dir)?;
         const ANDROID_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/android");

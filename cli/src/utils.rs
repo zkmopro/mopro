@@ -2,54 +2,18 @@ use std::collections::HashMap;
 
 use crate::{
     config::Config,
-    constants::{Adapter, AndroidArch, IosArch, Platform},
+    constants::{AndroidArch, IosArch, Platform},
+    init::adapter::Adapter,
     select::multi_select,
 };
 
-pub fn contains_circom(path: &str) -> bool {
-    path.to_lowercase().contains(Adapter::Circom.as_str())
-}
-
-pub fn contains_halo2(path: &str) -> bool {
-    path.to_lowercase().contains(Adapter::Halo2.as_str())
-}
-
-pub struct AdapterSelector {
-    pub adapters: Vec<Adapter>,
-}
-
-impl AdapterSelector {
-    pub fn construct(selections: Vec<usize>) -> Self {
-        let mut adapters: Vec<Adapter> = vec![];
-        for s in selections {
-            adapters.push(Adapter::from_idx(s));
-        }
-        Self { adapters }
-    }
-
-    pub fn select() -> Self {
-        let adapters = multi_select(
-            "Pick the adapters you want to use (multiple selection with space)",
-            "No adapters selected. Use space to select an adapter",
-            Adapter::all_strings(),
-            vec![],
-        );
-
-        Self {
-            adapters: adapters
-                .iter()
-                .map(|&i| Adapter::from_idx(i))
-                .collect::<Vec<Adapter>>(),
-        }
-    }
-
-    pub fn contains(&self, adapter: Adapter) -> bool {
-        self.adapters.contains(&adapter)
-    }
+pub fn contains_adapter(path: &str, adapter: Adapter) -> bool {
+    path.to_lowercase().contains(adapter.as_str())
 }
 
 pub struct PlatformSelector {
     pub platforms: Vec<Platform>,
+    pub archs: Vec<String>,
 }
 
 impl PlatformSelector {
@@ -58,7 +22,10 @@ impl PlatformSelector {
         for s in selections {
             platforms.push(Platform::parse_from_str(&s));
         }
-        Self { platforms }
+        Self {
+            platforms,
+            archs: vec![],
+        }
     }
 
     pub fn select(config: &Config) -> Self {
@@ -81,6 +48,7 @@ impl PlatformSelector {
                 .iter()
                 .map(|&i| Platform::from_idx(i))
                 .collect::<Vec<Platform>>(),
+            archs: vec![],
         }
     }
 
@@ -92,7 +60,7 @@ impl PlatformSelector {
         self.platforms.contains(&platform)
     }
 
-    pub fn select_archs(&self) -> HashMap<String, Vec<String>> {
+    pub fn select_archs(&mut self) -> HashMap<String, Vec<String>> {
         let mut archs: HashMap<String, Vec<String>> = HashMap::new();
         self.platforms.iter().for_each(|&p| match p {
             Platform::Ios => {
@@ -101,7 +69,8 @@ impl PlatformSelector {
                     .iter()
                     .map(|&i| IosArch::from_idx(i).as_str().to_string())
                     .collect::<Vec<String>>();
-                archs.insert(String::from(Platform::Ios.as_str()), sel_str);
+                archs.insert(String::from(Platform::Ios.as_str()), sel_str.clone());
+                self.archs.extend_from_slice(&sel_str);
             }
             Platform::Android => {
                 let sel = Self::select_multi_archs(p.as_str(), &AndroidArch::all_strings());
@@ -109,7 +78,8 @@ impl PlatformSelector {
                     .iter()
                     .map(|&i| AndroidArch::from_idx(i).as_str().to_string())
                     .collect::<Vec<String>>();
-                archs.insert(String::from(Platform::Android.as_str()), sel_str);
+                archs.insert(String::from(Platform::Android.as_str()), sel_str.clone());
+                self.archs.extend_from_slice(&sel_str);
             }
             Platform::Web => {}
         });
@@ -132,5 +102,11 @@ impl PlatformSelector {
             archs.to_vec(),
             vec![true; archs.len()],
         )
+    }
+
+    pub fn contains_archs(&self, arch_strs: &[&str]) -> bool {
+        arch_strs
+            .iter()
+            .any(|&arch| self.archs.contains(&arch.to_string()))
     }
 }

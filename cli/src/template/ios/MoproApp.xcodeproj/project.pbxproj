@@ -13,6 +13,9 @@
 		2A5992352CC7750C00135402 /* plonk_fibonacci_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 2A5992302CC7750C00135402 /* plonk_fibonacci_pk.bin */; };
 		2A5992392CC77A7E00135402 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A5992372CC77A7E00135402 /* MoproBindings.xcframework */; };
 		2A59923A2CC77A7E00135402 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5992362CC77A7E00135402 /* mopro.swift */; };
+		3F766D132DC859C200622A51 /* zkemail_input.json in Resources */ = {isa = PBXBuildFile; fileRef = 3F766D112DC859C200622A51 /* zkemail_input.json */; };
+		3F766D142DC859C200622A51 /* zkemail.json in Resources */ = {isa = PBXBuildFile; fileRef = 3F766D102DC859C200622A51 /* zkemail.json */; };
+		3F766D152DC859C200622A51 /* zkemail_srs.local in Resources */ = {isa = PBXBuildFile; fileRef = 3F766D122DC859C200622A51 /* zkemail_srs.local */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +45,9 @@
 		2A5992322CC7750C00135402 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = plonk_fibonacci_vk.bin; sourceTree = "<group>"; };
 		2A5992362CC77A7E00135402 /* mopro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro.swift; sourceTree = "<group>"; };
 		2A5992372CC77A7E00135402 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
+		3F766D102DC859C200622A51 /* zkemail.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = zkemail.json; sourceTree = "<group>"; };
+		3F766D112DC859C200622A51 /* zkemail_input.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = zkemail_input.json; sourceTree = "<group>"; };
+		3F766D122DC859C200622A51 /* zkemail_srs.local */ = {isa = PBXFileReference; lastKnownFileType = file; path = zkemail_srs.local; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -100,6 +106,9 @@
 				2A5992302CC7750C00135402 /* plonk_fibonacci_pk.bin */,
 				2A5992312CC7750C00135402 /* plonk_fibonacci_srs.bin */,
 				2A5992322CC7750C00135402 /* plonk_fibonacci_vk.bin */,
+				3F766D102DC859C200622A51 /* zkemail.json */,
+				3F766D112DC859C200622A51 /* zkemail_input.json */,
+				3F766D122DC859C200622A51 /* zkemail_srs.local */,
 			);
 			sourceTree = "<group>";
 		};
@@ -246,6 +255,9 @@
 				2A5992342CC7750C00135402 /* plonk_fibonacci_srs.bin in Resources */,
 				2A5992352CC7750C00135402 /* plonk_fibonacci_pk.bin in Resources */,
 				2A59922F2CC7750200135402 /* multiplier2_final.zkey in Resources */,
+				3F766D132DC859C200622A51 /* zkemail_input.json in Resources */,
+				3F766D142DC859C200622A51 /* zkemail.json in Resources */,
+				3F766D152DC859C200622A51 /* zkemail_srs.local in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
