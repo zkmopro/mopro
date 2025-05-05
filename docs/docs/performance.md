@@ -15,7 +15,8 @@ We _recommend_ developers benchmark their custom circuits before selecting tools
 
 -   [circom-witness-rs](https://github.com/philsippl/circom-witness-rs) is not fully compatible with circom circuits. See: [zkmopro/mopro#32](https://github.com/zkmopro/mopro/issues/32).
 -   [wasmer](https://github.com/arkworks-rs/circom-compat) doesn't work in iOS. See: [zkmopro/mopro#109](https://github.com/zkmopro/mopro/issues/109).
-    :::
+
+:::
 
 ### iOS
 
@@ -386,7 +387,7 @@ We have enabled `wasm-bindgen-rayon` for multithreading in the browser. Below is
     </table>
 
 :::info
-Details: [zkmopro/mopro#290](https://github.com/zkmopro/mopro/issues/290)
+**Details:** [zkmopro/mopro#290](https://github.com/zkmopro/mopro/issues/290)
 :::
 
 ## Halo2
