@@ -222,4 +222,36 @@ mod test {
             panic!("Failed to generate the proof!")
         }
     }
+
+    #[test]
+    fn test_generate_and_verify_keccak_plonk_proof() {
+        halo2_app!(mopro_ffi::Halo2ProofResult, mopro_ffi::MoproError);
+
+        set_halo2_circuits! {
+            ("keccak256_pk.bin", halo2_keccak_256::prove, "keccak256_vk.bin", halo2_keccak_256::verify),
+        }
+
+        const SRS_KEY_PATH: &str = "../test-vectors/halo2/keccak256_srs.bin";
+        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/keccak256_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/keccak256_vk.bin";
+
+        let mut input = HashMap::new();
+        input.insert("in".to_string(), vec!["55".to_string()]);
+
+        if let Ok(proof_result) = generate_halo2_proof(
+            SRS_KEY_PATH.to_string(),
+            PROVING_KEY_PATH.to_string(),
+            input,
+        ) {
+            let result = verify_halo2_proof(
+                SRS_KEY_PATH.to_string(),
+                VERIFYING_KEY_PATH.to_string(),
+                proof_result.proof,
+                proof_result.inputs,
+            );
+            assert!(result.is_ok());
+        } else {
+            panic!("Failed to generate the proof!")
+        }
+    }
 }

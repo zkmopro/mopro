@@ -91,7 +91,16 @@ function updateResults(testName, data, resultsTable, allPassedRef, error = null)
 
     const testCases = [
         {
-            name: "Plonk",
+            name: "Plonk (keccak256)",
+            input: { in: ["55"] },
+            srs: './assets/keccak256_srs.bin',
+            pk: './assets/keccak256_pk.bin',
+            vk: './assets/keccak256_vk.bin',
+            generateProof: mopro_wasm.generate_plonk_keccak256_proof,
+            verifyProof: mopro_wasm.verify_plonk_keccak256_proof,
+        },
+        {
+            name: "Plonk (fibonacci)",
             input: { out: ["55"] },
             srs: './assets/plonk_fibonacci_srs.bin',
             pk: './assets/plonk_fibonacci_pk.bin',
@@ -100,7 +109,7 @@ function updateResults(testName, data, resultsTable, allPassedRef, error = null)
             verifyProof: mopro_wasm.verify_plonk_proof,
         },
         {
-            name: "HyperPlonk",
+            name: "HyperPlonk (fibonacci)",
             input: { out: ["55"] },
             srs: './assets/hyperplonk_fibonacci_srs.bin',
             pk: './assets/hyperplonk_fibonacci_pk.bin',
@@ -109,7 +118,7 @@ function updateResults(testName, data, resultsTable, allPassedRef, error = null)
             verifyProof: mopro_wasm.verify_hyperplonk_proof,
         },
         {
-            name: "Gemini",
+            name: "Gemini (fibonacci)",
             input: { out: ["55"] },
             srs: './assets/gemini_fibonacci_srs.bin',
             pk: './assets/gemini_fibonacci_pk.bin',
