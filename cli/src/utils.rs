@@ -80,24 +80,28 @@ impl PlatformSelector {
                 // defaults based on previous selections if previous selections are not empty
                 // otherwise, selects all
                 let all_ios_archs = IosArch::all_strings();
-                let defaults: Vec<bool> = if config.ios.is_empty() {
+                let defaults: Vec<bool> = if !config.ios.is_some() {
                     vec![true; all_ios_archs.len()]
                 } else {
                     all_ios_archs
                         .iter()
-                        .map(|&acrch| config.ios.contains(acrch))
+                        .map(|&acrch| config.ios.as_ref().unwrap().contains(acrch))
                         .collect()
                 };
 
                 // clear previous selections before update
-                config.ios.clear();
+                if let Some(ref mut ios) = config.ios {
+                    ios.clear();
+                }
 
                 let sel = Self::select_multi_archs(p.as_str(), &all_ios_archs, defaults);
                 let sel_str = sel
                     .iter()
                     .map(|&i| {
                         let arch = IosArch::from_idx(i).as_str().to_string();
-                        config.ios.insert(arch.clone());
+                        if let Some(ref mut ios) = config.ios {
+                            ios.insert(arch.clone());
+                        }
                         arch
                     })
                     .collect::<Vec<String>>();
@@ -108,24 +112,28 @@ impl PlatformSelector {
                 // defaults based on previous selections if previous selections are not empty
                 // otherwise, selects all
                 let all_android_archs = AndroidArch::all_strings();
-                let defaults: Vec<bool> = if config.android.is_empty() {
+                let defaults: Vec<bool> = if !config.android.is_some() {
                     vec![true; all_android_archs.len()]
                 } else {
                     all_android_archs
                         .iter()
-                        .map(|&acrch| config.android.contains(acrch))
+                        .map(|&acrch| config.android.as_ref().unwrap().contains(acrch))
                         .collect()
                 };
 
                 // clear previous selections before update
-                config.android.clear();
+                if let Some(ref mut android) = config.android {
+                    android.clear();
+                }
 
                 let sel = Self::select_multi_archs(p.as_str(), &all_android_archs, defaults);
                 let sel_str = sel
                     .iter()
                     .map(|&i| {
                         let arch = AndroidArch::from_idx(i).as_str().to_string();
-                        config.android.insert(arch.clone());
+                        if let Some(ref mut android) = config.android {
+                            android.insert(arch.clone());
+                        }
                         arch
                     })
                     .collect::<Vec<String>>();
