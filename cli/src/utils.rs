@@ -80,7 +80,7 @@ impl PlatformSelector {
                 // defaults based on previous selections if previous selections are not empty
                 // otherwise, selects all
                 let all_ios_archs = IosArch::all_strings();
-                let defaults: Vec<bool> = if !config.ios.is_some() {
+                let defaults: Vec<bool> = if config.ios.is_none() {
                     vec![true; all_ios_archs.len()]
                 } else {
                     all_ios_archs
@@ -112,7 +112,7 @@ impl PlatformSelector {
                 // defaults based on previous selections if previous selections are not empty
                 // otherwise, selects all
                 let all_android_archs = AndroidArch::all_strings();
-                let defaults: Vec<bool> = if !config.android.is_some() {
+                let defaults: Vec<bool> = if config.android.is_none() {
                     vec![true; all_android_archs.len()]
                 } else {
                     all_android_archs

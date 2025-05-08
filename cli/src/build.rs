@@ -6,6 +6,7 @@ use dialoguer::Confirm;
 use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
+use std::collections::HashSet;
 use std::env;
 
 use crate::config::read_config;
@@ -148,6 +149,16 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
 
     // Architecture selection for iOS or Android
     let selected_architectures = platform.select_archs(&mut config);
+    let mut ios_hash = HashSet::new();
+    let mut android_hash = HashSet::new();
+    for arch in selected_architectures.get("ios").unwrap() {
+        ios_hash.insert(arch.clone());
+    }
+    for arch in selected_architectures.get("android").unwrap() {
+        android_hash.insert(arch.clone());
+    }
+    config.ios = Some(ios_hash);
+    config.android = Some(android_hash);
     write_config(&config_path, &config)?;
 
     // Noir only supports `aarch64-apple-ios` and `aarch64-linux-android`
