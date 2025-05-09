@@ -4,6 +4,7 @@ use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::prelude::*;
 
 use halo2_keccak_256;
+use mopro_halo2_rsa;
 use plonk_fibonacci;
 
 #[wasm_bindgen]

@@ -26,8 +26,8 @@ rust-witness = "0.1"
 num-bigint = { version = "0.4.0" }
 
 # Halo2 dependencies
-halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
-mopro-halo2-rsa = { git = "https://github.com/KimiWu123/halo2-rsa-mopro.git" }
+halo2-keccak-256 = { workspace = true }
+mopro-halo2-rsa = { workspace = true }
 plonk-fibonacci = { workspace = true }
 hyperplonk-fibonacci = { workspace = true }
 gemini-fibonacci = { workspace = true }
@@ -47,3 +47,4 @@ empty-line-after-doc-comments = "allow"
 
 [dev-dependencies]
 uniffi = { workspace = true, features = ["bindgen-tests"] }
+
