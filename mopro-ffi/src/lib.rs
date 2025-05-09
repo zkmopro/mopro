@@ -150,6 +150,7 @@ pub struct G2 {
 pub struct Halo2ProofResult {
     pub proof: Vec<u8>,
     pub inputs: Vec<u8>,
+    pub time: f32,
 }
 
 /// This macro is used to setup the Mopro FFI library
@@ -232,6 +233,7 @@ macro_rules! app {
         pub struct Halo2ProofResult {
             pub proof: Vec<u8>,
             pub inputs: Vec<u8>,
+            pub time: f32,
         }
 
         impl From<mopro_ffi::Halo2ProofResult> for Halo2ProofResult {
@@ -239,6 +241,7 @@ macro_rules! app {
                 Self {
                     proof: result.proof,
                     inputs: result.inputs,
+                    time: result.time,
                 }
             }
         }

@@ -11,6 +11,7 @@ plonk = ["plonk-fibonacci"]
 hyperplonk = ["hyperplonk-fibonacci"]
 gemini = ["gemini-fibonacci"]
 keccak = ["halo2-keccak-256"]
+rsa = ["mopro-halo2-rsa"]
 
 
 [dependencies]
@@ -18,6 +19,7 @@ plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifno
 hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git", optional = true }
 gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git", optional = true }
 halo2-keccak-256 = { git = "https://github.com/KimiWu123/halo2-keccak-stable.git", branch = "wasm32", optional = true }
+mopro-halo2-rsa = { git = "https://github.com/KimiWu123/halo2-rsa-mopro.git", branch = "wasm32", optional = true }
 rand = "0.8.5"
 
 [target.wasm32-unknown-unknown.dependencies]
