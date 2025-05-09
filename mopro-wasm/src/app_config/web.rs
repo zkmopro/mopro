@@ -26,7 +26,7 @@ pub fn build() {
         .current_dir(mopro_wasm_lib_dir)
         .args([
             "run",
-            "nightly-2024-07-18",
+            "nightly-2025-05-08",
             "wasm-pack",
             "build",
             "--target",
