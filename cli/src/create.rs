@@ -89,7 +89,13 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
                 let requires = [Platform::Ios, Platform::Android];
                 let missing: Vec<&str> = requires
                     .iter()
-                    .filter(|&req| !config.target_platforms.contains(req.as_str()))
+                    .filter(|&req| {
+                        if let Some(platforms) = &config.target_platforms {
+                            !platforms.contains(req.as_str())
+                        } else {
+                            false
+                        }
+                    })
                     .map(|r| r.as_str())
                     .collect();
 
@@ -106,9 +112,11 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
                 }
             }
             _ => {
-                if config.target_platforms.contains(framework_str) {
-                    items.push(framework_str.to_string());
-                    unselectable.push(false);
+                if let Some(platforms) = &config.target_platforms {
+                    if platforms.contains(framework_str) {
+                        items.push(framework_str.to_string());
+                        unselectable.push(false);
+                    }
                 } else {
                     items.push(format!(
                         "{:<12} - Require binding",

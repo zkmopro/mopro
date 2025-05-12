@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::{
     config::Config,
@@ -32,13 +32,13 @@ impl PlatformSelector {
     /// `select` updates `platforms` in the config file.
     pub fn select(config: &mut Config) -> Self {
         let platforms = Platform::all_strings();
-        // defaults based on previous selections or all platforms
-        let defaults: Vec<bool> = if config.target_platforms.is_empty() {
-            vec![true; platforms.len()]
+        // defaults based on previous selections or none
+        let defaults: Vec<bool> = if config.target_platforms.is_none() {
+            vec![false; platforms.len()]
         } else {
             platforms
                 .iter()
-                .map(|&platform| config.target_platforms.contains(platform))
+                .map(|&platform| config.target_platforms.as_ref().unwrap().contains(platform))
                 .collect()
         };
 
@@ -49,13 +49,17 @@ impl PlatformSelector {
             defaults,
         );
 
-        config.target_platforms.clear();
+        config.target_platforms = Some(HashSet::new());
+
         Self {
             platforms: platform_sel
                 .iter()
                 .map(|&i| {
                     let p = Platform::from_idx(i);
-                    config.target_platforms.insert(p.as_str().into());
+                    config
+                        .target_platforms
+                        .get_or_insert_with(HashSet::new)
+                        .insert(p.as_str().to_string());
                     p
                 })
                 .collect::<Vec<Platform>>(),
@@ -77,27 +81,26 @@ impl PlatformSelector {
         let mut archs: HashMap<String, Vec<String>> = HashMap::new();
         self.platforms.iter().for_each(|&p| match p {
             Platform::Ios => {
-                // defaults based on previous selections if previous selections are not empty
-                // otherwise, selects all
+                // defaults based on previous selections
                 let all_ios_archs = IosArch::all_strings();
-                let defaults: Vec<bool> = if config.ios.is_empty() {
-                    vec![true; all_ios_archs.len()]
+                let defaults: Vec<bool> = if config.ios.is_none() {
+                    vec![false; all_ios_archs.len()]
                 } else {
                     all_ios_archs
                         .iter()
-                        .map(|&acrch| config.ios.contains(acrch))
+                        .map(|&acrch| config.ios.as_ref().unwrap().contains(acrch))
                         .collect()
                 };
 
                 // clear previous selections before update
-                config.ios.clear();
+                config.ios = Some(HashSet::new());
 
                 let sel = Self::select_multi_archs(p.as_str(), &all_ios_archs, defaults);
                 let sel_str = sel
                     .iter()
                     .map(|&i| {
                         let arch = IosArch::from_idx(i).as_str().to_string();
-                        config.ios.insert(arch.clone());
+                        config.ios.as_mut().unwrap().insert(arch.clone());
                         arch
                     })
                     .collect::<Vec<String>>();
@@ -105,27 +108,26 @@ impl PlatformSelector {
                 self.archs.extend_from_slice(&sel_str);
             }
             Platform::Android => {
-                // defaults based on previous selections if previous selections are not empty
-                // otherwise, selects all
+                // defaults based on previous selections
                 let all_android_archs = AndroidArch::all_strings();
-                let defaults: Vec<bool> = if config.android.is_empty() {
-                    vec![true; all_android_archs.len()]
+                let defaults: Vec<bool> = if config.android.is_none() {
+                    vec![false; all_android_archs.len()]
                 } else {
                     all_android_archs
                         .iter()
-                        .map(|&acrch| config.android.contains(acrch))
+                        .map(|&acrch| config.android.as_ref().unwrap().contains(acrch))
                         .collect()
                 };
 
                 // clear previous selections before update
-                config.android.clear();
+                config.android = Some(HashSet::new());
 
                 let sel = Self::select_multi_archs(p.as_str(), &all_android_archs, defaults);
                 let sel_str = sel
                     .iter()
                     .map(|&i| {
                         let arch = AndroidArch::from_idx(i).as_str().to_string();
-                        config.android.insert(arch.clone());
+                        config.android.as_mut().unwrap().insert(arch.clone());
                         arch
                     })
                     .collect::<Vec<String>>();
@@ -137,21 +139,17 @@ impl PlatformSelector {
         archs
     }
 
-    fn select_multi_archs(platform: &str, archs: &[&str], default: Vec<bool>) -> Vec<usize> {
+    fn select_multi_archs(platform: &str, archs: &[&str], defaults: Vec<bool>) -> Vec<usize> {
         // At least one architecture must be selected
         multi_select(
-            format!(
-                "Select {} architecture(s) to compile (default: all)",
-                platform
-            )
-            .as_str(),
+            format!("Select {} architecture(s) to compile", platform).as_str(),
             format!(
                 "No architectures selected for {}. Please select at least one architecture.",
                 platform
             )
             .as_str(),
             archs.to_vec(),
-            default,
+            defaults,
         )
     }
 
