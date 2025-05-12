@@ -100,9 +100,7 @@ impl PlatformSelector {
                     .iter()
                     .map(|&i| {
                         let arch = IosArch::from_idx(i).as_str().to_string();
-                        if let Some(ref mut ios) = config.ios {
-                            ios.insert(arch.clone());
-                        }
+                        config.ios.as_mut().unwrap().insert(arch.clone());
                         arch
                     })
                     .collect::<Vec<String>>();
@@ -129,9 +127,7 @@ impl PlatformSelector {
                     .iter()
                     .map(|&i| {
                         let arch = AndroidArch::from_idx(i).as_str().to_string();
-                        if let Some(ref mut android) = config.android {
-                            android.insert(arch.clone());
-                        }
+                        config.android.as_mut().unwrap().insert(arch.clone());
                         arch
                     })
                     .collect::<Vec<String>>();
