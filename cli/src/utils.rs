@@ -33,12 +33,12 @@ impl PlatformSelector {
     pub fn select(config: &mut Config) -> Self {
         let platforms = Platform::all_strings();
         // defaults based on previous selections or all platforms
-        let defaults: Vec<bool> = if config.target_platforms.is_empty() {
-            vec![true; platforms.len()]
+        let defaults: Vec<bool> = if config.target_platforms.is_none() {
+            vec![false; platforms.len()]
         } else {
             platforms
                 .iter()
-                .map(|&platform| config.target_platforms.contains(platform))
+                .map(|&platform| config.target_platforms.as_ref().unwrap().contains(platform))
                 .collect()
         };
 
@@ -49,13 +49,17 @@ impl PlatformSelector {
             defaults,
         );
 
-        config.target_platforms.clear();
+        config.target_platforms = Some(HashSet::new());
+
         Self {
             platforms: platform_sel
                 .iter()
                 .map(|&i| {
                     let p = Platform::from_idx(i);
-                    config.target_platforms.insert(p.as_str().into());
+                    config
+                        .target_platforms
+                        .get_or_insert_with(HashSet::new)
+                        .insert(p.as_str().to_string());
                     p
                 })
                 .collect::<Vec<Platform>>(),

@@ -81,8 +81,8 @@ pub fn init_project(
     // Check if the config file exists, if not create a default one
     if !config_path.exists() {
         let default_config = Config {
-            target_adapters: HashSet::new(),
-            target_platforms: HashSet::new(),
+            target_adapters: Some(HashSet::new()),
+            target_platforms: Some(HashSet::new()),
             ios: Some(HashSet::new()),
             android: Some(HashSet::new()),
         };
@@ -91,7 +91,10 @@ pub fn init_project(
     // Read & Write config for selected adapter
     let mut config = read_config(&config_path)?;
     for adapter in adapter_sel.adapters {
-        config.target_adapters.insert(adapter.as_str().to_string());
+        config
+            .target_adapters
+            .get_or_insert_with(HashSet::new)
+            .insert(adapter.as_str().to_string());
     }
     write_config(&config_path, &config)?;
 

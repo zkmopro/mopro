@@ -10,19 +10,22 @@ use crate::init::adapter::Adapter;
 // Storing user selections while iterating with mopro cli
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Config {
-    pub(crate) target_adapters: HashSet<String>,
-    pub(crate) target_platforms: HashSet<String>,
+    pub(crate) target_adapters: Option<HashSet<String>>,
+    pub(crate) target_platforms: Option<HashSet<String>>,
     pub(crate) ios: Option<HashSet<String>>,
     pub(crate) android: Option<HashSet<String>>,
 }
 
 impl Config {
     pub fn adapter_eq(&self, adapter: Adapter) -> bool {
-        self.target_adapters == HashSet::from([String::from(adapter.as_str())])
+        self.target_adapters == Some(HashSet::from([String::from(adapter.as_str())]))
     }
-
     pub fn adapter_contains(&self, adapter: Adapter) -> bool {
-        self.target_adapters.contains(adapter.as_str())
+        if let Some(adapters) = &self.target_adapters {
+            adapters.contains(adapter.as_str())
+        } else {
+            false
+        }
     }
 }
 
