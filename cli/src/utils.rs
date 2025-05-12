@@ -32,7 +32,7 @@ impl PlatformSelector {
     /// `select` updates `platforms` in the config file.
     pub fn select(config: &mut Config) -> Self {
         let platforms = Platform::all_strings();
-        // defaults based on previous selections or all platforms
+        // defaults based on previous selections or none
         let defaults: Vec<bool> = if config.target_platforms.is_none() {
             vec![false; platforms.len()]
         } else {
