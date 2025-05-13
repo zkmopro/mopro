@@ -83,6 +83,22 @@ Once we have the Rust crate ready, integrating it into a Mopro project allows us
 
     Mopro is not tied to any specific mobile framework. By defining reusable templates for each target framework, developers are free to choose the environment they’re most comfortable with. Currently, Mopro supports _native iOS (Xcode + Swift)_, _native Android (Android Studio + Kotlin)_, as well as cross-platform frameworks like _React Native_ and _Flutter_—offering maximum flexibility and accessibility for diverse developer needs.
 
+### Mopro Support
+
+We’ve successfully integrated Noir proving into both Mopro-FFI and the Mopro CLI. You can now install the Mopro CLI and follow the steps in the [Getting Started](/docs/getting-started) guide to create a Noir project. Simply replace the SRS and circuit files with your own, and provide your custom circuit input — that’s it!
+
+We’ve also provided an example zkEmail repository featuring a Noir circuit
+
+-   mopro-zkemail-nr: https://github.com/zkmopro/mopro-zkemail-nr
+
+along with a NoirHack workshop video.
+
+<p align="center">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/UrT2x3JSKFg?si=OdRMi93vIBu9lSRn" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</p>
+
+Feel free to explore the repo, clone it, and follow along to learn how to use Noir with Mopro in a real-world application.
+
 ### Challenges
 
 Our current implementation draws heavily from the zkPassport team’s work, which currently supports iOS devices and ARM64 Android devices/emulators. However, there are limitations: iOS simulators—essential for efficient development and testing—are not supported, and many Android developers (especially those using Windows with WSL) rely on x86_64 emulators. Even CI environments like GitHub Actions commonly use x86_64 Android emulators.
@@ -186,6 +202,21 @@ This raises a challenge: _what if a project doesn’t have the expertise, time, 
 There’s still a long road ahead — for both the Mopro team and the Noir ecosystem — to provide a full suite of mobile-native infrastructure that can empower ZK developers, whether they're building the next zkPassport or an entirely new kind of app.
 
 Finally, we want to encourage more developers to explore building mobile-native apps. These platforms offer better performance, deeper device integration, and more seamless user experiences — which are essential if you want your ZK project to truly reach users.
+
+## Contribution
+
+All kinds of contributions are welcome! 🎉
+
+Feel free to check out the current issues on the [Mopro GitHub repository](https://github.com/zkmopro/mopro/issues), or open a new issue if you notice something missing or have ideas to improve the project.
+
+Here are some current Noir-related issues worth exploring:
+
+-   [[Noir] Download SRS script #423](https://github.com/zkmopro/mopro/issues/423)
+-   [[Noir] separating proof bytes and public signals bytes #422](https://github.com/zkmopro/mopro/issues/422)
+-   [[Noir] React native template update #410](https://github.com/zkmopro/mopro/issues/410)
+-   [[Noir] Flutter template update #409](https://github.com/zkmopro/mopro/issues/409)
+
+Feel free to reach out to the Mopro team on Telegram [@zkmopro](https://t.me/zkmopro) for questions or support, and follow us on X (formerly Twitter) [@zkmopro](https://x.com/zkmopro) to stay up to date with our latest progress!
 
 [^1]: Noir Swift wrapper: https://github.com/Swoir/Swoir/blob/main/Sources/Swoir/Circuit.swift
 [^2]: Noir Kotlin wrapper: https://github.com/madztheo/noir_android/blob/main/lib/src/main/java/com/noirandroid/lib/Circuit.kt
