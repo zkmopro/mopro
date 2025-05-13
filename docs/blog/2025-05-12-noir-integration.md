@@ -38,7 +38,7 @@ by _prebuilding the backend binaries_ and hosting them on a server. During the b
 
 Currently, the build process for the backend happens locally, which makes it non-reproducible and difficult to upgrade in CI environments like GitHub Actions. To improve this, we believe the build logic should be moved into CI. However, this process is quite complex and largely duplicated across repositories like the Noir and Aztec packages (See: [publish-bb.yml](https://github.com/AztecProtocol/aztec-packages/blob/46c2ad0b551a37e74118a789a1ea32a2daa1f849/.github/workflows/publish-bb.yml)).
 
-Our proposal is that the Noir and Aztec teams consolidate this effort by **building `libbarretenberg.a` within a the same CI pipeline and releasing them**. Since [`bb`](https://noir-lang.org/docs/dev/getting_started/quick_start#proving-backend-1) depends on these static libraries, they would naturally be compiled as part of that process. These prebuilt artifacts could then be published alongside the bb binary. This would allow downstream consumers like `noir-rs` to directly use the published binaries, eliminating the need to maintain custom build scripts or host binaries separately.
+Our proposal is that the Noir and Aztec teams consolidate this effort by **building `libbarretenberg.a` within the same CI pipeline and releasing them**. Since [`bb`](https://noir-lang.org/docs/dev/getting_started/quick_start#proving-backend-1) depends on these static libraries, they would naturally be compiled as part of that process. These prebuilt artifacts could then be published alongside the bb binary. This would allow downstream consumers like `noir-rs` to directly use the published binaries, eliminating the need to maintain custom build scripts or host binaries separately.
 
 :::note
 
@@ -99,7 +99,7 @@ along with a NoirHack workshop video.
 
 Feel free to explore the repo, clone it, and follow along to learn how to use Noir with Mopro in a real-world application.
 
-### Challenges
+### Challenge: Cross-platform support is limited
 
 Our current implementation draws heavily from the zkPassport team’s work, which currently supports iOS devices and ARM64 Android devices/emulators. However, there are limitations: iOS simulators—essential for efficient development and testing—are not supported, and many Android developers (especially those using Windows with WSL) rely on x86_64 emulators. Even CI environments like GitHub Actions commonly use x86_64 Android emulators.
 
@@ -121,6 +121,8 @@ Expanding support to these platforms is a significant challenge. The `barretenbe
 ## Case Study: Stealthnote Mobile App
 
 During the [NoirHack 2025 (April 14th to May 10th)](https://www.noirhack.com/), the Mopro team participated by building a mobile-native Noir application. Our project was inspired by [**Stealthnote**](https://stealthnote.xyz/), originally created by Saleel. Stealthnote is a web-based app that allows users to sign in with Google OAuth and prove ownership of their organizational email address. It leverages a Noir circuit to generate a zero-knowledge proof from the JWT issued by Google OAuth. You can read more about the original project in [Saleel’s blog post](https://saleel.xyz/blog/stealthnote/).
+
+We aim to enhance performance and user experience by building a fully native mobile app. At the same time, we want to demonstrate that the current Mopro + Noir stack is fully capable of supporting mobile-native development. Therefore, we decided to build a mobile version of Stealthnote.
 
 ### What We Built
 
@@ -171,7 +173,7 @@ While the Mopro team anticipated the outcome, the benchmark results are still no
 | Android emulator (Pixel 8) | 4.786 s  | 3.013 s |
 | iPhone 16 Pro              | 2.626 s  | 1.727 s |
 
-### Challenges
+### Challenge: Insufficient Rust tooling and SDKs.
 
 One of the main challenges we faced was converting all the TypeScript functions used in StealthNote into their Rust equivalents. For standard cryptographic operations like Ed25519 signatures, this was relatively straightforward — Rust has mature libraries we could rely on.
 
