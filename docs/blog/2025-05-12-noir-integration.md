@@ -87,6 +87,19 @@ Once we have the Rust crate ready, integrating it into a Mopro project allows us
 
 Our current implementation draws heavily from the zkPassport team’s work, which currently supports iOS devices and ARM64 Android devices/emulators. However, there are limitations: iOS simulators—essential for efficient development and testing—are not supported, and many Android developers (especially those using Windows with WSL) rely on x86_64 emulators. Even CI environments like GitHub Actions commonly use x86_64 Android emulators.
 
+| Platforms | Current support target        | Support |
+| --------- | ----------------------------- | ------- |
+| iOS       | `aarch64-apple-ios`           | ✅      |
+| iOS       | `aarch64-apple-ios-sim`       | ❌      |
+| iOS       | `x86_64-apple-ios`            | ❌      |
+| Android   | `x86_64-linux-android`        | ❌      |
+| Android   | `i686-linux-android`          | ❌      |
+| Android   | `armv7-linux-androideabi`     | ❌      |
+| Android   | `aarch64-linux-androids`      | ✅      |
+| MacOS     | `stable-aarch64-apple-darwin` | ✅      |
+| Linux     | `x86_64-unknown-linux-gnu`    | ✅      |
+| Windows   | `x86_64-pc-windows-msvc`      | ❌      |
+
 Expanding support to these platforms is a significant challenge. The `barretenberg` backend, written in C++ and built with CMake, is large and complex, making cross-compilation non-trivial. While we’re evaluating the effort required to support additional architectures, we’re also hopeful that the Noir or zkPassport teams may address this gap in the future.
 
 ## Case Study: Stealthnote Mobile App
