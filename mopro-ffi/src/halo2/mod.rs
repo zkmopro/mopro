@@ -16,11 +16,7 @@ macro_rules! halo2_app {
             let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())
                 .map_err(|e| <$err>::Halo2Error(format!("error getting proving circuit: {}", e)))?;
             let result = proving_fn(&srs_path, &pk_path, circuit_inputs)
-                .map(|(proof, inputs, time)| mopro_ffi::Halo2ProofResult {
-                    proof,
-                    inputs,
-                    time,
-                })
+                .map(|(proof, inputs)| mopro_ffi::Halo2ProofResult { proof, inputs })
                 .map_err(|e| mopro_ffi::MoproError::Halo2Error(format!("halo2 error: {}", e)))
                 .unwrap();
 
@@ -122,7 +118,7 @@ macro_rules! set_halo2_circuits {
 }
 
 pub type Halo2ProveFn =
-    fn(&str, &str, HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>, f32), Box<dyn Error>>;
+    fn(&str, &str, HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
 
 pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
 

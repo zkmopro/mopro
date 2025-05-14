@@ -1935,27 +1935,6 @@ dependencies = [
 [[package]]
 name = "halo2-keccak-256"
 version = "0.1.0"
-source = "git+https://github.com/KimiWu123/halo2-keccak-stable.git?branch=wasm32#6a3772f0f1ece1b17c22dbee66c55560751776c1"
-dependencies = [
- "array-init",
- "bincode",
- "clap 3.2.25",
- "ethers-core",
- "halo2_proofs 0.2.0 (git+https://github.com/privacy-scaling-explorations/halo2?tag=v2023_04_20)",
- "itertools 0.10.5",
- "lazy_static",
- "log",
- "num-bigint",
- "rand",
- "rayon",
- "serde",
- "sha3 0.10.8",
- "thiserror 1.0.69",
-]
-
-[[package]]
-name = "halo2-keccak-256"
-version = "0.1.0"
 source = "git+https://github.com/ElusAegis/halo2-keccak-stable.git#5c49f4dccd49f1a33f025f5266d1d7f08e996dcb"
 dependencies = [
  "array-init",
@@ -2931,26 +2910,6 @@ dependencies = [
 [[package]]
 name = "mopro-halo2-rsa"
 version = "0.1.0"
-source = "git+https://github.com/KimiWu123/halo2-rsa-mopro.git?branch=wasm32#2b210efae7db8d1f5efeb3e9d601f07ea556c86f"
-dependencies = [
- "bincode",
- "halo2-rsa",
- "halo2_proofs 0.2.0 (git+https://github.com/privacy-scaling-explorations/halo2?tag=v2023_04_20)",
- "halo2wrong",
- "maingate",
- "mopro-ffi 0.2.0 (git+https://github.com/zkmopro/mopro.git?branch=wasm32-bench)",
- "num-bigint",
- "rand",
- "rsa",
- "serde",
- "sha2",
- "thiserror 1.0.69",
- "uniffi",
-]
-
-[[package]]
-name = "mopro-halo2-rsa"
-version = "0.1.0"
 source = "git+https://github.com/KimiWu123/halo2-rsa-mopro.git#231f7e84900f4892856c2bec312ab702f9b3db4d"
 dependencies = [
  "bincode",
@@ -2983,7 +2942,7 @@ dependencies = [
  "getrandom 0.2.16",
  "halo2-keccak-256 0.1.0 (git+https://github.com/KimiWu123/halo2-keccak-stable.git)",
  "hyperplonk-fibonacci",
- "mopro-halo2-rsa 0.1.0 (git+https://github.com/KimiWu123/halo2-rsa-mopro.git)",
+ "mopro-halo2-rsa",
  "plonk-fibonacci",
  "rand",
  "serde-wasm-bindgen",
@@ -4893,10 +4852,10 @@ version = "0.1.0"
 dependencies = [
  "circom-prover",
  "gemini-fibonacci",
- "halo2-keccak-256 0.1.0 (git+https://github.com/KimiWu123/halo2-keccak-stable.git?branch=wasm32)",
+ "halo2-keccak-256 0.1.0 (git+https://github.com/KimiWu123/halo2-keccak-stable.git)",
  "hyperplonk-fibonacci",
  "mopro-ffi 0.2.0",
- "mopro-halo2-rsa 0.1.0 (git+https://github.com/KimiWu123/halo2-rsa-mopro.git?branch=wasm32)",
+ "mopro-halo2-rsa",
  "mopro-wasm",
  "num-bigint",
  "plonk-fibonacci",

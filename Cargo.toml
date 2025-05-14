@@ -7,8 +7,8 @@ exclude = ["mopro-example-app"]
 plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-halo2-keccak-256 = { package = "halo2-keccak-256", git = "https://github.com/KimiWu123/halo2-keccak-stable.git", branch = "wasm32" }
-mopro-halo2-rsa = { package = "mopro-halo2-rsa", git = "https://github.com/KimiWu123/halo2-rsa-mopro.git", branch = "wasm32" }
+halo2-keccak-256 = { package = "halo2-keccak-256", git = "https://github.com/KimiWu123/halo2-keccak-stable.git" }
+mopro-halo2-rsa = { package = "mopro-halo2-rsa", git = "https://github.com/KimiWu123/halo2-rsa-mopro.git" }
 
 uniffi = { version = "=0.29.0" }
 

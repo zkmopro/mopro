@@ -96,11 +96,11 @@ pub fn generate_plonk_rsa_proof(
     // The `prove`` function here contains key-gen, and this version of the RSA circuit
     // doesn't have functions to read from and write to a file for proving/verifcation key.
     // So we hacked here to add `elapsed` to record real proving time
-    let (proof, public_input, elapsed) = mopro_halo2_rsa::prove(srs_key, proving_key, input)
+    let (proof, public_input, _elapsed) = mopro_halo2_rsa::prove(srs_key, proving_key, input)
         .map_err(|e| JsValue::from_str(&format!("Proof generation failed: {}", e)))?;
 
     // Serialize the output back into JsValue
-    to_value(&(proof, public_input, elapsed))
+    to_value(&(proof, public_input))
         .map_err(|e| JsValue::from_str(&format!("Serialization failed: {}", e)))
 }
 
