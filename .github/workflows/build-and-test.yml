@@ -89,7 +89,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-            toolchain: 1.81.0
+            toolchain: 1.82.0
       - name: Run ffi tests
         run: cd mopro-ffi && cargo test --release --all-features
   setup-halo2-wasm-env:
@@ -103,7 +103,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2024-07-18
+          toolchain: nightly-2025-05-08
           override: true
       - name: Cache wasm-pack
         id: cache-wasm-pack
@@ -190,7 +190,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.81.0
+          toolchain: 1.82.0
           override: true
       - name: install dependencies
         run: brew install nasm
@@ -265,7 +265,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.81.0
+          toolchain: 1.82.0
           override: true
       - name: install requirements
         uses: awalsh128/cache-apt-pkgs-action@v1
@@ -326,7 +326,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2024-07-18
+          toolchain: nightly-2025-05-08
       - name: install requirements
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
@@ -349,7 +349,7 @@ jobs:
         run: |
           cd test-e2e
           echo "install rust-src component"
-          rustup component add rust-src --toolchain nightly-2024-07-18
+          rustup component add rust-src --toolchain nightly-2025-05-08
           cargo run --bin web
   test-halo2-wasm-web:
     runs-on: ubuntu-latest
