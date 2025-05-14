@@ -27,7 +27,6 @@ num-bigint = { version = "0.4.0" }
 
 # Halo2 dependencies
 halo2-keccak-256 = { workspace = true }
-mopro-halo2-rsa = { workspace = true }
 plonk-fibonacci = { workspace = true }
 hyperplonk-fibonacci = { workspace = true }
 gemini-fibonacci = { workspace = true }

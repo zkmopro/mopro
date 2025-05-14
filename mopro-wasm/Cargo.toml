@@ -11,7 +11,6 @@ plonk = ["plonk-fibonacci"]
 hyperplonk = ["hyperplonk-fibonacci"]
 gemini = ["gemini-fibonacci"]
 keccak = ["halo2-keccak-256"]
-rsa = ["mopro-halo2-rsa"]
 
 
 [dependencies]
@@ -19,7 +18,6 @@ plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifno
 hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git", optional = true }
 gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git", optional = true }
 halo2-keccak-256 = { git = "https://github.com/KimiWu123/halo2-keccak-stable.git", optional = true }
-mopro-halo2-rsa = { package = "mopro-halo2-rsa", git = "https://github.com/KimiWu123/halo2-rsa-mopro.git", optional = true }
 rand = "0.8.5"
 
 [target.wasm32-unknown-unknown.dependencies]
@@ -32,6 +30,3 @@ wasm-bindgen-futures = "0.4.47"
 wasm-bindgen-rayon = { version = "1.2.2", features = ["no-bundler"] }
 wasm-bindgen-test = "0.3.42"
 
-# patch for mopro_halo2_rsa
-[patch."https://github.com/SoraSuegami/halo2-dynamic-sha256.git"]
-halo2-dynamic-sha256 = { git = "https://github.com/SoraSuegami//halo2-dynamic-sha256.git", version = "0.1.0", rev = "46dc9c31ca0678bd4d047b54a2944ff2b3594f65"}

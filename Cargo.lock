@@ -566,7 +566,7 @@ dependencies = [
 [[package]]
 name = "bb"
 version = "0.1.0"
-source = "git+https://github.com/zkmopro/noir-rs#e69a9d38917b852d407c66a1a9239ba39b45c010"
+source = "git+https://github.com/zkmopro/noir-rs?rev=afea0865d453f6d33978fbccf8724aefeda5c410#afea0865d453f6d33978fbccf8724aefeda5c410"
 dependencies = [
  "num-bigint",
  "thiserror 1.0.69",
@@ -1085,22 +1085,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "console_log"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be8aed40e4edbf4d3b4431ab260b63fdc40f5780a4766824329ea0f1eefe3c0f"
-dependencies = [
- "log",
- "web-sys",
-]
-
-[[package]]
-name = "const-oid"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e4c78c047431fee22c1a7bb92e00ad095a02a983affe4d8a72e2a2c62c1b94f3"
-
-[[package]]
 name = "const-oid"
 version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1223,16 +1207,6 @@ checksum = "43da5946c66ffcc7745f48db692ffbb10a83bfe0afd96235c5c2a4fb23994929"
 
 [[package]]
 name = "crypto-bigint"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "03c6a1d5fa1de37e071642dfa44ec552ca5b299adb128fab16138e24b548fd21"
-dependencies = [
- "generic-array",
- "subtle",
-]
-
-[[package]]
-name = "crypto-bigint"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ef2b4b23cddf68b89b8f8069890e8c270d54e2d5fe1b143820234805e4cb17ef"
@@ -1296,22 +1270,11 @@ checksum = "da692b8d1080ea3045efaab14434d40468c3d8657e42abddfffca87b428f4c1b"
 
 [[package]]
 name = "der"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6919815d73839e7ad218de758883aae3a257ba6759ce7a9992501efbb53d705c"
-dependencies = [
- "const-oid 0.7.1",
- "crypto-bigint 0.3.2",
- "pem-rfc7468",
-]
-
-[[package]]
-name = "der"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f1a467a65c5e759bce6e65eaf91cc29f466cdc57cb65777bd646872a8a1fd4de"
 dependencies = [
- "const-oid 0.9.6",
+ "const-oid",
  "zeroize",
 ]
 
@@ -1396,7 +1359,7 @@ version = "0.14.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "413301934810f597c1d19ca71c8710e99a3f1ba28a0d2ebc01551a2daeea3c5c"
 dependencies = [
- "der 0.6.1",
+ "der",
  "elliptic-curve",
  "rfc6979",
  "signature",
@@ -1427,13 +1390,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e7bb888ab5300a19b8e5bceef25ac745ad065f3c9f7efc6de1b91958110891d3"
 dependencies = [
  "base16ct",
- "crypto-bigint 0.4.9",
- "der 0.6.1",
+ "crypto-bigint",
+ "der",
  "digest 0.10.7",
  "ff 0.12.1",
  "generic-array",
  "group 0.12.1",
- "pkcs8 0.9.0",
+ "pkcs8",
  "rand_core",
  "sec1",
  "subtle",
@@ -1609,7 +1572,6 @@ version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d013fc25338cc558c5c2cfbad646908fb23591e2404481826742b651c9af7160"
 dependencies = [
- "bitvec",
  "rand_core",
  "subtle",
 ]
@@ -1927,18 +1889,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "halo2-dynamic-sha256"
-version = "0.1.0"
-source = "git+https://github.com/SoraSuegami//halo2-dynamic-sha256.git?rev=46dc9c31ca0678bd4d047b54a2944ff2b3594f65#46dc9c31ca0678bd4d047b54a2944ff2b3594f65"
-dependencies = [
- "console_error_panic_hook",
- "console_log",
- "halo2wrong",
- "log",
- "maingate",
-]
-
-[[package]]
 name = "halo2-keccak-256"
 version = "0.1.0"
 source = "git+https://github.com/KimiWu123/halo2-keccak-stable.git#bad06d7a783c1de83012883cdd0f99e5a8780429"
@@ -1957,43 +1907,6 @@ dependencies = [
  "serde",
  "sha3 0.10.8",
  "thiserror 1.0.69",
-]
-
-[[package]]
-name = "halo2-rsa"
-version = "0.1.0"
-source = "git+https://github.com/SoraSuegami/halo2-rsa.git#86358fa77265d92aab45c940a52265ca5ed27cd8"
-dependencies = [
- "console_error_panic_hook",
- "getrandom 0.2.16",
- "halo2-dynamic-sha256",
- "halo2wrong",
- "js-sys",
- "maingate",
- "num-bigint",
- "rayon",
- "sha2",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "wasm-bindgen-rayon",
- "web-sys",
-]
-
-[[package]]
-name = "halo2_proofs"
-version = "0.2.0"
-source = "git+https://github.com/privacy-scaling-explorations/halo2?tag=v2022_10_22#5fc8ce89ef3235d8eefeb8994173ac706e89e4ec"
-dependencies = [
- "blake2b_simd",
- "console_error_panic_hook",
- "console_log",
- "ff 0.12.1",
- "group 0.12.1",
- "halo2curves 0.2.1",
- "log",
- "rand_core",
- "rayon",
- "tracing",
 ]
 
 [[package]]
@@ -2031,23 +1944,6 @@ dependencies = [
 
 [[package]]
 name = "halo2curves"
-version = "0.2.1"
-source = "git+https://github.com/privacy-scaling-explorations/halo2curves?tag=0.3.0#83c72d49762343ffc9576ca11a2aa615efe1029b"
-dependencies = [
- "ff 0.12.1",
- "group 0.12.1",
- "lazy_static",
- "num-bigint",
- "num-traits",
- "pasta_curves 0.4.1",
- "rand",
- "rand_core",
- "static_assertions",
- "subtle",
-]
-
-[[package]]
-name = "halo2curves"
 version = "0.3.2"
 source = "git+https://github.com/privacy-scaling-explorations/halo2curves?tag=0.3.2#9f5c50810bbefe779ee5cf1d852b2fe85dc35d5e"
 dependencies = [
@@ -2056,7 +1952,7 @@ dependencies = [
  "lazy_static",
  "num-bigint",
  "num-traits",
- "pasta_curves 0.5.1",
+ "pasta_curves",
  "paste",
  "rand",
  "rand_core",
@@ -2074,25 +1970,13 @@ dependencies = [
  "lazy_static",
  "num-bigint",
  "num-traits",
- "pasta_curves 0.5.1",
+ "pasta_curves",
  "paste",
  "rand",
  "rand_core",
  "serde",
  "static_assertions",
  "subtle",
-]
-
-[[package]]
-name = "halo2wrong"
-version = "0.1.0"
-source = "git+https://github.com/privacy-scaling-explorations/halo2wrong?rev=63bde545d934e69c806ef9bc8b18f03f6ec0fe8e#63bde545d934e69c806ef9bc8b18f03f6ec0fe8e"
-dependencies = [
- "group 0.12.1",
- "halo2_proofs 0.2.0 (git+https://github.com/privacy-scaling-explorations/halo2?tag=v2022_10_22)",
- "num-bigint",
- "num-integer",
- "num-traits",
 ]
 
 [[package]]
@@ -2691,12 +2575,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d750af042f7ef4f724306de029d18836c26c1765a54a6a3f094cbd23a7267ffa"
 
 [[package]]
-name = "libm"
-version = "0.2.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9fbbcab51052fe104eb5e5d351cf728d30a5be1fe14d9be8a3b097481fb97de"
-
-[[package]]
 name = "linux-raw-sys"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2743,20 +2621,6 @@ dependencies = [
  "cc",
  "libc",
  "pkg-config",
-]
-
-[[package]]
-name = "maingate"
-version = "0.1.0"
-source = "git+https://github.com/privacy-scaling-explorations/halo2wrong?rev=63bde545d934e69c806ef9bc8b18f03f6ec0fe8e#63bde545d934e69c806ef9bc8b18f03f6ec0fe8e"
-dependencies = [
- "group 0.12.1",
- "halo2wrong",
- "num-bigint",
- "num-integer",
- "num-traits",
- "rand",
- "subtle",
 ]
 
 [[package]]
@@ -2885,49 +2749,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mopro-ffi"
-version = "0.2.0"
-source = "git+https://github.com/zkmopro/mopro.git?branch=wasm32-bench#b0fa9b060e0196a4c123bd33acc993810f825779"
-dependencies = [
- "anyhow",
- "camino",
- "color-eyre",
- "num-bigint",
- "serde",
- "serde_json",
- "thiserror 2.0.12",
- "toml 0.8.22",
- "uniffi",
- "uuid",
-]
-
-[[package]]
-name = "mopro-halo2-rsa"
-version = "0.1.0"
-source = "git+https://github.com/KimiWu123/halo2-rsa-mopro.git#231f7e84900f4892856c2bec312ab702f9b3db4d"
-dependencies = [
- "bincode",
- "console_error_panic_hook",
- "console_log",
- "halo2-rsa",
- "halo2_proofs 0.2.0 (git+https://github.com/privacy-scaling-explorations/halo2?tag=v2023_04_20)",
- "halo2wrong",
- "log",
- "maingate",
- "mopro-ffi 0.2.0 (git+https://github.com/zkmopro/mopro.git?branch=wasm32-bench)",
- "num-bigint",
- "rand",
- "rsa",
- "serde",
- "sha2",
- "thiserror 1.0.69",
- "uniffi",
- "wasm-bindgen",
- "web-sys",
- "web-time",
-]
-
-[[package]]
 name = "mopro-wasm"
 version = "0.1.0"
 dependencies = [
@@ -2936,7 +2757,6 @@ dependencies = [
  "getrandom 0.2.16",
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
- "mopro-halo2-rsa",
  "plonk-fibonacci",
  "rand",
  "serde-wasm-bindgen",
@@ -3006,7 +2826,7 @@ dependencies = [
 [[package]]
 name = "noir"
 version = "0.1.0"
-source = "git+https://github.com/zkmopro/noir-rs#e69a9d38917b852d407c66a1a9239ba39b45c010"
+source = "git+https://github.com/zkmopro/noir-rs?rev=afea0865d453f6d33978fbccf8724aefeda5c410#afea0865d453f6d33978fbccf8724aefeda5c410"
 dependencies = [
  "acir",
  "acvm",
@@ -3224,23 +3044,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num-bigint-dig"
-version = "0.8.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc84195820f291c7697304f3cbdadd1cb7199c0efc917ff5eafd71225c136151"
-dependencies = [
- "byteorder",
- "lazy_static",
- "libm",
- "num-integer",
- "num-iter",
- "num-traits",
- "rand",
- "smallvec",
- "zeroize",
-]
-
-[[package]]
 name = "num-complex"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3293,7 +3096,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
 dependencies = [
  "autocfg",
- "libm",
 ]
 
 [[package]]
@@ -3465,21 +3267,6 @@ dependencies = [
 
 [[package]]
 name = "pasta_curves"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5cc65faf8e7313b4b1fbaa9f7ca917a0eed499a9663be71477f87993604341d8"
-dependencies = [
- "blake2b_simd",
- "ff 0.12.1",
- "group 0.12.1",
- "lazy_static",
- "rand",
- "static_assertions",
- "subtle",
-]
-
-[[package]]
-name = "pasta_curves"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3e57598f73cc7e1b2ac63c79c517b31a0877cd7c402cdcaa311b5208de7a095"
@@ -3512,15 +3299,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pem-rfc7468"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01de5d978f34aa4b2296576379fcc416034702fd94117c56ffd8a1a767cefb30"
-dependencies = [
- "base64ct",
-]
-
-[[package]]
 name = "percent-encoding"
 version = "2.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3549,35 +3327,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
-name = "pkcs1"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a78f66c04ccc83dd4486fd46c33896f4e17b24a7a3a6400dedc48ed0ddd72320"
-dependencies = [
- "der 0.5.1",
- "pkcs8 0.8.0",
- "zeroize",
-]
-
-[[package]]
-name = "pkcs8"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7cabda3fb821068a9a4fab19a683eac3af12edf0f34b94a8be53c4972b8149d0"
-dependencies = [
- "der 0.5.1",
- "spki 0.5.4",
- "zeroize",
-]
-
-[[package]]
 name = "pkcs8"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9eca2c590a5f85da82668fa685c09ce2888b9430e83299debf1f34b65fd4a4ba"
 dependencies = [
- "der 0.6.1",
- "spki 0.6.0",
+ "der",
+ "spki",
 ]
 
 [[package]]
@@ -3618,7 +3374,7 @@ dependencies = [
  "itertools 0.10.5",
  "num-bigint",
  "num-integer",
- "pasta_curves 0.5.1",
+ "pasta_curves",
  "poseidon",
  "rand",
  "rayon",
@@ -3929,7 +3685,7 @@ version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7743f17af12fa0b03b803ba12cd6a8d9483a587e89c69445e3909655c0b9fabb"
 dependencies = [
- "crypto-bigint 0.4.9",
+ "crypto-bigint",
  "hmac",
  "zeroize",
 ]
@@ -4035,26 +3791,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "rsa"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4cf22754c49613d2b3b119f0e5d46e34a2c628a937e3024b8762de4e7d8c710b"
-dependencies = [
- "byteorder",
- "digest 0.10.7",
- "num-bigint-dig",
- "num-integer",
- "num-iter",
- "num-traits",
- "pkcs1",
- "pkcs8 0.8.0",
- "rand_core",
- "smallvec",
- "subtle",
- "zeroize",
 ]
 
 [[package]]
@@ -4349,9 +4085,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3be24c1842290c45df0a7bf069e0c268a747ad05a192f2fd7dcfdbc1cba40928"
 dependencies = [
  "base16ct",
- "der 0.6.1",
+ "der",
  "generic-array",
- "pkcs8 0.9.0",
+ "pkcs8",
  "subtle",
  "zeroize",
 ]
@@ -4685,22 +4421,12 @@ checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
 
 [[package]]
 name = "spki"
-version = "0.5.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44d01ac02a6ccf3e07db148d2be087da624fea0221a16152ed01f0496a6b0a27"
-dependencies = [
- "base64ct",
- "der 0.5.1",
-]
-
-[[package]]
-name = "spki"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67cf02bbac7a337dc36e4f5a693db6c21e7863f45070f7064577eb4367a3212b"
 dependencies = [
  "base64ct",
- "der 0.6.1",
+ "der",
 ]
 
 [[package]]
@@ -4854,8 +4580,7 @@ dependencies = [
  "gemini-fibonacci",
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
- "mopro-ffi 0.2.0",
- "mopro-halo2-rsa",
+ "mopro-ffi",
  "mopro-wasm",
  "num-bigint",
  "plonk-fibonacci",

@@ -13,7 +13,6 @@ mopro-wasm = { path = "../../mopro-wasm", features = [
     "hyperplonk",
     "plonk",
     "keccak",
-    "rsa",
 ]}
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
@@ -25,7 +24,3 @@ wasm-bindgen-console-logger = "0.1.1"
 wasm-bindgen-futures = "0.4.47"
 wasm-bindgen-rayon = { version = "1.2.2", features = ["no-bundler"] }
 wasm-bindgen-test = "0.3.42"
-
-[patch."https://github.com/SoraSuegami/halo2-dynamic-sha256.git"]
-halo2-dynamic-sha256 = { git = "https://github.com/SoraSuegami//halo2-dynamic-sha256.git", version = "0.1.0", rev = "46dc9c31ca0678bd4d047b54a2944ff2b3594f65"}
-
