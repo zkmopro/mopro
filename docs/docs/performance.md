@@ -13,8 +13,8 @@ We _recommend_ developers benchmark their custom circuits before selecting tools
 
 :::warning
 
--   [circom-witness-rs](https://github.com/philsippl/circom-witness-rs) is not fully compatible with circom circuits. See: [zkmopro/mopro#32](https://github.com/zkmopro/mopro/issues/32).
--   [wasmer](https://github.com/arkworks-rs/circom-compat) doesn't work in iOS. See: [zkmopro/mopro#109](https://github.com/zkmopro/mopro/issues/109).
+- [circom-witness-rs](https://github.com/philsippl/circom-witness-rs) is not fully compatible with circom circuits. See: [zkmopro/mopro#32](https://github.com/zkmopro/mopro/issues/32).
+- [wasmer](https://github.com/arkworks-rs/circom-compat) doesn't work in iOS. See: [zkmopro/mopro#109](https://github.com/zkmopro/mopro/issues/109).
 
 :::
 
@@ -316,75 +316,75 @@ Benchmarks on an Macbook Pro M1 Max (2021).
 
 We have enabled `wasm-bindgen-rayon` for multithreading in the browser. Below is a benchmark comparing arkworks with `wasm-bindgen-rayon` against `snarkjs`.
 
--   **iPhone 16 Pro**
+- **iPhone 16 Pro**
 
-    <table>
-      <tr>
-        <th>Proof generation</th>
-        <th>[ark-works with `rayon`](https://github.com/RReverser/wasm-bindgen-rayon)</th>
-        <th>[snarkjs](https://github.com/iden3/snarkjs)</th>
-      </tr>
-      <tr>
-        <td>[Keccak256](https://github.com/zkmopro/circuit-registry/tree/main/keccak256)</td>
-        <td>1717.81 ms	 (<font color="FFB546">**~3x**</font>)</td>
-        <td>5166.02 ms</td>
-      </tr>
-      <tr>
-        <td>[SHA256](https://github.com/zkmopro/circuit-registry/tree/main/sha256)</td>
-        <td>601.32 ms	</td>
-        <td>380.61 ms (<font color="FFB546">**~1.5x**</font>) </td>
-      </tr>
-      <tr>
-        <td>[RSA](https://github.com/zkmopro/circuit-registry/tree/main/rsa)</td>
-        <td>7152.85 ms (<font color="FFB546">**~1.1x**</font>)</td>
-        <td>8473.58 ms</td>
-      </tr>
-      <tr>
-        <td>[Semaphore-32](https://github.com/zkmopro/circuit-registry/tree/main/semaphore-32)</td>
-        <td>652.07 ms (<font color="FFB546">**~1.4x**</font>)</td>
-        <td>919.54 ms</td>
-      </tr>
-      <tr>
-        <td>[Anon Aadhaar](https://github.com/zkmopro/circuit-registry/tree/main/anonAadhaar)</td>
-        <td>- ms</td>
-        <td>- ms</td>
-      </tr>
-    </table>
+  <table>
+    <tr>
+      <th>Proof generation</th>
+      <th>[ark-works with `rayon`](https://github.com/RReverser/wasm-bindgen-rayon)</th>
+      <th>[snarkjs](https://github.com/iden3/snarkjs)</th>
+    </tr>
+    <tr>
+      <td>[Keccak256](https://github.com/zkmopro/circuit-registry/tree/main/keccak256)</td>
+      <td>1717.81 ms	 (<font color="FFB546">**~3x**</font>)</td>
+      <td>5166.02 ms</td>
+    </tr>
+    <tr>
+      <td>[SHA256](https://github.com/zkmopro/circuit-registry/tree/main/sha256)</td>
+      <td>601.32 ms	</td>
+      <td>380.61 ms (<font color="FFB546">**~1.5x**</font>) </td>
+    </tr>
+    <tr>
+      <td>[RSA](https://github.com/zkmopro/circuit-registry/tree/main/rsa)</td>
+      <td>7152.85 ms (<font color="FFB546">**~1.1x**</font>)</td>
+      <td>8473.58 ms</td>
+    </tr>
+    <tr>
+      <td>[Semaphore-32](https://github.com/zkmopro/circuit-registry/tree/main/semaphore-32)</td>
+      <td>652.07 ms (<font color="FFB546">**~1.4x**</font>)</td>
+      <td>919.54 ms</td>
+    </tr>
+    <tr>
+      <td>[Anon Aadhaar](https://github.com/zkmopro/circuit-registry/tree/main/anonAadhaar)</td>
+      <td>- ms</td>
+      <td>- ms</td>
+    </tr>
+  </table>
 
--   **Android Samsung S23U**
+- **Android Samsung S23U**
 
-    <table>
-      <tr>
-        <th>Proof generation</th>
-        <th>[ark-works with `rayon`](https://github.com/RReverser/wasm-bindgen-rayon)</th>
-        <th>[snarkjs](https://github.com/iden3/snarkjs)</th>
-      </tr>
-      <tr>
-        <td>[Keccak256](https://github.com/zkmopro/circuit-registry/tree/main/keccak256)</td>
-        <td>2733.15 ms	 (<font color="FFB546">**~2.7x**</font>)</td>
-        <td>7412.39 ms</td>
-      </tr>
-      <tr>
-        <td>[SHA256](https://github.com/zkmopro/circuit-registry/tree/main/sha256)</td>
-        <td>980.64 ms	(<font color="FFB546">**~2.4x**</font>) </td>
-        <td>2379.58 ms</td>
-      </tr>
-      <tr>
-        <td>[RSA](https://github.com/zkmopro/circuit-registry/tree/main/rsa)</td>
-        <td>9313.07 ms (<font color="FFB546">**~1.1x**</font>)</td>
-        <td>10725.49 ms</td>
-      </tr>
-      <tr>
-        <td>[Semaphore-32](https://github.com/zkmopro/circuit-registry/tree/main/semaphore-32)</td>
-        <td>792.87 ms	(<font color="FFB546">**~1.3x**</font>)</td>
-        <td>1045.34 ms</td>
-      </tr>
-      <tr>
-        <td>[Anon Aadhaar](https://github.com/zkmopro/circuit-registry/tree/main/anonAadhaar)</td>
-        <td>- ms</td>
-        <td>- ms</td>
-      </tr>
-    </table>
+  <table>
+    <tr>
+      <th>Proof generation</th>
+      <th>[ark-works with `rayon`](https://github.com/RReverser/wasm-bindgen-rayon)</th>
+      <th>[snarkjs](https://github.com/iden3/snarkjs)</th>
+    </tr>
+    <tr>
+      <td>[Keccak256](https://github.com/zkmopro/circuit-registry/tree/main/keccak256)</td>
+      <td>2733.15 ms	 (<font color="FFB546">**~2.7x**</font>)</td>
+      <td>7412.39 ms</td>
+    </tr>
+    <tr>
+      <td>[SHA256](https://github.com/zkmopro/circuit-registry/tree/main/sha256)</td>
+      <td>980.64 ms	(<font color="FFB546">**~2.4x**</font>) </td>
+      <td>2379.58 ms</td>
+    </tr>
+    <tr>
+      <td>[RSA](https://github.com/zkmopro/circuit-registry/tree/main/rsa)</td>
+      <td>9313.07 ms (<font color="FFB546">**~1.1x**</font>)</td>
+      <td>10725.49 ms</td>
+    </tr>
+    <tr>
+      <td>[Semaphore-32](https://github.com/zkmopro/circuit-registry/tree/main/semaphore-32)</td>
+      <td>792.87 ms	(<font color="FFB546">**~1.3x**</font>)</td>
+      <td>1045.34 ms</td>
+    </tr>
+    <tr>
+      <td>[Anon Aadhaar](https://github.com/zkmopro/circuit-registry/tree/main/anonAadhaar)</td>
+      <td>- ms</td>
+      <td>- ms</td>
+    </tr>
+  </table>
 
 :::info
 **Details:** [zkmopro/mopro#290](https://github.com/zkmopro/mopro/issues/290)
@@ -400,14 +400,17 @@ The below tests were run on a Macbook Pro M1 Pro (2021) as well as an iPhone 15 
 | [Keccak256](https://github.com/ElusAegis/halo2-keccak-stable.git) | Prove Time (s) | Verify Time (s) |
 | :---------------------------------------------------------------: | :------------: | :-------------: |
 |                          Native (M1 Pro)                          |     10.3 s     |     0.15 s      |
-|                         Emulator (M1 Pro)                         |     10.1 s     |     0.13 s      |
 |                           iPhone 15 Pro                           |     11.0 s     |     0.12 s      |
+|                            Pixel 6 Pro                            |     23.9 s     |     0.51 s      |
+|                                Web                                |     26.6 s     |     0.55 s      |
 
-| [RSA](https://github.com/ElusAegis/halo2-rsa-mopro.git) | Prove Time (s) | Verify Time (s) |
+| [RSA](https://github.com/KimiWu123/halo2-rsa-mopro.git) | Prove Time (s) | Verify Time (s) |
 | :-----------------------------------------------------: | :------------: | :-------------: |
-|                     Native (M1 Pro)                     |     76.5 s     |     11.1 s      |
-|                    Emulator (M1 Pro)                    |     64.5 s     |      9.0 s      |
+|                     Native (M1 Pro)                     |     26.9 s     |      4.0 s      |
 |                      iPhone 15 Pro                      |    crashes     |     crashes     |
+|                       Pixel 6 Pro                       |    crashes     |     crashes     |
+|                           Web                           |  Not Support   |        x        |
 
-Note that the iPhone 15 Pro crashes when running the RSA circuit due to the large memory requirements. The circuit needs
-around 5GB of memory to run, while the iPhone 15 Pro usually limits the application memory usage to 3GB.
+Note that the iPhone 15 Pro and Pixel 6 Pro crash when running the RSA circuit due to the large memory requirements. The circuit needs
+around 5GB of memory to run, while the iPhone 15 Pro and Pixel 6 Pro usually limits the application memory usage to 3GB.
+Note that the RSA circuit built on top of former version of Halo2. When it generates a proof on web, it crashes inside Halo2 module.
