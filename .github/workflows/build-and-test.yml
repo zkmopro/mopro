@@ -89,7 +89,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-            toolchain: 1.88.0
+            toolchain: 1.82.0
       - name: Run ffi tests
         run: cd mopro-ffi && cargo test --release --all-features
   setup-halo2-wasm-env:

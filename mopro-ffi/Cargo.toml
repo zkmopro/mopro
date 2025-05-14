@@ -40,7 +40,7 @@ toml = "0.8.22"
 
 # Error handling
 thiserror = "2.0.12"
-color-eyre = "0.6.3"
+color-eyre = "=0.6.3"
 
 # circom deps
 rust-witness = { version = "0.1", optional = true }
@@ -64,7 +64,7 @@ uniffi = { workspace = true, features = ["build"] }
 witnesscalc-adapter = { version = "0.1", optional = true }
 
 [dev-dependencies]
-color-eyre = "0.6"
+color-eyre = "=0.6.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"
 serde_json = "1.0.94"
@@ -79,4 +79,4 @@ ark-bls12-381 = { version = "=0.5.0" }
 plonk-fibonacci = { workspace = true }
 hyperplonk-fibonacci = { workspace = true }
 gemini-fibonacci = { workspace = true }
-halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
+halo2-keccak-256 = { workspace = true }
