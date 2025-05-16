@@ -28,17 +28,12 @@ final class mopro_test_UITests: XCTestCase {
         app.launch()
         
         app.buttons["proveCircom"].tap()
-        var predicate = NSPredicate(format: "label CONTAINS[c] %@", "1️⃣")
-        var elementQuery = app.staticTexts.containing(predicate)
-        XCTAssert(elementQuery.count == 1)
-
-        // Wait for 2 seconds (or any suitable delay).
-        Thread.sleep(forTimeInterval: 2.0)
+        let proveText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "1️⃣")).firstMatch
+        XCTAssertTrue(proveText.waitForExistence(timeout: 5), "The time of proof generation is over 5 secs")
         
         app.buttons["verifyCircom"].tap()
-        predicate = NSPredicate(format: "label CONTAINS[c] %@", "2️⃣")
-        elementQuery = app.staticTexts.containing(predicate)
-        XCTAssert(elementQuery.count == 1)
+        let verifyText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "2️⃣")).firstMatch
+        XCTAssertTrue(verifyText.waitForExistence(timeout: 5), "The time of proof verification is over 5 secs")
     }
     
     func testHalo2ProveVerify() throws {
@@ -47,12 +42,11 @@ final class mopro_test_UITests: XCTestCase {
         app.launch()
         
         app.buttons["proveHalo2"].tap()
-        var predicate = NSPredicate(format: "label CONTAINS[c] %@", "1️⃣")
-        var elementQuery = app.staticTexts.containing(predicate)
-        XCTAssert(elementQuery.count == 1)
+        let proveText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "1️⃣")).firstMatch
+        XCTAssertTrue(proveText.waitForExistence(timeout: 5), "The time of proof generation is over 5 secs")
+        
         app.buttons["verifyHalo2"].tap()
-        predicate = NSPredicate(format: "label CONTAINS[c] %@", "2️⃣")
-        elementQuery = app.staticTexts.containing(predicate)
-        XCTAssert(elementQuery.count == 1)
+        let verifyText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "2️⃣")).firstMatch
+        XCTAssertTrue(verifyText.waitForExistence(timeout: 5), "The time of proof verification is over 5 secs")
     }
 }

@@ -42,11 +42,15 @@ class ExampleInstrumentedTest {
         composeTestRule.onNodeWithTag("circomGenerateProofButton").performClick()
         composeTestRule.onNodeWithTag("circomGenerateProofButton").assertIsDisplayed()
 
-        // Test click circom verify proof button
-        // Wait until the second button is enabled
-        Thread.sleep(500)
-
-        composeTestRule.onNodeWithTag("circomVerifyProofButton").performClick()
+        // Wait up to 5 seconds for any circomVerifyProofButton to become enabled before continuing the test
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+            try {
+                composeTestRule.onNodeWithTag("circomVerifyProofButton").performClick()
+                true
+            } catch (e: Exception) {
+                false
+            }
+        }
         composeTestRule.onNodeWithTag("circomVerifyProofButton").assertIsDisplayed()
     }
 
@@ -61,11 +65,16 @@ class ExampleInstrumentedTest {
         composeTestRule.onNodeWithTag("halo2GenerateProofButton").performClick()
         composeTestRule.onNodeWithTag("halo2GenerateProofButton").assertIsDisplayed()
 
-        // Test click circom verify proof button
-        // Wait until the second button is enabled
-        Thread.sleep(500)
+        // Wait up to 5 seconds for any halo2VerifyProofButton to become enabled before continuing the test
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+            try {
+                composeTestRule.onNodeWithTag("halo2VerifyProofButton").performClick()
+                true
+            } catch (e: Exception) {
+                false
+            }
+        }
 
-        composeTestRule.onNodeWithTag("halo2VerifyProofButton").performClick()
         composeTestRule.onNodeWithTag("halo2VerifyProofButton").assertIsDisplayed()
     }
 }
