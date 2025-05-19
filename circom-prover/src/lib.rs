@@ -13,6 +13,15 @@ use witness::WitnessFn;
 #[cfg(feature = "witnesscalc")]
 pub use witnesscalc_adapter;
 
+#[cfg(feature = "circom-witnesscalc")]
+#[doc(hidden)]
+pub mod __macro_deps {
+    pub use anyhow;
+    pub use circom_witnesscalc;
+    pub use once_cell;
+    pub use once_cell::sync::Lazy;
+}
+
 #[derive(Debug, Clone)]
 pub struct CircomProver {}
 
