@@ -338,12 +338,18 @@ mod tests {
         // then we reference it in our build somehow
         fn zkey_witness_map(name: &str) -> Result<mopro_ffi::witness::WitnessFn> {
             match name {
-                "multiplier2_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(multiplier2_witness)),
-                "keccak256_256_test_final.zkey" => {
-                    Ok(mopro_ffi::witness::WitnessFn::RustWitness(keccak256256test_witness))
-                }
-                "hashbench_bls_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(hashbenchbls_witness)),
-                "multiplier2_bls_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(multiplier2bls_witness)),
+                "multiplier2_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
+                    multiplier2_witness,
+                )),
+                "keccak256_256_test_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
+                    keccak256256test_witness,
+                )),
+                "hashbench_bls_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
+                    hashbenchbls_witness,
+                )),
+                "multiplier2_bls_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
+                    multiplier2bls_witness,
+                )),
                 _ => bail!("Unknown circuit name"),
             }
         }
