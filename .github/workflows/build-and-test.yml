@@ -38,7 +38,7 @@ jobs:
       - name: install requirements
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
-          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6 protobuf-compiler
           version: 1.0
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features
