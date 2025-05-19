@@ -13,7 +13,7 @@ exclude = ["test-vectors/*"]
 name = "circom_prover"
 
 [features]
-default = ["rustwitness", "arkworks", "circom-witnesscalc"]
+default = ["rustwitness", "arkworks"]
 beta = ["witnesscalc", "rapidsnark"]
 
 # Witness Generation
@@ -87,7 +87,7 @@ rand = { version = "0.8", features = ["std"] }
 witnesscalc-adapter = { version = "0.1", optional = true }
 
 # circom-witnesscalc
-circom-witnesscalc = { path = "/Users/zhengyawen/Documents/GitHub/circom-witnesscalc", optional = true }
+circom-witnesscalc = { git = "https://github.com/iden3/circom-witnesscalc", optional = true }
 
 # rapidsnark
 rust-rapidsnark = { version = "0.1", optional = true }
