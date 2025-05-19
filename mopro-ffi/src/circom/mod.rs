@@ -123,7 +123,7 @@ pub fn generate_circom_proof_wtns(
     json_input_str: String,
     witness_fn: WitnessFn,
 ) -> Result<CircomProofResult> {
-    let ret = CircomProver::prove(proof_lib, witness_fn, json_input_str, zkey_path).unwrap();
+    let ret = CircomProver::prove(proof_lib, witness_fn, json_input_str, zkey_path)?;
     let (proof, public_inputs) = match ret.proof.curve.as_ref() {
         CURVE_BN254 => (ret.proof.into(), ret.pub_inputs.into()),
         CURVE_BLS12_381 => (ret.proof.into(), ret.pub_inputs.into()),
