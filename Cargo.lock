@@ -4588,7 +4588,6 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
- "circom-prover",
  "gemini-fibonacci",
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
