@@ -47,7 +47,6 @@ mod tests {
     use std::collections::HashMap;
 
     const ZKEY_PATH: &str = "./test-vectors/multiplier2_final.zkey";
-    const GRAPH_PATH: &str = "./test-vectors/multiplier2.bin";
 
     fn generate_proof(witness_fn: WitnessFn, proof_lib: ProofLib) -> CircomProof {
         let inputs = HashMap::from([
@@ -87,7 +86,7 @@ mod tests {
     #[cfg(all(feature = "circom-witnesscalc", feature = "arkworks"))]
     #[test]
     fn test_circom_witnesscalc_arkworks_prove_and_verify() {
-        graph!(multiplier2, GRAPH_PATH);
+        graph!(multiplier2, "../test-vectors/multiplier2.bin");
         let proof = generate_proof(
             WitnessFn::CircomWitnessCalc(multiplier2_witness),
             ProofLib::Arkworks,

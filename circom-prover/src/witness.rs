@@ -25,14 +25,11 @@ pub enum WitnessFn {
 #[cfg(feature = "circom-witnesscalc")]
 macro_rules! graph {
     ($name:ident, $path:expr) => {
-        static GRAPH_DATA: $crate::__macro_deps::Lazy<Vec<u8>> =
-            $crate::__macro_deps::Lazy::new(|| {
-                std::fs::read($path).expect("Failed to read graph file")
-            });
-
         $crate::paste::paste! {
+            static [<$name:upper _GRAPH_DATA>]: &[u8] = include_bytes!($path);
+
             pub fn [<$name _witness>](json_input: &str) -> Result<Vec<u8>, $crate::__macro_deps::anyhow::Error> {
-                $crate::__macro_deps::circom_witnesscalc::calc_witness(json_input, &GRAPH_DATA)
+                $crate::__macro_deps::circom_witnesscalc::calc_witness(json_input, [<$name:upper _GRAPH_DATA>])
                     .map_err(|e| $crate::__macro_deps::anyhow::anyhow!("{}", e))
             }
         }
