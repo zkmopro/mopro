@@ -31,7 +31,6 @@ plonk-fibonacci = { workspace = true }
 hyperplonk-fibonacci = { workspace = true }
 gemini-fibonacci = { workspace = true }
 thiserror = "2.0.12"
-circom-prover = { path = "../circom-prover" }
 
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }

@@ -123,7 +123,7 @@ pub fn generate_circom_proof_wtns(
     json_input_str: String,
     witness_fn: WitnessFn,
 ) -> Result<CircomProofResult> {
-    let ret = CircomProver::prove(proof_lib, witness_fn, json_input_str, zkey_path).unwrap();
+    let ret = CircomProver::prove(proof_lib, witness_fn, json_input_str, zkey_path)?;
     let (proof, public_inputs) = match ret.proof.curve.as_ref() {
         CURVE_BN254 => (ret.proof.into(), ret.pub_inputs.into()),
         CURVE_BLS12_381 => (ret.proof.into(), ret.pub_inputs.into()),
@@ -240,8 +240,6 @@ mod tests {
     mod witnesscalc {
         use super::*;
         use crate as mopro_ffi;
-        use circom_prover::witness::WitnessFn;
-        use circom_prover::witnesscalc_adapter;
 
         // Only build the witness functions for tests, don't bundle them into
         // the final library
@@ -257,7 +255,7 @@ mod tests {
             );
 
             set_circom_circuits! {
-                ("multiplier2_final.zkey", WitnessFn::WitnessCalc(multiplier2_witness)),
+                ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::WitnessCalc(multiplier2_witness)),
             }
 
             const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
@@ -290,7 +288,6 @@ mod tests {
         use anyhow::bail;
         use ark_ff::PrimeField;
         use circom_prover::prover::{ProofLib, PublicInputs};
-        use circom_prover::witness::WitnessFn;
         use num_bigint::{BigUint, ToBigInt};
         use std::ops::{Add, Mul};
 
@@ -313,7 +310,7 @@ mod tests {
             );
 
             set_circom_circuits! {
-                ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),
+                ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(multiplier2_witness)),
             }
 
             const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
@@ -339,14 +336,20 @@ mod tests {
 
         // This should be defined by a file that the mopro package consumer authors
         // then we reference it in our build somehow
-        fn zkey_witness_map(name: &str) -> Result<WitnessFn> {
+        fn zkey_witness_map(name: &str) -> Result<mopro_ffi::witness::WitnessFn> {
             match name {
-                "multiplier2_final.zkey" => Ok(WitnessFn::RustWitness(multiplier2_witness)),
-                "keccak256_256_test_final.zkey" => {
-                    Ok(WitnessFn::RustWitness(keccak256256test_witness))
-                }
-                "hashbench_bls_final.zkey" => Ok(WitnessFn::RustWitness(hashbenchbls_witness)),
-                "multiplier2_bls_final.zkey" => Ok(WitnessFn::RustWitness(multiplier2bls_witness)),
+                "multiplier2_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
+                    multiplier2_witness,
+                )),
+                "keccak256_256_test_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
+                    keccak256256test_witness,
+                )),
+                "hashbench_bls_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
+                    hashbenchbls_witness,
+                )),
+                "multiplier2_bls_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
+                    multiplier2bls_witness,
+                )),
                 _ => bail!("Unknown circuit name"),
             }
         }

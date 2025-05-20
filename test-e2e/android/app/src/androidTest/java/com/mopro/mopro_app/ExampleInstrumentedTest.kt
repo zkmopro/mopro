@@ -44,7 +44,7 @@ class ExampleInstrumentedTest {
 
         // Test click circom verify proof button
         // Wait until the second button is enabled
-        Thread.sleep(500)
+        Thread.sleep(2000)
 
         composeTestRule.onNodeWithTag("circomVerifyProofButton").performClick()
         composeTestRule.onNodeWithTag("circomVerifyProofButton").assertIsDisplayed()
@@ -63,7 +63,7 @@ class ExampleInstrumentedTest {
 
         // Test click circom verify proof button
         // Wait until the second button is enabled
-        Thread.sleep(500)
+        Thread.sleep(2000)
 
         composeTestRule.onNodeWithTag("halo2VerifyProofButton").performClick()
         composeTestRule.onNodeWithTag("halo2VerifyProofButton").assertIsDisplayed()

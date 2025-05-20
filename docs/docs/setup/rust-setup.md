@@ -28,7 +28,6 @@ Include the crate in your Cargo.toml:
 [dependencies]
 mopro-ffi = { version = "0.2", features = ["circom"] }
 uniffi = "0.29"
-circom-prover = "0.1"
 thiserror = "2.0.12"
 
 [build-dependencies]
@@ -101,14 +100,12 @@ mopro_ffi::app!();
 Bind the corresponding WASM and Zkey files together using mopro-ffi.
 
 ```rust title="src/lib.rs"
-use circom_prover::witness::WitnessFn;
-
 // Activate rust-witness function
 rust_witness::witness!(multiplier2);
 
 // Set the witness functions to a zkey
 mopro_ffi::set_circom_circuits! {
-    ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),
+    ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(multiplier2_witness)),
 }
 ```
 
