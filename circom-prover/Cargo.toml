@@ -19,6 +19,11 @@ beta = ["witnesscalc", "rapidsnark"]
 # Witness Generation
 rustwitness = ["rust-witness"]
 witnesscalc = ["witnesscalc-adapter"]
+circom-witnesscalc = [
+    "dep:circom-witnesscalc",
+    "witnesscalc-adapter",
+    "once_cell",
+]
 
 # Proof Generation
 arkworks = [
@@ -84,6 +89,10 @@ rand = { version = "0.8", features = ["std"] }
 
 # witnesscalc-adapter
 witnesscalc-adapter = { version = "0.1", optional = true }
+
+# circom-witnesscalc
+circom-witnesscalc = { git = "https://github.com/iden3/circom-witnesscalc", optional = true }
+once_cell = { version = "1.21.3", optional = true }
 
 # rapidsnark
 rust-rapidsnark = { version = "0.1", optional = true }

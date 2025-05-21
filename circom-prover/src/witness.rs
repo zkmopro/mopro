@@ -4,18 +4,36 @@ use std::{collections::HashMap, thread::JoinHandle};
 #[cfg(feature = "rustwitness")]
 use std::str::FromStr;
 
-#[cfg(feature = "witnesscalc")]
+#[cfg(any(feature = "witnesscalc", feature = "circom-witnesscalc"))]
 use witnesscalc_adapter::parse_witness_to_bigints;
 
 /// Witness function signature for rust_witness (inputs) -> witness
 type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 /// Witness function signature for witnesscalc_adapter (inputs) -> witness
 type WitnesscalcWtnsFn = fn(&str) -> anyhow::Result<Vec<u8>>;
+/// Witness function signature for circom-witnesscalc (inputs, graph_path) -> witness
+type CircomWitnessCalcWtnsFn = fn(&str) -> anyhow::Result<Vec<u8>>;
 
 #[derive(Debug, Clone, Copy)]
 pub enum WitnessFn {
     WitnessCalc(WitnesscalcWtnsFn),
     RustWitness(RustWitnessWtnsFn),
+    CircomWitnessCalc(CircomWitnessCalcWtnsFn),
+}
+
+#[macro_export]
+#[cfg(feature = "circom-witnesscalc")]
+macro_rules! graph {
+    ($name:ident, $path:expr) => {
+        $crate::paste::paste! {
+            static [<$name:upper _GRAPH_DATA>]: &[u8] = include_bytes!($path);
+
+            pub fn [<$name _witness>](json_input: &str) -> Result<Vec<u8>, $crate::__macro_deps::anyhow::Error> {
+                $crate::__macro_deps::circom_witnesscalc::calc_witness(json_input, [<$name:upper _GRAPH_DATA>])
+                    .map_err(|e| $crate::__macro_deps::anyhow::anyhow!("{}", e))
+            }
+        }
+    };
 }
 
 #[allow(unused_variables)]
@@ -44,6 +62,11 @@ pub fn generate_witness(witness_fn: WitnessFn, json_input_str: String) -> JoinHa
                     })
                     .collect();
                 wit_fn(bigint_inputs)
+            }
+            #[cfg(feature = "circom-witnesscalc")]
+            WitnessFn::CircomWitnessCalc(wit_fn) => {
+                let witness = wit_fn(json_input_str.as_str()).unwrap();
+                parse_witness_to_bigints(&witness).unwrap()
             }
             #[allow(unreachable_patterns)]
             _ => panic!("Unsupported witness function"),

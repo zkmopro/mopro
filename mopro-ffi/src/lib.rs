@@ -15,6 +15,9 @@ pub use circom::{generate_circom_proof_wtns, verify_circom_proof};
 #[cfg(feature = "circom")]
 pub use circom_prover::{prover, witness};
 
+#[cfg(feature = "circom-witnesscalc")]
+pub use circom_prover::graph;
+
 #[cfg(feature = "halo2")]
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 

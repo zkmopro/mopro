@@ -13,6 +13,15 @@ use witness::WitnessFn;
 #[cfg(feature = "witnesscalc")]
 pub use witnesscalc_adapter;
 
+#[cfg(feature = "circom-witnesscalc")]
+#[doc(hidden)]
+pub mod __macro_deps {
+    pub use anyhow;
+    pub use circom_witnesscalc;
+    pub use once_cell;
+    pub use once_cell::sync::Lazy;
+}
+
 #[derive(Debug, Clone)]
 pub struct CircomProver {}
 
@@ -69,6 +78,17 @@ mod tests {
         witnesscalc_adapter::witness!(multiplier2);
         let proof = generate_proof(
             WitnessFn::WitnessCalc(multiplier2_witness),
+            ProofLib::Arkworks,
+        );
+        assert!(verify_proof(proof, ProofLib::Arkworks));
+    }
+
+    #[cfg(all(feature = "circom-witnesscalc", feature = "arkworks"))]
+    #[test]
+    fn test_circom_witnesscalc_arkworks_prove_and_verify() {
+        graph!(multiplier2, "../test-vectors/multiplier2.bin");
+        let proof = generate_proof(
+            WitnessFn::CircomWitnessCalc(multiplier2_witness),
             ProofLib::Arkworks,
         );
         assert!(verify_proof(proof, ProofLib::Arkworks));

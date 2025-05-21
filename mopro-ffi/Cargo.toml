@@ -23,6 +23,7 @@ noir = ["noir_rs"]
 ## witness
 rustwitness = ["circom-prover/rustwitness", "rust-witness"]
 witnesscalc = ["circom-prover/witnesscalc", "witnesscalc-adapter"]
+circom-witnesscalc = ["circom-prover/circom-witnesscalc"]
 ## proof
 arkworks = ["circom-prover/arkworks"]
 rapidsnark = ["circom-prover/rapidsnark"]
