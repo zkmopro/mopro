@@ -412,8 +412,8 @@ The below tests were run on a Macbook Pro M1 Pro (2021) as well as an iPhone 15 
 |                           Web                           |  Not Support   |        x        |
 
 Note that the iPhone 15 Pro and Pixel 6 Pro crash when running the RSA circuit due to the large memory requirements. The circuit needs
-around 5GB of memory to run, while the iPhone 15 Pro and Pixel 6 Pro usually limits the application memory usage to 3GB.
-Note that the RSA circuit built on top of former version of Halo2. When it generates a proof on web, it crashes inside Halo2 module.
+around 5GB of memory to run, while the iPhone 15 Pro and Pixel 6 Pro usually limits the application's memory usage to 3GB.
+Note that the RSA circuit is built on top of former version of Halo2. When it generates a proof on web, it crashes inside Halo2 module.
 
 ## Noir
 
