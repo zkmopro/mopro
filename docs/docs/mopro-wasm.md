@@ -32,7 +32,7 @@ To compile the WASM module for all supported backends-"plonk," "hyperplonk," and
 wasm-pack build --target web -- --all-features
 ```
 
-This command output files into the **pkg** directory, including the generated WASM file, JavaScript bindings, and metadata required for integration with web applications.
+This command outputs files into the **pkg** directory, including the generated WASM file, JavaScript bindings, and metadata required for integration with web applications.
 
 ### Testing
 
