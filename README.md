@@ -110,6 +110,25 @@ The below tests were run on a Macbook Pro M1 Pro (2021) as well as an iPhone 15 
 Note that the iPhone 15 Pro crashes when running the RSA circuit due to the large memory requirements. The circuit needs
 around 5GB of memory to run, while the iPhone 15 Pro usually limits the application memory usage to 3GB.
 
+### Noir
+
+We target [`nargo v1.0.0-beta.3`](https://noir-lang.org/docs/getting_started/quick_start#nargo) and [`bb v0.82.2`](https://noir-lang.org/docs/getting_started/quick_start#proving-backend-1), ensuring all related dependencies are aligned (e.g., [@noir-lang/noir\_js@1.0.0-beta.3](https://www.npmjs.com/package/@noir-lang/noir_js/v/1.0.0-beta.3), [@aztec/bb.js@0.82.2](https://www.npmjs.com/package/@aztec/bb.js/v/0.82.2)). The benchmarks below were run on a MacBook Air M3 (2024) and a Pixel 6 (2021). We report the fastest result from multiple runs to reduce cold-start effects.
+
+| Circuit | iOS  | Android |  bb CLI<br/>(Laptop) |  Web<br/>(Laptop) |
+| :-------------------------------------------------------------------------------: | :---------------: | :----------------: | :----------------: | :------------: |
+| [Keccak256](https://github.com/moven0831/mopro-example-app-keccak256) | 349 ms (\~11.8×) |  1303 ms (\~3.2×) |  345 ms (\~12.0×) |  4122 ms |
+| [RSA](https://github.com/moven0831/mopro-example-app-rsa) |  312 ms (\~6.6×) |  1091 ms (\~1.9×) |   221 ms (\~9.4×) |  2068 ms |
+| [zkemail](https://github.com/Mach-34/zkemail.nr_header_demo) | 1309 ms (\~5.0×) |  4757 ms (\~1.4×) |   804 ms (\~8.2×) |  6590 ms |
+| [anon aadhaar](https://github.com/moven0831/mopro-example-app-anon-aadhaar-noir) | 2225 ms (\~7.7×) |  8179 ms (\~2.1×) | 1366 ms (\~12.5×) | 17030 ms |
+| [semaphore](https://github.com/moven0831/mopro-example-app-semaphore-noir) |  828 ms (\~5.6×) |  3990 ms (\~1.2×) |   436 ms (\~10.6×) |  4638 ms |
+
+**Benchmark circuit details:**
+- Keccak256: From [Noir Stdlib](https://noir-lang.org/docs/noir/standard_library/cryptographic_primitives/hashes#keccak256).
+- RSA: pkcs1v15 signature verification (SHA-256). (see details in [zkpassport/noir_rsa](https://github.com/zkpassport/noir_rsa/blob/acb50389b79dbf38b1828f4fa82c28d742b140fc/src/rsa.nr#L286-L309))
+- zkEmail: Header extraction circuit ([`Mach-34/zkemail.nr_header_demo`](https://github.com/Mach-34/zkemail.nr_header_demo)).
+- Anon Aadhaar: Updated circuit (nargo v1.0.0-beta.3) in [`anon-aadhaar/anon-aadhaar-noir#6`](https://github.com/anon-aadhaar/anon-aadhaar-noir/pull/6).
+- Semaphore: From [`hashcloak/semaphore-noir`](https://github.com/hashcloak/semaphore-noir).
+
 ## Community
 
 -   X account: <a href="https://twitter.com/zkmopro"><img src="https://img.shields.io/twitter/follow/zkmopro?style=flat-square&logo=x&label=zkmopro"></a>
