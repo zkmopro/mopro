@@ -11,7 +11,6 @@ use std::env;
 use crate::config::read_config;
 use crate::config::write_config;
 use crate::constants::AndroidArch;
-use crate::constants::IosArch;
 use crate::constants::Mode;
 use crate::constants::Platform;
 use crate::create::utils::copy_embedded_dir;
@@ -150,14 +149,11 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     let selected_architectures = platform.select_archs(&mut config);
     write_config(&config_path, &config)?;
 
-    // Noir only supports `aarch64-apple-ios` and `aarch64-linux-android`
+    // Noir doesn't support `I686Linux` and `Armv7LinuxAbi`
     if config.adapter_contains(Adapter::Noir) {
         let not_allowed_archs = vec![
-            AndroidArch::X8664Linux.as_str(),
             AndroidArch::I686Linux.as_str(),
             AndroidArch::Armv7LinuxAbi.as_str(),
-            IosArch::X8664Apple.as_str(),
-            IosArch::Aarch64AppleSim.as_str(),
         ];
 
         if platform.contains_archs(not_allowed_archs.as_slice()) {
