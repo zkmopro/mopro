@@ -2,10 +2,10 @@
 slug: noir-integraion
 title: "Mopro x Noir: Powering Mobile Zero-Knowledge Proofs"
 authors:
-    name: Vivian Jeng
-    title: Developer on the Mopro Team
-    url: https://github.com/vivianjeng
-    image_url: https://github.com/vivianjeng.png
+  name: Vivian Jeng
+  title: Developer on the Mopro Team
+  url: https://github.com/vivianjeng
+  image_url: https://github.com/vivianjeng.png
 tags: [noir]
 ---
 
@@ -15,10 +15,10 @@ tags: [noir]
 
 However, while Noir offers strong support for web-based applications, native mobile support is still limited within the ecosystem. Most existing resources for mobile development have been contributed by the [zkPassport](https://github.com/zkpassport) team, including key projects like
 
--   [noir_rs](https://github.com/zkpassport/noir_rs)
--   [Swoir](https://github.com/Swoir/Swoir)
--   [noir_android](https://github.com/madztheo/noir_android).
--   [noir-react-native-starter](https://github.com/madztheo/noir-react-native-starter)
+- [noir_rs](https://github.com/zkpassport/noir_rs)
+- [Swoir](https://github.com/Swoir/Swoir)
+- [noir_android](https://github.com/madztheo/noir_android).
+- [noir-react-native-starter](https://github.com/madztheo/noir-react-native-starter)
 
 Our work is deeply inspired by the zkPassport team’s contributions, but builds upon them with significant improvements and optimizations.
 
@@ -30,7 +30,7 @@ Like many apps with Mopro, our journey began with building a Rust crate. We star
 
 To address these issues, we introduced a solution in
 
--   `noir-rs`: https://github.com/zkmopro/noir-rs
+- `noir-rs`: https://github.com/zkmopro/noir-rs
 
 by _prebuilding the backend binaries_ and hosting them on a server. During the build process, these binaries are downloaded automatically, eliminating the need for local compilation. This approach drastically reduces build time—from 20 minutes to just **8 seconds**—and removes the need for any special environment setup. In fact, you can see from our [GitHub Actions YAML file](https://github.com/zkmopro/noir-rs/blob/main/.github/workflows/test.yml) that **no additional dependencies are required**.
 
@@ -61,27 +61,27 @@ Once we have the Rust crate ready, integrating it into a Mopro project allows us
 
 1. **No additional Swift or Kotlin bindings required**
 
-    Unlike the zkPassport team's approach—where they built separate [`Swoir`](https://github.com/Swoir/Swoir) and [`noir_android`](https://github.com/madztheo/noir_android) libraries with custom domain-specific interfaces—Mopro leverages [uniffi](https://github.com/mozilla/uniffi-rs) to automatically generate language bindings. This means developers don’t need to manually maintain Swift [^1] or Kotlin wrappers [^2]; they can directly import and use the generated bindings in their mobile codebases. e.g.
+   Unlike the zkPassport team's approach—where they built separate [`Swoir`](https://github.com/Swoir/Swoir) and [`noir_android`](https://github.com/madztheo/noir_android) libraries with custom domain-specific interfaces—Mopro leverages [uniffi](https://github.com/mozilla/uniffi-rs) to automatically generate language bindings. This means developers don’t need to manually maintain Swift [^1] or Kotlin wrappers [^2]; they can directly import and use the generated bindings in their mobile codebases. e.g.
 
-    For swift:
+   For swift:
 
-    ```swift
-    import moproFFI
+   ```swift
+   import moproFFI
 
-    let proofData = try! generateNoirProof(circuitPath: zkemailCircuitPath, srsPath: zkemailSrsPath, inputs: inputs)
-    ```
+   let proofData = try! generateNoirProof(circuitPath: zkemailCircuitPath, srsPath: zkemailSrsPath, inputs: inputs)
+   ```
 
-    For kotlin:
+   For kotlin:
 
-    ```kotlin
-    import uniffi.mopro.generateNoirProof
+   ```kotlin
+   import uniffi.mopro.generateNoirProof
 
-    let proofData = generateNoirProof(circuitFile, srsPath, inputs)
-    ```
+   let proofData = generateNoirProof(circuitFile, srsPath, inputs)
+   ```
 
 2. **Framework-Agnostic Design**
 
-    Mopro is not tied to any specific mobile framework. By defining reusable templates for each target framework, developers are free to choose the environment they’re most comfortable with. Currently, Mopro supports _native iOS (Xcode + Swift)_, _native Android (Android Studio + Kotlin)_, as well as cross-platform frameworks like _React Native_ and _Flutter_—offering maximum flexibility and accessibility for diverse developer needs.
+   Mopro is not tied to any specific mobile framework. By defining reusable templates for each target framework, developers are free to choose the environment they’re most comfortable with. Currently, Mopro supports _native iOS (Xcode + Swift)_, _native Android (Android Studio + Kotlin)_, as well as cross-platform frameworks like _React Native_ and _Flutter_—offering maximum flexibility and accessibility for diverse developer needs.
 
 ### Mopro Support
 
@@ -89,7 +89,7 @@ We’ve successfully integrated Noir proving into both Mopro-FFI and the Mopro C
 
 We’ve also provided an example zkEmail repository featuring a Noir circuit
 
--   mopro-zkemail-nr: https://github.com/zkmopro/mopro-zkemail-nr
+- mopro-zkemail-nr: https://github.com/zkmopro/mopro-zkemail-nr
 
 along with a NoirHack workshop video.
 
@@ -106,9 +106,9 @@ Our current implementation draws heavily from the zkPassport team’s work, whic
 | Platforms | Current support target        | Support |
 | --------- | ----------------------------- | ------- |
 | iOS       | `aarch64-apple-ios`           | ✅      |
-| iOS       | `aarch64-apple-ios-sim`       | ❌      |
-| iOS       | `x86_64-apple-ios`            | ❌      |
-| Android   | `x86_64-linux-android`        | ❌      |
+| iOS       | `aarch64-apple-ios-sim`       | ✅      |
+| iOS       | `x86_64-apple-ios`            | ✅      |
+| Android   | `x86_64-linux-android`        | ✅      |
 | Android   | `i686-linux-android`          | ❌      |
 | Android   | `armv7-linux-androideabi`     | ❌      |
 | Android   | `aarch64-linux-androids`      | ✅      |
@@ -128,9 +128,9 @@ We aim to enhance performance and user experience by building a fully native mob
 
 During the hackathon, we developed
 
--   Stealthnote Mobile: https://github.com/vivianjeng/stealthnote-mobile
--   Testflight for iOS: [download](https://testflight.apple.com/join/8hqYwe8C)
--   Android APK: [download](https://drive.google.com/file/d/1IMsH0fBpaLGkFgFX0oqnlS6LQk3WCr3t/view?usp=sharing)
+- Stealthnote Mobile: https://github.com/vivianjeng/stealthnote-mobile
+- Testflight for iOS: [download](https://testflight.apple.com/join/8hqYwe8C)
+- Android APK: [download](https://drive.google.com/file/d/1IMsH0fBpaLGkFgFX0oqnlS6LQk3WCr3t/view?usp=sharing)
 
 A mobile-native frontend for the original Stealthnote project. To maintain compatibility, we kept the original Noir circuits and backend logic intact, focusing entirely on building the mobile frontend. Even so, creating a mobile frontend involved tackling many challenges across platforms.
 
@@ -138,27 +138,27 @@ We chose Flutter as our cross-platform framework because of its fast build times
 
 Our architecture separates responsibilities clearly:
 
--   **Flutter** handles:
+- **Flutter** handles:
 
-    1. UI/UX design
-    2. Google OAuth authentication
-    3. Backend API communication
+  1. UI/UX design
+  2. Google OAuth authentication
+  3. Backend API communication
 
--   **Rust** handles:
+- **Rust** handles:
 
-    1. Parsing the JWT and converting it into the structured inputs required by the Noir circuit
-    2. Generating and verifying Noir proofs
-    3. Ephemeral key generation using Ed25519 and Poseidon2
-       <br/>
+  1. Parsing the JWT and converting it into the structured inputs required by the Noir circuit
+  2. Generating and verifying Noir proofs
+  3. Ephemeral key generation using Ed25519 and Poseidon2
+     <br/>
 
-    :::info
-    To learn how to integrate Mopro Rust bindings into a Flutter project, please refer to the
+  :::info
+  To learn how to integrate Mopro Rust bindings into a Flutter project, please refer to the
 
-    -   [Flutter Setup](/docs/setup/flutter-setup) section
-    -   [flutter-app](https://github.com/zkmopro/flutter-app) example
-    -   [mopro_flutter_package](https://github.com/zkmopro/mopro_flutter_package) plugin example
+  - [Flutter Setup](/docs/setup/flutter-setup) section
+  - [flutter-app](https://github.com/zkmopro/flutter-app) example
+  - [mopro_flutter_package](https://github.com/zkmopro/mopro_flutter_package) plugin example
 
-    :::
+  :::
 
 This clear separation lets us leverage the strengths of both technologies—Flutter’s frontend speed and flexibility, and Rust’s performance and security for core cryptographic logic.
 
@@ -181,7 +181,7 @@ However, **Poseidon2** presented a bigger challenge. Unlike the original Poseido
 
 Eventually, we located the [Poseidon2 Noir circuit](https://github.com/noir-lang/poseidon/blob/master/src/poseidon2.nr) and its [permutation logic](https://github.com/noir-lang/noir/blob/master/acvm-repo/bn254_blackbox_solver/src/poseidon2.rs) in the noir-lang repository. Using that as a reference, we implemented our own version of
 
--   poseidon2.rs in Rust: https://github.com/vivianjeng/stealthnote-mobile/blob/main/src/proof/poseidon2.rs
+- poseidon2.rs in Rust: https://github.com/vivianjeng/stealthnote-mobile/blob/main/src/proof/poseidon2.rs
 
 aligning it with the Noir circuit to ensure compatibility.
 
@@ -213,10 +213,10 @@ Feel free to check out the current issues on the [Mopro GitHub repository](https
 
 Here are some current Noir-related issues worth exploring:
 
--   [[Noir] Download SRS script #423](https://github.com/zkmopro/mopro/issues/423)
--   [[Noir] separating proof bytes and public signals bytes #422](https://github.com/zkmopro/mopro/issues/422)
--   [[Noir] React native template update #410](https://github.com/zkmopro/mopro/issues/410)
--   [[Noir] Flutter template update #409](https://github.com/zkmopro/mopro/issues/409)
+- [[Noir] Download SRS script #423](https://github.com/zkmopro/mopro/issues/423)
+- [[Noir] separating proof bytes and public signals bytes #422](https://github.com/zkmopro/mopro/issues/422)
+- [[Noir] React native template update #410](https://github.com/zkmopro/mopro/issues/410)
+- [[Noir] Flutter template update #409](https://github.com/zkmopro/mopro/issues/409)
 
 Feel free to reach out to the Mopro team on Telegram [@zkmopro](https://t.me/zkmopro) for questions or support, and follow us on X (formerly Twitter) [@zkmopro](https://x.com/zkmopro) to stay up to date with our latest progress!
 
