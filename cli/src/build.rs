@@ -10,8 +10,8 @@ use std::env;
 
 use crate::config::read_config;
 use crate::config::write_config;
+use crate::config::Config;
 use crate::constants::AndroidArch;
-use crate::constants::IosArch;
 use crate::constants::Mode;
 use crate::constants::Platform;
 use crate::create::utils::copy_embedded_dir;
@@ -47,16 +47,17 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
 
     // Mode selection, select `release` or `debug`
     let mode: Mode = match arg_mode.as_deref() {
-        None => select_mode()?,
+        None => select_mode(&mut config)?,
         Some(m) => {
             if Mode::all_strings().contains(&m) {
                 Mode::parse_from_str(m)
             } else {
                 style::print_yellow("Invalid mode selected. Please choose a valid mode (e.g., 'release' or 'debug').".to_string());
-                select_mode()?
+                select_mode(&mut config)?
             }
         }
     };
+    write_config(&config_path, &config)?;
 
     // Platform selection
     let mut platform: PlatformSelector = match arg_platforms {
@@ -150,14 +151,11 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     let selected_architectures = platform.select_archs(&mut config);
     write_config(&config_path, &config)?;
 
-    // Noir only supports `aarch64-apple-ios` and `aarch64-linux-android`
+    // Noir doesn't support `I686Linux` and `Armv7LinuxAbi`
     if config.adapter_contains(Adapter::Noir) {
         let not_allowed_archs = vec![
-            AndroidArch::X8664Linux.as_str(),
             AndroidArch::I686Linux.as_str(),
             AndroidArch::Armv7LinuxAbi.as_str(),
-            IosArch::X8664Apple.as_str(),
-            IosArch::Aarch64AppleSim.as_str(),
         ];
 
         if platform.contains_archs(not_allowed_archs.as_slice()) {
@@ -209,11 +207,24 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     Ok(())
 }
 
-fn select_mode() -> Result<Mode> {
-    let idx = Select::with_theme(&ColorfulTheme::default())
+fn select_mode(config: &mut Config) -> Result<Mode> {
+    let theme = ColorfulTheme::default();
+    let mut selection = Select::with_theme(&theme);
+
+    // Get default based on previous selection.
+    if let Some(build_mode) = config.build_mode.clone() {
+        if let Some(idx) = Mode::idx(build_mode.as_ref()) {
+            selection.default(idx);
+        }
+    };
+
+    let idx = selection
         .with_prompt("Build mode")
         .items(Mode::all_strings().as_ref())
         .interact()?;
+
+    // update user's selection
+    config.build_mode = Some(Mode::from_idx(idx).as_str().to_string());
 
     Ok(Mode::from_idx(idx))
 }

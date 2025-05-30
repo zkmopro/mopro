@@ -41,6 +41,14 @@ impl Mode {
         MODES[idx].mode
     }
 
+    pub fn idx(s: &str) -> Option<usize> {
+        MODES
+            .iter()
+            .enumerate()
+            .find(|(_, m)| m.str == s)
+            .map(|(i, _)| i)
+    }
+
     pub fn all_strings() -> Vec<&'static str> {
         MODES.iter().map(|info| info.str).collect()
     }
