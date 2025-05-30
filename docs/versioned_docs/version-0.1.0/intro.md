@@ -16,7 +16,7 @@ If you just want to get started using mopro, see [getting started](getting-start
 
 ## Overview
 
-Mopro consists of a set of libraries and utilities. The following subprojects are including in the [mopro monorepo](https://github.com/zkmopro/mopro).
+Mopro consists of a set of libraries and utilities. The following subprojects are included in the [mopro monorepo](https://github.com/zkmopro/mopro).
 
 Primary libraries and utilities of interest:
 
