@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A0EBE562DF01648007A94BE /* noir_multiplier2.json in Resources */ = {isa = PBXBuildFile; fileRef = 2A0EBE552DF01648007A94BE /* noir_multiplier2.json */; };
 		4C05CDB22C327C4F00BEBACD /* mopro_test_UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C05CDB12C327C4F00BEBACD /* mopro_test_UITests.swift */; };
 		4CBAB2782C3334B300B536B7 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */; };
 		4CBAB27A2C3334B800B536B7 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAB2792C3334B800B536B7 /* mopro.swift */; };
@@ -31,6 +32,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2A0EBE552DF01648007A94BE /* noir_multiplier2.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = noir_multiplier2.json; path = "../../test-vectors/noir/noir_multiplier2.json"; sourceTree = "<group>"; };
 		4C05CDAF2C327C4F00BEBACD /* mopro-test-UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mopro-test-UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C05CDB12C327C4F00BEBACD /* mopro_test_UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro_test_UITests.swift; sourceTree = "<group>"; };
 		4CBAB2772C3334B300B536B7 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MoproBindings.xcframework; path = ../MoproiOSBindings/MoproBindings.xcframework; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 				60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */,
 				60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */,
 				60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */,
+				2A0EBE552DF01648007A94BE /* noir_multiplier2.json */,
 				4CCB9BDE2C33C20100C659C4 /* multiplier2_final.zkey */,
 				4CF977ED2C2BCF0000CE1139 /* mopro-test */,
 				4C05CDB02C327C4F00BEBACD /* mopro-test-UITests */,
@@ -214,6 +217,7 @@
 			files = (
 				4CCB9BDF2C33C20800C659C4 /* multiplier2_final.zkey in Resources */,
 				4CF977F62C2BCF0300CE1139 /* Preview Assets.xcassets in Resources */,
+				2A0EBE562DF01648007A94BE /* noir_multiplier2.json in Resources */,
 				60A8E43A2C40404300D3A953 /* plonk_fibonacci_vk.bin in Resources */,
 				60A8E4382C40404300D3A953 /* plonk_fibonacci_srs.bin in Resources */,
 				4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */,

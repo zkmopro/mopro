@@ -65,11 +65,20 @@ mod tests {
     use serde::Deserialize;
     use std::{collections::HashMap, fs};
 
+    const MULTIPLIER2_CIRCUIT_FILE: &str = "../test-vectors/noir/noir_multiplier2.json";
     const CIRCUIT_FILE: &str = "../test-vectors/noir/zkemail.json";
     const INPUT_FILE: &str = "../test-vectors/noir/zkemail_input.json";
     const SRS_FILE: &str = "../test-vectors/noir/zkemail_srs.local";
 
-    // TODO add tests with simpler circuits, eg. `multiplier2`
+    
+    #[test]
+    #[serial_test::serial]
+    fn test_proof_multiplier2() {
+        let witness = vec!["3".to_string(), "5".to_string()];
+        let proof = generate_noir_proof(MULTIPLIER2_CIRCUIT_FILE.to_string(), None, witness).unwrap();
+        assert!(verify_noir_proof(MULTIPLIER2_CIRCUIT_FILE.to_string(), proof));
+    }
+
     #[test]
     #[serial_test::serial]
     fn test_proof_zkemail() {

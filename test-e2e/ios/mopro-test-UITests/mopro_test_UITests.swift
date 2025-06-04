@@ -49,4 +49,18 @@ final class mopro_test_UITests: XCTestCase {
         let verifyText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "2️⃣")).firstMatch
         XCTAssertTrue(verifyText.waitForExistence(timeout: 5), "The time of proof verification is over 5 secs")
     }
+
+    func testNoirProveVerify() throws {
+        // UI tests must launch the application that they test.
+        let app = XCUIApplication()
+        app.launch()
+        
+        app.buttons["proveNoir"].tap()
+        let proveText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "1️⃣")).firstMatch
+        XCTAssertTrue(proveText.waitForExistence(timeout: 5), "The time of proof generation is over 5 secs")
+        
+        app.buttons["verifyNoir"].tap()
+        let verifyText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "2️⃣")).firstMatch
+        XCTAssertTrue(verifyText.waitForExistence(timeout: 5), "The time of proof verification is over 5 secs")
+    }
 }
