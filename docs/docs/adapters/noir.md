@@ -6,9 +6,9 @@ Mopro supports the integration of [Noir](https://noir-lang.org/) circuits, enabl
 
 You can explore real examples of how the Noir adapter works in these projects:
 
-- [mopro-zkemail-nr](https://github.com/zkmopro/mopro-zkemail-nr)
-- [stealthnote-mobile](https://github.com/vivianjeng/stealthnote-mobile)
-- [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e)
+-   [mopro-zkemail-nr](https://github.com/zkmopro/mopro-zkemail-nr)
+-   [stealthnote-mobile](https://github.com/vivianjeng/stealthnote-mobile)
+-   [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e)
 
 ## Setting Up the Rust Project
 
@@ -17,35 +17,38 @@ To get started, follow the [Rust Setup Guide](/setup/rust-setup.md) and activate
 ```toml
 [features]
 default = ["mopro-ffi/noir"]
-```
 
-You should also depend on `noir-rs`, our Rust binding crate built around the Noir + Barretenberg backend:
-
-```toml
 [dependencies]
-noir-rs = { git = "https://github.com/zkmopro/noir-rs" }
+mopro-ffi = { version = "0.2" }
+# ...
 ```
 
-This crate automatically fetches precompiled `libbarretenberg.a` binaries, avoiding the need for local compilation.
+:::info
+The Noir adapter depends on [`zkmopro/noir-rs`](https://github.com/zkmopro/noir-rs). Please checkout the usage and the version here.
+:::
 
 ## Proving and Verifying Functions
 
+### Preparing SRS
+
+Please follow this guide to generate the SRS for your Noir circuit: [Downloading SRS (Structured Reference String)](https://github.com/zkmopro/noir-rs?tab=readme-ov-file#downloading-srs-structured-reference-string)
+
 ### Proving Function
 
-The proving function is responsible for loading the circuit, preparing the SRS, converting the inputs into a witness map, and generating the proof using the Barretenberg backend.
+The proving function is responsible for loading the circuit, loading the SRS, converting the inputs into a witness map, and generating the proof using the Barretenberg backend.
 
 ```rust
 pub fn generate_noir_proof(
     circuit_path: String,
     srs_path: Option<String>,
     inputs: Vec<String>,
-) -> Result<Vec<u8>, String>;
+) -> Vec<u8>;
 ```
 
-- `circuit_path`: Path to the compiled Noir .acir circuit.
-- `srs_path`: Optional path to the structured reference string.
-- `inputs`: A list of strings representing public/private inputs.
-- Returns a serialized proof (Vec<u8>).
+-   `circuit_path`: Path to the compiled Noir .acir circuit.
+-   `srs_path`: Optional path to the structured reference string.
+-   `inputs`: A list of strings representing public/private inputs.
+-   Returns a serialized proof (`Vec<u8>`).
 
 ### Verifying Function
 
@@ -55,33 +58,49 @@ The verification function loads the circuit and derives the verification key, th
 pub fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> bool;
 ```
 
-- `circuit_path`: Path to the compiled Noir .acir circuit.
-- `proof`: The serialized proof to verify.
-- Returns `true` if the proof is valid.
+-   `circuit_path`: Path to the compiled Noir .acir circuit.
+-   `proof`: The serialized proof to verify.
+-   Returns `true` if the proof is valid.
 
 ## Using the Library
 
 ### iOS API
 
 ```swift
-// Generate a proof for a given circuit file and srs file, as well as the circuit inputs.
-generateNoirProof(circuitPath: circuitPath, srsPath: srsPath, inputs: inputs)
-
-// Verify a proof for a given circuit file, as well as the proof.
-verifyNoirProof(circuitPath: circuitPath, proof: proofData)
+generateNoirProof(circuitPath: String, srsPath: String?, inputs: [String])throws  -> Data
 ```
 
-### Android
+```swift
+verifyNoirProof(circuitPath: String, proof: Data)throws  -> Bool
+```
+
+### Android API
+
+```kotlin
+fun generateNoirProof(
+    circuitPath: kotlin.String,
+    srsPath: kotlin.String?,
+    inputs: List<kotlin.String>,
+): kotlin.ByteArray
+```
+
+```kotlin
+fun verifyNoirProof(
+    circuitPath: kotlin.String,
+    proof: kotlin.ByteArray,
+): kotlin.Boolean
+```
 
 The Noir adapter exposes the equivalent functions and types to be used in the Android project.
 
 ## Platform Support
 
-| Platform         | Target Triple              | Status |
-| ---------------- | -------------------------- | ------ |
-| iOS Device       | `aarch64-apple-ios`        | ✅     |
-| iOS Simulator    | `x86_64-apple-ios`         | ✅     |
-| Android Device   | `aarch64-linux-android`    | ✅     |
-| Android Emulator | `x86_64-linux-android`     | ✅     |
-| macOS (M1/M2)    | `aarch64-apple-darwin`     | ✅     |
-| Linux Desktop    | `x86_64-unknown-linux-gnu` | ✅     |
+| Platform                | Target Triple              | Status |
+| ----------------------- | -------------------------- | ------ |
+| iOS Device              | `aarch64-apple-ios`        | ✅     |
+| iOS aarch64 Simulator   | `aarch64-apple-ios-sim`    | ✅     |
+| iOS x86_64 Simulator    | `x86_64-apple-ios`         | ✅     |
+| Android aarch64 Device  | `aarch64-linux-android`    | ✅     |
+| Android x86_64 Emulator | `x86_64-linux-android`     | ✅     |
+| macOS (M1/M2)           | `aarch64-apple-darwin`     | ✅     |
+| Linux Desktop           | `x86_64-unknown-linux-gnu` | ✅     |
