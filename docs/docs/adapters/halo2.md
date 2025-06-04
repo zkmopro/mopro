@@ -15,6 +15,10 @@ In your `Cargo.toml` file, ensure the `halo2` feature is activated for `mopro-ff
 ```toml
 [features]
 default = ["mopro-ffi/halo2"]
+
+[dependencies]
+mopro-ffi = { version = "0.2" }
+# ...
 ```
 
 Then, remove the `rust-witness` dependency from `[dependencies]` and `[build-dependencies]` as it is unnecessary for Halo2 circuits.

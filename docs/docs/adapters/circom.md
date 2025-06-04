@@ -15,6 +15,10 @@ In your `Cargo.toml` file, ensure the `circom` feature is activated for `mopro-f
 ```toml
 [features]
 default = ["mopro-ffi/circom"]
+
+[dependencies]
+mopro-ffi = { version = "0.2" }
+# ...
 ```
 
 ## Witness Generation Functions
@@ -83,10 +87,10 @@ To do so, in the `lib.rs` file, you can add the following:
 ```rust
 rust_witness::witness!(multiplier2);
 rust_witness::witness!(multiplier3);
-rust_witness::witness!(keccak256256test);    
+rust_witness::witness!(keccak256256test);
 ```
 
-This will generate the witness function for the specified circuit following [the naming convention here](https://github.com/vimwitch/rust-witness?tab=readme-ov-file#rust-witness). 
+This will generate the witness function for the specified circuit following [the naming convention here](https://github.com/vimwitch/rust-witness?tab=readme-ov-file#rust-witness).
 
 ## Setting the Circom Circuits
 
@@ -151,18 +155,18 @@ public struct G1 {
     public var x: String
     public var y: String
 }
-    
+
 public struct G2 {
     public var x: [String]
     public var y: [String]
 }
-    
+
 public struct ProofCalldata {
     public var a: G1
     public var b: G2
     public var c: G1
 }
-    
+
 public struct GenerateProofResult {
     public var proof: Data
     public var inputs: Data
@@ -176,6 +180,4 @@ public enum ProofLib {
 
 ### Android API
 
-The Circom adapter exposes the equivalent functions and types to be used in the Android project. 
-
-
+The Circom adapter exposes the equivalent functions and types to be used in the Android project.

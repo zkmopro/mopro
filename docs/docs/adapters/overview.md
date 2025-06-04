@@ -30,6 +30,7 @@ For adapter specific dependencies, please refer to each adapter's documentation.
 
 - [Circom](/adapters/circom.md) - `["mopro-ffi/circom"]`
 - [Halo2](/adapters/halo2.md) - `["mopro-ffi/halo2"]`
+- [Noir](/adapters/noir.md) - `["mopro-ffi/noir"]`
 
 ## Using Adapters
 
@@ -62,4 +63,3 @@ let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInp
 
 let generateProofResult = try generateHalo2Proof(srsPath: srsPath, pkPath: pkPath, circuitInputs: inputs)
 ```
-
