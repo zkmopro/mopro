@@ -17,7 +17,7 @@ default = []
 
 halo2 = []
 circom = ["rustwitness", "arkworks"]
-noir = ["noir_rs"]
+noir = ["noir_rs", "base64ct"]
 
 # circom features
 ## witness
@@ -53,6 +53,7 @@ circom-prover = { path = "../circom-prover", optional = true }
 noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg", "android-compat"], optional = true }
 # build for iOS
 # noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg"], optional = true }
+base64ct = { version = "=1.7.0", optional = true }
 
 # ZKP generation
 uuid = { version = "1.9.1", features = ["v4"] }

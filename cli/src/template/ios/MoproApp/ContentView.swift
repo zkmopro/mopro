@@ -5,58 +5,6 @@
 import SwiftUI
 import moproFFI
 
-func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
-    var bytesArray: [UInt8] = []
-    let length = stringArray.count
-    var littleEndianLength = length.littleEndian
-    let targetLength = 32
-    withUnsafeBytes(of: &littleEndianLength) {
-        bytesArray.append(contentsOf: $0)
-    }
-    for value in stringArray {
-        // TODO: should handle 254-bit input
-        var littleEndian = Int32(value)!.littleEndian
-        var byteLength = 0
-        withUnsafeBytes(of: &littleEndian) {
-            bytesArray.append(contentsOf: $0)
-            byteLength = byteLength + $0.count
-        }
-        if byteLength < targetLength {
-            let paddingCount = targetLength - byteLength
-            let paddingArray = [UInt8](repeating: 0, count: paddingCount)
-            bytesArray.append(contentsOf: paddingArray)
-        }
-    }
-    return bytesArray
-}
-
-// Structs for decoding zkemail_input.json
-struct ZkEmailInputTest: Decodable {
-    let header: HeaderTest
-    let pubkey: PubKeyTest
-    let signature: [String]
-    let date_index: UInt32
-    let subject_sequence: SequenceTest
-    let from_header_sequence: SequenceTest
-    let from_address_sequence: SequenceTest
-}
-
-struct HeaderTest: Decodable {
-    let storage: [UInt8]
-    let len: UInt32
-}
-
-struct PubKeyTest: Decodable {
-    let modulus: [String]
-    let redc: [String]
-}
-
-struct SequenceTest: Decodable {
-    let index: UInt32
-    let length: UInt32
-}
-
-
 struct ContentView: View {
     @State private var textViewText = ""
     @State private var isCircomProveButtonEnabled = true
@@ -74,8 +22,8 @@ struct ContentView: View {
     private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
     private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
     private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
-    private let zkemailSrsPath = Bundle.main.path(forResource: "zkemail_srs.local", ofType: "")!
-    private let zkemailCircuitPath = Bundle.main.path(forResource: "zkemail.json", ofType: "")!
+    private let noirSrsPath = Bundle.main.path(forResource: "noir_multiplier2.srs", ofType: "")!
+    private let noirCircuitPath = Bundle.main.path(forResource: "noir_multiplier2.json", ofType: "")!
     
     var body: some View {
         VStack(spacing: 10) {
@@ -86,8 +34,8 @@ struct ContentView: View {
             Button("Verify Circom", action: runCircomVerifyAction).disabled(!isCircomVerifyButtonEnabled).accessibilityIdentifier("verifyCircom")
             Button("Prove Halo2", action: runHalo2ProveAction).disabled(!isHalo2roveButtonEnabled).accessibilityIdentifier("proveHalo2")
             Button("Verify Halo2", action: runHalo2VerifyAction).disabled(!isHalo2VerifyButtonEnabled).accessibilityIdentifier("verifyHalo2")
-            Button("Prove Noir(zkemail)", action: runNoirProveAction).disabled(!isNoirProveButtonEnabled).accessibilityIdentifier("proveNoir")
-            Button("Verify Noir(zkemail)", action: runNoirVerifyAction).disabled(!isNoirVerifyButtonEnabled).accessibilityIdentifier("verifyNoir")
+            Button("Prove Noir", action: runNoirProveAction).disabled(!isNoirProveButtonEnabled).accessibilityIdentifier("proveNoir")
+            Button("Verify Noir", action: runNoirVerifyAction).disabled(!isNoirVerifyButtonEnabled).accessibilityIdentifier("verifyNoir")
 
             ScrollView {
                 Text(textViewText)
@@ -231,48 +179,16 @@ extension ContentView {
     }
 
     func runNoirProveAction() {
-        textViewText += "Generating zkEmail proof...\n"
+        textViewText += "Generating Noir proof...\n"
 
-        // Get the path to the SRS file in the app bundle
-        guard let srsPath = Bundle.main.path(forResource: "zkemail_srs", ofType: "local") else {
-            textViewText += "Error: Could not find SRS file in app bundle\n"
-            return
-        }
-
-        // Get the path to the input JSON file
-        guard let inputJsonPath = Bundle.main.path(forResource: "zkemail_input", ofType: "json") else {
-            textViewText += "Error: Could not find zkemail_input.json in app bundle\n"
-            return
-        }
-
-        // Load and parse JSON
         do {
-            let jsonData = try Data(contentsOf: URL(fileURLWithPath: inputJsonPath))
-            let decoder = JSONDecoder()
-            let inputData = try decoder.decode(ZkEmailInputTest.self, from: jsonData)
+            let inputs: [String] = ["5", "3"]
 
-            // Convert to the format expected by proveZkemail
-            let inputs: [String] =
-                inputData.header.storage.map { String($0) } +
-                [String(inputData.header.len)] +
-                inputData.pubkey.modulus +
-                inputData.pubkey.redc +
-                inputData.signature +
-                [String(inputData.date_index)] +
-                [String(inputData.subject_sequence.index)] +
-                [String(inputData.subject_sequence.length)] +
-                [String(inputData.from_header_sequence.index)] +
-                [String(inputData.from_header_sequence.length)] +
-                [String(inputData.from_address_sequence.index)] +
-                [String(inputData.from_address_sequence.length)]
-
-
-            // Run in background thread
             DispatchQueue.global(qos: .userInitiated).async {
                 let start = CFAbsoluteTimeGetCurrent()
                 do {
                     // Generate the proof
-                    let proofData = try! generateNoirProof(circuitPath: zkemailCircuitPath, srsPath: zkemailSrsPath, inputs: inputs)
+                    let proofData = try! generateNoirProof(circuitPath: noirCircuitPath, srsPath: noirSrsPath, inputs: inputs)
 
                     let end = CFAbsoluteTimeGetCurrent()
                     let timeTaken = end - start
@@ -297,19 +213,13 @@ extension ContentView {
             return
         }
 
-        textViewText += "Verifying zkEmail proof...\n"
-
-        // Get the path to the SRS file in the app bundle
-        guard let srsPath = Bundle.main.path(forResource: "zkemail_srs", ofType: "local") else {
-            textViewText += "Error: Could not find SRS file in app bundle\n"
-            return
-        }
+        textViewText += "Verifying Noir proof...\n"
 
         DispatchQueue.global(qos: .userInitiated).async {
             let start = CFAbsoluteTimeGetCurrent()
             do {
                 // Verify the proof
-                let isValid = try! verifyNoirProof(circuitPath: zkemailCircuitPath, proof: proofData)
+                let isValid = try! verifyNoirProof(circuitPath: noirCircuitPath, proof: proofData)
 
                 let end = CFAbsoluteTimeGetCurrent()
                 let timeTaken = end - start
