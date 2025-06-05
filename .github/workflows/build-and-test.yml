@@ -273,7 +273,7 @@ jobs:
           packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
           version: 1.0
       - name: Build Android bindings
-        run: cd test-e2e && ANDROID_ARCHS=aarch64-linux-android,x86_64-linux-android cargo run --bin android
+        run: cd test-e2e && ANDROID_ARCHS=x86_64-linux-android cargo run --bin android
       - name: Cache android lib
         id: cache-android-lib
         uses: actions/cache/save@v4
