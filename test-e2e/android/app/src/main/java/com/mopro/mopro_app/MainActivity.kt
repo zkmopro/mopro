@@ -1,6 +1,7 @@
 package com.mopro.mopro_app
 
 import MultiplierComponent
+import NoirComponent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Circom", "Halo2")
+    val tabs = listOf("Circom", "Halo2", "Noir")
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(modifier = Modifier
@@ -75,6 +76,7 @@ fun MainScreen() {
             when (selectedTab) {
                 0 -> MultiplierComponent()
                 1 -> FibonacciComponent()
+                2 -> NoirComponent()
             }
         }
     }
