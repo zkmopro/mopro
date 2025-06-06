@@ -1,4 +1,3 @@
-use anyhow::Error;
 use anyhow::Ok;
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
@@ -6,6 +5,7 @@ use dialoguer::Confirm;
 use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
+use std::collections::HashSet;
 use std::env;
 
 use crate::config::read_config;
@@ -37,11 +37,16 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     // Detect `Config.toml`
     let config_path = current_dir.join("Config.toml");
 
-    // Check if the config file exist
+    // Check if the config file exists, if not create a default one
     if !config_path.exists() {
-        return Err(Error::msg(
-            "Config.toml does exists. Please run 'mopro init'",
-        ));
+        let default_config = Config {
+            build_mode: Some("".to_string()),
+            target_adapters: Some(HashSet::new()),
+            target_platforms: Some(HashSet::new()),
+            ios: Some(HashSet::new()),
+            android: Some(HashSet::new()),
+        };
+        write_config(&config_path, &default_config)?;
     }
     let mut config = read_config(&config_path)?;
 

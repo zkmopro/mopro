@@ -1,4 +1,4 @@
-use crate::select::multi_select;
+use crate::{select::multi_select, style};
 
 use super::{circom::Circom, halo2::Halo2, noir::Noir, ProvingSystem};
 
@@ -7,6 +7,7 @@ pub enum Adapter {
     Circom,
     Halo2,
     Noir,
+    NoneOfTheAbove,
 }
 
 pub struct AdapterInfo {
@@ -14,7 +15,7 @@ pub struct AdapterInfo {
     str: &'static str,
 }
 
-const ADAPTERS_INFO: [AdapterInfo; 3] = [
+const ADAPTERS_INFO: [AdapterInfo; 4] = [
     AdapterInfo {
         adapter: Adapter::Circom,
         str: "circom",
@@ -26,6 +27,10 @@ const ADAPTERS_INFO: [AdapterInfo; 3] = [
     AdapterInfo {
         adapter: Adapter::Noir,
         str: "noir",
+    },
+    AdapterInfo {
+        adapter: Adapter::NoneOfTheAbove,
+        str: "none of the above",
     },
 ];
 
@@ -63,10 +68,17 @@ impl AdapterSelector {
     pub fn select() -> Self {
         let adapters = multi_select(
             "Pick the adapters you want to use (multiple selection with space)",
-            "No adapters selected. Use space to select an adapter",
+            "No adapters selected. Use space to select an adapter or \"none of the above\" to skip",
             Adapter::all_strings(),
             vec![],
         );
+
+        if adapters.contains(&(Adapter::NoneOfTheAbove as usize)) {
+            style::print_yellow(
+                "\"none of the above\" options apply, you can bring in additional Rust crates and define your own bindings to suit your needs.".to_string(),
+            );
+            return Self { adapters: vec![] };
+        }
 
         Self {
             adapters: adapters

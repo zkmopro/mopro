@@ -25,7 +25,7 @@ enum Commands {
     Init {
         #[arg(
             long,
-            help = "Specify the adapter to use (e.g., 'circom', 'halo2' or 'circom,halo2')."
+            help = "Specify the adapter to use (e.g., 'circom', 'halo2', 'noir', or 'circom,halo2')."
         )]
         adapter: Option<String>,
         #[arg(long)]
