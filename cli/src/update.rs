@@ -15,7 +15,7 @@ pub fn update_bindings() -> Result<()> {
 
     // Update iOS bindings
     if ios_bindings_dir.exists() {
-        print_green_bold(format!("🔄 Updating iOS bindings..."));
+        print_green_bold("🔄 Updating iOS bindings...".to_string());
         let updated_xcframework_paths = update_folder(
             &ios_bindings_dir.join("MoproBindings.xcframework"),
             "MoproBindings.xcframework",
@@ -27,7 +27,7 @@ pub fn update_bindings() -> Result<()> {
     }
     // Update Android bindings
     if android_bindings_dir.exists() {
-        print_green_bold(format!("🔄 Updating Android bindings..."));
+        print_green_bold("🔄 Updating Android bindings...".to_string());
         let updated_jnilib_paths = update_folder(&android_bindings_dir.join("jniLibs"), "jniLibs")?;
         print_gray_items(updated_jnilib_paths);
         let updated_kotlin_paths = update_file(
@@ -41,7 +41,7 @@ pub fn update_bindings() -> Result<()> {
     }
 
     if web_bindings_dir.exists() {
-        print_green_bold(format!("🔄 Updating Web bindings..."));
+        print_green_bold("🔄 Updating Web bindings...".to_string());
         let updated_web_paths = update_folder(&web_bindings_dir, "MoproWasmBindings")?;
         print_gray_items(updated_web_paths);
     }
