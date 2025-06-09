@@ -14,7 +14,7 @@ use indicatif::ProgressStyle;
 use reqwest::blocking::Client;
 use zip::ZipArchive;
 
-use super::Framework;
+use crate::constants::Platform;
 
 pub fn copy_android_bindings(
     android_bindings_dir: &Path,
@@ -140,18 +140,8 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn check_bindings(project_dir: &Path, framework: Framework) -> Result<PathBuf> {
-    let bindings_name = match framework {
-        Framework::Ios => "MoproiOSBindings",
-        Framework::Android => "MoproAndroidBindings",
-        Framework::Web => "MoproWasmBindings",
-        _ => {
-            return Err(Error::msg(format!(
-                "Unsupported language/framework ({}) selected. ",
-                framework.as_str()
-            )));
-        }
-    };
+pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<PathBuf> {
+    let bindings_name = platform.binding_dir();
 
     let ios_bindings_dir = project_dir.join(bindings_name);
     if ios_bindings_dir.exists() && fs::read_dir(&ios_bindings_dir)?.count() > 0 {

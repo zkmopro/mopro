@@ -5,8 +5,8 @@ use include_dir::include_dir;
 use include_dir::Dir;
 
 use super::Create;
+use crate::constants::Platform;
 use crate::create::utils::{check_bindings, copy_android_bindings, copy_embedded_dir, copy_keys};
-use crate::create::Framework;
 use crate::print::print_footer_message;
 use crate::style::print_bold;
 use crate::style::print_green_bold;
@@ -17,7 +17,7 @@ impl Create for Android {
     const NAME: &'static str = "android";
 
     fn create(project_dir: PathBuf) -> Result<(), Error> {
-        let android_bindings_dir = check_bindings(&project_dir, Framework::Android)?;
+        let android_bindings_dir = check_bindings(&project_dir, Platform::Android)?;
 
         let target_dir = project_dir.join(Self::NAME);
         fs::create_dir_all(&target_dir)?;

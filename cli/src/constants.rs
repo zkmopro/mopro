@@ -224,6 +224,14 @@ impl Platform {
             Self::Web => "WASM",
         }
     }
+
+    pub fn binding_dir(&self) -> &str {
+        match self {
+            Self::Ios => "MoproiOSBindings",
+            Self::Android => "MoproAndroidBindings",
+            Self::Web => "MoproWasmBindings",
+        }
+    }
 }
 
 //
