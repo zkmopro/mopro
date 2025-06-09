@@ -24,13 +24,14 @@ mod halo2_tests {
         let result = generate_halo2_proof(srs_path.clone(), pk_path.clone(), circuit_inputs);
         assert!(result.is_ok());
         let halo2_proof_result = result.unwrap();
-        let result = verify_halo2_proof(
+        let valid = verify_halo2_proof(
             srs_path,
             vk_path,
             halo2_proof_result.proof,
             halo2_proof_result.inputs,
         );
-        assert!(result.is_ok());
+        assert!(valid.is_ok());
+        assert!(valid.unwrap());
     }
 
     #[test]
@@ -43,13 +44,14 @@ mod halo2_tests {
         let result = generate_halo2_proof(srs_path.clone(), pk_path.clone(), circuit_inputs);
         assert!(result.is_ok());
         let halo2_proof_result = result.unwrap();
-        let result = verify_halo2_proof(
+        let valid = verify_halo2_proof(
             srs_path,
             vk_path,
             halo2_proof_result.proof,
             halo2_proof_result.inputs,
         );
-        assert!(result.is_ok());
+        assert!(valid.is_ok());
+        assert!(valid.unwrap());
     }
 
     #[test]
@@ -62,12 +64,13 @@ mod halo2_tests {
         let result = generate_halo2_proof(srs_path.clone(), pk_path.clone(), circuit_inputs);
         assert!(result.is_ok());
         let halo2_proof_result = result.unwrap();
-        let result = verify_halo2_proof(
+        let valid = verify_halo2_proof(
             srs_path,
             vk_path,
             halo2_proof_result.proof,
             halo2_proof_result.inputs,
         );
-        assert!(result.is_ok());
+        assert!(valid.is_ok());
+        assert!(valid.unwrap());
     }
 }
