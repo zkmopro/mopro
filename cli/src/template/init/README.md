@@ -45,16 +45,19 @@ mopro create
 Follow the instructions to open the development tools
 
 For iOS:
+
 ```sh
 open ios/MoproApp.xcodeproj
 ```
 
 For Android:
+
 ```sh
 open android -a Android\ Studio
 ```
 
 For Web:
+
 ```sh
 cd web && yarn && yarn start
 ```
@@ -65,42 +68,68 @@ Follow the README in the `react-native` directory. Or [zkmopro/react-native-app/
 For Flutter:
 Follow the README in the `flutter` directory. Or [zkmopro/flutter-app/README.md](https://github.com/zkmopro/flutter-app/blob/main/README.md)
 
-## Advanced: Customize Builds Using Rust
+### 6. Update bindings
 
-For advanced usage, you can manually run Rust commands to build in either debug or release mode.
+After creating templates, you may still need to update the bindings.
 
-### iOS
+Once you've run `mopro build`, be sure to run mopro update to refresh the bindings in each template. This command will automatically locate the corresponding bindings folders and update them accordingly.
 
-- Debug Mode:
-    ```sh
-    cargo run --bin ios  # Debug mode
-    ```
-- Release Mode:
-    ```sh
-    CONFIGURATION=release cargo run --bin ios # Release mode
-    ```
+```sh
+mopro update
+```
 
-### Android
+## Customize Bindings
 
-- Debug Mode:
-    ```sh
-    cargo run --bin android  # Debug mode
-    ```
-- Release Mode:
-    ```sh
-    CONFIGURATION=release cargo run --bin android # Release mode
-    ```
+### UniFFI
 
-### Web
+For mobile native apps (iOS and Android), you can use `#[uniffi::export]` to define custom functions that will be included in the generated bindings. For example:
 
-- Debug Mode:
-    ```sh
-    cargo run --bin web  # Debug mode
-    ```
-- Release Mode:
-    ```sh
-    CONFIGURATION=release cargo run --bin web # Release mode
-    ```
+```rust
+#[uniffi::export]
+fn mopro_hello_world() -> String {
+    "Hello, World!".to_string()
+}
+```
+
+After defining your custom functions, run the standard Mopro commands (`mopro build`, `mopro create`, or `mopro update`) to regenerate and update the bindings for each target platform.
+
+### `wasm_bindgen`
+
+For web (WASM) apps, you can use `#[wasm_bindgen]` in [`mopro-wasm-lib/src/lib.rs`](mopro-wasm-lib/src/lib.rs) to expose custom functions to JavaScript. For example:
+
+```rust
+#[wasm_bindgen(js_name = "moproWasmHelloWorld")]
+pub fn mopro_wasm_hello_world() -> String {
+    "Hello, World!".to_string()
+}
+```
+
+After running `mopro build`, be sure to run `mopro update` to refresh the bindings in each template. This command automatically finds the appropriate bindings folders and updates them accordingly.
+
+## Test
+
+Run tests before building bindings
+
+```sh
+cargo test
+```
+
+Run wasm tests with `wasm-pack`
+
+```sh
+cd mopro-wasm-lib
+```
+
+> [!NOTE]  
+> The `mopro-wasm-lib` crate is created during `mopro build` if you’ve selected the `web` platform.
+
+```sh
+wasm-pack test --safari  # For Safari
+# or
+wasm-pack test --chrome  # For Chrome
+# or
+wasm-pack test --firefox # For Firefox
+```
 
 ## Community
 
