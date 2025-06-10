@@ -6,6 +6,8 @@ sidebar_position: 2
 
 Depending on what platforms and adapters you use, there are several prerequisites to install before getting started.
 
+## Installations
+
 -   General
     -   [Rust](https://www.rust-lang.org/learn/get-started)
     -   [Cmake](https://cmake.org/download/)
@@ -18,10 +20,17 @@ Depending on what platforms and adapters you use, there are several prerequisite
 -   Web(WASM)
     -   [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
     -   [Download Chrome/ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/)
+
+## Circuits
+
 -   Circom
-    -   Pre-built `zkey` and `wasm` files for your circuits
+    -   Pre-built `zkey` and `wasm` files for your circuits: See [circom documentation](https://docs.circom.io/getting-started/compiling-circuits/)
 -   Halo2
-    -   Pre-generated SRS (Structured Reference String) file, typically used as the universal setup for your circuits
+    -   Pre-generated SRS (Structured Reference String) file, typically used as the universal setup for your circuits.
+    -   Please check out [plonkish-fibonacci-sample](https://github.com/sifnoc/plonkish-fibonacci-sample) to prepare circuits and SRS files.
+-   Noir
+    -   Pre-built circuit file `.json` for your circuits. See [Noir documentation](https://noir-lang.org/docs/dev/getting_started/quick_start).<br/>
+    -   Pre-generated SRS (Structured Reference String) file. See [`noir-rs`: Downloading SRS](https://github.com/zkmopro/noir-rs?tab=readme-ov-file#downloading-srs-structured-reference-string)
 
 ## iOS configuration
 
@@ -40,7 +49,7 @@ After that, set the following environment variables:
 1. Export `$ANDROID_HOME` and change `{USER_NAME}` to your username
 
 ```sh
-export ANDROID_HOME="/Users/{USER_NAME}/Library/Android/sdk"
+export ANDROID_HOME="~/Library/Android/sdk"
 ```
 
 2. Locate which NDK version you have
