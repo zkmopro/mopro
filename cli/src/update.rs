@@ -3,7 +3,9 @@ use std::fs;
 use std::path::Path;
 use walkdir::WalkDir;
 
-use crate::constants::Platform;
+use crate::constants::{
+    Platform, JNILIBS_DIR, MOPRO_KOTLIN_FILE, MOPRO_SWIFT_FILE, XCFRAMEWORK_NAME,
+};
 use crate::print::print_update_success_message;
 use crate::style::{print_gray_items, print_green_bold};
 
@@ -16,33 +18,32 @@ pub fn update_bindings() -> Result<()> {
     // Update iOS bindings
     if ios_bindings_dir.exists() {
         print_green_bold("🔄 Updating iOS bindings...".to_string());
-        let updated_xcframework_paths = update_folder(
-            &ios_bindings_dir.join("MoproBindings.xcframework"),
-            "MoproBindings.xcframework",
-        )?;
+        let updated_xcframework_paths =
+            update_folder(&ios_bindings_dir.join(XCFRAMEWORK_NAME), XCFRAMEWORK_NAME)?;
         print_gray_items(updated_xcframework_paths);
         let updated_swift_paths =
-            update_file(&ios_bindings_dir.join("mopro.swift"), "mopro.swift")?;
+            update_file(&ios_bindings_dir.join(MOPRO_SWIFT_FILE), MOPRO_SWIFT_FILE)?;
         print_gray_items(updated_swift_paths);
     }
     // Update Android bindings
     if android_bindings_dir.exists() {
         print_green_bold("🔄 Updating Android bindings...".to_string());
-        let updated_jnilib_paths = update_folder(&android_bindings_dir.join("jniLibs"), "jniLibs")?;
+        let updated_jnilib_paths =
+            update_folder(&android_bindings_dir.join(JNILIBS_DIR), JNILIBS_DIR)?;
         print_gray_items(updated_jnilib_paths);
         let updated_kotlin_paths = update_file(
             &android_bindings_dir
                 .join("uniffi")
                 .join("mopro")
-                .join("mopro.kt"),
-            "mopro.kt",
+                .join(MOPRO_KOTLIN_FILE),
+            MOPRO_KOTLIN_FILE,
         )?;
         print_gray_items(updated_kotlin_paths);
     }
     // Update Wasm bindings
     if web_bindings_dir.exists() {
         print_green_bold("🔄 Updating Web bindings...".to_string());
-        let updated_web_paths = update_folder(&web_bindings_dir, "MoproWasmBindings")?;
+        let updated_web_paths = update_folder(&web_bindings_dir, Platform::Web.binding_dir())?;
         print_gray_items(updated_web_paths);
     }
 

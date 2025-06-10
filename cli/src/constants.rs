@@ -1,3 +1,8 @@
+pub const XCFRAMEWORK_NAME: &str = "MoproBindings.xcframework";
+pub const MOPRO_SWIFT_FILE: &str = "mopro.swift";
+pub const JNILIBS_DIR: &str = "jniLibs";
+pub const MOPRO_KOTLIN_FILE: &str = "mopro.kt";
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Mode {
     Debug,
