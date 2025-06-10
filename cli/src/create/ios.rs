@@ -4,8 +4,8 @@ use include_dir::Dir;
 use std::{env, fs, path::PathBuf};
 
 use super::Create;
+use crate::constants::Platform;
 use crate::create::utils::{check_bindings, copy_embedded_dir, copy_ios_bindings, copy_keys};
-use crate::create::Framework;
 use crate::print::print_footer_message;
 use crate::style::print_bold;
 use crate::style::print_green_bold;
@@ -16,7 +16,7 @@ impl Create for Ios {
     const NAME: &'static str = "ios";
 
     fn create(project_dir: PathBuf) -> Result<()> {
-        let ios_bindings_dir = check_bindings(&project_dir, Framework::Ios)?;
+        let ios_bindings_dir = check_bindings(&project_dir, Platform::Ios)?;
 
         let target_dir = project_dir.join(Self::NAME);
         if target_dir.exists() {

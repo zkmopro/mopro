@@ -14,14 +14,15 @@ use indicatif::ProgressStyle;
 use reqwest::blocking::Client;
 use zip::ZipArchive;
 
-use super::Framework;
+use crate::constants::Platform;
+use crate::constants::JNILIBS_DIR;
 
 pub fn copy_android_bindings(
     android_bindings_dir: &Path,
     target_dir: &Path,
     language: &str,
 ) -> Result<()> {
-    let jni_libs_name = "jniLibs";
+    let jni_libs_name = JNILIBS_DIR;
     let uniffi_name = "uniffi";
     let jni_libs_path = android_bindings_dir.join(jni_libs_name);
     let uniffi_path = android_bindings_dir.join(uniffi_name);
@@ -44,7 +45,7 @@ pub fn copy_android_bindings(
 }
 
 pub fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> Result<()> {
-    let ios_bindings_target_dir = output_dir.join("MoproiOSBindings");
+    let ios_bindings_target_dir = output_dir.join(Platform::Ios.binding_dir());
     if ios_bindings_target_dir.exists() {
         fs::remove_dir_all(&ios_bindings_target_dir)?;
     }
@@ -140,18 +141,8 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn check_bindings(project_dir: &Path, framework: Framework) -> Result<PathBuf> {
-    let bindings_name = match framework {
-        Framework::Ios => "MoproiOSBindings",
-        Framework::Android => "MoproAndroidBindings",
-        Framework::Web => "MoproWasmBindings",
-        _ => {
-            return Err(Error::msg(format!(
-                "Unsupported language/framework ({}) selected. ",
-                framework.as_str()
-            )));
-        }
-    };
+pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<PathBuf> {
+    let bindings_name = platform.binding_dir();
 
     let ios_bindings_dir = project_dir.join(bindings_name);
     if ios_bindings_dir.exists() && fs::read_dir(&ios_bindings_dir)?.count() > 0 {
