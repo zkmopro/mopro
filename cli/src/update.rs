@@ -39,7 +39,7 @@ pub fn update_bindings() -> Result<()> {
         )?;
         print_gray_items(updated_kotlin_paths);
     }
-// Update Wasm bindings
+    // Update Wasm bindings
     if web_bindings_dir.exists() {
         print_green_bold("🔄 Updating Web bindings...".to_string());
         let updated_web_paths = update_folder(&web_bindings_dir, "MoproWasmBindings")?;
