@@ -37,6 +37,8 @@ enum Commands {
         mode: Option<String>,
         #[arg(long, num_args = 1.., help = "Specify the platforms to build for (e.g., 'ios', 'android').")]
         platforms: Option<Vec<String>>,
+        #[arg(long, num_args = 1.., help = "Specify the architectures to build for (e.g., 'aarch64-apple-ios', 'aarch64-apple-ios-sim', x86_64-apple-ios, x86_64-linux-android, i686-linux-android, armv7-linux-androideabi, aarch64-linux-android).")]
+        architectures: Option<Vec<String>>,
     },
     /// Create templates for the specified platform
     Create {
@@ -56,7 +58,11 @@ fn main() {
             Ok(_) => {}
             Err(e) => style::print_red_bold(format!("Failed to initialize project: {:?}", e)),
         },
-        Commands::Build { mode, platforms } => match build::build_project(mode, platforms) {
+        Commands::Build {
+            mode,
+            platforms,
+            architectures,
+        } => match build::build_project(mode, platforms, architectures) {
             Ok(_) => {}
             Err(e) => style::print_red_bold(format!("Failed to build project: {:?}", e)),
         },
