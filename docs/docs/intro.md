@@ -11,12 +11,21 @@ sidebar_position: 1
 Mopro simplifies the development of mobile-native apps by offering:
 
 -   A powerful **CLI** to scaffold, build, and update projects
-
 -   Prebuilt **templates** for iOS, Android, React Native, and Flutter
-
 -   Clear, step-by-step **documentation** to guide developers at every stage
+-   Cross-platform–friendly **Rust tooling** for building native apps
 
 Our goal is to remove the friction from mobile ZK app development—so you can focus on your product, not the plumbing.
+
+## ⚡ Why Mobile-Native?
+
+Mobile-native apps offer several key advantages:
+
+-   **Up to 10× performance boost** compared to browser-based ZK applications. See our [**benchmarks**](performance) for detailed comparisons.
+-   **Seamless user experience** and deep integration with device capabilities — including biometrics 🫆, GPS 📍, NFC 💳, camera 📸, photo gallery 🌅, Bluetooth 🛜, and push notifications 🔔.
+-   **Offline readiness** and improved reliability in real-world usage.
+
+These benefits help bring your ZK protocol to a broader, more mainstream audience with better performance and usability.
 
 ## 🔧 How It Works
 
@@ -54,13 +63,6 @@ Examples include
 -   [`rust-rapidsnark`](https://github.com/zkmopro/rust-rapidsnark/tree/main)
 -   [`noir-rs`](https://github.com/zkmopro/noir-rs).
 
-
-## ⚡ Why Mobile-Native?
-
-Mobile-native apps offer up to **10x performance improvement** over browser-based ZK apps. They also provide **smoother UX**, better integration with device features (e.g., biometric auth, secure storage), and offline-friendly capabilities—bringing your ZK protocol to a broader, mainstream audience.
-
-See our [**benchmarks**](performance) for performance comparisons.
-
 ## ⚙️ GPU Acceleration
 
 Mopro also focuses on **mobile-native GPU acceleration**, enabling client-side devices to leverage their GPUs to speed up operations like **MSM (Multi-Scalar Multiplication)** during proof generation. This significantly improves performance for ZK proving on mobile.
@@ -72,9 +74,6 @@ See implementation details and updates in [**gpu-acceleration**](https://github.
 Explore the full ecosystem, documentation, and community resources:
 
 -   📱 Main GitHub Repository: https://github.com/zkmopro/mopro
-
 -   💡 Example Projects: https://zkmopro.org/docs/projects
-
 -   💬 Community & Talks: https://zkmopro.org/docs/community
-
 -   📰 Blog: https://zkmopro.org/blog
