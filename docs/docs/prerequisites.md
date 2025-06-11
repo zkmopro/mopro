@@ -46,7 +46,7 @@ First, install the latest SDK. In Android Studio, go to `SDK Manager > SDK Tools
 
 After that, set the following environment variables:
 
-1. Export `$ANDROID_HOME` and change `{USER_NAME}` to your username
+1. Export `$ANDROID_HOME`
 
 ```sh
 export ANDROID_HOME="~/Library/Android/sdk"
