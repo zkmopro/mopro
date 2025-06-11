@@ -735,7 +735,7 @@ dependencies = [
 [[package]]
 name = "bb"
 version = "0.1.0"
-source = "git+https://github.com/zkmopro/noir-rs#2be26fb0a4a11586692f35ed8ef22039da709c9b"
+source = "git+https://github.com/zkmopro/noir-rs#608d6050f9713d4e84d750b6705ea9a287e9465a"
 dependencies = [
  "num-bigint",
  "thiserror 1.0.69",
@@ -3316,6 +3316,7 @@ dependencies = [
  "reqwest",
  "serde",
  "toml 0.8.22",
+ "walkdir",
  "zip",
 ]
 
@@ -3327,7 +3328,6 @@ dependencies = [
  "ark-bls12-381",
  "ark-bn254",
  "ark-ff 0.5.0",
- "base64ct",
  "camino",
  "circom-prover",
  "color-eyre",
@@ -3437,12 +3437,13 @@ checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
 [[package]]
 name = "noir"
 version = "0.1.0"
-source = "git+https://github.com/zkmopro/noir-rs#2be26fb0a4a11586692f35ed8ef22039da709c9b"
+source = "git+https://github.com/zkmopro/noir-rs#608d6050f9713d4e84d750b6705ea9a287e9465a"
 dependencies = [
  "acir",
  "acvm",
  "acvm_blackbox_solver",
  "base64 0.22.1",
+ "base64ct",
  "bb",
  "bincode",
  "bn254_blackbox_solver",
@@ -3451,6 +3452,7 @@ dependencies = [
  "hex",
  "nargo",
  "openssl",
+ "proptest",
  "reqwest",
  "serde",
  "serde_json",
@@ -4205,6 +4207,8 @@ dependencies = [
  "rand_chacha 0.3.1",
  "rand_xorshift",
  "regex-syntax 0.8.5",
+ "rusty-fork",
+ "tempfile",
  "unarray",
 ]
 
@@ -4279,6 +4283,12 @@ dependencies = [
  "quote",
  "syn 1.0.109",
 ]
+
+[[package]]
+name = "quick-error"
+version = "1.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
 name = "quinn"
@@ -4942,6 +4952,18 @@ name = "rustversion"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eded382c5f5f786b989652c49544c4877d9f015cc22e145a5ea8ea66c2921cd2"
+
+[[package]]
+name = "rusty-fork"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb3dcc6e454c328bb824492db107ab7c0ae8fcffe4ad210136ef014458c1bc4f"
+dependencies = [
+ "fnv",
+ "quick-error",
+ "tempfile",
+ "wait-timeout",
+]
 
 [[package]]
 name = "ryu"
@@ -6260,6 +6282,15 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+
+[[package]]
+name = "wait-timeout"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09ac3b126d3914f9849036f826e054cbabdc8519970b8998ddaf3b5bd3c65f11"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "walkdir"

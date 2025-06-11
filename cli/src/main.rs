@@ -9,6 +9,7 @@ mod init;
 mod print;
 mod select;
 mod style;
+mod update;
 mod utils;
 
 /// CLI for creating a mopro project.
@@ -45,6 +46,8 @@ enum Commands {
         #[arg(long, help = "Specify the platform")]
         framework: Option<String>,
     },
+    /// Update the bindings for the all platforms
+    Update {},
 }
 
 fn main() {
@@ -69,6 +72,10 @@ fn main() {
         Commands::Create { framework } => match create::create_project(framework) {
             Ok(_) => {}
             Err(e) => style::print_red_bold(format!("Failed to create template: {:?}", e)),
+        },
+        Commands::Update {} => match update::update_bindings() {
+            Ok(_) => {}
+            Err(e) => style::print_red_bold(format!("Failed to update bindings: {:?}", e)),
         },
     }
 }

@@ -121,20 +121,6 @@ pub fn build_project(
         return Ok(());
     }
 
-    // If 'Circom' is the only selected adapter and 'Web' is the only selected platform,
-    // Restart the build step as this combination is not supported.
-    if config.adapter_eq(Adapter::Circom) && platform.eq(&vec![Platform::Web]) {
-        style::print_yellow(
-            "Circom doesn't support Web platform, choose different platform".to_string(),
-        );
-        build_project(
-            &Some(mode.as_str().to_string()),
-            arg_platforms,
-            arg_architectures,
-        )?;
-        return Ok(());
-    }
-
     // Notification when the user selects the 'circom' adapter and includes the 'web' platform in the selection.
     if config.adapter_eq(Adapter::Circom) && platform.contains(Platform::Web) {
         let confirm = Confirm::with_theme(&ColorfulTheme::default())

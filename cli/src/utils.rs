@@ -74,10 +74,6 @@ impl PlatformSelector {
         }
     }
 
-    pub fn eq(&self, platforms: &Vec<Platform>) -> bool {
-        self.platforms.eq(platforms)
-    }
-
     pub fn contains(&self, platform: Platform) -> bool {
         self.platforms.contains(&platform)
     }

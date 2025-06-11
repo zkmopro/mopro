@@ -23,3 +23,9 @@ mopro build
 ```sh
 mopro create
 ```
+
+## Update bindings
+
+```sh
+mopro update
+```

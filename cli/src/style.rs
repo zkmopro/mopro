@@ -38,3 +38,9 @@ pub fn create_custom_theme() -> ColorfulTheme {
         ..Default::default()
     }
 }
+
+pub fn print_gray_items(items: Vec<String>) {
+    for item in items {
+        println!("   - {}", style(item).dim());
+    }
+}
