@@ -46,14 +46,67 @@ Navigate to the folder where you want to build the app. Select the adapters usin
 mopro init
 ```
 
+:::note
+The following prompt will appear:
+
+```sh
+$ mopro init
+✔ Project name · mopro-example-app
+? Pick the adapters you want (multiple selection with space)
+⬚ circom
+⬚ halo2
+⬚ noir
+⬚ none of above
+🚀 Project 'mopro-example-app' initialized successfully! 🎉
+```
+
+:::
+
+Navigate to your project directory. (e.g. `cd mopro-example-app`)
+
+```sh
+cd mopro-example-app
+```
+
 ## 3. Build bindings
 
-Navigate to your project directory. (e.g. `cd mopro-example-app`) <br/>
+Follow the steps below to build example circuits (e.g., Circom: `multiplier2`, Halo2: `fibonacci`, Noir: `multiplier2`). <br/> If you have your own circuit, skip ahead to
+
+-   [5. Update Circuits](#5-update-circuits) to learn how to integrate it
+-   or visit [Rust setup](setup/rust-setup.md) section to learn how to customize and expose functions.
+
 Build bindings for specific targets (iOS, Android, Web).
 
 ```sh
 mopro build
 ```
+
+:::note
+The following prompt will appear:
+
+```sh
+$ mopro build
+? Build mode ›
+  debug
+> release
+? Select platform(s) to build for (multiple selection with space) ›
+⬚ ios
+⬚ android
+⬚ web
+? Select ios architecture(s) to compile ›
+⬚ aarch64-apple-ios
+⬚ aarch64-apple-ios-sim
+⬚ x86_64-apple-ios
+? Select android architecture(s) to compile >
+⬚ x86_64-linux-android
+⬚ i686-linux-android
+⬚ armv7-linux-androideabi
+⬚ aarch64-linux-android
+```
+
+:::
+
+<!-- TODO: add descriptions for different architectures and limitation -->
 
 :::warning
 The process of building bindings may take a few minutes.
@@ -71,6 +124,23 @@ Create templates for developing your mobile app.
 ```sh
 mopro create
 ```
+
+:::note
+The following prompt will appear:
+
+```sh
+$ mopro create
+? Create template ›
+  ios
+  android
+  web
+  flutter
+  react-native
+```
+
+Only one template can be selected at a time. To build for additional frameworks, run `mopro create` again.
+
+:::
 
 Follow the instructions to open the development tools
 
@@ -119,6 +189,8 @@ See more details in [react-native-app](https://github.com/zkmopro/react-native-a
 
 ### For Flutter
 
+Make sure [Flutter](https://flutter.dev/) is installed on your system.
+
 ```sh
 flutter doctor
 ```
@@ -137,9 +209,98 @@ flutter run
 See more details in [flutter-app](https://github.com/zkmopro/flutter-app)
 :::
 
-## 5. Update bindings
+## 5. Update circuits
 
-If you make changes to `src/lib.rs`—such as adding functions with `#[uniffi::export]`—and want to update the generated bindings across all platforms, simply run:
+### For Circom Circuits
+
+-   Ensure `circom` feature is activated in `mopro-ffi`
+-   Follow the [Circom documentation](https://docs.circom.io/getting-started/compiling-circuits/) to generate the `.wasm` and `.zkey` files for your circuit.
+-   Place the `.wasm` and `.zkey` files in the `test-vectors/circom` directory.
+-   Generate the execution function using the [`rust_witness`](https://github.com/chancehudson/rust-witness) macro:
+    ```rust
+    rust_witness::witness!(circuitname);
+    // ⚠️ The name should be the name of the wasm file all lowercase
+    // ⚠️ with all special characters removed
+    // ⚠️ Avoid using main as your circuit name, as it may cause conflicts during compilation and execution. Use a more descriptive and unique name instead.
+    //
+    // e.g.
+    // multiplier2 -> multiplier2
+    // keccak_256_256_main -> keccak256256main
+    // aadhaar-verifier -> aadhaarverifier
+    //
+    ```
+-   Bind the `.zkey` file to the witness generation function to enable proof generation. This ensures the circuit's proving key is correctly associated with its corresponding witness logic.
+    Ensure that the witness function follows the naming convention `circuitname_witness`, as expected by the generated bindings and proof system:
+    ```rust
+    mopro_ffi::set_circom_circuits! {
+        ("circuitname.zkey", mopro_ffi::witness::WitnessFn::RustWitness(circuitname_witness))
+    }
+    ```
+-   Ensure the circuit input matches your circuit's expected format.
+    Currently, only _a flat (one-dimensional) JSON string mapping_ (`String`) is supported.
+    For example:
+    ```rust
+    "{
+        \"a\": [\"3\"],
+        \"b\": [\"5\"]
+    }"
+    ```
+
+### For Halo2 Circuits
+
+-   Ensure `halo2` feature is activated in `mopro-ffi`
+-   Build a Halo2 Rust crate with the example: [plonkish-fibonacci-sample](https://github.com/sifnoc/plonkish-fibonacci-sample).<br/>
+    Expose the crate with the following public functions:
+
+    ```rust
+    pub fn prove(
+        srs_key_path: &str,
+        proving_key_path: &str,
+        input: HashMap<String, Vec<String>>,
+    ) -> Result<GenerateProofResult, Box<dyn Error>>
+    ```
+
+    ```rust
+    pub fn verify(
+        srs_key_path: &str,
+        verifying_key_path: &str,
+        proof: Vec<u8>,
+        public_inputs: Vec<u8>,
+    ) -> Result<bool, Box<dyn Error>>
+    ```
+
+-   Prepare the SRS, proving key, and verifying key files. Place the `.bin` files in the `test-vectors/halo2` directory.
+-   Bind the `prove` and `verify` functions with the corresponding proving and verifying keys.
+    ```rust
+    mopro_ffi::set_halo2_circuits! {
+        ("circuitname_pk.bin", rust_crate_name::prove, "circuitname_vk.bin", rust_crate_name::verify)
+    }
+    ```
+-   Ensure the circuit input matches your circuit's expected format.
+    Currently, only _a flat (one-dimensional) JSON string mapping_ (`HashMap<String, Vec<String>>`) is supported.
+    For example:
+    ```json
+    {
+        "a": ["3"],
+        "b": ["5"]
+    }
+    ```
+
+### For Noir Circuits
+
+-   Ensure `noir` feature is activated in `mopro-ffi`
+-   Follow the [Noir documentation](http://noir-lang.org/docs/dev) to generate the `.json` and the [Downloading SRS](https://github.com/zkmopro/noir-rs?tab=readme-ov-file#downloading-srs-structured-reference-string) to generate the `.srs` file.
+-   Place the `.json` and `.srs` files in the `test-vectors/noir` directory.
+-   Ensure the circuit input matches your circuit's expected format.
+    Currently, only _a flat (one-dimensional) string_ (`Vec<String>`) is supported.
+    For example:
+    ```json
+    ["3", "5"]
+    ```
+
+## 6. Update bindings
+
+If you make changes to `src/lib.rs`—such as updating circuits or adding functions with `#[uniffi::export]`—and want to update the generated bindings across all platforms, simply run:
 
 ```sh
 mopro build
@@ -148,7 +309,7 @@ mopro update
 
 This will automatically detect and update the corresponding bindings in each platform template you've set up.
 
-## 6. What's next
+## 7. What's next
 
 -   **Update your ZK circuits** as needed. After making changes, be sure to run:
 
