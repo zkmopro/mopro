@@ -17,11 +17,18 @@ pub struct PlatformSelector {
 }
 
 impl PlatformSelector {
-    pub fn construct(selections: Vec<String>) -> Self {
+    /// Construct platforms from command-line arguments and update config
+    pub fn construct_with_config(selections: Vec<String>, config: &mut Config) -> Self {
+        // Clear previous selections before update
+        config.target_platforms = Some(HashSet::new());
+
         let mut platforms: Vec<Platform> = vec![];
         for s in selections {
-            platforms.push(Platform::parse_from_str(&s));
+            let platform = Platform::parse_from_str(&s);
+            config.target_platforms.as_mut().unwrap().insert(s);
+            platforms.push(platform);
         }
+
         Self {
             platforms,
             archs: vec![],
@@ -153,5 +160,48 @@ impl PlatformSelector {
         arch_strs
             .iter()
             .any(|&arch| self.archs.contains(&arch.to_string()))
+    }
+
+    /// Construct architectures from command-line arguments
+    pub fn construct_archs(
+        &mut self,
+        archs: &[String],
+        config: &mut Config,
+    ) -> HashMap<String, Vec<String>> {
+        let mut selected_archs: HashMap<String, Vec<String>> = HashMap::new();
+
+        // Clear previous selections before update
+        config.ios = Some(HashSet::new());
+        config.android = Some(HashSet::new());
+
+        // Group architectures by platform
+        let mut ios_archs = Vec::new();
+        let mut android_archs = Vec::new();
+
+        for arch in archs {
+            if IosArch::all_strings().contains(&arch.as_str()) {
+                ios_archs.push(arch.clone());
+                config.ios.as_mut().unwrap().insert(arch.clone());
+            } else if AndroidArch::all_strings().contains(&arch.as_str()) {
+                android_archs.push(arch.clone());
+                config.android.as_mut().unwrap().insert(arch.clone());
+            }
+        }
+
+        // Add architectures to the result if the platform is selected
+        if self.contains(Platform::Ios) && !ios_archs.is_empty() {
+            selected_archs.insert(String::from(Platform::Ios.as_str()), ios_archs.clone());
+            self.archs.extend_from_slice(&ios_archs);
+        }
+
+        if self.contains(Platform::Android) && !android_archs.is_empty() {
+            selected_archs.insert(
+                String::from(Platform::Android.as_str()),
+                android_archs.clone(),
+            );
+            self.archs.extend_from_slice(&android_archs);
+        }
+
+        selected_archs
     }
 }

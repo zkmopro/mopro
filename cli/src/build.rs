@@ -22,7 +22,11 @@ use crate::style::blue_bold;
 use crate::style::print_green_bold;
 use crate::utils::PlatformSelector;
 
-pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<String>>) -> Result<()> {
+pub fn build_project(
+    arg_mode: &Option<String>,
+    arg_platforms: &Option<Vec<String>>,
+    arg_architectures: &Option<Vec<String>>,
+) -> Result<()> {
     // Detect `Cargo.toml` file before starting build process
     let current_dir = env::current_dir()?;
     let cargo_toml_path = current_dir.join("Cargo.toml");
@@ -89,10 +93,11 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
                         .to_string(),
                     );
                 }
-                PlatformSelector::construct(valid_platforms)
+                PlatformSelector::construct_with_config(valid_platforms, &mut config)
             }
         }
     };
+    write_config(&config_path, &config)?;
 
     // Supported adapters and platforms:
     // | Platforms | Circom | Halo2 | Noir |
@@ -108,7 +113,11 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
         style::print_yellow(
             "Noir doesn't support Web platform, choose different platform".to_string(),
         );
-        build_project(&Some(mode.as_str().to_string()), &None)?;
+        build_project(
+            &Some(mode.as_str().to_string()),
+            arg_platforms,
+            arg_architectures,
+        )?;
         return Ok(());
     }
 
@@ -120,7 +129,11 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
                 .interact()?;
 
         if !confirm {
-            build_project(&Some(mode.as_str().to_string()), &None)?;
+            build_project(
+                &Some(mode.as_str().to_string()),
+                arg_platforms,
+                arg_architectures,
+            )?;
             return Ok(());
         }
 
@@ -143,7 +156,11 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
     }
 
     // Architecture selection for iOS or Android
-    let selected_architectures = platform.select_archs(&mut config);
+    let selected_architectures = if let Some(archs) = arg_architectures {
+        platform.construct_archs(archs, &mut config)
+    } else {
+        platform.select_archs(&mut config)
+    };
     write_config(&config_path, &config)?;
 
     // Noir doesn't support `I686Linux` and `Armv7LinuxAbi`
@@ -161,7 +178,11 @@ pub fn build_project(arg_mode: &Option<String>, arg_platforms: &Option<Vec<Strin
                 )
                 .to_string(),
             );
-            build_project(&Some(mode.as_str().to_string()), &None)?;
+            build_project(
+                &Some(mode.as_str().to_string()),
+                arg_platforms,
+                arg_architectures,
+            )?;
             return Ok(());
         }
     }
