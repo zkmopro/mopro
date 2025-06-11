@@ -40,12 +40,12 @@ Include the crate in your `Cargo.toml`
 
 ```toml title="Cargo.toml"
 [dependencies]
-mopro-ffi = "0.2"
+mopro-ffi = { git = "https://github.com/zkmopro/mopro" }
 uniffi = "0.29"
 thiserror = "2.0.12"
 
 [build-dependencies]
-mopro-ffi = "0.2"
+mopro-ffi = { git = "https://github.com/zkmopro/mopro" }
 uniffi = { version = "0.29", features = ["build"] }
 ```
 
@@ -120,14 +120,14 @@ Each witness generator must be built within a project. You need to supply the re
 Here, we used [rust-witness](https://github.com/chancehudson/rust-witness) as an example.
 
 :::info
-To learn more about `witnesscalc` for Mopro, please check out [circom-prover](https://github.com/zkmopro/mopro/blob/main/circom-prover/README.md#advanced-usage).
+To learn more about `witnesscalc` and `circom-witnesscalc` for Mopro, please check out [circom-prover](https://github.com/zkmopro/mopro/blob/main/circom-prover/README.md#advanced-usage).
 :::
 
 Include the `rust-witness` in your Cargo.toml and enable `circom` feature in `mopro-ffi`:
 
 ```toml title="Cargo.toml"
 [dependencies]
-mopro-ffi = { version = "0.2", features = ["circom"] } # enable circom feature
+mopro-ffi = { git = "https://github.com/zkmopro/mopro", features = ["circom"] } # enable circom feature
 rust-witness = "0.1"
 num-bigint = "0.4"
 
@@ -199,7 +199,7 @@ mod circom_tests {
 
 Now you're ready to build your static library! You should be able to run either the Mopro CLI or the binaries.
 
-**1. Execute the process through Mopro CLI**
+**1. Execute the process through Mopro CLI (recommended 👍🏻)**
 
 To install the Mopro CLI, please refer to the [Getting Started](/docs/getting-started) guide.
 
@@ -252,7 +252,7 @@ Enable `halo2` feature in `mopro-ffi` and import the Halo2 prover as a Rust crat
 
 ```toml title="Cargo.toml"
 [dependencies]
-mopro-ffi = { version = "0.2", features = ["halo2"] } # enable halo2 feature
+mopro-ffi = { git = "https://github.com/zkmopro/mopro", features = ["halo2"] } # enable halo2 feature
 plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 ```
 
@@ -381,10 +381,9 @@ mod noir_tests {
         );
         assert!(result.is_ok());
         let proof = result.unwrap();
-        let result = verify_noir_proof(circuit_path.clone(), proof);
-        assert!(result.is_ok());
-        let valid = result.unwrap();
-        assert!(valid);
+        let valid = verify_noir_proof(circuit_path.clone(), proof);
+        assert!(valid.is_ok());
+        assert!(valid.unwrap());
     }
 }
 ```
@@ -436,6 +435,7 @@ For instance, to use `semaphore-rs`, you can add it like this:
 semaphore-rs = { git = "https://github.com/worldcoin/semaphore-rs", features = [
     "depth_16",
 ] }
+serde_json = "1.0" # for serialize proofs
 ```
 
 ```rust title="src/lib.rs"
@@ -517,6 +517,10 @@ Please refer to [this repo](https://github.com/chengggkk/Zuma/blob/master/src/li
 ### 2. Generate bindings for iOS and Android
 
 Similar to Circom-based Rust project setup [3. Generate bindings for iOS and Android](#3-generate-bindings-for-ios-and-android)
+
+Once the bindings are generated, you'll see your exported functions (e.g., `getIdCommitment`, `semaphoreProve`) included in the generated code—for example, in `MoproiOSBindings/mopro.swift` for iOS and `MoproAndroidBindings/uniffi/mopro/mopro.kt` for Android.
+
+You can then use these functions directly within your iOS and/or Android applications as part of the generated bindings.
 
 ### 3. What's next
 
