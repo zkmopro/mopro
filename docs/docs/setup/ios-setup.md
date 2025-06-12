@@ -117,7 +117,7 @@ You should now be able to run the iOS app on the simulator or a device and build
     ```
 
     :::warning
-    `mopro update` only works if the Android project was created _within_ the Rust project directory during mopro init. Otherwise, you can manually update the bindings by following [Step 2](#2-add-the-moproandroidbindings-folder-into-the-project).
+    `mopro update` only works if the Android project was created _within_ the Rust project directory during mopro init. Otherwise, you can manually update the bindings by following [Step 1](#1-drag-the-moproiosbindings-folder-into-the-project).
     :::
 
     This ensures the bindings are regenerated and reflect your latest updates.
