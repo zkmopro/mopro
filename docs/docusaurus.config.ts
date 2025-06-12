@@ -51,7 +51,7 @@ const config: Config = {
       respectPrefersColorScheme: false,
     },
     prism: {
-      additionalLanguages: ['powershell', 'bash', 'toml', 'diff', 'yaml'],
+      additionalLanguages: ['powershell', 'bash', 'toml', 'diff', 'yaml', 'ruby', 'dart'],
     },
     algolia: {
       appId: '57U3VFSJ7M',
