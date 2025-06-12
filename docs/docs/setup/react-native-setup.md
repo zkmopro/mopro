@@ -1,6 +1,6 @@
 # React Native Setup
 
-This tutorial will guide you through integrating the iOS bindings and Android bindings into an [React Native](<](https://reactnative.dev/)>) project. Before you begin, make sure you’ve completed the ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) process with selecting **iOS** platform and **Android** platform and have the `MoproiOSBindings` and `MoproAndroidBindings` folder ready:
+This tutorial will guide you through integrating the iOS bindings and Android bindings into an [React Native](https://reactnative.dev/)) project. Before you begin, make sure you’ve completed the ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) process with selecting **iOS** platform and **Android** platform and have the `MoproiOSBindings` and `MoproAndroidBindings` folder ready:
 
 React Native is a _JavaScript_ framework that enables developers to build native apps for multiple platforms with a single codebase.
 
