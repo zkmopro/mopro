@@ -118,8 +118,6 @@ Please refer to [flutter-app](https://github.com/zkmopro/flutter-app) to see the
 
 -   Create these types in the file: `mopro_flutter_plugin/ios/Classes/MoproFlutterPlugin.swift`
 
-        <details>
-            <summary>Circom types in `/mopro_flutter_plugin/ios/Classes/MoproFlutterPlugin.swift`</summary>
         ```swift title="/mopro_flutter_plugin/ios/Classes/MoproFlutterPlugin.swift"
         class FlutterG1 {
             let x: String
@@ -131,84 +129,21 @@ Please refer to [flutter-app](https://github.com/zkmopro/flutter-app) to see the
                self.y = y
                self.z = z
             }
-         }
-
-         class FlutterG2 {
-            let x: [String]
-            let y: [String]
-            let z: [String]
-
-            init(x: [String], y: [String], z: [String]) {
-               self.x = x
-               self.y = y
-               self.z = z
-            }
-         }
-
-         class FlutterCircomProof {
-            let a: FlutterG1
-            let b: FlutterG2
-            let c: FlutterG1
-            let `protocol`: String
-            let curve: String
-
-            init(a: FlutterG1, b: FlutterG2, c: FlutterG1, `protocol`: String, curve: String) {
-               self.a = a
-               self.b = b
-               self.c = c
-               self.`protocol` = `protocol`
-               self.curve = curve
-            }
-         }
-
-         class FlutterCircomProofResult {
-            let proof: FlutterCircomProof
-            let inputs: [String]
-
-            init(proof: FlutterCircomProof, inputs: [String]) {
-               self.proof = proof
-               self.inputs = inputs
-            }
-         }
+        }
+        // ...
         ```
-        </details>
+
+        :::note
+        See the full implementation here: [`MoproFlutterPlugin.swift`](https://github.com/zkmopro/flutter-app/blob/3f3f2201607084532c13d4abedbc3f8b68b566ce/mopro_flutter_plugin/ios/Classes/MoproFlutterPlugin.swift#L6C1-L54C2)
+        :::
 
 -   Define helper functions to bridge types between the Mopro bindings and the Flutter framework:
 
-      <details>
-            <summary>Helper functions in `/mopro_flutter_plugin/ios/Classes/MoproFlutterPlugin.swift`</summary>
         ```swift title="/mopro_flutter_plugin/ios/Classes/MoproFlutterPlugin.swift"
          // convert the mopro proofs to be exposed to Flutter framework
          func convertCircomProof(res: CircomProofResult) -> [String: Any] {
             let g1a = FlutterG1(x: res.proof.a.x, y: res.proof.a.y, z: res.proof.a.z)
-            let g2b = FlutterG2(x: res.proof.b.x, y: res.proof.b.y, z: res.proof.b.z)
-            let g1c = FlutterG1(x: res.proof.c.x, y: res.proof.c.y, z: res.proof.c.z)
-            let circomProof = FlutterCircomProof(
-                  a: g1a, b: g2b, c: g1c, `protocol`: res.proof.protocol, curve: res.proof.curve)
-            let circomProofResult = FlutterCircomProofResult(proof: circomProof, inputs: res.inputs)
-            let resultMap: [String: Any] = [
-               "proof": [
-                  "a": [
-                     "x": circomProofResult.proof.a.x,
-                     "y": circomProofResult.proof.a.y,
-                     "z": circomProofResult.proof.a.z,
-                  ],
-                  "b": [
-                     "x": circomProofResult.proof.b.x,
-                     "y": circomProofResult.proof.b.y,
-                     "z": circomProofResult.proof.b.z,
-                  ],
-                  "c": [
-                     "x": circomProofResult.proof.c.x,
-                     "y": circomProofResult.proof.c.y,
-                     "z": circomProofResult.proof.c.z,
-                  ],
-                  "protocol": circomProofResult.proof.protocol,
-                  "curve": circomProofResult.proof.curve,
-               ],
-               "inputs": circomProofResult.inputs,
-            ]
-            return resultMap
+            // ...
          }
 
          // convert the Flutter proofs to be used in mopro bindings
@@ -216,21 +151,12 @@ Please refer to [flutter-app](https://github.com/zkmopro/flutter-app) to see the
             let proofMap = proof["proof"] as! [String: Any]
             let aMap = proofMap["a"] as! [String: String]
             let g1a = G1(x: aMap["x"] ?? "0", y: aMap["y"] ?? "0", z: aMap["z"] ?? "1")
-            let bMap = proofMap["b"] as! [String: [String]]
-            let g2b = G2(
-               x: bMap["x"] ?? ["1", "0"], y: bMap["y"] ?? ["1", "0"], z: bMap["z"] ?? ["1", "0"])
-            let cMap = proofMap["c"] as! [String: String]
-            let g1c = G1(x: cMap["x"] ?? "0", y: cMap["y"] ?? "0", z: cMap["z"] ?? "1")
-            let circomProof = CircomProof(
-               a: g1a, b: g2b, c: g1c, `protocol`: proofMap["protocol"] as! String,
-               curve: proofMap["curve"] as! String)
-            let circomProofResult = CircomProofResult(
-               proof: circomProof, inputs: proof["inputs"] as! [String])
-            return circomProofResult
+            // ...
          }
-
         ```
-        </details>
+        :::note
+        See the full implementation here: [`MoproFlutterPlugin.swift`](https://github.com/zkmopro/flutter-app/blob/3f3f2201607084532c13d4abedbc3f8b68b566ce/mopro_flutter_plugin/ios/Classes/MoproFlutterPlugin.swift#L56C1-L103C2)
+        :::
 
 -   Define the native module API. See the [Writing custom platform-specific code](https://docs.flutter.dev/platform-integration/platform-channels) for details.
 
@@ -268,36 +194,15 @@ public class MoproFlutterPlugin: NSObject, FlutterPlugin {
                   code: "PROOF_GENERATION_ERROR", message: "Failed to generate proof",
                   details: error.localizedDescription))
          }
-
-         case "verifyCircomProof":
-         guard let args = call.arguments as? [String: Any],
-            let zkeyPath = args["zkeyPath"] as? String,
-            let proof = args["proof"] as? [String: Any],
-            let proofLib = args["proofLib"] as? ProofLib
-         else {
-            result(FlutterError(code: "ARGUMENT_ERROR", message: "Missing arguments", details: nil))
-            return
-         }
-
-         do {
-            let circomProofResult = convertCircomProofResult(proof: proof)
-            // Call the function from mopro.swift
-            let valid = try verifyCircomProof(
-               zkeyPath: zkeyPath, proofResult: circomProofResult, proofLib: proofLib)
-
-            // Return the proof and inputs as a map supported by the StandardMethodCodec
-            result(valid)
-         } catch {
-            result(
-               FlutterError(
-                  code: "PROOF_VERIFICATION_ERROR", message: "Failed to verify proof",
-                  details: error.localizedDescription))
-         }
       }
    }
    // ...
 }
 ```
+
+:::info
+See the full implementation here: [`MoproFlutterPlugin.swift`](https://github.com/zkmopro/flutter-app/blob/3f3f2201607084532c13d4abedbc3f8b68b566ce/mopro_flutter_plugin/ios/Classes/MoproFlutterPlugin.swift#L115C5-L138C8)
+:::
 
 ## 3. Implement the module on Android
 
@@ -338,73 +243,27 @@ dependencies {
 ### 3-3 Create convertible types for Javascript library with kotlin.
 
 -   Create these types in the file: `mopro_flutter_plugin/android/src/main/kotlin/com/example/mopro_flutter_plugin/MoproFlutterPlugin.kt`
-      <details>
-            <summary>Circom types in `/mopro_flutter_plugin/android/src/main/kotlin/com/example/mopro_flutter_plugin/MoproFlutterPlugin.kt`</summary>
-         ```kotlin title="/mopro_flutter_plugin/android/src/main/kotlin/com/example/mopro_flutter_plugin/MoproFlutterPlugin.kt"
-         class FlutterG1(x: String, y: String, z: String) {
-            val x = x
-            val y = y
-            val z = z
-         }
 
-         class FlutterG2(x: List<String>, y: List<String>, z: List<String>) {
-            val x = x
-            val y = y
-            val z = z
-         }
+    ```kotlin title="/mopro_flutter_plugin/android/src/main/kotlin/com/example/mopro_flutter_plugin/MoproFlutterPlugin.kt"
+    class FlutterG1(x: String, y: String, z: String) {
+       val x = x
+       val y = y
+       val z = z
+    }
+    // ...
+    ```
 
-         class FlutterCircomProof(a: FlutterG1, b: FlutterG2, c: FlutterG1, protocol: String, curve: String) {
-            val a = a
-            val b = b
-            val c = c
-            val protocol = protocol
-            val curve = curve
-         }
-
-         class FlutterCircomProofResult(proof: FlutterCircomProof, inputs: List<String>) {
-            val proof = proof
-            val inputs = inputs
-         }
-         ```
-
-      </details>
+    :::note
+    See the full implementation here: [`MoproFlutterPlugin.kt`](https://github.com/zkmopro/flutter-app/blob/3f3f2201607084532c13d4abedbc3f8b68b566ce/mopro_flutter_plugin/android/src/main/kotlin/com/example/mopro_flutter/MoproFlutterPlugin.kt#L13C1-L36C2)
+    :::
 
 -   Define helper functions to bridge types between the Mopro bindings and the Flutter framework:
 
-      <details>
-            <summary>Helper functions in `/mopro_flutter_plugin/android/src/main/kotlin/com/example/mopro_flutter_plugin/MoproFlutterPlugin.kt`</summary>
         ```kotlin title="/mopro_flutter_plugin/android/src/main/kotlin/com/example/mopro_flutter_plugin/MoproFlutterPlugin.kt"
          // convert the mopro proofs to be exposed to Flutter framework
          fun convertCircomProof(res: CircomProofResult): Map<String, Any> {
             val g1a = FlutterG1(res.proof.a.x, res.proof.a.y, res.proof.a.z)
-            val g2b = FlutterG2(res.proof.b.x, res.proof.b.y, res.proof.b.z)
-            val g1c = FlutterG1(res.proof.c.x, res.proof.c.y, res.proof.c.z)
-            val circomProof = FlutterCircomProof(g1a, g2b, g1c, res.proof.protocol, res.proof.curve)
-            val circomProofResult = FlutterCircomProofResult(circomProof, res.inputs)
-            // Convert to Map before sending
-            val resultMap = mapOf(
-               "proof" to mapOf(
-                  "a" to mapOf(
-                     "x" to circomProofResult.proof.a.x,
-                     "y" to circomProofResult.proof.a.y,
-                     "z" to circomProofResult.proof.a.z
-                  ),
-                  "b" to mapOf(
-                     "x" to circomProofResult.proof.b.x,
-                     "y" to circomProofResult.proof.b.y,
-                     "z" to circomProofResult.proof.b.z
-                  ),
-                  "c" to mapOf(
-                     "x" to circomProofResult.proof.c.x,
-                     "y" to circomProofResult.proof.c.y,
-                     "z" to circomProofResult.proof.c.z
-                  ),
-                  "protocol" to circomProofResult.proof.protocol,
-                  "curve" to circomProofResult.proof.curve
-               ),
-               "inputs" to circomProofResult.inputs
-            )
-            return resultMap
+            // ...
          }
 
          // convert the Flutter proofs to be used in mopro bindings
@@ -416,30 +275,13 @@ dependencies {
                aMap["y"] as String,
                aMap["z"] as String
             )
-            val bMap = proofMap["b"] as Map<String, Any>
-            val g2b = G2(
-               bMap["x"] as List<String>,
-               bMap["y"] as List<String>,
-               bMap["z"] as List<String>
-            )
-            val cMap = proofMap["c"] as Map<String, Any>
-            val g1c = G1(
-               cMap["x"] as String,
-               cMap["y"] as String,
-               cMap["z"] as String
-            )
-            val circomProof = CircomProof(
-               g1a,
-               g2b,
-               g1c,
-               proofMap["protocol"] as String,
-               proofMap["curve"] as String
-            )
-            val circomProofResult = CircomProofResult(circomProof, proofResult["inputs"] as List<String>)
-            return circomProofResult
+            // ...
          }
         ```
-        </details>
+
+    :::note
+    See the full implementation here: [`MoproFlutterPlugin.kt`](https://github.com/zkmopro/flutter-app/blob/3f3f2201607084532c13d4abedbc3f8b68b566ce/mopro_flutter_plugin/android/src/main/kotlin/com/example/mopro_flutter/MoproFlutterPlugin.kt#L38C1-L98C4)
+    :::
 
 -   Define the native module API. See the [Writing custom platform-specific code](https://docs.flutter.dev/platform-integration/platform-channels) for details.
 
@@ -484,30 +326,7 @@ class MoproFlutterPlugin: FlutterPlugin, MethodCallHandler {
 
 
          result.success(resultMap)
-      } else if (call.method == "verifyCircomProof") {
-         val zkeyPath = call.argument<String>("zkeyPath") ?: return result.error(
-            "ARGUMENT_ERROR",
-            "Missing zkeyPath",
-            null
-         )
-
-         val proof = call.argument<Map<String, Any>>("proof") ?: return result.error(
-            "ARGUMENT_ERROR",
-            "Missing proof",
-            null
-         )
-
-         val proofLibIndex = call.argument<Int>("proofLib") ?: return result.error(
-            "ARGUMENT_ERROR",
-            "Missing proofLib",
-            null
-         )
-
-         val proofLib = if (proofLibIndex == 0) ProofLib.ARKWORKS else ProofLib.RAPIDSNARK
-
-         val circomProofResult = convertCircomProofResult(proof)
-         val res = verifyCircomProof(zkeyPath, circomProofResult, proofLib)
-         result.success(res)
+      // ...
       } else {
          result.notImplemented()
       }
@@ -515,6 +334,10 @@ class MoproFlutterPlugin: FlutterPlugin, MethodCallHandler {
    // ...
 }
 ```
+
+:::note
+See the full implementation here: [`MoproFlutterPlugin.kt`](https://github.com/zkmopro/flutter-app/blob/3f3f2201607084532c13d4abedbc3f8b68b566ce/mopro_flutter_plugin/android/src/main/kotlin/com/example/mopro_flutter/MoproFlutterPlugin.kt#L118C9-L144C38)
+:::
 
 ## 4. Define Dart APIs
 
@@ -524,93 +347,30 @@ Please refer to [flutter-app](https://github.com/zkmopro/flutter-app) to see the
 
 -   Define the types for the native module. Add the following types in the file `mopro_flutter_plugin/lib/mopro_types.dart`:
 
-   <details>
-      <summary>Types in `/mopro_flutter_plugin/lib/mopro_types.dart`</summary>
-      ```dart title="/mopro_flutter_plugin/lib/mopro_types.dart"
-      import 'dart:typed_data';
+    ```dart title="/mopro_flutter_plugin/lib/mopro_types.dart"
+    import 'dart:typed_data';
 
-      class G1Point {
-         final String x;
-         final String y;
-         final String z;
+    class G1Point {
+       final String x;
+       final String y;
+       final String z;
 
-         G1Point(this.x, this.y, this.z);
+       G1Point(this.x, this.y, this.z);
 
-         @override
-         String toString() {
-            return "G1Point(\nx: $x, \ny: $y, \nz: $z)";
-         }
-      }
+       @override
+       String toString() {
+          return "G1Point(\nx: $x, \ny: $y, \nz: $z)";
+       }
+    }
 
-      class G2Point {
-         final List<String> x;
-         final List<String> y;
-         final List<String> z;
+    enum ProofLib { arkworks, rapidsnark }
 
-         G2Point(this.x, this.y, this.z);
+    // ...
+    ```
 
-         @override
-         String toString() {
-            return "G2Point(\nx: $x, \ny: $y, \nz: $z)";
-         }
-      }
-
-      class ProofCalldata {
-         final G1Point a;
-         final G2Point b;
-         final G1Point c;
-         final String protocol;
-         final String curve;
-
-         ProofCalldata(this.a, this.b, this.c, this.protocol, this.curve);
-
-         @override
-         String toString() {
-            return "ProofCalldata(\na: $a, \nb: $b, \nc: $c, \nprotocol: $protocol, \ncurve: $curve)";
-         }
-      }
-
-      enum ProofLib { arkworks, rapidsnark }
-
-      class CircomProofResult {
-         final ProofCalldata proof;
-         final List<String> inputs;
-
-         CircomProofResult(this.proof, this.inputs);
-
-         factory CircomProofResult.fromMap(Map<Object?, Object?> proofResult) {
-            var proof = proofResult["proof"] as Map<Object?, Object?>;
-            var inputs = proofResult["inputs"] as List;
-            var a = proof["a"] as Map<Object?, Object?>;
-            var b = proof["b"] as Map<Object?, Object?>;
-            var c = proof["c"] as Map<Object?, Object?>;
-
-            var g1a = G1Point(a["x"] as String, a["y"] as String, a["z"] as String);
-            var g2b = G2Point((b["x"] as List).cast<String>(),
-               (b["y"] as List).cast<String>(), (b["z"] as List).cast<String>());
-            var g1c = G1Point(c["x"] as String, c["y"] as String, c["z"] as String);
-            return CircomProofResult(
-               ProofCalldata(g1a, g2b, g1c, proof["protocol"] as String,
-                  proof["curve"] as String),
-               inputs.cast<String>());
-         }
-
-         Map<String, dynamic> toMap() {
-            return {
-               "proof": {
-                  "a": {"x": proof.a.x, "y": proof.a.y, "z": proof.a.z},
-                  "b": {"x": proof.b.x, "y": proof.b.y, "z": proof.b.z},
-                  "c": {"x": proof.c.x, "y": proof.c.y, "z": proof.c.z},
-                  "protocol": proof.protocol,
-                  "curve": proof.curve
-               },
-               "inputs": inputs
-            };
-         }
-      }
-      ```
-
-   </details>
+    :::note
+    See the full implementation here: [`mopro_types.dart`](https://github.com/zkmopro/flutter-app/blob/3f3f2201607084532c13d4abedbc3f8b68b566ce/mopro_flutter_plugin/lib/mopro_types.dart#L3C1-L81C2)
+    :::
 
 -   Add the native module's API functions in these files.
 
@@ -641,6 +401,10 @@ class MethodChannelMoproFlutterPlugin extends MoproFlutterPluginPlatform {
 }
 ```
 
+:::note
+See the full implementation here: [`mopro_flutter_method_channel.dart`](https://github.com/zkmopro/flutter-app/blob/3f3f2201607084532c13d4abedbc3f8b68b566ce/mopro_flutter_plugin/lib/mopro_flutter_method_channel.dart#L13C1-L30C4)
+:::
+
 ```dart title="mopro_flutter_plugin/lib/mopro_flutter_plugin_platform_interface.dart"
 abstract class MoproFlutterPluginPlatform extends PlatformInterface {
    //...
@@ -651,6 +415,10 @@ abstract class MoproFlutterPluginPlatform extends PlatformInterface {
    //...
 }
 ```
+
+:::note
+See the full implementation here: [`mopro_flutter_platform_interface.dart`](https://github.com/zkmopro/flutter-app/blob/3f3f2201607084532c13d4abedbc3f8b68b566ce/mopro_flutter_plugin/lib/mopro_flutter_platform_interface.dart#L29C3-L32C4)
+:::
 
 ```dart title="mopro_flutter_plugin/lib/mopro_flutter_plugin.dart"
 class MoproFlutterPlugin {
@@ -680,6 +448,10 @@ class MoproFlutterPlugin {
    //...
 }
 ```
+
+:::note
+See the full implementation here: [`mopro_flutter.dart`](https://github.com/zkmopro/flutter-app/blob/3f3f2201607084532c13d4abedbc3f8b68b566ce/mopro_flutter_plugin/lib/mopro_flutter.dart#L10C3-L33C1)
+:::
 
 ## 5. Use the plugin
 
@@ -718,10 +490,10 @@ Follow the steps below to integrate mopro plugin.
 3. Generate proofs in the app
 
     ```dart
-    import 'package:mopro_flutter/mopro_flutter.dart';
-    import 'package:mopro_flutter/mopro_types.dart';
+    import 'package:mopro_flutter_plugin/mopro_flutter_plugin.dart';
+    import 'package:mopro_flutter_plugin/mopro_types.dart';
 
-    final _moproFlutterPlugin = MoproFlutter();
+    final _moproFlutterPlugin = MoproFlutterPlugin();
 
     var inputs = '{"a":["3"],"b":["5"]}';
     var proofResult = await _moproFlutterPlugin.generateCircomProof(
