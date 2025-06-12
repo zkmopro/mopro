@@ -28,9 +28,9 @@ For adapter specific dependencies, please refer to each adapter's documentation.
 
 ## Supported Adapters
 
-- [Circom](/adapters/circom.md) - `["mopro-ffi/circom"]`
-- [Halo2](/adapters/halo2.md) - `["mopro-ffi/halo2"]`
-- [Noir](/adapters/noir.md) - `["mopro-ffi/noir"]`
+-   [Circom](/adapters/circom.md) - `["mopro-ffi/circom"]`
+-   [Halo2](/adapters/halo2.md) - `["mopro-ffi/halo2"]`
+-   [Noir](/adapters/noir.md) - `["mopro-ffi/noir"]`
 
 ## Using Adapters
 
@@ -47,7 +47,7 @@ mopro_ffi::app!();
 rust_witness::witness!(multiplier2);
 
 mopro_ffi::set_circom_circuits! {
-    ("multiplier2_final.zkey", multiplier2_witness),
+    ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(multiplier2_witness)),
 }
 
 // Halo2 adapter
@@ -59,7 +59,17 @@ mopro_ffi::set_halo2_circuits! {
 In the iOS project, you can utilize both adapters:
 
 ```swift
-let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs, proofLib: ProofLib.arkworks)
+let circomProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: inputs, proofLib: ProofLib.arkworks)
 
-let generateProofResult = try generateHalo2Proof(srsPath: srsPath, pkPath: pkPath, circuitInputs: inputs)
+let halo2ProofResult = try generateHalo2Proof(srsPath: srsPath, pkPath: pkPath, circuitInputs: inputs)
 ```
+
+## Custom Adapters
+
+Even if you're using an adapter that isn’t officially supported by Mopro, you can still integrate it using [UniFFI](https://github.com/mozilla/uniffi-rs). This allows you to build custom adapters, for example
+
+-   Binius: https://github.com/vivianjeng/binius-sha256
+-   Spartan: https://github.com/zkmopro/mopro/pull/244
+-   Nova Scotia: https://github.com/zkmopro/mopro/pull/240
+
+🔧 For setup details, refer to the [Rust Setup](setup/rust-setup) guide.
