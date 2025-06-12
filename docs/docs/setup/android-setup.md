@@ -41,7 +41,7 @@ Please make sure you choose the **Android** view like this.
 
 ## 1. Add dependencies
 
-Then add jna to `app/build.gradle.kts`
+Then add [jna](https://github.com/java-native-access/jna) to `app/build.gradle.kts`
 
 ```kts title="app/build.gradle.kts"
 dependencies {
