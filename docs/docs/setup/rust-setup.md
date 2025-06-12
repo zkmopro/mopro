@@ -103,7 +103,7 @@ This tutorial will cover:
 
 1. [Circom prover](#setup-circom-based-rust-project)
 2. [Halo2 prover](#setup-halo2-based-rust-project)
-3. [Noir prover](#setup-any-rust-project)
+3. [Noir prover](#setup-noir-based-rust-project)
 
 :::info
 If you’re starting from scratch, the setup process is very similar to using the mopro CLI. Please refer to the [Getting Started](/docs/getting-started) guide for detailed instructions.
@@ -428,91 +428,92 @@ You may also bring in other Rust crates to extend functionality.
 
 For instance, to use `semaphore-rs`, you can add it like this:
 
-<!-- TODO: use semaphore-protocol/semaphore-rs, waiting for this to be merged: https://github.com/semaphore-protocol/semaphore-rs/pull/12 -->
-
 ```toml title="Cargo.toml"
 [dependencies]
-semaphore-rs = { git = "https://github.com/worldcoin/semaphore-rs", features = [
-    "depth_16",
-] }
-serde_json = "1.0" # for serialize proofs
+semaphore-rs = { git = "https://github.com/semaphore-protocol/semaphore-rs", features = ["serde"] }
 ```
 
 ```rust title="src/lib.rs"
 mopro_ffi::app!(); // Enable the mopro-ffi macro to generate UniFFI scaffolding.
 
-use semaphore_rs::{
-    get_supported_depths, hash_to_field, identity::Identity, poseidon_tree::LazyPoseidonTree,
-    protocol::*, Field,
-};
-
-#[derive(uniffi::Record)] // if using proc-macros
-struct ProofResult {
-    inputs: String,
-    proof: String,
-}
-
-#[uniffi::export]
-fn get_id_commitment(id_secret: String) -> String {
-    let mut secret: [u8; 5] = [0; 5]; // Initialize with zeroes
-    let bytes = id_secret.as_bytes();
-    secret[..bytes.len().min(5)].copy_from_slice(&bytes[..bytes.len().min(5)]);
-    let id = Identity::from_secret(&mut secret, None);
-    return id.commitment().to_string();
-}
+use semaphore_rs::group::Group;
+use semaphore_rs::identity::Identity;
+use semaphore_rs::proof::GroupOrMerkleProof;
+use semaphore_rs::proof::Proof;
+use semaphore_rs::proof::SemaphoreProof;
 
 #[uniffi::export]
 fn semaphore_prove(
     id_secret: String,
-    leaves: Vec<String>,
-    signal: String,
-    external_nullifier: String,
-) -> ProofResult {
-    // generate identity
-    let mut secret: [u8; 5] = [0; 5]; // Initialize with zeroes
-    let bytes = id_secret.as_bytes();
-    secret[..bytes.len().min(5)].copy_from_slice(&bytes[..bytes.len().min(5)]);
-    let id = Identity::from_secret(&mut secret, None);
+    leaves: Vec<Vec<u8>>,
+    message: String,
+    scope: String,
+    tree_depth: u16,
+) -> String {
+    let identity = Identity::new(id_secret.as_bytes());
+    let group_members: Vec<[u8; 32]> = leaves
+        .iter()
+        .map(|leaf| {
+            leaf.as_slice()
+                .try_into()
+                .expect("Leaf must be exactly 32 bytes")
+        })
+        .collect::<Vec<[u8; 32]>>();
+    let group = Group::new(&group_members).unwrap();
+    let proof = Proof::generate_proof(
+        identity,
+        GroupOrMerkleProof::Group(group),
+        message.to_string(),
+        scope.to_string(),
+        tree_depth,
+    )
+    .unwrap();
+    let proof_json = proof.export().unwrap();
+    return proof_json;
+}
 
-    // Get the first available tree depth. This is controlled by the crate features.
-    let depth = get_supported_depths()[0];
-
-    // generate merkle tree
-    let empty_leaf = Field::from(0);
-    let mut tree = LazyPoseidonTree::new(depth, empty_leaf).derived();
-    let mut user_index = 0;
-    for (index, leaf_str) in leaves.iter().enumerate() {
-        let field_value = Field::from_str_radix(&leaf_str, 10).expect("Invalid decimal string");
-        tree = tree.update(index, &field_value);
-        if id.commitment() == field_value {
-            user_index = index;
-        }
-    }
-    let merkle_proof = tree.proof(user_index);
-    let root = tree.root();
-
-    // change signal and external_nullifier here
-    let signal_hash = hash_to_field(signal.as_bytes());
-    let external_nullifier_hash = hash_to_field(external_nullifier.as_bytes());
-
-    let nullifier_hash = generate_nullifier_hash(&id, external_nullifier_hash);
-
-    let proof = generate_proof(&id, &merkle_proof, external_nullifier_hash, signal_hash).unwrap();
-    let reserialized = serde_json::to_string(&proof).unwrap();
-    let serialized_inputs =
-        serde_json::to_string(&[root, nullifier_hash, signal_hash, external_nullifier_hash])
-            .unwrap();
-    let proof_result = ProofResult {
-        inputs: serialized_inputs,
-        proof: reserialized,
-    };
-    proof_result
+#[uniffi::export]
+fn semaphore_verify(proof: String) -> bool {
+    let proof = SemaphoreProof::import(&proof).unwrap();
+    let valid = Proof::verify_proof(proof);
+    valid
 }
 ```
 
-:::info
-Please refer to [this repo](https://github.com/chengggkk/Zuma/blob/master/src/lib.rs) for more information.
-:::
+<details>
+    <summary>Example usage</summary>
+    ```rust
+    #[cfg(test)]
+    mod uniffi_tests {
+        use super::*;
+        use semaphore_rs::utils::to_element;
+
+        #[test]
+        fn test_mopro_uniffi_hello_world() {
+            let secret1 = "secret1";
+            let secret2 = "secret2";
+            let identity1 = Identity::new(secret1.as_bytes());
+            let identity2 = Identity::new(secret2.as_bytes());
+            let leaves = vec![
+                to_element(*identity1.commitment()).to_vec(),
+                to_element(*identity2.commitment()).to_vec(),
+            ];
+            let message = "message";
+            let scope = "scope";
+            let tree_depth = 10;
+            let proof = semaphore_prove(
+                secret1.to_string(),
+                leaves,
+                message.to_string(),
+                scope.to_string(),
+                tree_depth,
+            );
+            assert!(semaphore_verify(proof));
+        }
+    }
+    ```
+
+</details>
 
 ### 2. Generate bindings for iOS and Android
 
