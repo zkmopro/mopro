@@ -10,6 +10,7 @@ sidebar_position: 1
 
 Mopro simplifies the development of mobile-native apps by offering:
 
+-   `mopro-ffi` **simplifies** the manual UniFFI setup process and enables a **modular** approach to proving systems.
 -   A powerful **CLI** to scaffold, build, and update projects
 -   Prebuilt **templates** for iOS, Android, React Native, and Flutter
 -   Clear, step-by-step **documentation** to guide developers at every stage

@@ -519,7 +519,7 @@ fn semaphore_verify(proof: String) -> bool {
 
 Similar to Circom-based Rust project setup [3. Generate bindings for iOS and Android](#3-generate-bindings-for-ios-and-android)
 
-Once the bindings are generated, you'll see your exported functions (e.g., `getIdCommitment`, `semaphoreProve`) included in the generated code—for example, in `MoproiOSBindings/mopro.swift` for iOS and `MoproAndroidBindings/uniffi/mopro/mopro.kt` for Android.
+Once the bindings are generated, you'll see your exported functions (e.g., `semaphoreProve`, `semaphoreVerify`) included in the generated code—for example, in `MoproiOSBindings/mopro.swift` for iOS and `MoproAndroidBindings/uniffi/mopro/mopro.kt` for Android.
 
 You can then use these functions directly within your iOS and/or Android applications as part of the generated bindings.
 
