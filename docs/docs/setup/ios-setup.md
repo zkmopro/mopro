@@ -1,31 +1,52 @@
-
 # iOS Setup
 
-Before starting, ensure you have completed ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) with selecting **iOS** platform. This step enables you to use the mopro cli to generate the required bindings for your iOS project.
+This tutorial will guide you through integrating the iOS bindings into an Xcode project. Before you begin, make sure you’ve completed the ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) process with selecting **iOS** platform and have the `MoproiOSBindings` folder ready:
 
-Once the iOS bindings have been built successfully, you will find a folder named **MoproiOSBindings** in your project directory. Inside **MoproiOSBindings** folder there should be a file named `mopro.swift` and a folder named `MoproBindings.xcframework`.
+```sh
+MoproiOSBindings
+├── mopro.swift
+└── MoproBindings.xcframework
+```
 
-## Demo video of this tutorial
+Watch the demo video below for a step-by-step guide to integrating the bindings into Xcode, or follow the written instructions that follow.
 
 <p align="center">
 <iframe width="560" height="315" src="https://www.youtube.com/embed/6TydXwYMQCU?si=TDw5qkbWSs-Uhw5E" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </p>
 
-First let's make a new iOS app Xcode project. If you already have an app project you can skip this step. We'll do File -> New -> Project and create an iOS App. Make sure the language is Swift. We suggest putting this iOS project inside the rust project folder created above.
+:::info
+In this example, we use Circom circuits and their corresponding `.zkey` files. The process is similar for other provers.
+:::
 
+## 0. Initialize an XCode project
+
+First let's make a new iOS app Xcode project. If you already have an app project you can skip this step. We'll do `File` -> `New` -> `Project` and create an iOS App. Make sure the language is _Swift_. We suggest putting this iOS project inside the rust project folder created above.
+
+<p align="center">
 ![create an ios app project](/img/ios-example-1.png)
+</p>
 
-Your Xcode project should be open now. Open Finder and drag the `MoproiOSBindings` folder into the project folder structure.
+## 1. Drag the `MoproiOSBindings` folder into the project
 
+Your Xcode project should be open now. Open **Finder** and drag the `MoproiOSBindings` folder into the project folder structure.
+
+<p align="center">
 ![add mopro ios bindings to project](/img/ios-example-2.png)
+</p>
 
-Next drag in any zkeys you plan to prove with. Go to the project "Build Phases" and add each zkey to the "Copy Bundle Resources" step.
+## 2. Place proving keys into the project
+
+Next drag in any key you plan to prove with. Go to the project **Build Phases** and add each key to the **Copy Bundle Resources** step.
 
 ![copy zkeys as bundle resources](/img/ios-example-3.png)
 
 Now you're ready to write the proving code in your app!
 
-## Proving from the app
+:::warning
+Although relative paths may work locally in Rust, the proving keys should be copied into the project to ensure they are accessible by the mobile app.
+:::
+
+## 3. Proving from the app
 
 In your project there should be a file named `ContentView`. At the top of this file add the following:
 
@@ -36,9 +57,10 @@ import moproFFI
 This will make the proving functions `generateCircomProof` and `verifyCircomProof` available in this module.
 
 In the `ContentView` itself add a private variable and a button like this:
+
 ```swift
 struct ContentView: View {
-    private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
+    private let zkeyPath = Bundle.main.path(forResource: "multiplier3_final", ofType: "zkey")!
 
     var body: some View {
         VStack {
@@ -49,7 +71,7 @@ struct ContentView: View {
 }
 ```
 
-We use the `Bundle` api to retrieve the full path to our zkey. Change `multiplier2_final` to the name of your zkey.
+We use the `Bundle` api to retrieve the full path to our zkey. Change `multiplier3_final` to the name of your zkey.
 
 At the bottom of this file we'll add an extension with a function to generate a proof. In this example we're going to prove a simple circuit that accepts two inputs named `a` and `b` and generates an output `c`.
 
@@ -65,17 +87,17 @@ extension ContentView {
         // the input is not an array, it will still be specified as
         // and array of length 1.
         let input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
-        
+
         // Begin timing our proof generation
         let start = CFAbsoluteTimeGetCurrent()
-        
+
         // Call into the compiled static library
         do {
             let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
         } catch {
             print("Error generate a proof: \(error)")
         }
-        
+
         let end = CFAbsoluteTimeGetCurrent()
         let timeTaken = end - start
         print("built proof in \(String(format: "%.3f", timeTaken))s")
@@ -83,4 +105,27 @@ extension ContentView {
 }
 ```
 
-You should now be able to run the iOS app on the simulator or a device and build a proof. The app should log the time taken to generate the proof. For a more complete example including serialization and verification check [here](https://github.com/vimwitch/mopro-app/blob/main/ios/mopro-test/ContentView.swift).
+You should now be able to run the iOS app on the simulator or a device and build a proof. The app should log the time taken to generate the proof. For a more complete example including serialization and verification check [here](https://github.com/zkmopro/mopro/blob/63d6cbaf1bdbcb089f889f86b2a6a0443c6a8679/test-e2e/ios/mopro-test/ContentView.swift).
+
+## 4. What's next?
+
+-   **Update your ZK circuits** as needed. After making changes, be sure to run:
+
+    ```sh
+    mopro build
+    mopro update
+    ```
+
+    :::warning
+    `mopro update` only works if the Android project was created _within_ the Rust project directory during mopro init. Otherwise, you can manually update the bindings by following [Step 1](#1-drag-the-moproiosbindings-folder-into-the-project).
+    :::
+
+    This ensures the bindings are regenerated and reflect your latest updates.
+
+-   **Build your mobile app frontend** according to your business logic and user flow.
+-   **Expose additional Rust functionality:**
+    If a function is missing in Swift, Kotlin, React Native, or Flutter, you can:
+
+    -   Add the required Rust crate in `Cargo.toml`
+    -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](setup/rust-setup.md#-customize-the-bindings) guide for details).<br/>
+        Once exported, the function will be available across all supported platforms.
