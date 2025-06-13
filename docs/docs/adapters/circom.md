@@ -4,7 +4,7 @@ Mopro supports the integration of Circom circuits. For this, you need to have pr
 
 ## Samples
 
-Explore how the Circom adapter is implemented by checking out this sample project [mopro-app](https://github.com/vimwitch/mopro-app) or the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
+Explore how the Circom adapter is implemented by checking out the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
 
 ## Setup the rust project
 
@@ -25,17 +25,23 @@ mopro-ffi = { version = "0.2" }
 
 In order for the Mopro to be able to generate proofs for your chosen circom circuits, you need to provide a witness generation function for each of the circuits you plan to use to generate proofs for. This function handles the witness generation for your circuit. You can read more about witnesses for circom circuits [here](https://docs.circom.io/background/background/#witness).
 
+Mopro provides three different witness generators. By default, the Mopro CLI uses `rust-witness`, as it offers better stability and faster build times.
+
+If you're interested in exploring the differences between witness generators, check out [this blog post](/blog/circom-comparison).
+
+### [`rust-witness`](https://github.com/chancehudson/rust-witness)
+
 The function signature should be:
 
 ```rust
-pub type WtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
+type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 ```
 
-## Implementing the Witness Function
+-   Implementing the Witness Function
 
 For simplicity, you can use the `witness!` macro provided by the `rust-witness` crate. This macro generates a witness function for you given the circuit name. You can read more about the `witness!` macro [here](https://github.com/vimwitch/rust-witness).
 
-#### Adding the `rust-witness` Crate Dependency
+-   Adding the `rust-witness` Crate Dependency
 
 To use it, you must first add the `rust-witness` crate to your `Cargo.toml` regular and build dependencies:
 
@@ -49,7 +55,7 @@ rust-witness = "0.1"
 rust-witness = "0.1"
 ```
 
-#### Configuring the path to the `.wasm` circuit files in the `build.rs`
+-   Configuring the path to the `.wasm` circuit files in the `build.rs`
 
 Then you need to add to the `build.rs` the call to `rust_witness::transpile::transpile_wasm` macro and pass it the path to the folder containing the `.wasm` files for the circom circuits. The path can be absolute or a relative to the location of the `build.rs` file. Note that the `.wasm` files can be recursively in subfolders of the specified folder, as in the example below.
 
@@ -78,7 +84,7 @@ fn main() {
 }
 ```
 
-#### Automatically Generating Witness Functions
+-   Automatically Generating Witness Functions
 
 Then you can automatically generate the witness functions for all the circuits in the specified folder.
 
@@ -92,6 +98,103 @@ rust_witness::witness!(keccak256256test);
 
 This will generate the witness function for the specified circuit following [the naming convention here](https://github.com/vimwitch/rust-witness?tab=readme-ov-file#rust-witness).
 
+### [`witnesscalc_adapter`](https://github.com/zkmopro/witnesscalc_adapter)
+
+:::warning
+Ensure the following [requirements](https://github.com/zkmopro/witnesscalc_adapter?tab=readme-ov-file#requirements) before using `witnesscalc_adapter`.
+:::
+
+The witnesscalc-adapter is based on the original [witnesscalc](https://github.com/0xPolygonID/witnesscalc) implementation in C++. To use it, compile your Circom circuit with the `--c` flag to generate C++ code. Then, retrieve the `.dat` file from the output C++ folder for use in the adapter. For example, compile the circuit using:
+
+```sh
+circom multiplier2.circom --c
+```
+
+-   The function signature should be:
+
+```rust
+type WitnesscalcWtnsFn = fn(&str) -> anyhow::Result<Vec<u8>>;
+```
+
+-   Adding the `witnesscalc-adapter` Crate Dependency
+
+To use it, you must first add the `witnesscalc-adapter` crate to your `Cargo.toml` regular and build dependencies:
+
+```toml
+[dependencies]
+# ...
+mopro-ffi = { version="0.2", features = ["witnesscalc"] } # activate witnesscalc feature
+witnesscalc-adapter = "0.1"
+
+[build-dependencies]
+# ...
+witnesscalc-adapter = "0.1"
+```
+
+-   Configuring the path to the `.dat` circuit files in the `build.rs`
+
+Then you need to add to the `build.rs` the call to `witnesscalc_adapter::build_and_link` macro and pass it the path to the folder containing the `.dat` files for the circom circuits. The path can be absolute or a relative to the location of the `build.rs` file. Note that the `.dat` files can be recursively in subfolders of the specified folder.
+
+You will need to add the following to the `build.rs` file:
+
+```rust
+fn main() {
+    // ...
+    witnesscalc_adapter::build_and_link("../test-vectors/circom");
+    // ...
+}
+```
+
+-   Automatically Generating Witness Functions
+
+Then you can automatically generate the witness functions for all the circuits in the specified folder.
+
+To do so, in the `lib.rs` file, you can add the following:
+
+```rust
+witnesscalc_adapter::witness!(multiplier2);
+witnesscalc_adapter::witness!(multiplier3);
+witnesscalc_adapter::witness!(keccak_256_256_test);
+```
+
+:::warning
+Currently, circuit names can include underscores (`_`) but not dashes (`-`). <br/>
+Make sure your circuit name does not contain dashes, and avoid using `main` as the circuit name to prevent conflicts.
+:::
+
+### [`circom-witnesscalc`](https://github.com/iden3/circom-witnesscalc)
+
+:::danger
+It doesn't support for some circuits: see [Unimplemented features](https://github.com/iden3/circom-witnesscalc?tab=readme-ov-file#unimplemented-features)
+:::
+
+-   Compile a circuit graph before using the `circom-witnesscalc`. Please checkout: [Compile a circuit and build the witness graph](https://github.com/iden3/circom-witnesscalc?tab=readme-ov-file#compile-a-circuit-and-build-the-witness-graph).
+
+-   The function signature should be:
+
+```rust
+type CircomWitnessCalcWtnsFn = fn(&str) -> anyhow::Result<Vec<u8>>;
+```
+
+-   Activate `circom-witnesscalc` Feature
+
+To use it, you only need to activate the `circom-witnesscalc` feature in `mopro-ffi` in your `Cargo.toml`.
+
+```toml
+[dependencies]
+# ...
+mopro-ffi = { version= "0.2", features = ["circom-witnesscalc"] } # activate circom-witnesscalc feature
+```
+
+-   Use the Mopro helper to enable the graph functionality in your project.
+
+```rust
+const GRAPH_PATH: &str = "./test-vectors/circom/multiplier2.bin";
+mopro_ffi::graph!(multiplier2, &GRAPH_PATH)
+// The witness name (multiplier2) does not need to match the file name, and there are no restrictions on its format.
+// Then you will have a witness function called multiplier2_witness
+```
+
 ## Setting the Circom Circuits
 
 To set Circom circuits you want to use on other platforms, you need to use the `set_circom_circuits!` macro provided by the `mopro-ffi` crate. This macro should be called in the `lib.rs` file of your project, after the `mopro_ffi::app()` macro call. You should pass it a list of tuples (pairs), where the first element is the name of the `zkey` file and the second element is the witness generation function.
@@ -100,9 +203,12 @@ For example:
 
 ```rust
 mopro_ffi::set_circom_circuits! {
-    ("multiplier2_final.zkey", multiplier2_witness),
-    ("multiplier3_final.zkey", multiplier3_witness),
-    ("keccak256_256_test_final.zkey", keccak256256test_witness),
+    // using rust-witness
+    ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(multiplier2_witness)),
+    // using witnesscalc
+    ("multiplier3_final.zkey", mopro_ffi::witness::WitnessFn::Witnesscalc(multiplier3_witness)),
+    // using circom-witnesscalc
+    ("keccak256_256_test_final.zkey", mopro_ffi::witness::WitnessFn::CircomWitnesscalc(keccak256256test_witness)),
 }
 ```
 
@@ -123,6 +229,45 @@ fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::WtnsFn, mopro_ffi::Mop
 
 This might be useful if you want to have more control over the proving functions for each circuit.
 
+## Proof Generation Functions
+
+Mopro now supports 2 Circom provers. You can find more information in [the blog post](/blog/circom-comparison).
+
+### [`ark-works`](https://github.com/arkworks-rs)
+
+-   By default, Arkworks is enabled as it offers greater stability.
+
+### [`rust-rapidsnark`](https://github.com/zkmopro/rust-rapidsnark)
+
+-   `rust-rapidsnark` is based on the original C++ implementation of [rapidsnark](https://github.com/iden3/rapidsnark), with the binary wrapped and integrated in Rust.
+-   Activate `rapidsnark` Feature for both `[dependencies]` and `[build-dependencies]`
+
+```toml
+[dependencies]
+# ...
+mopro-ffi = { version= "0.2", features = ["rapidsnark"] } # activate rapidsnark feature
+
+[build-dependencies]
+# ...
+mopro-ffi = { version= "0.2", features = ["rapidsnark"] } # activate rapidsnark featurer
+```
+
+## Generate Proofs
+
+By integrating the witness generator with the prover, you can run `generate_circom_proof` using
+
+```rust
+let zkey_path = "./test-vectors/circom/multiplier2_final.zkey".to_string();
+let circuit_inputs = "{\"a\": 2, \"b\": 3}".to_string();
+let result = generate_circom_proof(
+    zkey_path.clone(),
+    circuit_inputs,
+    ProofLib::Arkworks
+    // To use rapidsnark
+    // ProofLib::Rapidsnark
+);
+```
+
 ## Using the Library
 
 After you have specified the circuits you want to use, you can follow the usual steps to build the library and use it in your project.
@@ -131,47 +276,66 @@ After you have specified the circuits you want to use, you can follow the usual 
 
 The Circom adapter exposes the following functions to be used in the iOS project:
 
+### `generateCircomProof`
+
 ```swift
 // Generate a proof for a given circuit zkey, as well as the circuit inputs
 // Make sure that the name of the zkey file matches the one you set in the `set_circom_circuits!` macro
-generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input, proofLib: proofLib) -> GenerateProofResult
-
-// Verify a proof for a given circuit zkey
-// This works for arbitrary circuits, as long as the zkey file is valid
-verifyCircomProof(
-    zkeyPath: zkeyPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs, proofLib: proofLib) -> Bool
-
-// Convert a Circom proof to an Ethereum compatible proof
-toEthereumProof(proof: generateProofResult.proof) -> ProofCalldata
-
-// Convert a Circom public input to an Ethereum compatible public input
-toEthereumInputs(inputs: generateProofResult.inputs) -> [String]
+public func generateCircomProof(zkeyPath: String, circuitInputs: String, proofLib: ProofLib)throws  -> CircomProofResult
 ```
 
-As well as the following types:
+### `verifyCircomProof`
+
+```swift
+// Verify a proof for a given circuit zkey
+// This works for arbitrary circuits, as long as the zkey file is valid
+public func verifyCircomProof(zkeyPath: String, proofResult: CircomProofResult, proofLib: ProofLib)throws  -> Bool
+```
+
+### `G1`
 
 ```swift
 public struct G1 {
     public var x: String
     public var y: String
+    public var z: String
 }
+```
 
+### `G2`
+
+```swift
 public struct G2 {
     public var x: [String]
     public var y: [String]
+    public var z: [String]
 }
+```
 
-public struct ProofCalldata {
+### `CircomProof`
+
+```swift
+public struct CircomProof {
     public var a: G1
     public var b: G2
     public var c: G1
+    public var `protocol`: String
+    public var curve: String
 }
+```
 
-public struct GenerateProofResult {
-    public var proof: Data
-    public var inputs: Data
+### `CircomProofResult`
+
+```swift
+public struct CircomProofResult {
+    public var proof: CircomProof
+    public var inputs: [String]
 }
+```
 
+### `ProofLib`
+
+```swift
 public enum ProofLib {
     case arkworks
     case rapidsnark
@@ -181,3 +345,75 @@ public enum ProofLib {
 ### Android API
 
 The Circom adapter exposes the equivalent functions and types to be used in the Android project.
+
+### `generateCircomProof`
+
+```kotlin
+// Generate a proof for a given circuit zkey, as well as the circuit inputs
+// Make sure that the name of the zkey file matches the one you set in the `set_circom_circuits!` macro
+fun `generateCircomProof`(
+    `zkeyPath`: kotlin.String,
+    `circuitInputs`: kotlin.String,
+    `proofLib`: ProofLib,
+): CircomProofResult
+```
+
+### `verifyCircomProof`
+
+```kotlin
+fun `verifyCircomProof`(
+    `zkeyPath`: kotlin.String,
+    `proofResult`: CircomProofResult,
+    `proofLib`: ProofLib,
+): kotlin.Boolean
+```
+
+### `G1`
+
+```kotlin
+data class G1(
+    var `x`: kotlin.String,
+    var `y`: kotlin.String,
+    var `z`: kotlin.String,
+)
+```
+
+### `G2`
+
+```kotlin
+data class G2(
+    var `x`: List<kotlin.String>,
+    var `y`: List<kotlin.String>,
+    var `z`: List<kotlin.String>,
+)
+```
+
+### `CircomProof`
+
+```kotlin
+data class CircomProof(
+    var `a`: G1,
+    var `b`: G2,
+    var `c`: G1,
+    var `protocol`: kotlin.String,
+    var `curve`: kotlin.String,
+)
+```
+
+### `CircomProofResult`
+
+```kotlin
+data class CircomProofResult(
+    var `proof`: CircomProof,
+    var `inputs`: List<kotlin.String>,
+)
+```
+
+### `ProofLib`
+
+```kotlin
+enum class ProofLib {
+    ARKWORKS,
+    RAPIDSNARK,
+}
+```
