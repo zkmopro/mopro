@@ -538,5 +538,5 @@ Don't forget to modify the input values for your specific case!
 -   **Expose additional Rust functionality:**
     If a function is missing in Swift, Kotlin, React Native, or Flutter, you can:
     -   Add the required Rust crate in `Cargo.toml`
-    -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](setup/rust-setup.md#setup-any-rust-project) guide for details).<br/>
+    -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](rust-setup.md#-customize-the-bindings) guide for details).<br/>
         Once exported, the function will be available across all supported platforms.

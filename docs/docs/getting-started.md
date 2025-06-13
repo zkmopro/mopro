@@ -325,7 +325,7 @@ This will automatically detect and update the corresponding bindings in each pla
     If a function is missing in Swift, Kotlin, React Native, or Flutter, you can:
 
     -   Add the required Rust crate in `Cargo.toml`
-    -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](setup/rust-setup.md#setup-any-rust-project) guide for details).<br/>
+    -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](setup/rust-setup.md#-customize-the-bindings) guide for details).<br/>
         Once exported, the function will be available across all supported platforms.
         :::warning
         When using React Native or Flutter, don’t forget to update the module’s API definitions to ensure the framework can access the new Swift/Kotlin bindings.<br/>

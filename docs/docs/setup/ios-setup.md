@@ -127,5 +127,5 @@ You should now be able to run the iOS app on the simulator or a device and build
     If a function is missing in Swift, Kotlin, React Native, or Flutter, you can:
 
     -   Add the required Rust crate in `Cargo.toml`
-    -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](setup/rust-setup.md#-customize-the-bindings) guide for details).<br/>
+    -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](rust-setup.md#-customize-the-bindings) guide for details).<br/>
         Once exported, the function will be available across all supported platforms.
