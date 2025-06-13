@@ -4,7 +4,7 @@ Mopro supports the use of Halo2 circuits, allowing for both the Halo2 library fr
 
 ## Samples
 
-Explore how the Halo2 adapter is implemented by checking out this [Sample Mopro Halo2-Adapter Project](https://github.com/zkmopro/halo2-app) or the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
+Explore how the Halo2 adapter is implemented by checking out the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
 
 ## Setting Up the Rust Project
 
@@ -21,8 +21,11 @@ mopro-ffi = { version = "0.2" }
 # ...
 ```
 
-Then, remove the `rust-witness` dependency from `[dependencies]` and `[build-dependencies]` as it is unnecessary for Halo2 circuits.
+:::note
+If you already had a project with circom:<br/>
+Remove the `rust-witness` dependency from `[dependencies]` and `[build-dependencies]` as it is unnecessary for Halo2 circuits.
 Likewise, remove the `rust_witness::transpile::transpile_wasm!` macro call from the `build.rs` file and any `rust_witness::witness!` and `mopro_ffi::set_circom_circuits!` calls from the `lib.rs`.
+:::
 
 ## Implementing the Halo2 Circuit
 
@@ -33,7 +36,7 @@ The design of the Halo2 adapter minimizes restrictions, allowing flexibility in 
 When generating a proof for a Halo2 circuit, the Mopro will do a call to the proving function that you provide. This function should have the following signature:
 
 ```rust
-pub type Halo2ProveFn = fn(&str, &str, HashMap<String, Vec<String>>) -> Result<GenerateProofResult, Box<dyn std::error::Error>>;
+pub type Halo2ProveFn = fn(&str, &str, HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
 ```
 
 The first two arguments are the path to the `srs` and `proving` key files, and the third argument is a map of the inputs for the circuit.
@@ -42,6 +45,10 @@ It is then your responsibility to load the keys from the path and set up the cir
 
 The result of the function should be a `GenerateProofResult` struct, which contains the proof and the public inputs in the form of `Vec<u8>`. It is up to you to serialize the proof and the public inputs in a way that you can deserialize.
 
+```rust
+pub type GenerateProofResult = (Vec<u8>, Vec<u8>);
+```
+
 You can find an example of a proving function in the [Halo2 Fibonacci circuit sample](https://github.com/ElusAegis/halo2-fibonacci-sample/blob/main/src/lib.rs).
 
 ### Verifying Function
@@ -49,12 +56,12 @@ You can find an example of a proving function in the [Halo2 Fibonacci circuit sa
 When verifying a proof for a Halo2 circuit, the Mopro will do a call to the verifying function that you provide. This function should have the following signature:
 
 ```rust
-pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn std::error::Error>>;
+pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
 ```
 
 The first two arguments are the path to the `srs` and `verifying` key files, and the last two arguments are the serialised proof and the public inputs.
 
-It is then your responsibility to load the keys from the path and set up the circuit, as well as to deserialize the proof and the public inputs and verify the proof. 
+It is then your responsibility to load the keys from the path and set up the circuit, as well as to deserialize the proof and the public inputs and verify the proof.
 Make sure that your deserialization method is compatible with the serialization method you used in the proving function.
 
 The result of the function should be a `bool`, which indicates whether the proof is valid or not.
@@ -99,6 +106,10 @@ fn get_halo2_verifying_circuit(circuit: &str) -> Result<Halo2VerifyFn, MoproErro
 
 This might be useful if you want to have more control over the proving and verifying functions for each circuit or if you want to only add the proving or verifying function for a circuit.
 
+## Plonkish Backends
+
+You can also switch between different proving backends using [`plonkish_backend`](https://github.com/han0110/plonkish). See [this example repo](https://github.com/sifnoc/plonkish-fibonacci-sample) for more details.
+
 ## Using the Library
 
 After you have specified the circuits you want to use, you can follow the usual steps to build the library and use it in your project.
@@ -107,20 +118,22 @@ After you have specified the circuits you want to use, you can follow the usual 
 
 The Halo2 adapter exposes the following functions to be used in the iOS project:
 
-```swift
-// Generate a proof for a Halo2 circuit given the srs and proving key files, as well as the circuit inputs
-// Make sure that the key was set in the Rust library
-generateHalo2Proof(srsPath: srsPath, pkPath: pkPath, circuitInputs: inputs) -> GenerateProofResult
+#### `generateHalo2Proof`
 
-// Verify a proof for a Halo2 circuit given the srs and verifying key files, as well as the proof and public inputs
-// Make sure that the key was set in the Rust library
-verifyHalo2Proof(srsPath: srsPath, vkPath: vkPath, proof: generateProofResult.proof, publicInput: generateProofResult.inputs) -> Bool
+```swift
+public func generateHalo2Proof(srsPath: String, pkPath: String, circuitInputs: [String: [String]])throws  -> Halo2ProofResult
 ```
 
-As well as the following types:
+#### `verifyHalo2Proof`
 
 ```swift
-public struct GenerateProofResult {
+public func verifyHalo2Proof(srsPath: String, vkPath: String, proof: Data, publicInput: Data)throws  -> Bool
+```
+
+#### `Halo2ProofResult`
+
+```swift
+public struct Halo2ProofResult {
     public var proof: Data
     public var inputs: Data
 }
@@ -128,6 +141,34 @@ public struct GenerateProofResult {
 
 ### Android API
 
-The Halo2 adapter exposes the equivalent functions and types to be used in the Android project. 
+The Halo2 adapter exposes the equivalent functions and types to be used in the Android project.
 
+#### `generateHalo2Proof`
 
+```kotlin
+fun `generateHalo2Proof`(
+    `srsPath`: kotlin.String,
+    `pkPath`: kotlin.String,
+    `circuitInputs`: Map<kotlin.String, List<kotlin.String>>,
+): Halo2ProofResult
+```
+
+#### `verifyHalo2Proof`
+
+```kotlin
+fun `verifyHalo2Proof`(
+    `srsPath`: kotlin.String,
+    `vkPath`: kotlin.String,
+    `proof`: kotlin.ByteArray,
+    `publicInput`: kotlin.ByteArray,
+): kotlin.Boolean
+```
+
+#### `Halo2ProofResult`
+
+```kotlin
+data class Halo2ProofResult(
+    var `proof`: kotlin.ByteArray,
+    var `inputs`: kotlin.ByteArray,
+)
+```
