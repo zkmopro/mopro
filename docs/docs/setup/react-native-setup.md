@@ -1,78 +1,29 @@
 # React Native Setup
 
-Using ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) guide, you can generate the "MoproAndroidBindings" and "MoproIOSBindings" for the iOS and android platforms in your project folder. These bindings allow you to create a cross-platform project using [React Native](https://reactnative.dev/).<br/>
+This tutorial will guide you through integrating the iOS bindings and Android bindings into an [React Native](https://reactnative.dev/)) project. Before you begin, make sure you’ve completed the ["Getting Started - 3. Mopro build"](/docs/getting-started.md#3-build-bindings) process with selecting **iOS** platform and **Android** platform and have the `MoproiOSBindings` and `MoproAndroidBindings` folder ready:
 
 React Native is a _JavaScript_ framework that enables developers to build native apps for multiple platforms with a single codebase.
 
-In this tutorial, you will learn how to create a native Mopro module on both Android and iOS simulators. <br/>
+In this tutorial, you will learn how to create a native Mopro module on both Android and iOS simulators/devices. <br/>
 
 <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
     <img src="/img/react-native-android.png" alt="First Image" width="250"/>
     <img src="/img/react-native-ios.png" alt="Second Image" width="250"/>
 </div>
 
-You have 3 options to get started with a mopro React Native project:
+:::info
+In this example, we use Circom circuits and their corresponding `.zkey` files. The process is similar for other provers.
+:::
 
-## Option 1: Use Mopro Cli
+## 0. Initialize an React Native project
 
-The easiest way to set up your project is by using the mopro cli **create** command.<br/>This command helps you quickly add templates, similar to the next option, but with fewer manual steps.
-
-```sh
-mopro-example-app $ mopro create
-```
-
-Assuming you’ve successfully built the **iOS** and **android** bindings: `MoproAndroidBindings` and `MoproIOSBindings` in your project folder, the mopro cli stored some parameters into the `Config.toml` file and reads them during the create command. It will also allow you to select the **react-native** template, as shown below:
-
-```
-? Create template ›
-  ios
-  android
-  web          - Require binding
-  flutter
-❯ react-native
-```
-
-## Option 2: Clone the Repository and Import the Bindings
-
-This option is a more manual compared to [Option 1](#option-1-use-mopro-cli). You can clone a pre-configured repository and manually import the generated bindings into your React Native project.
-
-1. Clone the [zkmopro/react-native-app](https://github.com/zkmopro/react-native-app) repository
-
-    ```sh
-    git clone https://github.com/zkmopro/react-native-app
-    ```
-
-2. Install dependencies
-
-    ```sh
-    npm install
-    ```
-
-3. Run the app
-
-    ```sh
-    npm run android
-    ```
-
-    or
-
-    ```sh
-    npm run ios
-    ```
-
-4. Update mopro bindings in [Android](#4-2-include-mopro-bindings-in-the-native-android-module) and [iOS](#51-use-a-framework) native module
-
-## Option 3: Follow the Tutorial and Build a React Native Module
-
-If you prefer a more hands-on approach and wish to understand how everything works, you can follow the tutorial to build a React Native module from scratch.
-
-### 1. Initializing a New React Native Project or Using an Existing One
+First let's create a new React Native project. If you already have a React Native project you can skip this step.
 
 -   Getting started with React Native: [Official documentation](https://reactnative.dev/docs/environment-setup)
 
     :::info
     The [Expo](https://expo.dev/) framework is recommended by the React Native community.
-    (_Last updated on Aug 15, 2024_)<br/>
+    (_Last updated on Apr 14, 2025_)<br/>
     We will use the Expo framework throughout this documentation. <br/>
     Ref: [Start a new React Native project with Expo](https://reactnative.dev/docs/environment-setup#start-a-new-react-native-project-with-expo)
     :::
@@ -87,7 +38,7 @@ If you prefer a more hands-on approach and wish to understand how everything wor
     ```
     for Android emulators.
 
-### 2. Creating a Native Module
+## 1. Creating a Native Module
 
 -   Creating a native module by the command
 
@@ -95,58 +46,244 @@ If you prefer a more hands-on approach and wish to understand how everything wor
     npx create-expo-module --local mopro
     ```
 
-    It will create a native module named `mopro` in the `modules/mopro` folder.
+    It will create a native module named `mopro` in the `modules/mopro` folder with the structure like this
+
+    ```sh
+    ├── modules
+    │   └── mopro
+    │     ├── android
+    │     ├── expo-module.config.json
+    │     ├── index.ts
+    │     ├── ios
+    │     └── src
+    ```
 
     :::info
     Ref: [Tutorial: Creating a native module](https://docs.expo.dev/modules/native-module-tutorial/),
     [Wrap third-party native libraries](https://docs.expo.dev/modules/third-party-library/)
     :::
 
-### 3. Define an API
+## 2. Implement the module on iOS
 
--   Define the types for the native module. Add the following types in the file:
+:::info
+Please refer to [react-native-app](https://github.com/zkmopro/react-native-app) to see the latest update.
+:::
 
-    ```typescript title="/modules/mopro/index.ts"
-    // Define the G1 type
-    export type G1 = {
-        x: string;
-        y: string;
-    };
+### 2-1 Use a framework
 
-    // Define the G2 type
-    export type G2 = {
-        x: string[];
-        y: string[];
-    };
+-   Get the `MoproiOSBindings` from `mopro build`.
+    :::info
+    See [Getting Started](/docs/getting-started.md)
+    :::
 
-    // Define the ProofCalldata type
-    export type ProofCalldata = {
-        a: G1;
-        b: G2;
-        c: G1;
-    };
-
-    // Define the Result type
-    export type Result = {
-        proof: ProofCalldata;
-        inputs: string[];
-    };
+-   Copy the `MoproiOSBindings` directory to `modules/mopro/ios`
+-   Bundle the bindings in `Mopro.podspec`
+    ```ruby title="/modules/mopro/ios/Mopro.podspec"
+        ...
+        s.dependency 'ExpoModulesCore'
+        s.vendored_frameworks = 'MoproiOSBindings/MoproBindings.xcframework'
+        ...
     ```
 
--   Add the native module's API functions in the same file.
+### 2-2 Create convertible types for Javascript library with swift.
 
-    ```typescript title="/modules/mopro/index.ts"
-    export function generateCircomProof(
-        zkeyPath: string,
-        circuitInputs: { [key: string]: string[] }
-    ): Result {
-        return MoproModule.generateCircomProof(zkeyPath, circuitInputs);
+-   Create a new file called `MoproType.swift` in the following folder: `modules/mopro/ios`
+
+        <details>
+            <summary>Full `/modules/mopro/ios/MoproType.swift`</summary>
+        ```swift title="/modules/mopro/ios/MoproType.swift"
+        import ExpoModulesCore
+
+        struct ExpoG1: Record {
+            @Field
+            var x: String?
+
+            @Field
+            var y: String?
+
+            @Field
+            var z: String?
+
+        }
+
+        struct ExpoG2: Record {
+            @Field
+            var x: [String]?
+
+            @Field
+            var y: [String]?
+
+            @Field
+            var z: [String]?
+
+        }
+
+        struct ExpoProof: Record {
+            @Field
+            var a: ExpoG1?
+
+            @Field
+            var b: ExpoG2?
+
+            @Field
+            var c: ExpoG1?
+
+            @Field
+            var `protocol`: String?
+
+            @Field
+            var curve: String?
+
+        }
+
+        struct ExpoCircomProofResult: Record {
+            @Field
+            var inputs: [String]?
+
+            @Field
+            var proof: ExpoProof?
+
+        }
+
+        enum ProofLibOption: Int, Enumerable {
+            case arkworks
+            case rapidsnark
+        }
+
+        struct ExpoCircomProofLib: Record {
+            @Field
+            var proofLib: ProofLibOption = .arkworks
+        }
+
+        ```
+
+    </details>
+
+### 2-3. Create native module implementation in `MoproModule.swift`
+
+-   Define helper functions to bridge types between the Mopro bindings and the Expo framework:
+
+          <details>
+            <summary>`/modules/mopro/ios/MoproModule.swift` helpers</summary>
+          ```swift title="/modules/mopro/ios/MoproModule.swift"
+          import ExpoModulesCore
+          import moproFFI
+
+            // convert the mopro proofs to be exposed to Expo framework
+            func convertCircomProof(proof: CircomProof) -> ExpoProof {
+
+                let a = ExpoG1()
+                a.x = proof.a.x
+
+                a.y = proof.a.y
+                a.z = proof.a.z
+
+                let b = ExpoG2()
+                b.x = proof.b.x
+                b.y = proof.b.y
+                b.z = proof.b.z
+
+                let c = ExpoG1()
+                c.x = proof.c.x
+                c.y = proof.c.y
+                c.z = proof.c.z
+
+                let expoProof = ExpoProof()
+                expoProof.a = a
+                expoProof.b = b
+                expoProof.c = c
+                expoProof.protocol = proof.protocol
+                expoProof.curve = proof.curve
+                return expoProof
+            }
+
+            // convert the Expo proofs to be used in mopro bindings
+            func convertCircomProofResult(proofResult: ExpoCircomProofResult) -> CircomProofResult {
+                guard let proof = proofResult.proof,
+                let a = proof.a,
+                let b = proof.b,
+                let c = proof.c,
+                let inputs = proofResult.inputs,
+                let `protocol` = proof.protocol,
+                let curve = proof.curve
+                else {
+                    fatalError("Invalid proof result")
+                }
+
+                let g1a = G1(x: a.x ?? "0", y: a.y ?? "0", z: a.z ?? "1")
+                let g2b = G2(x: b.x ?? ["1", "0"], y: b.y ?? ["1", "0"], z: b.z ?? ["1", "0"])
+                let g1c = G1(x: c.x ?? "0", y: c.y ?? "0", z: c.z ?? "1")
+
+                let circomProof = CircomProof(
+                    a: g1a, b: g2b, c: g1c, protocol: `protocol`, curve: curve)
+                let circomProofResult = CircomProofResult(proof: circomProof, inputs: inputs)
+                return circomProofResult
+            }
+
+            enum CircomError: Error {
+                case circomProofGenerationFailed(String)
+                case circomProofVerificationFailed(String)
+            }
+
+        ```
+
+    </details>
+
+-   Define the native module API. See the [Module API Reference](https://docs.expo.dev/modules/module-api/) for details.
+
+    ```swift title="modules/mopro/ios/MoproModule.swift"
+    public class MoproModule: Module {
+    // Each module class must implement the definition function. The definition consists of components
+    // that describes the module's functionality and behavior.
+    // See https://docs.expo.dev/modules/module-api for more details about available components.
+    public func definition() -> ModuleDefinition {
+        // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
+        // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
+        // The module will be accessible from `requireNativeModule('Mopro')` in JavaScript.
+        Name("Mopro")
+        // ...
+        AsyncFunction("generateCircomProof") {
+            (zkeyPath: String, circuitInputs: String, expoProofLib: ExpoCircomProofLib) -> ExpoCircomProofResult in
+
+            do {
+                let proofLib = expoProofLib.proofLib == ProofLibOption.arkworks ? ProofLib.arkworks : ProofLib.rapidsnark
+                let res = try generateCircomProof(
+                    zkeyPath: zkeyPath, circuitInputs: circuitInputs, proofLib: proofLib)
+                let result = ExpoCircomProofResult()
+                result.inputs = res.inputs
+                result.proof = convertCircomProof(proof: res.proof)
+                return result
+            } catch {
+                throw CircomError.circomProofGenerationFailed(error.localizedDescription)
+            }
+        }
+
+        AsyncFunction("verifyCircomProof") {
+            (zkeyPath: String, proofResult: ExpoCircomProofResult, proofLib: ExpoCircomProofLib) -> Bool in
+
+            do {
+                let proofLib = proofLib.proofLib == .arkworks ? ProofLib.arkworks : ProofLib.rapidsnark
+                let isValid = try verifyCircomProof(
+                    zkeyPath: zkeyPath,
+                    proofResult: convertCircomProofResult(proofResult: proofResult),
+                    proofLib: ProofLib.arkworks
+                )
+                return isValid
+            } catch {
+                throw CircomError.circomProofVerificationFailed(error.localizedDescription)
+            }
+        }
+        // ...
     }
     ```
 
-### 4. Implement the module on Android
+## 3. Implement the module on Android
 
-#### 4-1. Add dependency for [jna](https://github.com/java-native-access/jna) in the file `build.gradle`.
+:::info
+Please refer to [react-native-app](https://github.com/zkmopro/react-native-app) to see the latest update.
+:::
+
+### 3-1. Add dependency for [jna](https://github.com/java-native-access/jna) in the file `build.gradle`.
 
 ```kotlin title="/modules/mopro/android/build.gradle"
 dependencies {
@@ -154,11 +291,11 @@ dependencies {
 }
 ```
 
-#### 4-2. Include Mopro bindings in the native Android module
+### 3-2. Include Mopro bindings in the native Android module
 
--   Get the `MoproAndroidBindings` from `cargo run --bin android`.
+-   Get the `MoproAndroidBindings` from `mopro build`.
     :::info
-    See [Rust Setup](rust-setup.md)
+    See [Getting Started](/docs/getting-started.md)
     :::
 -   Move the `jniLibs` directory to `modules/mopro/android/src/main/`. <br/>
     And move `uniffi` directory to `modules/mopro/android/src/main/java/`.<br/>
@@ -178,269 +315,245 @@ dependencies {
     │           └── mopro.kt
     └── jniLibs
         ├── arm64-v8a
-        │   └── libuniffi_mopro.so
         ├── armeabi-v7a
-        │   └── libuniffi_mopro.so
         ├── x86
-        │   └── libuniffi_mopro.so
         └── x86_64
-            └── libuniffi_mopro.so
     ```
 
-#### 4-3. Create convertible types for Javascript library with kotlin.
+### 3-3. Create convertible types for Javascript library with kotlin.
 
 It is a better way to represent a JavaScript object with the native type safety.
 
 -   Create a new file called `MoproType.kt` in the following folder: `modules/mopro/android/src/main/java/expo/modules/mopro/`
 
-```kotlin title="/modules/mopro/android/src/main/java/expo/modules/mopro/MoproType.kt"
-package expo.modules.mopro
+    <details>
+            <summary>Full `/modules/mopro/android/src/main/java/expo/modules/mopro/MoproType.kt`</summary>
+        ```kotlin title="modules/mopro/android/src/main/java/expo/modules/mopro/MoproType.kt"
+        package expo.modules.mopro
 
-import expo.modules.kotlin.records.Field
-import expo.modules.kotlin.records.Record
+        import expo.modules.kotlin.records.Field
+        import expo.modules.kotlin.records.Record
+        import expo.modules.kotlin.types.Enumerable
 
-class ExpoG1 : Record {
-    @Field var x: String?
+        class ExpoG1 : Record {
+            @Field var x: String?
 
-    @Field var y: String?
+            @Field var y: String?
 
-    constructor(_x: String, _y: String) {
-        x = _x
-        y = _y
-    }
-}
+            @Field var z: String?
 
-class ExpoG2 : Record {
-    @Field var x: List<String>?
+            constructor(_x: String, _y: String, _z: String) {
+                x = _x
+                y = _y
+                z = _z
+            }
+        }
 
-    @Field var y: List<String>?
+        class ExpoG2 : Record {
+            @Field var x: List<String>?
 
-    constructor(_x: List<String>, _y: List<String>) {
-        x = _x
-        y = _y
-    }
-}
+            @Field var y: List<String>?
 
-class ExpoProof : Record {
-    @Field var a: ExpoG1?
+            @Field var z: List<String>?
 
-    @Field var b: ExpoG2?
+            constructor(_x: List<String>, _y: List<String>, _z: List<String>) {
+                x = _x
+                y = _y
+                z = _z
+            }
+        }
 
-    @Field var c: ExpoG1?
+        class ExpoProof : Record {
+            @Field var a: ExpoG1?
 
-    constructor(_a: ExpoG1, _b: ExpoG2, _c: ExpoG1) {
-        a = _a
-        b = _b
-        c = _c
-    }
-}
+            @Field var b: ExpoG2?
 
-class Result : Record {
-    @Field var proof: ExpoProof?
+            @Field var c: ExpoG1?
 
-    @Field var inputs: List<String>?
+            @Field var `protocol`: String?
 
-    constructor(_proof: ExpoProof, _inputs: List<String>) {
-        proof = _proof
-        inputs = _inputs
-    }
-}
+            @Field var curve: String?
 
-```
+            constructor(_a: ExpoG1, _b: ExpoG2, _c: ExpoG1, _protocol: String, _curve: String) {
+                a = _a
+                b = _b
+                c = _c
+                `protocol` = _protocol
+                curve = _curve
+            }
+        }
 
-:::info
-Ref: [Records](https://docs.expo.dev/modules/module-api/#records)
-:::
+        class ExpoCircomProofResult : Record {
+            @Field var proof: ExpoProof?
 
-#### 4-4. Create native module implementation in `MoproModule.kt`
+            @Field var inputs: List<String>?
 
-```kotlin title="/modules/mopro/android/src/main/java/expo/modules/mopro/MoproModule.kt"
-package expo.modules.mopro
+            constructor(_proof: ExpoProof, _inputs: List<String>) {
+                proof = _proof
+                inputs = _inputs
+            }
+        }
 
-import expo.modules.kotlin.modules.Module
-import expo.modules.kotlin.modules.ModuleDefinition
-import java.io.File
-import uniffi.mopro.ProofCalldata
-import uniffi.mopro.generateCircomProof
-import uniffi.mopro.toEthereumInputs
-import uniffi.mopro.toEthereumProof
+        enum class ProofLibOption(val value: Int) : Enumerable {
+            arkworks(0),
+            rapidsnark(1)
+        }
 
-fun convertType(proof: ProofCalldata): ExpoProof {
-  var a = ExpoG1(proof.a.x, proof.a.y)
-  var b = ExpoG2(proof.b.x, proof.b.y)
-  var c = ExpoG1(proof.c.x, proof.c.y)
-  var output = ExpoProof(a, b, c)
-  return output
-}
+        class ExpoCircomProofLib : Record {
+            @Field
+            val proofLib: ProofLibOption = ProofLibOption.arkworks
+        }
 
-fun generateProof(zkeyPath: String, circuitInputs: Map<String, List<String>>): Result {
-  val file = File(zkeyPath)
-  val res = generateCircomProof(file.absolutePath, circuitInputs)
-  val proof = toEthereumProof(res.proof)
-  val inputs = toEthereumInputs(res.inputs)
-  val result = Result(convertType(proof), inputs)
-  return result
-}
+        ```
 
-class MoproModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
-  override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a
-    // string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for
-    // clarity.
-    // The module will be accessible from `requireNativeModule('Mopro')` in JavaScript.
-    Name("Mopro")
+    </details>
 
-    Function("generateCircomProof") { zkeyPath: String, circuitInputs: Map<String, List<String>> ->
-      generateProof(zkeyPath, circuitInputs)
-    }
-
-    View(MoproView::class) {
-      // Defines a setter for the `name` prop.
-      Prop("name") { view: MoproView, prop: String -> println(prop) }
-    }
-  }
-}
-```
-
-### 5. Implement the module on iOS
-
-#### 5.1 Use a framework
-
--   Get the `MoproiOSBindings` from `cargo run --bin ios`.
     :::info
-    See [Rust Setup](rust-setup.md)
+    Ref: [Records](https://docs.expo.dev/modules/module-api/#records)
     :::
 
--   Copy the `MoproiOSBindings` directory to `modules/mopro/ios`
--   Bundle the bindings in `Mopro.podspec`
-    ```podspec title="/modules/mopro/ios/Mopro.podspec"
-        ...
-        s.dependency 'ExpoModulesCore'
-        s.vendored_frameworks = 'MoproiOSBindings/MoproBindings.xcframework'
-        ...
+### 3-4. Create native module implementation in `MoproModule.kt`
+
+-   Define helper functions to bridge types between the Mopro bindings and the Expo framework:
+
+            <details>
+              <summary>`/modules/mopro/android/src/main/java/expo/modules/mopro/MoproModule.kt` helpers</summary>
+            ```kotlin title="/modules/mopro/android/src/main/java/expo/modules/mopro/MoproModule.kt"
+            // convert the mopro proofs to be exposed to Expo framework
+            fun convertCircomProof(proof: CircomProof): ExpoProof {
+                var a = ExpoG1(proof.a.x, proof.a.y, proof.a.z)
+                var b = ExpoG2(proof.b.x, proof.b.y, proof.b.z)
+                var c = ExpoG1(proof.c.x, proof.c.y, proof.c.z)
+                var output = ExpoProof(a, b, c, proof.protocol, proof.curve)
+                return output
+            }
+
+            // convert the Expo proofs to be used in mopro bindings
+            fun convertCircomProofResult(proofResult: ExpoCircomProofResult): CircomProofResult {
+                var g1a = G1(proofResult.proof?.a?.x ?: "0", proofResult.proof?.a?.y ?: "0", proofResult.proof?.a?.z ?: "1")
+                var g2b = G2(proofResult.proof?.b?.x ?: listOf("1", "0"), proofResult.proof?.b?.y ?: listOf("1", "0"), proofResult.proof?.b?.z ?: listOf("1", "0"))
+                var g1c = G1(proofResult.proof?.c?.x ?: "0", proofResult.proof?.c?.y ?: "0", proofResult.proof?.c?.z ?: "1")
+                var circomProof = CircomProof(g1a, g2b, g1c, proofResult.proof?.protocol ?: "groth16", proofResult.proof?.curve ?: "bn128")
+                var circomProofResult = CircomProofResult(circomProof, proofResult.inputs ?: listOf("0"))
+                return circomProofResult
+            }
+          ```
+
+      </details>
+
+-   Define the native module API. See the [Module API Reference](https://docs.expo.dev/modules/module-api/) for details.
+
+    ```kotlin title="modules/mopro/android/src/main/java/expo/modules/mopro/MoproModule.kt"
+    class MoproModule : Module() {
+    // Each module class must implement the definition function. The definition consists of components
+    // that describes the module's functionality and behavior.
+    // See https://docs.expo.dev/modules/module-api for more details about available components.
+    override fun definition() = ModuleDefinition {
+        // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
+        // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
+        // The module will be accessible from `requireNativeModule('Mopro')` in JavaScript.
+        Name("Mopro")
+        // ...
+        AsyncFunction("generateCircomProof") { zkeyPath: String, circuitInputs: String, expoProofLib: ExpoCircomProofLib ->
+            try {
+                val file = File(zkeyPath)
+
+                if (!file.exists()) {
+                    throw CodedException("ZkeyFileNotFound", "The zkey file was not found at path: $zkeyPath", null)
+                }
+
+                val proofLib = if (expoProofLib.proofLib == ProofLibOption.arkworks) ProofLib.ARKWORKS else ProofLib.RAPIDSNARK
+                val res = generateCircomProof(file.absolutePath, circuitInputs, proofLib)
+                ExpoCircomProofResult(convertCircomProof(res.proof), res.inputs)
+            } catch (e: Exception) {
+                throw CodedException("GenerateProofFailed", "Unknown error occurred during proof generation", e)
+            }
+        }
+
+        AsyncFunction("verifyCircomProof") { zkeyPath: String, proofResult: ExpoCircomProofResult, expoProofLib: ExpoCircomProofLib ->
+            try {
+                val file = File(zkeyPath)
+                if (!file.exists()) {
+                    throw CodedException("ZkeyFileNotFound", "The zkey file was not found at path: $zkeyPath", null)
+                }
+                val proofLib = if (expoProofLib.proofLib == ProofLibOption.arkworks) ProofLib.ARKWORKS else ProofLib.RAPIDSNARK
+                val isValid = verifyCircomProof(file.absolutePath, convertCircomProofResult(proofResult), proofLib)
+                isValid
+            } catch (e: Exception) {
+                throw CodedException("VerifyProofFailed", "Unknown error occurred during proof verification", e)
+            }
+        }
+        // ...
+    }
     ```
 
-#### 5.2 Create convertible types for Javascript library with swift.
+## 4. Define typescript APIs
 
--   Create a new file called `MoproType.swift` in the following folder: `modules/mopro/ios`
+:::info
+Please refer to [react-native-app](https://github.com/zkmopro/react-native-app) to see the latest update.
+:::
 
-    ```swift title="/modules/mopro/ios/MoproType.swift"
-    import ExpoModulesCore
+-   Define the types for the native module. Add the following types in the file:
 
+    ```typescript title="/modules/mopro/index.ts"
+    // Define the G1 type
+    export type G1 = {
+        x: string;
+        y: string;
+        z: string;
+    };
 
-    struct ExpoG1: Record {
-        @Field
-        var x: String?
+    // Define the G2 type
+    export type G2 = {
+        x: string[];
+        y: string[];
+        z: string[];
+    };
 
-        @Field
-        var y: String?
+    // Define the CircomProof type
+    export type CircomProof = {
+        a: G1;
+        b: G2;
+        c: G1;
+        protocol: string;
+        curve: string;
+    };
+
+    // Define the CircomProofResult type
+    export type CircomProofResult = {
+        proof: CircomProof;
+        inputs: string[];
+    };
+
+    export enum ProofLibOption {
+        Arkworks,
+        Rapidsnark,
     }
 
-    struct ExpoG2: Record {
-        @Field
-        var x: [String]?
+    export type CircomProofLib = {
+        proofLib: ProofLibOption;
+    };
+    ```
 
-        @Field
-        var y: [String]?
-    }
+-   Add the native module's API functions in the same file.
 
-    struct ExpoProof: Record {
-        @Field
-        var a: ExpoG1?
-
-        @Field
-        var b: ExpoG2?
-
-        @Field
-        var c: ExpoG1?
-    }
-
-    struct Result: Record {
-        @Field
-        var inputs: [String]?
-
-        @Field
-        var proof: ExpoProof?
+    ```typescript title="/modules/mopro/index.ts"
+    export async function generateCircomProof(
+        zkeyPath: string,
+        circuitInputs: string,
+        proofLib: CircomProofLib
+    ): Promise<CircomProofResult> {
+        return await MoproModule.generateCircomProof(
+            zkeyPath,
+            circuitInputs,
+            proofLib
+        );
     }
     ```
 
-#### 5-3. Create native module implementation in `MoproModule.swift`
+## 5. Run the app
 
-```swift title="/modules/mopro/ios/MoproModule.swift"
-import ExpoModulesCore
-import moproFFI
-
-func convertType(proof: ProofCalldata) -> ExpoProof {
-  var a = ExpoG1()
-  a.x = proof.a.x
-  a.y = proof.a.y
-
-  var b = ExpoG2()
-  b.x = proof.b.x
-  b.y = proof.b.y
-
-  var c = ExpoG1()
-  c.x = proof.c.x
-  c.y = proof.c.y
-
-  var expoProof = ExpoProof()
-  expoProof.a = a
-  expoProof.b = b
-  expoProof.c = c
-  return expoProof
-}
-
-func generateProof(zkeyPath: String, circuitInputs: [String: [String]]) -> Result {
-  do {
-    let res = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: circuitInputs)
-    let proof = toEthereumProof(proof: res.proof)
-    let result = Result()
-    result.inputs = toEthereumInputs(inputs: res.inputs)
-    result.proof = convertType(proof: proof)
-    return result
-  } catch {
-    print("Error: \(error)")
-    let result = Result()
-    return result
-  }
-}
-
-public class MoproModule: Module {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
-  public func definition() -> ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('Mopro')` in JavaScript.
-    Name("Mopro")
-
-    Function("generateCircomProof") {
-      (zkeyPath: String, circuitInputs: [String: [String]]) -> Result in
-
-      // Call into the compiled static library
-      return generateProof(zkeyPath: zkeyPath, circuitInputs: circuitInputs)
-    }
-
-    // Enables the module to be used as a native view. Definition components that are accepted as part of the
-    // view definition: Prop, Events.
-    View(MoproView.self) {
-      // Defines a setter for the `name` prop.
-      Prop("name") { (view: MoproView, prop: String) in
-        print(prop)
-      }
-    }
-  }
-}
-```
-
-### 6. Run the app
-
-#### 6.1 Install expo-asset
+### 5.1 Install expo-asset
 
 Install `expo-asset` to use assets.
 
@@ -448,11 +561,11 @@ Install `expo-asset` to use assets.
 npx expo install expo-asset
 ```
 
-#### 6.2 Check the expo command
+### 5.2 Check the expo command
 
-The `android` and `ios` script should be as follows:
+The `android` and `ios` scripts should be defined as follows to support running with the mobile native modules:
 
-```js title="package.json"
+```json title="package.json"
 {
     ...
     "scripts": {
@@ -465,161 +578,82 @@ The `android` and `ios` script should be as follows:
 }
 ```
 
-#### 6.3 Create an example view
+### 5.3 Generate proofs in the app
 
-This view enables users to generate `multiplier2` proofs and the public signals.
+Here is an example demonstrating how to generate a proof within an app:
 
-```ts title="/app/(tabs)/index.tsx"
-import { Image, StyleSheet, Button, TextInput, View, Text } from "react-native";
+```ts
+import {
+    generateCircomProof,
+    verifyCircomProof,
+    ProofLibOption,
+    CircomProofLib,
+    CircomProofResult,
+} from "@/modules/mopro";
 
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { generateCircomProof, Result } from "@/modules/mopro";
-import * as FileSystem from "expo-file-system";
-import { useState } from "react";
-import { Asset } from "expo-asset";
-
-export default function HomeScreen() {
-    const [a, setA] = useState("");
-    const [b, setB] = useState("");
-    const [inputs, setInputs] = useState<string>("");
-    const [proof, setProof] = useState<string>("");
-    async function genProof(): Promise<void> {
-        const asset = Asset.fromURI(
-            "https://ci-keys.zkmopro.org/multiplier2_final.zkey"
-        );
-        const newFileName = "multiplier2_final.zkey";
-        const newFilePath = `${FileSystem.documentDirectory}${newFileName}`;
-        const fileInfo = await FileSystem.getInfoAsync(newFilePath);
-        if (!fileInfo.exists) {
-            try {
-                const file = await asset.downloadAsync();
-                if (file.localUri === null) {
-                    throw new Error("Failed to download the file");
-                }
-                await FileSystem.moveAsync({
-                    from: file.localUri,
-                    to: newFilePath,
-                });
-            } catch (error) {
-                console.error("Error renaming the file:", error);
-            }
-        }
-        const circuitInputs = {
-            a: [a],
-            b: [b],
-        };
-        const res: Result = generateCircomProof(
-            newFilePath.replace("file://", ""),
-            circuitInputs
-        );
-        setProof(JSON.stringify(res.proof));
-        setInputs(JSON.stringify(res.inputs));
-    }
-    return (
-        <ParallaxScrollView
-            headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-            headerImage={
-                <Image
-                    source={require("@/assets/images/partial-react-logo.png")}
-                    style={styles.reactLogo}
-                />
-            }
-        >
-            <View style={styles.inputContainer}>
-                <Text style={styles.label}>a</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter value for a"
-                    value={a}
-                    onChangeText={setA}
-                    keyboardType="numeric"
-                />
-            </View>
-            <View style={styles.inputContainer}>
-                <Text style={styles.label}>b</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter value for b"
-                    value={b}
-                    onChangeText={setB}
-                    keyboardType="numeric"
-                />
-            </View>
-            <Button title="Proof" onPress={() => genProof()} />
-            <ThemedView style={styles.stepContainer}>
-                <ThemedText type="subtitle">Public Signals:</ThemedText>
-                <Text style={styles.output}>{inputs}</Text>
-                <ThemedText type="subtitle">Proof:</ThemedText>
-                <Text style={styles.output}>{proof}</Text>
-            </ThemedView>
-        </ParallaxScrollView>
-    );
-}
-
-const styles = StyleSheet.create({
-    stepContainer: {
-        gap: 8,
-        marginBottom: 8,
-    },
-    input: {
-        height: 40,
-        borderColor: "gray",
-        borderWidth: 1,
-        flex: 1,
-        paddingHorizontal: 10,
-    },
-    inputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 10,
-    },
-    label: {
-        fontSize: 16,
-        marginRight: 10,
-    },
-    reactLogo: {
-        height: 178,
-        width: 290,
-        bottom: 0,
-        left: 0,
-        position: "absolute",
-    },
-    output: {
-        fontSize: 16,
-        borderColor: "gray",
-        borderWidth: 1,
-        padding: 10,
-    },
-});
+const circuitInputs = {
+    a: ["3"],
+    b: ["5"],
+};
+const proofLib: CircomProofLib = {
+    proofLib: ProofLibOption.Arkworks,
+};
+const result: CircomProofResult = await generateCircomProof(
+    zkeyPath.replace("file://", ""),
+    JSON.stringify(circuitInputs),
+    proofLib
+);
+const valid: boolean = await verifyCircomProof(
+    zkeyPath.replace("file://", ""),
+    result,
+    proofLib
+);
 ```
 
-#### 6.4 Run in simulators
+:::info
+Please refer to [react-native-app](https://github.com/zkmopro/react-native-app) to see the latest update.
+:::
+
+### 5.4 Run in simulators
 
 -   **Android**
 
-```bash
-npm run android
-```
+    Export `ANDROID_HOME`
 
-:::warning
-**Trouble Shooting:**
-If it shows
+    ```bash
+    export ANDROID_HOME="~/Library/Android/sdk"
+    ```
 
-```sh
-FAILURE: Build failed with an exception.
+    Then run
 
-* What went wrong:
-Could not determine the dependencies of task ':app:compileDebugJavaWithJavac'.
-> SDK location not found. Define a valid SDK location with an ANDROID_HOME environment variable or by setting the sdk.dir path in your project's local properties file at '.../android/local.properties'.
-```
-
-Add the `ANDROID_HOME` environment variable by following the [prerequisites](../prerequisites.md).
-:::
+    ```bash
+    npm run android
+    ```
 
 -   **iOS**
+    ```bash
+    npm run ios
+    ```
 
-```bash
-npm run ios
-```
+## 6. What's next
+
+-   **Update your ZK circuits** as needed. After making changes, be sure to run:
+
+    ```sh
+    mopro build
+    mopro update
+    ```
+
+    :::warning
+    `mopro update` only works if the Android project was created _within_ the Rust project directory during mopro init. Otherwise, you can manually update the bindings by following [Step 2-1](#2-1-use-a-framework) and [Step 3-2](#3-2-include-mopro-bindings-in-the-native-android-module).
+    :::
+
+    This ensures the bindings are regenerated and reflect your latest updates.
+
+-   **Build your mobile app frontend** according to your business logic and user flow.
+-   **Expose additional Rust functionality:**
+    If a function is missing in Swift, Kotlin, React Native, or Flutter, you can:
+
+    -   Add the required Rust crate in `Cargo.toml`
+    -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](setup/rust-setup.md#setup-any-rust-project) guide for details).<br/>
+        Once exported, the function will be available across all supported platforms.
