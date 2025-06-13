@@ -1,6 +1,6 @@
 # Noir Adapter
 
-Mopro supports the integration of [Noir](https://noir-lang.org/) circuits, enabling zero-knowledge proofs in native mobile applications with ease. This adapter builds upon foundational work from the zkPassport team and streamlines cross-platform integration with performance, reliability, and developer experience in mind.
+Mopro supports the integration of [Noir](https://noir-lang.org/) circuits, enabling zero-knowledge proofs in native mobile applications with ease. This adapter builds upon foundational work from the [zkPassport](https://zkpassport.id/) team and streamlines cross-platform integration with performance, reliability, and developer experience in mind.
 
 ## Samples
 
@@ -45,10 +45,13 @@ pub fn generate_noir_proof(
 ) -> Vec<u8>;
 ```
 
--   `circuit_path`: Path to the compiled Noir .acir circuit.
+-   `circuit_path`: Path to the compiled Noir `.json` circuit.
 -   `srs_path`: Optional path to the structured reference string.
 -   `inputs`: A list of strings representing public/private inputs.
 -   Returns a serialized proof (`Vec<u8>`).
+    :::warning
+    The output now includes both the proof and public signals. Feel free to check out the issue [here](https://github.com/zkmopro/mopro/issues/422). Contributions are welcome!
+    :::
 
 ### Verifying Function
 
@@ -58,7 +61,7 @@ The verification function loads the circuit and derives the verification key, th
 pub fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> bool;
 ```
 
--   `circuit_path`: Path to the compiled Noir .acir circuit.
+-   `circuit_path`: Path to the compiled Noir `.json` circuit.
 -   `proof`: The serialized proof to verify.
 -   Returns `true` if the proof is valid.
 
@@ -66,15 +69,21 @@ pub fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> bool;
 
 ### iOS API
 
-```swift
-generateNoirProof(circuitPath: String, srsPath: String?, inputs: [String])throws  -> Data
-```
+#### `generateNoirProof`
 
 ```swift
-verifyNoirProof(circuitPath: String, proof: Data)throws  -> Bool
+public func generateNoirProof(circuitPath: String, srsPath: String?, inputs: [String])throws  -> Data
+```
+
+#### `verifyNoirProof`
+
+```swift
+public func verifyNoirProof(circuitPath: String, proof: Data)throws  -> Bool
 ```
 
 ### Android API
+
+#### `generateNoirProof`
 
 ```kotlin
 fun generateNoirProof(
@@ -83,6 +92,8 @@ fun generateNoirProof(
     inputs: List<kotlin.String>,
 ): kotlin.ByteArray
 ```
+
+#### `verifyNoirProof`
 
 ```kotlin
 fun verifyNoirProof(
