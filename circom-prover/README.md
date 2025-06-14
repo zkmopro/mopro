@@ -41,7 +41,6 @@ Include the crate in your Cargo.toml:
 ```toml
 [dependencies]
 rust-witness = "0.1"
-num-bigint = "0.4"
 
 [build-dependencies]
 rust-witness = "0.1"
@@ -109,7 +108,6 @@ Setup features flags
 [dependencies]
 circom-prover = { version = "0.1", default-features = false, features = ["witnesscalc"] }
 witnesscalc-adapter = "0.1"
-anyhow = "1.0"
 
 [build-dependencies]
 witnesscalc-adapter = "0.1"
