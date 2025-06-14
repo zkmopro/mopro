@@ -306,10 +306,8 @@ cargo install --path .
 
 ## Performance
 
-### Circom
-
-Both native witness generation and proof generation are generally faster than `snarkjs` in the browser, with potential speed improvements of up to 20 times.
-Check the details here: [performance](https://zkmopro.org/docs/performance).
+Both native circom witness generation and proof generation are generally faster than `snarkjs` in the browser, with potential speed improvements of up to 20 times.
+Check the details for circom, halo2, and noir provers here: [performance](https://zkmopro.org/docs/performance).
 
 ## Community
 
