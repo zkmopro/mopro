@@ -70,8 +70,10 @@ pub enum IosArch {
 }
 
 struct IosArchInfo {
+    #[allow(dead_code)] // currently not used
     arch: IosArch,
     str: &'static str,
+    description: &'static str,
 }
 
 // Architecture strings need to be aligned with those in the mopro-ffi.
@@ -79,32 +81,30 @@ const IOS_ARCHS: [IosArchInfo; 3] = [
     IosArchInfo {
         arch: IosArch::Aarch64Apple,
         str: "aarch64-apple-ios",
+        description: "64-bit iOS devices (iPhone/iPad)",
     },
     IosArchInfo {
         arch: IosArch::Aarch64AppleSim,
         str: "aarch64-apple-ios-sim",
+        description: "ARM64 iOS simulator on Apple Silicon Macs",
     },
     IosArchInfo {
         arch: IosArch::X8664Apple,
         str: "x86_64-apple-ios",
+        description: "x86_64 iOS simulator on Intel Macs",
     },
 ];
 
 impl IosArch {
-    pub fn as_str(&self) -> &'static str {
-        IOS_ARCHS
-            .iter()
-            .find(|info| info.arch == *self)
-            .map(|info| info.str)
-            .expect("Unsupported iOS Arch")
-    }
-
-    pub fn from_idx(idx: usize) -> Self {
-        IOS_ARCHS[idx].arch
-    }
-
     pub fn all_strings() -> Vec<&'static str> {
         IOS_ARCHS.iter().map(|info| info.str).collect()
+    }
+
+    pub fn all_display_strings() -> Vec<(String, String)> {
+        IOS_ARCHS
+            .iter()
+            .map(|info| (info.str.to_string(), info.description.to_string()))
+            .collect()
     }
 }
 
@@ -119,6 +119,7 @@ pub enum AndroidArch {
 struct AndroidArchInfo {
     arch: AndroidArch,
     str: &'static str,
+    description: &'static str,
 }
 
 // Architecture strings need to be aligned with those in the mopro-ffi.
@@ -126,18 +127,22 @@ const ANDROID_ARCHS: [AndroidArchInfo; 4] = [
     AndroidArchInfo {
         arch: AndroidArch::X8664Linux,
         str: "x86_64-linux-android",
+        description: "64-bit Android emulators (x86_64 architecture)",
     },
     AndroidArchInfo {
         arch: AndroidArch::I686Linux,
         str: "i686-linux-android",
+        description: "32-bit Android emulators (x86 architecture, legacy)",
     },
     AndroidArchInfo {
         arch: AndroidArch::Armv7LinuxAbi,
         str: "armv7-linux-androideabi",
+        description: "32-bit ARM devices (older Android smartphones/tablets)",
     },
     AndroidArchInfo {
         arch: AndroidArch::Aarch64Linux,
         str: "aarch64-linux-android",
+        description: "64-bit ARM devices (modern Android smartphones/tablets)",
     },
 ];
 
@@ -150,12 +155,15 @@ impl AndroidArch {
             .expect("Unsupported Android Arch")
     }
 
-    pub fn from_idx(idx: usize) -> Self {
-        ANDROID_ARCHS[idx].arch
-    }
-
     pub fn all_strings() -> Vec<&'static str> {
         ANDROID_ARCHS.iter().map(|info| info.str).collect()
+    }
+
+    pub fn all_display_strings() -> Vec<(String, String)> {
+        ANDROID_ARCHS
+            .iter()
+            .map(|info| (info.str.to_string(), info.description.to_string()))
+            .collect()
     }
 }
 

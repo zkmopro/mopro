@@ -5,6 +5,7 @@ use crate::{
     constants::{AndroidArch, IosArch, Platform},
     init::adapter::Adapter,
     select::multi_select,
+    style,
 };
 
 pub fn contains_adapter(path: &str, adapter: Adapter) -> bool {
@@ -82,29 +83,35 @@ impl PlatformSelector {
     /// `select_archs` updates `ios` and `android` in the config file.
     pub fn select_archs(&mut self, config: &mut Config) -> HashMap<String, Vec<String>> {
         let mut archs: HashMap<String, Vec<String>> = HashMap::new();
+        Self::print_architecture_message();
         self.platforms.iter().for_each(|&p| match p {
             Platform::Ios => {
                 // defaults based on previous selections
-                let all_ios_archs = IosArch::all_strings();
+                let all_ios_archs = IosArch::all_display_strings();
+                let display_strings: Vec<String> = all_ios_archs
+                    .iter()
+                    .map(|(arch, desc)| format!("{} {}", arch, style::grey(desc)))
+                    .collect();
+                let display_refs: Vec<&str> = display_strings.iter().map(|s| s.as_str()).collect();
                 let defaults: Vec<bool> = if config.ios.is_none() {
                     vec![false; all_ios_archs.len()]
                 } else {
                     all_ios_archs
                         .iter()
-                        .map(|&acrch| config.ios.as_ref().unwrap().contains(acrch))
+                        .map(|(arch, _)| config.ios.as_ref().unwrap().contains(arch))
                         .collect()
                 };
 
                 // clear previous selections before update
                 config.ios = Some(HashSet::new());
 
-                let sel = Self::select_multi_archs(p.as_str(), &all_ios_archs, defaults);
+                let sel = Self::select_multi_archs(p.as_str(), &display_refs, defaults);
                 let sel_str = sel
                     .iter()
                     .map(|&i| {
-                        let arch = IosArch::from_idx(i).as_str().to_string();
+                        let (arch, _) = &all_ios_archs[i];
                         config.ios.as_mut().unwrap().insert(arch.clone());
-                        arch
+                        arch.clone()
                     })
                     .collect::<Vec<String>>();
                 archs.insert(String::from(Platform::Ios.as_str()), sel_str.clone());
@@ -112,26 +119,31 @@ impl PlatformSelector {
             }
             Platform::Android => {
                 // defaults based on previous selections
-                let all_android_archs = AndroidArch::all_strings();
+                let all_android_archs = AndroidArch::all_display_strings();
+                let display_strings: Vec<String> = all_android_archs
+                    .iter()
+                    .map(|(arch, desc)| format!("{} {}", arch, style::grey(desc)))
+                    .collect();
+                let display_refs: Vec<&str> = display_strings.iter().map(|s| s.as_str()).collect();
                 let defaults: Vec<bool> = if config.android.is_none() {
                     vec![false; all_android_archs.len()]
                 } else {
                     all_android_archs
                         .iter()
-                        .map(|&acrch| config.android.as_ref().unwrap().contains(acrch))
+                        .map(|(arch, _)| config.android.as_ref().unwrap().contains(arch))
                         .collect()
                 };
 
                 // clear previous selections before update
                 config.android = Some(HashSet::new());
 
-                let sel = Self::select_multi_archs(p.as_str(), &all_android_archs, defaults);
+                let sel = Self::select_multi_archs(p.as_str(), &display_refs, defaults);
                 let sel_str = sel
                     .iter()
                     .map(|&i| {
-                        let arch = AndroidArch::from_idx(i).as_str().to_string();
+                        let (arch, _) = &all_android_archs[i];
                         config.android.as_mut().unwrap().insert(arch.clone());
-                        arch
+                        arch.clone()
                     })
                     .collect::<Vec<String>>();
                 archs.insert(String::from(Platform::Android.as_str()), sel_str.clone());
@@ -154,6 +166,13 @@ impl PlatformSelector {
             archs.to_vec(),
             defaults,
         )
+    }
+
+    fn print_architecture_message() {
+        println!(
+            "📚 To learn more about the architecture selection, \n    visit: {}",
+            style::blue_bold("https://zkmopro.org/docs/architectures".to_string())
+        );
     }
 
     pub fn contains_archs(&self, arch_strs: &[&str]) -> bool {

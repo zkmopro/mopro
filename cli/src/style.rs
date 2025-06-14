@@ -44,3 +44,7 @@ pub fn print_gray_items(items: Vec<String>) {
         println!("   - {}", style(item).dim());
     }
 }
+
+pub fn grey(text: &str) -> StyledObject<String> {
+    style(text.to_string()).dim()
+}
