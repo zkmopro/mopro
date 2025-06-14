@@ -1,6 +1,6 @@
 [package]
 name = "circom-prover"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Circom prover is a Rust library for generating and verifying proofs for Circom circuits."
 license = "MIT OR Apache-2.0"
@@ -91,7 +91,7 @@ rand = { version = "0.8", features = ["std"] }
 witnesscalc-adapter = { version = "0.1", optional = true }
 
 # circom-witnesscalc
-circom-witnesscalc = { git = "https://github.com/iden3/circom-witnesscalc", optional = true }
+circom-witnesscalc = { version = "0.2", optional = true }
 once_cell = { version = "1.21.3", optional = true }
 
 # rapidsnark
