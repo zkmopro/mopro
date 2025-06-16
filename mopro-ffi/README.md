@@ -13,6 +13,11 @@ Key features include:
 ## Usage
 
 -   Please check out the [Rust Setup for Android/iOS Bindings](https://zkmopro.org/docs/setup/rust-setup) for integrating `mopro-ffi` into your project.
+-   To learn more about each adapter, please refer to the
+    -   [Circom Adapter](https://zkmopro.org/docs/adapters/circom)
+    -   [Halo2 Adapter](https://zkmopro.org/docs/adapters/halo2)
+    -   [Noir Adapter](https://zkmopro.org/docs/adapters/noir)
+-   For building a custom prover, take a look at the [Custom Adapter Examples](https://zkmopro.org/docs/adapters/overview/#custom-adapters).
 
 ## Community
 
