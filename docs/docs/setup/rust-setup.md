@@ -97,7 +97,7 @@ You have two options moving forward:
 
 ## 🔐 Integrating a ZK prover
 
-Be sure to complete the [general setup](#general-setup) before continuing.
+Be sure to complete the [general setup](#-general-setup) before continuing.
 
 This tutorial will cover:
 
