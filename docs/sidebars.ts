@@ -23,6 +23,11 @@ const sidebars: SidebarsConfig = {
             id: 'projects',
         },
         {
+            type: 'doc',
+            label: 'Architectures',
+            id: 'architectures',
+        },
+        {
             type: 'category',
             label: 'Setup',
             items: [
