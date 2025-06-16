@@ -50,6 +50,7 @@ const sidebars: SidebarsConfig = {
             items: [
                 'crates/mopro-ffi',
                 'crates/mopro-wasm',
+                'crates/mopro-cli',
                 'crates/circom-prover',
                 'crates/rust-rapidsnark',
                 'crates/rust-witness',
