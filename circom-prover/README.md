@@ -5,6 +5,13 @@ It is designed to be used in cross-platform applications, and is compatible with
 
 It supports multiple adapters, allowing you to choose the one that best optimizes performance.
 
+## Features
+
+-   ✅ **Cross-platform proving** — Works seamlessly on Linux, macOS, iOS, and Android.
+-   🔄 **Flexible architecture** — Easily switch between different witness generators and proof systems.
+-   ⚡ **High performance** — The fastest known Rust-based Circom prover (see [performance](#performance)).
+-   🔐 **Curve support** — Supports both `BN254` and `BLS12-381` elliptic curves.
+
 ## Adapters
 
 ## Witness Generation
@@ -238,6 +245,13 @@ let valid = CircomProver::verify(
     zkey_path,
 ).unwrap();
 ```
+
+### `BLS12-381` Curve
+
+To use the `BLS12-381` curve, simply generate a `.wasm` with [`circom`](https://docs.circom.io/getting-started/installation/) and generate a `.zkey` file with [`snarkjs`](https://github.com/iden3/snarkjs) using the bls12-381 curve option. Then, provide this .zkey and your input to the prover to produce a BLS12-381 proof. Usage is identical to [proof generation](#proof-generation-1), with only the witness function and zkey path differing.
+
+> [!NOTE]  
+> This feature is currently only supported when using the default configuration, which includes `rust-witness` and `arkworks`.
 
 ## Community
 
