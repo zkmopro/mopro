@@ -45,14 +45,19 @@ const sidebars: SidebarsConfig = {
             ]
         },
         {
-            type: 'doc',
-            label: 'Mopro FFI',
-            id: 'mopro-ffi',
-        },
-        {
-            type: 'doc',
-            label: 'Mopro WASM',
-            id: 'mopro-wasm',
+            type: 'category',
+            label: 'Rust Crates',
+            items: [
+                'crates/mopro-ffi',
+                'crates/mopro-wasm',
+                'crates/mopro-cli',
+                'crates/circom-prover',
+                'crates/rust-rapidsnark',
+                'crates/rust-witness',
+                'crates/witnesscalc_adapter',
+                'crates/ark-zkey',
+                'crates/noir-rs',
+            ]
         },
         {
             type: 'doc',
