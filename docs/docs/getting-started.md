@@ -17,14 +17,23 @@ Make sure you've installed the [prerequisites](/docs/prerequisites).
 
 ## 1. Install CLI
 
-Clone the `mopro` repository and install the `mopro` CLI tool.
+-   Get published CLI
+
+```sh
+cargo install mopro-cli
+```
+
+:::note
+
+-   Or get the latest CLI on GitHub
 
 ```sh
 git clone https://github.com/zkmopro/mopro
 cd mopro/cli
 cargo install --path .
-cd ../..
 ```
+
+:::
 
 You can run
 
@@ -106,7 +115,9 @@ $ mopro build
 
 :::
 
-<!-- TODO: add descriptions for different architectures and limitation -->
+:::info
+See more details about the architectures in [Architectures](architectures) Section
+:::
 
 :::warning
 The process of building bindings may take a few minutes.

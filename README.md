@@ -72,7 +72,10 @@ This repository contains the following components:
                     mopro-cli
                 </a>
             </td>
-            <td> WIP
+            <td> 
+                <a href="https://crates.io/crates/mopro-cli">
+                    <img src="https://img.shields.io/crates/v/mopro-cli?label=mopro-cli&style=flat-square">
+                </a>
             </td>
             <td>
                 A command-line tool that makes it easy to scaffold ZK projects using selected proving systems and target platforms. Currently supports: Swift (Xcode), Kotlin (Android Studio), React Native, Flutter and Web.
