@@ -6,6 +6,7 @@ use std::{env, fs, path::PathBuf};
 use super::Create;
 use crate::constants::Platform;
 use crate::create::utils::{check_bindings, copy_dir, copy_embedded_dir, copy_embedded_file};
+use crate::create::write_toml;
 use crate::style::print_bold;
 use crate::style::print_green_bold;
 
@@ -20,6 +21,10 @@ impl Create for Web {
         fs::create_dir(&target_dir)?;
 
         env::set_current_dir(&target_dir)?;
+        fs::write(
+            target_dir.join("Cargo.toml"),
+            write_toml::mopro_wasm_lib_toml(),
+        )?;
         const WEB_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/web");
         copy_embedded_dir(&WEB_TEMPLATE_DIR, &target_dir)?;
 

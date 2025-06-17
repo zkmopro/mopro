@@ -90,7 +90,7 @@ impl PlatformSelector {
                 let all_ios_archs = IosArch::all_display_strings();
                 let display_strings: Vec<String> = all_ios_archs
                     .iter()
-                    .map(|(arch, desc)| format!("{} {}", arch, style::grey(desc)))
+                    .map(|(arch, desc)| format!("{} {}", arch, desc))
                     .collect();
                 let display_refs: Vec<&str> = display_strings.iter().map(|s| s.as_str()).collect();
                 let defaults: Vec<bool> = if config.ios.is_none() {
@@ -122,7 +122,7 @@ impl PlatformSelector {
                 let all_android_archs = AndroidArch::all_display_strings();
                 let display_strings: Vec<String> = all_android_archs
                     .iter()
-                    .map(|(arch, desc)| format!("{} {}", arch, style::grey(desc)))
+                    .map(|(arch, desc)| format!("{} {}", arch, desc))
                     .collect();
                 let display_refs: Vec<&str> = display_strings.iter().map(|s| s.as_str()).collect();
                 let defaults: Vec<bool> = if config.android.is_none() {
