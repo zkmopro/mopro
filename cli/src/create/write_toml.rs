@@ -1,5 +1,5 @@
 pub fn mopro_wasm_lib_toml() -> &'static str {
-    let toml = r#"
+    r#"
 [package]
 name = "mopro-wasm-lib"
 version = "0.1.0"
@@ -24,12 +24,11 @@ wasm-bindgen-console-logger = "0.1.1"
 wasm-bindgen-futures = "0.4.47"
 wasm-bindgen-rayon = { version = "1.2.2", features = ["no-bundler"] }
 wasm-bindgen-test = "0.3.42"
-"#;
-    toml
+"#
 }
 
 pub fn init_toml() -> &'static str {
-    let toml = r#"
+    r#"
 [package]
 name = "MOPRO_TEMPLATE_PROJECT_NAME"
 version = "0.1.0"
@@ -59,6 +58,5 @@ rust-witness = "0.1"
 uniffi = { version = "=0.29.0", features = ["build"] }
 
 # CIRCOM_DEPENDENCIES
-    "#;
-    toml
+    "#
 }
