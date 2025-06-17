@@ -10,6 +10,14 @@ To set up and build bindings, follow these steps.
 
 ### 1. Install the Mopro CLI Tool
 
+-   Get published CLI
+
+```sh
+cargo install mopro-cli
+```
+
+-   Or get the latest CLI on GitHub
+
 ```sh
 git clone https://github.com/zkmopro/mopro
 cd mopro/cli
