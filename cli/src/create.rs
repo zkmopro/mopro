@@ -20,6 +20,7 @@ use flutter::Flutter;
 mod react_native;
 use react_native::ReactNative;
 pub mod utils;
+pub mod write_toml;
 
 trait Create {
     const NAME: &'static str;
