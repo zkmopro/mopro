@@ -17,13 +17,19 @@ name = "android"
 name = "web"
 
 [dependencies]
-mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "circom", "noir"] }
+mopro-ffi = { path = "../mopro-ffi", features = [
+    "halo2",
+    "circom",
+    "noir",
+    "witnesscalc",
+    "rapidsnark",
+] }
 mopro-wasm = { path = "../mopro-wasm" }
 uniffi = { workspace = true }
 
 # Circom dependencies
 rust-witness = "0.1"
-num-bigint = { version = "0.4.0" }
+witnesscalc-adapter = "0.1"
 
 # Halo2 dependencies
 halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
@@ -38,6 +44,7 @@ uniffi = { workspace = true, features = ["build"] }
 
 # Circom dependencies
 rust-witness = "0.1"
+witnesscalc-adapter = "0.1"
 
 # remove after uniffi is upgraded (see https://github.com/mozilla/uniffi-rs/issues/2346)
 [lints.clippy]

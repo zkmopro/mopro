@@ -52,6 +52,25 @@ class ExampleInstrumentedTest {
     }
 
     @Test
+    fun testRapidsnarkButtonClick() {
+        // Set up the Compose UI
+        composeTestRule.setContent {
+            MultiplierComponent() // Replace with the actual Composable function
+        }
+
+        // Test click circom rapidnsark generate proof button
+        composeTestRule.onNodeWithTag("rapidsnarkGenerateProofButton").performClick()
+        composeTestRule.onNodeWithTag("rapidsnarkGenerateProofButton").assertIsDisplayed()
+
+        // Test click circom rapidnsark verify proof button
+        // Wait until the second button is enabled
+        Thread.sleep(2000)
+
+        composeTestRule.onNodeWithTag("rapidsnarkVerifyProofButton").performClick()
+        composeTestRule.onNodeWithTag("rapidsnarkVerifyProofButton").assertIsDisplayed()
+    }
+
+    @Test
     fun testHalo2ButtonClick() {
         // Set up the Compose UI
         composeTestRule.setContent {
