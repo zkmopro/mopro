@@ -6,7 +6,7 @@
     <a href="https://github.com/zkmopro" target="_blank">
         <img src="https://img.shields.io/badge/project-Mopro-blue.svg?style=flat-square">
     </a>
-    <a href="/LICENSE">
+    <a href="/LICENSE-APACHE">
         <img alt="Github license" src="https://img.shields.io/github/license/zkmopro/mopro.svg?style=flat-square">
     </a>
     <a href="https://github.com/zkmopro/mopro/actions?query=workflow%3Aproduction">
