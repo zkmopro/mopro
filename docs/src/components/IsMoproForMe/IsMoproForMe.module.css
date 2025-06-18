@@ -1,0 +1,249 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  background: #18122B;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.nodeBox, .resultBox, .graphNode {
+  background: #393053;
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.12);
+  text-align: center;
+  color: #fff;
+}
+
+.graphNode.start {
+  background: #635985;
+  color: #fff;
+}
+.graphNode.decision {
+  background: #443C68;
+  color: #fff;
+}
+.graphNode.option {
+  background: #FFB347;
+  color: #18122B;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.graphNode.result {
+  background: #18122B;
+  color: #fff;
+  border: 2px solid #FFB347;
+}
+
+.nodeLabel {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+.nodeDesc {
+  font-size: 0.98rem;
+  color: #e0e0e0;
+  margin-bottom: 0.5rem;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.optionBtn {
+  background: #ffb347;
+  color: #18122B;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.optionBtn:hover {
+  background: #ff9900;
+}
+
+.tags {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.tag {
+  background: #ffb347;
+  color: #18122B;
+  border-radius: 6px;
+  padding: 0.3em 0.8em;
+  font-size: 0.95em;
+  font-weight: 500;
+}
+
+.restartBtn {
+  margin-top: 1.5rem;
+  background: #f87171;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.restartBtn:hover {
+  background: #dc2626;
+}
+
+.graphWrapper {
+  background: transparent;
+}
+
+.graphGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  position: relative;
+}
+.graphRow {
+  display: flex;
+  flex-direction: row;
+  gap: 1.2rem;
+  justify-content: center;
+}
+.graphCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: center;
+}
+
+.graphSvg {
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem 0.2rem;
+  }
+  .nodeBox, .resultBox, .graphNode {
+    padding: 1rem 0.5rem;
+  }
+  .title {
+    font-size: 1.3rem;
+  }
+}
+
+.hoverPopup {
+  position: absolute;
+  top: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #22223b;
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 24px #000a;
+  padding: 1rem 1.2rem;
+  width: 320px;
+  max-width: 98vw;
+  word-break: break-word;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.2s;
+}
+
+.popupOverlay {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .hoverPopup {
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    max-width: 98vw;
+    min-width: 0;
+    padding: 1rem 0.8rem;
+    z-index: 1002;
+  }
+  .popupOverlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 18, 43, 0.55);
+    z-index: 1001;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.popupDesc {
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+  text-align: center;
+  color: #fff;
+}
+
+.getStartedBtn {
+  background: #FFB347;
+  color: #18122B;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5em 1.2em;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s;
+  box-shadow: 0 2px 8px #0002;
+}
+.getStartedBtn:hover {
+  background: #ff9900;
+}
+
+.learnMore {
+  color: #635985;
+  font-size: 0.98rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+.learnMore:hover {
+  color: #a594f9;
+}

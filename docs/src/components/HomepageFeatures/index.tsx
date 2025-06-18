@@ -8,47 +8,71 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Ease of use',
+    title: 'Cross-platform Support',
     Svg: require('@site/static/img/gold_arch.svg').default,
     description: (
       <>
-        mopro simplifies the complexity of integrating zk proofs into mobile apps, making it accessible even for developers new to mobile development.
+        Automated pipelines for generating bindings and deploying libraries across platforms: iOS (Swift), Android (Kotlin), web/JS app, react-native, flutter.
       </>
     ),
   },
   {
-    title: 'Performance',
+    title: 'Simple CLI & SDK',
     Svg: require('@site/static/img/red_angle.svg').default,
     description: (
       <>
-        By optimizing for mobile GPUs, mopro significantly enhances the speed and capacity for handling large circuits, surpassing traditional browser-based solutions.
+        Developers can generate bindings and integrate circuits in minutes via an intuitive command-line interface and mobile-friendly SDK.
       </>
     ),
   },
   {
-    title: 'Scalability',
+    title: 'Circuit Integration',
     Svg: require('@site/static/img/blue_angle.svg').default,
     description: (
       <>
-        Designed to scale with your needs, mopro supports a broad range of proving systems and seamlessly integrates with any Rust crate, enabling the development of versatile, high-performance applications.
+        Support for Circom, Halo2 and Noir.
       </>
     ),
   },
   {
-    title: 'Security',
+    title: 'Extensibility to new proving systems',
     Svg: require('@site/static/img/gold_leaf.svg').default,
     description: (
       <>
-        Users can generate claims securely on their devices, ensuring data privacy and integrity.
+        Currently supporting Arkworks, Rapidsnark, Plonk, Hyperplonk, Gemini, Barretenberg with more to come!
+      </>
+    ),
+  },
+];
+
+const AdditionalFeatureList = [
+  {
+    title: 'WebAssembly (WASM) Support',
+    description: 'Generates WebAssembly (WASM) with Rayon for browser compatibility.',
+  },
+  {
+    title: 'ark-zkey',
+    description: (
+      <>
+        <a href="https://github.com/zkmopro/ark-zkey">ark-zkey</a>: Compresses and decompresses zkey files for Arkworks.
       </>
     ),
   },
   {
-    title: 'X-platform compatibility',
-    Svg: require('@site/static/img/yellow_drop.svg').default,
+    title: 'witnesscalc_adapter',
     description: (
       <>
-        Whether you're developing for iOS, Android, web, desktop operating systems, or even game consoles, mopro supports you with a unified toolkit that works seamlessly across all platforms.
+        <a href="https://github.com/zkmopro/witnesscalc_adapter">witnesscalc_adapter</a>: A Rust wrapper for{' '}
+        <a href="https://github.com/0xPolygonID/witnesscalc">witnesscalc</a>.
+      </>
+    ),
+  },
+  {
+    title: 'rust-rapidsnark',
+    description: (
+      <>
+        <a href="https://github.com/zkmopro/rust-rapidsnark">rust-rapidsnark</a>: A Rust wrapper for{' '}
+        <a href="https://github.com/iden3/rapidsnark">Rapidsnark</a>.
       </>
     ),
   },
@@ -68,13 +92,29 @@ function Feature({ title, Svg, description }: FeatureItem) {
   );
 }
 
+function AdditionalFeature({ title, description }: { title: string; description: JSX.Element }) {
+  return (
+    <div className={styles.additionalFeature}>
+      <div className={styles.additionalFeatureHeading}>{title}</div>
+      <p className={styles.additionalFeatureText}>{description}</p>
+    </div>
+  );
+}
+
 export default function HomepageFeatures(): JSX.Element {
   return (
     <section>
-      <div className={styles.heading}>Developer Capabilities</div>
+      <div className={styles.heading}>Core Features</div>
       <div className={styles.featuresContainer}>
         {FeatureList.map((props, idx) => (
           <Feature key={idx} {...props} />
+        ))}
+      </div>
+      
+      <div className={styles.additionalHeading}>Additional Features</div>
+      <div className={styles.additionalFeaturesContainer}>
+        {AdditionalFeatureList.map((props, idx) => (
+          <AdditionalFeature key={idx} {...props} />
         ))}
       </div>
     </section>
