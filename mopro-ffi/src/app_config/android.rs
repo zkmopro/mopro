@@ -21,7 +21,7 @@ use super::mktemp_local;
 pub fn build() {
     const BINDING_NAME: &str = "MoproAndroidBindings";
 
-    #[cfg(any(feature = "witnesscalc"))]
+    #[cfg(feature = "witnesscalc")]
     let _ = std::env::var("ANDROID_NDK").unwrap_or_else(|_| {
         panic!("ANDROID_NDK is not set");
     });
