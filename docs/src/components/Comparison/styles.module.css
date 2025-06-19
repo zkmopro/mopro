@@ -94,13 +94,13 @@
 }
 
 .comparisonTable th:first-child {
-    width: 35%;
-    min-width: 300px;
+    width: 25%;
+    min-width: 200px;
 }
 
 .comparisonTable th:nth-child(2),
 .comparisonTable th:nth-child(3) {
-    width: 32.5%;
+    width: 37.5%;
     min-width: 250px;
 }
 
@@ -118,12 +118,12 @@
 }
 
 .moproCell {
-    color: #4caf50;
+    color: #d4af37;
     font-weight: 500;
 }
 
 .legacyCell {
-    color: #ff6b6b;
+    color: rgba(255, 255, 255, 0.6);
     font-weight: 500;
 }
 

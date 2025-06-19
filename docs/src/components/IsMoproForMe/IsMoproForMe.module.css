@@ -57,6 +57,7 @@
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #fff;
+  white-space: pre-line;
 }
 .nodeDesc {
   font-size: 0.98rem;
