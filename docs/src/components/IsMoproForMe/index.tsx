@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect, useState, useMemo } from "react";
+import React, { useRef, useLayoutEffect, useState, useMemo, useEffect } from "react";
 import styles from "./IsMoproForMe.module.css";
 
 const nodes = [
@@ -48,31 +48,60 @@ const Node: React.FC<{
     nodeRef?: React.RefObject<HTMLDivElement>;
 }> = ({ node, nodeRef }) => {
     const [hovered, setHovered] = useState(false);
+    const [clicked, setClicked] = useState(false);
     const isZkApp = node.id === "zkApp";
     const isMobileApp = node.id === "mobileApp";
     const isZkProtocol = node.id === "zkProtocol";
     const isWebJSApp = node.id === "webJSApp";
     const isUpgradeProving = node.id === "upgradeProving";
+    
+    // Close popup when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (clicked && nodeRef?.current && !nodeRef.current.contains(event.target as Node)) {
+                setClicked(false);
+                setHovered(false);
+            }
+        };
+
+        if (clicked) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [clicked, nodeRef]);
+
+    const handleMoreClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (clicked) {
+            setClicked(false);
+            setHovered(false);
+        } else {
+            setClicked(true);
+            setHovered(true);
+        }
+    };
+
+    const handleMouseEnter = () => {
+        if (!clicked && (isZkApp || isMobileApp || isZkProtocol || isWebJSApp || isUpgradeProving)) {
+            setHovered(true);
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if (!clicked && (isZkApp || isMobileApp || isZkProtocol || isWebJSApp || isUpgradeProving)) {
+            setHovered(false);
+        }
+    };
+
     return (
         <div
             ref={nodeRef}
             className={`${styles.graphNode} ${styles[node.type]}`}
-            onMouseEnter={() =>
-                (isZkApp ||
-                    isMobileApp ||
-                    isZkProtocol ||
-                    isWebJSApp ||
-                    isUpgradeProving) &&
-                setHovered(true)
-            }
-            onMouseLeave={() =>
-                (isZkApp ||
-                    isMobileApp ||
-                    isZkProtocol ||
-                    isWebJSApp ||
-                    isUpgradeProving) &&
-                setHovered(false)
-            }
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             style={{ position: "relative" }}
         >
             <div className={styles.nodeLabel}>{node.label}</div>
@@ -81,9 +110,9 @@ const Node: React.FC<{
                 isZkProtocol ||
                 isWebJSApp ||
                 isUpgradeProving) && (
-                <div className={styles.learnMore}>More</div>
+                <div className={`${styles.learnMore} ${clicked ? styles.clicked : ''}`} onClick={handleMoreClick}>More</div>
             )}
-            {isZkApp && hovered && (
+            {isZkApp && (hovered || clicked) && (
                 <div className={`${styles.hoverPopup} ${styles.zkAppPopup}`}>
                     <div className={styles.popupDesc}>
                         Use Mopro to jumpstart your ZK mobile development - it
@@ -97,7 +126,7 @@ const Node: React.FC<{
                     </a>
                 </div>
             )}
-            {isMobileApp && hovered && (
+            {isMobileApp && (hovered || clicked) && (
                 <div className={`${styles.hoverPopup} ${styles.mobileAppPopup}`}>
                     <div className={styles.popupDesc}>
                         Add privacy-preserving features without deep
@@ -109,7 +138,7 @@ const Node: React.FC<{
                     </a>
                 </div>
             )}
-            {isZkProtocol && hovered && (
+            {isZkProtocol && (hovered || clicked) && (
                 <div className={styles.hoverPopup}>
                     <div className={styles.popupDesc}>
                         Package your protocol with mobile-ready SDKs and
@@ -123,7 +152,7 @@ const Node: React.FC<{
                     </a>
                 </div>
             )}
-            {isWebJSApp && hovered && (
+            {isWebJSApp && (hovered || clicked) && (
                 <div className={`${styles.hoverPopup} ${styles.webJSAppPopup}`}>
                     <div className={styles.popupDesc}>
                         Bringing existing ZK logic to mobile by building
@@ -137,7 +166,7 @@ const Node: React.FC<{
                     </a>
                 </div>
             )}
-            {isUpgradeProving && hovered && (
+            {isUpgradeProving && (hovered || clicked) && (
                 <div className={styles.hoverPopup}>
                     <div className={styles.popupDesc}>
                         Mopro can help you maintain and upgrade your stack — by

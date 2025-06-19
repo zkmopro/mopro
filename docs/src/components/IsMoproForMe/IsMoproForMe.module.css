@@ -276,3 +276,10 @@
 .learnMore:hover {
   color: #a594f9;
 }
+.learnMore.clicked {
+  color: #FFB347;
+  text-decoration: underline solid;
+  background: #635985;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+}
