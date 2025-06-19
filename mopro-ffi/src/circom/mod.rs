@@ -243,7 +243,7 @@ mod tests {
 
         // Only build the witness functions for tests, don't bundle them into
         // the final library
-        witnesscalc_adapter::witness!(multiplier2);
+        witnesscalc_adapter::witness!(multiplier2_witnesscalc);
 
         #[test]
         fn test_circom_macros() {
@@ -255,7 +255,7 @@ mod tests {
             );
 
             set_circom_circuits! {
-                ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::WitnessCalc(multiplier2_witness)),
+                ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::WitnessCalc(multiplier2_witnesscalc_witness)),
             }
 
             const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";

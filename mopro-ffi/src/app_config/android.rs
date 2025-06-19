@@ -21,6 +21,11 @@ use super::mktemp_local;
 pub fn build() {
     const BINDING_NAME: &str = "MoproAndroidBindings";
 
+    #[cfg(feature = "witnesscalc")]
+    let _ = std::env::var("ANDROID_NDK").unwrap_or_else(|_| {
+        panic!("ANDROID_NDK is not set");
+    });
+
     let cwd = std::env::current_dir().expect("Failed to get current directory");
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());

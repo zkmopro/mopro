@@ -7,9 +7,11 @@ mopro_ffi::app!();
 rust_witness::witness!(multiplier2);
 rust_witness::witness!(multiplier2bls);
 rust_witness::witness!(keccak256256test);
+witnesscalc_adapter::witness!(multiplier2_witnesscalc);
 
 mopro_ffi::set_circom_circuits! {
     ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(multiplier2_witness)),
+    ("multiplier2_witnesscalc_final.zkey", mopro_ffi::witness::WitnessFn::WitnessCalc(multiplier2_witnesscalc_witness)),
     ("multiplier2_bls_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(multiplier2bls_witness)),
     ("keccak256_256_test_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(keccak256256test_witness)),
 }

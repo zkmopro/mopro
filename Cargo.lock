@@ -5147,11 +5147,11 @@ dependencies = [
  "hyperplonk-fibonacci",
  "mopro-ffi",
  "mopro-wasm",
- "num-bigint",
  "plonk-fibonacci",
  "rust-witness",
  "thiserror 2.0.12",
  "uniffi",
+ "witnesscalc-adapter",
 ]
 
 [[package]]
