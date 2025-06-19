@@ -540,3 +540,40 @@ Don't forget to modify the input values for your specific case!
     -   Add the required Rust crate in `Cargo.toml`
     -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](rust-setup.md#-customize-the-bindings) guide for details).<br/>
         Once exported, the function will be available across all supported platforms.
+
+## ⚠️ Error when running `flutter run --release`
+
+If you see an error like this:
+
+```sh
+E/AndroidRuntime(17363): java.lang.UnsatisfiedLinkError: Can't obtain peer field ID for class com.sun.jna.Pointer
+...
+```
+
+This happens because **UniFFI relies on JNA**, which is not compatible with code shrinking or obfuscation enabled in Android release builds.
+
+-   See: Android code shrinking
+-   See: UniFFI Kotlin JNA requirements
+
+**✅ Solution**
+
+To fix this, disable code shrinking in your Android `build.gradle` for release builds:
+
+```kt
+android {
+    buildTypes {
+        release {
+            minifyEnabled false       // Disable code shrinking & obfuscation
+            shrinkResources false     // Optional: also disable resource shrinking
+        }
+    }
+}
+```
+
+After applying this change, you should be able to run:
+
+```sh
+flutter run --release
+```
+
+without hitting the JNA-related crash.
