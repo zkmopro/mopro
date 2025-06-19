@@ -5,18 +5,50 @@
   width: 75%;
 }
 
+.additionalHeading {
+  font-size: 4rem;
+  line-height: 4.1rem;
+  font-weight: 600;
+  width: 75%;
+  margin-top: 8rem;
+}
+
 .featuresContainer {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 4rem;
   padding-top: 5rem;
- }
+}
 
- .feature {
+.additionalFeaturesContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding-top: 3rem;
+}
+
+.feature {
   display: flex;
   gap: 1.25rem;
-  width: 45%;
- }
+  width: 100%;
+}
+
+.additionalFeature {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: var(--ifm-background-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  transition: all 0.3s ease;
+}
+
+.additionalFeature:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--ifm-color-primary);
+}
 
 .featureSvg svg {
   width: 120;
@@ -29,8 +61,34 @@
   line-height: 2.6rem;
 }
 
-@media screen and (max-width: 996px) {
+.additionalFeatureHeading {
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.9rem;
+  color: var(--ifm-color-primary);
+  margin: 0;
+}
 
+.additionalFeatureText {
+  font-size: 1.1rem;
+  line-height: 1.6rem;
+  color: var(--ifm-color-emphasis-700);
+  margin: 0;
+}
+
+.additionalFeatureText a {
+  color: var(--ifm-color-warning);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.additionalFeatureText a:hover {
+  color: var(--ifm-color-white);
+  text-decoration: none;
+}
+
+@media screen and (max-width: 996px) {
   .heading {
     font-size: 3.3rem;
     line-height: 3.4rem;
@@ -38,15 +96,29 @@
     width: 100%;
   }
 
+  .additionalHeading {
+    font-size: 2.5rem;
+    line-height: 2.6rem;
+    font-weight: 500;
+    width: 100%;
+    margin-top: 4rem;
+  }
+
   .featuresContainer {
     gap: 1rem;
     padding-top: 3rem;
   }
 
+  .additionalFeaturesContainer {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding-top: 2rem;
+  }
+
   .feature {
     width: 100%;
     gap: 0.75rem;
-   }
+  }
   
   .featureSvg svg {
     width: 70px;
@@ -59,7 +131,22 @@
     line-height: 2.1rem;
   }
 
+  .additionalFeatureHeading {
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.6rem;
+  }
+
   .featureText {
     font-size: .9rem;
+  }
+
+  .additionalFeatureText {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .additionalFeature {
+    padding: 1.25rem;
   }
 }

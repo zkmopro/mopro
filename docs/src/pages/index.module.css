@@ -42,10 +42,123 @@ p {
   order: 4;
 }
 
+.whyMoproContainer {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 2rem 0;
+  width: 45%;
+  order: 1;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.whyMoproHeading {
+  font-size: 2.5rem;
+  line-height: 3rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 2rem;
+}
+
+.whyMoproContent {
+  max-width: 100%;
+}
+
+.whyMoproSubheading {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.whyMoproText {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #D6D2B9;
+  line-height: 1.6;
+}
+
 .separator {
   display: flex;
   justify-content: center;
   padding: 15% 0;
+}
+
+.cliSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.cliCodeContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cliCode {
+  background-color: #1a1a1a;
+  padding: 1rem;
+  border-radius: 8px;
+  color: #fff;
+  font-family: monospace;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.copyButton {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #D6D2B9;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.copyButton:hover {
+  color: #FFB546;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.copyButton:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.getStartedButton {
+  background-color: #FFB546;
+  color: #000;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.getStartedButton:hover {
+  background-color: #FFC066;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 181, 70, 0.2);
+}
+
+.getStartedButton:active {
+  transform: translateY(0);
+  background-color: #FFA526;
 }
 
 @media screen and (max-width: 996px) {
@@ -77,6 +190,34 @@ p {
     order: 3;
     width: 100%;
     justify-self: center;
+  }
+
+  .whyMoproContainer {
+    width: 100%;
+    text-align: center;
+    align-items: center;
+  }
+  
+  .phoneImg {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 907px) and (max-width: 1261px) {
+  .introContainer {
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .whyMoproContainer {
+    width: 50%;
+    order: 1;
+  }
+
+  .phoneImg {
+    width: 45%;
+    order: 2;
   }
 }
 
