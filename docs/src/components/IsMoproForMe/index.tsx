@@ -84,7 +84,7 @@ const Node: React.FC<{
                 <div className={styles.learnMore}>More</div>
             )}
             {isZkApp && hovered && (
-                <div className={styles.hoverPopup}>
+                <div className={`${styles.hoverPopup} ${styles.zkAppPopup}`}>
                     <div className={styles.popupDesc}>
                         Use Mopro to jumpstart your ZK mobile development - it
                         provides native bindings and ready-to-use templates.
@@ -98,7 +98,7 @@ const Node: React.FC<{
                 </div>
             )}
             {isMobileApp && hovered && (
-                <div className={styles.hoverPopup}>
+                <div className={`${styles.hoverPopup} ${styles.mobileAppPopup}`}>
                     <div className={styles.popupDesc}>
                         Add privacy-preserving features without deep
                         cryptography expertise. Includes sample circuits and
@@ -124,7 +124,7 @@ const Node: React.FC<{
                 </div>
             )}
             {isWebJSApp && hovered && (
-                <div className={styles.hoverPopup}>
+                <div className={`${styles.hoverPopup} ${styles.webJSAppPopup}`}>
                     <div className={styles.popupDesc}>
                         Bringing existing ZK logic to mobile by building
                         circuits and APIs to mobile libs

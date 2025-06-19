@@ -178,6 +178,34 @@
   animation: fadeIn 0.2s;
 }
 
+
+.hoverPopup.zkAppPopup {
+  content: '';
+  position: absolute;
+  left: 150px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #22223b;
+}
+
+.hoverPopup.mobileAppPopup {
+  content: '';
+  position: absolute;
+  left: 100px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #22223b;
+}
+
+.hoverPopup.webJSAppPopup {
+  content: '';
+  position: absolute;
+  left: -40px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #22223b;
+}
+
 .popupOverlay {
   display: none;
 }
