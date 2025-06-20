@@ -1,5 +1,5 @@
 use super::Create;
-use crate::constants::{Platform, MOPRO_SWIFT_FILE, XCFRAMEWORK_NAME_TEMPLATE};
+use crate::constants::Platform;
 use crate::create::utils::{
     check_bindings, copy_android_bindings, copy_dir, copy_keys, download_and_extract_template,
 };
@@ -7,7 +7,7 @@ use crate::print::print_footer_message;
 use crate::style::print_green_bold;
 use crate::utils::project_name_from_toml;
 use anyhow::Error;
-use convert_case::Case::UpperCamel;
+use convert_case::Case::{Kebab, Snake, UpperCamel};
 use convert_case::Casing;
 use std::ops::Add;
 use std::{fs, path::PathBuf};
@@ -37,11 +37,12 @@ impl Create for Flutter {
         let flutter_dir = project_dir.join("flutter-app-main");
         fs::rename(flutter_dir, &target_dir)?;
 
-        let identifier = project_name_from_toml(&project_dir).to_case(UpperCamel);
-        let xcframework_name = identifier.add(XCFRAMEWORK_NAME_TEMPLATE);
+        let identifier = project_name_from_toml(&project_dir);
+        let xcframework_name = identifier.to_case(UpperCamel).add("Bindings.xcframework");
+        let swift_name = identifier.from_case(Kebab).to_case(Snake).add(".swift");
 
         let xcframeworks_dir = ios_bindings_dir.join(&xcframework_name);
-        let mopro_swift_file = ios_bindings_dir.join(MOPRO_SWIFT_FILE);
+        let mopro_swift_file = ios_bindings_dir.join(&swift_name);
 
         let mopro_flutter_plugin_dir = target_dir.join("mopro_flutter_plugin");
         let ios_dir = mopro_flutter_plugin_dir.join("ios");
@@ -52,8 +53,8 @@ impl Create for Flutter {
         fs::create_dir(&mopro_bindings_dir)?;
         copy_dir(&xcframeworks_dir, &mopro_bindings_dir)?;
 
-        fs::remove_file(classes_dir.join(MOPRO_SWIFT_FILE))?;
-        fs::copy(mopro_swift_file, classes_dir.join(MOPRO_SWIFT_FILE))?;
+        fs::remove_file(classes_dir.join(&swift_name))?;
+        fs::copy(mopro_swift_file, classes_dir.join(&swift_name))?;
 
         copy_android_bindings(
             &android_bindings_dir,

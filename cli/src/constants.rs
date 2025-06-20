@@ -2,8 +2,6 @@ use crate::utils::project_name_from_toml;
 use convert_case::{Case, Casing};
 use std::path::Path;
 
-pub const XCFRAMEWORK_NAME_TEMPLATE: &str = "Bindings.xcframework";
-pub const MOPRO_SWIFT_FILE: &str = "mopro.swift";
 pub const JNILIBS_DIR: &str = "jniLibs";
 pub const MOPRO_KOTLIN_FILE: &str = "mopro.kt";
 
