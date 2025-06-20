@@ -1,7 +1,4 @@
-use crate::config::read_config;
-use crate::constants::{
-    Platform, JNILIBS_DIR, MOPRO_KOTLIN_FILE, MOPRO_SWIFT_FILE, XCFRAMEWORK_NAME,
-};
+use crate::constants::{Platform, JNILIBS_DIR, MOPRO_KOTLIN_FILE};
 use crate::print::print_update_success_message;
 use crate::style::{print_gray_items, print_green_bold};
 use anyhow::Result;
@@ -10,22 +7,18 @@ use std::path::Path;
 use walkdir::WalkDir;
 
 pub fn update_bindings() -> Result<()> {
-    let project_dir = std::env::current_dir()?; // TODO - this is a strong assumption that we update within the project directory
+    let project_dir = std::env::current_dir()?;
 
-    let config = read_config(&project_dir.join("Config.toml")).ok();
-    let ios_bindings_dir = project_dir.join(Platform::Ios.binding_dir(&config));
-    let android_bindings_dir = project_dir.join(Platform::Android.binding_dir(&config));
-    let web_bindings_dir = project_dir.join(Platform::Web.binding_dir(&config));
+    let ios_bindings_dir = project_dir.join(Platform::Ios.binding_dir(&project_dir));
+    let android_bindings_dir = project_dir.join(Platform::Android.binding_dir(&project_dir));
+    let web_bindings_dir = project_dir.join(Platform::Web.binding_dir(&project_dir));
 
     // Update iOS bindings
     if ios_bindings_dir.exists() {
         print_green_bold("🔄 Updating iOS bindings...".to_string());
-        let updated_xcframework_paths =
-            update_folder(&ios_bindings_dir.join(XCFRAMEWORK_NAME), XCFRAMEWORK_NAME)?; // TODO - handle custom name of XCFramework
-        print_gray_items(updated_xcframework_paths);
-        let updated_swift_paths =
-            update_file(&ios_bindings_dir.join(MOPRO_SWIFT_FILE), MOPRO_SWIFT_FILE)?;
-        print_gray_items(updated_swift_paths);
+        let updated_bindings_paths =
+            update_folder(&ios_bindings_dir, &Platform::Ios.binding_dir(&project_dir))?;
+        print_gray_items(updated_bindings_paths);
     }
     // Update Android bindings
     if android_bindings_dir.exists() {
@@ -46,7 +39,7 @@ pub fn update_bindings() -> Result<()> {
     if web_bindings_dir.exists() {
         print_green_bold("🔄 Updating Web bindings...".to_string());
         let updated_web_paths =
-            update_folder(&web_bindings_dir, &Platform::Web.binding_dir(&config))?;
+            update_folder(&web_bindings_dir, &Platform::Web.binding_dir(&project_dir))?;
         print_gray_items(updated_web_paths);
     }
 

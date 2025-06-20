@@ -7,13 +7,14 @@ use include_dir::include_dir;
 use include_dir::Dir;
 use std::collections::HashSet;
 use std::env;
+use std::path::Path;
 
 use crate::config::read_config;
 use crate::config::write_config;
 use crate::config::Config;
+use crate::constants::AndroidArch;
 use crate::constants::Mode;
 use crate::constants::Platform;
-use crate::constants::{AndroidArch, DEFAULT_IDENTIFIER};
 use crate::create::utils::copy_embedded_dir;
 use crate::init::adapter::Adapter;
 use crate::print::print_build_success_message;
@@ -44,7 +45,6 @@ pub fn build_project(
     // Check if the config file exists, if not create a default one
     if !config_path.exists() {
         let default_config = Config {
-            identifier: Some("".to_string()),
             build_mode: Some("".to_string()),
             target_adapters: Some(HashSet::new()),
             target_platforms: Some(HashSet::new()),
@@ -99,14 +99,6 @@ pub fn build_project(
         }
     };
     write_config(&config_path, &config)?;
-    
-    // Identifier
-    let identifier = config
-        .identifier
-        .get_or_insert_with(|| DEFAULT_IDENTIFIER.to_string())
-        .clone();
-    write_config(&config_path, &config)?;
-    
 
     // Supported adapters and platforms:
     // | Platforms | Circom | Halo2 | Noir |
@@ -208,8 +200,7 @@ pub fn build_project(
             .arg("run")
             .arg("--bin")
             .arg(platform_str)
-            .env("MODE", mode.as_str())
-            .env("IDENTIFIER", identifier.as_str())
+            .env("CONFIG", mode.as_str())
             .env(p.arch_key(), selected_arch);
 
         // The dependencies of Noir libraries need iOS 15 and above.
@@ -228,7 +219,7 @@ pub fn build_project(
         }
     }
 
-    print_binding_message(&platform.platforms, identifier.as_str())?;
+    print_binding_message(&platform.platforms, &current_dir)?;
 
     Ok(())
 }
@@ -255,17 +246,14 @@ fn select_mode(config: &mut Config) -> Result<Mode> {
     Ok(Mode::from_idx(idx))
 }
 
-fn print_binding_message(platforms: &Vec<Platform>, identifier: &str) -> anyhow::Result<()> {
-    let current_dir = env::current_dir()?;
-
+fn print_binding_message(platforms: &Vec<Platform>, current_dir: &Path) -> anyhow::Result<()> {
     print_green_bold("✨ Bindings Built Successfully! ✨".to_string());
     println!("The Mopro bindings have been successfully generated and are available in the following directories:\n");
     for platform in platforms {
         let text = format!(
-            "- {}/{}{}Bindings", // TODO - this needs to be changed to the custom name of the binding
+            "- {}/{}",
             current_dir.display(),
-            identifier,
-            platform.binding_name()
+            platform.binding_dir(current_dir)
         );
         println!("{}", blue_bold(text.to_string()));
     }

@@ -10,7 +10,6 @@ use crate::init::adapter::Adapter;
 // Storing user selections while iterating with mopro cli
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Config {
-    pub(crate) identifier: Option<String>,
     pub(crate) build_mode: Option<String>,
     pub(crate) target_adapters: Option<HashSet<String>>,
     pub(crate) target_platforms: Option<HashSet<String>>,

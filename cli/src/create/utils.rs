@@ -6,7 +6,6 @@ use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 
-use crate::config::read_config;
 use crate::constants::Platform;
 use crate::constants::JNILIBS_DIR;
 use anyhow::{Error, Result};
@@ -147,8 +146,7 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
 }
 
 pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<PathBuf> {
-    let config = read_config(&project_dir.join("Config.toml")).ok();
-    let bindings_name = platform.binding_dir(&config);
+    let bindings_name = platform.binding_dir(project_dir);
 
     let ios_bindings_dir = project_dir.join(&bindings_name);
     if ios_bindings_dir.exists() && fs::read_dir(&ios_bindings_dir)?.count() > 0 {

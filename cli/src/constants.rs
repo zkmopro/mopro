@@ -1,8 +1,9 @@
-use crate::config::Config;
+use crate::utils::project_name_from_toml;
+use convert_case::{Case, Casing};
+use std::path::Path;
 
-pub const DEFAULT_IDENTIFIER: &str = "Mopro";
-pub const XCFRAMEWORK_NAME: &str = "MoproBindings.xcframework"; // TODO - update this
-pub const MOPRO_SWIFT_FILE: &str = "mopro.swift"; // TODO - update this
+pub const XCFRAMEWORK_NAME_TEMPLATE: &str = "Bindings.xcframework";
+pub const MOPRO_SWIFT_FILE: &str = "mopro.swift";
 pub const JNILIBS_DIR: &str = "jniLibs";
 pub const MOPRO_KOTLIN_FILE: &str = "mopro.kt";
 
@@ -241,17 +242,14 @@ impl Platform {
         }
     }
 
-    pub fn binding_dir(&self, config: &Option<Config>) -> String {
-        let identifier = config
-            .as_ref()
-            .and_then(|c| c.identifier.as_deref())
-            .unwrap_or(DEFAULT_IDENTIFIER);
+    pub fn binding_dir(&self, project_dir: &Path) -> String {
+        let identifier = match self {
+            Self::Ios => project_name_from_toml(project_dir).to_case(Case::UpperCamel),
+            Self::Android => "Mopro".to_string(),
+            Self::Web => "Mopro".to_string(),
+        };
 
-        match self {
-            Self::Ios => format!("{}iOSBindings", identifier),
-            Self::Android => format!("{}MoproAndroidBindings", identifier),
-            Self::Web => "MoproWasmBindings".to_string(),
-        }
+        format!("{}{}Bindings", identifier, self.binding_name())
     }
 }
 

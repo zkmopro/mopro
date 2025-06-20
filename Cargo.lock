@@ -3027,6 +3027,7 @@ dependencies = [
  "anyhow",
  "clap 4.5.37",
  "console",
+ "convert_case",
  "dialoguer",
  "fs_extra",
  "include_dir",
