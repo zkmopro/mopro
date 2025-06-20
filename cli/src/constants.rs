@@ -1,5 +1,8 @@
-pub const XCFRAMEWORK_NAME: &str = "MoproBindings.xcframework";
-pub const MOPRO_SWIFT_FILE: &str = "mopro.swift";
+use crate::config::Config;
+
+pub const DEFAULT_IDENTIFIER: &str = "Mopro";
+pub const XCFRAMEWORK_NAME: &str = "MoproBindings.xcframework"; // TODO - update this
+pub const MOPRO_SWIFT_FILE: &str = "mopro.swift"; // TODO - update this
 pub const JNILIBS_DIR: &str = "jniLibs";
 pub const MOPRO_KOTLIN_FILE: &str = "mopro.kt";
 
@@ -238,11 +241,16 @@ impl Platform {
         }
     }
 
-    pub fn binding_dir(&self) -> &str {
+    pub fn binding_dir(&self, config: &Option<Config>) -> String {
+        let identifier = config
+            .as_ref()
+            .and_then(|c| c.identifier.as_deref())
+            .unwrap_or(DEFAULT_IDENTIFIER);
+
         match self {
-            Self::Ios => "MoproiOSBindings",
-            Self::Android => "MoproAndroidBindings",
-            Self::Web => "MoproWasmBindings",
+            Self::Ios => format!("{}iOSBindings", identifier),
+            Self::Android => format!("{}MoproAndroidBindings", identifier),
+            Self::Web => "MoproWasmBindings".to_string(),
         }
     }
 }

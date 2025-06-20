@@ -8,14 +8,17 @@ use uniffi::CargoMetadataConfigSupplier;
 use uniffi::SwiftBindingGenerator;
 
 use super::cleanup_tmp_local;
-use super::constants::{IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
+use super::constants::{
+    IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_IDENTIFIER, ENV_IOS_ARCHS, ENV_MODE,
+};
 use super::install_arch;
 use super::mktemp_local;
 use crate::app_config::toml_lib_name;
 
-// Load environment variables that are specified by by xcode
 pub fn build() {
-    const BINDING_NAME: &str = "MoproiOSBindings";
+    const DEFAULT_IDENTIFIER: &str = "Mopro";
+    let identifier = std::env::var(ENV_IDENTIFIER).ok().unwrap_or(DEFAULT_IDENTIFIER.to_owned());
+    let binding_name = binding_name_from(&identifier);
 
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
@@ -24,15 +27,16 @@ pub fn build() {
     let build_dir_path = Path::new(&build_dir);
     let work_dir = mktemp_local(build_dir_path);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
-    let bindings_out = work_dir.join(BINDING_NAME);
+    let bindings_out = work_dir.join(&binding_name);
     fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
-    let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
-    let framework_out = bindings_out.join("MoproBindings.xcframework");
+    let bindings_dest = Path::new(&manifest_dir).join(&binding_name);
+    let framework_out = bindings_out.join(format!("{}Bindings.xcframework", &identifier));
+    let swift_out = format!("{}.swift", &identifier.to_lowercase());
     let lib_name = toml_lib_name("a");
 
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
     let mode = Mode::parse_from_str(
-        std::env::var(ENV_CONFIG)
+        std::env::var(ENV_MODE)
             .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
             .as_str(),
     );
@@ -113,10 +117,10 @@ pub fn build() {
         .expect("Failed to generate bindings for iOS");
 
     fs::rename(
-        swift_bindings_dir.join("mopro.swift"),
-        bindings_out.join("mopro.swift"),
+        swift_bindings_dir.join(&swift_out),
+        bindings_out.join(&swift_out),
     )
-    .expect("Failed to move mopro.swift into place");
+    .expect(&format!("Failed to move {} into place", swift_out));
 
     let mut xcbuild_cmd = Command::new("xcodebuild");
     xcbuild_cmd.arg("-create-xcframework");
@@ -136,9 +140,9 @@ pub fn build() {
         .unwrap();
 
     // The iOS project expects the module map files to be named "module.modulemap",
-    // but uniffi-bindgen creates "moproFFI.modulemap" files by default,
+    // but uniffi-bindgen creates "<identifier>FFI.modulemap" files by default,
     // therefore we need to rename all of them.
-    rename_module_maps_recursively(&bindings_out);
+    rename_module_maps_recursively(&bindings_out, &identifier.to_lowercase());
 
     if let Ok(info) = fs::metadata(&bindings_dest) {
         if !info.is_dir() {
@@ -148,7 +152,7 @@ pub fn build() {
     }
 
     fs::rename(&bindings_out, &bindings_dest).expect("Failed to move framework into place");
-    // Copy the mopro.swift file to the output directory
+    // Copy the <identifier>.swift file to the output directory
     cleanup_tmp_local(build_dir_path)
 }
 
@@ -190,18 +194,18 @@ fn group_target_archs(target_archs: &[IosArch]) -> Vec<Vec<IosArch>> {
 }
 
 /// Recursively renames all module maps in the given directory to "module.modulemap".
-/// This is necessary because uniffi-bindgen creates module maps with the name "moproFFI.modulemap"
+/// This is necessary because uniffi-bindgen creates module maps with the name "<identifier>FFI.modulemap"
 /// by default. We're looking for multiple files as there are separate modules for the
 /// physical device and the simulator.
-fn rename_module_maps_recursively(bindings_out: &PathBuf) {
+fn rename_module_maps_recursively(bindings_out: &PathBuf, identifier: &str) {
     for entry in fs::read_dir(bindings_out).expect("Failed to read bindings out directory") {
         let entry = entry.expect("Failed to read entry");
         let path = entry.path();
-        if path.is_file() && path.file_name().unwrap() == "moproFFI.modulemap" {
-            let dest_path = path.with_file_name("module.modulemap");
+        if path.is_file() && path.file_name().unwrap() == format!("{}FFI.modulemap", identifier).as_str() {
+            let dest_path = path.with_file_name(format!("{}module.modulemap", identifier));
             fs::rename(&path, &dest_path).expect("Failed to rename module map");
         } else if path.is_dir() {
-            rename_module_maps_recursively(&path);
+            rename_module_maps_recursively(&path, identifier);
         }
     }
 }
@@ -226,4 +230,8 @@ fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Resul
     )
     .map_err(|e| Error::other(e.to_string()))?;
     Ok(())
+}
+
+pub fn binding_name_from<S: AsRef<str>>(prefix: S) -> String {
+    format!("{}iOSBindings", prefix.as_ref())
 }

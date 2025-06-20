@@ -218,8 +218,8 @@ For example:
 ```sh
 cargo run --bin ios # Debug mode for iOS
 cargo run --bin android # Debug mode for Android
-CONFIGURATION=release cargo run --bin ios # Release mode for iOS
-CONFIGURATION=release cargo run --bin android # Release mode for Android
+MODE=release cargo run --bin ios # Release mode for iOS
+MODE=release cargo run --bin android # Release mode for Android
 ANDROID_ARCHS=x86_64-linux-android cargo run --bin android # Build for Android x86_64-linux-android architecture
 IOS_ARCHS=aarch64-apple-ios,aarch64-apple-ios-sim cargo run --bin ios # Build for iOS aarch64-apple-ios and aarch64-apple-ios-sim architecture
 ```

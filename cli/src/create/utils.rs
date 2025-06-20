@@ -6,6 +6,9 @@ use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 
+use crate::config::read_config;
+use crate::constants::Platform;
+use crate::constants::JNILIBS_DIR;
 use anyhow::{Error, Result};
 use include_dir::include_dir;
 use include_dir::Dir;
@@ -13,9 +16,6 @@ use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
 use reqwest::blocking::Client;
 use zip::ZipArchive;
-
-use crate::constants::Platform;
-use crate::constants::JNILIBS_DIR;
 
 pub fn copy_android_bindings(
     android_bindings_dir: &Path,
@@ -45,7 +45,12 @@ pub fn copy_android_bindings(
 }
 
 pub fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> Result<()> {
-    let ios_bindings_target_dir = output_dir.join(Platform::Ios.binding_dir());
+    let input_name = input_dir
+        .file_name()
+        .ok_or_else(|| anyhow::anyhow!("Input directory has no name"))?;
+
+    let ios_bindings_target_dir = output_dir.join(input_name);
+
     if ios_bindings_target_dir.exists() {
         fs::remove_dir_all(&ios_bindings_target_dir)?;
     }
@@ -142,9 +147,10 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
 }
 
 pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<PathBuf> {
-    let bindings_name = platform.binding_dir();
+    let config = read_config(&project_dir.join("Config.toml")).ok();
+    let bindings_name = platform.binding_dir(&config);
 
-    let ios_bindings_dir = project_dir.join(bindings_name);
+    let ios_bindings_dir = project_dir.join(&bindings_name);
     if ios_bindings_dir.exists() && fs::read_dir(&ios_bindings_dir)?.count() > 0 {
         Ok(ios_bindings_dir)
     } else {

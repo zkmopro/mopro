@@ -12,14 +12,16 @@ use crate::app_config::toml_lib_name;
 use super::cleanup_tmp_local;
 use super::constants::{
     AndroidArch, Mode, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, ENV_ANDROID_ARCHS,
-    ENV_CONFIG,
+    ENV_IDENTIFIER, ENV_MODE,
 };
 use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
 pub fn build() {
-    const BINDING_NAME: &str = "MoproAndroidBindings";
+    const DEFAULT_IDENTIFIER: &str = "Mopro";
+    let identifier = std::env::var(ENV_IDENTIFIER).ok();
+    let binding_name = binding_name_from(identifier.as_deref().unwrap_or(DEFAULT_IDENTIFIER));
 
     #[cfg(feature = "witnesscalc")]
     let _ = std::env::var("ANDROID_NDK").unwrap_or_else(|_| {
@@ -31,12 +33,12 @@ pub fn build() {
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());
     let build_dir = Path::new(&manifest_dir).join("build");
     let work_dir = mktemp_local(&build_dir);
-    let bindings_out = work_dir.join(BINDING_NAME);
-    let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
+    let bindings_out = work_dir.join(&binding_name);
+    let bindings_dest = Path::new(&manifest_dir).join(&binding_name);
     let lib_name = toml_lib_name("so");
 
     let mode = Mode::parse_from_str(
-        std::env::var(ENV_CONFIG)
+        std::env::var(ENV_MODE)
             .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
             .as_str(),
     );
@@ -149,4 +151,8 @@ fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::R
     )
     .map_err(|e| Error::other(e.to_string()))?;
     Ok(())
+}
+
+pub fn binding_name_from<S: AsRef<str>>(prefix: S) -> String {
+    format!("{}AndroidBindings", prefix.as_ref())
 }

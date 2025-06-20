@@ -151,18 +151,18 @@ cargo run --bin android # Debug mode
 to build the corresponding static library. Move on to [iOS setup](ios-setup) or [Android setup](android-setup) to begin integrating in an app.
 
 :::info
-To achieve optimal performance, it's recommended to build and run your application in release mode. You can do this by setting the `CONFIGURATION` environment variable to `release` before running your commands.
+To achieve optimal performance, it's recommended to build and run your application in release mode. You can do this by setting the `MODE` environment variable to `release` before running your commands.
 
 Example usage
 
 ```sh
-CONFIGURATION=release cargo run --bin ios # Release mode
+MODE=release cargo run --bin ios # Release mode
 ```
 
 or
 
 ```sh
-CONFIGURATION=release cargo run --bin android # Release mode
+MODE=release cargo run --bin android # Release mode
 ```
 
 Running your project in release mode significantly enhances performance compared to debug mode. This is because the Rust compiler applies optimizations that improve runtime speed and reduce binary size, making your application more efficient.

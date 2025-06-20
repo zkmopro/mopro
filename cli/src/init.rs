@@ -83,6 +83,7 @@ pub fn init_project(
     // Check if the config file exists, if not create a default one
     if !config_path.exists() {
         let default_config = Config {
+            identifier: Some("".to_string()),
             build_mode: Some("".to_string()),
             target_adapters: Some(HashSet::new()),
             target_platforms: Some(HashSet::new()),
