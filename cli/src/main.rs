@@ -31,6 +31,8 @@ enum Commands {
         adapter: Option<String>,
         #[arg(long)]
         project_name: Option<String>,
+        #[arg(long, help = "Show instruction message for init")]
+        show: bool,
     },
     /// Builds the project for specified platforms
     Build {
@@ -40,6 +42,8 @@ enum Commands {
         platforms: Option<Vec<String>>,
         #[arg(long, num_args = 1.., help = "Specify the architectures to build for (e.g., 'aarch64-apple-ios', 'aarch64-apple-ios-sim', x86_64-apple-ios, x86_64-linux-android, i686-linux-android, armv7-linux-androideabi, aarch64-linux-android).")]
         architectures: Option<Vec<String>>,
+        #[arg(long, help = "Show instruction message for build")]
+        show: bool,
     },
     /// Create templates for the specified platform
     Create {
@@ -57,18 +61,32 @@ fn main() {
         Commands::Init {
             adapter,
             project_name,
-        } => match init::init_project(adapter, project_name) {
-            Ok(_) => {}
-            Err(e) => style::print_red_bold(format!("Failed to initialize project: {:?}", e)),
-        },
+            show,
+        } => {
+            if *show {
+                print::print_init_instructions("<PROJECT NAME>".to_string());
+                return;
+            }
+            match init::init_project(adapter, project_name) {
+                Ok(_) => {}
+                Err(e) => style::print_red_bold(format!("Failed to initialize project: {:?}", e)),
+            }
+        }
         Commands::Build {
             mode,
             platforms,
             architectures,
-        } => match build::build_project(mode, platforms, architectures) {
-            Ok(_) => {}
-            Err(e) => style::print_red_bold(format!("Failed to build project: {:?}", e)),
-        },
+            show,
+        } => {
+            if *show {
+                print::print_build_success_message();
+                return;
+            }
+            match build::build_project(mode, platforms, architectures) {
+                Ok(_) => {}
+                Err(e) => style::print_red_bold(format!("Failed to build project: {:?}", e)),
+            }
+        }
         Commands::Create { framework } => match create::create_project(framework) {
             Ok(_) => {}
             Err(e) => style::print_red_bold(format!("Failed to create template: {:?}", e)),
