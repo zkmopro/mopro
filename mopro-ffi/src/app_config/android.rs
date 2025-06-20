@@ -7,21 +7,20 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
 
-use crate::app_config::toml_lib_name;
+use crate::app_config::project_name_from_toml;
 
 use super::cleanup_tmp_local;
 use super::constants::{
     AndroidArch, Mode, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, ENV_ANDROID_ARCHS,
-    ENV_IDENTIFIER, ENV_MODE,
+    ENV_CONFIG,
 };
 use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
 pub fn build() {
-    const DEFAULT_IDENTIFIER: &str = "Mopro";
-    let identifier = std::env::var(ENV_IDENTIFIER).ok();
-    let binding_name = binding_name_from(identifier.as_deref().unwrap_or(DEFAULT_IDENTIFIER));
+    let identifier = project_name_from_toml();
+    let binding_name = binding_name_from(&identifier);
 
     #[cfg(feature = "witnesscalc")]
     let _ = std::env::var("ANDROID_NDK").unwrap_or_else(|_| {
@@ -35,10 +34,10 @@ pub fn build() {
     let work_dir = mktemp_local(&build_dir);
     let bindings_out = work_dir.join(&binding_name);
     let bindings_dest = Path::new(&manifest_dir).join(&binding_name);
-    let lib_name = toml_lib_name("so");
+    let lib_name = format!("{}.so", &identifier.to_lowercase());
 
     let mode = Mode::parse_from_str(
-        std::env::var(ENV_MODE)
+        std::env::var(ENV_CONFIG)
             .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
             .as_str(),
     );

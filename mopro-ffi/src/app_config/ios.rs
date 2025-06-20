@@ -1,4 +1,6 @@
+use anyhow::Context;
 use camino::Utf8Path;
+use convert_case::{Case, Casing};
 use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
@@ -8,18 +10,29 @@ use uniffi::CargoMetadataConfigSupplier;
 use uniffi::SwiftBindingGenerator;
 
 use super::cleanup_tmp_local;
-use super::constants::{
-    IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_IDENTIFIER, ENV_IOS_ARCHS, ENV_MODE,
-};
+use super::constants::{IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
 use super::install_arch;
 use super::mktemp_local;
-use crate::app_config::toml_lib_name;
+use crate::app_config::project_name_from_toml;
 
 pub fn build() {
-    const DEFAULT_IDENTIFIER: &str = "Mopro";
-    let identifier = std::env::var(ENV_IDENTIFIER).ok().unwrap_or(DEFAULT_IDENTIFIER.to_owned());
-    let binding_name = binding_name_from(&identifier);
+    // Name used when defining `uniffi::setup_scaffolding!("mopro")` in `lib.rs`
+    const UNIFFI_NAME: &str = "mopro";
 
+    let project_name = project_name_from_toml();
+    let camel_case_project_name = project_name.to_case(Case::UpperCamel);
+    let snake_case_project_name = project_name.to_case(Case::Snake);
+
+    // Names for the generated files and directories
+    let lib_name = format!("lib{}.a", &snake_case_project_name);
+    let bindings_folder_name = format!("{}iOSBindings", &camel_case_project_name);
+    let framework_name = format!("{}Bindings.xcframework", &camel_case_project_name);
+
+    let swift_name = format!("{}.swift", UNIFFI_NAME);
+    let header_name = format!("{}FFI.h", UNIFFI_NAME);
+    let modulemap_name = format!("{}FFI.modulemap", UNIFFI_NAME);
+
+    // Paths for the generated files
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
@@ -27,16 +40,14 @@ pub fn build() {
     let build_dir_path = Path::new(&build_dir);
     let work_dir = mktemp_local(build_dir_path);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
-    let bindings_out = work_dir.join(&binding_name);
+    let bindings_out = work_dir.join(&bindings_folder_name);
     fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
-    let bindings_dest = Path::new(&manifest_dir).join(&binding_name);
-    let framework_out = bindings_out.join(format!("{}Bindings.xcframework", &identifier));
-    let swift_out = format!("{}.swift", &identifier.to_lowercase());
-    let lib_name = toml_lib_name("a");
+    let bindings_dest = Path::new(&manifest_dir).join(&bindings_folder_name);
+    let framework_out = bindings_out.join(framework_name);
 
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
     let mode = Mode::parse_from_str(
-        std::env::var(ENV_MODE)
+        std::env::var(ENV_CONFIG)
             .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
             .as_str(),
     );
@@ -117,10 +128,11 @@ pub fn build() {
         .expect("Failed to generate bindings for iOS");
 
     fs::rename(
-        swift_bindings_dir.join(&swift_out),
-        bindings_out.join(&swift_out),
+        swift_bindings_dir.join(&swift_name),
+        bindings_out.join(&swift_name),
     )
-    .expect(&format!("Failed to move {} into place", swift_out));
+    .with_context(|| format!("Failed to rename bindings for {}", swift_name))
+    .unwrap();
 
     let mut xcbuild_cmd = Command::new("xcodebuild");
     xcbuild_cmd.arg("-create-xcframework");
@@ -139,10 +151,16 @@ pub fn build() {
         .wait()
         .unwrap();
 
-    // The iOS project expects the module map files to be named "module.modulemap",
-    // but uniffi-bindgen creates "<identifier>FFI.modulemap" files by default,
-    // therefore we need to rename all of them.
-    rename_module_maps_recursively(&bindings_out, &identifier.to_lowercase());
+    // Swift requires module maps named "module.modulemap", but uniffi uses "<placeholder>FFI.modulemap".
+    // To support multiple libraries in the same project without naming conflicts,
+    // we move each header + module map into its own subfolder and rename accordingly.
+    regroup_header_artifacts(
+        &framework_out,
+        &header_name,
+        &modulemap_name,
+        &camel_case_project_name,
+    )
+    .expect("Failed to generate header artifacts");
 
     if let Ok(info) = fs::metadata(&bindings_dest) {
         if !info.is_dir() {
@@ -193,21 +211,51 @@ fn group_target_archs(target_archs: &[IosArch]) -> Vec<Vec<IosArch>> {
     grouped_archs
 }
 
-/// Recursively renames all module maps in the given directory to "module.modulemap".
-/// This is necessary because uniffi-bindgen creates module maps with the name "<identifier>FFI.modulemap"
-/// by default. We're looking for multiple files as there are separate modules for the
-/// physical device and the simulator.
-fn rename_module_maps_recursively(bindings_out: &PathBuf, identifier: &str) {
-    for entry in fs::read_dir(bindings_out).expect("Failed to read bindings out directory") {
-        let entry = entry.expect("Failed to read entry");
-        let path = entry.path();
-        if path.is_file() && path.file_name().unwrap() == format!("{}FFI.modulemap", identifier).as_str() {
-            let dest_path = path.with_file_name(format!("{}module.modulemap", identifier));
-            fs::rename(&path, &dest_path).expect("Failed to rename module map");
-        } else if path.is_dir() {
-            rename_module_maps_recursively(&path, identifier);
+/// Iterate over all architecture entries inside the .xcframework
+/// Move `.{h,modulemap}` files into
+/// `Headers/<project_name>/`, renaming the module map to
+/// `module.modulemap`, for **every** architecture slice.
+pub fn regroup_header_artifacts(
+    framework_out: &Path,
+    header_name: &str,
+    modulemap_name: &str,
+    project_name: &str,
+) -> anyhow::Result<()> {
+    for entry in
+        fs::read_dir(framework_out).with_context(|| format!("reading {:?}", framework_out))?
+    {
+        let entry = entry?;
+        let arch_path = entry.path();
+        if !arch_path.is_dir() {
+            // Skip Info.plist or anything that isn't a directory slice
+            continue;
+        }
+
+        let headers_dir = arch_path.join("Headers");
+        if !headers_dir.is_dir() {
+            continue; // Skip resources-only slices
+        }
+
+        // Source file names
+        let modmap_src = headers_dir.join(modulemap_name);
+        let header_src = headers_dir.join(header_name);
+
+        // Destination folder: Headers/<identifier>/
+        let target_dir = headers_dir.join(project_name);
+        fs::create_dir_all(&target_dir).with_context(|| format!("creating {:?}", target_dir))?;
+
+        // ── move & rename ────────────────────────────────────────
+        if modmap_src.exists() {
+            fs::rename(&modmap_src, target_dir.join("module.modulemap"))
+                .with_context(|| format!("moving {:?}", modmap_src))?;
+        }
+        if header_src.exists() {
+            fs::rename(&header_src, target_dir.join(header_name))
+                .with_context(|| format!("moving {:?}", header_src))?;
         }
     }
+
+    Ok(())
 }
 
 fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Result<()> {
@@ -230,8 +278,4 @@ fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Resul
     )
     .map_err(|e| Error::other(e.to_string()))?;
     Ok(())
-}
-
-pub fn binding_name_from<S: AsRef<str>>(prefix: S) -> String {
-    format!("{}iOSBindings", prefix.as_ref())
 }
