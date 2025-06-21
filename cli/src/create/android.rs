@@ -1,7 +1,6 @@
 use std::{env, fs, path::PathBuf};
 
 use anyhow::Error;
-use convert_case::{Case, Casing};
 use include_dir::include_dir;
 use include_dir::Dir;
 
@@ -22,14 +21,19 @@ impl Create for Android {
         let android_bindings_dir = check_bindings(&project_dir, Platform::Android)?;
 
         let android_template_import_name = "import uniffi.mopro.";
-        let android_real_import_name = format!("import uniffi.{}.", project_name_from_toml(&project_dir));
+        let android_real_import_name =
+            format!("import uniffi.{}.", project_name_from_toml(&project_dir));
 
         let target_dir = project_dir.join(Self::NAME);
         fs::create_dir_all(&target_dir)?;
 
         env::set_current_dir(&target_dir)?;
         const ANDROID_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/android");
-        copy_embedded_dir(&ANDROID_TEMPLATE_DIR, &target_dir, Some((android_template_import_name, &android_real_import_name)))?;
+        copy_embedded_dir(
+            &ANDROID_TEMPLATE_DIR,
+            &target_dir,
+            Some((android_template_import_name, &android_real_import_name)),
+        )?;
 
         env::set_current_dir(&project_dir)?;
         let app_dir = target_dir.join("app");

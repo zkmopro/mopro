@@ -7,8 +7,7 @@ use crate::print::print_footer_message;
 use crate::style::print_green_bold;
 use crate::utils::project_name_from_toml;
 use anyhow::Error;
-use convert_case::Case::{Kebab, Snake, UpperCamel};
-use convert_case::Casing;
+use convert_case::{Case, Casing};
 use std::ops::Add;
 use std::{fs, path::PathBuf};
 
@@ -38,7 +37,9 @@ impl Create for Flutter {
         fs::rename(flutter_dir, &target_dir)?;
 
         let identifier = project_name_from_toml(&project_dir);
-        let xcframework_name = identifier.to_case(UpperCamel).add("Bindings.xcframework");
+        let xcframework_name = identifier
+            .to_case(Case::UpperCamel)
+            .add("Bindings.xcframework");
         let swift_name = identifier.add(".swift");
 
         let xcframeworks_dir = ios_bindings_dir.join(&xcframework_name);

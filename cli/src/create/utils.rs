@@ -83,7 +83,11 @@ pub fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn copy_embedded_dir(dir: &Dir, output_dir: &Path, text_replacement: Option<(&str, &str)>) -> Result<()> {
+pub fn copy_embedded_dir(
+    dir: &Dir,
+    output_dir: &Path,
+    text_replacement: Option<(&str, &str)>,
+) -> Result<()> {
     for file in dir.entries() {
         let relative_path = file.path();
         let output_path = output_dir.join(relative_path);
@@ -107,7 +111,7 @@ pub fn copy_embedded_dir(dir: &Dir, output_dir: &Path, text_replacement: Option<
                         }
                     }
                 }
-            
+
                 // Write the (possibly modified) content
                 if let Err(e) = fs::write(&output_path, contents) {
                     if e.kind() == ErrorKind::AlreadyExists {

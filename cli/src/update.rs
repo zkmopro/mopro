@@ -1,34 +1,34 @@
 use crate::constants::{Platform, ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
 use crate::print::print_update_success_message;
 use crate::style::{print_gray_items, print_green_bold};
+use crate::utils::project_name_from_toml;
 use anyhow::Result;
 use std::fs;
 use std::path::Path;
 use walkdir::WalkDir;
-use crate::utils::project_name_from_toml;
 
 pub fn update_bindings() -> Result<()> {
     let project_dir = std::env::current_dir()?;
-    
+
     for platform in [Platform::Ios, Platform::Android, Platform::Web].iter() {
-        
         let binding_dir_name = platform.binding_dir(&project_dir);
         let platform_bindings_dir = project_dir.join(&binding_dir_name);
-        
+
         if !platform_bindings_dir.exists() {
             continue;
         }
-        
-        print_green_bold(format!("🔄 Updating {} bindings...", platform.binding_name()));
-        
-        let updated_bindings_paths = match platform { 
-            Platform::Ios => {
-                update_folder(&platform_bindings_dir, &binding_dir_name, false)?
-            }
+
+        print_green_bold(format!(
+            "🔄 Updating {} bindings...",
+            platform.binding_name()
+        ));
+
+        let updated_bindings_paths = match platform {
+            Platform::Ios => update_folder(&platform_bindings_dir, &binding_dir_name, false)?,
             Platform::Android => {
                 let binding_project_name = project_name_from_toml(&project_dir);
                 let kotlin_file_name = format!("{}.kt", binding_project_name);
-                
+
                 let jnilib_path = platform_bindings_dir.join(ANDROID_JNILIBS_DIR);
                 let kotlin_path = platform_bindings_dir
                     .join(ANDROID_UNIFFI_DIR)
@@ -38,14 +38,12 @@ pub fn update_bindings() -> Result<()> {
                 let mut updated_paths = Vec::new();
                 updated_paths.extend(update_file(&kotlin_path, &kotlin_file_name)?);
                 updated_paths.extend(update_folder(&jnilib_path, ANDROID_JNILIBS_DIR, true)?);
-            
+
                 updated_paths
             }
-            Platform::Web => {
-                update_folder(&platform_bindings_dir, &binding_dir_name, false)?
-            }
+            Platform::Web => update_folder(&platform_bindings_dir, &binding_dir_name, false)?,
         };
-        
+
         print_gray_items(updated_bindings_paths);
     }
 
@@ -57,7 +55,11 @@ pub fn update_bindings() -> Result<()> {
 /// Recursively updates all directories in the current directory that match `target_dir_name`.
 /// If `gracefully` is `true`, existing directories are preserved and only overlapping files are overwritten.
 /// This is useful for shared folders across multiple bindings (e.g., Android JNI libs).
-fn update_folder(source_dir: &Path, target_dir_name: &str, gracefully: bool) -> Result<Vec<String>> {
+fn update_folder(
+    source_dir: &Path,
+    target_dir_name: &str,
+    gracefully: bool,
+) -> Result<Vec<String>> {
     let mut updated_paths = Vec::new();
     if !source_dir.exists() {
         return Err(anyhow::anyhow!(
@@ -80,8 +82,8 @@ fn update_folder(source_dir: &Path, target_dir_name: &str, gracefully: bool) -> 
             if !gracefully {
                 // Remove old directory
                 fs::remove_dir_all(path)?;
-            } 
-            
+            }
+
             // Copy the new directory into the parent of the old one
             fs_extra::dir::copy(
                 source_dir,
@@ -90,7 +92,7 @@ fn update_folder(source_dir: &Path, target_dir_name: &str, gracefully: bool) -> 
                     .overwrite(true)
                     .copy_inside(true),
             )?;
-            
+
             updated_paths.push(path.display().to_string());
         }
     }
