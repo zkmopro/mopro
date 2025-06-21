@@ -86,7 +86,7 @@ pub fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> Result<()> {
 pub fn copy_embedded_dir(
     dir: &Dir,
     output_dir: &Path,
-    text_replacement: Option<(&str, &str)>,
+    text_replacements: Option<&[(&str, &str)]>,
 ) -> Result<()> {
     for file in dir.entries() {
         let relative_path = file.path();
@@ -102,7 +102,7 @@ pub fn copy_embedded_dir(
             Some(file) => {
                 let mut contents = file.contents().to_vec();
 
-                if let Some((old, new)) = text_replacement {
+                for (old, new) in text_replacements.unwrap_or_default() {
                     // Replace the specified import if it exists
                     if let Ok(text) = std::str::from_utf8(&contents) {
                         if text.contains(old) {
@@ -122,7 +122,7 @@ pub fn copy_embedded_dir(
                 }
             }
             None => {
-                copy_embedded_dir(file.as_dir().unwrap(), output_dir, text_replacement)?;
+                copy_embedded_dir(file.as_dir().unwrap(), output_dir, text_replacements)?;
             }
         }
     }

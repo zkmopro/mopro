@@ -48,15 +48,7 @@ Although relative paths may work locally in Rust, the proving keys should be cop
 
 ## 3. Proving from the app
 
-In your project there should be a file named `ContentView`. At the top of this file add the following:
-
-```swift
-import moproFFI
-```
-
-This will make the proving functions `generateCircomProof` and `verifyCircomProof` available in this module.
-
-In the `ContentView` itself add a private variable and a button like this:
+In your project there should be a file named `ContentView`. Add a private variable and a button like this:
 
 ```swift
 struct ContentView: View {
