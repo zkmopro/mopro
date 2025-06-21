@@ -121,7 +121,7 @@ In your project, there should be a file named `MainActivity.kt`
 It should be under `app/src/main/java/com/example/YOUR_APP/MainActivity.kt`
 :::
 
-Import the following functions:
+Import the following boilerplate functions:
 
 ```kotlin title="MainActivity.kt"
 import androidx.compose.runtime.*
@@ -133,10 +133,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import kotlinx.coroutines.launch
-import uniffi.mopro.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+```
+
+Then, import the `uniffi.<PROJECT_NAME>` package that contains the generated bindings for your project. Replace `<PROJECT_NAME>` with the name of your project, which is usually the same as the Rust crate name, with `-` replaced by `_`. For example, if your Rust crate is named `mopro-example`, the import would look like this:
+
+```kotlin title="MainActivity.kt"
+import uniffi.mopro_example.*
 ```
 
 This will make the proving functions `generateCircomProof` available in this module and also help to load zkey.
@@ -211,6 +216,7 @@ fun MainScreen(context: Context) {
 
 <details>
   <summary>Full `MainActivity.kt` (simplified)</summary>
+ % TODO - update this to custom project name 
 
 ```kotlin
 package com.example.moproandroidapp // Your application ID
@@ -234,7 +240,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlinx.coroutines.launch
-import uniffi.mopro.*
+import uniffi.<PROJECT_NAME>.*
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
