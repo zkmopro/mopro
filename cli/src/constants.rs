@@ -2,8 +2,8 @@ use crate::utils::project_name_from_toml;
 use convert_case::{Case, Casing};
 use std::path::Path;
 
-pub const JNILIBS_DIR: &str = "jniLibs";
-pub const MOPRO_KOTLIN_FILE: &str = "mopro.kt";
+pub const ANDROID_JNILIBS_DIR: &str = "jniLibs";
+pub const ANDROID_UNIFFI_DIR: &str = "uniffi";
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Mode {
@@ -243,7 +243,7 @@ impl Platform {
     pub fn binding_dir(&self, project_dir: &Path) -> String {
         let identifier = match self {
             Self::Ios => project_name_from_toml(project_dir).to_case(Case::UpperCamel),
-            Self::Android => "Mopro".to_string(),
+            Self::Android => project_name_from_toml(project_dir).to_case(Case::UpperCamel),
             Self::Web => "Mopro".to_string(),
         };
 

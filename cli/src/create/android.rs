@@ -30,6 +30,8 @@ impl Create for Android {
         let app_dir = target_dir.join("app");
         copy_android_bindings(&android_bindings_dir, &app_dir, "java")?;
 
+        // TODO- update the Fibonacci, Noir and Multiplier explaies to include the changed name of the project
+
         let assets_dir = app_dir.join("src/main/assets");
         copy_keys(assets_dir)?;
 

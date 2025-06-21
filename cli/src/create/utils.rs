@@ -6,8 +6,7 @@ use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 
-use crate::constants::Platform;
-use crate::constants::JNILIBS_DIR;
+use crate::constants::{Platform, ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
 use anyhow::{Error, Result};
 use include_dir::include_dir;
 use include_dir::Dir;
@@ -21,13 +20,11 @@ pub fn copy_android_bindings(
     target_dir: &Path,
     language: &str,
 ) -> Result<()> {
-    let jni_libs_name = JNILIBS_DIR;
-    let uniffi_name = "uniffi";
-    let jni_libs_path = android_bindings_dir.join(jni_libs_name);
-    let uniffi_path = android_bindings_dir.join(uniffi_name);
+    let jni_libs_path = android_bindings_dir.join(ANDROID_JNILIBS_DIR);
+    let uniffi_path = android_bindings_dir.join(ANDROID_UNIFFI_DIR);
     let main_dir = target_dir.join("src").join("main");
-    let target_jni_libs_path = main_dir.join(jni_libs_name);
-    let target_uniffi_path = main_dir.join(language).join(uniffi_name);
+    let target_jni_libs_path = main_dir.join(ANDROID_JNILIBS_DIR);
+    let target_uniffi_path = main_dir.join(language).join(ANDROID_UNIFFI_DIR);
 
     if target_jni_libs_path.exists() {
         fs::remove_dir_all(target_jni_libs_path.clone())?;
@@ -148,9 +145,9 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
 pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<PathBuf> {
     let bindings_name = platform.binding_dir(project_dir);
 
-    let ios_bindings_dir = project_dir.join(&bindings_name);
-    if ios_bindings_dir.exists() && fs::read_dir(&ios_bindings_dir)?.count() > 0 {
-        Ok(ios_bindings_dir)
+    let bindings_dir = project_dir.join(&bindings_name);
+    if bindings_dir.exists() && fs::read_dir(&bindings_dir)?.count() > 0 {
+        Ok(bindings_dir)
     } else {
         Err(Error::msg(format!(
             "{} are required to create the template. Please run 'mopro build' to generate them.",
