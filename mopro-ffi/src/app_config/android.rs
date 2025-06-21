@@ -1,5 +1,4 @@
 use camino::Utf8Path;
-use convert_case::Case::{Kebab, Snake};
 use convert_case::{Case, Casing};
 use std::fs;
 use std::io::{Error, ErrorKind};
@@ -21,13 +20,12 @@ use super::install_ndk;
 use super::mktemp_local;
 
 pub fn build() {
-    let identifier = project_name_from_toml();
-    let camel_case_identifier = identifier.to_case(Case::UpperCamel);
-    let snake_case_identifier = identifier.from_case(Kebab).to_case(Snake);
+    let uniffi_style_identifier = project_name_from_toml();
+    let user_friendly_identifier = uniffi_style_identifier.to_case(Case::UpperCamel);
 
     // Names for the generated files and directories
-    let binding_name = format!("{}AndroidBindings", &camel_case_identifier);
-    let lib_name = format!("lib{}.so", &snake_case_identifier);
+    let binding_name = format!("{}AndroidBindings", &user_friendly_identifier);
+    let lib_name = format!("lib{}.so", &uniffi_style_identifier);
 
     #[cfg(feature = "witnesscalc")]
     let _ = std::env::var("ANDROID_NDK").unwrap_or_else(|_| {

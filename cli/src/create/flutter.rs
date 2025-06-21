@@ -39,7 +39,7 @@ impl Create for Flutter {
 
         let identifier = project_name_from_toml(&project_dir);
         let xcframework_name = identifier.to_case(UpperCamel).add("Bindings.xcframework");
-        let swift_name = identifier.from_case(Kebab).to_case(Snake).add(".swift");
+        let swift_name = identifier.add(".swift");
 
         let xcframeworks_dir = ios_bindings_dir.join(&xcframework_name);
         let mopro_swift_file = ios_bindings_dir.join(&swift_name);

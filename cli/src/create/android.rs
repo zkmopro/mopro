@@ -22,7 +22,7 @@ impl Create for Android {
         let android_bindings_dir = check_bindings(&project_dir, Platform::Android)?;
 
         let android_template_import_name = "import uniffi.mopro.";
-        let android_real_import_name = format!("import uniffi.{}.", project_name_from_toml(&project_dir).to_case(Case::Snake));
+        let android_real_import_name = format!("import uniffi.{}.", project_name_from_toml(&project_dir));
 
         let target_dir = project_dir.join(Self::NAME);
         fs::create_dir_all(&target_dir)?;

@@ -1,6 +1,5 @@
 use anyhow::Context;
 use camino::Utf8Path;
-use convert_case::Case::{Kebab, Snake};
 use convert_case::{Case, Casing};
 use std::fs;
 use std::io::{Error, ErrorKind};
@@ -17,18 +16,17 @@ use super::mktemp_local;
 use crate::app_config::project_name_from_toml;
 
 pub fn build() {
-    let identifier = project_name_from_toml();
-    let camel_case_identifier = identifier.to_case(Case::UpperCamel);
-    let snake_case_identifier = identifier.from_case(Kebab).to_case(Snake);
+    let uniffi_style_identifier = project_name_from_toml();
+    let user_friendly_identifier = uniffi_style_identifier.to_case(Case::UpperCamel);
 
     // Names for the generated files and directories
-    let lib_name = format!("lib{}.a", &snake_case_identifier);
-    let bindings_folder_name = format!("{}iOSBindings", &camel_case_identifier);
-    let framework_name = format!("{}Bindings.xcframework", &camel_case_identifier);
+    let lib_name = format!("lib{}.a", &uniffi_style_identifier);
+    let bindings_folder_name = format!("{}iOSBindings", &user_friendly_identifier);
+    let framework_name = format!("{}Bindings.xcframework", &user_friendly_identifier);
 
-    let swift_name = format!("{}.swift", snake_case_identifier);
-    let header_name = format!("{}FFI.h", snake_case_identifier);
-    let modulemap_name = format!("{}FFI.modulemap", snake_case_identifier);
+    let swift_name = format!("{}.swift", uniffi_style_identifier);
+    let header_name = format!("{}FFI.h", uniffi_style_identifier);
+    let modulemap_name = format!("{}FFI.modulemap", uniffi_style_identifier);
 
     // Paths for the generated files
     let cwd = std::env::current_dir().unwrap();
@@ -156,7 +154,7 @@ pub fn build() {
         &framework_out,
         &header_name,
         &modulemap_name,
-        &camel_case_identifier,
+        &user_friendly_identifier,
     )
     .expect("Failed to generate header artifacts");
 

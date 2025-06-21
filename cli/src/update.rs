@@ -4,7 +4,6 @@ use crate::style::{print_gray_items, print_green_bold};
 use anyhow::Result;
 use std::fs;
 use std::path::Path;
-use convert_case::{Case, Casing};
 use walkdir::WalkDir;
 use crate::utils::project_name_from_toml;
 
@@ -27,13 +26,13 @@ pub fn update_bindings() -> Result<()> {
                 update_folder(&platform_bindings_dir, &binding_dir_name, false)?
             }
             Platform::Android => {
-                let snake_case_project_name = project_name_from_toml(&project_dir).to_case(Case::Snake);
-                let kotlin_file_name = format!("{}.kt", snake_case_project_name);
- 
+                let binding_project_name = project_name_from_toml(&project_dir);
+                let kotlin_file_name = format!("{}.kt", binding_project_name);
+                
                 let jnilib_path = platform_bindings_dir.join(ANDROID_JNILIBS_DIR);
                 let kotlin_path = platform_bindings_dir
                     .join(ANDROID_UNIFFI_DIR)
-                    .join(&snake_case_project_name)
+                    .join(&binding_project_name)
                     .join(&kotlin_file_name);
 
                 let mut updated_paths = Vec::new();
