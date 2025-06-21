@@ -1,4 +1,6 @@
 use camino::Utf8Path;
+use convert_case::Case::{Kebab, Snake};
+use convert_case::{Case, Casing};
 use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
@@ -20,13 +22,19 @@ use super::mktemp_local;
 
 pub fn build() {
     let identifier = project_name_from_toml();
-    let binding_name = binding_name_from(&identifier);
+    let camel_case_identifier = identifier.to_case(Case::UpperCamel);
+    let snake_case_identifier = identifier.from_case(Kebab).to_case(Snake);
+
+    // Names for the generated files and directories
+    let binding_name = format!("{}AndroidBindings", &camel_case_identifier);
+    let lib_name = format!("lib{}.so", &snake_case_identifier);
 
     #[cfg(feature = "witnesscalc")]
     let _ = std::env::var("ANDROID_NDK").unwrap_or_else(|_| {
         panic!("ANDROID_NDK is not set");
     });
 
+    // Paths for the generated files
     let cwd = std::env::current_dir().expect("Failed to get current directory");
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());
@@ -34,7 +42,6 @@ pub fn build() {
     let work_dir = mktemp_local(&build_dir);
     let bindings_out = work_dir.join(&binding_name);
     let bindings_dest = Path::new(&manifest_dir).join(&binding_name);
-    let lib_name = format!("{}.so", &identifier.to_lowercase());
 
     let mode = Mode::parse_from_str(
         std::env::var(ENV_CONFIG)
@@ -150,8 +157,4 @@ fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::R
     )
     .map_err(|e| Error::other(e.to_string()))?;
     Ok(())
-}
-
-pub fn binding_name_from<S: AsRef<str>>(prefix: S) -> String {
-    format!("{}AndroidBindings", prefix.as_ref())
 }
