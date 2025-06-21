@@ -29,7 +29,7 @@ impl Create for Ios {
 
         env::set_current_dir(&target_dir)?;
         const IOS_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/ios");
-        copy_embedded_dir(&IOS_TEMPLATE_DIR, &target_dir)?;
+        copy_embedded_dir(&IOS_TEMPLATE_DIR, &target_dir, None)?;
 
         env::set_current_dir(&project_dir)?;
         copy_ios_bindings(ios_bindings_dir, target_dir.clone())?;

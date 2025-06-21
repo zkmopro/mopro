@@ -268,7 +268,7 @@ fn copy_mopro_wasm_lib() -> anyhow::Result<()> {
     if !target_dir.exists() {
         const WASM_TEMPLATE_DIR: Dir =
             include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
-        copy_embedded_dir(&WASM_TEMPLATE_DIR, &target_dir)?;
+        copy_embedded_dir(&WASM_TEMPLATE_DIR, &target_dir, None)?;
     }
 
     Ok(())

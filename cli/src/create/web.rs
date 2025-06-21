@@ -26,7 +26,7 @@ impl Create for Web {
             write_toml::mopro_wasm_lib_toml(),
         )?;
         const WEB_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/web");
-        copy_embedded_dir(&WEB_TEMPLATE_DIR, &target_dir)?;
+        copy_embedded_dir(&WEB_TEMPLATE_DIR, &target_dir, None)?;
 
         env::set_current_dir(&project_dir)?;
 
