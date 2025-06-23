@@ -5,7 +5,6 @@
 //  Created by Chance on 6/25/24.
 //
 import SwiftUI
-import moproFFI
 
 struct ContentView: View {
     @State private var textViewText = ""
