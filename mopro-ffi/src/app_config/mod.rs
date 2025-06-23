@@ -57,7 +57,7 @@ pub fn install_arch(arch: String) {
         .unwrap_or_else(|_| panic!("Failed to install target architecture {}", arch));
 }
 
-pub fn toml_lib_name(ext_name: &str) -> String {
+pub fn project_name_from_toml() -> String {
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let cargo_toml_path = std::path::Path::new(&manifest_dir).join("Cargo.toml");
     let cargo_toml_content = std::fs::read_to_string(cargo_toml_path).unwrap();
@@ -65,7 +65,7 @@ pub fn toml_lib_name(ext_name: &str) -> String {
 
     // If the `name` under [lib] section is set, using the `name` as library name.
     // Otherwise, using the package name.
-    let lib_name = cargo_toml
+    let project_name = cargo_toml
         .get("lib")
         .and_then(|lib| lib.get("name"))
         .and_then(|lib| lib.as_str())
@@ -79,5 +79,5 @@ pub fn toml_lib_name(ext_name: &str) -> String {
                 .and_then(|pkg| pkg.as_str().map(|s| s.replace("-", "_")))
                 .expect("Cannot find package name")
         });
-    format!("lib{}.{}", lib_name.as_str(), ext_name)
+    project_name
 }

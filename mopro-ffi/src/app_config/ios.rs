@@ -1,3 +1,4 @@
+use anyhow::Context;
 use camino::Utf8Path;
 use std::fs;
 use std::io::{Error, ErrorKind};
@@ -11,12 +12,24 @@ use super::cleanup_tmp_local;
 use super::constants::{IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
 use super::install_arch;
 use super::mktemp_local;
-use crate::app_config::toml_lib_name;
+use crate::app_config::project_name_from_toml;
 
-// Load environment variables that are specified by by xcode
 pub fn build() {
-    const BINDING_NAME: &str = "MoproiOSBindings";
+    let uniffi_style_identifier = project_name_from_toml();
 
+    // Names for the generated files and directories
+    let bindings_dir_name = "MoproiOSBindings";
+
+    let gen_swift_file_name = format!("{}.swift", uniffi_style_identifier);
+    let out_swift_file_name = "mopro.swift";
+
+    let framework_name = "MoproBindings.xcframework";
+
+    let lib_name = format!("lib{}.a", &uniffi_style_identifier);
+    let header_name = format!("{}FFI.h", uniffi_style_identifier);
+    let modulemap_name = format!("{}FFI.modulemap", uniffi_style_identifier);
+
+    // Paths for the generated files
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
@@ -24,11 +37,10 @@ pub fn build() {
     let build_dir_path = Path::new(&build_dir);
     let work_dir = mktemp_local(build_dir_path);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
-    let bindings_out = work_dir.join(BINDING_NAME);
+    let bindings_out = work_dir.join(bindings_dir_name);
     fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
-    let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
-    let framework_out = bindings_out.join("MoproBindings.xcframework");
-    let lib_name = toml_lib_name("a");
+    let bindings_dest = Path::new(&manifest_dir).join(bindings_dir_name);
+    let framework_out = bindings_out.join(framework_name);
 
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
     let mode = Mode::parse_from_str(
@@ -113,10 +125,11 @@ pub fn build() {
         .expect("Failed to generate bindings for iOS");
 
     fs::rename(
-        swift_bindings_dir.join("mopro.swift"),
-        bindings_out.join("mopro.swift"),
+        swift_bindings_dir.join(&gen_swift_file_name),
+        bindings_out.join(out_swift_file_name),
     )
-    .expect("Failed to move mopro.swift into place");
+    .with_context(|| format!("Failed to rename bindings from {}", gen_swift_file_name))
+    .unwrap();
 
     let mut xcbuild_cmd = Command::new("xcodebuild");
     xcbuild_cmd.arg("-create-xcframework");
@@ -135,10 +148,16 @@ pub fn build() {
         .wait()
         .unwrap();
 
-    // The iOS project expects the module map files to be named "module.modulemap",
-    // but uniffi-bindgen creates "moproFFI.modulemap" files by default,
-    // therefore we need to rename all of them.
-    rename_module_maps_recursively(&bindings_out);
+    // Swift requires module maps named "module.modulemap", but uniffi uses "<placeholder>FFI.modulemap".
+    // To support multiple libraries in the same project without naming conflicts,
+    // we move each header + module map into its own subdirectory and rename accordingly.
+    regroup_header_artifacts(
+        &framework_out,
+        &header_name,
+        &modulemap_name,
+        &uniffi_style_identifier,
+    )
+    .expect("Failed to generate header artifacts");
 
     if let Ok(info) = fs::metadata(&bindings_dest) {
         if !info.is_dir() {
@@ -189,21 +208,51 @@ fn group_target_archs(target_archs: &[IosArch]) -> Vec<Vec<IosArch>> {
     grouped_archs
 }
 
-/// Recursively renames all module maps in the given directory to "module.modulemap".
-/// This is necessary because uniffi-bindgen creates module maps with the name "moproFFI.modulemap"
-/// by default. We're looking for multiple files as there are separate modules for the
-/// physical device and the simulator.
-fn rename_module_maps_recursively(bindings_out: &PathBuf) {
-    for entry in fs::read_dir(bindings_out).expect("Failed to read bindings out directory") {
-        let entry = entry.expect("Failed to read entry");
-        let path = entry.path();
-        if path.is_file() && path.file_name().unwrap() == "moproFFI.modulemap" {
-            let dest_path = path.with_file_name("module.modulemap");
-            fs::rename(&path, &dest_path).expect("Failed to rename module map");
-        } else if path.is_dir() {
-            rename_module_maps_recursively(&path);
+/// Iterate over all architecture entries inside the .xcframework
+/// Move `.{h,modulemap}` files into
+/// `Headers/<project_name>/`, renaming the module map to
+/// `module.modulemap`, for **every** architecture slice.
+pub fn regroup_header_artifacts(
+    framework_out: &Path,
+    header_name: &str,
+    modulemap_name: &str,
+    project_name: &str,
+) -> anyhow::Result<()> {
+    for entry in
+        fs::read_dir(framework_out).with_context(|| format!("reading {:?}", framework_out))?
+    {
+        let entry = entry?;
+        let arch_path = entry.path();
+        if !arch_path.is_dir() {
+            // Skip Info.plist or anything that isn't a directory slice
+            continue;
+        }
+
+        let headers_dir = arch_path.join("Headers");
+        if !headers_dir.is_dir() {
+            continue; // Skip resources-only slices
+        }
+
+        // Source file names
+        let modmap_src = headers_dir.join(modulemap_name);
+        let header_src = headers_dir.join(header_name);
+
+        // Destination directory: Headers/<identifier>/
+        let target_dir = headers_dir.join(project_name);
+        fs::create_dir_all(&target_dir).with_context(|| format!("creating {:?}", target_dir))?;
+
+        // ── move & rename ────────────────────────────────────────
+        if modmap_src.exists() {
+            fs::rename(&modmap_src, target_dir.join("module.modulemap"))
+                .with_context(|| format!("moving {:?}", modmap_src))?;
+        }
+        if header_src.exists() {
+            fs::rename(&header_src, target_dir.join(header_name))
+                .with_context(|| format!("moving {:?}", header_src))?;
         }
     }
+
+    Ok(())
 }
 
 fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Result<()> {

@@ -1,5 +1,5 @@
 import Foundation
-import mopro
+import mopro_bindings
 
 func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
   var bytesArray: [UInt8] = []
@@ -55,7 +55,7 @@ do {
     "Circuit outputs mismatch the expected outputs")
 
   let isValid = 
-    try verifyCircomProof(zkeyPath: zkeyPath, proof: generateProofResult, proofLib: ProofLib.arkworks)
+    try verifyCircomProof(zkeyPath: zkeyPath, proofResult: generateProofResult, proofLib: ProofLib.arkworks)
   assert(isValid, "Proof verification should succeed")
 
   assert(generateProofResult.proof.a.x.count > 0, "Proof should not be empty")

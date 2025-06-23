@@ -1,7 +1,9 @@
-pub const XCFRAMEWORK_NAME: &str = "MoproBindings.xcframework";
-pub const MOPRO_SWIFT_FILE: &str = "mopro.swift";
-pub const JNILIBS_DIR: &str = "jniLibs";
-pub const MOPRO_KOTLIN_FILE: &str = "mopro.kt";
+pub const IOS_SWIFT_FILE: &str = "mopro.swift";
+pub const IOS_XCFRAMEWORKS_DIR: &str = "MoproBindings.xcframework";
+pub const ANDROID_JNILIBS_DIR: &str = "jniLibs";
+pub const ANDROID_UNIFFI_DIR: &str = "uniffi";
+pub const ANDROID_MOPRO_DIR: &str = "mopro";
+pub const ANDROID_MOPRO_KT_FILE: &str = "mopro.kt";
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Mode {

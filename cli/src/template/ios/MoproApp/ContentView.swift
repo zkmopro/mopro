@@ -3,7 +3,6 @@
 //  MoproApp
 //
 import SwiftUI
-import moproFFI
 
 struct ContentView: View {
     @State private var textViewText = ""
