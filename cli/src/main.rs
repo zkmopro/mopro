@@ -1,3 +1,4 @@
+use clap::CommandFactory;
 use clap::Parser;
 use clap::Subcommand;
 
@@ -56,6 +57,8 @@ enum Commands {
             long,
             value_name = "FRAMEWORK",
             num_args = 0..=1,
+            required = false,
+            default_missing_value = "",
             help = "Show instruction message for create"
         )]
         show: Option<String>,
@@ -99,6 +102,16 @@ fn main() {
         }
         Commands::Create { framework, show } => {
             if let Some(framework) = show {
+                if framework.trim().is_empty() {
+                    Cli::command()
+                        .find_subcommand_mut("create")
+                        .unwrap()
+                        .print_help()
+                        .unwrap();
+                    println!();
+                    return;
+                }
+
                 match Framework::parse_from_str(framework) {
                     Framework::Ios => <Ios as Create>::print_message(),
                     Framework::Android => <Android as Create>::print_message(),
@@ -106,8 +119,10 @@ fn main() {
                     Framework::Flutter => <Flutter as Create>::print_message(),
                     Framework::ReactNative => <ReactNative as Create>::print_message(),
                 }
+                println!();
                 return;
             }
+
             match create::create_project(framework) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to create template: {:?}", e)),
