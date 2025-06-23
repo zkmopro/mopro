@@ -197,7 +197,7 @@ fn reformat_kotlin_package(
         fs::read_to_string(&out_android_kt_file).context("Failed to read generated Kotlin file")?;
     let modified_content = content.replace(
         &format!("package uniffi.{}", gen_android_module_name),
-        &format!("package uniffi.{}", gen_android_module_name),
+        &format!("package uniffi.{}", out_android_module_name),
     );
     fs::write(&out_android_kt_file, modified_content)
         .context("Failed to write modified Kotlin file")
