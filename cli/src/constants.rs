@@ -1,3 +1,5 @@
+use mopro_ffi::build::constants::{ANDROID_BINDINGS_DIR, IOS_BINDINGS_DIR};
+
 //
 // Platform Section
 //
@@ -71,8 +73,8 @@ impl Platform {
 
     pub fn binding_dir(&self) -> &str {
         match self {
-            Self::Ios => "MoproiOSBindings",
-            Self::Android => "MoproAndroidBindings",
+            Self::Ios => IOS_BINDINGS_DIR,
+            Self::Android => ANDROID_BINDINGS_DIR,
             Self::Web => "MoproWasmBindings",
         }
     }
