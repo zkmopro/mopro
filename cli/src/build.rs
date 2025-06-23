@@ -1,15 +1,3 @@
-use crate::config::read_config;
-use crate::config::write_config;
-use crate::config::Config;
-use crate::constants::Platform;
-use crate::create::utils::copy_embedded_dir;
-use crate::init::adapter::Adapter;
-use crate::print::print_build_success_message;
-use crate::style;
-use crate::style::blue_bold;
-use crate::style::print_green_bold;
-use crate::utils::PlatformSelector;
-
 use anyhow::Result;
 use anyhow::{Context, Ok};
 use dialoguer::theme::ColorfulTheme;
@@ -24,6 +12,18 @@ use std::env;
 use mopro_ffi::app_config::android::AndroidBindingsBuilder;
 use mopro_ffi::app_config::ios::{IosBindingsBuilder, IosBindingsParams};
 use mopro_ffi::app_config::PlatformBindingsBuilder;
+
+use crate::config::read_config;
+use crate::config::write_config;
+use crate::config::Config;
+use crate::constants::Platform;
+use crate::create::utils::copy_embedded_dir;
+use crate::init::adapter::Adapter;
+use crate::print::print_build_success_message;
+use crate::style;
+use crate::style::blue_bold;
+use crate::style::print_green_bold;
+use crate::utils::PlatformSelector;
 
 pub fn build_project(
     arg_mode: &Option<String>,

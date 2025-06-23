@@ -19,7 +19,7 @@ use super::{
 };
 use crate::app_config::project_name_from_toml;
 
-// Added for backward compatibility
+// Maintained for backwards compatibility
 pub fn build() {
     let mode = get_build_mode();
     let project_dir = get_project_dir();

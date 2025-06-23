@@ -1,11 +1,12 @@
 use anyhow::Result;
+use std::fs;
+use std::path::Path;
+use walkdir::WalkDir;
+
 use mopro_ffi::app_config::constants::{
     ANDROID_JNILIBS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ANDROID_UNIFFI_DIR, IOS_SWIFT_FILE,
     IOS_XCFRAMEWORKS_DIR,
 };
-use std::fs;
-use std::path::Path;
-use walkdir::WalkDir;
 
 use crate::constants::Platform;
 use crate::print::print_update_success_message;

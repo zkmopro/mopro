@@ -22,7 +22,7 @@ use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
-// Added for backward compatibility
+// Maintained for backwards compatibility
 pub fn build() {
     let mode = get_build_mode();
     let project_dir = get_project_dir();
@@ -58,7 +58,7 @@ impl PlatformBindingsBuilder for AndroidBindingsBuilder {
         let gen_android_kt_file_name = format!("{}.kt", &uniffi_style_identifier);
 
         #[cfg(feature = "witnesscalc")]
-        let _ = std::env::var("ANDROID_NDK").context("ANDROID_NDK not set")?;
+        let _ = std::env::var("ANDROID_NDK").context("ANDROID_NDK is not set")?;
 
         // Paths for the generated files
         let build_dir = Path::new(&project_dir).join("build");
@@ -131,7 +131,13 @@ fn build_for_arch(
         AndroidArch::Aarch64Linux => ARCH_ARM_64_V8,
     };
 
-    let out_lib_path = build_dir.join(format!("{}/{}/{}", arch_str, mode.as_str(), lib_name));
+    let out_lib_path = build_dir.join(format!(
+        "{}/{}/{}/{}",
+        build_dir.display(),
+        arch_str,
+        mode.as_str(),
+        lib_name
+    ));
     let out_lib_dest = bindings_out.join(format!("jniLibs/{}/{}", folder, lib_name));
 
     let parent_dir = out_lib_dest.parent().context(format!(

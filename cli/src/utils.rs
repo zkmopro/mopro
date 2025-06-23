@@ -1,5 +1,6 @@
-use mopro_ffi::app_config::constants::{AndroidArch, Arch, IosArch};
 use std::collections::{HashMap, HashSet};
+
+use mopro_ffi::app_config::constants::{AndroidArch, Arch, IosArch};
 
 use crate::{
     config::Config, constants::Platform, init::adapter::Adapter, select::multi_select, style,
