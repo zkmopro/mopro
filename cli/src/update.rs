@@ -1,19 +1,21 @@
-use crate::constants::{
-    Platform, ANDROID_JNILIBS_DIR, ANDROID_MOPRO_DIR, ANDROID_MOPRO_KT_FILE, ANDROID_UNIFFI_DIR,
-};
-use crate::print::print_update_success_message;
-use crate::style::{print_gray_items, print_green_bold};
 use anyhow::Result;
 use std::fs;
 use std::path::Path;
 use walkdir::WalkDir;
+
+use crate::constants::{
+    Platform, ANDROID_JNILIBS_DIR, ANDROID_MOPRO_DIR, ANDROID_MOPRO_KT_FILE, ANDROID_UNIFFI_DIR,
+    IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR,
+};
+use crate::print::print_update_success_message;
+use crate::style::{print_gray_items, print_green_bold};
 
 pub fn update_bindings() -> Result<()> {
     let project_dir = std::env::current_dir()?;
 
     for platform in [Platform::Ios, Platform::Android, Platform::Web].iter() {
         let binding_dir_name = platform.binding_dir();
-        let platform_bindings_dir = project_dir.join(&binding_dir_name);
+        let platform_bindings_dir = project_dir.join(binding_dir_name);
 
         if !platform_bindings_dir.exists() {
             continue;
@@ -24,8 +26,20 @@ pub fn update_bindings() -> Result<()> {
             platform.binding_name()
         ));
 
-        let updated_bindings_paths = match platform {
-            Platform::Ios => update_folder(&platform_bindings_dir, &binding_dir_name, false)?,
+        let mut updated_paths = vec![];
+
+        match platform {
+            Platform::Ios => {
+                updated_paths.extend(update_folder(
+                    &platform_bindings_dir.join(IOS_XCFRAMEWORKS_DIR),
+                    IOS_XCFRAMEWORKS_DIR,
+                    false,
+                )?);
+                updated_paths.extend(update_file(
+                    &platform_bindings_dir.join(IOS_SWIFT_FILE),
+                    IOS_SWIFT_FILE,
+                )?);
+            }
             Platform::Android => {
                 let jnilib_path = platform_bindings_dir.join(ANDROID_JNILIBS_DIR);
                 let kotlin_path = platform_bindings_dir
@@ -33,16 +47,17 @@ pub fn update_bindings() -> Result<()> {
                     .join(ANDROID_MOPRO_DIR)
                     .join(ANDROID_MOPRO_KT_FILE);
 
-                let mut updated_paths = Vec::new();
                 updated_paths.extend(update_file(&kotlin_path, ANDROID_MOPRO_KT_FILE)?);
                 updated_paths.extend(update_folder(&jnilib_path, ANDROID_JNILIBS_DIR, true)?);
-
-                updated_paths
             }
-            Platform::Web => update_folder(&platform_bindings_dir, &binding_dir_name, false)?,
+            Platform::Web => updated_paths.extend(update_folder(
+                &platform_bindings_dir,
+                binding_dir_name,
+                false,
+            )?),
         };
 
-        print_gray_items(updated_bindings_paths);
+        print_gray_items(updated_paths);
     }
 
     print_update_success_message();

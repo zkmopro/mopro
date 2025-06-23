@@ -167,7 +167,7 @@ pub fn build() {
     }
 
     fs::rename(&bindings_out, &bindings_dest).expect("Failed to move framework into place");
-    // Copy the <identifier>.swift file to the output directory
+    // Copy the mopro.swift file to the output directory
     cleanup_tmp_local(build_dir_path)
 }
 

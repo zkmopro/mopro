@@ -6,7 +6,6 @@ use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 
-use crate::constants::{Platform, ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
 use anyhow::{Error, Result};
 use include_dir::include_dir;
 use include_dir::Dir;
@@ -14,6 +13,8 @@ use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
 use reqwest::blocking::Client;
 use zip::ZipArchive;
+
+use crate::constants::{Platform, ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
 
 pub fn copy_android_bindings(
     android_bindings_dir: &Path,
@@ -41,12 +42,7 @@ pub fn copy_android_bindings(
 }
 
 pub fn copy_ios_bindings(input_dir: PathBuf, output_dir: PathBuf) -> Result<()> {
-    let input_name = input_dir
-        .file_name()
-        .ok_or_else(|| anyhow::anyhow!("Input directory has no name"))?;
-
-    let ios_bindings_target_dir = output_dir.join(input_name);
-
+    let ios_bindings_target_dir = output_dir.join(Platform::Ios.binding_dir());
     if ios_bindings_target_dir.exists() {
         fs::remove_dir_all(&ios_bindings_target_dir)?;
     }
@@ -96,9 +92,7 @@ pub fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> Result<()> {
         // Write the file to the output directory
         match file.as_file() {
             Some(file) => {
-                let contents = file.contents().to_vec();
-
-                if let Err(e) = fs::write(&output_path, contents) {
+                if let Err(e) = fs::write(&output_path, file.contents()) {
                     if e.kind() == ErrorKind::AlreadyExists {
                         println!("File already exists: {:?}", output_path);
                     } else {
@@ -145,15 +139,15 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
 }
 
 pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<PathBuf> {
-    let bindings_name = platform.binding_dir();
+    let bindings_dir_name = platform.binding_dir();
 
-    let bindings_dir = project_dir.join(&bindings_name);
+    let bindings_dir = project_dir.join(bindings_dir_name);
     if bindings_dir.exists() && fs::read_dir(&bindings_dir)?.count() > 0 {
         Ok(bindings_dir)
     } else {
         Err(Error::msg(format!(
             "{} are required to create the template. Please run 'mopro build' to generate them.",
-            bindings_name
+            bindings_dir_name
         )))
     }
 }

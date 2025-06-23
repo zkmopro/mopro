@@ -1,13 +1,14 @@
+use anyhow::{Error, Result};
+use include_dir::include_dir;
+use include_dir::Dir;
+use std::{env, fs, path::PathBuf};
+
 use super::Create;
 use crate::constants::Platform;
 use crate::create::utils::{check_bindings, copy_embedded_dir, copy_ios_bindings, copy_keys};
 use crate::print::print_footer_message;
 use crate::style::print_bold;
 use crate::style::print_green_bold;
-use anyhow::{Error, Result};
-use include_dir::include_dir;
-use include_dir::Dir;
-use std::{env, fs, path::PathBuf};
 
 pub struct Ios;
 
@@ -28,7 +29,6 @@ impl Create for Ios {
 
         env::set_current_dir(&target_dir)?;
         const IOS_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/ios");
-
         copy_embedded_dir(&IOS_TEMPLATE_DIR, &target_dir)?;
 
         env::set_current_dir(&project_dir)?;

@@ -24,7 +24,6 @@ impl Create for Android {
 
         env::set_current_dir(&target_dir)?;
         const ANDROID_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/android");
-
         copy_embedded_dir(&ANDROID_TEMPLATE_DIR, &target_dir)?;
 
         env::set_current_dir(&project_dir)?;

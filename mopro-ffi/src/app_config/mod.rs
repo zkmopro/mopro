@@ -76,8 +76,7 @@ pub fn project_name_from_toml() -> String {
             cargo_toml
                 .get("package")
                 .and_then(|pkg| pkg.get("name"))
-                .and_then(Value::as_str)
-                .map(|str| str.replace("-", "_"))
+                .and_then(|pkg| pkg.as_str().map(|s| s.replace("-", "_")))
                 .expect("Cannot find package name")
         });
     project_name

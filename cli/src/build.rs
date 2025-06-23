@@ -7,7 +7,6 @@ use include_dir::include_dir;
 use include_dir::Dir;
 use std::collections::HashSet;
 use std::env;
-use std::path::Path;
 
 use crate::config::read_config;
 use crate::config::write_config;
@@ -200,7 +199,7 @@ pub fn build_project(
             .arg("run")
             .arg("--bin")
             .arg(platform_str)
-            .env("CONFIG", mode.as_str())
+            .env("CONFIGURATION", mode.as_str())
             .env(p.arch_key(), selected_arch);
 
         // The dependencies of Noir libraries need iOS 15 and above.
@@ -219,7 +218,7 @@ pub fn build_project(
         }
     }
 
-    print_binding_message(&platform.platforms, &current_dir)?;
+    print_binding_message(&platform.platforms)?;
 
     Ok(())
 }
@@ -246,7 +245,8 @@ fn select_mode(config: &mut Config) -> Result<Mode> {
     Ok(Mode::from_idx(idx))
 }
 
-fn print_binding_message(platforms: &Vec<Platform>, current_dir: &Path) -> anyhow::Result<()> {
+fn print_binding_message(platforms: &Vec<Platform>) -> anyhow::Result<()> {
+    let current_dir = env::current_dir()?;
     print_green_bold("✨ Bindings Built Successfully! ✨".to_string());
     println!("The Mopro bindings have been successfully generated and are available in the following directories:\n");
     for platform in platforms {

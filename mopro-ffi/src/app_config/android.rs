@@ -1,3 +1,4 @@
+use anyhow::Context;
 use camino::Utf8Path;
 use std::fs;
 use std::io::{Error, ErrorKind};
@@ -72,33 +73,14 @@ pub fn build() {
     generate_android_bindings(&latest_out_lib_path, &bindings_out)
         .expect("Failed to generate bindings");
 
-    let generated_kt_file = bindings_out
-        .join("uniffi")
-        .join(gen_android_module_name)
-        .join(gen_android_kt_file_name);
-    let out_android_kt_file = bindings_out
-        .join("uniffi")
-        .join(out_android_module_name)
-        .join(out_android_kt_file_name);
-
-    fs::create_dir(bindings_out.join("uniffi").join(out_android_module_name))
-        .expect("Failed to create bindings directory");
-    fs::rename(generated_kt_file, &out_android_kt_file).expect(&format!(
-        "Failed to rename android kotlin package `{}/{}` to `{}`",
-        gen_android_module_name, gen_android_module_name, out_android_kt_file_name
-    ));
-    fs::remove_dir(bindings_out.join("uniffi").join(gen_android_module_name))
-        .expect("Failed to remove gen android kotlin package directory");
-
-    // Remove `package uniffi.<gen_android_module_name>` from the generated Kotlin file
-    let content =
-        fs::read_to_string(&out_android_kt_file).expect("Failed to read generated Kotlin file");
-    let modified_content = content.replace(
-        &format!("package uniffi.{}", gen_android_module_name),
-        &format!("package uniffi.{}", gen_android_module_name),
-    );
-    fs::write(&out_android_kt_file, modified_content)
-        .expect("Failed to write modified Kotlin file");
+    reformat_kotlin_package(
+        &gen_android_module_name,
+        &gen_android_kt_file_name,
+        out_android_module_name,
+        &out_android_kt_file_name,
+        &bindings_out,
+    )
+    .expect("Failed to reformat generated Kotlin package");
 
     move_bindings(&bindings_out, &bindings_dest);
     cleanup_tmp_local(&build_dir);
@@ -186,4 +168,37 @@ fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::R
     )
     .map_err(|e| Error::other(e.to_string()))?;
     Ok(())
+}
+
+fn reformat_kotlin_package(
+    gen_android_module_name: &str,
+    gen_android_kt_file_name: &str,
+    out_android_module_name: &str,
+    out_android_kt_file_name: &&str,
+    bindings_out: &PathBuf,
+) -> anyhow::Result<()> {
+    let generated_kt_file = bindings_out
+        .join("uniffi")
+        .join(gen_android_module_name)
+        .join(gen_android_kt_file_name);
+    let out_android_kt_file = bindings_out
+        .join("uniffi")
+        .join(out_android_module_name)
+        .join(out_android_kt_file_name);
+
+    fs::create_dir(bindings_out.join("uniffi").join(out_android_module_name))
+        .context("Failed to create new package directory")?;
+    fs::rename(generated_kt_file, &out_android_kt_file).context("Failed to move kotlin file")?;
+    fs::remove_dir(bindings_out.join("uniffi").join(gen_android_module_name))
+        .context("Failed to remove gen android kotlin package directory")?;
+
+    // Remove `package uniffi.<gen_android_module_name>` from the generated Kotlin file
+    let content =
+        fs::read_to_string(&out_android_kt_file).context("Failed to read generated Kotlin file")?;
+    let modified_content = content.replace(
+        &format!("package uniffi.{}", gen_android_module_name),
+        &format!("package uniffi.{}", gen_android_module_name),
+    );
+    fs::write(&out_android_kt_file, modified_content)
+        .context("Failed to write modified Kotlin file")
 }

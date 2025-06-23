@@ -240,8 +240,12 @@ impl Platform {
         }
     }
 
-    pub fn binding_dir(&self) -> String {
-        format!("Mopro{}Bindings", self.binding_name())
+    pub fn binding_dir(&self) -> &str {
+        match self {
+            Self::Ios => "MoproiOSBindings",
+            Self::Android => "MoproAndroidBindings",
+            Self::Web => "MoproWasmBindings",
+        }
     }
 }
 
