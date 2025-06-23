@@ -55,14 +55,6 @@ impl Platform {
         PLATFORMS[idx].platform
     }
 
-    pub fn arch_key(&self) -> &str {
-        match self {
-            Self::Ios => "IOS_ARCHS",
-            Self::Android => "ANDROID_ARCHS",
-            Self::Web => "",
-        }
-    }
-
     pub fn binding_name(&self) -> &str {
         match self {
             Self::Ios => "iOS",
