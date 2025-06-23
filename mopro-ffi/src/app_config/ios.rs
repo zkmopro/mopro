@@ -7,15 +7,24 @@ use std::process::Command;
 use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::SwiftBindingGenerator;
-
-use super::{cleanup_tmp_local, PlatformBindingsBuilder};
-use super::constants::{
-    IosArch, Mode, ARCH_ARM_64, ARCH_X86_64,
-    IOS_BINDINGS_DIR, IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR,
-};
+use super::{cleanup_tmp_local, get_build_mode, get_project_dir, get_target_archs, PlatformBindingsBuilder};
+use super::constants::{Arch, IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, IOS_BINDINGS_DIR, IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR};
 use super::install_arch;
 use super::mktemp_local;
-use crate::build::project_name_from_toml;
+use crate::app_config::project_name_from_toml;
+
+// Added for backward compatibility
+pub fn build() {
+    let mode= get_build_mode();
+    let project_dir = get_project_dir();
+    let target_archs = get_target_archs();
+    let params = IosBindingsParams {
+        using_noir: false,
+    };
+    
+    IosBindingsBuilder::build(mode, &project_dir, target_archs, params)
+        .expect("Failed to build Android bindings");
+}
 
 pub struct IosBindingsBuilder;
 

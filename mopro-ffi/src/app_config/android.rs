@@ -8,13 +8,23 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
 
-use crate::build::{project_name_from_toml, PlatformBindingsBuilder};
+use crate::app_config::{get_build_mode, get_project_dir, get_target_archs, project_name_from_toml, PlatformBindingsBuilder};
 
 use super::cleanup_tmp_local;
-use super::constants::{AndroidArch, Mode, ANDROID_BINDINGS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64};
+use super::constants::{AndroidArch, Arch, Mode, ANDROID_BINDINGS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64};
 use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
+
+// Added for backward compatibility
+pub fn build() {
+    let mode= get_build_mode();
+    let project_dir = get_project_dir();
+    let target_archs = get_target_archs();
+    
+    AndroidBindingsBuilder::build(mode, &project_dir, target_archs, ())
+        .expect("Failed to build Android bindings");
+}
 
 pub struct AndroidBindingsBuilder;
 

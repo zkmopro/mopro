@@ -1,4 +1,4 @@
-use mopro_ffi::build::constants::{AndroidArch, IosArch};
+use mopro_ffi::app_config::constants::{AndroidArch, Arch, IosArch};
 use std::collections::{HashMap, HashSet};
 
 use crate::{

@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use toml::Value;
 use uuid::Uuid;
-use crate::build::constants::Mode;
+use crate::app_config::constants::{Arch, Mode};
 
 pub mod android;
 pub mod constants;
@@ -96,4 +96,33 @@ pub fn project_name_from_toml(project_dir: &Path) -> anyhow::Result<String> {
         });
 
     project_name.ok_or(anyhow::anyhow!("Failed to find project name in Cargo.toml"))
+}
+
+fn get_project_dir() -> PathBuf {
+    std::env::var("CARGO_MANIFEST_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| PathBuf::from("."))
+}
+
+fn get_build_mode() -> Mode {
+    Mode::parse_from_str(
+        std::env::var("CONFIGURATION")
+            .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
+            .as_str(),
+    )
+}
+
+fn get_target_archs<A: Arch>() -> Vec<A> {
+    if let Ok(archs_str) = std::env::var(A::env_var_name()) {
+        archs_str
+            .split(',')
+            .map(Arch::parse_from_str)
+            .collect()
+    } else {
+        // Default case: select all supported architectures if none are provided
+        A::all_strings()
+            .iter()
+            .map(|s| A::parse_from_str(s))
+            .collect()
+    }
 }

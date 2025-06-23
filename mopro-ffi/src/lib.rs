@@ -1,7 +1,7 @@
 #![allow(unexpected_cfgs)]
 
 #[cfg(feature = "build")]
-pub mod build;
+pub mod app_config;
 
 #[cfg(feature = "circom")]
 mod circom;

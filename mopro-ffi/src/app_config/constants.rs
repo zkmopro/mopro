@@ -72,8 +72,17 @@ impl Mode {
 
 //
 // Architecture Section
-// https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
 //
+
+pub trait Arch {
+    fn as_str(&self) -> &'static str;
+    fn parse_from_str<S: AsRef<str>>(s: S) -> Self;
+    fn all_strings() -> Vec<&'static str>;
+    fn all_display_strings() -> Vec<(String, String)>;
+    fn env_var_name() -> &'static str;
+}
+
+// https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum IosArch {
     Aarch64Apple,
@@ -106,8 +115,8 @@ const IOS_ARCHS: [IosArchInfo; 3] = [
     },
 ];
 
-impl IosArch {
-    pub fn as_str(&self) -> &'static str {
+impl Arch for IosArch {
+    fn as_str(&self) -> &'static str {
         IOS_ARCHS
             .iter()
             .find(|info| info.arch == *self)
@@ -115,22 +124,26 @@ impl IosArch {
             .expect("Unsupported iOS Arch")
     }
 
-pub fn parse_from_str<S: AsRef<str>>(s: S) -> Self {        IOS_ARCHS
+    fn parse_from_str<S: AsRef<str>>(s: S) -> Self {        IOS_ARCHS
             .iter()
             .find(|info| info.str.to_lowercase() == s.as_ref().to_lowercase())
             .map(|info| info.arch)
             .expect("Unsupported iOS String")
     }
 
-    pub fn all_strings() -> Vec<&'static str> {
+    fn all_strings() -> Vec<&'static str> {
         IOS_ARCHS.iter().map(|info| info.str).collect()
     }
 
-    pub fn all_display_strings() -> Vec<(String, String)> {
+    fn all_display_strings() -> Vec<(String, String)> {
         IOS_ARCHS
             .iter()
             .map(|info| (info.str.to_string(), info.description.to_string()))
             .collect()
+    }
+    
+    fn env_var_name() -> &'static str {
+        "IOS_ARCHS"
     }
 }
 
@@ -171,8 +184,8 @@ const ANDROID_ARCHS: [AndroidArchInfo; 4] = [
     },
 ];
 
-impl AndroidArch {
-    pub fn as_str(&self) -> &'static str {
+impl Arch for AndroidArch {
+    fn as_str(&self) -> &'static str {
         ANDROID_ARCHS
             .iter()
             .find(|info| info.arch == *self)
@@ -180,21 +193,25 @@ impl AndroidArch {
             .expect("Unsupported Android Arch")
     }
 
-pub fn parse_from_str<S: AsRef<str>>(s: S) -> Self {        ANDROID_ARCHS
+fn parse_from_str<S: AsRef<str>>(s: S) -> Self {        ANDROID_ARCHS
             .iter()
             .find(|info| info.str.to_lowercase() == s.as_ref().to_lowercase())
             .map(|info| info.arch)
             .expect("Unsupported Android String")
     }
 
-    pub fn all_strings() -> Vec<&'static str> {
+    fn all_strings() -> Vec<&'static str> {
         ANDROID_ARCHS.iter().map(|info| info.str).collect()
     }
 
-    pub fn all_display_strings() -> Vec<(String, String)> {
+    fn all_display_strings() -> Vec<(String, String)> {
         ANDROID_ARCHS
             .iter()
             .map(|info| (info.str.to_string(), info.description.to_string()))
             .collect()
+    }
+    
+    fn env_var_name() -> &'static str {
+        "ANDROID_ARCHS"
     }
 }

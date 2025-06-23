@@ -17,13 +17,13 @@ use dialoguer::Confirm;
 use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
-use mopro_ffi::build::constants::{AndroidArch, IosArch, Mode};
+use mopro_ffi::app_config::constants::{AndroidArch, Arch, IosArch, Mode};
 use std::collections::HashSet;
 use std::env;
 
-use mopro_ffi::build::android::AndroidBindingsBuilder;
-use mopro_ffi::build::ios::{IosBindingsBuilder, IosBindingsParams};
-use mopro_ffi::build::PlatformBindingsBuilder;
+use mopro_ffi::app_config::android::AndroidBindingsBuilder;
+use mopro_ffi::app_config::ios::{IosBindingsBuilder, IosBindingsParams};
+use mopro_ffi::app_config::PlatformBindingsBuilder;
 
 pub fn build_project(
     arg_mode: &Option<String>,

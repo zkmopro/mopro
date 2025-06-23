@@ -12,7 +12,7 @@ use include_dir::include_dir;
 use include_dir::Dir;
 use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
-use mopro_ffi::build::constants::{ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
+use mopro_ffi::app_config::constants::{ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
 use reqwest::blocking::Client;
 use zip::ZipArchive;
 
