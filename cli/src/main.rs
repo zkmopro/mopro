@@ -56,10 +56,7 @@ enum Commands {
         #[arg(
             long,
             value_name = "FRAMEWORK",
-            num_args = 0..=1,
-            required = false,
-            default_missing_value = "",
-            help = "Show instruction message for create"
+            help = "Show instruction message for create (e.g., 'ios', 'android', 'web', 'flutter', 'react-native')."
         )]
         show: Option<String>,
     },
