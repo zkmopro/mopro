@@ -10,8 +10,8 @@ use crate::style::blue_bold;
 use crate::style::print_green_bold;
 use crate::utils::PlatformSelector;
 
-use anyhow::{Context, Ok};
 use anyhow::Result;
+use anyhow::{Context, Ok};
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
 use dialoguer::Select;
@@ -189,39 +189,34 @@ pub fn build_project(
             return Ok(());
         }
     }
-    
-    
 
     for p in platform.platforms.clone() {
         let platform_str: &str = p.as_str();
-        let selected_arch = selected_architectures
-            .get(platform_str)
-            .context(format!("No architectures selected for platform: {}", platform_str))?;
+        let selected_arch = selected_architectures.get(platform_str).context(format!(
+            "No architectures selected for platform: {}",
+            platform_str
+        ))?;
 
         match p {
             Platform::Ios => {
-                let target_selected_arch = selected_arch
-                    .iter()
-                    .map(IosArch::parse_from_str)
-                    .collect();
+                let target_selected_arch =
+                    selected_arch.iter().map(IosArch::parse_from_str).collect();
                 let _ = IosBindingsBuilder::build(
                     mode,
                     &current_dir,
                     target_selected_arch,
-                    IosBindingsParams { using_noir: config.adapter_contains(Adapter::Noir) }
+                    IosBindingsParams {
+                        using_noir: config.adapter_contains(Adapter::Noir),
+                    },
                 )?;
             }
             Platform::Android => {
                 let target_selected_arch = selected_arch
                     .iter()
-                    .map(|it| AndroidArch::parse_from_str(&it))
+                    .map(AndroidArch::parse_from_str)
                     .collect();
-                let _ = AndroidBindingsBuilder::build(
-                    mode,
-                    &current_dir,
-                    target_selected_arch,
-                    ()
-                )?;
+                let _ =
+                    AndroidBindingsBuilder::build(mode, &current_dir, target_selected_arch, ())?;
             }
             Platform::Web => {
                 // Web platform doesn't require architecture selection

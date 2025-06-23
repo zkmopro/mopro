@@ -7,21 +7,25 @@ use std::process::Command;
 use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::SwiftBindingGenerator;
-use super::{cleanup_tmp_local, get_build_mode, get_project_dir, get_target_archs, PlatformBindingsBuilder};
-use super::constants::{Arch, IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, IOS_BINDINGS_DIR, IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR};
+
+use super::constants::{
+    Arch, IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, IOS_BINDINGS_DIR, IOS_SWIFT_FILE,
+    IOS_XCFRAMEWORKS_DIR,
+};
 use super::install_arch;
 use super::mktemp_local;
+use super::{
+    cleanup_tmp_local, get_build_mode, get_project_dir, get_target_archs, PlatformBindingsBuilder,
+};
 use crate::app_config::project_name_from_toml;
 
 // Added for backward compatibility
 pub fn build() {
-    let mode= get_build_mode();
+    let mode = get_build_mode();
     let project_dir = get_project_dir();
     let target_archs = get_target_archs();
-    let params = IosBindingsParams {
-        using_noir: false,
-    };
-    
+    let params = IosBindingsParams { using_noir: false };
+
     IosBindingsBuilder::build(mode, &project_dir, target_archs, params)
         .expect("Failed to build Android bindings");
 }
@@ -42,7 +46,7 @@ impl PlatformBindingsBuilder for IosBindingsBuilder {
         target_archs: Vec<IosArch>,
         params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
-        let uniffi_style_identifier = project_name_from_toml(&project_dir)
+        let uniffi_style_identifier = project_name_from_toml(project_dir)
             .expect("Failed to get project name from Cargo.toml");
 
         // Names for the files that will be outputted (can be changed)
@@ -64,14 +68,14 @@ impl PlatformBindingsBuilder for IosBindingsBuilder {
         fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
         let bindings_dest = Path::new(&project_dir).join(bindings_dir_name);
         let framework_out = bindings_out.join(framework_name);
-        
+
         // Take a list of architectures, build them, and combine them into
         // a single universal binary/archive
         let build_combined_archs = |archs: &[IosArch]| -> PathBuf {
             let out_lib_paths: Vec<PathBuf> = archs
                 .iter()
                 .map(|arch| {
-                    Path::new(&build_dir_path).join(&format!(
+                    Path::new(&build_dir_path).join(format!(
                         "{}/{}/{}",
                         arch.as_str(),
                         mode.as_str(),
@@ -88,8 +92,7 @@ impl PlatformBindingsBuilder for IosBindingsBuilder {
                 }
                 // The dependencies of Noir libraries need iOS 15 and above.
                 if params.using_noir {
-                    build_cmd
-                        .env("IPHONEOS_DEPLOYMENT_TARGET", "15.0");
+                    build_cmd.env("IPHONEOS_DEPLOYMENT_TARGET", "15.0");
                 }
                 build_cmd
                     .arg("--lib")
@@ -138,13 +141,15 @@ impl PlatformBindingsBuilder for IosBindingsBuilder {
             swift_bindings_dir.join(&gen_swift_file_name),
             bindings_out.join(out_swift_file_name),
         )
-        .context(format!("Failed to rename bindings from {}", gen_swift_file_name))?;
+        .context(format!(
+            "Failed to rename bindings from {}",
+            gen_swift_file_name
+        ))?;
 
         let mut xcbuild_cmd = Command::new("xcodebuild");
         // The dependencies of Noir libraries need iOS 15 and above.
         if params.using_noir {
-            xcbuild_cmd
-                .env("IPHONEOS_DEPLOYMENT_TARGET", "15.0");
+            xcbuild_cmd.env("IPHONEOS_DEPLOYMENT_TARGET", "15.0");
         }
         xcbuild_cmd.arg("-create-xcframework");
         for lib_path in out_lib_paths {

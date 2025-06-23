@@ -124,7 +124,8 @@ impl Arch for IosArch {
             .expect("Unsupported iOS Arch")
     }
 
-    fn parse_from_str<S: AsRef<str>>(s: S) -> Self {        IOS_ARCHS
+    fn parse_from_str<S: AsRef<str>>(s: S) -> Self {
+        IOS_ARCHS
             .iter()
             .find(|info| info.str.to_lowercase() == s.as_ref().to_lowercase())
             .map(|info| info.arch)
@@ -141,7 +142,7 @@ impl Arch for IosArch {
             .map(|info| (info.str.to_string(), info.description.to_string()))
             .collect()
     }
-    
+
     fn env_var_name() -> &'static str {
         "IOS_ARCHS"
     }
@@ -193,7 +194,8 @@ impl Arch for AndroidArch {
             .expect("Unsupported Android Arch")
     }
 
-fn parse_from_str<S: AsRef<str>>(s: S) -> Self {        ANDROID_ARCHS
+    fn parse_from_str<S: AsRef<str>>(s: S) -> Self {
+        ANDROID_ARCHS
             .iter()
             .find(|info| info.str.to_lowercase() == s.as_ref().to_lowercase())
             .map(|info| info.arch)
@@ -210,7 +212,7 @@ fn parse_from_str<S: AsRef<str>>(s: S) -> Self {        ANDROID_ARCHS
             .map(|info| (info.str.to_string(), info.description.to_string()))
             .collect()
     }
-    
+
     fn env_var_name() -> &'static str {
         "ANDROID_ARCHS"
     }

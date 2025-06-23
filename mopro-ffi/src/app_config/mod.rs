@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use toml::Value;
 use uuid::Uuid;
+
 use crate::app_config::constants::{Arch, Mode};
 
 pub mod android;
@@ -114,10 +115,7 @@ fn get_build_mode() -> Mode {
 
 fn get_target_archs<A: Arch>() -> Vec<A> {
     if let Ok(archs_str) = std::env::var(A::env_var_name()) {
-        archs_str
-            .split(',')
-            .map(Arch::parse_from_str)
-            .collect()
+        archs_str.split(',').map(Arch::parse_from_str).collect()
     } else {
         // Default case: select all supported architectures if none are provided
         A::all_strings()

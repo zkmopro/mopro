@@ -8,20 +8,26 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
 
-use crate::app_config::{get_build_mode, get_project_dir, get_target_archs, project_name_from_toml, PlatformBindingsBuilder};
+use crate::app_config::{
+    get_build_mode, get_project_dir, get_target_archs, project_name_from_toml,
+    PlatformBindingsBuilder,
+};
 
 use super::cleanup_tmp_local;
-use super::constants::{AndroidArch, Arch, Mode, ANDROID_BINDINGS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64};
+use super::constants::{
+    AndroidArch, Arch, Mode, ANDROID_BINDINGS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME,
+    ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64,
+};
 use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
 // Added for backward compatibility
 pub fn build() {
-    let mode= get_build_mode();
+    let mode = get_build_mode();
     let project_dir = get_project_dir();
     let target_archs = get_target_archs();
-    
+
     AndroidBindingsBuilder::build(mode, &project_dir, target_archs, ())
         .expect("Failed to build Android bindings");
 }
@@ -38,8 +44,8 @@ impl PlatformBindingsBuilder for AndroidBindingsBuilder {
         target_archs: Vec<AndroidArch>,
         _params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
-        let uniffi_style_identifier =
-            project_name_from_toml(project_dir).expect("Failed to get project name from Cargo.toml");
+        let uniffi_style_identifier = project_name_from_toml(project_dir)
+            .expect("Failed to get project name from Cargo.toml");
 
         // Names for the files that will be outputted (can be changed)
         let binding_dir_name = ANDROID_BINDINGS_DIR;
@@ -63,9 +69,10 @@ impl PlatformBindingsBuilder for AndroidBindingsBuilder {
         install_ndk();
         let mut latest_out_lib_path = PathBuf::new();
         for arch in target_archs {
-            latest_out_lib_path = build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode).context(
-                format!("Failed to build for architecture: {}", arch.as_str()),
-            )?;
+            latest_out_lib_path =
+                build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode).context(
+                    format!("Failed to build for architecture: {}", arch.as_str()),
+                )?;
         }
 
         generate_android_bindings(&latest_out_lib_path, &bindings_out)
@@ -78,7 +85,7 @@ impl PlatformBindingsBuilder for AndroidBindingsBuilder {
             &out_android_kt_file_name,
             &bindings_out,
         )
-            .expect("Failed to reformat generated Kotlin package");
+        .expect("Failed to reformat generated Kotlin package");
 
         move_bindings(&bindings_out, &bindings_dest);
         cleanup_tmp_local(&build_dir);
@@ -124,16 +131,14 @@ fn build_for_arch(
         AndroidArch::Aarch64Linux => ARCH_ARM_64_V8,
     };
 
-    let out_lib_path = build_dir.join(format!(
-        "{}/{}/{}",
-        arch_str,
-        mode.as_str(),
-        lib_name
-    ));
+    let out_lib_path = build_dir.join(format!("{}/{}/{}", arch_str, mode.as_str(), lib_name));
     let out_lib_dest = bindings_out.join(format!("jniLibs/{}/{}", folder, lib_name));
 
-    let parent_dir = out_lib_dest.parent().context(format!("Failed to get parent directory for {}", out_lib_dest.display()))?;
-        
+    let parent_dir = out_lib_dest.parent().context(format!(
+        "Failed to get parent directory for {}",
+        out_lib_dest.display()
+    ))?;
+
     fs::create_dir_all(parent_dir).context("Failed to create jniLibs directory")?;
     fs::copy(&out_lib_path, &out_lib_dest).context("Failed to copy file")?;
 
@@ -152,7 +157,9 @@ fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
 
 fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Result<()> {
     let content = "[bindings.kotlin]\nandroid = true";
-    let parent_dir = binding_dir.parent().context("Failed to get parent directory")?;
+    let parent_dir = binding_dir
+        .parent()
+        .context("Failed to get parent directory")?;
     let config_path = parent_dir.join("uniffi_config.toml");
     fs::write(&config_path, content).expect("Failed to write uniffi_config.toml");
 
