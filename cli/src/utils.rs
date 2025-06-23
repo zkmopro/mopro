@@ -1,11 +1,8 @@
+use mopro_ffi::build::constants::{AndroidArch, IosArch};
 use std::collections::{HashMap, HashSet};
 
 use crate::{
-    config::Config,
-    constants::{AndroidArch, IosArch, Platform},
-    init::adapter::Adapter,
-    select::multi_select,
-    style,
+    config::Config, constants::Platform, init::adapter::Adapter, select::multi_select, style,
 };
 
 pub fn contains_adapter(path: &str, adapter: Adapter) -> bool {

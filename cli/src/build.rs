@@ -1,18 +1,6 @@
-use anyhow::Ok;
-use anyhow::Result;
-use dialoguer::theme::ColorfulTheme;
-use dialoguer::Confirm;
-use dialoguer::Select;
-use include_dir::include_dir;
-use include_dir::Dir;
-use std::collections::HashSet;
-use std::env;
-
 use crate::config::read_config;
 use crate::config::write_config;
 use crate::config::Config;
-use crate::constants::AndroidArch;
-use crate::constants::Mode;
 use crate::constants::Platform;
 use crate::create::utils::copy_embedded_dir;
 use crate::init::adapter::Adapter;
@@ -21,6 +9,18 @@ use crate::style;
 use crate::style::blue_bold;
 use crate::style::print_green_bold;
 use crate::utils::PlatformSelector;
+
+use anyhow::Ok;
+use anyhow::Result;
+use dialoguer::theme::ColorfulTheme;
+use dialoguer::Confirm;
+use dialoguer::Select;
+use include_dir::include_dir;
+use include_dir::Dir;
+use mopro_ffi::build::constants::{AndroidArch, IosArch, Mode};
+use mopro_ffi::build::ios;
+use std::collections::HashSet;
+use std::env;
 
 pub fn build_project(
     arg_mode: &Option<String>,
@@ -191,30 +191,54 @@ pub fn build_project(
         let platform_str: &str = p.as_str();
         let selected_arch = selected_architectures
             .get(platform_str)
-            .map(|archs| archs.join(","))
+            .cloned()  // TODO - do it better 
             .unwrap_or_default();
 
-        let mut command = std::process::Command::new("cargo");
-        command
-            .arg("run")
-            .arg("--bin")
-            .arg(platform_str)
-            .env("CONFIGURATION", mode.as_str())
-            .env(p.arch_key(), selected_arch);
+        match p {
+            Platform::Ios => {
+                let selected_arch = selected_arch
+                    .iter()
+                    .map(|it| IosArch::parse_from_str(&it))
+                    .collect();
+                ios::build(
+                    Some(selected_arch),
+                    Some(mode),
+                    Some(&current_dir),
+                    None,
+                    None,
+                    None,
+                );
 
-        // The dependencies of Noir libraries need iOS 15 and above.
-        let status = if config.adapter_contains(Adapter::Noir) && p.eq(&Platform::Ios) {
-            command.env("IPHONEOS_DEPLOYMENT_TARGET", "15").status()?
-        } else {
-            command.status()?
-        };
+                // // The dependencies of Noir libraries need iOS 15 and above.
+                // let status = if config.adapter_contains(Adapter::Noir) && p.eq(&Platform::Ios) {
+                //     command.env("IPHONEOS_DEPLOYMENT_TARGET", "15").status()?
+                // } else {
+                //     command.status()? // TODO - handle this case
+                // };
+            }
+            Platform::Android => {
+                if selected_arch.is_empty() {
+                    style::print_yellow(
+                        "No architectures selected for Android platform.".to_string(),
+                    );
+                    continue;
+                }
+            }
+            Platform::Web => {
+                // Web platform doesn't require architecture selection
+                let mut command = std::process::Command::new("cargo");
+                command.arg("run").arg("--bin").arg(platform_str);
 
-        if !status.success() {
-            // Return a custom error if the command fails
-            return Err(anyhow::anyhow!(
-                "Output with status code {}",
-                status.code().unwrap()
-            ));
+                let status = command.status()?;
+
+                if !status.success() {
+                    // Return a custom error if the command fails
+                    return Err(anyhow::anyhow!(
+                        "Output with status code {}",
+                        status.code().unwrap()
+                    ));
+                }
+            }
         }
     }
 

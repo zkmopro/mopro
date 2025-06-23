@@ -1,3 +1,15 @@
+use std::path::{Path, PathBuf};
+
+pub const IOS_BINDINGS_DIR: &str = "MoproiOSBindings";
+pub const IOS_SWIFT_FILE: &str = "mopro.swift";
+pub const IOS_XCFRAMEWORKS_DIR: &str = "MoproBindings.xcframework";
+
+pub const ANDROID_BINDINGS_DIR: &str = "MoproAndroidBindings";
+pub const ANDROID_JNILIBS_DIR: &str = "jniLibs";
+pub const ANDROID_UNIFFI_DIR: &str = "uniffi";
+pub const ANDROID_PACKAGE_NAME: &str = "mopro";
+pub const ANDROID_KT_FILE: &str = "mopro.kt";
+
 pub const ARCH_X86_64: &str = "x86_64";
 pub const ARCH_ARM_64: &str = "aarch64";
 pub const ARCH_I686: &str = "x86";
@@ -51,6 +63,14 @@ impl Mode {
         MODES[idx].mode
     }
 
+    pub fn idx(s: &str) -> Option<usize> {
+        MODES
+            .iter()
+            .enumerate()
+            .find(|(_, m)| m.str == s)
+            .map(|(i, _)| i)
+    }
+
     pub fn all_strings() -> Vec<&'static str> {
         MODES.iter().map(|info| info.str).collect()
     }
@@ -67,23 +87,27 @@ pub enum IosArch {
 }
 
 struct IosArchInfo {
+    #[allow(dead_code)] // currently not used
     arch: IosArch,
     str: &'static str,
+    description: &'static str,
 }
 
-// Architecture strings need to be aligned with those in the CLI.
 const IOS_ARCHS: [IosArchInfo; 3] = [
     IosArchInfo {
         arch: IosArch::Aarch64Apple,
         str: "aarch64-apple-ios",
+        description: "64-bit iOS devices (iPhone/iPad)",
     },
     IosArchInfo {
         arch: IosArch::Aarch64AppleSim,
         str: "aarch64-apple-ios-sim",
+        description: "ARM64 iOS simulator on Apple Silicon Macs",
     },
     IosArchInfo {
         arch: IosArch::X8664Apple,
         str: "x86_64-apple-ios",
+        description: "x86_64 iOS simulator on Intel Macs",
     },
 ];
 
@@ -107,6 +131,13 @@ impl IosArch {
     pub fn all_strings() -> Vec<&'static str> {
         IOS_ARCHS.iter().map(|info| info.str).collect()
     }
+
+    pub fn all_display_strings() -> Vec<(String, String)> {
+        IOS_ARCHS
+            .iter()
+            .map(|info| (info.str.to_string(), info.description.to_string()))
+            .collect()
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -120,25 +151,29 @@ pub enum AndroidArch {
 struct AndroidArchInfo {
     arch: AndroidArch,
     str: &'static str,
+    description: &'static str,
 }
 
-// Architecture strings need to be aligned with those in the CLI.
 const ANDROID_ARCHS: [AndroidArchInfo; 4] = [
     AndroidArchInfo {
         arch: AndroidArch::X8664Linux,
         str: "x86_64-linux-android",
+        description: "64-bit Android emulators (x86_64 architecture)",
     },
     AndroidArchInfo {
         arch: AndroidArch::I686Linux,
         str: "i686-linux-android",
+        description: "32-bit Android emulators (x86 architecture, legacy)",
     },
     AndroidArchInfo {
         arch: AndroidArch::Armv7LinuxAbi,
         str: "armv7-linux-androideabi",
+        description: "32-bit ARM devices (older Android smartphones/tablets)",
     },
     AndroidArchInfo {
         arch: AndroidArch::Aarch64Linux,
         str: "aarch64-linux-android",
+        description: "64-bit ARM devices (modern Android smartphones/tablets)",
     },
 ];
 
@@ -161,5 +196,12 @@ impl AndroidArch {
 
     pub fn all_strings() -> Vec<&'static str> {
         ANDROID_ARCHS.iter().map(|info| info.str).collect()
+    }
+
+    pub fn all_display_strings() -> Vec<(String, String)> {
+        ANDROID_ARCHS
+            .iter()
+            .map(|info| (info.str.to_string(), info.description.to_string()))
+            .collect()
     }
 }

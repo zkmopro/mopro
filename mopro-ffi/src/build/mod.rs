@@ -1,3 +1,4 @@
+use anyhow::Context;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -57,9 +58,15 @@ pub fn install_arch(arch: String) {
         .unwrap_or_else(|_| panic!("Failed to install target architecture {}", arch));
 }
 
-pub fn project_name_from_toml() -> String {
-    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-    let cargo_toml_path = std::path::Path::new(&manifest_dir).join("Cargo.toml");
+pub fn project_name_from_toml(project_dir: Option<&Path>) -> anyhow::Result<String> {
+    let project_dir = if let Some(project_dir) = project_dir {
+        PathBuf::from(project_dir)
+    } else {
+        let manifest_dir = std::env::var("CARGO_MANIFEST_DIR")
+            .context("If `project_dir` is not provided, CARGO_MANIFEST_DIR must be set")?;
+        PathBuf::from(manifest_dir)
+    };
+    let cargo_toml_path = Path::new(&project_dir).join("Cargo.toml");
     let cargo_toml_content = std::fs::read_to_string(cargo_toml_path).unwrap();
     let cargo_toml: Value = cargo_toml_content.parse::<Value>().unwrap();
 
@@ -79,5 +86,5 @@ pub fn project_name_from_toml() -> String {
                 .and_then(|pkg| pkg.as_str().map(|s| s.replace("-", "_")))
                 .expect("Cannot find package name")
         });
-    project_name
+    Ok(project_name)
 }

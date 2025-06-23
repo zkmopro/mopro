@@ -6,15 +6,15 @@ use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 
+use crate::constants::Platform;
 use anyhow::{Error, Result};
 use include_dir::include_dir;
 use include_dir::Dir;
 use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
+use mopro_ffi::build::constants::{ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
 use reqwest::blocking::Client;
 use zip::ZipArchive;
-
-use crate::constants::{Platform, ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
 
 pub fn copy_android_bindings(
     android_bindings_dir: &Path,

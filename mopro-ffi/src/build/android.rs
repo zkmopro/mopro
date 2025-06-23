@@ -8,28 +8,36 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
 
-use crate::app_config::project_name_from_toml;
+use crate::build::project_name_from_toml;
 
 use super::cleanup_tmp_local;
 use super::constants::{
-    AndroidArch, Mode, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, ENV_ANDROID_ARCHS,
-    ENV_CONFIG,
+    AndroidArch, IosArch, Mode, ANDROID_BINDINGS_DIR, ANDROID_JNILIBS_DIR, ANDROID_KT_FILE,
+    ANDROID_PACKAGE_NAME, ANDROID_UNIFFI_DIR, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686,
+    ARCH_X86_64, ENV_ANDROID_ARCHS, ENV_CONFIG,
 };
 use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
-pub fn build() {
-    let uniffi_style_identifier = project_name_from_toml();
+pub fn build(
+    target_archs: Option<Vec<IosArch>>,
+    bindings_dir_name: Option<&str>,
+    project_dir: Option<&Path>,
+    package_name: Option<&str>,
+    out_android_kt_file_name: Option<&str>,
+) -> PathBuf {
+    let uniffi_style_identifier =
+        project_name_from_toml(project_dir).expect("Failed to get project name from Cargo.toml");
 
     // Names for the generated files and directories
-    let binding_dir_name = "MoproAndroidBindings";
-    let lib_name = format!("lib{}.so", &uniffi_style_identifier);
+    let binding_dir_name = bindings_dir_name.unwrap_or(ANDROID_BINDINGS_DIR);
+    let out_android_package_name = package_name.unwrap_or(ANDROID_PACKAGE_NAME);
+    let out_android_kt_file_name = out_android_kt_file_name.unwrap_or(ANDROID_KT_FILE);
 
+    let lib_name = format!("lib{}.so", &uniffi_style_identifier);
     let gen_android_module_name = &uniffi_style_identifier;
     let gen_android_kt_file_name = format!("{}.kt", &uniffi_style_identifier);
-    let out_android_module_name = "mopro";
-    let out_android_kt_file_name = "mopro.kt";
 
     #[cfg(feature = "witnesscalc")]
     let _ = std::env::var("ANDROID_NDK").unwrap_or_else(|_| {
@@ -76,7 +84,7 @@ pub fn build() {
     reformat_kotlin_package(
         gen_android_module_name,
         &gen_android_kt_file_name,
-        out_android_module_name,
+        out_android_package_name,
         &out_android_kt_file_name,
         &bindings_out,
     )
@@ -84,6 +92,8 @@ pub fn build() {
 
     move_bindings(&bindings_out, &bindings_dest);
     cleanup_tmp_local(&build_dir);
+
+    bindings_out
 }
 
 fn build_for_arch(
