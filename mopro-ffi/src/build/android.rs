@@ -8,93 +8,70 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
 
-use crate::build::project_name_from_toml;
+use crate::build::{project_name_from_toml, PlatformBindingsBuilder};
 
 use super::cleanup_tmp_local;
-use super::constants::{
-    AndroidArch, Mode, ANDROID_BINDINGS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8,
-    ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, ENV_ANDROID_ARCHS, ENV_CONFIG,
-};
+use super::constants::{AndroidArch, Mode, ANDROID_BINDINGS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64};
 use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
-pub fn build(
-    target_archs: Option<Vec<AndroidArch>>,
-    mode: Option<Mode>,
-    project_dir: Option<&Path>,
-    bindings_dir_name: Option<&str>,
-    package_name: Option<&str>,
-    out_android_kt_file_name: Option<&str>,
-) -> PathBuf {
-    let uniffi_style_identifier =
-        project_name_from_toml(project_dir).expect("Failed to get project name from Cargo.toml");
+pub struct AndroidBindingsBuilder;
 
-    // Names for the generated files and directories
-    let binding_dir_name = bindings_dir_name.unwrap_or(ANDROID_BINDINGS_DIR);
-    let out_android_package_name = package_name.unwrap_or(ANDROID_PACKAGE_NAME);
-    let out_android_kt_file_name = out_android_kt_file_name.unwrap_or(ANDROID_KT_FILE);
+impl PlatformBindingsBuilder for AndroidBindingsBuilder {
+    type Arch = AndroidArch;
 
-    let lib_name = format!("lib{}.so", &uniffi_style_identifier);
-    let gen_android_module_name = &uniffi_style_identifier;
-    let gen_android_kt_file_name = format!("{}.kt", &uniffi_style_identifier);
+    fn build(
+        mode: Mode,
+        project_dir: &Path,
+        target_archs: Vec<AndroidArch>,
+    ) -> anyhow::Result<PathBuf> {
+        let uniffi_style_identifier =
+            project_name_from_toml(project_dir).expect("Failed to get project name from Cargo.toml");
 
-    #[cfg(feature = "witnesscalc")]
-    let _ = std::env::var("ANDROID_NDK").unwrap_or_else(|_| {
-        panic!("ANDROID_NDK is not set");
-    });
+        // Names for the generated files and directories
+        let binding_dir_name = ANDROID_BINDINGS_DIR;
+        let out_android_package_name = ANDROID_PACKAGE_NAME;
+        let out_android_kt_file_name = ANDROID_KT_FILE;
 
-    // Paths for the generated files
-    let cwd = std::env::current_dir().expect("Failed to get current directory");
-    let manifest_dir =
-        std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());
-    let build_dir = Path::new(&manifest_dir).join("build");
-    let work_dir = mktemp_local(&build_dir);
-    let bindings_out = work_dir.join(binding_dir_name);
-    let bindings_dest = Path::new(&manifest_dir).join(binding_dir_name);
+        let lib_name = format!("lib{}.so", &uniffi_style_identifier);
+        let gen_android_module_name = &uniffi_style_identifier;
+        let gen_android_kt_file_name = format!("{}.kt", &uniffi_style_identifier);
 
-    let mode = mode.unwrap_or(Mode::parse_from_str(
-        std::env::var(ENV_CONFIG)
-            .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
-            .as_str(),
-    ));
+        #[cfg(feature = "witnesscalc")]
+        let _ = std::env::var("ANDROID_NDK").context("ANDROID_NDK not set")?;
 
-    let target_archs: Vec<AndroidArch> =
-        target_archs.unwrap_or(if let Ok(archs_str) = std::env::var(ENV_ANDROID_ARCHS) {
-            archs_str
-                .split(',')
-                .map(AndroidArch::parse_from_str)
-                .collect()
-        } else {
-            // Default case: select all supported architectures if none are provided
-            AndroidArch::all_strings()
-                .iter()
-                .map(|s| AndroidArch::parse_from_str(s))
-                .collect()
-        });
+        // Paths for the generated files
+        let build_dir = Path::new(&project_dir).join("build");
+        let work_dir = mktemp_local(&build_dir);
+        let bindings_out = work_dir.join(binding_dir_name);
+        let bindings_dest = Path::new(&project_dir).join(binding_dir_name);
 
-    install_ndk();
-    let mut latest_out_lib_path = PathBuf::new();
-    for arch in target_archs {
-        latest_out_lib_path = build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode);
+        install_ndk();
+        let mut latest_out_lib_path = PathBuf::new();
+        for arch in target_archs {
+            latest_out_lib_path = build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode).context(
+                format!("Failed to build for architecture: {}", arch.as_str()),
+            )?;
+        }
+
+        generate_android_bindings(&latest_out_lib_path, &bindings_out)
+            .expect("Failed to generate bindings");
+
+        reformat_kotlin_package(
+            gen_android_module_name,
+            &gen_android_kt_file_name,
+            out_android_package_name,
+            &out_android_kt_file_name,
+            &bindings_out,
+        )
+            .expect("Failed to reformat generated Kotlin package");
+
+        move_bindings(&bindings_out, &bindings_dest);
+        cleanup_tmp_local(&build_dir);
+
+        Ok(bindings_out)
     }
-
-    generate_android_bindings(&latest_out_lib_path, &bindings_out)
-        .expect("Failed to generate bindings");
-
-    reformat_kotlin_package(
-        gen_android_module_name,
-        &gen_android_kt_file_name,
-        out_android_package_name,
-        &out_android_kt_file_name,
-        &bindings_out,
-    )
-    .expect("Failed to reformat generated Kotlin package");
-
-    move_bindings(&bindings_out, &bindings_dest);
-    cleanup_tmp_local(&build_dir);
-
-    bindings_out
 }
 
 fn build_for_arch(
@@ -103,7 +80,7 @@ fn build_for_arch(
     build_dir: &Path,
     bindings_out: &Path,
     mode: Mode,
-) -> PathBuf {
+) -> anyhow::Result<PathBuf> {
     let arch_str = arch.as_str();
     install_arch(arch_str.to_string());
     let cpp_lib_dest = bindings_out.join("jniLibs");
@@ -135,18 +112,19 @@ fn build_for_arch(
     };
 
     let out_lib_path = build_dir.join(format!(
-        "{}/{}/{}/{}",
-        build_dir.display(),
+        "{}/{}/{}",
         arch_str,
         mode.as_str(),
         lib_name
     ));
     let out_lib_dest = bindings_out.join(format!("jniLibs/{}/{}", folder, lib_name));
 
-    fs::create_dir_all(out_lib_dest.parent().unwrap()).expect("Failed to create jniLibs directory");
-    fs::copy(&out_lib_path, &out_lib_dest).expect("Failed to copy file");
+    let parent_dir = out_lib_dest.parent().context(format!("Failed to get parent directory for {}", out_lib_dest.display()))?;
+        
+    fs::create_dir_all(parent_dir).context("Failed to create jniLibs directory")?;
+    fs::copy(&out_lib_path, &out_lib_dest).context("Failed to copy file")?;
 
-    out_lib_path
+    Ok(out_lib_path)
 }
 
 fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
@@ -161,7 +139,8 @@ fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
 
 fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Result<()> {
     let content = "[bindings.kotlin]\nandroid = true";
-    let config_path = binding_dir.parent().unwrap().join("uniffi_config.toml");
+    let parent_dir = binding_dir.parent().context("Failed to get parent directory")?;
+    let config_path = parent_dir.join("uniffi_config.toml");
     fs::write(&config_path, content).expect("Failed to write uniffi_config.toml");
 
     generate_bindings_library_mode(

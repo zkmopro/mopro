@@ -18,9 +18,12 @@ use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
 use mopro_ffi::build::constants::{AndroidArch, IosArch, Mode};
-use mopro_ffi::build::{android, ios};
 use std::collections::HashSet;
 use std::env;
+
+use mopro_ffi::build::android::AndroidBindingsBuilder;
+use mopro_ffi::build::ios::IosBindingsBuilder;
+use mopro_ffi::build::PlatformBindingsBuilder;
 
 pub fn build_project(
     arg_mode: &Option<String>,
@@ -200,14 +203,11 @@ pub fn build_project(
                     .iter()
                     .map(|it| IosArch::parse_from_str(&it))
                     .collect();
-                ios::build(
-                    Some(target_selected_arch),
-                    Some(mode),
-                    Some(&current_dir),
-                    None,
-                    None,
-                    None,
-                );
+                let _ = IosBindingsBuilder::build(
+                    mode,
+                    &current_dir,
+                    target_selected_arch,
+                )?;
 
                 // // The dependencies of Noir libraries need iOS 15 and above.
                 // let status = if config.adapter_contains(Adapter::Noir) && p.eq(&Platform::Ios) {
@@ -221,14 +221,11 @@ pub fn build_project(
                     .iter()
                     .map(|it| AndroidArch::parse_from_str(&it))
                     .collect();
-                android::build(
-                    Some(target_selected_arch),
-                    Some(mode),
-                    Some(&current_dir),
-                    None,
-                    None,
-                    None,
-                );
+                let _ = AndroidBindingsBuilder::build(
+                    mode,
+                    &current_dir,
+                    target_selected_arch,
+                )?;
             }
             Platform::Web => {
                 // Web platform doesn't require architecture selection

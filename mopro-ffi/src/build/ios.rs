@@ -8,179 +8,158 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::SwiftBindingGenerator;
 
-use super::cleanup_tmp_local;
+use super::{cleanup_tmp_local, PlatformBindingsBuilder};
 use super::constants::{
-    IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS, IOS_BINDINGS_DIR,
-    IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR,
+    IosArch, Mode, ARCH_ARM_64, ARCH_X86_64,
+    IOS_BINDINGS_DIR, IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR,
 };
 use super::install_arch;
 use super::mktemp_local;
 use crate::build::project_name_from_toml;
 
-pub fn build(
-    target_archs: Option<Vec<IosArch>>,
-    mode: Option<Mode>,
-    project_dir: Option<&Path>,
-    bindings_dir_name: Option<&str>,
-    framework_name: Option<&str>,
-    out_swift_file_name: Option<&str>,
-) -> PathBuf {
-    let uniffi_style_identifier =
-        project_name_from_toml(project_dir).expect("Failed to get project name from Cargo.toml");
+pub struct IosBindingsBuilder;
 
-    // Names for the generated and output files and directories
-    let bindings_dir_name = bindings_dir_name.unwrap_or(IOS_BINDINGS_DIR);
-    let framework_name = framework_name.unwrap_or(IOS_XCFRAMEWORKS_DIR);
-    let out_swift_file_name = out_swift_file_name.unwrap_or(IOS_SWIFT_FILE);
+impl PlatformBindingsBuilder for IosBindingsBuilder {
+    type Arch = IosArch;
 
-    let gen_swift_file_name = format!("{}.swift", uniffi_style_identifier);
-    let lib_name = format!("lib{}.a", &uniffi_style_identifier);
-    let header_name = format!("{}FFI.h", uniffi_style_identifier);
-    let modulemap_name = format!("{}FFI.modulemap", uniffi_style_identifier);
+    fn build(
+        mode: Mode,
+        project_dir: &Path,
+        target_archs: Vec<IosArch>,
+    ) -> anyhow::Result<PathBuf> {
+        let uniffi_style_identifier = project_name_from_toml(&project_dir)
+            .expect("Failed to get project name from Cargo.toml");
 
-    // Paths for the generated files
-    let cwd = std::env::current_dir().unwrap();
-    let manifest_dir =
-        std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
-    let build_dir = format!("{}/build", manifest_dir);
-    let build_dir_path = Path::new(&build_dir);
-    let work_dir = mktemp_local(build_dir_path);
-    let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
-    let bindings_out = work_dir.join(bindings_dir_name);
-    fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
-    let bindings_dest = Path::new(&manifest_dir).join(bindings_dir_name);
-    let framework_out = bindings_out.join(framework_name);
+        // Names for the generated and output files and directories
+        let bindings_dir_name = IOS_BINDINGS_DIR;
+        let framework_name = IOS_XCFRAMEWORKS_DIR;
+        let out_swift_file_name = IOS_SWIFT_FILE;
 
-    // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
-    let mode = mode.unwrap_or(Mode::parse_from_str(
-        std::env::var(ENV_CONFIG)
-            .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
-            .as_str(),
-    ));
+        let gen_swift_file_name = format!("{}.swift", uniffi_style_identifier);
+        let lib_name = format!("lib{}.a", &uniffi_style_identifier);
+        let header_name = format!("{}FFI.h", uniffi_style_identifier);
+        let modulemap_name = format!("{}FFI.modulemap", uniffi_style_identifier);
 
-    let target_archs =
-        target_archs.unwrap_or(if let Ok(archs_str) = std::env::var(ENV_IOS_ARCHS) {
-            archs_str.split(',').map(IosArch::parse_from_str).collect()
-        } else {
-            // Default case: select all supported architectures if none are provided
-            IosArch::all_strings()
+        // Paths for the generated files
+        let build_dir_path = project_dir.join("build");
+        let work_dir = mktemp_local(&build_dir_path);
+        let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
+        let bindings_out = work_dir.join(bindings_dir_name);
+        fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
+        let bindings_dest = Path::new(&project_dir).join(bindings_dir_name);
+        let framework_out = bindings_out.join(framework_name);
+        
+        // Take a list of architectures, build them, and combine them into
+        // a single universal binary/archive
+        let build_combined_archs = |archs: &[IosArch]| -> PathBuf {
+            let out_lib_paths: Vec<PathBuf> = archs
                 .iter()
-                .map(|s| IosArch::parse_from_str(s))
-                .collect()
-        });
-
-    // Take a list of architectures, build them, and combine them into
-    // a single universal binary/archive
-    let build_combined_archs = |archs: &[IosArch]| -> PathBuf {
-        let out_lib_paths: Vec<PathBuf> = archs
-            .iter()
-            .map(|arch| {
-                Path::new(&build_dir).join(Path::new(&format!(
-                    "{}/{}/{}/{}",
-                    build_dir,
-                    arch.as_str(),
-                    mode.as_str(),
-                    lib_name
-                )))
-            })
-            .collect();
-        for arch in archs {
-            install_arch(arch.as_str().to_string());
-            let mut build_cmd = Command::new("cargo");
-            build_cmd.arg("build");
-            if mode == Mode::Release {
-                build_cmd.arg("--release");
+                .map(|arch| {
+                    Path::new(&build_dir_path).join(&format!(
+                        "{}/{}/{}",
+                        arch.as_str(),
+                        mode.as_str(),
+                        lib_name
+                    ))
+                })
+                .collect();
+            for arch in archs {
+                install_arch(arch.as_str().to_string());
+                let mut build_cmd = Command::new("cargo");
+                build_cmd.arg("build");
+                if mode == Mode::Release {
+                    build_cmd.arg("--release");
+                }
+                build_cmd
+                    .arg("--lib")
+                    .env("CARGO_BUILD_TARGET_DIR", &build_dir_path)
+                    .env("CARGO_BUILD_TARGET", arch.as_str())
+                    .spawn()
+                    .expect("Failed to spawn cargo build")
+                    .wait()
+                    .expect("cargo build errored");
             }
-            build_cmd
-                .arg("--lib")
-                .env("CARGO_BUILD_TARGET_DIR", &build_dir)
-                .env("CARGO_BUILD_TARGET", arch.as_str())
+            // now lipo the libraries together
+            let mut lipo_cmd = Command::new("lipo");
+            let lib_out = mktemp_local(&build_dir_path).join(lib_name.clone());
+            lipo_cmd
+                .arg("-create")
+                .arg("-output")
+                .arg(lib_out.to_str().unwrap());
+            for p in out_lib_paths {
+                lipo_cmd.arg(p.to_str().unwrap());
+            }
+            lipo_cmd
                 .spawn()
-                .expect("Failed to spawn cargo build")
+                .expect("Failed to spawn lipo")
                 .wait()
-                .expect("cargo build errored");
+                .expect("lipo command failed");
+
+            lib_out
+        };
+
+        let out_lib_paths: Vec<PathBuf> = group_target_archs(&target_archs)
+            .iter()
+            .map(|v| build_combined_archs(v))
+            .collect();
+
+        let out_dylib_path = build_dir_path.join(format!(
+            "{}/{}/{}",
+            target_archs[0].as_str(),
+            mode.as_str(),
+            lib_name.replace(".a", ".dylib")
+        ));
+
+        generate_ios_bindings(&out_dylib_path, &swift_bindings_dir)
+            .expect("Failed to generate bindings for iOS");
+
+        fs::rename(
+            swift_bindings_dir.join(&gen_swift_file_name),
+            bindings_out.join(out_swift_file_name),
+        )
+        .context(format!("Failed to rename bindings from {}", gen_swift_file_name))?;
+
+        let mut xcbuild_cmd = Command::new("xcodebuild");
+        xcbuild_cmd.arg("-create-xcframework");
+        for lib_path in out_lib_paths {
+            xcbuild_cmd
+                .arg("-library")
+                .arg(lib_path.to_str().unwrap())
+                .arg("-headers")
+                .arg(swift_bindings_dir.to_str().unwrap());
         }
-        // now lipo the libraries together
-        let mut lipo_cmd = Command::new("lipo");
-        let lib_out = mktemp_local(build_dir_path).join(lib_name.clone());
-        lipo_cmd
-            .arg("-create")
-            .arg("-output")
-            .arg(lib_out.to_str().unwrap());
-        for p in out_lib_paths {
-            lipo_cmd.arg(p.to_str().unwrap());
-        }
-        lipo_cmd
-            .spawn()
-            .expect("Failed to spawn lipo")
-            .wait()
-            .expect("lipo command failed");
-
-        lib_out
-    };
-
-    let out_lib_paths: Vec<PathBuf> = group_target_archs(&target_archs)
-        .iter()
-        .map(|v| build_combined_archs(v))
-        .collect();
-
-    let out_dylib_path = build_dir_path.join(format!(
-        "{}/{}/{}",
-        target_archs[0].as_str(),
-        mode.as_str(),
-        lib_name.replace(".a", ".dylib")
-    ));
-
-    generate_ios_bindings(&out_dylib_path, &swift_bindings_dir)
-        .expect("Failed to generate bindings for iOS");
-
-    fs::rename(
-        swift_bindings_dir.join(&gen_swift_file_name),
-        bindings_out.join(out_swift_file_name),
-    )
-    .with_context(|| format!("Failed to rename bindings from {}", gen_swift_file_name))
-    .unwrap();
-
-    let mut xcbuild_cmd = Command::new("xcodebuild");
-    xcbuild_cmd.arg("-create-xcframework");
-    for lib_path in out_lib_paths {
         xcbuild_cmd
-            .arg("-library")
-            .arg(lib_path.to_str().unwrap())
-            .arg("-headers")
-            .arg(swift_bindings_dir.to_str().unwrap());
-    }
-    xcbuild_cmd
-        .arg("-output")
-        .arg(framework_out.to_str().unwrap())
-        .spawn()
-        .unwrap()
-        .wait()
-        .unwrap();
+            .arg("-output")
+            .arg(framework_out.to_str().unwrap())
+            .spawn()
+            .context("Failed to spawn xcodebuild")?
+            .wait()
+            .context("xcodebuild command failed")?;
 
-    // Swift requires module maps named "module.modulemap", but uniffi uses "<placeholder>FFI.modulemap".
-    // To support multiple libraries in the same project without naming conflicts,
-    // we move each header + module map into its own subdirectory and rename accordingly.
-    regroup_header_artifacts(
-        &framework_out,
-        &header_name,
-        &modulemap_name,
-        &uniffi_style_identifier,
-    )
-    .expect("Failed to generate header artifacts");
+        // Swift requires module maps named "module.modulemap", but uniffi uses "<placeholder>FFI.modulemap".
+        // To support multiple libraries in the same project without naming conflicts,
+        // we move each header + module map into its own subdirectory and rename accordingly.
+        regroup_header_artifacts(
+            &framework_out,
+            &header_name,
+            &modulemap_name,
+            &uniffi_style_identifier,
+        )
+        .expect("Failed to generate header artifacts");
 
-    if let Ok(info) = fs::metadata(&bindings_dest) {
-        if !info.is_dir() {
-            panic!("framework directory exists and is not a directory");
+        if let Ok(info) = fs::metadata(&bindings_dest) {
+            if !info.is_dir() {
+                panic!("framework directory exists and is not a directory");
+            }
+            fs::remove_dir_all(&bindings_dest).expect("Failed to remove framework directory");
         }
-        fs::remove_dir_all(&bindings_dest).expect("Failed to remove framework directory");
+
+        fs::rename(&bindings_out, &bindings_dest).expect("Failed to move framework into place");
+        // Copy the mopro.swift file to the output directory
+        cleanup_tmp_local(&build_dir_path);
+
+        Ok(bindings_dest)
     }
-
-    fs::rename(&bindings_out, &bindings_dest).expect("Failed to move framework into place");
-    // Copy the mopro.swift file to the output directory
-    cleanup_tmp_local(build_dir_path);
-
-    bindings_dest
 }
 
 // More general cases
