@@ -10,7 +10,7 @@ use crate::style::blue_bold;
 use crate::style::print_green_bold;
 use crate::utils::PlatformSelector;
 
-use anyhow::Ok;
+use anyhow::{Context, Ok};
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
@@ -194,14 +194,13 @@ pub fn build_project(
         let platform_str: &str = p.as_str();
         let selected_arch = selected_architectures
             .get(platform_str)
-            .cloned() // TODO - do it better
-            .unwrap_or_default();
+            .context(format!("No architectures selected for platform: {}", platform_str))?;
 
         match p {
             Platform::Ios => {
                 let target_selected_arch = selected_arch
                     .iter()
-                    .map(|it| IosArch::parse_from_str(&it))
+                    .map(IosArch::parse_from_str)
                     .collect();
                 let _ = IosBindingsBuilder::build(
                     mode,
