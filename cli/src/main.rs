@@ -1,6 +1,9 @@
 use clap::Parser;
 use clap::Subcommand;
 
+use crate::constants::Framework;
+use crate::create::{Android, Create, Flutter, Ios, ReactNative, Web};
+
 mod build;
 mod config;
 mod constants;
@@ -47,8 +50,15 @@ enum Commands {
     },
     /// Create templates for the specified platform
     Create {
-        #[arg(long, help = "Specify the platform")]
+        #[arg(long, help = "Specify the framework")]
         framework: Option<String>,
+        #[arg(
+            long,
+            value_name = "FRAMEWORK",
+            num_args = 0..=1,
+            help = "Show instruction message for create"
+        )]
+        show: Option<String>,
     },
     /// Update the bindings for the all platforms
     Update {},
@@ -87,10 +97,22 @@ fn main() {
                 Err(e) => style::print_red_bold(format!("Failed to build project: {:?}", e)),
             }
         }
-        Commands::Create { framework } => match create::create_project(framework) {
-            Ok(_) => {}
-            Err(e) => style::print_red_bold(format!("Failed to create template: {:?}", e)),
-        },
+        Commands::Create { framework, show } => {
+            if let Some(framework) = show {
+                match Framework::parse_from_str(framework) {
+                    Framework::Ios => <Ios as Create>::print_message(),
+                    Framework::Android => <Android as Create>::print_message(),
+                    Framework::Web => <Web as Create>::print_message(),
+                    Framework::Flutter => <Flutter as Create>::print_message(),
+                    Framework::ReactNative => <ReactNative as Create>::print_message(),
+                }
+                return;
+            }
+            match create::create_project(framework) {
+                Ok(_) => {}
+                Err(e) => style::print_red_bold(format!("Failed to create template: {:?}", e)),
+            }
+        }
         Commands::Update {} => match update::update_bindings() {
             Ok(_) => {}
             Err(e) => style::print_red_bold(format!("Failed to update bindings: {:?}", e)),
