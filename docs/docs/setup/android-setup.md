@@ -349,11 +349,11 @@ To resolve this:
    At the top of the file, change the `package uniffi.mopro` line to a unique name (e.g. `uniffi.mylibrarya`).
 
 2. **Merge JNI libraries**  
-   Combine `.so` files from each seperate binding into a single `jniLibs` folder, keeping all architectures (e.g. `arm64-v8a`, `x86_64`).  
+   Combine `.so` files from each separate binding into a single `jniLibs` folder, keeping all architectures (e.g. `arm64-v8a`, `x86_64`).  
    Ensure each `.so` has a unique name to prevent overwriting.
 
 3. **Adjust your imports**  
-   Use the new package names to import each binding module without conflict.
+   Use the new package names to import each binding module without conflicts.
 
 4. **Repeat steps 1–3** for each additional binding (`MyLibraryB`, `MyLibraryC`, …).  
    Ensure each binding was generated from a distinct Mopro project with a unique name.

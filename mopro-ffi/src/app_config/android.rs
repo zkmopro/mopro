@@ -23,7 +23,7 @@ pub fn build() {
     let uniffi_style_identifier = project_name_from_toml();
 
     // Names for the generated files and directories
-    let binding_name = "MoproAndroidBindings";
+    let binding_dir_name = "MoproAndroidBindings";
     let lib_name = format!("lib{}.so", &uniffi_style_identifier);
 
     let gen_android_module_name = &uniffi_style_identifier;
@@ -42,8 +42,8 @@ pub fn build() {
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());
     let build_dir = Path::new(&manifest_dir).join("build");
     let work_dir = mktemp_local(&build_dir);
-    let bindings_out = work_dir.join(&binding_name);
-    let bindings_dest = Path::new(&manifest_dir).join(&binding_name);
+    let bindings_out = work_dir.join(binding_dir_name);
+    let bindings_dest = Path::new(&manifest_dir).join(binding_dir_name);
 
     let mode = Mode::parse_from_str(
         std::env::var(ENV_CONFIG)
@@ -74,7 +74,7 @@ pub fn build() {
         .expect("Failed to generate bindings");
 
     reformat_kotlin_package(
-        &gen_android_module_name,
+        gen_android_module_name,
         &gen_android_kt_file_name,
         out_android_module_name,
         &out_android_kt_file_name,
@@ -175,7 +175,7 @@ fn reformat_kotlin_package(
     gen_android_kt_file_name: &str,
     out_android_module_name: &str,
     out_android_kt_file_name: &&str,
-    bindings_out: &PathBuf,
+    bindings_out: &Path,
 ) -> anyhow::Result<()> {
     let generated_kt_file = bindings_out
         .join("uniffi")

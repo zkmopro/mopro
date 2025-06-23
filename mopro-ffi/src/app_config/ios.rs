@@ -18,7 +18,7 @@ pub fn build() {
     let uniffi_style_identifier = project_name_from_toml();
 
     // Names for the generated files and directories
-    let bindings_folder_name = "MoproiOSBindings";
+    let bindings_dir_name = "MoproiOSBindings";
 
     let gen_swift_file_name = format!("{}.swift", uniffi_style_identifier);
     let out_swift_file_name = "mopro.swift";
@@ -37,9 +37,9 @@ pub fn build() {
     let build_dir_path = Path::new(&build_dir);
     let work_dir = mktemp_local(build_dir_path);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
-    let bindings_out = work_dir.join(&bindings_folder_name);
+    let bindings_out = work_dir.join(bindings_dir_name);
     fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
-    let bindings_dest = Path::new(&manifest_dir).join(&bindings_folder_name);
+    let bindings_dest = Path::new(&manifest_dir).join(bindings_dir_name);
     let framework_out = bindings_out.join(framework_name);
 
     // https://developer.apple.com/documentation/xcode/build-settings-reference#Architectures
@@ -126,7 +126,7 @@ pub fn build() {
 
     fs::rename(
         swift_bindings_dir.join(&gen_swift_file_name),
-        bindings_out.join(&out_swift_file_name),
+        bindings_out.join(out_swift_file_name),
     )
     .with_context(|| format!("Failed to rename bindings from {}", gen_swift_file_name))
     .unwrap();
@@ -150,7 +150,7 @@ pub fn build() {
 
     // Swift requires module maps named "module.modulemap", but uniffi uses "<placeholder>FFI.modulemap".
     // To support multiple libraries in the same project without naming conflicts,
-    // we move each header + module map into its own subfolder and rename accordingly.
+    // we move each header + module map into its own subdirectory and rename accordingly.
     regroup_header_artifacts(
         &framework_out,
         &header_name,
@@ -237,7 +237,7 @@ pub fn regroup_header_artifacts(
         let modmap_src = headers_dir.join(modulemap_name);
         let header_src = headers_dir.join(header_name);
 
-        // Destination folder: Headers/<identifier>/
+        // Destination directory: Headers/<identifier>/
         let target_dir = headers_dir.join(project_name);
         fs::create_dir_all(&target_dir).with_context(|| format!("creating {:?}", target_dir))?;
 
