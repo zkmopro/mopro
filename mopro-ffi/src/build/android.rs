@@ -20,11 +20,13 @@ pub struct AndroidBindingsBuilder;
 
 impl PlatformBindingsBuilder for AndroidBindingsBuilder {
     type Arch = AndroidArch;
+    type Params = ();
 
     fn build(
         mode: Mode,
         project_dir: &Path,
         target_archs: Vec<AndroidArch>,
+        _params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
         let uniffi_style_identifier =
             project_name_from_toml(project_dir).expect("Failed to get project name from Cargo.toml");

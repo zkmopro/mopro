@@ -12,11 +12,13 @@ pub mod ios;
 
 pub trait PlatformBindingsBuilder {
     type Arch;
+    type Params;
 
     fn build(
         mode: Mode,
         cargo_toml_path: &Path,
         target_archs: Vec<Self::Arch>,
+        params: Self::Params,
     ) -> anyhow::Result<PathBuf>;
 }
 

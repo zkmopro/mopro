@@ -22,7 +22,7 @@ use std::collections::HashSet;
 use std::env;
 
 use mopro_ffi::build::android::AndroidBindingsBuilder;
-use mopro_ffi::build::ios::IosBindingsBuilder;
+use mopro_ffi::build::ios::{IosBindingsBuilder, IosBindingsParams};
 use mopro_ffi::build::PlatformBindingsBuilder;
 
 pub fn build_project(
@@ -206,14 +206,8 @@ pub fn build_project(
                     mode,
                     &current_dir,
                     target_selected_arch,
+                    IosBindingsParams { using_noir: config.adapter_contains(Adapter::Noir) }
                 )?;
-
-                // // The dependencies of Noir libraries need iOS 15 and above.
-                // let status = if config.adapter_contains(Adapter::Noir) && p.eq(&Platform::Ios) {
-                //     command.env("IPHONEOS_DEPLOYMENT_TARGET", "15").status()?
-                // } else {
-                //     command.status()? // TODO - handle this case
-                // };
             }
             Platform::Android => {
                 let target_selected_arch = selected_arch
@@ -224,6 +218,7 @@ pub fn build_project(
                     mode,
                     &current_dir,
                     target_selected_arch,
+                    ()
                 )?;
             }
             Platform::Web => {

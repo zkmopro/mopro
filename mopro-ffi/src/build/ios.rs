@@ -19,13 +19,19 @@ use crate::build::project_name_from_toml;
 
 pub struct IosBindingsBuilder;
 
+pub struct IosBindingsParams {
+    pub using_noir: bool,
+}
+
 impl PlatformBindingsBuilder for IosBindingsBuilder {
     type Arch = IosArch;
+    type Params = IosBindingsParams;
 
     fn build(
         mode: Mode,
         project_dir: &Path,
         target_archs: Vec<IosArch>,
+        params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
         let uniffi_style_identifier = project_name_from_toml(&project_dir)
             .expect("Failed to get project name from Cargo.toml");
@@ -70,6 +76,11 @@ impl PlatformBindingsBuilder for IosBindingsBuilder {
                 build_cmd.arg("build");
                 if mode == Mode::Release {
                     build_cmd.arg("--release");
+                }
+                // The dependencies of Noir libraries need iOS 15 and above.
+                if params.using_noir {
+                    build_cmd
+                        .env("IPHONEOS_DEPLOYMENT_TARGET", "15.0");
                 }
                 build_cmd
                     .arg("--lib")
@@ -121,6 +132,11 @@ impl PlatformBindingsBuilder for IosBindingsBuilder {
         .context(format!("Failed to rename bindings from {}", gen_swift_file_name))?;
 
         let mut xcbuild_cmd = Command::new("xcodebuild");
+        // The dependencies of Noir libraries need iOS 15 and above.
+        if params.using_noir {
+            xcbuild_cmd
+                .env("IPHONEOS_DEPLOYMENT_TARGET", "15.0");
+        }
         xcbuild_cmd.arg("-create-xcframework");
         for lib_path in out_lib_paths {
             xcbuild_cmd
