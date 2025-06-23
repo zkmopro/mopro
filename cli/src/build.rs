@@ -189,6 +189,8 @@ pub fn build_project(
             return Ok(());
         }
     }
+    
+    
 
     for p in platform.platforms.clone() {
         let platform_str: &str = p.as_str();
@@ -266,7 +268,6 @@ fn select_mode(config: &mut Config) -> Result<Mode> {
     Ok(Mode::from_idx(idx))
 }
 
-// TODO - update this to use real paths
 fn print_binding_message(platforms: &Vec<Platform>) -> anyhow::Result<()> {
     let current_dir = env::current_dir()?;
     print_green_bold("✨ Bindings Built Successfully! ✨".to_string());
