@@ -4,9 +4,7 @@ use crate::create::utils::{check_bindings, copy_embedded_dir, copy_ios_bindings,
 use crate::print::print_footer_message;
 use crate::style::print_bold;
 use crate::style::print_green_bold;
-use crate::utils::project_name_from_toml;
 use anyhow::{Error, Result};
-use convert_case::{Case, Casing};
 use include_dir::include_dir;
 use include_dir::Dir;
 use std::{env, fs, path::PathBuf};
@@ -31,27 +29,7 @@ impl Create for Ios {
         env::set_current_dir(&target_dir)?;
         const IOS_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/ios");
 
-        let project_name = project_name_from_toml(&project_dir);
-        let swift_name = format!("{}.swift", &project_name);
-        let binding_xcframework_name = format!(
-            "{}Bindings.xcframework",
-            project_name.to_case(Case::UpperCamel)
-        );
-        let binding_dir_name = Platform::Ios.binding_dir(&project_dir);
-
-        let text_replacements = vec![
-            ("mopro.swift", swift_name.as_str()),
-            (
-                "MoproBindings.xcframework",
-                binding_xcframework_name.as_str(),
-            ),
-            ("MoproiOSBindings", binding_dir_name.as_str()),
-        ];
-        copy_embedded_dir(
-            &IOS_TEMPLATE_DIR,
-            &target_dir,
-            Some(text_replacements.as_slice()),
-        )?;
+        copy_embedded_dir(&IOS_TEMPLATE_DIR, &target_dir)?;
 
         env::set_current_dir(&project_dir)?;
         copy_ios_bindings(ios_bindings_dir, target_dir.clone())?;

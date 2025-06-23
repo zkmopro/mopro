@@ -1,14 +1,11 @@
 use super::Create;
-use crate::constants::Platform;
+use crate::constants::{Platform, IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR};
 use crate::create::utils::{
     check_bindings, copy_android_bindings, copy_dir, copy_keys, download_and_extract_template,
 };
 use crate::print::print_footer_message;
 use crate::style::print_green_bold;
-use crate::utils::project_name_from_toml;
 use anyhow::Error;
-use convert_case::{Case, Casing};
-use std::ops::Add;
 use std::{fs, path::PathBuf};
 
 pub struct Flutter;
@@ -36,26 +33,20 @@ impl Create for Flutter {
         let flutter_dir = project_dir.join("flutter-app-main");
         fs::rename(flutter_dir, &target_dir)?;
 
-        let identifier = project_name_from_toml(&project_dir);
-        let xcframework_name = identifier
-            .to_case(Case::UpperCamel)
-            .add("Bindings.xcframework");
-        let swift_name = identifier.add(".swift");
-
-        let xcframeworks_dir = ios_bindings_dir.join(&xcframework_name);
-        let mopro_swift_file = ios_bindings_dir.join(&swift_name);
+        let xcframeworks_dir = ios_bindings_dir.join(IOS_XCFRAMEWORKS_DIR);
+        let mopro_swift_file = ios_bindings_dir.join(IOS_SWIFT_FILE);
 
         let mopro_flutter_plugin_dir = target_dir.join("mopro_flutter_plugin");
         let ios_dir = mopro_flutter_plugin_dir.join("ios");
-        let mopro_bindings_dir = ios_dir.join(&xcframework_name);
+        let mopro_bindings_dir = ios_dir.join(IOS_XCFRAMEWORKS_DIR);
         let classes_dir = ios_dir.join("Classes");
 
         fs::remove_dir_all(&mopro_bindings_dir)?;
         fs::create_dir(&mopro_bindings_dir)?;
         copy_dir(&xcframeworks_dir, &mopro_bindings_dir)?;
 
-        fs::remove_file(classes_dir.join(&swift_name))?;
-        fs::copy(mopro_swift_file, classes_dir.join(&swift_name))?;
+        fs::remove_file(classes_dir.join(IOS_SWIFT_FILE))?;
+        fs::copy(mopro_swift_file, classes_dir.join(IOS_SWIFT_FILE))?;
 
         copy_android_bindings(
             &android_bindings_dir,

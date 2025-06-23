@@ -83,11 +83,7 @@ pub fn copy_embedded_file(dir: &Dir, output_dir: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn copy_embedded_dir(
-    dir: &Dir,
-    output_dir: &Path,
-    text_replacements: Option<&[(&str, &str)]>,
-) -> Result<()> {
+pub fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> Result<()> {
     for file in dir.entries() {
         let relative_path = file.path();
         let output_path = output_dir.join(relative_path);
@@ -100,19 +96,8 @@ pub fn copy_embedded_dir(
         // Write the file to the output directory
         match file.as_file() {
             Some(file) => {
-                let mut contents = file.contents().to_vec();
+                let contents = file.contents().to_vec();
 
-                for (old, new) in text_replacements.unwrap_or_default() {
-                    // Replace the specified import if it exists
-                    if let Ok(text) = std::str::from_utf8(&contents) {
-                        if text.contains(old) {
-                            let replaced = text.replace(old, new);
-                            contents = replaced.into_bytes();
-                        }
-                    }
-                }
-
-                // Write the (possibly modified) content
                 if let Err(e) = fs::write(&output_path, contents) {
                     if e.kind() == ErrorKind::AlreadyExists {
                         println!("File already exists: {:?}", output_path);
@@ -122,7 +107,7 @@ pub fn copy_embedded_dir(
                 }
             }
             None => {
-                copy_embedded_dir(file.as_dir().unwrap(), output_dir, text_replacements)?;
+                copy_embedded_dir(file.as_dir().unwrap(), output_dir)?;
             }
         }
     }
@@ -160,7 +145,7 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
 }
 
 pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<PathBuf> {
-    let bindings_name = platform.binding_dir(project_dir);
+    let bindings_name = platform.binding_dir();
 
     let bindings_dir = project_dir.join(&bindings_name);
     if bindings_dir.exists() && fs::read_dir(&bindings_dir)?.count() > 0 {

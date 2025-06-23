@@ -1,6 +1,5 @@
 use anyhow::Context;
 use camino::Utf8Path;
-use convert_case::{Case, Casing};
 use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
@@ -17,14 +16,16 @@ use crate::app_config::project_name_from_toml;
 
 pub fn build() {
     let uniffi_style_identifier = project_name_from_toml();
-    let user_friendly_identifier = uniffi_style_identifier.to_case(Case::UpperCamel);
 
     // Names for the generated files and directories
-    let lib_name = format!("lib{}.a", &uniffi_style_identifier);
-    let bindings_folder_name = format!("{}iOSBindings", &user_friendly_identifier);
-    let framework_name = format!("{}Bindings.xcframework", &user_friendly_identifier);
+    let bindings_folder_name = "MoproiOSBindings";
 
-    let swift_name = format!("{}.swift", uniffi_style_identifier);
+    let gen_swift_file_name = format!("{}.swift", uniffi_style_identifier);
+    let out_swift_file_name = "mopro.swift";
+
+    let framework_name = "MoproBindings.xcframework";
+
+    let lib_name = format!("lib{}.a", &uniffi_style_identifier);
     let header_name = format!("{}FFI.h", uniffi_style_identifier);
     let modulemap_name = format!("{}FFI.modulemap", uniffi_style_identifier);
 
@@ -124,10 +125,10 @@ pub fn build() {
         .expect("Failed to generate bindings for iOS");
 
     fs::rename(
-        swift_bindings_dir.join(&swift_name),
-        bindings_out.join(&swift_name),
+        swift_bindings_dir.join(&gen_swift_file_name),
+        bindings_out.join(&out_swift_file_name),
     )
-    .with_context(|| format!("Failed to rename bindings for {}", swift_name))
+    .with_context(|| format!("Failed to rename bindings from {}", gen_swift_file_name))
     .unwrap();
 
     let mut xcbuild_cmd = Command::new("xcodebuild");
@@ -154,7 +155,7 @@ pub fn build() {
         &framework_out,
         &header_name,
         &modulemap_name,
-        &user_friendly_identifier,
+        &uniffi_style_identifier,
     )
     .expect("Failed to generate header artifacts");
 

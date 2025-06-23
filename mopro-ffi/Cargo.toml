@@ -38,7 +38,6 @@ num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
 toml = "0.8.22"
-convert_case = "0.8.0"
 
 # Error handling
 thiserror = "2.0.12"

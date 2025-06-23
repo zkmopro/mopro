@@ -1,5 +1,4 @@
 use camino::Utf8Path;
-use convert_case::{Case, Casing};
 use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
@@ -21,11 +20,15 @@ use super::mktemp_local;
 
 pub fn build() {
     let uniffi_style_identifier = project_name_from_toml();
-    let user_friendly_identifier = uniffi_style_identifier.to_case(Case::UpperCamel);
 
     // Names for the generated files and directories
-    let binding_name = format!("{}AndroidBindings", &user_friendly_identifier);
+    let binding_name = "MoproAndroidBindings";
     let lib_name = format!("lib{}.so", &uniffi_style_identifier);
+
+    let gen_android_module_name = &uniffi_style_identifier;
+    let gen_android_kt_file_name = format!("{}.kt", &uniffi_style_identifier);
+    let out_android_module_name = "mopro";
+    let out_android_kt_file_name = "mopro.kt";
 
     #[cfg(feature = "witnesscalc")]
     let _ = std::env::var("ANDROID_NDK").unwrap_or_else(|_| {
@@ -68,6 +71,34 @@ pub fn build() {
 
     generate_android_bindings(&latest_out_lib_path, &bindings_out)
         .expect("Failed to generate bindings");
+
+    let generated_kt_file = bindings_out
+        .join("uniffi")
+        .join(gen_android_module_name)
+        .join(gen_android_kt_file_name);
+    let out_android_kt_file = bindings_out
+        .join("uniffi")
+        .join(out_android_module_name)
+        .join(out_android_kt_file_name);
+
+    fs::create_dir(bindings_out.join("uniffi").join(out_android_module_name))
+        .expect("Failed to create bindings directory");
+    fs::rename(generated_kt_file, &out_android_kt_file).expect(&format!(
+        "Failed to rename android kotlin package `{}/{}` to `{}`",
+        gen_android_module_name, gen_android_module_name, out_android_kt_file_name
+    ));
+    fs::remove_dir(bindings_out.join("uniffi").join(gen_android_module_name))
+        .expect("Failed to remove gen android kotlin package directory");
+
+    // Remove `package uniffi.<gen_android_module_name>` from the generated Kotlin file
+    let content =
+        fs::read_to_string(&out_android_kt_file).expect("Failed to read generated Kotlin file");
+    let modified_content = content.replace(
+        &format!("package uniffi.{}", gen_android_module_name),
+        &format!("package uniffi.{}", gen_android_module_name),
+    );
+    fs::write(&out_android_kt_file, modified_content)
+        .expect("Failed to write modified Kotlin file");
 
     move_bindings(&bindings_out, &bindings_dest);
     cleanup_tmp_local(&build_dir);

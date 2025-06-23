@@ -10,7 +10,6 @@ use crate::create::utils::{check_bindings, copy_android_bindings, copy_embedded_
 use crate::print::print_footer_message;
 use crate::style::print_bold;
 use crate::style::print_green_bold;
-use crate::utils::project_name_from_toml;
 
 pub struct Android;
 
@@ -26,21 +25,11 @@ impl Create for Android {
         env::set_current_dir(&target_dir)?;
         const ANDROID_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/android");
 
-        let android_real_import_name =
-            format!("import uniffi.{}.", project_name_from_toml(&project_dir));
-
-        let replacements = vec![("import uniffi.mopro.", android_real_import_name.as_str())];
-        copy_embedded_dir(
-            &ANDROID_TEMPLATE_DIR,
-            &target_dir,
-            Some(replacements.as_slice()),
-        )?;
+        copy_embedded_dir(&ANDROID_TEMPLATE_DIR, &target_dir)?;
 
         env::set_current_dir(&project_dir)?;
         let app_dir = target_dir.join("app");
         copy_android_bindings(&android_bindings_dir, &app_dir, "java")?;
-
-        // TODO- update the Fibonacci, Noir and Multiplier explaies to include the changed name of the project
 
         let assets_dir = app_dir.join("src/main/assets");
         copy_keys(assets_dir)?;

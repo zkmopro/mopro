@@ -1,9 +1,9 @@
-use crate::utils::project_name_from_toml;
-use convert_case::{Case, Casing};
-use std::path::Path;
-
+pub const IOS_SWIFT_FILE: &str = "mopro.swift";
+pub const IOS_XCFRAMEWORKS_DIR: &str = "MoproBindings.xcframework";
 pub const ANDROID_JNILIBS_DIR: &str = "jniLibs";
 pub const ANDROID_UNIFFI_DIR: &str = "uniffi";
+pub const ANDROID_MOPRO_DIR: &str = "mopro";
+pub const ANDROID_MOPRO_KT_FILE: &str = "mopro.kt";
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Mode {
@@ -240,14 +240,8 @@ impl Platform {
         }
     }
 
-    pub fn binding_dir(&self, project_dir: &Path) -> String {
-        let identifier = match self {
-            Self::Ios => project_name_from_toml(project_dir).to_case(Case::UpperCamel),
-            Self::Android => project_name_from_toml(project_dir).to_case(Case::UpperCamel),
-            Self::Web => "Mopro".to_string(),
-        };
-
-        format!("{}{}Bindings", identifier, self.binding_name())
+    pub fn binding_dir(&self) -> String {
+        format!("Mopro{}Bindings", self.binding_name())
     }
 }
 

@@ -250,11 +250,7 @@ fn print_binding_message(platforms: &Vec<Platform>, current_dir: &Path) -> anyho
     print_green_bold("✨ Bindings Built Successfully! ✨".to_string());
     println!("The Mopro bindings have been successfully generated and are available in the following directories:\n");
     for platform in platforms {
-        let text = format!(
-            "- {}/{}",
-            current_dir.display(),
-            platform.binding_dir(current_dir)
-        );
+        let text = format!("- {}/{}", current_dir.display(), platform.binding_dir());
         println!("{}", blue_bold(text.to_string()));
     }
     print_build_success_message();
@@ -268,7 +264,7 @@ fn copy_mopro_wasm_lib() -> anyhow::Result<()> {
     if !target_dir.exists() {
         const WASM_TEMPLATE_DIR: Dir =
             include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
-        copy_embedded_dir(&WASM_TEMPLATE_DIR, &target_dir, None)?;
+        copy_embedded_dir(&WASM_TEMPLATE_DIR, &target_dir)?;
     }
 
     Ok(())

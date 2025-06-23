@@ -337,3 +337,25 @@ You should now be able to run the Android app (`^`+`R` or `ctrl`+`R`) on the sim
     -   Add the required Rust crate in `Cargo.toml`
     -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](rust-setup.md#-customize-the-bindings) guide for details).<br/>
         Once exported, the function will be available across all supported platforms.
+
+## 6. Importing multiple bindings
+
+Adding two or more Mopro-generated bindings directly into one Android project will cause conflicts due to duplicate package names.
+
+To resolve this:
+
+1. **Rename Kotlin binding files**  
+   For each binding, rename `mopro.kt` to something unique (e.g. `MyLibraryA.kt`).  
+   At the top of the file, change the `package uniffi.mopro` line to a unique name (e.g. `uniffi.mylibrarya`).
+
+2. **Merge JNI libraries**  
+   Combine `.so` files from each seperate binding into a single `jniLibs` folder, keeping all architectures (e.g. `arm64-v8a`, `x86_64`).  
+   Ensure each `.so` has a unique name to prevent overwriting.
+
+3. **Adjust your imports**  
+   Use the new package names to import each binding module without conflict.
+
+4. **Repeat steps 1–3** for each additional binding (`MyLibraryB`, `MyLibraryC`, …).  
+   Ensure each binding was generated from a distinct Mopro project with a unique name.
+
+You can now include multiple bindings in the same project without symbol or package collisions.
