@@ -1,5 +1,3 @@
-use std::path::{Path, PathBuf};
-
 pub const IOS_BINDINGS_DIR: &str = "MoproiOSBindings";
 pub const IOS_SWIFT_FILE: &str = "mopro.swift";
 pub const IOS_XCFRAMEWORKS_DIR: &str = "MoproBindings.xcframework";
@@ -117,10 +115,9 @@ impl IosArch {
             .expect("Unsupported iOS Arch")
     }
 
-    pub fn parse_from_str(s: &str) -> Self {
-        IOS_ARCHS
+pub fn parse_from_str<S: AsRef<str>>(s: S) -> Self {        IOS_ARCHS
             .iter()
-            .find(|info| info.str.to_lowercase() == s.to_lowercase())
+            .find(|info| info.str.to_lowercase() == s.as_ref().to_lowercase())
             .map(|info| info.arch)
             .expect("Unsupported iOS String")
     }
@@ -183,10 +180,9 @@ impl AndroidArch {
             .expect("Unsupported Android Arch")
     }
 
-    pub fn parse_from_str(s: &str) -> Self {
-        ANDROID_ARCHS
+pub fn parse_from_str<S: AsRef<str>>(s: S) -> Self {        ANDROID_ARCHS
             .iter()
-            .find(|info| info.str.to_lowercase() == s.to_lowercase())
+            .find(|info| info.str.to_lowercase() == s.as_ref().to_lowercase())
             .map(|info| info.arch)
             .expect("Unsupported Android String")
     }
