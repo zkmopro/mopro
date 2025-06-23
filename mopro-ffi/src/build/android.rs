@@ -29,11 +29,12 @@ impl PlatformBindingsBuilder for AndroidBindingsBuilder {
         let uniffi_style_identifier =
             project_name_from_toml(project_dir).expect("Failed to get project name from Cargo.toml");
 
-        // Names for the generated files and directories
+        // Names for the files that will be outputted (can be changed)
         let binding_dir_name = ANDROID_BINDINGS_DIR;
         let out_android_package_name = ANDROID_PACKAGE_NAME;
         let out_android_kt_file_name = ANDROID_KT_FILE;
 
+        // Names for the generated files by uniffi
         let lib_name = format!("lib{}.so", &uniffi_style_identifier);
         let gen_android_module_name = &uniffi_style_identifier;
         let gen_android_kt_file_name = format!("{}.kt", &uniffi_style_identifier);

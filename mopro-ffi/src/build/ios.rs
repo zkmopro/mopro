@@ -30,11 +30,12 @@ impl PlatformBindingsBuilder for IosBindingsBuilder {
         let uniffi_style_identifier = project_name_from_toml(&project_dir)
             .expect("Failed to get project name from Cargo.toml");
 
-        // Names for the generated and output files and directories
+        // Names for the files that will be outputted (can be changed)
         let bindings_dir_name = IOS_BINDINGS_DIR;
         let framework_name = IOS_XCFRAMEWORKS_DIR;
         let out_swift_file_name = IOS_SWIFT_FILE;
 
+        // Names for the generated files by uniffi
         let gen_swift_file_name = format!("{}.swift", uniffi_style_identifier);
         let lib_name = format!("lib{}.a", &uniffi_style_identifier);
         let header_name = format!("{}FFI.h", uniffi_style_identifier);
