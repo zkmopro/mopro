@@ -18,7 +18,7 @@ use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
 use mopro_ffi::build::constants::{AndroidArch, IosArch, Mode};
-use mopro_ffi::build::ios;
+use mopro_ffi::build::{android, ios};
 use std::collections::HashSet;
 use std::env;
 
@@ -191,17 +191,17 @@ pub fn build_project(
         let platform_str: &str = p.as_str();
         let selected_arch = selected_architectures
             .get(platform_str)
-            .cloned()  // TODO - do it better 
+            .cloned() // TODO - do it better
             .unwrap_or_default();
 
         match p {
             Platform::Ios => {
-                let selected_arch = selected_arch
+                let target_selected_arch = selected_arch
                     .iter()
                     .map(|it| IosArch::parse_from_str(&it))
                     .collect();
                 ios::build(
-                    Some(selected_arch),
+                    Some(target_selected_arch),
                     Some(mode),
                     Some(&current_dir),
                     None,
@@ -217,12 +217,18 @@ pub fn build_project(
                 // };
             }
             Platform::Android => {
-                if selected_arch.is_empty() {
-                    style::print_yellow(
-                        "No architectures selected for Android platform.".to_string(),
-                    );
-                    continue;
-                }
+                let target_selected_arch = selected_arch
+                    .iter()
+                    .map(|it| AndroidArch::parse_from_str(&it))
+                    .collect();
+                android::build(
+                    Some(target_selected_arch),
+                    Some(mode),
+                    Some(&current_dir),
+                    None,
+                    None,
+                    None,
+                );
             }
             Platform::Web => {
                 // Web platform doesn't require architecture selection
@@ -269,6 +275,7 @@ fn select_mode(config: &mut Config) -> Result<Mode> {
     Ok(Mode::from_idx(idx))
 }
 
+// TODO - update this to use real paths
 fn print_binding_message(platforms: &Vec<Platform>) -> anyhow::Result<()> {
     let current_dir = env::current_dir()?;
     print_green_bold("✨ Bindings Built Successfully! ✨".to_string());

@@ -1,5 +1,3 @@
-use std::path::{Path, PathBuf};
-
 pub const IOS_BINDINGS_DIR: &str = "MoproiOSBindings";
 pub const IOS_SWIFT_FILE: &str = "mopro.swift";
 pub const IOS_XCFRAMEWORKS_DIR: &str = "MoproBindings.xcframework";

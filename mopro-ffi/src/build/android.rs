@@ -12,18 +12,18 @@ use crate::build::project_name_from_toml;
 
 use super::cleanup_tmp_local;
 use super::constants::{
-    AndroidArch, IosArch, Mode, ANDROID_BINDINGS_DIR, ANDROID_JNILIBS_DIR, ANDROID_KT_FILE,
-    ANDROID_PACKAGE_NAME, ANDROID_UNIFFI_DIR, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686,
-    ARCH_X86_64, ENV_ANDROID_ARCHS, ENV_CONFIG,
+    AndroidArch, Mode, ANDROID_BINDINGS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8,
+    ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, ENV_ANDROID_ARCHS, ENV_CONFIG,
 };
 use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
 
 pub fn build(
-    target_archs: Option<Vec<IosArch>>,
-    bindings_dir_name: Option<&str>,
+    target_archs: Option<Vec<AndroidArch>>,
+    mode: Option<Mode>,
     project_dir: Option<&Path>,
+    bindings_dir_name: Option<&str>,
     package_name: Option<&str>,
     out_android_kt_file_name: Option<&str>,
 ) -> PathBuf {
@@ -53,24 +53,25 @@ pub fn build(
     let bindings_out = work_dir.join(binding_dir_name);
     let bindings_dest = Path::new(&manifest_dir).join(binding_dir_name);
 
-    let mode = Mode::parse_from_str(
+    let mode = mode.unwrap_or(Mode::parse_from_str(
         std::env::var(ENV_CONFIG)
             .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
             .as_str(),
-    );
+    ));
 
-    let target_archs: Vec<AndroidArch> = if let Ok(archs_str) = std::env::var(ENV_ANDROID_ARCHS) {
-        archs_str
-            .split(',')
-            .map(AndroidArch::parse_from_str)
-            .collect()
-    } else {
-        // Default case: select all supported architectures if none are provided
-        AndroidArch::all_strings()
-            .iter()
-            .map(|s| AndroidArch::parse_from_str(s))
-            .collect()
-    };
+    let target_archs: Vec<AndroidArch> =
+        target_archs.unwrap_or(if let Ok(archs_str) = std::env::var(ENV_ANDROID_ARCHS) {
+            archs_str
+                .split(',')
+                .map(AndroidArch::parse_from_str)
+                .collect()
+        } else {
+            // Default case: select all supported architectures if none are provided
+            AndroidArch::all_strings()
+                .iter()
+                .map(|s| AndroidArch::parse_from_str(s))
+                .collect()
+        });
 
     install_ndk();
     let mut latest_out_lib_path = PathBuf::new();
