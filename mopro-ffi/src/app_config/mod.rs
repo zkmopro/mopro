@@ -5,36 +5,56 @@ use std::process::Command;
 use toml::Value;
 use uuid::Uuid;
 
-use self::constants::{Arch, Mode, BUILD_MODE_ENV};
+use self::constants::{Arch, Mode, PlatformBuilder, BUILD_MODE_ENV};
 
 pub mod android;
 pub mod constants;
 pub mod ios;
 
-fn build<Builder: PlatformBindingsBuilder>() {
+/// Builds bindings for the specified platform using environment variables to determine
+/// the build mode, project directory, and target architectures.
+fn build_from_env<Builder: PlatformBuilder>() {
     let mode = get_build_mode();
     let project_dir = get_project_dir();
-    let target_archs = get_target_archs();
+    let target_archs: Vec<Builder::Arch> = get_target_archs();
     let params = Builder::Params::default();
+
+    // Do not build if no target architectures are specified
+    if target_archs.is_empty() {
+        return;
+    }
 
     Builder::build(mode, &project_dir, target_archs, params)
         .context(format!(
             "Failed to build {} bindings",
-            Builder::Arch::identifier()
+            Builder::identifier()
         ))
         .unwrap();
 }
 
-pub trait PlatformBindingsBuilder {
-    type Arch: Arch;
-    type Params: Default;
+/// Builds bindings for the specified platform using a string representation of the target architectures.
+pub fn build_from_str_arch<Builder: PlatformBuilder>(
+    mode: Mode,
+    project_dir: &Path,
+    target_archs: Vec<&String>,
+    params: Builder::Params,
+) -> anyhow::Result<PathBuf> {
+    if target_archs.is_empty() {
+        return Err(anyhow::anyhow!(
+            "No target architectures specified for {} bindings",
+            Builder::identifier()
+        ));
+    }
 
-    fn build(
-        mode: Mode,
-        cargo_toml_path: &Path,
-        target_archs: Vec<Self::Arch>,
-        params: Self::Params,
-    ) -> anyhow::Result<PathBuf>;
+    let target_archs: Vec<Builder::Arch> = target_archs
+        .iter()
+        .map(Builder::Arch::parse_from_str)
+        .collect();
+
+    Builder::build(mode, project_dir, target_archs, params).context(format!(
+        "Failed to build {} bindings",
+        Builder::identifier()
+    ))
 }
 
 pub fn mktemp() -> PathBuf {
@@ -129,6 +149,10 @@ fn get_build_mode() -> Mode {
 
 fn get_target_archs<A: Arch>() -> Vec<A> {
     if let Ok(archs_str) = std::env::var(A::env_var_name()) {
+        if archs_str.is_empty() {
+            return vec![];
+        }
+
         archs_str.split(',').map(Arch::parse_from_str).collect()
     } else {
         // Default case: select all supported architectures if none are provided

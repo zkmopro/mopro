@@ -1,3 +1,5 @@
+use color_eyre::eyre::ContextCompat;
+
 pub const BUILD_MODE_ENV: &str = "CONFIGURATION";
 pub const IOS_ARCHS_ENV: &str = "IOS_ARCHS";
 pub const ANDROID_ARCHS_ENV: &str = "ANDROID_ARCHS";
@@ -79,7 +81,7 @@ impl Mode {
 //
 
 pub trait Arch {
-    fn identifier() -> &'static str;
+    fn platform() -> Box<dyn Platform>;
     fn as_str(&self) -> &'static str;
     fn parse_from_str<S: AsRef<str>>(s: S) -> Self;
     fn all_strings() -> Vec<&'static str>;
@@ -121,8 +123,8 @@ const IOS_ARCHS: [IosArchInfo; 3] = [
 ];
 
 impl Arch for IosArch {
-    fn identifier() -> &'static str {
-        "iOS"
+    fn platform() -> Box<dyn Platform> {
+        Box::new(IosPlatform)
     }
 
     fn as_str(&self) -> &'static str {
@@ -138,7 +140,8 @@ impl Arch for IosArch {
             .iter()
             .find(|info| info.str.to_lowercase() == s.as_ref().to_lowercase())
             .map(|info| info.arch)
-            .expect("Unsupported iOS String")
+            .context(format!("Unsupported iOS Arch '{}'", s.as_ref()))
+            .unwrap()
     }
 
     fn all_strings() -> Vec<&'static str> {
@@ -195,8 +198,8 @@ const ANDROID_ARCHS: [AndroidArchInfo; 4] = [
 ];
 
 impl Arch for AndroidArch {
-    fn identifier() -> &'static str {
-        "Android"
+    fn platform() -> Box<dyn Platform> {
+        Box::new(AndroidPlatform)
     }
 
     fn as_str(&self) -> &'static str {
@@ -212,7 +215,8 @@ impl Arch for AndroidArch {
             .iter()
             .find(|info| info.str.to_lowercase() == s.as_ref().to_lowercase())
             .map(|info| info.arch)
-            .expect("Unsupported Android String")
+            .context(format!("Unsupported Android Arch '{}'", s.as_ref()))
+            .unwrap()
     }
 
     fn all_strings() -> Vec<&'static str> {
@@ -228,5 +232,51 @@ impl Arch for AndroidArch {
 
     fn env_var_name() -> &'static str {
         ANDROID_ARCHS_ENV
+    }
+}
+
+//
+// Platform Section
+//
+
+pub trait Platform {
+    fn identifier() -> &'static str
+    where
+        Self: Sized;
+}
+
+pub trait PlatformBuilder: Platform {
+    type Arch: Arch;
+    type Params: Default;
+
+    fn build(
+        mode: Mode,
+        project_dir: &std::path::Path,
+        target_arch: Vec<Self::Arch>,
+        params: Self::Params,
+    ) -> anyhow::Result<std::path::PathBuf>;
+}
+
+pub struct IosPlatform;
+
+impl Platform for IosPlatform {
+    fn identifier() -> &'static str {
+        "iOS Bindings Builder"
+    }
+}
+
+pub struct AndroidPlatform;
+
+impl Platform for AndroidPlatform {
+    fn identifier() -> &'static str {
+        "Android Bindings Builder"
+    }
+}
+
+pub struct WebPlatform;
+
+impl Platform for WebPlatform {
+    fn identifier() -> &'static str {
+        "Web Bindings Builder"
     }
 }

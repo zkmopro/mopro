@@ -5,13 +5,12 @@ use dialoguer::Confirm;
 use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
-use mopro_ffi::app_config::constants::{AndroidArch, Arch, IosArch, Mode};
+use mopro_ffi::app_config::constants::{AndroidArch, AndroidPlatform, Arch, IosPlatform, Mode};
 use std::collections::HashSet;
 use std::env;
 
-use mopro_ffi::app_config::android::AndroidBindingsBuilder;
-use mopro_ffi::app_config::ios::{IosBindingsBuilder, IosBindingsParams};
-use mopro_ffi::app_config::PlatformBindingsBuilder;
+use mopro_ffi::app_config::build_from_str_arch;
+use mopro_ffi::app_config::ios::IosBindingsParams;
 
 use crate::config::read_config;
 use crate::config::write_config;
@@ -192,34 +191,28 @@ pub fn build_project(
 
     for p in platform.platforms.clone() {
         let platform_str: &str = p.as_str();
-        let selected_arch = selected_architectures.get(platform_str).context(format!(
-            "No architectures selected for platform: {}",
-            platform_str
-        ))?;
+
+        let mut platform_arch = vec![];
+        if p != Platform::Web {
+            platform_arch.extend(selected_architectures.get(platform_str).context(format!(
+                "No architectures selected for platform: {}",
+                platform_str
+            ))?);
+        }
 
         match p {
-            Platform::Ios => {
-                let target_selected_arch =
-                    selected_arch.iter().map(IosArch::parse_from_str).collect();
-                let _ = IosBindingsBuilder::build(
-                    mode,
-                    &current_dir,
-                    target_selected_arch,
-                    IosBindingsParams {
-                        using_noir: config.adapter_contains(Adapter::Noir),
-                    },
-                )?;
-            }
+            Platform::Ios => build_from_str_arch::<IosPlatform>(
+                mode,
+                &current_dir,
+                platform_arch,
+                IosBindingsParams {
+                    using_noir: config.adapter_contains(Adapter::Noir),
+                },
+            ),
             Platform::Android => {
-                let target_selected_arch = selected_arch
-                    .iter()
-                    .map(AndroidArch::parse_from_str)
-                    .collect();
-                let _ =
-                    AndroidBindingsBuilder::build(mode, &current_dir, target_selected_arch, ())?;
+                build_from_str_arch::<AndroidPlatform>(mode, &current_dir, platform_arch, ())
             }
             Platform::Web => {
-                // Web platform doesn't require architecture selection
                 let mut command = std::process::Command::new("cargo");
                 command.arg("run").arg("--bin").arg(platform_str);
 
@@ -227,13 +220,15 @@ pub fn build_project(
 
                 if !status.success() {
                     // Return a custom error if the command fails
-                    return Err(anyhow::anyhow!(
+                    Err(anyhow::anyhow!(
                         "Output with status code {}",
                         status.code().unwrap()
-                    ));
+                    ))
+                } else {
+                    Ok(current_dir.join(p.binding_dir()))
                 }
             }
-        }
+        }?;
     }
 
     print_binding_message(&platform.platforms)?;

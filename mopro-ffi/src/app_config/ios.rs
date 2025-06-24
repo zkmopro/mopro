@@ -9,34 +9,32 @@ use uniffi::CargoMetadataConfigSupplier;
 use uniffi::SwiftBindingGenerator;
 
 use super::constants::{
-    Arch, IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, IOS_BINDINGS_DIR, IOS_SWIFT_FILE,
+    Arch, IosArch, IosPlatform, Mode, ARCH_ARM_64, ARCH_X86_64, IOS_BINDINGS_DIR, IOS_SWIFT_FILE,
     IOS_XCFRAMEWORKS_DIR,
 };
-use super::install_arch;
 use super::mktemp_local;
-use super::{cleanup_tmp_local, project_name_from_toml, PlatformBindingsBuilder};
+use super::{cleanup_tmp_local, project_name_from_toml};
+use super::{install_arch, PlatformBuilder};
 
 // Maintained for backwards compatibility
 #[inline]
 pub fn build() {
-    super::build::<IosBindingsBuilder>()
+    super::build_from_env::<IosPlatform>()
 }
-
-pub struct IosBindingsBuilder;
 
 #[derive(Default)]
 pub struct IosBindingsParams {
     pub using_noir: bool,
 }
 
-impl PlatformBindingsBuilder for IosBindingsBuilder {
+impl PlatformBuilder for IosPlatform {
     type Arch = IosArch;
     type Params = IosBindingsParams;
 
     fn build(
         mode: Mode,
         project_dir: &Path,
-        target_archs: Vec<IosArch>,
+        target_archs: Vec<Self::Arch>,
         params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
         let uniffi_style_identifier = project_name_from_toml(project_dir)
