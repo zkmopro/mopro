@@ -11,9 +11,19 @@ pub mod android;
 pub mod constants;
 pub mod ios;
 
+fn build<Builder: PlatformBindingsBuilder>() {
+    let mode = get_build_mode();
+    let project_dir = get_project_dir();
+    let target_archs = get_target_archs();
+    let params = Builder::Params::default();
+
+    Builder::build(mode, &project_dir, target_archs, params)
+        .expect(&format!("Failed to build {} bindings", Builder::Arch::identifier()));
+}
+
 pub trait PlatformBindingsBuilder {
-    type Arch;
-    type Params;
+    type Arch : Arch;
+    type Params : Default;
 
     fn build(
         mode: Mode,

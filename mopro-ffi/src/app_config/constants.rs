@@ -1,3 +1,6 @@
+pub const IOS_ARCHS_ENV: &str = "IOS_ARCHS";
+pub const ANDROID_ARCHS_ENV: &str = "ANDROID_ARCHS";
+
 pub const IOS_BINDINGS_DIR: &str = "MoproiOSBindings";
 pub const IOS_SWIFT_FILE: &str = "mopro.swift";
 pub const IOS_XCFRAMEWORKS_DIR: &str = "MoproBindings.xcframework";
@@ -75,6 +78,7 @@ impl Mode {
 //
 
 pub trait Arch {
+    fn identifier() -> &'static str;
     fn as_str(&self) -> &'static str;
     fn parse_from_str<S: AsRef<str>>(s: S) -> Self;
     fn all_strings() -> Vec<&'static str>;
@@ -116,6 +120,10 @@ const IOS_ARCHS: [IosArchInfo; 3] = [
 ];
 
 impl Arch for IosArch {
+    fn identifier() -> &'static str {
+        "iOS"
+    }
+
     fn as_str(&self) -> &'static str {
         IOS_ARCHS
             .iter()
@@ -144,7 +152,7 @@ impl Arch for IosArch {
     }
 
     fn env_var_name() -> &'static str {
-        "IOS_ARCHS"
+        IOS_ARCHS_ENV
     }
 }
 
@@ -186,6 +194,10 @@ const ANDROID_ARCHS: [AndroidArchInfo; 4] = [
 ];
 
 impl Arch for AndroidArch {
+    fn identifier() -> &'static str {
+        "Android"
+    }
+
     fn as_str(&self) -> &'static str {
         ANDROID_ARCHS
             .iter()
@@ -214,6 +226,6 @@ impl Arch for AndroidArch {
     }
 
     fn env_var_name() -> &'static str {
-        "ANDROID_ARCHS"
+        ANDROID_ARCHS_ENV
     }
 }
