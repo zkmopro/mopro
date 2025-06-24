@@ -8,10 +8,7 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
 
-use crate::app_config::{
-    project_name_from_toml,
-    PlatformBindingsBuilder,
-};
+use crate::app_config::{project_name_from_toml, PlatformBindingsBuilder};
 
 use super::cleanup_tmp_local;
 use super::constants::{
@@ -24,7 +21,9 @@ use super::mktemp_local;
 
 // Maintained for backwards compatibility
 #[inline]
-pub fn build() { super::build::<AndroidBindingsBuilder>() }
+pub fn build() {
+    super::build::<AndroidBindingsBuilder>()
+}
 
 pub struct AndroidBindingsBuilder;
 

@@ -18,12 +18,16 @@ fn build<Builder: PlatformBindingsBuilder>() {
     let params = Builder::Params::default();
 
     Builder::build(mode, &project_dir, target_archs, params)
-        .expect(&format!("Failed to build {} bindings", Builder::Arch::identifier()));
+        .context(format!(
+            "Failed to build {} bindings",
+            Builder::Arch::identifier()
+        ))
+        .unwrap();
 }
 
 pub trait PlatformBindingsBuilder {
-    type Arch : Arch;
-    type Params : Default;
+    type Arch: Arch;
+    type Params: Default;
 
     fn build(
         mode: Mode,

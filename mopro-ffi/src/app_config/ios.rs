@@ -14,13 +14,13 @@ use super::constants::{
 };
 use super::install_arch;
 use super::mktemp_local;
-use super::{
-    cleanup_tmp_local, PlatformBindingsBuilder, project_name_from_toml
-};
+use super::{cleanup_tmp_local, project_name_from_toml, PlatformBindingsBuilder};
 
 // Maintained for backwards compatibility
 #[inline]
-pub fn build() { super::build::<IosBindingsBuilder>() }
+pub fn build() {
+    super::build::<IosBindingsBuilder>()
+}
 
 pub struct IosBindingsBuilder;
 
