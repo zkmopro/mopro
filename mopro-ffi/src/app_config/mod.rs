@@ -5,8 +5,10 @@ use std::process::Command;
 use toml::Value;
 use uuid::Uuid;
 
-use self::constants::{Arch, Mode, PlatformBuilder, BUILD_BINDINGS_ENV, BUILD_MODE_ENV};
-use crate::app_config::constants::{AndroidPlatform, IosPlatform};
+use self::constants::{
+    AndroidPlatform, Arch, IosPlatform, Mode, PlatformBuilder, ANDROID_ARCHS_ENV,
+    BUILD_BINDINGS_ENV, BUILD_MODE_ENV, IOS_ARCHS_ENV,
+};
 
 pub mod android;
 pub mod constants;
@@ -22,6 +24,9 @@ pub fn generate_bindings() {
 
     if is_build_script {
         println!("cargo:rerun-if-env-changed={}", BUILD_BINDINGS_ENV);
+        println!("cargo:rerun-if-env-changed={}", BUILD_MODE_ENV);
+        println!("cargo:rerun-if-env-changed={}", IOS_ARCHS_ENV);
+        println!("cargo:rerun-if-env-changed={}", ANDROID_ARCHS_ENV);
         println!("cargo:rerun-if-changed=.");
 
         if !should_build {
