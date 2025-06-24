@@ -1,4 +1,6 @@
 #![allow(unexpected_cfgs)]
+
+#[cfg(feature = "build")]
 pub mod app_config;
 
 #[cfg(feature = "circom")]
@@ -203,7 +205,7 @@ pub struct Halo2ProofResult {
 #[macro_export]
 macro_rules! app {
     () => {
-        uniffi::setup_scaffolding!("mopro");
+        uniffi::setup_scaffolding!();
 
         // This should be declared into this macro due to Uniffi's limitation
         // Please refer this issue: https://github.com/mozilla/uniffi-rs/issues/2257

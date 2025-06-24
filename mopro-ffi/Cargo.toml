@@ -13,11 +13,13 @@ exclude = ["target/*"]
 name = "mopro_ffi"
 
 [features]
-default = []
+default = ["build"]
 
 halo2 = []
 circom = ["rustwitness", "arkworks"]
 noir = ["noir_rs"]
+
+build = ["toml", "uuid", "camino"]
 
 # circom features
 ## witness
@@ -37,7 +39,7 @@ anyhow = "1.0.86"
 num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
-toml = "0.8.22"
+toml = { version = "0.8.22", optional = true }
 
 # Error handling
 thiserror = "2.0.12"
@@ -55,8 +57,8 @@ noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", featur
 # noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg"], optional = true }
 
 # ZKP generation
-uuid = { version = "1.9.1", features = ["v4"] }
-camino = "1.1.9"
+uuid = { version = "1.9.1", features = ["v4"], optional = true }
+camino = { version = "1.1.9", optional = true }
 serde_json = "1.0.94"
 
 [build-dependencies]
