@@ -13,7 +13,7 @@ use crate::app_config::{project_name_from_toml, PlatformBuilder};
 use super::cleanup_tmp_local;
 use super::constants::{
     AndroidArch, AndroidPlatform, Arch, Mode, ANDROID_BINDINGS_DIR, ANDROID_KT_FILE,
-    ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64,
+    ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, BUILD_BINDINGS_ENV
 };
 use super::install_arch;
 use super::install_ndk;
@@ -109,6 +109,8 @@ fn build_for_arch(
         build_cmd.arg("--release");
     }
     build_cmd
+        .env_remove("CARGO_MAKEFLAGS") // Remove CARGO_MAKEFLAGS to avoid deadlock when run inside the build script
+        .env_remove(BUILD_BINDINGS_ENV) // Remove the environment variable that indicates that we want to build bindings to prevent build.rs from running build bindings again
         .env("CARGO_BUILD_TARGET_DIR", build_dir)
         .env("CARGO_BUILD_TARGET", arch_str)
         .env("CARGO_NDK_OUTPUT_PATH", cpp_lib_dest)

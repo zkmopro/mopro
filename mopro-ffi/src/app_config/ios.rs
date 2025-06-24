@@ -9,7 +9,7 @@ use uniffi::CargoMetadataConfigSupplier;
 use uniffi::SwiftBindingGenerator;
 
 use super::constants::{
-    Arch, IosArch, IosPlatform, Mode, ARCH_ARM_64, ARCH_X86_64, IOS_BINDINGS_DIR, IOS_SWIFT_FILE,
+    Arch, IosArch, IosPlatform, Mode, ARCH_ARM_64, ARCH_X86_64, BUILD_BINDINGS_ENV, IOS_BINDINGS_DIR, IOS_SWIFT_FILE,
     IOS_XCFRAMEWORKS_DIR,
 };
 use super::mktemp_local;
@@ -87,6 +87,8 @@ impl PlatformBuilder for IosPlatform {
                 }
                 build_cmd
                     .arg("--lib")
+                    .env_remove("CARGO_MAKEFLAGS") // Remove CARGO_MAKEFLAGS to avoid deadlock when run inside the build script
+                    .env_remove(BUILD_BINDINGS_ENV) // Remove the environment variable that indicates that we want to build bindings to prevent build.rs from running build bindings again
                     .env("CARGO_BUILD_TARGET_DIR", &build_dir_path)
                     .env("CARGO_BUILD_TARGET", arch.as_str())
                     .spawn()
