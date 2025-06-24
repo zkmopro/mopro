@@ -11,6 +11,37 @@ pub mod android;
 pub mod constants;
 pub mod ios;
 
+/// Generates bindings for both iOS and Android platforms.
+///
+/// Can be executed manually or from a Cargo build script. If run inside a build script,
+/// it reacts to `BUILD_BINDINGS_ENV` and emits the appropriate `cargo:` directives.
+pub fn generate_bindings() {
+    let is_build_script = std::env::var_os("OUT_DIR").is_some();
+    let should_build = std::env::var_os(BUILD_BINDINGS_ENV).is_some();
+
+    if is_build_script {
+        println!("cargo:rerun-if-env-changed={}", BUILD_BINDINGS_ENV);
+        println!("cargo:rerun-if-changed=.");
+
+        if !should_build {
+            println!(
+                "cargo:warning=build.rs: skipping bindings generation — \
+                 {} is not set.",
+                BUILD_BINDINGS_ENV
+            );
+            return;
+        }
+
+        println!(
+            "cargo:warning=build.rs: generating bindings — \
+             this might take a while..."
+        );
+    }
+
+    build::<IosBindingsBuilder>();
+    build::<AndroidBindingsBuilder>();
+}
+
 /// Builds bindings for the specified platform using environment variables to determine
 /// the build mode, project directory, and target architectures.
 fn build_from_env<Builder: PlatformBuilder>() {
