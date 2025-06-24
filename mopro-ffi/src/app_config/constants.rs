@@ -1,3 +1,4 @@
+pub const BUILD_MODE_ENV: &str = "CONFIGURATION";
 pub const IOS_ARCHS_ENV: &str = "IOS_ARCHS";
 pub const ANDROID_ARCHS_ENV: &str = "ANDROID_ARCHS";
 

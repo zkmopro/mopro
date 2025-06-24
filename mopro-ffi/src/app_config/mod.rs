@@ -5,7 +5,7 @@ use std::process::Command;
 use toml::Value;
 use uuid::Uuid;
 
-use crate::app_config::constants::{Arch, Mode};
+use self::constants::{Arch, Mode, BUILD_MODE_ENV};
 
 pub mod android;
 pub mod constants;
@@ -117,7 +117,7 @@ fn get_project_dir() -> PathBuf {
 
 fn get_build_mode() -> Mode {
     Mode::parse_from_str(
-        std::env::var("CONFIGURATION")
+        std::env::var(BUILD_MODE_ENV)
             .unwrap_or_else(|_| Mode::Debug.as_str().to_string())
             .as_str(),
     )
