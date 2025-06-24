@@ -5,7 +5,8 @@ use std::process::Command;
 use toml::Value;
 use uuid::Uuid;
 
-use self::constants::{Arch, Mode, PlatformBuilder, BUILD_MODE_ENV};
+use self::constants::{Arch, Mode, PlatformBuilder, BUILD_BINDINGS_ENV, BUILD_MODE_ENV};
+use crate::app_config::constants::{AndroidPlatform, IosPlatform};
 
 pub mod android;
 pub mod constants;
@@ -38,8 +39,8 @@ pub fn generate_bindings() {
         );
     }
 
-    build::<IosBindingsBuilder>();
-    build::<AndroidBindingsBuilder>();
+    build_from_env::<IosPlatform>();
+    build_from_env::<AndroidPlatform>();
 }
 
 /// Builds bindings for the specified platform using environment variables to determine

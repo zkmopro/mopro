@@ -13,7 +13,8 @@ use crate::app_config::{project_name_from_toml, PlatformBuilder};
 use super::cleanup_tmp_local;
 use super::constants::{
     AndroidArch, AndroidPlatform, Arch, Mode, ANDROID_BINDINGS_DIR, ANDROID_KT_FILE,
-    ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, BUILD_BINDINGS_ENV
+    ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64,
+    BUILD_BINDINGS_ENV,
 };
 use super::install_arch;
 use super::install_ndk;

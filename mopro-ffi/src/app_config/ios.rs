@@ -9,8 +9,8 @@ use uniffi::CargoMetadataConfigSupplier;
 use uniffi::SwiftBindingGenerator;
 
 use super::constants::{
-    Arch, IosArch, IosPlatform, Mode, ARCH_ARM_64, ARCH_X86_64, BUILD_BINDINGS_ENV, IOS_BINDINGS_DIR, IOS_SWIFT_FILE,
-    IOS_XCFRAMEWORKS_DIR,
+    Arch, IosArch, IosPlatform, Mode, ARCH_ARM_64, ARCH_X86_64, BUILD_BINDINGS_ENV,
+    IOS_BINDINGS_DIR, IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR,
 };
 use super::mktemp_local;
 use super::{cleanup_tmp_local, project_name_from_toml};

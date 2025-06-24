@@ -1,3 +1,5 @@
+use anyhow::Context;
+
 pub const BUILD_BINDINGS_ENV: &str = "MOPRO_BUILD_BINDINGS";
 pub const BUILD_MODE_ENV: &str = "CONFIGURATION";
 pub const IOS_ARCHS_ENV: &str = "IOS_ARCHS";
