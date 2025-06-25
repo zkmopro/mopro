@@ -45,9 +45,5 @@ mopro-ffi = { path = "../mopro-ffi" }
 rust-witness = "0.1"
 witnesscalc-adapter = "0.1"
 
-# remove after uniffi is upgraded (see https://github.com/mozilla/uniffi-rs/issues/2346)
-[lints.clippy]
-empty-line-after-doc-comments = "allow"
-
 [dev-dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["uniffi-tests"] }
