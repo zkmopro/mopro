@@ -25,7 +25,6 @@ mopro-ffi = { path = "../mopro-ffi", features = [
     "rapidsnark",
 ] }
 mopro-wasm = { path = "../mopro-wasm" }
-uniffi = { workspace = true }
 
 # Circom dependencies
 rust-witness = "0.1"
@@ -40,7 +39,6 @@ thiserror = "2.0.12"
 
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
-uniffi = { workspace = true, features = ["build"] }
 
 # Circom dependencies
 rust-witness = "0.1"
