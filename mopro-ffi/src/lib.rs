@@ -4,10 +4,10 @@ pub mod app_config;
 // UniFFI re-export
 //
 // Uniffi macros use fully qualified paths (`::uniffi::*`) internally.
-// To allow downstream crates to transparently resolve these macros to `mopro_ffi`, 
+// To allow downstream crates to transparently resolve these macros to `mopro_ffi`,
 // users must alias it (`extern crate mopro_ffi as uniffi;`, automated via `app!` macro).
 //
-// However, for this alias to work correctly, `mopro_ffi` must provide the exact same 
+// However, for this alias to work correctly, `mopro_ffi` must provide the exact same
 // exported items as the original `uniffi`. Hence, we re-export all individual items.
 #[cfg(feature = "uniffi")]
 pub use uniffi::*;
@@ -231,7 +231,6 @@ pub struct Halo2ProofResult {
 macro_rules! app {
     () => {
         mopro_ffi::uniffi_setup!();
-
 
         uniffi::setup_scaffolding!("mopro");
 
