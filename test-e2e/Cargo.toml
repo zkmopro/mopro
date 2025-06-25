@@ -18,6 +18,7 @@ name = "web"
 
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = [
+    "uniffi",
     "halo2",
     "circom",
     "noir",

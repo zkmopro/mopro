@@ -43,7 +43,7 @@ default = ["<FEATURES>"]
 
 [dependencies]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi"] }
 rust-witness = "0.1"
 num-bigint = "0.4.0"
 thiserror = "2.0.12"

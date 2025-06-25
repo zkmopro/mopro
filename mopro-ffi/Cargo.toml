@@ -13,7 +13,7 @@ exclude = ["target/*"]
 name = "mopro_ffi"
 
 [features]
-default = ["uniffi"]
+default = []
 
 uniffi = []
 uniffi-tests = ["uniffi", "uniffi/bindgen-tests"]
