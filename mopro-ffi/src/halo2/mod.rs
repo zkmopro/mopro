@@ -6,7 +6,7 @@ use anyhow::Result;
 #[macro_export]
 macro_rules! halo2_app {
     ($result:ty, $err:ty) => {
-        #[uniffi::export]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn generate_halo2_proof(
             srs_path: String,
             pk_path: String,
@@ -23,7 +23,7 @@ macro_rules! halo2_app {
             Ok(result.into())
         }
 
-        #[uniffi::export]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn verify_halo2_proof(
             srs_path: String,
             vk_path: String,
@@ -122,7 +122,7 @@ pub type Halo2ProveFn =
 
 pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "no_uniffi_exports"))]
 mod test {
     use crate as mopro_ffi;
     use std::collections::HashMap;

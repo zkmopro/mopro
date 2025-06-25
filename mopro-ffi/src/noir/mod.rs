@@ -9,7 +9,7 @@ use noir_rs::{
 #[macro_export]
 macro_rules! noir_app {
     ($err:ty) => {
-        #[uniffi::export]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn generate_noir_proof(
             circuit_path: String,
             srs_path: Option<String>,
@@ -19,7 +19,7 @@ macro_rules! noir_app {
                 .map_err(|e| <$err>::NoirError(format!("Generate Proof error: {}", e)))
         }
 
-        #[uniffi::export]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> Result<bool, $err> {
             Ok(mopro_ffi::verify_noir_proof(circuit_path, proof))
         }
@@ -97,6 +97,7 @@ mod tests {
         assert!(verify_noir_proof(CIRCUIT_FILE.to_string(), proof));
     }
 
+    #[cfg(feature = "no_uniffi_exports")]
     #[test]
     #[serial_test::serial]
     fn test_macro_proof_zkemail() {

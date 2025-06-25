@@ -19,6 +19,8 @@ halo2 = []
 circom = ["rustwitness", "arkworks"]
 noir = ["noir_rs"]
 
+no_uniffi_exports = []
+
 # circom features
 ## witness
 rustwitness = ["circom-prover/rustwitness", "rust-witness"]

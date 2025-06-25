@@ -17,7 +17,7 @@ use std::str::FromStr;
 #[macro_export]
 macro_rules! circom_app {
     ($result:ty, $proof:ty, $err:ty, $proof_lib:ty) => {
-        #[uniffi::export]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn generate_circom_proof(
             zkey_path: String,
             circuit_inputs: String,
@@ -48,7 +48,7 @@ macro_rules! circom_app {
             Ok(result.into())
         }
 
-        #[uniffi::export]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn verify_circom_proof(
             zkey_path: String,
             proof_result: $result,
@@ -243,6 +243,7 @@ mod tests {
         // the final library
         witnesscalc_adapter::witness!(multiplier2_witnesscalc);
 
+        #[cfg(feature = "no_uniffi_exports")]
         #[test]
         fn test_circom_macros() {
             circom_app!(
@@ -268,13 +269,21 @@ mod tests {
             inputs.insert("b".to_string(), vec![b.to_string()]);
 
             let input_str = serde_json::to_string(&inputs).unwrap();
-            let result = generate_circom_proof(
+            let proof = generate_circom_proof(
                 ZKEY_PATH.to_string(),
                 input_str,
                 circom_prover::prover::ProofLib::Arkworks,
-            );
+            )
+            .expect("Proof generation failed");
 
-            assert!(result.is_ok());
+            let is_valid = verify_circom_proof(
+                ZKEY_PATH.to_string(),
+                proof,
+                circom_prover::prover::ProofLib::Arkworks,
+            )
+            .expect("Proof verification failed");
+
+            assert!(is_valid, "Expected the proof to be valid");
         }
     }
 
@@ -298,6 +307,7 @@ mod tests {
 
         use crate as mopro_ffi;
 
+        #[cfg(feature = "no_uniffi_exports")]
         #[test]
         fn test_circom_macros() {
             circom_app!(
@@ -323,13 +333,21 @@ mod tests {
             inputs.insert("b".to_string(), vec![b.to_string()]);
 
             let input_str = serde_json::to_string(&inputs).unwrap();
-            let result = generate_circom_proof(
+            let proof = generate_circom_proof(
                 ZKEY_PATH.to_string(),
                 input_str,
                 circom_prover::prover::ProofLib::Arkworks,
-            );
+            )
+            .expect("Proof generation failed");
 
-            assert!(result.is_ok());
+            let is_valid = verify_circom_proof(
+                ZKEY_PATH.to_string(),
+                proof,
+                circom_prover::prover::ProofLib::Arkworks,
+            )
+            .expect("Proof verification failed");
+
+            assert!(is_valid, "Expected the proof to be valid");
         }
 
         // This should be defined by a file that the mopro package consumer authors
