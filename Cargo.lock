@@ -5150,7 +5150,6 @@ dependencies = [
  "plonk-fibonacci",
  "rust-witness",
  "thiserror 2.0.12",
- "uniffi",
  "witnesscalc-adapter",
 ]
 
@@ -5579,7 +5578,6 @@ dependencies = [
  "anyhow",
  "cargo_metadata",
  "uniffi_bindgen",
- "uniffi_build",
  "uniffi_core",
  "uniffi_macros",
 ]
@@ -5606,17 +5604,6 @@ dependencies = [
  "uniffi_meta",
  "uniffi_testing",
  "uniffi_udl",
-]
-
-[[package]]
-name = "uniffi_build"
-version = "0.29.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c887a6c9a2857d8dc2ab0c8d578e8aa4978145b4fd65ed44296341e89aebc3cc"
-dependencies = [
- "anyhow",
- "camino",
- "uniffi_bindgen",
 ]
 
 [[package]]

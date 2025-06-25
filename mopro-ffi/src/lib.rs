@@ -1,10 +1,37 @@
 pub mod app_config;
 
+// UniFFI re-export
+//
+// Uniffi macros use fully qualified paths (`::uniffi::*`) internally.
+// To allow downstream crates to transparently resolve these macros to `mopro_ffi`,
+// users must alias it (`extern crate mopro_ffi as uniffi;`, automated via `app!` macro).
+//
+// However, for this alias to work correctly, `mopro_ffi` must provide the exact same
+// exported items as the original `uniffi`. Hence, we re-export all individual items.
+#[cfg(feature = "uniffi")]
+pub use uniffi::*;
+
+#[cfg(feature = "uniffi")]
+#[macro_export]
+macro_rules! uniffi_setup {
+    () => {
+        // `::uniffi` must be available in the caller’s extern-prelude.
+        extern crate mopro_ffi as uniffi;
+    };
+}
+
+#[cfg(not(feature = "uniffi"))]
+#[macro_export]
+macro_rules! uniffi_setup {
+    () => {
+        // No-op when `uniffi` feature isn't enabled in `mopro_ffi`.
+    };
+}
+
 #[cfg(feature = "circom")]
 mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
-
 #[cfg(feature = "noir")]
 mod noir;
 
@@ -196,6 +223,8 @@ pub struct Halo2ProofResult {
 #[macro_export]
 macro_rules! app {
     () => {
+        mopro_ffi::uniffi_setup!();
+
         uniffi::setup_scaffolding!("mopro");
 
         // This should be declared into this macro due to Uniffi's limitation
