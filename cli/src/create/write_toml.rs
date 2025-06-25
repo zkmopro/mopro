@@ -45,7 +45,6 @@ default = ["<FEATURES>"]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
 mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
 rust-witness = "0.1"
-uniffi = { version = "=0.29.0" }
 num-bigint = "0.4.0"
 thiserror = "2.0.12"
 # HALO2_DEPENDENCIES
@@ -53,9 +52,7 @@ thiserror = "2.0.12"
 # NOIR_DEPENDENCIES
 
 [build-dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git" }
 rust-witness = "0.1"
-uniffi = { version = "=0.29.0", features = ["build"] }
 
 # CIRCOM_DEPENDENCIES
     "#
