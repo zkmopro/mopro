@@ -6,7 +6,7 @@ use anyhow::Result;
 #[macro_export]
 macro_rules! halo2_app {
     ($result:ty, $err:ty) => {
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        #[uniffi::export]
         fn generate_halo2_proof(
             srs_path: String,
             pk_path: String,
@@ -23,7 +23,7 @@ macro_rules! halo2_app {
             Ok(result.into())
         }
 
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        #[uniffi::export]
         fn verify_halo2_proof(
             srs_path: String,
             vk_path: String,

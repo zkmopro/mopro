@@ -17,8 +17,7 @@ use std::str::FromStr;
 #[macro_export]
 macro_rules! circom_app {
     ($result:ty, $proof:ty, $err:ty, $proof_lib:ty) => {
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        #[uniffi::export]
         fn generate_circom_proof(
             zkey_path: String,
             circuit_inputs: String,
@@ -49,8 +48,7 @@ macro_rules! circom_app {
             Ok(result.into())
         }
 
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        #[uniffi::export]
         fn verify_circom_proof(
             zkey_path: String,
             proof_result: $result,
