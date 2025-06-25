@@ -14,7 +14,7 @@ pub use uniffi::*;
 
 #[cfg(feature = "uniffi")]
 #[macro_export]
-macro_rules! uniffi_reexport_scaffolding {
+macro_rules! uniffi_setup {
     () => {
         // `::uniffi` must be available in the caller’s extern-prelude.
         extern crate mopro_ffi as uniffi;
@@ -23,7 +23,7 @@ macro_rules! uniffi_reexport_scaffolding {
 
 #[cfg(not(feature = "uniffi"))]
 #[macro_export]
-macro_rules! uniffi_reexport_scaffolding {
+macro_rules! uniffi_setup {
     () => {
         // No-op when `uniffi` feature isn't enabled in `mopro_ffi`.
     };
@@ -230,8 +230,7 @@ pub struct Halo2ProofResult {
 #[macro_export]
 macro_rules! app {
     () => {
-        
-        mopro_ffi::uniffi_reexport_scaffolding!();
+        mopro_ffi::uniffi_setup!();
 
 
         uniffi::setup_scaffolding!("mopro");
