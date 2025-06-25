@@ -55,7 +55,7 @@ noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", featur
 # build for iOS
 # noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg"], optional = true }
 
-# Bindings generation dependencies
+# Bindings generation
 uuid = { version = "1.9.1", features = ["v4"] }
 camino = "1.1.9"
 
