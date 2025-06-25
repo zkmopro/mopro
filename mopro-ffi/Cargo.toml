@@ -16,6 +16,7 @@ name = "mopro_ffi"
 default = ["uniffi"]
 
 uniffi = []
+uniffi-tests = ["uniffi", "uniffi/bindgen-tests"]
 
 halo2 = []
 circom = ["rustwitness", "arkworks"]

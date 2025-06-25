@@ -49,4 +49,4 @@ witnesscalc-adapter = "0.1"
 empty-line-after-doc-comments = "allow"
 
 [dev-dependencies]
-uniffi = { workspace = true, features = ["bindgen-tests"] }
+mopro-ffi = { path = "../mopro-ffi", features = ["uniffi-tests"] }
