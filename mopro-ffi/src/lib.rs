@@ -62,8 +62,8 @@ pub use crate::platforms as app_config;
 #[macro_export]
 macro_rules! setup {
     () => {
-        mopro_ffi::setup_bindings!();
-        mopro_ffi::setup_adapters!();
+        $crate::setup_bindings!();
+        $crate::setup_adapters_common!();
     };
 }
 
@@ -71,9 +71,10 @@ macro_rules! setup {
 #[macro_export]
 macro_rules! app {
     () => {
-        mopro_ffi::setup!();
+        $crate::setup!();
 
-        // This is the only adapter macro that would not be called otherwise.
-        mopro_ffi::noir_app!();
+        $crate::circom_setup!();
+        $crate::halo2_setup!();
+        $crate::noir_setup!();
     };
 }

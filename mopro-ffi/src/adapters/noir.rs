@@ -17,41 +17,48 @@ pub fn get_bytecode(circuit_path: String) -> String {
 #[macro_export]
 macro_rules! noir_app {
     () => {
+        $crate::noir_setup!();
+    }
+}
+
+#[macro_export]
+macro_rules! noir_setup {
+    () => {
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn generate_noir_proof(
             circuit_path: String,
             srs_path: Option<String>,
             inputs: Vec<String>,
-        ) -> Result<Vec<u8>, crate::MoproError> {
-            let circuit_bytecode = mopro_ffi::noir::get_bytecode(circuit_path);
+        ) -> Result<Vec<u8>, MoproError> {
+            let circuit_bytecode = $crate::noir::get_bytecode(circuit_path);
 
-            mopro_ffi::noir::setup_srs_from_bytecode(circuit_bytecode.as_str(), srs_path.as_deref(), false)
-                .map_err(|e| crate::MoproError::NoirError(format!("Setting up SRS error: {}", e)))?;
+            $crate::noir::setup_srs_from_bytecode(circuit_bytecode.as_str(), srs_path.as_deref(), false)
+                .map_err(|e| MoproError::NoirError(format!("Setting up SRS error: {}", e)))?;
 
-            let witness = mopro_ffi::noir::from_vec_str_to_witness_map(inputs.iter().map(|s| s.as_str()).collect())
-                .map_err(|e| crate::MoproError::NoirError(format!("Setting up Witness Map error: {}", e)))?;
+            let witness = $crate::noir::from_vec_str_to_witness_map(inputs.iter().map(|s| s.as_str()).collect())
+                .map_err(|e| MoproError::NoirError(format!("Setting up Witness Map error: {}", e)))?;
 
-            mopro_ffi::noir::prove_ultra_honk(circuit_bytecode.as_str(), witness, false)
-                .map_err(|e| crate::MoproError::NoirError(format!("Generate Proof error: {}", e)))
+            $crate::noir::prove_ultra_honk(circuit_bytecode.as_str(), witness, false)
+                .map_err(|e| MoproError::NoirError(format!("Generate Proof error: {}", e)))
         }
 
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn verify_noir_proof(
             circuit_path: String,
             proof: Vec<u8>,
-        ) -> Result<bool, crate::MoproError> {
-            let circuit_bytecode = mopro_ffi::noir::get_bytecode(circuit_path);
+        ) -> Result<bool, MoproError> {
+            let circuit_bytecode = $crate::noir::get_bytecode(circuit_path);
 
-            let vk = mopro_ffi::noir::get_honk_verification_key(circuit_bytecode.as_str(), false)
-                .map_err(|e| crate::MoproError::NoirError(format!("Setting up Verification Key error: {}", e)))?;
+            let vk = $crate::noir::get_honk_verification_key(circuit_bytecode.as_str(), false)
+                .map_err(|e| MoproError::NoirError(format!("Setting up Verification Key error: {}", e)))?;
 
-            mopro_ffi::noir::verify_ultra_honk(proof, vk)
-                .map_err(|e| crate::MoproError::NoirError(format!("Verifying Proof error: {}", e)))
+            $crate::noir::verify_ultra_honk(proof, vk)
+                .map_err(|e| MoproError::NoirError(format!("Verifying Proof error: {}", e)))
         }
     };
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "no_uniffi_exports"))]
 mod tests {
     use serde::Deserialize;
     use std::{collections::HashMap, fs};
@@ -60,6 +67,9 @@ mod tests {
     const CIRCUIT_FILE: &str = "../test-vectors/noir/zkemail.json";
     const INPUT_FILE: &str = "../test-vectors/noir/zkemail_input.json";
     const SRS_FILE: &str = "../test-vectors/noir/zkemail_srs.local";
+
+    crate::setup_adapters_common!();
+    crate::noir_app!();
 
     #[test]
     #[serial_test::serial]
@@ -70,7 +80,7 @@ mod tests {
         assert!(verify_noir_proof(
             MULTIPLIER2_CIRCUIT_FILE.to_string(),
             proof
-        ));
+        ).unwrap());
     }
 
     #[test]
@@ -87,14 +97,13 @@ mod tests {
         )
         .unwrap();
 
-        assert!(verify_noir_proof(CIRCUIT_FILE.to_string(), proof));
+        assert!(verify_noir_proof(CIRCUIT_FILE.to_string(), proof).unwrap());
     }
 
-    #[cfg(feature = "no_uniffi_exports")]
     #[test]
     #[serial_test::serial]
     fn test_macro_proof_zkemail() {
-        noir_app!(mopro_ffi::MoproError);
+        noir_setup!();
 
         // Load input data from the JSON file for the test case
         let json_str = fs::read_to_string(INPUT_FILE).unwrap();
