@@ -36,16 +36,13 @@ macro_rules! circom_app {
                 }
             };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
-            let result = mopro_ffi::generate_circom_proof_wtns(
+            mopro_ffi::generate_circom_proof_wtns(
                 chosen_proof_lib,
                 zkey_path,
                 circuit_inputs,
                 witness_fn,
             )
             .map_err(|e| <$err>::CircomError(format!("Unknown ZKEY: {}", e)))
-            .unwrap();
-
-            Ok(result.into())
         }
 
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]

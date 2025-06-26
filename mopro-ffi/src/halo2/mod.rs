@@ -15,12 +15,9 @@ macro_rules! halo2_app {
             let name = std::path::Path::new(pk_path.as_str()).file_name().unwrap();
             let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())
                 .map_err(|e| <$err>::Halo2Error(format!("error getting proving circuit: {}", e)))?;
-            let result = proving_fn(&srs_path, &pk_path, circuit_inputs)
+            proving_fn(&srs_path, &pk_path, circuit_inputs)
                 .map(|(proof, inputs)| mopro_ffi::Halo2ProofResult { proof, inputs })
                 .map_err(|e| mopro_ffi::MoproError::Halo2Error(format!("halo2 error: {}", e)))
-                .unwrap();
-
-            Ok(result.into())
         }
 
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
