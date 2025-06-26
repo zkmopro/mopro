@@ -1,64 +1,17 @@
-use crate::{CircomProof, CircomProofResult, G1, G2};
-use anyhow::{bail, Ok, Result};
-use circom_prover::{
-    prover::{
-        circom::{
-            Proof as CircomProverProof, CURVE_BLS12_381, CURVE_BN254, G1 as CircomProverG1,
-            G2 as CircomProverG2,
-        },
-        ProofLib,
-    },
-    witness::WitnessFn,
-    CircomProver,
-};
-use num_bigint::BigUint;
-use std::str::FromStr;
+pub use num_bigint::BigUint;
 
+#[cfg(feature = "circom-witnesscalc")]
+pub use circom_prover::graph;
+
+pub use circom_prover::{prover::{ProofLib, CircomProof, circom::{Proof,  CURVE_BLS12_381, CURVE_BN254, G1,
+            G2}}, witness, CircomProver};
+
+/// This macro is provided for backward compatibility.
 #[macro_export]
-macro_rules! circom_app {
-    ($result:ty, $proof:ty, $err:ty, $proof_lib:ty) => {
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn generate_circom_proof(
-            zkey_path: String,
-            circuit_inputs: String,
-            proof_lib: $proof_lib,
-        ) -> Result<$result, $err> {
-            let chosen_proof_lib = match proof_lib {
-                <$proof_lib>::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
-                <$proof_lib>::Rapidsnark => mopro_ffi::prover::ProofLib::Rapidsnark,
-            };
-            let name = match std::path::Path::new(zkey_path.as_str()).file_name() {
-                Some(v) => v,
-                None => {
-                    return Err(<$err>::CircomError(format!(
-                        "failed to parse file name from zkey_path"
-                    )))
-                }
-            };
-            let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
-            mopro_ffi::generate_circom_proof_wtns(
-                chosen_proof_lib,
-                zkey_path,
-                circuit_inputs,
-                witness_fn,
-            )
-            .map_err(|e| <$err>::CircomError(format!("Unknown ZKEY: {}", e)))
-        }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_circom_proof(
-            zkey_path: String,
-            proof_result: $result,
-            proof_lib: $proof_lib,
-        ) -> Result<bool, $err> {
-            let chosen_proof_lib = match proof_lib {
-                <$proof_lib>::Arkworks => mopro_ffi::prover::ProofLib::Arkworks,
-                <$proof_lib>::Rapidsnark => mopro_ffi::prover::ProofLib::Rapidsnark,
-            };
-            mopro_ffi::verify_circom_proof(chosen_proof_lib, zkey_path, proof_result.into())
-                .map_err(|e| <$err>::CircomError(format!("Verification error: {}", e)))
-        }
-    };
+macro_rules! set_circom_circuits {
+    ($(($key:expr, $func:expr)),+ $(,)?) => {
+        mopro_ffi::circom_app! { $( ($key, $func) ),+ }
+    }
 }
 
 /// Set the circuits that can be proven by the mopro library
@@ -99,129 +52,194 @@ macro_rules! circom_app {
 /// }
 /// ```
 #[macro_export]
-macro_rules! set_circom_circuits {
+macro_rules! circom_app {
     ($(($key:expr, $func:expr)),+ $(,)?) => {
-        fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::witness::WitnessFn, mopro_ffi::MoproError> {
+
+        mopro_ffi::circom_setup!();
+
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn generate_circom_proof(
+            zkey_path: String,
+            circuit_inputs: String,
+            proof_lib: CircomProofLib,
+        ) -> Result<CircomProofResult, crate::MoproError> {
+            let name = match std::path::Path::new(zkey_path.as_str()).file_name() {
+                Some(v) => v,
+                None => {
+                    return Err(crate::MoproError::CircomError(format!(
+                        "failed to parse file name from zkey_path"
+                    )))
+                }
+            };
+            let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
+            mopro_ffi::circom::CircomProver::prove(proof_lib.into(), witness_fn, circuit_inputs, zkey_path)
+                .map_err(|e| crate::MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
+            .map(|result| {
+                CircomProofResult {
+                    proof: result.proof.into(),
+                    inputs: result.pub_inputs.into(),
+                }
+            })
+        }
+
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn verify_circom_proof(
+            zkey_path: String,
+            proof_result: CircomProofResult,
+            proof_lib: CircomProofLib,
+        ) -> Result<bool, crate::MoproError> {
+            mopro_ffi::circom::CircomProver::verify(
+                proof_lib.into(),
+                mopro_ffi::circom::CircomProof {
+                    proof: proof_result.proof.into(),
+                    pub_inputs: proof_result.inputs.into(),
+                },
+                zkey_path,
+            )
+                .map_err(|e| crate::MoproError::CircomError(format!("Verification error: {}", e)))
+        }
+
+        fn get_circom_wtns_fn(circuit: &str) -> Result<mopro_ffi::circom::witness::WitnessFn, crate::MoproError> {
             match circuit {
                 $(
                    $key => Ok($func),
                 )+
-                _ => Err(mopro_ffi::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit)))
+                _ => Err(crate::MoproError::CircomError(format!("Unknown ZKEY: {}", circuit)))
             }
         }
     };
 }
 
-pub fn generate_circom_proof_wtns(
-    proof_lib: ProofLib,
-    zkey_path: String,
-    json_input_str: String,
-    witness_fn: WitnessFn,
-) -> Result<CircomProofResult> {
-    let ret = CircomProver::prove(proof_lib, witness_fn, json_input_str, zkey_path)?;
-    let (proof, public_inputs) = match ret.proof.curve.as_ref() {
-        CURVE_BN254 => (ret.proof.into(), ret.pub_inputs.into()),
-        CURVE_BLS12_381 => (ret.proof.into(), ret.pub_inputs.into()),
-        _ => bail!("Not unsupported curve"),
+#[macro_export]
+macro_rules! circom_setup {
+    () => {
+        #[derive(Debug, Clone, Default, uniffi::Enum)]
+        pub enum CircomProofLib {
+            #[default]
+            Arkworks,
+            Rapidsnark,
+        }
+
+        #[derive(Debug, Clone)]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), derive(uniffi::Record))]
+        pub struct CircomProofResult {
+            pub proof: CircomProof,
+            pub inputs: Vec<String>,
+        }
+
+        #[derive(Debug, Clone, Default)]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), derive(uniffi::Record))]
+        pub struct CircomProof {
+            pub a: G1,
+            pub b: G2,
+            pub c: G1,
+            pub protocol: String,
+            pub curve: String,
+        }
+
+        #[derive(Debug, Clone, Default)]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), derive(uniffi::Record))]
+        pub struct G1 {
+            pub x: String,
+            pub y: String,
+            pub z: String,
+        }
+
+        #[derive(Debug, Clone, Default)]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), derive(uniffi::Record))]
+        pub struct G2 {
+            pub x: Vec<String>,
+            pub y: Vec<String>,
+            pub z: Vec<String>,
+        }
+
+        //
+        // `From` implementation for proof conversion
+        //
+        impl From<CircomProofLib> for mopro_ffi::circom::ProofLib {
+            fn from(lib: CircomProofLib) -> Self {
+                match lib {
+                    CircomProofLib::Arkworks => mopro_ffi::circom::ProofLib::Arkworks,
+                    CircomProofLib::Rapidsnark => mopro_ffi::circom::ProofLib::Rapidsnark,
+                }
+            }
+        }
+
+        impl From<mopro_ffi::circom::Proof> for CircomProof {
+            fn from(proof: mopro_ffi::circom::Proof) -> Self {
+                CircomProof {
+                    a: proof.a.into(),
+                    b: proof.b.into(),
+                    c: proof.c.into(),
+                    protocol: proof.protocol,
+                    curve: proof.curve,
+                }
+            }
+        }
+
+        impl From<CircomProof> for mopro_ffi::circom::Proof {
+            fn from(proof: CircomProof) -> Self {
+                mopro_ffi::circom::Proof {
+                    a: proof.a.into(),
+                    b: proof.b.into(),
+                    c: proof.c.into(),
+                    protocol: proof.protocol,
+                    curve: proof.curve,
+                }
+            }
+        }
+
+        impl From<mopro_ffi::circom::G1> for G1 {
+            fn from(g1: mopro_ffi::circom::G1) -> Self {
+                G1 {
+                    x: g1.x.to_string(),
+                    y: g1.y.to_string(),
+                    z: g1.z.to_string(),
+                }
+            }
+        }
+
+        impl From<G1> for mopro_ffi::circom::G1 {
+            fn from(g1: G1) -> Self {
+                mopro_ffi::circom::G1 {
+                    x: <mopro_ffi::circom::BigUint as std::str::FromStr>::from_str(g1.x.as_str()).unwrap(),
+                    y: <mopro_ffi::circom::BigUint as std::str::FromStr>::from_str(g1.y.as_str()).unwrap(),
+                    z: <mopro_ffi::circom::BigUint as std::str::FromStr>::from_str(g1.z.as_str()).unwrap(),
+                }
+            }
+        }
+
+        impl From<mopro_ffi::circom::G2> for G2 {
+            fn from(g2: mopro_ffi::circom::G2) -> Self {
+                let x = vec![g2.x[0].to_string(), g2.x[1].to_string()];
+                let y = vec![g2.y[0].to_string(), g2.y[1].to_string()];
+                let z = vec![g2.z[0].to_string(), g2.z[1].to_string()];
+                G2 { x, y, z }
+            }
+        }
+
+        impl From<G2> for mopro_ffi::circom::G2 {
+            fn from(g2: G2) -> Self {
+                let x =
+                    g2.x.iter()
+                        .map(|p| <mopro_ffi::circom::BigUint as std::str::FromStr>::from_str(p.as_str()).unwrap())
+                        .collect::<Vec<mopro_ffi::circom::BigUint>>();
+                let y =
+                    g2.y.iter()
+                        .map(|p| <mopro_ffi::circom::BigUint as std::str::FromStr>::from_str(p.as_str()).unwrap())
+                        .collect::<Vec<mopro_ffi::circom::BigUint>>();
+                let z =
+                    g2.z.iter()
+                        .map(|p| <mopro_ffi::circom::BigUint as std::str::FromStr>::from_str(p.as_str()).unwrap())
+                        .collect::<Vec<mopro_ffi::circom::BigUint>>();
+                mopro_ffi::circom::G2 {
+                    x: [x[0].clone(), x[1].clone()],
+                    y: [y[0].clone(), y[1].clone()],
+                    z: [z[0].clone(), z[1].clone()],
+                }
+            }
+        }
     };
-    Ok(CircomProofResult {
-        proof,
-        inputs: public_inputs,
-    })
-}
-
-// Prove on a generic curve
-pub fn verify_circom_proof(
-    proof_lib: ProofLib,
-    zkey_path: String,
-    proof_result: CircomProofResult,
-) -> Result<bool> {
-    CircomProver::verify(
-        proof_lib,
-        circom_prover::prover::CircomProof {
-            proof: proof_result.proof.into(),
-            pub_inputs: proof_result.inputs.into(),
-        },
-        zkey_path,
-    )
-}
-
-//
-// `From` implementation for proof conversion
-//
-impl From<CircomProverProof> for CircomProof {
-    fn from(proof: CircomProverProof) -> Self {
-        CircomProof {
-            a: proof.a.into(),
-            b: proof.b.into(),
-            c: proof.c.into(),
-            protocol: proof.protocol,
-            curve: proof.curve,
-        }
-    }
-}
-
-impl From<CircomProof> for CircomProverProof {
-    fn from(proof: CircomProof) -> Self {
-        CircomProverProof {
-            a: proof.a.into(),
-            b: proof.b.into(),
-            c: proof.c.into(),
-            protocol: proof.protocol,
-            curve: proof.curve,
-        }
-    }
-}
-
-impl From<CircomProverG1> for G1 {
-    fn from(g1: CircomProverG1) -> Self {
-        G1 {
-            x: g1.x.to_string(),
-            y: g1.y.to_string(),
-            z: g1.z.to_string(),
-        }
-    }
-}
-
-impl From<G1> for CircomProverG1 {
-    fn from(g1: G1) -> Self {
-        CircomProverG1 {
-            x: BigUint::from_str(g1.x.as_str()).unwrap(),
-            y: BigUint::from_str(g1.y.as_str()).unwrap(),
-            z: BigUint::from_str(g1.z.as_str()).unwrap(),
-        }
-    }
-}
-
-impl From<CircomProverG2> for G2 {
-    fn from(g2: CircomProverG2) -> Self {
-        let x = vec![g2.x[0].to_string(), g2.x[1].to_string()];
-        let y = vec![g2.y[0].to_string(), g2.y[1].to_string()];
-        let z = vec![g2.z[0].to_string(), g2.z[1].to_string()];
-        G2 { x, y, z }
-    }
-}
-
-impl From<G2> for CircomProverG2 {
-    fn from(g2: G2) -> Self {
-        let x =
-            g2.x.iter()
-                .map(|p| BigUint::from_str(p.as_str()).unwrap())
-                .collect::<Vec<BigUint>>();
-        let y =
-            g2.y.iter()
-                .map(|p| BigUint::from_str(p.as_str()).unwrap())
-                .collect::<Vec<BigUint>>();
-        let z =
-            g2.z.iter()
-                .map(|p| BigUint::from_str(p.as_str()).unwrap())
-                .collect::<Vec<BigUint>>();
-        CircomProverG2 {
-            x: [x[0].clone(), x[1].clone()],
-            y: [y[0].clone(), y[1].clone()],
-            z: [z[0].clone(), z[1].clone()],
-        }
-    }
 }
 
 #[cfg(test)]
@@ -233,8 +251,6 @@ mod tests {
 
     #[cfg(feature = "witnesscalc")]
     mod witnesscalc {
-        use super::*;
-        use crate as mopro_ffi;
 
         // Only build the witness functions for tests, don't bundle them into
         // the final library
@@ -287,11 +303,10 @@ mod tests {
     #[cfg(feature = "rustwitness")]
     mod rustwitness {
         use super::*;
-        use crate::circom::{generate_circom_proof_wtns, verify_circom_proof};
-        use crate::CircomProofResult;
         use anyhow::bail;
         use ark_ff::PrimeField;
         use circom_prover::prover::{ProofLib, PublicInputs};
+        use circom_prover::witness::WitnessFn;
         use num_bigint::{BigUint, ToBigInt};
         use std::ops::{Add, Mul};
 
@@ -301,8 +316,6 @@ mod tests {
         rust_witness::witness!(multiplier2bls);
         rust_witness::witness!(keccak256256test);
         rust_witness::witness!(hashbenchbls);
-
-        use crate as mopro_ffi;
 
         #[cfg(feature = "no_uniffi_exports")]
         #[test]
@@ -349,20 +362,14 @@ mod tests {
 
         // This should be defined by a file that the mopro package consumer authors
         // then we reference it in our build somehow
-        fn zkey_witness_map(name: &str) -> Result<mopro_ffi::witness::WitnessFn> {
+        fn zkey_witness_map(name: &str) -> Result<WitnessFn> {
             match name {
-                "multiplier2_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
-                    multiplier2_witness,
-                )),
-                "keccak256_256_test_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
-                    keccak256256test_witness,
-                )),
-                "hashbench_bls_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
-                    hashbenchbls_witness,
-                )),
-                "multiplier2_bls_final.zkey" => Ok(mopro_ffi::witness::WitnessFn::RustWitness(
-                    multiplier2bls_witness,
-                )),
+                "multiplier2_final.zkey" => Ok(WitnessFn::RustWitness(multiplier2_witness)),
+                "keccak256_256_test_final.zkey" => {
+                    Ok(WitnessFn::RustWitness(keccak256256test_witness))
+                }
+                "hashbench_bls_final.zkey" => Ok(WitnessFn::RustWitness(hashbenchbls_witness)),
+                "multiplier2_bls_final.zkey" => Ok(WitnessFn::RustWitness(multiplier2bls_witness)),
                 _ => bail!("Unknown circuit name"),
             }
         }
