@@ -13,16 +13,15 @@ exclude = ["target/*"]
 name = "mopro_ffi"
 
 [features]
-default = []
+default = ["uniffi-reexport"]
 
-uniffi = []
+uniffi = ["dep:uniffi"]
+uniffi-reexport = ["uniffi"]
 uniffi-tests = ["uniffi", "uniffi/bindgen-tests"]
 
 halo2 = []
 circom = ["rustwitness", "arkworks"]
 noir = ["noir_rs"]
-
-no_uniffi_exports = []
 
 # circom features
 ## witness
@@ -36,7 +35,8 @@ rapidsnark = ["circom-prover/rapidsnark"]
 circom-all = ["rustwitness", "witnesscalc", "arkworks", "rapidsnark"]
 
 [dependencies]
-uniffi = { workspace = true, features = ["bindgen"] }
+uniffi = { workspace = true, features = ["bindgen"], optional = true }
+
 serde = { version = "1.0", features = ["derive"] }
 anyhow = "1.0.86"
 num-bigint = { version = "0.4.3", default-features = false, features = [

@@ -78,3 +78,7 @@ macro_rules! app {
         $crate::noir_setup!();
     };
 }
+
+// Set up the crate for the `mopro-ffi` tests.
+#[cfg(test)]
+crate::setup!();

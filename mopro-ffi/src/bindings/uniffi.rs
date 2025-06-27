@@ -6,11 +6,12 @@
 //!
 //! However, for this alias to work correctly, `mopro_ffi` must provide the exact same
 //! exported items as the original `uniffi`. Hence, we re-export all individual items.
-#[cfg(feature = "uniffi")]
+#[cfg(feature = "uniffi-reexport")]
 #[allow(unused_imports)]
 pub use ::uniffi::*;
 
-#[cfg(feature = "uniffi")]
+// We configure this out for `mopro-ffi` tests as we can not do `extern crate` then
+#[cfg(all(feature = "uniffi-reexport", not(test)))]
 #[macro_export]
 macro_rules! uniffi_setup {
     () => {
@@ -21,10 +22,11 @@ macro_rules! uniffi_setup {
     };
 }
 
-#[cfg(not(feature = "uniffi"))]
+#[cfg(not(all(feature = "uniffi-reexport", not(test))))]
 #[macro_export]
 macro_rules! uniffi_setup {
     () => {
         uniffi::setup_scaffolding!("mopro");
     };
 }
+

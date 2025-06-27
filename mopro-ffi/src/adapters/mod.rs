@@ -13,7 +13,7 @@ macro_rules! setup_adapters_common {
         // Please refer this issue: https://github.com/mozilla/uniffi-rs/issues/2257
         #[derive(Debug, thiserror::Error)]
         #[allow(unused)]
-        #[cfg_attr(not(feature = "no_uniffi_exports"), derive(uniffi::Error))]
+        #[cfg_attr(any(target_os="ios", target_os="android"), derive(uniffi::Error))]
         #[allow(clippy::enum_variant_names)] // Needs a refactor that removes the `Error` postfixes.
         pub enum MoproError {
             #[error("CircomError: {0}")]

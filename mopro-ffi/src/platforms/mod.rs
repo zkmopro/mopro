@@ -4,8 +4,10 @@ use std::process::Command;
 use toml::Value;
 use uuid::Uuid;
 
+#[cfg(feature = "uniffi")]
 pub mod android;
 pub mod constants;
+#[cfg(feature = "uniffi")]
 pub mod ios;
 
 pub fn mktemp() -> PathBuf {
