@@ -14,6 +14,7 @@ macro_rules! setup_adapters_common {
         #[derive(Debug, thiserror::Error)]
         #[allow(unused)]
         #[cfg_attr(not(feature = "no_uniffi_exports"), derive(uniffi::Error))]
+        #[allow(clippy::enum_variant_names)] // Needs a refactor that removes the `Error` postfixes.
         pub enum MoproError {
             #[error("CircomError: {0}")]
             CircomError(String),
