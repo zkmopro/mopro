@@ -125,8 +125,9 @@ macro_rules! halo2_setup {
             circuit_inputs: std::collections::HashMap<String, Vec<String>>,
         ) -> Result<Halo2ProofResult, MoproError> {
             let name = std::path::Path::new(pk_path.as_str()).file_name().unwrap();
-            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())
-                .map_err(|e| MoproError::Halo2Error(format!("error getting proving circuit: {}", e)))?;
+            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap()).map_err(|e| {
+                MoproError::Halo2Error(format!("error getting proving circuit: {}", e))
+            })?;
             proving_fn(&srs_path, &pk_path, circuit_inputs)
                 .map(|(proof, inputs)| Halo2ProofResult { proof, inputs })
                 .map_err(|e| MoproError::Halo2Error(format!("halo2 error: {}", e)))
@@ -147,7 +148,6 @@ macro_rules! halo2_setup {
             verifying_fn(&srs_path, &vk_path, proof, public_input)
                 .map_err(|e| MoproError::Halo2Error(format!("error verifying proof: {}", e)))
         }
-
     };
 }
 
@@ -157,14 +157,28 @@ mod test {
 
     crate::setup_adapters_common!();
     crate::halo2_app!(
-        ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
-        ("gemini_fibonacci_pk.bin", gemini_fibonacci::prove, "gemini_fibonacci_vk.bin", gemini_fibonacci::verify),
-        ("hyperplonk_fibonacci_pk.bin", hyperplonk_fibonacci::prove, "hyperplonk_fibonacci_vk.bin", hyperplonk_fibonacci::verify),
+        (
+            "plonk_fibonacci_pk.bin",
+            plonk_fibonacci::prove,
+            "plonk_fibonacci_vk.bin",
+            plonk_fibonacci::verify
+        ),
+        (
+            "gemini_fibonacci_pk.bin",
+            gemini_fibonacci::prove,
+            "gemini_fibonacci_vk.bin",
+            gemini_fibonacci::verify
+        ),
+        (
+            "hyperplonk_fibonacci_pk.bin",
+            hyperplonk_fibonacci::prove,
+            "hyperplonk_fibonacci_vk.bin",
+            hyperplonk_fibonacci::verify
+        ),
     );
 
     #[test]
     fn test_generate_and_verify_plonk_proof() {
-
         const SRS_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_srs.bin";
         const PROVING_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_pk.bin";
         const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_vk.bin";
@@ -191,7 +205,6 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_hyperplonk_proof() {
-
         const SRS_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_srs.bin";
         const PROVING_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_pk.bin";
         const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_vk.bin";
@@ -218,7 +231,6 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_gemini_proof() {
-
         const SRS_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_srs.bin";
         const PROVING_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_pk.bin";
         const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_vk.bin";

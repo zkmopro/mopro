@@ -3,8 +3,13 @@ pub use num_bigint::BigUint;
 #[cfg(feature = "circom-witnesscalc")]
 pub use circom_prover::graph; // TODO - understand why this is needed
 
-pub use circom_prover::{prover::{ProofLib, CircomProof, circom::{Proof,  CURVE_BLS12_381, CURVE_BN254, G1,
-            G2}}, witness, CircomProver};
+pub use circom_prover::{
+    prover::{
+        circom::{Proof, CURVE_BLS12_381, CURVE_BN254, G1, G2},
+        CircomProof, ProofLib,
+    },
+    witness, CircomProver,
+};
 
 #[macro_export]
 macro_rules! circom_app {
@@ -43,7 +48,7 @@ macro_rules! circom_setup {
     () => {
         #[derive(Debug, Clone, Default)]
         #[cfg_attr(not(feature = "no_uniffi_exports"), derive(uniffi::Enum))]
-        pub enum CircomProofLib {
+        pub enum ProofLib {
             #[default]
             Arkworks,
             Rapidsnark,
@@ -85,11 +90,11 @@ macro_rules! circom_setup {
         //
         // `From` implementation for proof conversion
         //
-        impl From<CircomProofLib> for $crate::circom::ProofLib {
-            fn from(lib: CircomProofLib) -> Self {
+        impl From<ProofLib> for $crate::circom::ProofLib {
+            fn from(lib: ProofLib) -> Self {
                 match lib {
-                    CircomProofLib::Arkworks => $crate::circom::ProofLib::Arkworks,
-                    CircomProofLib::Rapidsnark => $crate::circom::ProofLib::Rapidsnark,
+                    ProofLib::Arkworks => $crate::circom::ProofLib::Arkworks,
+                    ProofLib::Rapidsnark => $crate::circom::ProofLib::Rapidsnark,
                 }
             }
         }
@@ -131,9 +136,12 @@ macro_rules! circom_setup {
         impl From<G1> for $crate::circom::G1 {
             fn from(g1: G1) -> Self {
                 $crate::circom::G1 {
-                    x: <$crate::circom::BigUint as std::str::FromStr>::from_str(g1.x.as_str()).unwrap(),
-                    y: <$crate::circom::BigUint as std::str::FromStr>::from_str(g1.y.as_str()).unwrap(),
-                    z: <$crate::circom::BigUint as std::str::FromStr>::from_str(g1.z.as_str()).unwrap(),
+                    x: <$crate::circom::BigUint as std::str::FromStr>::from_str(g1.x.as_str())
+                        .unwrap(),
+                    y: <$crate::circom::BigUint as std::str::FromStr>::from_str(g1.y.as_str())
+                        .unwrap(),
+                    z: <$crate::circom::BigUint as std::str::FromStr>::from_str(g1.z.as_str())
+                        .unwrap(),
                 }
             }
         }
@@ -151,15 +159,24 @@ macro_rules! circom_setup {
             fn from(g2: G2) -> Self {
                 let x =
                     g2.x.iter()
-                        .map(|p| <$crate::circom::BigUint as std::str::FromStr>::from_str(p.as_str()).unwrap())
+                        .map(|p| {
+                            <$crate::circom::BigUint as std::str::FromStr>::from_str(p.as_str())
+                                .unwrap()
+                        })
                         .collect::<Vec<$crate::circom::BigUint>>();
                 let y =
                     g2.y.iter()
-                        .map(|p| <$crate::circom::BigUint as std::str::FromStr>::from_str(p.as_str()).unwrap())
+                        .map(|p| {
+                            <$crate::circom::BigUint as std::str::FromStr>::from_str(p.as_str())
+                                .unwrap()
+                        })
                         .collect::<Vec<$crate::circom::BigUint>>();
                 let z =
                     g2.z.iter()
-                        .map(|p| <$crate::circom::BigUint as std::str::FromStr>::from_str(p.as_str()).unwrap())
+                        .map(|p| {
+                            <$crate::circom::BigUint as std::str::FromStr>::from_str(p.as_str())
+                                .unwrap()
+                        })
                         .collect::<Vec<$crate::circom::BigUint>>();
                 $crate::circom::G2 {
                     x: [x[0].clone(), x[1].clone()],
@@ -174,7 +191,7 @@ macro_rules! circom_setup {
         fn generate_circom_proof(
             zkey_path: String,
             circuit_inputs: String,
-            proof_lib: CircomProofLib,
+            proof_lib: ProofLib,
         ) -> Result<CircomProofResult, MoproError> {
             let name = match std::path::Path::new(zkey_path.as_str()).file_name() {
                 Some(v) => v,
@@ -185,13 +202,16 @@ macro_rules! circom_setup {
                 }
             };
             let witness_fn = get_circom_wtns_fn(name.to_str().unwrap())?;
-            $crate::circom::CircomProver::prove(proof_lib.into(), witness_fn, circuit_inputs, zkey_path)
-                .map_err(|e| MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
-            .map(|result| {
-                CircomProofResult {
-                    proof: result.proof.into(),
-                    inputs: result.pub_inputs.into(),
-                }
+            $crate::circom::CircomProver::prove(
+                proof_lib.into(),
+                witness_fn,
+                circuit_inputs,
+                zkey_path,
+            )
+            .map_err(|e| MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
+            .map(|result| CircomProofResult {
+                proof: result.proof.into(),
+                inputs: result.pub_inputs.into(),
             })
         }
 
@@ -199,7 +219,7 @@ macro_rules! circom_setup {
         fn verify_circom_proof(
             zkey_path: String,
             proof_result: CircomProofResult,
-            proof_lib: CircomProofLib,
+            proof_lib: ProofLib,
         ) -> Result<bool, MoproError> {
             $crate::circom::CircomProver::verify(
                 proof_lib.into(),
@@ -209,7 +229,7 @@ macro_rules! circom_setup {
                 },
                 zkey_path,
             )
-                .map_err(|e| MoproError::CircomError(format!("Verification error: {}", e)))
+            .map_err(|e| MoproError::CircomError(format!("Verification error: {}", e)))
         }
     };
 }
@@ -230,14 +250,13 @@ mod tests {
 
         witnesscalc_adapter::witness!(multiplier2_witnesscalc);
 
-
-        circom_app!(
-            ("multiplier2_final.zkey", WitnessFn::WitnessCalc(multiplier2_witnesscalc_witness)),
-        );
+        circom_app!((
+            "multiplier2_final.zkey",
+            WitnessFn::WitnessCalc(multiplier2_witnesscalc_witness)
+        ),);
 
         #[test]
         fn test_circom_macros() {
-
             const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
 
             let mut inputs = HashMap::new();
@@ -250,19 +269,11 @@ mod tests {
             inputs.insert("b".to_string(), vec![b.to_string()]);
 
             let input_str = serde_json::to_string(&inputs).unwrap();
-            let proof = generate_circom_proof(
-                ZKEY_PATH.to_string(),
-                input_str,
-                CircomProofLib::Arkworks,
-            )
-            .expect("Proof generation failed");
+            let proof = generate_circom_proof(ZKEY_PATH.to_string(), input_str, ProofLib::Arkworks)
+                .expect("Proof generation failed");
 
-            let is_valid = verify_circom_proof(
-                ZKEY_PATH.to_string(),
-                proof,
-                CircomProofLib::Arkworks,
-            )
-            .expect("Proof verification failed");
+            let is_valid = verify_circom_proof(ZKEY_PATH.to_string(), proof, ProofLib::Arkworks)
+                .expect("Proof verification failed");
 
             assert!(is_valid, "Expected the proof to be valid");
         }
@@ -283,12 +294,23 @@ mod tests {
         rust_witness::witness!(keccak256256test);
         rust_witness::witness!(hashbenchbls);
 
-
         circom_app!(
-            ("multiplier2_final.zkey", WitnessFn::RustWitness(multiplier2_witness)),
-            ("keccak256_256_test_final.zkey", WitnessFn::RustWitness(keccak256256test_witness)),
-            ("hashbench_bls_final.zkey", WitnessFn::RustWitness(hashbenchbls_witness)),
-            ("multiplier2_bls_final.zkey", WitnessFn::RustWitness(multiplier2bls_witness)),
+            (
+                "multiplier2_final.zkey",
+                WitnessFn::RustWitness(multiplier2_witness)
+            ),
+            (
+                "keccak256_256_test_final.zkey",
+                WitnessFn::RustWitness(keccak256256test_witness)
+            ),
+            (
+                "hashbench_bls_final.zkey",
+                WitnessFn::RustWitness(hashbenchbls_witness)
+            ),
+            (
+                "multiplier2_bls_final.zkey",
+                WitnessFn::RustWitness(multiplier2bls_witness)
+            ),
         );
 
         fn bytes_to_bits(bytes: &[u8]) -> Vec<bool> {
@@ -342,7 +364,7 @@ mod tests {
 
             // Generate Proof
             let input_str = serde_json::to_string(&inputs).unwrap();
-            let p = generate_circom_proof(zkey_path.clone(), input_str, CircomProofLib::Arkworks)?;
+            let p = generate_circom_proof(zkey_path.clone(), input_str, ProofLib::Arkworks)?;
             let proof = p.proof.clone();
             let pub_inputs: PublicInputs = p.inputs.clone().into();
 
@@ -351,7 +373,7 @@ mod tests {
             assert_eq!(pub_inputs.0, expected_output);
 
             // Step 3: Verify Proof
-            let is_valid = verify_circom_proof(zkey_path, p, CircomProofLib::Arkworks)?;
+            let is_valid = verify_circom_proof(zkey_path, p, ProofLib::Arkworks)?;
             assert!(is_valid);
 
             Ok(())
@@ -378,7 +400,7 @@ mod tests {
 
             // Generate Proof
             let input_str = serde_json::to_string(&inputs).unwrap();
-            let p = generate_circom_proof(zkey_path.clone(), input_str, CircomProofLib::Arkworks)?;
+            let p = generate_circom_proof(zkey_path.clone(), input_str, ProofLib::Arkworks)?;
             let proof = p.proof.clone();
             let pub_inputs: PublicInputs = p.inputs.clone().into();
 
@@ -387,7 +409,7 @@ mod tests {
             assert_eq!(pub_inputs.0, serialized_outputs);
 
             // Verify Proof
-            let is_valid = verify_circom_proof(zkey_path, p, CircomProofLib::Arkworks)?;
+            let is_valid = verify_circom_proof(zkey_path, p, ProofLib::Arkworks)?;
             assert!(is_valid);
 
             Ok(())
@@ -412,7 +434,7 @@ mod tests {
 
             // Generate Proof
             let input_str = serde_json::to_string(&inputs).unwrap();
-            let p = generate_circom_proof(zkey_path.clone(), input_str, CircomProofLib::Arkworks)?;
+            let p = generate_circom_proof(zkey_path.clone(), input_str, ProofLib::Arkworks)?;
             let proof = p.proof.clone();
 
             let pub_inputs: PublicInputs = p.inputs.clone().into();
@@ -421,7 +443,7 @@ mod tests {
             assert_eq!(pub_inputs.0[0], expected_output);
 
             // Step 3: Verify Proof
-            let is_valid = verify_circom_proof(zkey_path, p, CircomProofLib::Arkworks)?;
+            let is_valid = verify_circom_proof(zkey_path, p, ProofLib::Arkworks)?;
             assert!(is_valid);
 
             Ok(())
@@ -447,7 +469,7 @@ mod tests {
 
             // Generate Proof
             let input_str = serde_json::to_string(&inputs).unwrap();
-            let p = generate_circom_proof(zkey_path.clone(), input_str, CircomProofLib::Arkworks)?;
+            let p = generate_circom_proof(zkey_path.clone(), input_str, ProofLib::Arkworks)?;
             let proof = p.proof.clone();
             let pub_inputs: PublicInputs = p.inputs.clone().into();
 
@@ -456,7 +478,7 @@ mod tests {
             assert_eq!(pub_inputs.0, expected_output);
 
             // Step 3: Verify Proof
-            let is_valid = verify_circom_proof(zkey_path, p, CircomProofLib::Arkworks)?;
+            let is_valid = verify_circom_proof(zkey_path, p, ProofLib::Arkworks)?;
             assert!(is_valid);
 
             Ok(())

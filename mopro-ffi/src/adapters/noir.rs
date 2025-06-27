@@ -18,7 +18,7 @@ pub fn get_bytecode(circuit_path: String) -> String {
 macro_rules! noir_app {
     () => {
         $crate::noir_setup!();
-    }
+    };
 }
 
 #[macro_export]
@@ -32,25 +32,30 @@ macro_rules! noir_setup {
         ) -> Result<Vec<u8>, MoproError> {
             let circuit_bytecode = $crate::noir::get_bytecode(circuit_path);
 
-            $crate::noir::setup_srs_from_bytecode(circuit_bytecode.as_str(), srs_path.as_deref(), false)
-                .map_err(|e| MoproError::NoirError(format!("Setting up SRS error: {}", e)))?;
+            $crate::noir::setup_srs_from_bytecode(
+                circuit_bytecode.as_str(),
+                srs_path.as_deref(),
+                false,
+            )
+            .map_err(|e| MoproError::NoirError(format!("Setting up SRS error: {}", e)))?;
 
-            let witness = $crate::noir::from_vec_str_to_witness_map(inputs.iter().map(|s| s.as_str()).collect())
-                .map_err(|e| MoproError::NoirError(format!("Setting up Witness Map error: {}", e)))?;
+            let witness = $crate::noir::from_vec_str_to_witness_map(
+                inputs.iter().map(|s| s.as_str()).collect(),
+            )
+            .map_err(|e| MoproError::NoirError(format!("Setting up Witness Map error: {}", e)))?;
 
             $crate::noir::prove_ultra_honk(circuit_bytecode.as_str(), witness, false)
                 .map_err(|e| MoproError::NoirError(format!("Generate Proof error: {}", e)))
         }
 
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_noir_proof(
-            circuit_path: String,
-            proof: Vec<u8>,
-        ) -> Result<bool, MoproError> {
+        fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> Result<bool, MoproError> {
             let circuit_bytecode = $crate::noir::get_bytecode(circuit_path);
 
             let vk = $crate::noir::get_honk_verification_key(circuit_bytecode.as_str(), false)
-                .map_err(|e| MoproError::NoirError(format!("Setting up Verification Key error: {}", e)))?;
+                .map_err(|e| {
+                    MoproError::NoirError(format!("Setting up Verification Key error: {}", e))
+                })?;
 
             $crate::noir::verify_ultra_honk(proof, vk)
                 .map_err(|e| MoproError::NoirError(format!("Verifying Proof error: {}", e)))
@@ -77,10 +82,7 @@ mod tests {
         let witness = vec!["3".to_string(), "5".to_string()];
         let proof =
             generate_noir_proof(MULTIPLIER2_CIRCUIT_FILE.to_string(), None, witness).unwrap();
-        assert!(verify_noir_proof(
-            MULTIPLIER2_CIRCUIT_FILE.to_string(),
-            proof
-        ).unwrap());
+        assert!(verify_noir_proof(MULTIPLIER2_CIRCUIT_FILE.to_string(), proof).unwrap());
     }
 
     #[test]

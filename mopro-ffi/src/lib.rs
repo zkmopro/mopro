@@ -3,13 +3,13 @@ pub mod bindings;
 pub mod platforms;
 
 #[allow(unused_imports)]
-pub use bindings::*;
-#[allow(unused_imports)]
 pub use adapters::*;
+#[allow(unused_imports)]
+pub use bindings::*;
 
 /// This export is added for backwards compatibility.
 #[cfg(feature = "circom")]
-pub use crate::adapters::circom::witness as witness;
+pub use crate::adapters::circom::witness;
 
 /// This export is added for backwards compatibility.
 pub use crate::platforms as app_config;

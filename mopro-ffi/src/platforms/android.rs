@@ -7,7 +7,6 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
 
-use super::toml_lib_name;
 use super::cleanup_tmp_local;
 use super::constants::{
     AndroidArch, Mode, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64, ENV_ANDROID_ARCHS,
@@ -16,6 +15,7 @@ use super::constants::{
 use super::install_arch;
 use super::install_ndk;
 use super::mktemp_local;
+use super::toml_lib_name;
 
 pub fn build() {
     const BINDING_NAME: &str = "MoproAndroidBindings";
