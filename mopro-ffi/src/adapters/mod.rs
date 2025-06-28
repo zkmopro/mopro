@@ -23,6 +23,13 @@ macro_rules! setup_adapters_common {
             #[error("NoirError: {0}")]
             NoirError(String),
         }
+
+        #[cfg(target_arch="wasm32")]
+        impl From<MoproError> for wasm_bindgen::JsValue {
+            fn from(err: MoproError) -> wasm_bindgen::JsValue {
+                wasm_bindgen::JsValue::from_str(&err.to_string())
+            }
+        }
     };
 }
 

@@ -4,16 +4,25 @@
 mopro_ffi::app!();
 
 // --- Circom Example of setting up 4 circuits ---
+#[cfg(not(target_arch = "wasm32"))]
 rust_witness::witness!(multiplier2);
+#[cfg(not(target_arch = "wasm32"))]
 rust_witness::witness!(multiplier2bls);
+#[cfg(not(target_arch = "wasm32"))]
 rust_witness::witness!(keccak256256test);
+#[cfg(not(target_arch = "wasm32"))]
 witnesscalc_adapter::witness!(multiplier2_witnesscalc);
 
+#[cfg(not(target_arch = "wasm32"))]
 mopro_ffi::set_circom_circuits! {
     ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(multiplier2_witness)),
     ("multiplier2_witnesscalc_final.zkey", mopro_ffi::witness::WitnessFn::WitnessCalc(multiplier2_witnesscalc_witness)),
     ("multiplier2_bls_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(multiplier2bls_witness)),
     ("keccak256_256_test_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(keccak256256test_witness)),
+}
+
+#[cfg(target_arch = "wasm32")]
+mopro_ffi::set_circom_circuits! {
 }
 
 // --- Halo2 Example of using Plonk proving and verifying circuits ---

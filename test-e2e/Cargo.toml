@@ -17,14 +17,15 @@ name = "android"
 name = "web"
 
 [dependencies]
-mopro-ffi = { path = "../mopro-ffi", features = [
+mopro-ffi = { path = "../mopro-ffi", default-features = false, features = [
     "halo2",
+    "uniffi-reexport",
+    "wasm-bindgen-reexport",
     "circom",
-    "noir",
+#    "noir", # TODO - does not compile with wasm
     "witnesscalc",
-    "rapidsnark",
+#    "rapidsnark", # TODO - does not compile with wasm
 ] }
-mopro-wasm = { path = "../mopro-wasm" }
 
 # Circom dependencies
 rust-witness = "0.1"

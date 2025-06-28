@@ -113,13 +113,15 @@ macro_rules! halo2_setup {
     () => {
         #[derive(Debug, Clone)]
         #[cfg_attr(any(target_os="ios", target_os="android"), derive(uniffi::Record))]
+        #[cfg_attr(target_arch="wasm32", wasm_bindgen::prelude::wasm_bindgen(getter_with_clone))]
         pub struct Halo2ProofResult {
             pub proof: Vec<u8>,
             pub inputs: Vec<u8>,
         }
 
         #[cfg_attr(any(target_os="ios", target_os="android"), uniffi::export)] // TODO - this does not work in the target crate
-        fn generate_halo2_proof(
+        #[cfg(not(target_arch="wasm32"))]
+        pub fn generate_halo2_proof(
             srs_path: String,
             pk_path: String,
             circuit_inputs: std::collections::HashMap<String, Vec<String>>,
@@ -133,8 +135,30 @@ macro_rules! halo2_setup {
                 .map_err(|e| MoproError::Halo2Error(format!("halo2 error: {}", e)))
         }
 
+        #[cfg(target_arch="wasm32")]
+        #[wasm_bindgen::prelude::wasm_bindgen]
+        pub fn generate_halo2_proof(
+            srs_path: String,
+            pk_path: String,
+            circuit_inputs: wasm_bindgen::JsValue,
+        ) -> Result<Halo2ProofResult, MoproError> {
+
+            let circuit_inputs: std::collections::HashMap<String, Vec<String>> = serde_wasm_bindgen::from_value(circuit_inputs).map_err(|e| {
+                MoproError::Halo2Error(format!("Failed to parse the circuit_inputs {}", e))
+            })?;
+
+            let name = std::path::Path::new(pk_path.as_str()).file_name().unwrap();
+            let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap()).map_err(|e| {
+                MoproError::Halo2Error(format!("error getting proving circuit: {}", e))
+            })?;
+            proving_fn(&srs_path, &pk_path, circuit_inputs)
+                .map(|(proof, inputs)| Halo2ProofResult { proof, inputs })
+                .map_err(|e| MoproError::Halo2Error(format!("halo2 error: {}", e)))
+        }
+
         #[cfg_attr(any(target_os="ios", target_os="android"), uniffi::export)]
-        fn verify_halo2_proof(
+        #[cfg_attr(target_arch="wasm32", wasm_bindgen::prelude::wasm_bindgen)]
+        pub fn verify_halo2_proof(
             srs_path: String,
             vk_path: String,
             proof: Vec<u8>,
