@@ -20,14 +20,13 @@ pub use ::serde_wasm_bindgen::*;
 macro_rules! wasm_bindgen_setup {
     () => {
         // `::uniffi` must be available in the caller’s extern-prelude.
-        extern crate mopro_ffi as wasm_bindgen;
         extern crate mopro_ffi as serde_wasm_bindgen;
+        extern crate mopro_ffi as wasm_bindgen;
     };
 }
 
 #[cfg(not(all(feature = "wasm-bindgen-reexport", not(test))))]
 #[macro_export]
 macro_rules! wasm_bindgen_setup {
-    () => {
-    };
+    () => {};
 }

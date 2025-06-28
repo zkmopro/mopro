@@ -47,7 +47,7 @@ macro_rules! set_circom_circuits {
 macro_rules! circom_setup {
     () => {
         #[derive(Debug, Clone, Default)]
-        #[cfg_attr(any(target_os="ios", target_os="android"), derive(uniffi::Enum))]
+        #[cfg_attr(any(target_os = "ios", target_os = "android"), derive(uniffi::Enum))]
         pub enum ProofLib {
             #[default]
             Arkworks,
@@ -55,14 +55,14 @@ macro_rules! circom_setup {
         }
 
         #[derive(Debug, Clone)]
-        #[cfg_attr(any(target_os="ios", target_os="android"), derive(uniffi::Record))]
+        #[cfg_attr(any(target_os = "ios", target_os = "android"), derive(uniffi::Record))]
         pub struct CircomProofResult {
             pub proof: CircomProof,
             pub inputs: Vec<String>,
         }
 
         #[derive(Debug, Clone, Default)]
-        #[cfg_attr(any(target_os="ios", target_os="android"), derive(uniffi::Record))]
+        #[cfg_attr(any(target_os = "ios", target_os = "android"), derive(uniffi::Record))]
         pub struct CircomProof {
             pub a: G1,
             pub b: G2,
@@ -72,7 +72,7 @@ macro_rules! circom_setup {
         }
 
         #[derive(Debug, Clone, Default)]
-        #[cfg_attr(any(target_os="ios", target_os="android"), derive(uniffi::Record))]
+        #[cfg_attr(any(target_os = "ios", target_os = "android"), derive(uniffi::Record))]
         pub struct G1 {
             pub x: String,
             pub y: String,
@@ -80,7 +80,7 @@ macro_rules! circom_setup {
         }
 
         #[derive(Debug, Clone, Default)]
-        #[cfg_attr(any(target_os="ios", target_os="android"), derive(uniffi::Record))]
+        #[cfg_attr(any(target_os = "ios", target_os = "android"), derive(uniffi::Record))]
         pub struct G2 {
             pub x: Vec<String>,
             pub y: Vec<String>,
@@ -187,7 +187,7 @@ macro_rules! circom_setup {
         }
 
         // Logic for Proving and Verifying Circom Proofs
-        #[cfg_attr(any(target_os="ios", target_os="android"), uniffi::export)]
+        #[cfg_attr(any(target_os = "ios", target_os = "android"), uniffi::export)]
         fn generate_circom_proof(
             zkey_path: String,
             circuit_inputs: String,
@@ -215,7 +215,7 @@ macro_rules! circom_setup {
             })
         }
 
-        #[cfg_attr(any(target_os="ios", target_os="android"), uniffi::export)]
+        #[cfg_attr(any(target_os = "ios", target_os = "android"), uniffi::export)]
         fn verify_circom_proof(
             zkey_path: String,
             proof_result: CircomProofResult,

@@ -24,7 +24,7 @@ macro_rules! noir_app {
 #[macro_export]
 macro_rules! noir_setup {
     () => {
-        #[cfg_attr(any(target_os="ios", target_os="android"), uniffi::export)]
+        #[cfg_attr(any(target_os = "ios", target_os = "android"), uniffi::export)]
         fn generate_noir_proof(
             circuit_path: String,
             srs_path: Option<String>,
@@ -48,7 +48,7 @@ macro_rules! noir_setup {
                 .map_err(|e| MoproError::NoirError(format!("Generate Proof error: {}", e)))
         }
 
-        #[cfg_attr(any(target_os="ios", target_os="android"), uniffi::export)]
+        #[cfg_attr(any(target_os = "ios", target_os = "android"), uniffi::export)]
         fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> Result<bool, MoproError> {
             let circuit_bytecode = $crate::noir::get_bytecode(circuit_path);
 
@@ -107,7 +107,6 @@ mod tests {
     #[test]
     #[serial_test::serial]
     fn test_macro_proof_zkemail() {
-
         // Load input data from the JSON file for the test case
         let json_str = fs::read_to_string(INPUT_FILE).unwrap();
         let witness = to_zkemail_witness(json_str.as_str());

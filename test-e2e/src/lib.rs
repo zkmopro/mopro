@@ -22,8 +22,7 @@ mopro_ffi::set_circom_circuits! {
 }
 
 #[cfg(target_arch = "wasm32")]
-mopro_ffi::set_circom_circuits! {
-}
+mopro_ffi::set_circom_circuits! {}
 
 // --- Halo2 Example of using Plonk proving and verifying circuits ---
 

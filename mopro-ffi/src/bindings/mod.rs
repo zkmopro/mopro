@@ -4,11 +4,14 @@ mod uniffi;
 mod wasm_bindgen;
 
 #[cfg(all(not(feature = "uniffi"), any(target_os = "ios", target_os = "android")))]
-compile_error!("To compile mopro_ffi for iOS and Android targets you must enable the `uniffi` feature!");
+compile_error!(
+    "To compile mopro_ffi for iOS and Android targets you must enable the `uniffi` feature!"
+);
 
 #[cfg(all(not(feature = "wasm-bindgen"), target_arch = "wasm32"))]
-compile_error!("To compile mopro_ffi for iOS and Android targets you must enable the `uniffi` feature!");
-
+compile_error!(
+    "To compile mopro_ffi for iOS and Android targets you must enable the `uniffi` feature!"
+);
 
 #[cfg(feature = "uniffi-reexport")]
 #[allow(unused_imports)]

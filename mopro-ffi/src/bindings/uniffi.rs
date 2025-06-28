@@ -29,4 +29,3 @@ macro_rules! uniffi_setup {
         uniffi::setup_scaffolding!("mopro");
     };
 }
-
