@@ -4,8 +4,8 @@ resolver = "2"
 exclude = ["mopro-example-app"]
 
 [workspace.dependencies]
-plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/ElusAegis/halo2-fibonacci-sample", rev = "01963da" }
+hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/ElusAegis/halo2-fibonacci-sample", rev = "01963da" }
+gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/ElusAegis/halo2-fibonacci-sample", rev = "01963da" }
 
 uniffi = { version = "=0.29.0" }

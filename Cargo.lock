@@ -1823,6 +1823,20 @@ dependencies = [
 [[package]]
 name = "fibonacci-circuit"
 version = "0.1.0"
+source = "git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da#01963dae3b4245590b62cd1993a9426bfe769268"
+dependencies = [
+ "bincode",
+ "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature%2Ffor-benchmark)",
+ "itertools 0.13.0",
+ "plonkish_backend",
+ "rand 0.8.5",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "fibonacci-circuit"
+version = "0.1.0"
 source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3917ee5e91f2237d97210821649b73806ada7e2f"
 dependencies = [
  "bincode",
@@ -2024,9 +2038,19 @@ dependencies = [
 [[package]]
 name = "gemini-fibonacci"
 version = "0.1.0"
+source = "git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da#01963dae3b4245590b62cd1993a9426bfe769268"
+dependencies = [
+ "fibonacci-circuit 0.1.0 (git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da)",
+ "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature%2Ffor-benchmark)",
+ "plonkish_backend",
+]
+
+[[package]]
+name = "gemini-fibonacci"
+version = "0.1.0"
 source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3917ee5e91f2237d97210821649b73806ada7e2f"
 dependencies = [
- "fibonacci-circuit",
+ "fibonacci-circuit 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature%2Ffor-benchmark)",
  "plonkish_backend",
 ]
@@ -2404,9 +2428,19 @@ dependencies = [
 [[package]]
 name = "hyperplonk-fibonacci"
 version = "0.1.0"
+source = "git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da#01963dae3b4245590b62cd1993a9426bfe769268"
+dependencies = [
+ "fibonacci-circuit 0.1.0 (git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da)",
+ "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature%2Ffor-benchmark)",
+ "plonkish_backend",
+]
+
+[[package]]
+name = "hyperplonk-fibonacci"
+version = "0.1.0"
 source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3917ee5e91f2237d97210821649b73806ada7e2f"
 dependencies = [
- "fibonacci-circuit",
+ "fibonacci-circuit 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature%2Ffor-benchmark)",
  "plonkish_backend",
 ]
@@ -3040,13 +3074,16 @@ dependencies = [
  "camino",
  "circom-prover",
  "color-eyre",
- "gemini-fibonacci",
- "hyperplonk-fibonacci",
+ "console_error_panic_hook",
+ "gemini-fibonacci 0.1.0 (git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da)",
+ "getrandom 0.2.15",
+ "hyperplonk-fibonacci 0.1.0 (git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da)",
  "noir",
  "num-bigint",
- "plonk-fibonacci",
+ "plonk-fibonacci 0.1.0 (git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da)",
  "rust-witness",
  "serde",
+ "serde-wasm-bindgen",
  "serde_derive",
  "serde_json",
  "serial_test",
@@ -3054,6 +3091,10 @@ dependencies = [
  "toml 0.8.22",
  "uniffi",
  "uuid",
+ "wasm-bindgen",
+ "wasm-bindgen-console-logger",
+ "wasm-bindgen-futures",
+ "wasm-bindgen-test",
  "witnesscalc-adapter",
 ]
 
@@ -3062,10 +3103,10 @@ name = "mopro-wasm"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
- "gemini-fibonacci",
+ "gemini-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
  "getrandom 0.2.15",
- "hyperplonk-fibonacci",
- "plonk-fibonacci",
+ "hyperplonk-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
+ "plonk-fibonacci 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
  "rand 0.8.5",
  "serde-wasm-bindgen",
  "wasm-bindgen",
@@ -3674,10 +3715,23 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 [[package]]
 name = "plonk-fibonacci"
 version = "0.1.0"
+source = "git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da#01963dae3b4245590b62cd1993a9426bfe769268"
+dependencies = [
+ "bincode",
+ "fibonacci-circuit 0.1.0 (git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da)",
+ "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature%2Ffor-benchmark)",
+ "plonkish_backend",
+ "rand 0.8.5",
+ "serde",
+]
+
+[[package]]
+name = "plonk-fibonacci"
+version = "0.1.0"
 source = "git+https://github.com/sifnoc/plonkish-fibonacci-sample.git#3917ee5e91f2237d97210821649b73806ada7e2f"
 dependencies = [
  "bincode",
- "fibonacci-circuit",
+ "fibonacci-circuit 0.1.0 (git+https://github.com/sifnoc/plonkish-fibonacci-sample.git)",
  "halo2_proofs 0.2.0 (git+https://github.com/han0110/halo2.git?branch=feature%2Ffor-benchmark)",
  "plonkish_backend",
  "rand 0.8.5",
@@ -5142,12 +5196,11 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
- "gemini-fibonacci",
+ "gemini-fibonacci 0.1.0 (git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da)",
  "halo2-keccak-256",
- "hyperplonk-fibonacci",
+ "hyperplonk-fibonacci 0.1.0 (git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da)",
  "mopro-ffi",
- "mopro-wasm",
- "plonk-fibonacci",
+ "plonk-fibonacci 0.1.0 (git+https://github.com/ElusAegis/halo2-fibonacci-sample?rev=01963da)",
  "rust-witness",
  "thiserror 2.0.12",
  "witnesscalc-adapter",
@@ -5724,6 +5777,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "458f7a779bf54acc9f347480ac654f68407d3aab21269a6e3c9f922acd9e2da9"
 dependencies = [
  "getrandom 0.3.2",
+ "js-sys",
+ "wasm-bindgen",
 ]
 
 [[package]]

@@ -11,7 +11,7 @@ use super::cleanup_tmp_local;
 use super::constants::{IosArch, Mode, ARCH_ARM_64, ARCH_X86_64, ENV_CONFIG, ENV_IOS_ARCHS};
 use super::install_arch;
 use super::mktemp_local;
-use crate::app_config::toml_lib_name;
+use super::toml_lib_name;
 
 // Load environment variables that are specified by by xcode
 pub fn build() {

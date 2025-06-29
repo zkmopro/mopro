@@ -1,3 +1,4 @@
 fn main() {
-    mopro_wasm::app_config::web::build()
+    // TODO - move to mopro-ffi
+    // mopro_wasm::app_config::web::build()
 }
