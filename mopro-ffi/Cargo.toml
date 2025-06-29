@@ -15,9 +15,14 @@ name = "mopro_ffi"
 [features]
 default = []
 
+uniffi = []
+uniffi-tests = ["uniffi", "uniffi/bindgen-tests"]
+
 halo2 = []
 circom = ["rustwitness", "arkworks"]
 noir = ["noir_rs"]
+
+no_uniffi_exports = []
 
 # circom features
 ## witness
@@ -31,8 +36,7 @@ rapidsnark = ["circom-prover/rapidsnark"]
 circom-all = ["rustwitness", "witnesscalc", "arkworks", "rapidsnark"]
 
 [dependencies]
-uniffi = { workspace = true, features = ["build", "cargo-metadata", "bindgen"] }
-
+uniffi = { workspace = true, features = ["bindgen"] }
 num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
@@ -61,7 +65,6 @@ camino = "1.1.9"
 
 [build-dependencies]
 rust-witness = { version = "0.1", optional = true }
-uniffi = { workspace = true, features = ["build"] }
 witnesscalc-adapter = { version = "0.1", optional = true }
 
 [dev-dependencies]
