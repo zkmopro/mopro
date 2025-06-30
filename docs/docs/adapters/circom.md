@@ -53,7 +53,7 @@ rust_witness::witness!(your_circuit);
 
 ### 6. Proof Generation Example
 
-See the [circom-prover README](../../circom-prover/README.md) for how to generate and verify proofs using these files.
+See the [circom-prover README](https://github.com/zkmopro/mopro/blob/main/circom-prover/README.md) for how to generate and verify proofs using these files.
 
 ---
 
