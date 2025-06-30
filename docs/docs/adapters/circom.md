@@ -2,6 +2,61 @@
 
 Mopro supports the integration of Circom circuits. For this, you need to have pre-built `zkey` and `wasm` files for your circuits. You can find more information on how to generate these files in the [Circom documentation](https://docs.circom.io).
 
+---
+
+## Preparing Circuits
+
+To use your own Circom circuits with Mopro, you need to prepare the necessary files by following these steps:
+
+### 1. Compile the Circuit
+
+Use Circom to compile your `.circom` file into `.wasm` and `.r1cs` files:
+
+```sh
+circom <your_circuit>.circom --wasm --r1cs -o <output_dir>
+```
+- `<your_circuit>.circom`: your circuit source file
+- `<output_dir>`: directory for output files (e.g., `test-vectors/circom/`)
+
+### 2. Trusted Setup (Powers of Tau)
+
+You need a ptau file (e.g., `powersOfTau28_hez_final_21.ptau`). Download it or generate it as described in the [Circom docs](https://docs.circom.io/getting-started/proving-circuits/#powers-of-tau-ceremony).
+
+Run the trusted setup:
+
+```sh
+snarkjs groth16 setup <output_dir>/<your_circuit>.r1cs <ptau_file> <output_dir>/<your_circuit>_0000.zkey
+snarkjs zkey contribute <output_dir>/<your_circuit>_0000.zkey <output_dir>/<your_circuit>_final.zkey --name="Contributor Name"
+```
+
+### 3. (Optional) Generate arkzkey
+
+If you use the Arkworks backend, you may need to convert the zkey to arkzkey or use it directly if supported by your workflow.
+
+### 4. Place the Files
+
+Put the resulting `.wasm` and `.zkey` (or arkzkey) files in a directory such as `test-vectors/circom/`.
+
+### 5. Configure Your Rust Project
+
+In your `build.rs`:
+
+```rust
+rust_witness::transpile::transpile_wasm("test-vectors/circom".to_string());
+```
+
+In your `lib.rs`:
+
+```rust
+rust_witness::witness!(your_circuit);
+```
+
+### 6. Proof Generation Example
+
+See the [circom-prover README](../../circom-prover/README.md) for how to generate and verify proofs using these files.
+
+---
+
 ## Samples
 
 Explore how the Circom adapter is implemented by checking out the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
