@@ -86,5 +86,13 @@
             "ios": "https://testflight.apple.com/join/8hqYwe8C",
             "android": "https://drive.google.com/file/d/1IMsH0fBpaLGkFgFX0oqnlS6LQk3WCr3t/view?usp=sharing"
         }
+    },
+    {
+        "name": "Mopro dApp On-chain Verification (Circom)",
+        "description": "A Flutter template for building Mobile dApps using Mopro with and on-chain verification",
+        "links": {
+            "github": "https://github.com/moven0831/mopro-wallet-connet-circom",
+            "website": "https://github.com/moven0831/mopro-wallet-connet-circom"
+        }
     }
 ]
