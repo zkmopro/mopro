@@ -1,0 +1,49 @@
+.impactSection {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--ifm-color-primary);
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--ifm-color-primary);
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.listItem {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--ifm-background-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.listItem strong {
+  color: var(--ifm-color-primary);
+  font-size: 1.1rem;
+}
+
+.listItem a {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.listItem a:hover {
+  text-decoration: underline;
+} 
