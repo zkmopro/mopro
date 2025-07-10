@@ -54,7 +54,7 @@ pub fn install_arch(arch: String) {
         .spawn()
         .expect("Failed to spawn rustup, is it installed?")
         .wait()
-        .unwrap_or_else(|_| panic!("Failed to install target architecture {}", arch));
+        .unwrap_or_else(|_| panic!("Failed to install target architecture {arch}"));
 }
 
 pub fn project_name_from_toml() -> String {

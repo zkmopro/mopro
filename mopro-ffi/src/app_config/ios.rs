@@ -20,20 +20,20 @@ pub fn build() {
     // Names for the generated files and directories
     let bindings_dir_name = "MoproiOSBindings";
 
-    let gen_swift_file_name = format!("{}.swift", uniffi_style_identifier);
+    let gen_swift_file_name = format!("{uniffi_style_identifier}.swift");
     let out_swift_file_name = "mopro.swift";
 
     let framework_name = "MoproBindings.xcframework";
 
     let lib_name = format!("lib{}.a", &uniffi_style_identifier);
-    let header_name = format!("{}FFI.h", uniffi_style_identifier);
-    let modulemap_name = format!("{}FFI.modulemap", uniffi_style_identifier);
+    let header_name = format!("{uniffi_style_identifier}FFI.h");
+    let modulemap_name = format!("{uniffi_style_identifier}FFI.modulemap");
 
     // Paths for the generated files
     let cwd = std::env::current_dir().unwrap();
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or(cwd.to_str().unwrap().to_string());
-    let build_dir = format!("{}/build", manifest_dir);
+    let build_dir = format!("{manifest_dir}/build");
     let build_dir_path = Path::new(&build_dir);
     let work_dir = mktemp_local(build_dir_path);
     let swift_bindings_dir = work_dir.join(Path::new("SwiftBindings"));
@@ -128,7 +128,7 @@ pub fn build() {
         swift_bindings_dir.join(&gen_swift_file_name),
         bindings_out.join(out_swift_file_name),
     )
-    .with_context(|| format!("Failed to rename bindings from {}", gen_swift_file_name))
+    .with_context(|| format!("Failed to rename bindings from {gen_swift_file_name}"))
     .unwrap();
 
     let mut xcbuild_cmd = Command::new("xcodebuild");
@@ -180,7 +180,7 @@ fn group_target_archs(target_archs: &[IosArch]) -> Vec<Vec<IosArch>> {
     let device_prefix = match current_arch {
         arch if arch.starts_with(ARCH_X86_64) => ARCH_X86_64,
         arch if arch.starts_with(ARCH_ARM_64) => ARCH_ARM_64,
-        _ => panic!("Unsupported host architecture: {}", current_arch),
+        _ => panic!("Unsupported host architecture: {current_arch}"),
     };
 
     let mut device_archs = Vec::new();
@@ -219,7 +219,7 @@ pub fn regroup_header_artifacts(
     project_name: &str,
 ) -> anyhow::Result<()> {
     for entry in
-        fs::read_dir(framework_out).with_context(|| format!("reading {:?}", framework_out))?
+        fs::read_dir(framework_out).with_context(|| format!("reading {framework_out:?}"))?
     {
         let entry = entry?;
         let arch_path = entry.path();
@@ -239,16 +239,16 @@ pub fn regroup_header_artifacts(
 
         // Destination directory: Headers/<identifier>/
         let target_dir = headers_dir.join(project_name);
-        fs::create_dir_all(&target_dir).with_context(|| format!("creating {:?}", target_dir))?;
+        fs::create_dir_all(&target_dir).with_context(|| format!("creating {target_dir:?}"))?;
 
         // ── move & rename ────────────────────────────────────────
         if modmap_src.exists() {
             fs::rename(&modmap_src, target_dir.join("module.modulemap"))
-                .with_context(|| format!("moving {:?}", modmap_src))?;
+                .with_context(|| format!("moving {modmap_src:?}"))?;
         }
         if header_src.exists() {
             fs::rename(&header_src, target_dir.join(header_name))
-                .with_context(|| format!("moving {:?}", header_src))?;
+                .with_context(|| format!("moving {header_src:?}"))?;
         }
     }
 
