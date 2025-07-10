@@ -1,11 +1,37 @@
-#![allow(unexpected_cfgs)]
 pub mod app_config;
+
+// UniFFI re-export
+//
+// Uniffi macros use fully qualified paths (`::uniffi::*`) internally.
+// To allow downstream crates to transparently resolve these macros to `mopro_ffi`,
+// users must alias it (`extern crate mopro_ffi as uniffi;`, automated via `app!` macro).
+//
+// However, for this alias to work correctly, `mopro_ffi` must provide the exact same
+// exported items as the original `uniffi`. Hence, we re-export all individual items.
+#[cfg(feature = "uniffi")]
+pub use uniffi::*;
+
+#[cfg(feature = "uniffi")]
+#[macro_export]
+macro_rules! uniffi_setup {
+    () => {
+        // `::uniffi` must be available in the caller’s extern-prelude.
+        extern crate mopro_ffi as uniffi;
+    };
+}
+
+#[cfg(not(feature = "uniffi"))]
+#[macro_export]
+macro_rules! uniffi_setup {
+    () => {
+        // No-op when `uniffi` feature isn't enabled in `mopro_ffi`.
+    };
+}
 
 #[cfg(feature = "circom")]
 mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
-
 #[cfg(feature = "noir")]
 mod noir;
 
@@ -29,8 +55,7 @@ pub use noir::{generate_noir_proof, verify_noir_proof};
 macro_rules! circom_app {
     ($result:ty, $proof:ty, $err:ty, $proof_lib:ty) => {
         // TODO: fix this if CLI template can be customized
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn generate_circom_proof(
             zkey_path: String,
             circuit_inputs: String,
@@ -40,8 +65,7 @@ macro_rules! circom_app {
         }
 
         // TODO: fix this if CLI template can be customized
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn verify_circom_proof(
             zkey_path: String,
             proof_result: $result,
@@ -57,8 +81,7 @@ macro_rules! circom_app {
 macro_rules! halo2_app {
     ($result:ty, $err:ty) => {
         // TODO: fix this if CLI template can be customized
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn generate_halo2_proof(
             srs_path: String,
             pk_path: String,
@@ -68,8 +91,7 @@ macro_rules! halo2_app {
         }
 
         // TODO: fix this if CLI template can be customized
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn verify_halo2_proof(
             srs_path: String,
             vk_path: String,
@@ -86,8 +108,7 @@ macro_rules! halo2_app {
 macro_rules! noir_app {
     ($err:ty) => {
         // TODO: fix this if CLI template can be customized
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn generate_noir_proof(
             circuit_path: String,
             srs_path: Option<String>,
@@ -97,8 +118,7 @@ macro_rules! noir_app {
         }
 
         // TODO: fix this if CLI template can be customized
-        #[allow(dead_code)]
-        #[cfg_attr(not(disable_uniffi_export), uniffi::export)]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> Result<bool, $err> {
             panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
         }
@@ -203,6 +223,7 @@ pub struct Halo2ProofResult {
 #[macro_export]
 macro_rules! app {
     () => {
+        mopro_ffi::uniffi_setup!();
         uniffi::setup_scaffolding!();
 
         // This should be declared into this macro due to Uniffi's limitation
