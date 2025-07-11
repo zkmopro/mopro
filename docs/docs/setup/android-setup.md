@@ -121,7 +121,7 @@ In your project, there should be a file named `MainActivity.kt`
 It should be under `app/src/main/java/com/example/YOUR_APP/MainActivity.kt`
 :::
 
-Import the following functions:
+Import the following boilerplate functions:
 
 ```kotlin title="MainActivity.kt"
 import androidx.compose.runtime.*
@@ -133,10 +133,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import kotlinx.coroutines.launch
-import uniffi.mopro.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+```
+
+Then, import the `uniffi.<PROJECT_NAME>` package that contains the generated bindings for your project. Replace `<PROJECT_NAME>` with the name of your project, which is usually the same as the Rust crate name, with `-` replaced by `_`. For example, if your Rust crate is named `mopro-example`, the import would look like this:
+
+```kotlin title="MainActivity.kt"
+import uniffi.mopro_example.*
 ```
 
 This will make the proving functions `generateCircomProof` available in this module and also help to load zkey.
@@ -211,6 +216,7 @@ fun MainScreen(context: Context) {
 
 <details>
   <summary>Full `MainActivity.kt` (simplified)</summary>
+ % TODO - update this to custom project name 
 
 ```kotlin
 package com.example.moproandroidapp // Your application ID
@@ -234,7 +240,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlinx.coroutines.launch
-import uniffi.mopro.*
+import uniffi.<PROJECT_NAME>.*
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -330,3 +337,25 @@ You should now be able to run the Android app (`^`+`R` or `ctrl`+`R`) on the sim
     -   Add the required Rust crate in `Cargo.toml`
     -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](rust-setup.md#-customize-the-bindings) guide for details).<br/>
         Once exported, the function will be available across all supported platforms.
+
+## 6. Importing multiple bindings
+
+Adding two or more Mopro-generated bindings directly into one Android project will cause conflicts due to duplicate package names.
+
+To resolve this:
+
+1. **Rename Kotlin binding files**  
+   For each binding, rename `mopro.kt` to something unique (e.g. `MyLibraryA.kt`).  
+   At the top of the file, change the `package uniffi.mopro` line to a unique name (e.g. `uniffi.mylibrarya`).
+
+2. **Merge JNI libraries**  
+   Combine `.so` files from each separate binding into a single `jniLibs` folder, keeping all architectures (e.g. `arm64-v8a`, `x86_64`).  
+   Ensure each `.so` has a unique name to prevent overwriting.
+
+3. **Adjust your imports**  
+   Use the new package names to import each binding module without conflicts.
+
+4. **Repeat steps 1–3** for each additional binding (`MyLibraryB`, `MyLibraryC`, …).  
+   Ensure each binding was generated from a distinct Mopro project with a unique name.
+
+You can now include multiple bindings in the same project without symbol or package collisions.

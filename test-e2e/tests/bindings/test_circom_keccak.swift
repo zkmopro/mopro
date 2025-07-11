@@ -1,5 +1,5 @@
 import Foundation
-import mopro
+import mopro_bindings
 
 // Helper function to convert bytes to bits
 func bytesToBits(bytes: [UInt8]) -> [String] {

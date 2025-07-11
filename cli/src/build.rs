@@ -250,11 +250,7 @@ fn print_binding_message(platforms: &Vec<Platform>) -> anyhow::Result<()> {
     print_green_bold("✨ Bindings Built Successfully! ✨".to_string());
     println!("The Mopro bindings have been successfully generated and are available in the following directories:\n");
     for platform in platforms {
-        let text = format!(
-            "- {}/Mopro{}Bindings",
-            current_dir.display(),
-            platform.binding_name()
-        );
+        let text = format!("- {}/{}", current_dir.display(), platform.binding_dir());
         println!("{}", blue_bold(text.to_string()));
     }
     print_build_success_message();

@@ -1,3 +1,4 @@
+use anyhow::Context;
 use camino::Utf8Path;
 use std::fs;
 use std::io::{Error, ErrorKind};
@@ -7,7 +8,7 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
 
-use crate::app_config::toml_lib_name;
+use crate::app_config::project_name_from_toml;
 
 use super::cleanup_tmp_local;
 use super::constants::{
@@ -19,21 +20,30 @@ use super::install_ndk;
 use super::mktemp_local;
 
 pub fn build() {
-    const BINDING_NAME: &str = "MoproAndroidBindings";
+    let uniffi_style_identifier = project_name_from_toml();
+
+    // Names for the generated files and directories
+    let binding_dir_name = "MoproAndroidBindings";
+    let lib_name = format!("lib{}.so", &uniffi_style_identifier);
+
+    let gen_android_module_name = &uniffi_style_identifier;
+    let gen_android_kt_file_name = format!("{}.kt", &uniffi_style_identifier);
+    let out_android_module_name = "mopro";
+    let out_android_kt_file_name = "mopro.kt";
 
     #[cfg(feature = "witnesscalc")]
     let _ = std::env::var("ANDROID_NDK").unwrap_or_else(|_| {
         panic!("ANDROID_NDK is not set");
     });
 
+    // Paths for the generated files
     let cwd = std::env::current_dir().expect("Failed to get current directory");
     let manifest_dir =
         std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| cwd.to_str().unwrap().to_string());
     let build_dir = Path::new(&manifest_dir).join("build");
     let work_dir = mktemp_local(&build_dir);
-    let bindings_out = work_dir.join(BINDING_NAME);
-    let bindings_dest = Path::new(&manifest_dir).join(BINDING_NAME);
-    let lib_name = toml_lib_name("so");
+    let bindings_out = work_dir.join(binding_dir_name);
+    let bindings_dest = Path::new(&manifest_dir).join(binding_dir_name);
 
     let mode = Mode::parse_from_str(
         std::env::var(ENV_CONFIG)
@@ -62,6 +72,15 @@ pub fn build() {
 
     generate_android_bindings(&latest_out_lib_path, &bindings_out)
         .expect("Failed to generate bindings");
+
+    reformat_kotlin_package(
+        gen_android_module_name,
+        &gen_android_kt_file_name,
+        out_android_module_name,
+        &out_android_kt_file_name,
+        &bindings_out,
+    )
+    .expect("Failed to reformat generated Kotlin package");
 
     move_bindings(&bindings_out, &bindings_dest);
     cleanup_tmp_local(&build_dir);
@@ -149,4 +168,37 @@ fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::R
     )
     .map_err(|e| Error::other(e.to_string()))?;
     Ok(())
+}
+
+fn reformat_kotlin_package(
+    gen_android_module_name: &str,
+    gen_android_kt_file_name: &str,
+    out_android_module_name: &str,
+    out_android_kt_file_name: &&str,
+    bindings_out: &Path,
+) -> anyhow::Result<()> {
+    let generated_kt_file = bindings_out
+        .join("uniffi")
+        .join(gen_android_module_name)
+        .join(gen_android_kt_file_name);
+    let out_android_kt_file = bindings_out
+        .join("uniffi")
+        .join(out_android_module_name)
+        .join(out_android_kt_file_name);
+
+    fs::create_dir(bindings_out.join("uniffi").join(out_android_module_name))
+        .context("Failed to create new package directory")?;
+    fs::rename(generated_kt_file, &out_android_kt_file).context("Failed to move kotlin file")?;
+    fs::remove_dir(bindings_out.join("uniffi").join(gen_android_module_name))
+        .context("Failed to remove gen android kotlin package directory")?;
+
+    // Remove `package uniffi.<gen_android_module_name>` from the generated Kotlin file
+    let content =
+        fs::read_to_string(&out_android_kt_file).context("Failed to read generated Kotlin file")?;
+    let modified_content = content.replace(
+        &format!("package uniffi.{}", gen_android_module_name),
+        &format!("package uniffi.{}", out_android_module_name),
+    );
+    fs::write(&out_android_kt_file, modified_content)
+        .context("Failed to write modified Kotlin file")
 }

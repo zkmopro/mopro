@@ -4,47 +4,60 @@ use std::path::Path;
 use walkdir::WalkDir;
 
 use crate::constants::{
-    Platform, JNILIBS_DIR, MOPRO_KOTLIN_FILE, MOPRO_SWIFT_FILE, XCFRAMEWORK_NAME,
+    Platform, ANDROID_JNILIBS_DIR, ANDROID_MOPRO_DIR, ANDROID_MOPRO_KT_FILE, ANDROID_UNIFFI_DIR,
+    IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR,
 };
 use crate::print::print_update_success_message;
 use crate::style::{print_gray_items, print_green_bold};
 
 pub fn update_bindings() -> Result<()> {
     let project_dir = std::env::current_dir()?;
-    let ios_bindings_dir = project_dir.join(Platform::Ios.binding_dir());
-    let android_bindings_dir = project_dir.join(Platform::Android.binding_dir());
-    let web_bindings_dir = project_dir.join(Platform::Web.binding_dir());
 
-    // Update iOS bindings
-    if ios_bindings_dir.exists() {
-        print_green_bold("🔄 Updating iOS bindings...".to_string());
-        let updated_xcframework_paths =
-            update_folder(&ios_bindings_dir.join(XCFRAMEWORK_NAME), XCFRAMEWORK_NAME)?;
-        print_gray_items(updated_xcframework_paths);
-        let updated_swift_paths =
-            update_file(&ios_bindings_dir.join(MOPRO_SWIFT_FILE), MOPRO_SWIFT_FILE)?;
-        print_gray_items(updated_swift_paths);
-    }
-    // Update Android bindings
-    if android_bindings_dir.exists() {
-        print_green_bold("🔄 Updating Android bindings...".to_string());
-        let updated_jnilib_paths =
-            update_folder(&android_bindings_dir.join(JNILIBS_DIR), JNILIBS_DIR)?;
-        print_gray_items(updated_jnilib_paths);
-        let updated_kotlin_paths = update_file(
-            &android_bindings_dir
-                .join("uniffi")
-                .join("mopro")
-                .join(MOPRO_KOTLIN_FILE),
-            MOPRO_KOTLIN_FILE,
-        )?;
-        print_gray_items(updated_kotlin_paths);
-    }
-    // Update Wasm bindings
-    if web_bindings_dir.exists() {
-        print_green_bold("🔄 Updating Web bindings...".to_string());
-        let updated_web_paths = update_folder(&web_bindings_dir, Platform::Web.binding_dir())?;
-        print_gray_items(updated_web_paths);
+    for platform in [Platform::Ios, Platform::Android, Platform::Web].iter() {
+        let binding_dir_name = platform.binding_dir();
+        let platform_bindings_dir = project_dir.join(binding_dir_name);
+
+        if !platform_bindings_dir.exists() {
+            continue;
+        }
+
+        print_green_bold(format!(
+            "🔄 Updating {} bindings...",
+            platform.binding_name()
+        ));
+
+        let mut updated_paths = vec![];
+
+        match platform {
+            Platform::Ios => {
+                updated_paths.extend(update_folder(
+                    &platform_bindings_dir.join(IOS_XCFRAMEWORKS_DIR),
+                    IOS_XCFRAMEWORKS_DIR,
+                    false,
+                )?);
+                updated_paths.extend(update_file(
+                    &platform_bindings_dir.join(IOS_SWIFT_FILE),
+                    IOS_SWIFT_FILE,
+                )?);
+            }
+            Platform::Android => {
+                let jnilib_path = platform_bindings_dir.join(ANDROID_JNILIBS_DIR);
+                let kotlin_path = platform_bindings_dir
+                    .join(ANDROID_UNIFFI_DIR)
+                    .join(ANDROID_MOPRO_DIR)
+                    .join(ANDROID_MOPRO_KT_FILE);
+
+                updated_paths.extend(update_file(&kotlin_path, ANDROID_MOPRO_KT_FILE)?);
+                updated_paths.extend(update_folder(&jnilib_path, ANDROID_JNILIBS_DIR, true)?);
+            }
+            Platform::Web => updated_paths.extend(update_folder(
+                &platform_bindings_dir,
+                binding_dir_name,
+                false,
+            )?),
+        };
+
+        print_gray_items(updated_paths);
     }
 
     print_update_success_message();
@@ -52,7 +65,14 @@ pub fn update_bindings() -> Result<()> {
     Ok(())
 }
 
-fn update_folder(source_dir: &Path, target_dir_name: &str) -> Result<Vec<String>> {
+/// Recursively updates all directories in the current directory that match `target_dir_name`.
+/// If `gracefully` is `true`, existing directories are preserved and only overlapping files are overwritten.
+/// This is useful for shared folders across multiple bindings (e.g., Android JNI libs).
+fn update_folder(
+    source_dir: &Path,
+    target_dir_name: &str,
+    gracefully: bool,
+) -> Result<Vec<String>> {
     let mut updated_paths = Vec::new();
     if !source_dir.exists() {
         return Err(anyhow::anyhow!(
@@ -72,8 +92,10 @@ fn update_folder(source_dir: &Path, target_dir_name: &str) -> Result<Vec<String>
                 continue;
             }
 
-            // Remove old directory
-            fs::remove_dir_all(path)?;
+            if !gracefully {
+                // Remove old directory
+                fs::remove_dir_all(path)?;
+            }
 
             // Copy the new directory into the parent of the old one
             fs_extra::dir::copy(
