@@ -90,7 +90,7 @@ impl PlatformSelector {
                 let all_ios_archs = IosArch::all_display_strings();
                 let display_strings: Vec<String> = all_ios_archs
                     .iter()
-                    .map(|(arch, desc)| format!("{} {}", arch, desc))
+                    .map(|(arch, desc)| format!("{arch} {desc}"))
                     .collect();
                 let display_refs: Vec<&str> = display_strings.iter().map(|s| s.as_str()).collect();
                 let defaults: Vec<bool> = if config.ios.is_none() {
@@ -122,7 +122,7 @@ impl PlatformSelector {
                 let all_android_archs = AndroidArch::all_display_strings();
                 let display_strings: Vec<String> = all_android_archs
                     .iter()
-                    .map(|(arch, desc)| format!("{} {}", arch, desc))
+                    .map(|(arch, desc)| format!("{arch} {desc}"))
                     .collect();
                 let display_refs: Vec<&str> = display_strings.iter().map(|s| s.as_str()).collect();
                 let defaults: Vec<bool> = if config.android.is_none() {
@@ -157,10 +157,9 @@ impl PlatformSelector {
     fn select_multi_archs(platform: &str, archs: &[&str], defaults: Vec<bool>) -> Vec<usize> {
         // At least one architecture must be selected
         multi_select(
-            format!("Select {} architecture(s) to compile", platform).as_str(),
+            format!("Select {platform} architecture(s) to compile").as_str(),
             format!(
-                "No architectures selected for {}. Please select at least one architecture.",
-                platform
+                "No architectures selected for {platform}. Please select at least one architecture.",
             )
             .as_str(),
             archs.to_vec(),

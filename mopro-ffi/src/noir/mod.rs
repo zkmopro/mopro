@@ -215,7 +215,7 @@ mod tests {
         for key in witness_key_order {
             match inputs.get(key) {
                 Some(values) => witness_vec_string.extend(values.iter().cloned()),
-                None => panic!("Missing required input key in HashMap: {}", key),
+                None => panic!("Missing required input key in HashMap: {key}"),
             }
         }
         witness_vec_string

@@ -79,7 +79,7 @@ fn main() {
             }
             match init::init_project(adapter, project_name) {
                 Ok(_) => {}
-                Err(e) => style::print_red_bold(format!("Failed to initialize project: {:?}", e)),
+                Err(e) => style::print_red_bold(format!("Failed to initialize project: {e:?}")),
             }
         }
         Commands::Build {
@@ -94,7 +94,7 @@ fn main() {
             }
             match build::build_project(mode, platforms, architectures) {
                 Ok(_) => {}
-                Err(e) => style::print_red_bold(format!("Failed to build project: {:?}", e)),
+                Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
             }
         }
         Commands::Create { framework, show } => {
@@ -122,12 +122,12 @@ fn main() {
 
             match create::create_project(framework) {
                 Ok(_) => {}
-                Err(e) => style::print_red_bold(format!("Failed to create template: {:?}", e)),
+                Err(e) => style::print_red_bold(format!("Failed to create template: {e:?}")),
             }
         }
         Commands::Update {} => match update::update_bindings() {
             Ok(_) => {}
-            Err(e) => style::print_red_bold(format!("Failed to update bindings: {:?}", e)),
+            Err(e) => style::print_red_bold(format!("Failed to update bindings: {e:?}")),
         },
     }
 }

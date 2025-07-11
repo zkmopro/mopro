@@ -173,8 +173,7 @@ pub fn build_project(
         if platform.contains_archs(not_allowed_archs.as_slice()) {
             style::print_yellow(
                 format!(
-                    "Noir doesn't support following architectures: {:?}, choose other architectures",
-                    not_allowed_archs
+                    "Noir doesn't support following architectures: {not_allowed_archs:?}, choose other architectures",
                 )
                 .to_string(),
             );
