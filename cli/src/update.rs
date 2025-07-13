@@ -3,12 +3,13 @@ use std::fs;
 use std::path::Path;
 use walkdir::WalkDir;
 
-use crate::constants::{
-    Platform, ANDROID_JNILIBS_DIR, ANDROID_MOPRO_DIR, ANDROID_MOPRO_KT_FILE, ANDROID_UNIFFI_DIR,
-    IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR,
-};
+use crate::constants::Platform;
 use crate::print::print_update_success_message;
 use crate::style::{print_gray_items, print_green_bold};
+use mopro_ffi::app_config::constants::{
+    ANDROID_JNILIBS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ANDROID_UNIFFI_DIR, IOS_SWIFT_FILE,
+    IOS_XCFRAMEWORKS_DIR,
+};
 
 pub fn update_bindings() -> Result<()> {
     let project_dir = std::env::current_dir()?;
@@ -44,10 +45,10 @@ pub fn update_bindings() -> Result<()> {
                 let jnilib_path = platform_bindings_dir.join(ANDROID_JNILIBS_DIR);
                 let kotlin_path = platform_bindings_dir
                     .join(ANDROID_UNIFFI_DIR)
-                    .join(ANDROID_MOPRO_DIR)
-                    .join(ANDROID_MOPRO_KT_FILE);
+                    .join(ANDROID_PACKAGE_NAME)
+                    .join(ANDROID_KT_FILE);
 
-                updated_paths.extend(update_file(&kotlin_path, ANDROID_MOPRO_KT_FILE)?);
+                updated_paths.extend(update_file(&kotlin_path, ANDROID_KT_FILE)?);
                 updated_paths.extend(update_folder(&jnilib_path, ANDROID_JNILIBS_DIR, true)?);
             }
             Platform::Web => updated_paths.extend(update_folder(

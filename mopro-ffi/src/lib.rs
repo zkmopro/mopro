@@ -1,3 +1,6 @@
+#![allow(unexpected_cfgs)]
+
+#[cfg(feature = "build")]
 pub mod app_config;
 
 // UniFFI re-export

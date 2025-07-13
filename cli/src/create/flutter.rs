@@ -2,12 +2,14 @@ use anyhow::Error;
 use std::{fs, path::PathBuf};
 
 use super::Create;
-use crate::constants::{Platform, IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR};
+use crate::constants::Platform;
 use crate::create::utils::{
     check_bindings, copy_android_bindings, copy_dir, copy_keys, download_and_extract_template,
 };
 use crate::print::print_footer_message;
 use crate::style::print_green_bold;
+
+use mopro_ffi::app_config::constants::{IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR};
 
 pub struct Flutter;
 

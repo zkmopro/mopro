@@ -14,7 +14,9 @@ use indicatif::ProgressStyle;
 use reqwest::blocking::Client;
 use zip::ZipArchive;
 
-use crate::constants::{Platform, ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
+use mopro_ffi::app_config::constants::{ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
+
+use crate::constants::Platform;
 
 pub fn copy_android_bindings(
     android_bindings_dir: &Path,

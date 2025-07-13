@@ -1,18 +1,20 @@
-use anyhow::Ok;
 use anyhow::Result;
+use anyhow::{Context, Ok};
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
 use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
+use mopro_ffi::app_config::constants::{AndroidArch, AndroidPlatform, Arch, IosPlatform, Mode};
 use std::collections::HashSet;
 use std::env;
+
+use mopro_ffi::app_config::build_from_str_arch;
+use mopro_ffi::app_config::ios::IosBindingsParams;
 
 use crate::config::read_config;
 use crate::config::write_config;
 use crate::config::Config;
-use crate::constants::AndroidArch;
-use crate::constants::Mode;
 use crate::constants::Platform;
 use crate::create::utils::copy_embedded_dir;
 use crate::init::adapter::Adapter;
@@ -188,33 +190,43 @@ pub fn build_project(
 
     for p in platform.platforms.clone() {
         let platform_str: &str = p.as_str();
-        let selected_arch = selected_architectures
-            .get(platform_str)
-            .map(|archs| archs.join(","))
-            .unwrap_or_default();
 
-        let mut command = std::process::Command::new("cargo");
-        command
-            .arg("run")
-            .arg("--bin")
-            .arg(platform_str)
-            .env("CONFIGURATION", mode.as_str())
-            .env(p.arch_key(), selected_arch);
-
-        // The dependencies of Noir libraries need iOS 15 and above.
-        let status = if config.adapter_contains(Adapter::Noir) && p.eq(&Platform::Ios) {
-            command.env("IPHONEOS_DEPLOYMENT_TARGET", "15").status()?
-        } else {
-            command.status()?
-        };
-
-        if !status.success() {
-            // Return a custom error if the command fails
-            return Err(anyhow::anyhow!(
-                "Output with status code {}",
-                status.code().unwrap()
-            ));
+        let mut platform_arch = vec![];
+        if p != Platform::Web {
+            platform_arch.extend(selected_architectures.get(platform_str).context(format!(
+                "No architectures selected for platform: {platform_str}"
+            ))?);
         }
+
+        match p {
+            Platform::Ios => build_from_str_arch::<IosPlatform>(
+                mode,
+                &current_dir,
+                platform_arch,
+                IosBindingsParams {
+                    using_noir: config.adapter_contains(Adapter::Noir),
+                },
+            ),
+            Platform::Android => {
+                build_from_str_arch::<AndroidPlatform>(mode, &current_dir, platform_arch, ())
+            }
+            Platform::Web => {
+                let mut command = std::process::Command::new("cargo");
+                command.arg("run").arg("--bin").arg(platform_str);
+
+                let status = command.status()?;
+
+                if !status.success() {
+                    // Return a custom error if the command fails
+                    Err(anyhow::anyhow!(
+                        "Output with status code {}",
+                        status.code().unwrap()
+                    ))
+                } else {
+                    Ok(current_dir.join(p.binding_dir()))
+                }
+            }
+        }?;
     }
 
     print_binding_message(&platform.platforms)?;
