@@ -46,10 +46,10 @@ impl PlatformBuilder for IosPlatform {
         let out_swift_file_name = IOS_SWIFT_FILE;
 
         // Names for the generated files by uniffi
-        let gen_swift_file_name = format!("{}.swift", uniffi_style_identifier);
-        let lib_name = format!("lib{}.a", &uniffi_style_identifier);
-        let header_name = format!("{}FFI.h", uniffi_style_identifier);
-        let modulemap_name = format!("{}FFI.modulemap", uniffi_style_identifier);
+        let gen_swift_file_name = format!("{uniffi_style_identifier}.swift");
+        let lib_name = format!("lib{uniffi_style_identifier}.a");
+        let header_name = format!("{uniffi_style_identifier}FFI.h");
+        let modulemap_name = format!("{uniffi_style_identifier}FFI.modulemap");
 
         // Paths for the generated files
         let build_dir_path = project_dir.join("build");
@@ -133,8 +133,7 @@ impl PlatformBuilder for IosPlatform {
             bindings_out.join(out_swift_file_name),
         )
         .context(format!(
-            "Failed to rename bindings from {}",
-            gen_swift_file_name
+            "Failed to rename bindings from {gen_swift_file_name}"
         ))?;
 
         let mut xcbuild_cmd = Command::new("xcodebuild");

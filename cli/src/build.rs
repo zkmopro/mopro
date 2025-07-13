@@ -194,8 +194,7 @@ pub fn build_project(
         let mut platform_arch = vec![];
         if p != Platform::Web {
             platform_arch.extend(selected_architectures.get(platform_str).context(format!(
-                "No architectures selected for platform: {}",
-                platform_str
+                "No architectures selected for platform: {platform_str}"
             ))?);
         }
 
