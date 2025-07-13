@@ -96,7 +96,7 @@ pub fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> Result<()> {
             Some(file) => {
                 if let Err(e) = fs::write(&output_path, file.contents()) {
                     if e.kind() == ErrorKind::AlreadyExists {
-                        println!("File already exists: {:?}", output_path);
+                        println!("File already exists: {output_path:?}");
                     } else {
                         return Err(e.into());
                     }
@@ -148,8 +148,7 @@ pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<PathBuf>
         Ok(bindings_dir)
     } else {
         Err(Error::msg(format!(
-            "{} are required to create the template. Please run 'mopro build' to generate them.",
-            bindings_dir_name
+            "{bindings_dir_name} are required to create the template. Please run 'mopro build' to generate them.",
         )))
     }
 }
@@ -163,7 +162,7 @@ pub fn download_and_extract_template(url: &str, dest: &Path, platform: &str) -> 
             .template("{msg} {spinner} {bytes} downloaded")
             .unwrap(),
     );
-    spinner.set_message(format!("Downloading {} template...", platform));
+    spinner.set_message(format!("Downloading {platform} template..."));
 
     // Save to a temporary file
     let temp_zip_path = dest.join("template.zip");

@@ -11,18 +11,18 @@ use dialoguer::Select;
 
 mod android;
 mod ios;
-use android::Android;
-use ios::Ios;
+pub use android::Android;
+pub use ios::Ios;
 mod web;
-use web::Web;
+pub use web::Web;
 mod flutter;
-use flutter::Flutter;
+pub use flutter::Flutter;
 mod react_native;
-use react_native::ReactNative;
+pub use react_native::ReactNative;
 pub mod utils;
 pub mod write_toml;
 
-trait Create {
+pub trait Create {
     const NAME: &'static str;
     fn create(project_dir: PathBuf) -> Result<(), Error>;
     fn print_message();

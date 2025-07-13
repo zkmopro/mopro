@@ -116,7 +116,7 @@ $ mopro build
 :::
 
 :::info
-See more details about the architectures in [Architectures](architectures) Section
+See more details about the architectures in [Architectures](./architectures.md) Section
 :::
 
 :::warning
