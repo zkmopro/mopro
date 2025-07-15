@@ -6,8 +6,8 @@ use toml::Value;
 use uuid::Uuid;
 
 use self::constants::{
-    AndroidPlatform, Arch, IosPlatform, Mode, PlatformBuilder, ANDROID_ARCHS_ENV,
-    BUILD_BINDINGS_ENV, BUILD_MODE_ENV, IOS_ARCHS_ENV,
+    AndroidPlatform, Arch, IosPlatform, Mode, PlatformBuilder, ANDROID_ARCHS_ENV, BUILD_MODE_ENV,
+    IOS_ARCHS_ENV, SKIP_BUILDING_BINDINGS_ENV,
 };
 
 pub mod android;
@@ -20,20 +20,20 @@ pub mod ios;
 /// it reacts to `BUILD_BINDINGS_ENV` and emits the appropriate `cargo:` directives.
 pub fn generate_bindings() {
     let is_build_script = std::env::var_os("OUT_DIR").is_some();
-    let should_build = std::env::var_os(BUILD_BINDINGS_ENV).is_some();
+    let should_not_build = std::env::var_os(SKIP_BUILDING_BINDINGS_ENV).is_some();
 
     if is_build_script {
-        println!("cargo:rerun-if-env-changed={}", BUILD_BINDINGS_ENV);
+        println!("cargo:rerun-if-env-changed={}", SKIP_BUILDING_BINDINGS_ENV);
         println!("cargo:rerun-if-env-changed={}", BUILD_MODE_ENV);
         println!("cargo:rerun-if-env-changed={}", IOS_ARCHS_ENV);
         println!("cargo:rerun-if-env-changed={}", ANDROID_ARCHS_ENV);
         println!("cargo:rerun-if-changed=.");
 
-        if !should_build {
+        if should_not_build {
             println!(
                 "cargo:warning=build.rs: skipping bindings generation — \
-                 {} is not set.",
-                BUILD_BINDINGS_ENV
+                 {} is set.",
+                SKIP_BUILDING_BINDINGS_ENV
             );
             return;
         }
