@@ -187,7 +187,7 @@ fn replace_features(file_path: &str, adapters: Vec<&str>) -> Result<()> {
 
     let features: Vec<String> = adapters
         .iter()
-        .map(|adapter| format!("\"mopro-ffi/{}\"", adapter))
+        .map(|adapter| format!("\"mopro-ffi/{adapter}\""))
         .collect();
 
     replace_string_in_file(file_path, target, &features.join(", "))

@@ -175,8 +175,7 @@ pub fn build_project(
         if platform.contains_archs(not_allowed_archs.as_slice()) {
             style::print_yellow(
                 format!(
-                    "Noir doesn't support following architectures: {:?}, choose other architectures",
-                    not_allowed_archs
+                    "Noir doesn't support following architectures: {not_allowed_archs:?}, choose other architectures",
                 )
                 .to_string(),
             );
@@ -195,8 +194,7 @@ pub fn build_project(
         let mut platform_arch = vec![];
         if p != Platform::Web {
             platform_arch.extend(selected_architectures.get(platform_str).context(format!(
-                "No architectures selected for platform: {}",
-                platform_str
+                "No architectures selected for platform: {platform_str}"
             ))?);
         }
 

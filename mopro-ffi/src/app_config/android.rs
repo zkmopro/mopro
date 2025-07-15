@@ -1,4 +1,3 @@
-use anyhow::Context;
 use camino::Utf8Path;
 use std::fs;
 use std::io::{Error, ErrorKind};
@@ -134,7 +133,7 @@ fn build_for_arch(
         mode.as_str(),
         lib_name
     ));
-    let out_lib_dest = bindings_out.join(format!("jniLibs/{}/{}", folder, lib_name));
+    let out_lib_dest = bindings_out.join(format!("jniLibs/{folder}/{lib_name}"));
 
     let parent_dir = out_lib_dest.parent().context(format!(
         "Failed to get parent directory for {}",
@@ -208,8 +207,8 @@ fn reformat_kotlin_package(
     let content =
         fs::read_to_string(&out_android_kt_file).context("Failed to read generated Kotlin file")?;
     let modified_content = content.replace(
-        &format!("package uniffi.{}", gen_android_module_name),
-        &format!("package uniffi.{}", out_android_module_name),
+        &format!("package uniffi.{gen_android_module_name}"),
+        &format!("package uniffi.{out_android_module_name}"),
     );
     fs::write(&out_android_kt_file, modified_content)
         .context("Failed to write modified Kotlin file")

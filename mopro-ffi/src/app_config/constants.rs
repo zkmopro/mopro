@@ -1,4 +1,4 @@
-use anyhow::Context;
+use color_eyre::eyre::ContextCompat;
 
 pub const BUILD_BINDINGS_ENV: &str = "MOPRO_BUILD_BINDINGS";
 pub const BUILD_MODE_ENV: &str = "CONFIGURATION";
