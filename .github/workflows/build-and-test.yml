@@ -89,7 +89,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-            toolchain: 1.81.0
+            toolchain: 1.84.0
       - name: Run ffi tests
         run: cd mopro-ffi && cargo test --release --all-features
   setup-halo2-wasm-env:
@@ -190,7 +190,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.81.0
+          toolchain: 1.84.0
           override: true
       - name: install dependencies
         run: brew install nasm
@@ -265,7 +265,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.81.0
+          toolchain: 1.84.0
           override: true
       - name: install requirements
         uses: awalsh128/cache-apt-pkgs-action@v1
