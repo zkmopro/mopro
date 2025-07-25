@@ -28,7 +28,7 @@ mopro-ffi = { path = "../mopro-ffi", features = [
 mopro-wasm = { path = "../mopro-wasm" }
 
 # Circom dependencies
-rust-witness = "0.1"
+rust-witness = { workspace = true }
 witnesscalc-adapter = "0.1"
 
 # Halo2 dependencies
@@ -42,7 +42,7 @@ thiserror = "2.0.12"
 mopro-ffi = { path = "../mopro-ffi" }
 
 # Circom dependencies
-rust-witness = "0.1"
+rust-witness = { workspace = true }
 witnesscalc-adapter = "0.1"
 
 [dev-dependencies]

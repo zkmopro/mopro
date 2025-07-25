@@ -58,7 +58,7 @@ num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
 anyhow = "1.0.95"
-rust-witness = { version = "0.1", optional = true }
+rust-witness = { workspace = true, optional = true }
 byteorder = { version = "1.0.0" }
 uuid = { version = "1.9.1", features = ["v4"] }
 serde_json = "1.0.94"
@@ -91,7 +91,7 @@ rand = { version = "0.8", features = ["std"] }
 witnesscalc-adapter = { version = "0.1", optional = true }
 
 # circom-witnesscalc
-circom-witnesscalc = { version = "0.2", optional = true }
+circom-witnesscalc = { version = "0.2.1", optional = true }
 once_cell = { version = "1.21.3", optional = true }
 
 # rapidsnark
@@ -104,7 +104,7 @@ hex-literal = "0.4.1"
 
 [build-dependencies]
 # rust-witness
-rust-witness = { version = "0.1", optional = true }
+rust-witness = { workspace = true, optional = true }
 # witnesscalc-adapter
 witnesscalc-adapter = { version = "0.1", optional = true }
 # rapidsnark
