@@ -53,6 +53,8 @@ enum Commands {
     Create {
         #[arg(long, help = "Specify the framework")]
         framework: Option<String>,
+        #[arg(long, help = "Specify the native platform (ios or android) for supported frameworks")]
+        platform: Option<String>,
         #[arg(
             long,
             value_name = "FRAMEWORK",
@@ -60,9 +62,10 @@ enum Commands {
         )]
         show: Option<String>,
     },
-    /// Update the bindings for the all platforms
+    /// Update the bindings for all platforms
     Update {},
 }
+
 
 fn main() {
     let cli = Cli::parse();
@@ -97,7 +100,8 @@ fn main() {
                 Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
             }
         }
-        Commands::Create { framework, show } => {
+        
+        Commands::Create { framework, platform, show } => {
             if let Some(framework) = show {
                 if framework.trim().is_empty() {
                     Cli::command()
@@ -108,23 +112,26 @@ fn main() {
                     println!();
                     return;
                 }
-
+        
                 match Framework::parse_from_str(framework) {
                     Framework::Ios => <Ios as Create>::print_message(),
                     Framework::Android => <Android as Create>::print_message(),
                     Framework::Web => <Web as Create>::print_message(),
-                    Framework::Flutter => <Flutter as Create>::print_message(),
+                    Framework::Flutter => <Flutter as Create>::print_message(),   // ✅ Flutter supported
                     Framework::ReactNative => <ReactNative as Create>::print_message(),
                 }
                 println!();
                 return;
             }
-
-            match create::create_project(framework) {
+        
+            // Handles platform-aware creation (React Native + Flutter)
+            match create::create_project(framework, platform) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to create template: {e:?}")),
             }
         }
+        
+
         Commands::Update {} => match update::update_bindings() {
             Ok(_) => {}
             Err(e) => style::print_red_bold(format!("Failed to update bindings: {e:?}")),
