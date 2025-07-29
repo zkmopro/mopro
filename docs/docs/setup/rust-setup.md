@@ -237,7 +237,7 @@ Once the bindings are successfully built, you will see the `MoproiOSBindings` an
 Next, you have two options:
 
 -   Use the `mopro create` command from the mopro CLI to generate ready-to-use templates for your desired framework (e.g., Swift, Kotlin, React Native, or Flutter).
--   If you already have a mobile app or prefer to manually integrate the bindings, follow the [iOS Setup](ios-setup) and/or [Android Setup](android-setup) sections.
+-   If you already have a mobile app or prefer to manually integrate the bindings, follow the [iOS Setup](ios-setup.md) and/or [Android Setup](android-setup.md) sections.
 -   If you find that some functionality is still missing on mobile, you can refer to the [Customize the Bindings](#-customize-the-bindings) section to learn how to expose additional functions using any Rust crate.
 
 ---
