@@ -274,7 +274,7 @@ This section explains how to update circuits with alternative witness generators
 
     :::info
     We aim to provide the `mopro update` CLI tool to assist with updating bindings.
-    Contributions to this effort are welcome.https://github.com/zkmopro/mopro/issues/269
+    Contributions to this effort are welcome. [GitHub Issue #269](https://github.com/zkmopro/mopro/issues/269)
     :::
 
 5.  Copy zkeys to assets
