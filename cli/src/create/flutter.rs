@@ -22,7 +22,11 @@ impl Create for Flutter {
         let ios_bindings_dir = check_bindings(&project_dir, Platform::Ios)?;
         let android_bindings_dir = check_bindings(&project_dir, Platform::Android)?;
 
-        Self::create_internal(project_dir, Some(ios_bindings_dir), Some(android_bindings_dir))
+        Self::create_internal(
+            project_dir,
+            Some(ios_bindings_dir),
+            Some(android_bindings_dir),
+        )
     }
 
     fn print_message() {

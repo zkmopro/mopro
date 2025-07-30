@@ -28,7 +28,10 @@ pub trait Create {
     fn print_message();
 }
 
-pub fn create_project(arg_framework: &Option<String>, arg_platform: &Option<String>) -> anyhow::Result<()> {
+pub fn create_project(
+    arg_framework: &Option<String>,
+    arg_platform: &Option<String>,
+) -> anyhow::Result<()> {
     // 1. Determine framework
     let framework: String = match arg_framework.as_deref() {
         None => select_framework()?,
@@ -50,7 +53,7 @@ pub fn create_project(arg_framework: &Option<String>, arg_platform: &Option<Stri
             if let Some(platform) = arg_platform {
                 ReactNative::create_with_platform(project_dir, platform.to_lowercase())?;
             } else {
-                let selected_platform = select_platform()?;  
+                let selected_platform = select_platform()?;
                 ReactNative::create_with_platform(project_dir, selected_platform)?;
             }
         }
@@ -58,7 +61,7 @@ pub fn create_project(arg_framework: &Option<String>, arg_platform: &Option<Stri
             if let Some(platform) = arg_platform {
                 Flutter::create_with_platform(project_dir, platform.to_lowercase())?;
             } else {
-                let selected_platform = select_platform()?;  
+                let selected_platform = select_platform()?;
                 Flutter::create_with_platform(project_dir, selected_platform)?;
             }
         }
@@ -66,12 +69,9 @@ pub fn create_project(arg_framework: &Option<String>, arg_platform: &Option<Stri
         Framework::Android => Android::create(project_dir)?,
         Framework::Web => Web::create(project_dir)?,
     }
-    
 
     Ok(())
 }
-
-
 
 fn select_framework() -> anyhow::Result<String> {
     let (items, unselectable) = get_target_platforms_with_status()?;
@@ -151,7 +151,6 @@ fn get_target_platforms_with_status() -> anyhow::Result<(Vec<String>, Vec<bool>)
 
     Ok((items, unselectable))
 }
-
 
 fn select_platform() -> anyhow::Result<String> {
     let items = vec!["ios", "android"];

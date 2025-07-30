@@ -1,7 +1,7 @@
+use anyhow::Result;
+use cli::create::{Create, Flutter};
 use std::fs;
 use tempfile::tempdir;
-use cli::create::{Flutter, Create};
-use anyhow::Result;
 
 #[test]
 fn test_flutter_create_success() -> Result<()> {

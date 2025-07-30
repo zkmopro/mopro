@@ -108,7 +108,7 @@ impl ReactNative {
         let mopro_module_dir = target_dir.join("modules/mopro");
 
         // Copy bindings based on selected platform
-       
+
         match platform.as_str() {
             "ios" => {
                 if let Some(dir) = ios_bindings_dir {
@@ -122,7 +122,6 @@ impl ReactNative {
             }
             _ => unreachable!("Platform should already be validated"),
         }
-        
 
         // Keys directory (same as before)
         let assets_dir = target_dir.join("assets/keys");
@@ -136,5 +135,3 @@ impl ReactNative {
         Ok(())
     }
 }
-
-

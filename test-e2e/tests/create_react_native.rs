@@ -1,7 +1,7 @@
+use anyhow::Result;
+use cli::create::{Create, ReactNative};
 use std::fs;
 use tempfile::tempdir;
-use cli::create::{ReactNative, Create};
-use anyhow::Result;
 
 #[test]
 fn test_react_native_create_success() -> Result<()> {
