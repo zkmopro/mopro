@@ -61,7 +61,7 @@ The hackathon provided valuable insights into the state of mobile ZK proving:
 **What's Working Well:**
 - Mopro's developer experience received consistently positive feedback
 - Teams successfully integrated various proving systems (RISC-0, Noir, Gnark) with Mopro
-- The ecosystem is mature enough for developers to build meaningful applications in 48 hours
+- The ecosystem is mature enough for developers to build meaningful applications in 36 hours
 
 **Challenges Identified:**
 - Writing circuits remains the biggest pain point for developers
