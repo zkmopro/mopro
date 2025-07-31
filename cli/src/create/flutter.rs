@@ -16,63 +16,11 @@ pub struct Flutter;
 impl Create for Flutter {
     const NAME: &'static str = "flutter";
 
-    /// Legacy behavior: build for BOTH platforms
     fn create(project_dir: PathBuf) -> Result<(), Error> {
         // Check both bindings
         let ios_bindings_dir = check_bindings(&project_dir, Platform::Ios)?;
         let android_bindings_dir = check_bindings(&project_dir, Platform::Android)?;
 
-        Self::create_internal(
-            project_dir,
-            Some(ios_bindings_dir),
-            Some(android_bindings_dir),
-        )
-    }
-
-    fn print_message() {
-        print_green_bold("Flutter template created successfully!".to_string());
-        println!();
-        print_green_bold("Next steps:".to_string());
-        println!();
-        print_green_bold(
-            "  Refer to the README.md in the `flutter` folder for instructions on running the app."
-                .to_string(),
-        );
-        print_footer_message();
-    }
-}
-
-impl Flutter {
-    /// New API for platform-aware template creation
-    pub fn create_with_platform(project_dir: PathBuf, platform: String) -> Result<(), Error> {
-        // Validate platform input
-        if platform != "ios" && platform != "android" {
-            return Err(Error::msg(format!(
-                "Invalid platform selected: {}. Must be 'ios' or 'android'.",
-                platform
-            )));
-        }
-
-        let ios_bindings_dir = if platform == "ios" {
-            Some(check_bindings(&project_dir, Platform::Ios)?)
-        } else {
-            None
-        };
-        let android_bindings_dir = if platform == "android" {
-            Some(check_bindings(&project_dir, Platform::Android)?)
-        } else {
-            None
-        };
-
-        Self::create_internal(project_dir, ios_bindings_dir, android_bindings_dir)
-    }
-
-    /// Core creation logic
-    fn create_internal(
-        project_dir: PathBuf,
-        ios_bindings_dir: Option<PathBuf>,
-        android_bindings_dir: Option<PathBuf>,
-    ) -> Result<(), Error> {
         let target_dir = project_dir.join(Self::NAME);
         if target_dir.exists() {
             return Err(Error::msg(format!(
@@ -128,5 +76,17 @@ impl Flutter {
 
         Self::print_message();
         Ok(())
+    }
+
+    fn print_message() {
+        print_green_bold("Flutter template created successfully!".to_string());
+        println!();
+        print_green_bold("Next steps:".to_string());
+        println!();
+        print_green_bold(
+            "  Refer to the README.md in the `flutter` folder for instructions on running the app."
+                .to_string(),
+        );
+        print_footer_message();
     }
 }

@@ -55,11 +55,6 @@ enum Commands {
         framework: Option<String>,
         #[arg(
             long,
-            help = "Specify the native platform (ios or android) for supported frameworks"
-        )]
-        platform: Option<String>,
-        #[arg(
-            long,
             value_name = "FRAMEWORK",
             help = "Show instruction message for create (e.g., 'ios', 'android', 'web', 'flutter', 'react-native')."
         )]
@@ -103,11 +98,7 @@ fn main() {
             }
         }
 
-        Commands::Create {
-            framework,
-            platform,
-            show,
-        } => {
+        Commands::Create { framework, show } => {
             if let Some(framework) = show {
                 if framework.trim().is_empty() {
                     Cli::command()
@@ -123,7 +114,7 @@ fn main() {
                     Framework::Ios => <Ios as Create>::print_message(),
                     Framework::Android => <Android as Create>::print_message(),
                     Framework::Web => <Web as Create>::print_message(),
-                    Framework::Flutter => <Flutter as Create>::print_message(), // ✅ Flutter supported
+                    Framework::Flutter => <Flutter as Create>::print_message(),
                     Framework::ReactNative => <ReactNative as Create>::print_message(),
                 }
                 println!();
@@ -131,7 +122,7 @@ fn main() {
             }
 
             // Handles platform-aware creation (React Native + Flutter)
-            match create::create_project(framework, platform) {
+            match create::create_project(framework) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to create template: {e:?}")),
             }
