@@ -37,7 +37,7 @@ What makes this project remarkable is its practical approach to identity verific
 
 The ZKNox team showcased their cryptographic expertise at the hackathon with "Zkipper," a project that turns the ARX chips in ETHGlobal wristbands into transaction signers, enabling post‑quantum–secure smart accounts via EIP‑7702.
 
-The technical achievement here is twofold: First, they successfully integrated Gnark with Mopro within the 48-hour timeframe, which is a significant contribution to the ecosystem. Second, they implemented [Falcon512](https://falcon-sign.info/) post-quantum signatures to secure smart accounts, preventing "Bybit-style" attacks by separating admin commands onto distinct devices. This approach shows how Mopro can enable hardware-based security solutions that are both quantum-resistant and user-friendly.
+The technical achievement here is twofold: First, they successfully integrated Gnark with Mopro within the 36-hour timeframe, which is a significant contribution to the ecosystem. Second, they implemented [Falcon512](https://falcon-sign.info/) post-quantum signatures to secure smart accounts, preventing "Bybit-style" attacks by separating admin commands onto distinct devices. This approach shows how Mopro can enable hardware-based security solutions that are both quantum-resistant and user-friendly.
 
 ### 🥉 Third Place: 👀Proov! - Tamper-Proof Media with ZK
 
