@@ -1,3 +1,4 @@
+use anyhow::Error;
 use anyhow::Result;
 use include_dir::include_dir;
 use include_dir::Dir;
@@ -32,14 +33,19 @@ impl Create for Web {
 
         let target_wasm_bindings_dir = target_dir.join("MoproWasmBindings");
         fs::create_dir(target_wasm_bindings_dir.clone())?;
-        copy_dir(&wasm_bindings_dir, &target_wasm_bindings_dir)?;
+        if let Some(bindings_dir) = wasm_bindings_dir {
+            copy_dir(&bindings_dir, &target_wasm_bindings_dir)?;
+            fs::remove_dir_all(&bindings_dir)?;
+        } else {
+            return Err(Error::msg(
+                "No Web bindings found. Please run 'mopro build' to generate them.",
+            ));
+        }
 
         let asset_dir = target_dir.join("assets");
         const HALO2_KEYS_DIR: Dir =
             include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2");
         copy_embedded_file(&HALO2_KEYS_DIR, &asset_dir)?;
-
-        fs::remove_dir_all(&wasm_bindings_dir)?;
 
         Self::print_message();
         Ok(())

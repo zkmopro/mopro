@@ -28,7 +28,13 @@ impl Create for Android {
 
         env::set_current_dir(&project_dir)?;
         let app_dir = target_dir.join("app");
-        copy_android_bindings(&android_bindings_dir, &app_dir, "java")?;
+        if let Some(bindings_dir) = android_bindings_dir {
+            copy_android_bindings(&bindings_dir, &app_dir, "java")?;
+        } else {
+            return Err(Error::msg(
+                "No Android bindings found. Please run 'mopro build' to generate them.",
+            ));
+        }
 
         let assets_dir = app_dir.join("src/main/assets");
         copy_keys(assets_dir)?;

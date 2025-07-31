@@ -6,7 +6,7 @@ use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 
-use anyhow::{Error, Result};
+use anyhow::Result;
 use include_dir::include_dir;
 use include_dir::Dir;
 use indicatif::ProgressBar;
@@ -140,16 +140,14 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<PathBuf> {
+pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<Option<PathBuf>> {
     let bindings_dir_name = platform.binding_dir();
 
     let bindings_dir = project_dir.join(bindings_dir_name);
     if bindings_dir.exists() && fs::read_dir(&bindings_dir)?.count() > 0 {
-        Ok(bindings_dir)
+        Ok(Some(bindings_dir))
     } else {
-        Err(Error::msg(format!(
-            "{bindings_dir_name} are required to create the template. Please run 'mopro build' to generate them.",
-        )))
+        Ok(None)
     }
 }
 
