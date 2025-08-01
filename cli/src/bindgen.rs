@@ -1,4 +1,4 @@
-use std::{env, ffi::OsStr, fs, path::Path};
+use std::{collections::HashMap, env, ffi::OsStr, fs, path::Path};
 
 use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, Input};
@@ -18,8 +18,6 @@ pub fn bindgen(
 ) -> Result<()> {
     // Currently only support circom
     let adapter = Adapter::Circom;
-
-    // Find the circuit name
 
     let mut specified_circuit_dir = String::new();
     if let Some(circuit_dir) = circuit_dir {
@@ -55,7 +53,7 @@ pub fn bindgen(
     }
 
     let mut project_name = String::new();
-
+    let mut circuit_map: HashMap<String, String> = HashMap::new();
     for entry in WalkDir::new(&absolute_circuit_dir) {
         let e = entry.unwrap();
         let path = e.path();
@@ -65,18 +63,36 @@ pub fn bindgen(
         let ext = path.extension().and_then(OsStr::to_str).unwrap_or("");
         // Iterate over all wasm files and generate c source, then compile each source to
         // a static library that can be called from rust
-        if ext != "wasm" {
+        if ext == "wasm" {
+            // make source files with the same name as the wasm binary file
+            let circuit_name = path.file_stem().unwrap();
+            let circuit_name_compressed = circuit_name
+                .to_str()
+                .unwrap()
+                .replace("_", "")
+                .replace("-", "");
+            project_name = circuit_name_compressed;
+            // Store the circuit name and wasm path
+            circuit_map.insert(circuit_name.to_str().unwrap().to_string(), "".to_string());
+        }
+    }
+
+    // find zkey and wasm mapping
+    for entry in WalkDir::new(&absolute_circuit_dir) {
+        let e = entry.unwrap();
+        let path = e.path();
+        if path.is_dir() {
             continue;
         }
-        // make source files with the same name as the wasm binary file
-        let circuit_name = path.file_stem().unwrap();
-        let circuit_name_compressed = circuit_name
-            .to_str()
-            .unwrap()
-            .replace("_", "")
-            .replace("-", "");
-        project_name = circuit_name_compressed;
-        // TODO: find zkey and wasm mapping
+        let ext = path.extension().and_then(OsStr::to_str).unwrap_or("");
+        if ext == "zkey" {
+            let circuit_name = path.file_stem().unwrap();
+            for (key, value) in &mut circuit_map {
+                if circuit_name.to_str().unwrap().contains(key) {
+                    *value = path.to_str().unwrap().to_string();
+                }
+            }
+        }
     }
 
     init_project(
@@ -128,7 +144,7 @@ pub fn bindgen(
         )?;
     }
 
-    fs::remove_dir_all(&project_dir)?;
+    // fs::remove_dir_all(&project_dir)?;
 
     Ok(())
 }
