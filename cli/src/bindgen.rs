@@ -1,7 +1,10 @@
+use crate::init::replace_string_in_file;
 use std::{collections::HashMap, env, ffi::OsStr, fs, path::Path};
 
 use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, Input};
+use include_dir::include_dir;
+use include_dir::Dir;
 use mopro_ffi::app_config::constants::{ANDROID_BINDINGS_DIR, IOS_BINDINGS_DIR};
 use walkdir::WalkDir;
 
@@ -19,7 +22,7 @@ pub fn bindgen(
     // Currently only support circom
     let adapter = Adapter::Circom;
 
-    let mut specified_circuit_dir = String::new();
+    let specified_circuit_dir;
     if let Some(circuit_dir) = circuit_dir {
         specified_circuit_dir = circuit_dir.to_string();
     } else {
@@ -116,7 +119,18 @@ pub fn bindgen(
         &fs_extra::dir::CopyOptions::new(),
     )?;
 
-    // TODO: Update rust_witness functions
+    let lib_rs_path = project_dir.join("src").join("lib.rs");
+    let template_dir: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/circom");
+    let circom_lib_rs = match template_dir.get_file("lib.rs") {
+        Some(file) => file.contents(),
+        None => return Err(anyhow::anyhow!("lib.rs not found in template")),
+    };
+    let replacement = generate_rust_witness_functions(&circuit_map);
+    replace_string_in_file(
+        lib_rs_path.to_str().unwrap(),
+        &String::from_utf8_lossy(circom_lib_rs),
+        &replacement,
+    )?;
 
     // Run the build command
     build_project(arg_mode, arg_platforms, arg_architectures)?;
@@ -128,7 +142,7 @@ pub fn bindgen(
         fs::create_dir_all(&output_ios_bindings_dir)?;
         fs_extra::dir::copy(
             &ios_bindings_dir,
-            &output_ios_bindings_dir,
+            output_ios_bindings_dir.parent().unwrap(),
             &fs_extra::dir::CopyOptions::new(),
         )?;
     }
@@ -139,12 +153,34 @@ pub fn bindgen(
         fs::create_dir_all(&output_android_bindings_dir)?;
         fs_extra::dir::copy(
             &android_bindings_dir,
-            &output_android_bindings_dir,
+            output_android_bindings_dir.parent().unwrap(),
             &fs_extra::dir::CopyOptions::new(),
         )?;
     }
 
-    // fs::remove_dir_all(&project_dir)?;
+    fs::remove_dir_all(&project_dir)?;
 
     Ok(())
+}
+
+fn generate_rust_witness_functions(circuit_map: &HashMap<String, String>) -> String {
+    let mut content = String::new();
+    for key in circuit_map.keys() {
+        let rust_witness_key = key.replace("_", "").replace("-", "");
+        content.push_str(&format!("rust_witness::witness!({});\n", rust_witness_key));
+    }
+
+    content.push('\n');
+    content.push_str("mopro_ffi::set_circom_circuits! {");
+
+    for (key, value) in circuit_map {
+        let rust_witness_key = key.replace("_", "").replace("-", "");
+        content.push_str(&format!(
+            "({:?}, mopro_ffi::witness::WitnessFn::RustWitness({}_witness)),\n",
+            value, rust_witness_key
+        ));
+    }
+
+    content.push('}');
+    content
 }
