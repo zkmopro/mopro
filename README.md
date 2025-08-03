@@ -9,8 +9,8 @@
     <a href="/LICENSE-APACHE">
         <img alt="Github license" src="https://img.shields.io/github/license/zkmopro/mopro.svg?style=flat-square">
     </a>
-    <a href="https://github.com/zkmopro/mopro/actions?query=workflow%3Aproduction">
-        <img alt="GitHub Workflow test" src="https://img.shields.io/github/actions/workflow/status/zkmopro/mopro/build-and-test.yml?branch=main&label=test&style=flat-square&logo=github">
+    <a href="https://github.com/zkmopro/mopro/actions">
+        <img alt="GitHub Workflow test" src="https://github.com/zkmopro/mopro/actions/workflows/build-and-test.yml/badge.svg">
     </a>
     <img alt="Repository top language" src="https://img.shields.io/github/languages/top/zkmopro/mopro?style=flat-square">
     <a href="http://commitizen.github.io/cz-cli/">
