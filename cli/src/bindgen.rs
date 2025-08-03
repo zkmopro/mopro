@@ -167,7 +167,7 @@ fn generate_rust_witness_functions(circuit_map: &HashMap<String, String>) -> Str
     let mut content = String::new();
     for key in circuit_map.keys() {
         let rust_witness_key = key.replace("_", "").replace("-", "");
-        content.push_str(&format!("rust_witness::witness!({});\n", rust_witness_key));
+        content.push_str(&format!("rust_witness::witness!({rust_witness_key});\n"));
     }
 
     content.push('\n');
@@ -176,8 +176,7 @@ fn generate_rust_witness_functions(circuit_map: &HashMap<String, String>) -> Str
     for (key, value) in circuit_map {
         let rust_witness_key = key.replace("_", "").replace("-", "");
         content.push_str(&format!(
-            "({:?}, mopro_ffi::witness::WitnessFn::RustWitness({}_witness)),\n",
-            value, rust_witness_key
+            "({value:?}, mopro_ffi::witness::WitnessFn::RustWitness({rust_witness_key}_witness)),\n"
         ));
     }
 
