@@ -6,6 +6,10 @@ This tutorial guides you through building iOS and Android bindings from a Rust p
 -   [**🔐 Integrating a ZK prover**](#-integrating-a-zk-prover) – Add support for Circom, Halo2, and/or Noir.
 -   [**🦄 customize the bindings**](#-customize-the-bindings) using any Rust crate, making it easy to expose your logic to mobile platforms.
 
+If you want to quickly get started with Circom `.wasm` and `.zkey` files, refer to the
+
+-   [**📋 Generating Circom Bindings**](#-generate-circom-bindings) section.
+
 :::info
 Make sure you've installed the [prerequisites](/docs/prerequisites).
 :::
@@ -522,6 +526,52 @@ Similar to Circom-based Rust project setup [3. Generate bindings for iOS and And
 Once the bindings are generated, you'll see your exported functions (e.g., `semaphoreProve`, `semaphoreVerify`) included in the generated code—for example, in `MoproiOSBindings/mopro.swift` for iOS and `MoproAndroidBindings/uniffi/mopro/mopro.kt` for Android.
 
 You can then use these functions directly within your iOS and/or Android applications as part of the generated bindings.
+
+## 📋 Generate Circom bindings
+
+<!-- TODO: update mopro-cli package -->
+
+Install the latest CLI from GitHub:
+
+```sh
+git clone https://github.com/zkmopro/mopro
+cd mopro/cli
+cargo install --path .
+```
+
+Use `mopro bindgen` to specify your circuit path and target architectures (e.g., iOS or Android):
+
+-   Specify configuration directly in the CLI command
+
+```sh
+mopro bindgen
+```
+
+-   Specify circuit directory
+
+```sh
+mopro bindgen --circuit-dir ./test-vectors/circom
+```
+
+-   Specify circuit directory, build mode, and architectures
+
+```sh
+mopro bindgen \
+  --circuit-dir ./test-vectors/circom \
+  --mode release \
+  --platforms ios \
+  --architectures aarch64-apple-ios-sim
+```
+
+-   View all available options:
+
+```sh
+mopro bindgen --help
+```
+
+:::warning
+Currently, only the [`rust-witness`](https://github.com/chancehudson/rust-witness) witness generator is supported.
+:::
 
 ### 3. What's next
 

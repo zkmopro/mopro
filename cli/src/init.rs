@@ -193,7 +193,7 @@ fn replace_features(file_path: &str, adapters: Vec<&str>) -> Result<()> {
     replace_string_in_file(file_path, target, &features.join(", "))
 }
 
-fn replace_string_in_file(file_path: &str, target: &str, replacement: &str) -> Result<()> {
+pub fn replace_string_in_file(file_path: &str, target: &str, replacement: &str) -> Result<()> {
     // Read the entire content of the file
     let content = fs::read_to_string(file_path)?;
 
