@@ -155,7 +155,7 @@ fn get_target_archs<A: Arch>() -> Vec<A> {
             return vec![];
         }
 
-        archs_str.split(',').map(Arch::parse_from_str).collect()
+        archs_str.split(',').map(A::parse_from_str).collect()
     } else {
         // Default case: select all supported architectures if none are provided
         A::all_strings()
