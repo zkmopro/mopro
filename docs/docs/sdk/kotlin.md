@@ -28,7 +28,7 @@ git clone https://github.com/zkmopro/mopro-kotlin-package
 
 2. Replace the generated bindings:
 
-Replace replace the bindings directory `MoproAndroidBindings/uniffi` and `MoproAndroidBindings/jniLibs` with your generated files in the following location:
+Replace the bindings directory `MoproAndroidBindings/uniffi` and `MoproAndroidBindings/jniLibs` with your generated files in the following location:
 
 -   `android/app/src/main/java/uniffi`
 -   `android/app/src/main/jniLibs`
