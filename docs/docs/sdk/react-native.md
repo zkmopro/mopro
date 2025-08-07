@@ -30,7 +30,7 @@ git clone https://github.com/zkmopro/mopro-react-native-package
 2. Replace the generated bindings:
 
 -   **iOS:** Replace the bindings directory `MoproiOSBindings` with the generated files in the following location:
-    -   `iOS/MoproiOSBindings`
+    -   `ios/MoproiOSBindings`
 -   **Android:** Replace the bindings directory `MoproAndroidBindings/uniffi` and `MoproAndroidBindings/jniLibs` with your generated files in the following location:
 
     -   `android/src/main/java/uniffi`
