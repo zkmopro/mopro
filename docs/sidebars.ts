@@ -41,6 +41,17 @@ const sidebars: SidebarsConfig = {
         },
         {
             type: 'category',
+            label: 'Mobile SDKs',
+            items: [
+                'sdk/overview',
+                'sdk/swift',
+                'sdk/kotlin',
+                'sdk/react-native',
+                'sdk/flutter',
+            ]
+        },
+        {
+            type: 'category',
             label: 'Supported Adapters',
             items: [
                 'adapters/overview',
