@@ -17,6 +17,8 @@ To get started with building Mopro bindings, refer to the [Getting Started](/doc
 If you’d like to generate custom bindings for your own circuits or proving schemes, see the guide:
 [Rust Setup for Android/iOS Bindings](/docs/setup/rust-setup).
 
+Then you will have a `MoproiOSBindings` in the project directory.
+
 ## Integrate the bindings into a Swift Package
 
 1. Clone the SDK template repository:
@@ -79,7 +81,7 @@ pod install
 Here is an example of how to integrate and use this example package
 
 ```swift
-import MoproFFI
+import MoproFFI // Name of the package
 
 // ...
 let generateProofResult = try generateCircomProof(zkeyPath: zkeyPath, circuitInputs: input_str, proofLib: ProofLib.arkworks)
@@ -89,7 +91,7 @@ Or checkout the [test-e2e](https://github.com/zkmopro/mopro/blob/793626f32ed34dc
 
 ## How to publish the package
 
-If you want to publish a package that can be used by React Native or Flutter, you can distribute it via [CocoaPods](cocoapods.org).
+If you want to publish a package that can be used by React Native or Flutter, you can distribute it via [CocoaPods](https://cocoapods.org).
 
 To do this, you'll need to update the [`.podspec`](https://github.com/zkmopro/mopro-swift-package/blob/main/MoproFFI.podspec) file accordingly.
 
