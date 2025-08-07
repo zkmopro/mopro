@@ -94,5 +94,69 @@
             "github": "https://github.com/moven0831/mopro-wallet-connet-circom",
             "website": "https://github.com/moven0831/mopro-wallet-connet-circom"
         }
+    },
+    {
+        "name": "Mopro dApp On-chain Verification (Noir)",
+        "description": "Minimal Flutter template for Sepolia on-chain verification via Mopro & Noir.",
+        "links": {
+            "github": "https://github.com/moven0831/mopro-wallet-connect-noir",
+            "website": "https://ethglobal.com/showcase/moirpro-e347p"
+        }
+    },
+    {
+        "name": "Zkipper",
+        "description": "This projects demonstrates role based access control enforced by EIP-7702, PQC admin, and ZK users",
+        "links": {
+            "github": "https://github.com/ZKNoxHQ/ZKipper",
+            "website": "https://ethglobal.com/showcase/zkipper-czc3z"
+        }
+    },
+    {
+        "name": "MobiScale",
+        "description": "Cryptographic Photo-Identity Verification using Apple's Secure Enclave and RISC-0 ZK Proofs.",
+        "links": {
+            "github": "https://github.com/ElusAegis/MobiScale",
+            "website": "https://ethglobal.com/showcase/mobiscale-n9vj6"
+        }
+    },
+    {
+        "name": "bidet",
+        "description": "\"Tag\"-like game where people infect other people scanning NFC wristbands with ZK proofs",
+        "links": {
+            "github": "https://github.com/aciceri/bidet",
+            "website": "https://ethglobal.com/showcase/bidet-gdvtq"
+        }
+    },
+    {
+        "name": "ProofOfFunds",
+        "description": "Mobile app that generates ZK proofs of crypto balances without revealing exact amounts",
+        "links": {
+            "github": "https://github.com/sanandmv7/ProofOfFunds-Android",
+            "website": "https://ethglobal.com/showcase/proofoffunds-zczod"
+        }
+    },
+    {
+        "name": "ProofOfParticipation",
+        "description": "Prove you were in Cannes for the event with your mobile and mint a NFT",
+        "links": {
+            "github": "https://github.com/youtpout/eth-cannes",
+            "website": "https://ethglobal.com/showcase/proofofparticipation-xca0a"
+        }
+    },
+    {
+        "name": "ZKAge Proof Mobile",
+        "description": "ZK Age Proof Mobile: Verify your age, without revealing any personal information.",
+        "links": {
+            "github": "https://github.com/Ty-HA/zkage-proof-mobile",
+            "website": "https://ethglobal.com/showcase/zkage-proof-mobile-2yroo"
+        }
+    },
+    {
+        "name": "👀Proov!",
+        "description": "Fotos & Videos with Built-in Truth: Tamper-proof media with ZK verifiable origins and authenticity.",
+        "links": {
+            "github": "https://github.com/undefinedlab/PROOV_ZK",
+            "website": "https://ethglobal.com/showcase/eyes-proov-at10u"
+        }
     }
 ]
