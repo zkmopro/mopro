@@ -96,6 +96,14 @@
         }
     },
     {
+        "name": "Mopro dApp On-chain Verification (Noir)",
+        "description": "Minimal Flutter template for Sepolia on-chain verification via Mopro & Noir.",
+        "links": {
+            "github": "https://github.com/moven0831/mopro-wallet-connect-noir",
+            "website": "https://ethglobal.com/showcase/moirpro-e347p"
+        }
+    },
+    {
         "name": "Zkipper",
         "description": "This projects demonstrates role based access control enforced by EIP-7702, PQC admin, and ZK users",
         "links": {
@@ -125,14 +133,6 @@
         "links": {
             "github": "https://github.com/sanandmv7/ProofOfFunds-Android",
             "website": "https://ethglobal.com/showcase/proofoffunds-zczod"
-        }
-    },
-    {
-        "name": "MoirPro",
-        "description": "Mobile app that generates ZK proofs of crypto balances without revealing exact amounts",
-        "links": {
-            "github": "https://github.com/moven0831/mopro-wallet-connect-noir",
-            "website": "https://ethglobal.com/showcase/moirpro-e347p"
         }
     },
     {
