@@ -13,7 +13,7 @@ from: [Rayon - github](https://github.com/rayon-rs/rayon#usage-with-webassembly)
 
 ## Getting started
 
-- Install [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
+- Install [wasm-pack](https://drager.github.io/wasm-pack/installer/)
 - Install `chrome` and `chromedriver` with the same version, Refer to [Download Chrome/ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/).
 
 ## Run tests
