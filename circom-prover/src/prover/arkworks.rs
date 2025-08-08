@@ -2,7 +2,6 @@ use anyhow::bail;
 use anyhow::Result;
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
-use ark_crypto_primitives::snark::SNARK;
 use ark_ec::pairing::Pairing;
 use ark_ff::{BigInteger, PrimeField};
 use ark_groth16::{prepare_verifying_key, Groth16, ProvingKey, VerifyingKey};
