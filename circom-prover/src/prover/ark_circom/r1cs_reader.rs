@@ -119,7 +119,14 @@ impl<E: Pairing> R1CSFile<E> {
 
         reader.seek(SeekFrom::Start(*constraint_offset?))?;
 
-        let constraints = read_constraints::<&mut R, E>(&mut reader, &header)?;
+        let constraint_size = sec_sizes.get(&constraint_type).ok_or_else(|| {
+            Error::new(
+                ErrorKind::InvalidData,
+                "No section size for constraint type found",
+            )
+        });
+
+        let constraints = read_constraints::<&mut R, E>(&mut reader, *constraint_size?, &header)?;
 
         let wire2label_offset = sec_offsets.get(&wire2label_type).ok_or_else(|| {
             Error::new(
@@ -215,9 +222,19 @@ fn read_constraint_vec<R: Read, E: Pairing>(mut reader: R) -> IoResult<Constrain
 
 fn read_constraints<R: Read, E: Pairing>(
     mut reader: R,
+    size: u64,
     header: &Header,
 ) -> IoResult<Vec<Constraints<E>>> {
-    // todo check section size
+    // Calculate expected size: each constraint has 3 constraint vectors (A, B, C)
+    // Each constraint vector has a variable number of terms, but we need to read the data to validate
+    // For now, we'll implement a basic size check to ensure we don't read beyond the section
+    let expected_min_size = header.n_constraints as u64 * 12; // Minimum 4 bytes per constraint vector count (3 vectors per constraint)
+    if size < expected_min_size {
+        return Err(IoError(Error::new(
+            ErrorKind::InvalidData,
+            "Invalid constraints section size: too small for expected number of constraints",
+        )));
+    }
     let mut vec = Vec::with_capacity(header.n_constraints as usize);
     for _ in 0..header.n_constraints {
         vec.push((
