@@ -185,9 +185,8 @@ sudo apt install protobuf-compiler
 Usage
 
 ```rust
-// import graph path
-const GRAPH_PATH: &str = "./test-vectors/circom/multiplier2.bin";
-circom_prover::graph!(multiplier2, &GRAPH_PATH);
+// Use a literal path — include_bytes! requires a string literal
+circom_prover::graph!(multiplier2, "./test-vectors/multiplier2.bin");
 
 let result = CircomProver::prove(
     ProofLib::Arkworks,
