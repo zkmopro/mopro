@@ -532,7 +532,7 @@ impl ZkeyHeaderReader {
             1 => self.read_header(section_len),
             2 => self.read_groth16_header(section_len),
             // 3 => self.read_ic(section_len),
-            // 4 => self.read_ccoefs(section_len),
+            // 4 => self.read_coefs(section_len),
             // 5 => self.read_a(section_len),
             // 6 => self.read_b1(section_len),
             // 7 => self.read_b2(section_len),
