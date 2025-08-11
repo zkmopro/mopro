@@ -88,6 +88,6 @@ Special recognition goes to the ETHGlobal team for organizing an exceptional eve
 
 The work showcased at ETHGlobal Cannes is just the beginning. If you're interested in building with Mopro or contributing to the ecosystem:
 
-- Explore the [Mopro documentation](https://zkmopro.org/docs)
+- Explore the [Mopro documentation](https://zkmopro.org/docs/intro)
 - Check out the [project gallery](https://zkmopro.org/docs/projects) for inspiration
 - Join the [community discussions on Telegram](https://t.me/zkmopro) and contribute to the [open issues](https://github.com/zkmopro/mopro/issues)
