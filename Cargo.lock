@@ -4361,7 +4361,7 @@ dependencies = [
 [[package]]
 name = "rust-witness"
 version = "0.1.5"
-source = "git+https://github.com/chancehudson/rust-witness.git?branch=fix-link#ecb710abf0a82f85c4f9be513780ff825690a205"
+source = "git+https://github.com/chancehudson/rust-witness.git?branch=fix-link#c3b7efb8ec8d5a2d41598219195890d182350458"
 dependencies = [
  "cc",
  "fnv",
