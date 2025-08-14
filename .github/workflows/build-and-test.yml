@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: install requirements
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
@@ -34,7 +34,7 @@ jobs:
     env:
       RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: install requirements
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check formatting
         run: cargo fmt --all -- --check
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: install requirements
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install cli
         run: |
           cd cli
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: install requirements
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
@@ -99,7 +99,7 @@ jobs:
       chrome-dir: ${{ steps.parsed-chrome-chromedriver-dir.outputs.chrome-dir }}
       chromedriver-dir: ${{ steps.parsed-chrome-chromedriver-dir.outputs.chromedriver-dir }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -142,7 +142,7 @@ jobs:
       CHROME_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}/chrome
       CHROMEDRIVER_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}/chromedriver
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Restore cached wasm-pack
         uses: actions/cache@v4
         with:
@@ -168,7 +168,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v5
   #     - name: Install Rust toolchain
   #       uses: actions-rs/toolchain@v1
   #       with:
@@ -186,7 +186,7 @@ jobs:
     runs-on: macos-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -206,7 +206,7 @@ jobs:
     runs-on: macos-latest
     needs: build-xcframework
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -224,7 +224,7 @@ jobs:
     runs-on: macos-latest
     needs: build-xcframework
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -242,7 +242,7 @@ jobs:
     runs-on: macos-14
     needs: build-xcframework
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -261,7 +261,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -284,7 +284,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-android-lib
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -330,7 +330,7 @@ jobs:
     needs: setup-halo2-wasm-env
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -371,7 +371,7 @@ jobs:
       run:
         working-directory: test-e2e/web
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Restore cached chrome and chromedriver
         uses: actions/cache@v4
         with:

@@ -54,6 +54,12 @@ mopro create
 mopro update
 ```
 
+### Create bindings without Rust project
+
+```sh
+mopro bindgen
+```
+
 ## Development
 
 After cloning the repository, you can install the CLI locally with your changes by running:

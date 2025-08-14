@@ -5,6 +5,7 @@ use clap::Subcommand;
 use crate::constants::Framework;
 use crate::create::{Android, Create, Flutter, Ios, ReactNative, Web};
 
+mod bindgen;
 mod build;
 mod config;
 mod constants;
@@ -60,8 +61,24 @@ enum Commands {
         )]
         show: Option<String>,
     },
-    /// Update the bindings for the all platforms
+    /// Update the bindings for all platforms
     Update {},
+    /// Generate the bindings for the specified platform (NOTE: it only supports circom with rust-witness and arkworks now)
+    Bindgen {
+        #[arg(long, help = "Specify the build mode (e.g., 'release' or 'debug').")]
+        mode: Option<String>,
+        #[arg(long, num_args = 1.., help = "Specify the platforms to build for (e.g., 'ios', 'android').")]
+        platforms: Option<Vec<String>>,
+        #[arg(long, num_args = 1.., help = "Specify the architectures to build for (e.g., 'aarch64-apple-ios', 'aarch64-apple-ios-sim', x86_64-apple-ios, x86_64-linux-android, i686-linux-android, armv7-linux-androideabi, aarch64-linux-android).")]
+        architectures: Option<Vec<String>>,
+        #[arg(
+            long,
+            help = "path to the circuit directory (it should contain `.wtns` and `.zkey` files)"
+        )]
+        circuit_dir: Option<String>,
+        #[arg(long, help = "Show instruction message for build")]
+        show: bool,
+    },
 }
 
 fn main() {
@@ -97,6 +114,7 @@ fn main() {
                 Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
             }
         }
+
         Commands::Create { framework, show } => {
             if let Some(framework) = show {
                 if framework.trim().is_empty() {
@@ -120,14 +138,33 @@ fn main() {
                 return;
             }
 
+            // Handles platform-aware creation (React Native + Flutter)
             match create::create_project(framework) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to create template: {e:?}")),
             }
         }
+
         Commands::Update {} => match update::update_bindings() {
             Ok(_) => {}
             Err(e) => style::print_red_bold(format!("Failed to update bindings: {e:?}")),
         },
+
+        Commands::Bindgen {
+            mode,
+            platforms,
+            architectures,
+            circuit_dir,
+            show,
+        } => {
+            if *show {
+                // TODO: print bindgen instructions
+                return;
+            }
+            match bindgen::bindgen(mode, platforms, architectures, circuit_dir) {
+                Ok(_) => {}
+                Err(e) => style::print_red_bold(format!("Failed to generate bindings: {e:?}")),
+            }
+        }
     }
 }

@@ -17,6 +17,7 @@ impl Create for Flutter {
     const NAME: &'static str = "flutter";
 
     fn create(project_dir: PathBuf) -> Result<(), Error> {
+        // Check both bindings
         let ios_bindings_dir = check_bindings(&project_dir, Platform::Ios)?;
         let android_bindings_dir = check_bindings(&project_dir, Platform::Android)?;
 
@@ -27,6 +28,7 @@ impl Create for Flutter {
                 target_dir.display()
             )));
         }
+
         download_and_extract_template(
             "https://github.com/zkmopro/flutter-app/archive/refs/heads/main.zip",
             &project_dir,
@@ -36,31 +38,40 @@ impl Create for Flutter {
         let flutter_dir = project_dir.join("flutter-app-main");
         fs::rename(flutter_dir, &target_dir)?;
 
-        let xcframeworks_dir = ios_bindings_dir.join(IOS_XCFRAMEWORKS_DIR);
-        let mopro_swift_file = ios_bindings_dir.join(IOS_SWIFT_FILE);
-
         let mopro_flutter_plugin_dir = target_dir.join("mopro_flutter_plugin");
-        let ios_dir = mopro_flutter_plugin_dir.join("ios");
-        let mopro_bindings_dir = ios_dir.join(IOS_XCFRAMEWORKS_DIR);
-        let classes_dir = ios_dir.join("Classes");
 
-        fs::remove_dir_all(&mopro_bindings_dir)?;
-        fs::create_dir(&mopro_bindings_dir)?;
-        copy_dir(&xcframeworks_dir, &mopro_bindings_dir)?;
+        // Handle iOS if provided
+        if let Some(ios_dir) = ios_bindings_dir {
+            let xcframeworks_dir = ios_dir.join(IOS_XCFRAMEWORKS_DIR);
+            let mopro_swift_file = ios_dir.join(IOS_SWIFT_FILE);
 
-        fs::remove_file(classes_dir.join(IOS_SWIFT_FILE))?;
-        fs::copy(mopro_swift_file, classes_dir.join(IOS_SWIFT_FILE))?;
+            let ios_target_dir = mopro_flutter_plugin_dir.join("ios");
+            let mopro_bindings_dir = ios_target_dir.join(IOS_XCFRAMEWORKS_DIR);
+            let classes_dir = ios_target_dir.join("Classes");
 
-        copy_android_bindings(
-            &android_bindings_dir,
-            &target_dir.join("mopro_flutter_plugin/android"),
-            "kotlin",
-        )?;
+            fs::remove_dir_all(&mopro_bindings_dir)?;
+            fs::create_dir(&mopro_bindings_dir)?;
+            copy_dir(&xcframeworks_dir, &mopro_bindings_dir)?;
 
+            fs::remove_file(classes_dir.join(IOS_SWIFT_FILE))?;
+            fs::copy(mopro_swift_file, classes_dir.join(IOS_SWIFT_FILE))?;
+        }
+
+        // Handle Android if provided
+        if let Some(android_dir) = android_bindings_dir {
+            copy_android_bindings(
+                &android_dir,
+                &mopro_flutter_plugin_dir.join("android"),
+                "kotlin",
+            )?;
+        }
+
+        // Keys
         let assets_dir = target_dir.join("assets");
-        fs::remove_dir_all(&assets_dir)?;
+        if assets_dir.exists() {
+            fs::remove_dir_all(&assets_dir)?;
+        }
         fs::create_dir(&assets_dir)?;
-
         copy_keys(assets_dir)?;
 
         Self::print_message();

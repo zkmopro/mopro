@@ -32,7 +32,13 @@ impl Create for Ios {
         copy_embedded_dir(&IOS_TEMPLATE_DIR, &target_dir)?;
 
         env::set_current_dir(&project_dir)?;
-        copy_ios_bindings(ios_bindings_dir, target_dir.clone())?;
+        if let Some(bindings_dir) = ios_bindings_dir {
+            copy_ios_bindings(bindings_dir, target_dir.clone())?;
+        } else {
+            return Err(Error::msg(
+                "No iOS bindings found. Please run 'mopro build' to generate them.",
+            ));
+        }
         copy_keys(target_dir)?;
 
         Self::print_message();

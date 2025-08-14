@@ -36,13 +36,17 @@ impl Create for ReactNative {
         fs::rename(react_native_dir, &target_dir)?;
 
         let mopro_module_dir = target_dir.join("modules/mopro");
-        copy_ios_bindings(ios_bindings_dir, mopro_module_dir.join("ios"))?;
+        if let Some(ios_bindings_dir) = ios_bindings_dir {
+            copy_ios_bindings(ios_bindings_dir, mopro_module_dir.join("ios"))?;
+        }
 
-        copy_android_bindings(
-            &android_bindings_dir,
-            &mopro_module_dir.join("android"),
-            "java",
-        )?;
+        if let Some(android_bindings_dir) = android_bindings_dir {
+            copy_android_bindings(
+                &android_bindings_dir,
+                &mopro_module_dir.join("android"),
+                "java",
+            )?;
+        }
 
         let assets_dir = target_dir.join("assets/keys");
         fs::remove_dir_all(&assets_dir)?;

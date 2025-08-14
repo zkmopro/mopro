@@ -89,6 +89,8 @@ pub fn install_ndk() {
     Command::new("cargo")
         .arg("install")
         .arg("cargo-ndk")
+        .arg("--version")
+        .arg("3.5.4")
         .spawn()
         .expect("Failed to spawn cargo, is it installed?")
         .wait()
@@ -153,7 +155,7 @@ fn get_target_archs<A: Arch>() -> Vec<A> {
             return vec![];
         }
 
-        archs_str.split(',').map(Arch::parse_from_str).collect()
+        archs_str.split(',').map(A::parse_from_str).collect()
     } else {
         // Default case: select all supported architectures if none are provided
         A::all_strings()
