@@ -708,8 +708,9 @@ dependencies = [
 [[package]]
 name = "bb"
 version = "0.82.2"
-source = "git+https://github.com/zkmopro/noir-rs#3004a9f716aa33d919b3ffaf23e88f8947a62c1a"
+source = "git+https://github.com/zkmopro/noir-rs?branch=stub#16ef699a99b6f043e4165554978aabc9ea89519f"
 dependencies = [
+ "cc",
  "num-bigint",
  "thiserror 1.0.69",
  "tracing",
@@ -3142,7 +3143,7 @@ dependencies = [
 [[package]]
 name = "noir"
 version = "1.0.0-beta.3-2"
-source = "git+https://github.com/zkmopro/noir-rs#3004a9f716aa33d919b3ffaf23e88f8947a62c1a"
+source = "git+https://github.com/zkmopro/noir-rs?branch=stub#16ef699a99b6f043e4165554978aabc9ea89519f"
 dependencies = [
  "acir",
  "acvm",
