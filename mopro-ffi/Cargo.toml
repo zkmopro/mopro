@@ -52,7 +52,7 @@ color-eyre = "0.6.3"
 
 # circom deps
 rust-witness = { workspace = true, optional = true }
-witnesscalc-adapter = { version = "0.1", optional = true }
+witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter", branch = "update-ndk", optional = true }
 circom-prover = { path = "../circom-prover", optional = true }
 
 # noir deps
@@ -60,7 +60,7 @@ circom-prover = { path = "../circom-prover", optional = true }
 noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
     "barretenberg",
     "android-compat",
-], version = "1.0.0-beta.3-2", optional = true }
+], version = "1.0.0-beta.3-2", branch = "update-ndk", optional = true }
 
 
 # ZKP generation# build for iOS
@@ -73,7 +73,7 @@ camino = { version = "1.1.9", optional = true }
 uuid = { version = "1.9.1", features = ["v4"] }
 camino = "1.1.9"
 rust-witness = { workspace = true, optional = true }
-witnesscalc-adapter = { version = "0.1", optional = true }
+witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter", branch = "update-ndk", optional = true }
 
 [dev-dependencies]
 serial_test = "3.0.0"
