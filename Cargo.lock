@@ -708,9 +708,10 @@ dependencies = [
 [[package]]
 name = "bb"
 version = "0.82.2"
-source = "git+https://github.com/zkmopro/noir-rs?branch=stub#16ef699a99b6f043e4165554978aabc9ea89519f"
+source = "git+https://github.com/zkmopro/noir-rs#854e254e6680badff00bbfdc9838ba7e224cd128"
 dependencies = [
  "cc",
+ "chkstk_stub",
  "num-bigint",
  "thiserror 1.0.69",
  "tracing",
@@ -1060,6 +1061,15 @@ name = "cfg_aliases"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
+
+[[package]]
+name = "chkstk_stub"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "047f6ab2f3b9bcaf23b593d1580898e4244d27eadf1a1fae99212ee5735d3d1c"
+dependencies = [
+ "cc",
+]
 
 [[package]]
 name = "chrono"
@@ -3143,7 +3153,7 @@ dependencies = [
 [[package]]
 name = "noir"
 version = "1.0.0-beta.3-2"
-source = "git+https://github.com/zkmopro/noir-rs?branch=stub#16ef699a99b6f043e4165554978aabc9ea89519f"
+source = "git+https://github.com/zkmopro/noir-rs#854e254e6680badff00bbfdc9838ba7e224cd128"
 dependencies = [
  "acir",
  "acvm",
@@ -4349,20 +4359,22 @@ dependencies = [
 
 [[package]]
 name = "rust-rapidsnark"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ccf47a6aedd44c85537d9e1ca6255cda1503720e80ff61613372e8694ec783c5"
+checksum = "a4e26a53114925ae6bdbff7abc9a89e35458f1c6601a94211ed2b9fa2b6a6247"
 dependencies = [
  "anyhow",
  "cc",
+ "chkstk_stub",
  "num-bigint",
  "num-traits",
 ]
 
 [[package]]
 name = "rust-witness"
-version = "0.1.5"
-source = "git+https://github.com/chancehudson/rust-witness.git?branch=fix-link#c3b7efb8ec8d5a2d41598219195890d182350458"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b59361683f7b6b3b0d343fc77e797ee5a267b8a470b9531ed9911aeed160dea0"
 dependencies = [
  "cc",
  "fnv",

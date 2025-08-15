@@ -60,7 +60,7 @@ circom-prover = { path = "../circom-prover", optional = true }
 noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
     "barretenberg",
     "android-compat",
-], version = "1.0.0-beta.3-2", branch = "stub", optional = true }
+], version = "1.0.0-beta.3-2", optional = true }
 
 
 # ZKP generation# build for iOS
