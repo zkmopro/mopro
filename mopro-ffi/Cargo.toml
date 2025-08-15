@@ -51,7 +51,7 @@ anyhow = "1.0.86"
 color-eyre = "0.6.3"
 
 # circom deps
-rust-witness = { version = "0.1", optional = true }
+rust-witness = { workspace = true, optional = true }
 witnesscalc-adapter = { version = "0.1", optional = true }
 circom-prover = { path = "../circom-prover", optional = true }
 
@@ -60,7 +60,7 @@ circom-prover = { path = "../circom-prover", optional = true }
 noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
     "barretenberg",
     "android-compat",
-], optional = true }
+], version = "1.0.0-beta.3-2", optional = true }
 
 
 # ZKP generation# build for iOS
@@ -72,7 +72,7 @@ camino = { version = "1.1.9", optional = true }
 [build-dependencies]
 uuid = { version = "1.9.1", features = ["v4"] }
 camino = "1.1.9"
-rust-witness = { version = "0.1", optional = true }
+rust-witness = { workspace = true, optional = true }
 witnesscalc-adapter = { version = "0.1", optional = true }
 
 [dev-dependencies]
