@@ -29,7 +29,7 @@ mopro-wasm = { path = "../mopro-wasm" }
 
 # Circom dependencies
 rust-witness = { workspace = true }
-witnesscalc-adapter = "0.1"
+witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter", branch = "update-ndk" }
 
 # Halo2 dependencies
 halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
@@ -43,7 +43,7 @@ mopro-ffi = { path = "../mopro-ffi" }
 
 # Circom dependencies
 rust-witness = { workspace = true }
-witnesscalc-adapter = "0.1"
+witnesscalc-adapter = { git = "https://github.com/zkmopro/witnesscalc_adapter", branch = "update-ndk" }
 
 [dev-dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["uniffi-tests"] }
