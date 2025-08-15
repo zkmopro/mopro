@@ -89,8 +89,6 @@ pub fn install_ndk() {
     Command::new("cargo")
         .arg("install")
         .arg("cargo-ndk")
-        .arg("--version")
-        .arg("3.5.4")
         .spawn()
         .expect("Failed to spawn cargo, is it installed?")
         .wait()
