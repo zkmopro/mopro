@@ -16,7 +16,7 @@ Depending on what platforms and adapters you use, there are several prerequisite
     -   [JDK(Java Development Kit)](https://www.oracle.com/java/technologies/downloads)
     -   Also see [configuration](#android-configuration) below
 -   Web(WASM)
-    -   [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
+    -   [wasm-pack](https://drager.github.io/wasm-pack/installer/)
     -   [Download Chrome/ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/)
 -   Circom
     -   Pre-built `zkey` and `wasm` files for your circuits
