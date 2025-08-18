@@ -104,6 +104,7 @@ fn build_for_arch(
         .arg("-t")
         .arg(arch_str)
         .arg("build")
+        .arg("--link-libcxx-shared")
         .arg("--lib");
     if mode == Mode::Release {
         build_cmd.arg("--release");
