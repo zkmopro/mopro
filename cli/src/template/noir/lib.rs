@@ -11,10 +11,15 @@ mod noir_tests {
             circuit_path.clone(),
             Some(srs_path.clone()),
             circuit_inputs.clone(),
+            false  // low_memory_mode
         );
         assert!(result.is_ok());
         let proof = result.unwrap();
-        let result = verify_noir_proof(circuit_path.clone(), proof);
+        let result = verify_noir_proof(
+            circuit_path.clone(),
+            proof,
+            false  // disable_zk
+        );
         assert!(result.is_ok());
         let valid = result.unwrap();
         assert!(valid);

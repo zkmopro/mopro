@@ -51,7 +51,9 @@ pub use circom_prover::graph;
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 
 #[cfg(feature = "noir")]
-pub use noir::{generate_noir_proof, verify_noir_proof};
+pub use noir::{
+    generate_noir_keccak_proof, generate_noir_proof, verify_noir_keccak_proof, verify_noir_proof,
+};
 
 #[cfg(not(feature = "circom"))]
 #[macro_export]
@@ -116,13 +118,41 @@ macro_rules! noir_app {
             circuit_path: String,
             srs_path: Option<String>,
             inputs: Vec<String>,
+            low_memory_mode: bool,
         ) -> Result<Vec<u8>, $err> {
             panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
         }
 
         // TODO: fix this if CLI template can be customized
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> Result<bool, $err> {
+        fn verify_noir_proof(
+            circuit_path: String,
+            proof: Vec<u8>,
+            low_memory_mode: bool,
+        ) -> Result<bool, $err> {
+            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
+        }
+
+        // TODO: fix this if CLI template can be customized
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn generate_noir_keccak_proof(
+            circuit_path: String,
+            srs_path: Option<String>,
+            inputs: Vec<String>,
+            disable_zk: bool,
+            low_memory_mode: bool,
+        ) -> Result<Vec<u8>, $err> {
+            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
+        }
+
+        // TODO: fix this if CLI template can be customized
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn verify_noir_keccak_proof(
+            circuit_path: String,
+            proof: Vec<u8>,
+            disable_zk: bool,
+            low_memory_mode: bool,
+        ) -> Result<bool, $err> {
             panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
         }
     };
