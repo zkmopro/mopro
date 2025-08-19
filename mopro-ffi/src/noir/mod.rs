@@ -69,6 +69,60 @@ macro_rules! noir_app {
                 low_memory_mode,
             ))
         }
+
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn get_noir_verification_keccak_key(
+            circuit_path: String,
+            srs_path: Option<String>,
+            disable_zk: bool,
+            low_memory_mode: bool,
+        ) -> Result<Vec<u8>, $err> {
+            mopro_ffi::get_noir_verification_keccak_key(
+                circuit_path,
+                srs_path,
+                disable_zk,
+                low_memory_mode,
+            )
+            .map_err(|e| <$err>::NoirError(format!("Get Verification Key error: {}", e)))
+        }
+
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn generate_noir_keccak_proof_with_vk(
+            circuit_path: String,
+            srs_path: Option<String>,
+            vk: Vec<u8>,
+            inputs: Vec<String>,
+            disable_zk: bool,
+            low_memory_mode: bool,
+        ) -> Result<Vec<u8>, $err> {
+            mopro_ffi::generate_noir_keccak_proof_with_vk(
+                circuit_path,
+                srs_path,
+                vk,
+                inputs,
+                disable_zk,
+                low_memory_mode,
+            )
+            .map_err(|e| <$err>::NoirError(format!("Generate Proof error: {}", e)))
+        }
+
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn verify_noir_keccak_proof_with_vk(
+            circuit_path: String,
+            vk: Vec<u8>,
+            proof: Vec<u8>,
+            disable_zk: bool,
+            low_memory_mode: bool,
+        ) -> Result<bool, $err> {
+            mopro_ffi::verify_noir_keccak_proof_with_vk(
+                circuit_path,
+                vk,
+                proof,
+                disable_zk,
+                low_memory_mode,
+            )
+            .map_err(|e| <$err>::NoirError(format!("Verify Proof error: {}", e)))
+        }
     };
 }
 
@@ -146,6 +200,67 @@ pub fn verify_noir_keccak_proof(
     verify_ultra_honk_keccak(proof, vk, disable_zk).unwrap()
 }
 
+pub fn get_noir_verification_keccak_key(
+    circuit_path: String,
+    srs_path: Option<String>,
+    disable_zk: bool,
+    low_memory_mode: bool,
+) -> Result<Vec<u8>, String> {
+    let circuit_bytecode = get_bytecode(circuit_path);
+
+    // Setup the SRS
+    setup_srs_from_bytecode(circuit_bytecode.as_str(), srs_path.as_deref(), false).unwrap();
+
+    // Set up the witness
+    let vk = get_ultra_honk_keccak_verification_key(
+        circuit_bytecode.as_str(),
+        disable_zk,
+        low_memory_mode,
+    )
+    .unwrap();
+    Ok(vk)
+}
+
+pub fn generate_noir_keccak_proof_with_vk(
+    circuit_path: String,
+    srs_path: Option<String>,
+    vk: Vec<u8>,
+    inputs: Vec<String>,
+    disable_zk: bool,
+    low_memory_mode: bool,
+) -> Result<Vec<u8>, String> {
+    let circuit_bytecode = get_bytecode(circuit_path);
+
+    // Setup the SRS
+    setup_srs_from_bytecode(circuit_bytecode.as_str(), srs_path.as_deref(), false).unwrap();
+
+    let witness = from_vec_str_to_witness_map(inputs.iter().map(|s| s.as_str()).collect()).unwrap();
+    prove_ultra_honk_keccak(
+        circuit_bytecode.as_str(),
+        witness,
+        vk,
+        disable_zk,
+        low_memory_mode,
+    )
+}
+
+pub fn verify_noir_keccak_proof_with_vk(
+    circuit_path: String,
+    vk: Vec<u8>,
+    proof: Vec<u8>,
+    disable_zk: bool,
+    low_memory_mode: bool,
+) -> Result<bool, String> {
+    let circuit_bytecode = get_bytecode(circuit_path);
+    let vk = get_ultra_honk_keccak_verification_key(
+        circuit_bytecode.as_str(),
+        disable_zk,
+        low_memory_mode,
+    )
+    .unwrap();
+    Ok(verify_ultra_honk_keccak(proof, vk, disable_zk).unwrap())
+}
+
 fn get_bytecode(circuit_path: String) -> String {
     // Read the JSON manifest of the circuit
     let circuit_txt = std::fs::read_to_string(circuit_path).unwrap();
@@ -161,6 +276,7 @@ mod tests {
 
     const MULTIPLIER2_CIRCUIT_FILE: &str = "../test-vectors/noir/noir_multiplier2.json";
     const SRS_FILE: &str = "../test-vectors/noir/noir_multiplier2.srs";
+    const VK_FILE: &str = "../test-vectors/noir/noir_multiplier2.vk";
 
     #[test]
     #[serial_test::serial]
@@ -269,6 +385,31 @@ mod tests {
             false,
             true,
         ));
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_keccak_proof_multiplier2_with_vk() {
+        let witness = vec!["3".to_string(), "5".to_string()];
+        let vk = std::fs::read(VK_FILE).unwrap();
+        let proof = generate_noir_keccak_proof_with_vk(
+            MULTIPLIER2_CIRCUIT_FILE.to_string(),
+            Some(SRS_FILE.to_string()),
+            vk.clone(),
+            witness,
+            false,
+            false,
+        )
+        .unwrap();
+        let is_valid = verify_noir_keccak_proof_with_vk(
+            MULTIPLIER2_CIRCUIT_FILE.to_string(),
+            vk.clone(),
+            proof.clone(),
+            false,
+            false,
+        )
+        .unwrap();
+        assert!(is_valid);
     }
 
     #[cfg(feature = "no_uniffi_exports")]
