@@ -52,7 +52,9 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 
 #[cfg(feature = "noir")]
 pub use noir::{
-    generate_noir_keccak_proof, generate_noir_proof, verify_noir_keccak_proof, verify_noir_proof,
+    generate_noir_keccak_proof, generate_noir_keccak_proof_with_vk, generate_noir_proof,
+    get_noir_verification_keccak_key, verify_noir_keccak_proof, verify_noir_keccak_proof_with_vk,
+    verify_noir_proof,
 };
 
 #[cfg(not(feature = "circom"))]
@@ -149,6 +151,39 @@ macro_rules! noir_app {
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn verify_noir_keccak_proof(
             circuit_path: String,
+            proof: Vec<u8>,
+            disable_zk: bool,
+            low_memory_mode: bool,
+        ) -> Result<bool, $err> {
+            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
+        }
+
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn get_noir_verification_keccak_key(
+            circuit_path: String,
+            srs_path: Option<String>,
+            disable_zk: bool,
+            low_memory_mode: bool,
+        ) -> Result<Vec<u8>, $err> {
+            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
+        }
+
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn generate_noir_keccak_proof_with_vk(
+            circuit_path: String,
+            srs_path: Option<String>,
+            vk: Vec<u8>,
+            inputs: Vec<String>,
+            disable_zk: bool,
+            low_memory_mode: bool,
+        ) -> Result<Vec<u8>, $err> {
+            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
+        }
+
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn verify_noir_keccak_proof_with_vk(
+            circuit_path: String,
+            vk: Vec<u8>,
             proof: Vec<u8>,
             disable_zk: bool,
             low_memory_mode: bool,
