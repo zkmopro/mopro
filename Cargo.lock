@@ -710,7 +710,7 @@ dependencies = [
 [[package]]
 name = "bb"
 version = "1.0.0-nightly.20250723"
-source = "git+https://github.com/zkmopro/noir-rs#4e77eb1d9ebc9a0c26c4ac736d1b1f1ea92d908e"
+source = "git+https://github.com/zkmopro/noir-rs#fc088b9ba1eab257bc5392129aa32b97d69daf0f"
 dependencies = [
  "cc",
  "chkstk_stub",
@@ -3259,7 +3259,7 @@ dependencies = [
 [[package]]
 name = "noir"
 version = "1.0.0-beta.8-3"
-source = "git+https://github.com/zkmopro/noir-rs#4e77eb1d9ebc9a0c26c4ac736d1b1f1ea92d908e"
+source = "git+https://github.com/zkmopro/noir-rs#fc088b9ba1eab257bc5392129aa32b97d69daf0f"
 dependencies = [
  "acir",
  "acvm",

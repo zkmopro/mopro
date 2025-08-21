@@ -46,99 +46,14 @@ macro_rules! noir_app {
         }
 
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn generate_noir_proof_with_poseidon(
+        fn get_noir_verification_key(
             circuit_path: String,
             srs_path: Option<String>,
-            inputs: Vec<String>,
-            vk: Vec<u8>,
+            on_chain: bool,
             low_memory_mode: bool,
         ) -> Result<Vec<u8>, $err> {
-            mopro_ffi::generate_noir_proof_with_poseidon(
-                circuit_path,
-                srs_path,
-                inputs,
-                vk,
-                low_memory_mode,
-            )
-            .map_err(|e| <$err>::NoirError(format!("Generate Proof error: {}", e)))
-        }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_noir_proof_with_poseidon(
-            circuit_path: String,
-            proof: Vec<u8>,
-            vk: Vec<u8>,
-            low_memory_mode: bool,
-        ) -> Result<bool, $err> {
-            Ok(mopro_ffi::verify_noir_proof_with_poseidon(
-                circuit_path,
-                proof,
-                vk,
-                low_memory_mode,
-            ))
-        }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn get_noir_verification_poseidon_key(
-            circuit_path: String,
-            srs_path: Option<String>,
-            low_memory_mode: bool,
-        ) -> Result<Vec<u8>, $err> {
-            mopro_ffi::get_noir_verification_poseidon_key(circuit_path, srs_path, low_memory_mode)
+            mopro_ffi::get_noir_verification_key(circuit_path, srs_path, on_chain, low_memory_mode)
                 .map_err(|e| <$err>::NoirError(format!("Get Verification Key error: {}", e)))
-        }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn generate_noir_proof_with_keccak(
-            circuit_path: String,
-            srs_path: Option<String>,
-            inputs: Vec<String>,
-            disable_zk: bool,
-            vk: Vec<u8>,
-            low_memory_mode: bool,
-        ) -> Result<Vec<u8>, $err> {
-            mopro_ffi::generate_noir_proof_with_keccak(
-                circuit_path,
-                srs_path,
-                inputs,
-                disable_zk,
-                vk,
-                low_memory_mode,
-            )
-            .map_err(|e| <$err>::NoirError(format!("Generate Proof error: {}", e)))
-        }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_noir_proof_with_keccak(
-            circuit_path: String,
-            proof: Vec<u8>,
-            disable_zk: bool,
-            vk: Vec<u8>,
-            low_memory_mode: bool,
-        ) -> Result<bool, $err> {
-            Ok(mopro_ffi::verify_noir_proof_with_keccak(
-                circuit_path,
-                proof,
-                disable_zk,
-                vk,
-                low_memory_mode,
-            ))
-        }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn get_noir_verification_keccak_key(
-            circuit_path: String,
-            srs_path: Option<String>,
-            disable_zk: bool,
-            low_memory_mode: bool,
-        ) -> Result<Vec<u8>, $err> {
-            mopro_ffi::get_noir_verification_keccak_key(
-                circuit_path,
-                srs_path,
-                disable_zk,
-                low_memory_mode,
-            )
-            .map_err(|e| <$err>::NoirError(format!("Get Verification Key error: {}", e)))
         }
     };
 }
@@ -298,6 +213,26 @@ pub fn verify_noir_proof_with_keccak(
 ) -> bool {
     let _circuit_bytecode = get_bytecode(circuit_path);
     verify_ultra_honk_keccak(proof, vk, disable_zk).unwrap()
+}
+
+/// Generates a verification key with automatic hash function selection
+///
+/// This function automatically chooses the appropriate hash function based
+/// on the intended use case:
+///
+/// - `on_chain = true`: Uses Keccak hash for Solidity verifier compatibility
+/// - `on_chain = false`: Uses Poseidon hash for better performance
+pub fn get_noir_verification_key(
+    circuit_path: String,
+    srs_path: Option<String>,
+    on_chain: bool,
+    low_memory_mode: bool,
+) -> Result<Vec<u8>, String> {
+    if on_chain {
+        get_noir_verification_keccak_key(circuit_path, srs_path, false, low_memory_mode)
+    } else {
+        get_noir_verification_poseidon_key(circuit_path, srs_path, low_memory_mode)
+    }
 }
 
 /// Generates a verification key for Keccak-based Noir proofs
@@ -663,6 +598,32 @@ mod tests {
         assert!(is_valid);
     }
 
+    #[test]
+    #[serial_test::serial]
+    fn test_get_noir_verification_key_poseidon() {
+        let vk = get_noir_verification_key(
+            MULTIPLIER2_CIRCUIT_FILE.to_string(),
+            Some(SRS_FILE.to_string()),
+            false, // off-chain, uses Poseidon
+            false,
+        );
+        assert!(vk.is_ok());
+        assert!(!vk.unwrap().is_empty());
+    }
+
+    #[test]
+    #[serial_test::serial]
+    fn test_get_noir_verification_key_keccak() {
+        let vk = get_noir_verification_key(
+            MULTIPLIER2_CIRCUIT_FILE.to_string(),
+            Some(SRS_FILE.to_string()),
+            true, // on-chain, uses Keccak
+            false,
+        );
+        assert!(vk.is_ok());
+        assert!(!vk.unwrap().is_empty());
+    }
+
     #[cfg(feature = "no_uniffi_exports")]
     #[test]
     #[serial_test::serial]
@@ -672,27 +633,60 @@ mod tests {
         noir_app!(mopro_ffi::MoproError);
 
         let witness = vec!["3".to_string(), "5".to_string()];
-        let vk = get_noir_verification_poseidon_key(
+        let vk_offchain = get_noir_verification_key(
             MULTIPLIER2_CIRCUIT_FILE.to_string(),
             Some(SRS_FILE.to_string()),
+            false,
             false,
         )
         .unwrap();
-        let proof_result = generate_noir_proof_with_poseidon(
+        let vk_onchain = get_noir_verification_key(
             MULTIPLIER2_CIRCUIT_FILE.to_string(),
             Some(SRS_FILE.to_string()),
-            witness,
-            vk.clone(),
+            true,
+            false,
+        )
+        .unwrap();
+        let proof_offchain = generate_noir_proof(
+            MULTIPLIER2_CIRCUIT_FILE.to_string(),
+            Some(SRS_FILE.to_string()),
+            witness.clone(),
+            false,
+            vk_offchain.clone(),
+            false,
+        );
+        let proof_onchain = generate_noir_proof(
+            MULTIPLIER2_CIRCUIT_FILE.to_string(),
+            Some(SRS_FILE.to_string()),
+            witness.clone(),
+            true,
+            vk_onchain.clone(),
             false,
         );
 
-        assert!(proof_result.is_ok());
-        let proof = proof_result.unwrap();
+        assert!(proof_offchain.is_ok());
+        assert!(proof_onchain.is_ok());
+        let proof_offchain = proof_offchain.unwrap();
+        let proof_onchain = proof_onchain.unwrap();
 
-        let verify_result =
-            verify_noir_proof_with_poseidon(MULTIPLIER2_CIRCUIT_FILE.to_string(), proof, vk, false);
+        let verify_result_offchain = verify_noir_proof(
+            MULTIPLIER2_CIRCUIT_FILE.to_string(),
+            proof_offchain.clone(),
+            false,
+            vk_offchain,
+            false,
+        );
+        let verify_result_onchain = verify_noir_proof(
+            MULTIPLIER2_CIRCUIT_FILE.to_string(),
+            proof_onchain.clone(),
+            true,
+            vk_onchain,
+            false,
+        );
 
-        assert!(verify_result.is_ok());
-        assert!(verify_result.unwrap());
+        assert!(verify_result_offchain.is_ok());
+        assert!(verify_result_offchain.unwrap());
+        assert!(verify_result_onchain.is_ok());
+        assert!(verify_result_onchain.unwrap());
     }
 }

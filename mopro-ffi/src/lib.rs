@@ -51,11 +51,7 @@ pub use circom_prover::graph;
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 
 #[cfg(feature = "noir")]
-pub use noir::{
-    generate_noir_proof, generate_noir_proof_with_keccak, generate_noir_proof_with_poseidon,
-    get_noir_verification_keccak_key, get_noir_verification_poseidon_key, verify_noir_proof,
-    verify_noir_proof_with_keccak, verify_noir_proof_with_poseidon,
-};
+pub use noir::{generate_noir_proof, get_noir_verification_key, verify_noir_proof};
 
 #[cfg(not(feature = "circom"))]
 #[macro_export]
@@ -123,7 +119,15 @@ macro_rules! noir_app {
             vk: Vec<u8>,
             low_memory_mode: bool,
         ) -> Result<Vec<u8>, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
+            mopro_ffi::generate_noir_proof(
+                circuit_path,
+                srs_path,
+                inputs,
+                on_chain,
+                vk,
+                low_memory_mode,
+            )
+            .map_err(|e| <$err>::NoirError(format!("Generate Proof error: {}", e)))
         }
 
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
@@ -134,72 +138,20 @@ macro_rules! noir_app {
             vk: Vec<u8>,
             low_memory_mode: bool,
         ) -> Result<bool, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
+            mopro_ffi::verify_noir_proof(circuit_path, proof, on_chain, vk, low_memory_mode)
+                .map_err(|e| <$err>::NoirError(format!("Verify Proof error: {}", e)))
         }
 
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn generate_noir_proof_with_poseidon(
+        fn get_noir_verification_key(
             circuit_path: String,
             srs_path: Option<String>,
-            inputs: Vec<String>,
-            vk: Vec<u8>,
+            on_chain: bool,
             low_memory_mode: bool,
         ) -> Result<Vec<u8>, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
+            mopro_ffi::get_noir_verification_key(circuit_path, srs_path, on_chain, low_memory_mode)
+                .map_err(|e| <$err>::NoirError(format!("Get Verification Key error: {}", e)))
         }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_noir_proof_with_poseidon(
-            circuit_path: String,
-            proof: Vec<u8>,
-            vk: Vec<u8>,
-            low_memory_mode: bool,
-        ) -> Result<bool, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
-        }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn get_noir_verification_poseidon_key(
-            circuit_path: String,
-            srs_path: Option<String>,
-            low_memory_mode: bool,
-        ) -> Result<Vec<u8>, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
-        }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn generate_noir_proof_with_keccak(
-            circuit_path: String,
-            srs_path: Option<String>,
-            inputs: Vec<String>,
-            disable_zk: bool,
-            vk: Vec<u8>,
-            low_memory_mode: bool,
-        ) -> Result<Vec<u8>, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
-        }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_noir_proof_with_keccak(
-            circuit_path: String,
-            proof: Vec<u8>,
-            disable_zk: bool,
-            vk: Vec<u8>,
-            low_memory_mode: bool,
-        ) -> Result<bool, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
-        }
-
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn get_noir_verification_keccak_key(
-            circuit_path: String,
-            srs_path: Option<String>,
-            disable_zk: bool,
-            low_memory_mode: bool,
-        ) -> Result<Vec<u8>, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
-        }
-
     };
 }
 
