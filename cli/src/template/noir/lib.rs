@@ -9,31 +9,29 @@ mod noir_tests {
         let srs_path = "./test-vectors/noir/noir_multiplier2.srs".to_string();
         let circuit_path = "./test-vectors/noir/noir_multiplier2.json".to_string();
         let circuit_inputs = vec!["3".to_string(), "5".to_string()];
-        let vk = get_noir_verification_keccak_key(
+        let vk = get_noir_verification_key(
             circuit_path.clone(),
             Some(srs_path.clone()),
-            false,  // disable_zk
+            true,   // on_chain (uses Keccak for Solidity compatibility)
             false,  // low_memory_mode
         ).unwrap();
-        let result = generate_noir_proof_with_keccak(
+
+        let proof = generate_noir_proof(
             circuit_path.clone(),
             Some(srs_path.clone()),
             circuit_inputs.clone(),
-            false,  // disable_zk
+            true,   // on_chain (uses Keccak for Solidity compatibility)
             vk.clone(),
             false,  // low_memory_mode
-        );
-        assert!(result.is_ok());
-        let proof = result.unwrap();
-        let result = verify_noir_proof_with_keccak(
-            circuit_path.clone(),
+        ).unwrap();
+
+        let valid = verify_noir_proof(
+            circuit_path,
             proof,
-            false,  // disable_zk
+            true,   // on_chain (uses Keccak for Solidity compatibility)
             vk,
             false,  // low_memory_mode
-        );
-        assert!(result.is_ok());
-        let valid = result.unwrap();
+        ).unwrap();
         assert!(valid);
     }
 
@@ -44,28 +42,26 @@ mod noir_tests {
         let vk_path = "./test-vectors/noir/noir_multiplier2.vk".to_string();
 
         // read vk from file as Vec<u8>
-        let vk: Vec<u8> = std::fs::read(vk_path.clone()).unwrap();
+        let vk = std::fs::read(vk_path).unwrap();
 
         let circuit_inputs = vec!["3".to_string(), "5".to_string()];
-        let result = generate_noir_proof_with_keccak(
+
+        let proof = generate_noir_proof(
             circuit_path.clone(),
-            Some(srs_path.clone()),
-            circuit_inputs.clone(),
-            false,  // disable_zk
+            Some(srs_path),
+            circuit_inputs,
+            true,   // on_chain (uses Keccak for Solidity compatibility)
             vk.clone(),
             false,  // low_memory_mode
-        );
-        assert!(result.is_ok());
-        let proof = result.unwrap();
-        let result = verify_noir_proof_with_keccak(
-            circuit_path.clone(),
+        ).unwrap();
+
+        let valid = verify_noir_proof(
+            circuit_path,
             proof,
-            false,  // disable_zk
-            vk.clone(),
+            true,   // on_chain (uses Keccak for Solidity compatibility)
+            vk,
             false,  // low_memory_mode
-        );
-        assert!(result.is_ok());
-        let valid = result.unwrap();
+        ).unwrap();
         assert!(valid);
     }
 }
