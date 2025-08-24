@@ -708,7 +708,7 @@ dependencies = [
 [[package]]
 name = "bb"
 version = "0.82.2"
-source = "git+https://github.com/zkmopro/noir-rs#35027e6238cd8651bffd99567228062e9cc1e216"
+source = "git+https://github.com/zkmopro/noir-rs?branch=v1.0.0-beta.3-2#35027e6238cd8651bffd99567228062e9cc1e216"
 dependencies = [
  "cc",
  "chkstk_stub",
@@ -742,7 +742,7 @@ dependencies = [
  "bitflags 2.9.0",
  "cexpr",
  "clang-sys",
- "itertools 0.13.0",
+ "itertools 0.10.5",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -3153,7 +3153,7 @@ dependencies = [
 [[package]]
 name = "noir"
 version = "1.0.0-beta.3-2"
-source = "git+https://github.com/zkmopro/noir-rs#35027e6238cd8651bffd99567228062e9cc1e216"
+source = "git+https://github.com/zkmopro/noir-rs?branch=v1.0.0-beta.3-2#35027e6238cd8651bffd99567228062e9cc1e216"
 dependencies = [
  "acir",
  "acvm",
@@ -3837,7 +3837,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be769465445e8c1474e9c5dac2018218498557af32d9ed057325ec9a41ae81bf"
 dependencies = [
  "heck 0.5.0",
- "itertools 0.13.0",
+ "itertools 0.10.5",
  "log",
  "multimap",
  "once_cell",
@@ -3857,7 +3857,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a56d757972c98b346a9b766e3f02746cde6dd1cd1d1d563472929fdd74bec4d"
 dependencies = [
  "anyhow",
- "itertools 0.13.0",
+ "itertools 0.10.5",
  "proc-macro2",
  "quote",
  "syn 2.0.100",
