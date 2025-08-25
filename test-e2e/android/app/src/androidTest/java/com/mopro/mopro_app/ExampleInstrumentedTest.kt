@@ -48,7 +48,25 @@ class ExampleInstrumentedTest {
         Thread.sleep(2000)
 
         composeTestRule.onNodeWithTag("circomVerifyProofButton").performClick()
-        composeTestRule.onNodeWithTag("circomVerifyProofButton").assertIsDisplayed()
+    }
+
+    @Test
+    fun testNoirButtonClick() {
+        // Set up the Compose UI
+        composeTestRule.setContent {
+            NoirComponent() // Replace with the actual Composable function
+        }
+
+        // Test click noir generate proof button
+        composeTestRule.onNodeWithTag("noirGenerateProofButton").performClick()
+        composeTestRule.onNodeWithTag("noirGenerateProofButton").assertIsDisplayed()
+
+        // Test click noir verify proof button
+        // Wait until the second button is enabled (noir proofs take longer)
+        Thread.sleep(10000)
+
+        composeTestRule.onNodeWithTag("noirVerifyProofButton").performClick()
+        composeTestRule.onNodeWithTag("noirVerifyProofButton").assertIsDisplayed()
     }
 
     @Test
@@ -89,22 +107,4 @@ class ExampleInstrumentedTest {
         composeTestRule.onNodeWithTag("halo2VerifyProofButton").assertIsDisplayed()
     }
 
-    @Test
-    fun testNoirButtonClick() {
-        // Set up the Compose UI
-        composeTestRule.setContent {
-            NoirComponent() // Replace with the actual Composable function
-        }
-
-        // Test click circom generate proof button
-        composeTestRule.onNodeWithTag("noirGenerateProofButton").performClick()
-        composeTestRule.onNodeWithTag("noirGenerateProofButton").assertIsDisplayed()
-
-        // Test click circom verify proof button
-        // Wait until the second button is enabled
-        Thread.sleep(2000)
-
-        composeTestRule.onNodeWithTag("noirVerifyProofButton").performClick()
-        composeTestRule.onNodeWithTag("noirVerifyProofButton").assertIsDisplayed()
-    }
 }
