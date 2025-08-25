@@ -1,3 +1,6 @@
 [env]
-MOPRO_FFI_LINK_TEST_WITNESS=""
-CIRCOM_PROVER_TEST_WITNESS=""
+MOPRO_FFI_LINK_TEST_WITNESS = ""
+CIRCOM_PROVER_TEST_WITNESS = ""
+
+[unstable]
+build-std = ["panic_abort", "std"]
