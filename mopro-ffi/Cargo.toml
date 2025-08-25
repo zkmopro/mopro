@@ -36,6 +36,18 @@ rapidsnark = ["circom-prover/rapidsnark"]
 ## include all circom features
 circom-all = ["rustwitness", "witnesscalc", "arkworks", "rapidsnark"]
 
+# WASM
+wasm = [
+    "console_error_panic_hook",
+    "getrandom",
+    "serde-wasm-bindgen",
+    "wasm-bindgen",
+    "wasm-bindgen-console-logger",
+    "wasm-bindgen-futures",
+    "wasm-bindgen-rayon",
+    "uuid/js",
+]
+
 [dependencies]
 uniffi = { workspace = true, features = ["bindgen"] }
 num-bigint = { version = "0.4.3", default-features = false, features = [
@@ -83,6 +95,22 @@ ark-ff = { version = "0.5.0" }
 ark-bn254 = { version = "=0.5.0" }
 ark-bls12-381 = { version = "=0.5.0" }
 
+[target.wasm32-unknown-unknown.dependencies]
+console_error_panic_hook = { version = "0.1.7", optional = true }
+getrandom = { version = "0.2.15", features = ["js"], optional = true }
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
+wasm-bindgen = { version = "0.2.95", features = [
+    "serde-serialize",
+], optional = true }
+wasm-bindgen-console-logger = { version = "0.1.1", optional = true }
+wasm-bindgen-futures = { version = "0.4.47", optional = true }
+wasm-bindgen-rayon = { version = "1.2.2", features = [
+    "no-bundler",
+], optional = true }
+
+
+[target.wasm32-unknown-unknown.dev-dependencies]
+wasm-bindgen-test = { version = "0.3.42"}
 # Halo2 dependencies
 plonk-fibonacci = { workspace = true }
 hyperplonk-fibonacci = { workspace = true }

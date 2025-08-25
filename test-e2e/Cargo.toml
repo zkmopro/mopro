@@ -16,34 +16,65 @@ name = "android"
 [[bin]]
 name = "web"
 
-[dependencies]
-mopro-ffi = { path = "../mopro-ffi", features = [
+[features]
+default = [
     "uniffi",
     "halo2",
-    "circom",
-    "noir",
-    "witnesscalc",
-    "rapidsnark",
-] }
-mopro-wasm = { path = "../mopro-wasm" }
+    #  "circom", 
+    #  "noir"
+]
+uniffi = ["mopro-ffi/uniffi"]
+circom = [
+    "mopro-ffi/circom",
+    "dep:rust-witness",
+    "dep:witnesscalc-adapter",
+    "mopro-ffi/witnesscalc",
+    "mopro-ffi/rapidsnark",
+]
+halo2 = [
+    "mopro-ffi/halo2",
+    "dep:halo2-keccak-256",
+    "dep:plonk-fibonacci",
+    "dep:hyperplonk-fibonacci",
+    "dep:gemini-fibonacci",
+]
+noir = ["mopro-ffi/noir"]
+no_uniffi_exports = []
+
+[dependencies]
+mopro-ffi = { path = "../mopro-ffi" }
 
 # Circom dependencies
-rust-witness = { workspace = true }
-witnesscalc-adapter = "0.1"
+rust-witness = { workspace = true, optional = true }
+witnesscalc-adapter = { version = "0.1", optional = true }
 
 # Halo2 dependencies
-halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git" }
-plonk-fibonacci = { workspace = true }
-hyperplonk-fibonacci = { workspace = true }
-gemini-fibonacci = { workspace = true }
+halo2-keccak-256 = { git = "https://github.com/ElusAegis/halo2-keccak-stable.git", optional = true }
+plonk-fibonacci = { workspace = true, optional = true }
+hyperplonk-fibonacci = { workspace = true, optional = true }
+gemini-fibonacci = { workspace = true, optional = true }
 thiserror = "2.0.12"
 
 [build-dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
 
 # Circom dependencies
-rust-witness = { workspace = true }
-witnesscalc-adapter = "0.1"
+rust-witness = { workspace = true, optional = true }
+witnesscalc-adapter = { version = "0.1", optional = true }
 
 [dev-dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["uniffi-tests"] }
+
+[target.wasm32-unknown-unknown.dependencies]
+mopro-ffi = { path = "../mopro-ffi", features = ["halo2", "wasm", "uniffi"] }
+console_error_panic_hook = "0.1.7"
+getrandom = { version = "0.2.15", features = ["js"] }
+log = "0.4"
+serde-wasm-bindgen = "0.6.5"
+wasm-bindgen = { version = "0.2.95", features = ["serde-serialize"] }
+wasm-bindgen-console-logger = "0.1.1"
+wasm-bindgen-futures = "0.4.47"
+wasm-bindgen-rayon = { version = "1.2.2", features = ["no-bundler"] }
+
+[target.wasm32-unknown-unknown.dev-dependencies]
+wasm-bindgen-test = "0.3.42"

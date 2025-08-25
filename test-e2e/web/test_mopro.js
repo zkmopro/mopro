@@ -1,12 +1,17 @@
 // Initialize the WASM module and thread pool
 async function initializeWasm() {
     try {
-        const mopro_wasm = await import('../MoproWasmBindings/mopro_wasm_lib.js');
+        const mopro_wasm = await import(
+            "../MoproWasmBindings/mopro_bindings.js"
+        );
         await mopro_wasm.default();
         await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
         return mopro_wasm;
     } catch (error) {
-        console.error("Failed to initialize WASM module or thread pool:", error);
+        console.error(
+            "Failed to initialize WASM module or thread pool:",
+            error
+        );
         throw error;
     }
 }
@@ -27,21 +32,33 @@ async function measureTime(callback) {
 }
 
 // Run a specific test
-async function runTest(testName, input, srs, pk, vk, generateProof, verifyProof) {
+async function runTest(
+    testName,
+    input,
+    srs,
+    pk,
+    vk,
+    generateProof,
+    verifyProof
+) {
     try {
         const SRS_KEY = await fetchBinaryFile(srs);
         const PROVING_KEY = await fetchBinaryFile(pk);
         const VERIFYING_KEY = await fetchBinaryFile(vk);
 
-        const { result: proofResult, timeTaken: proofTime } = await measureTime(() =>
-            generateProof(SRS_KEY, PROVING_KEY, input)
+        const pkName = pk.split("/").pop();
+        const vkName = vk.split("/").pop();
+
+        const { result: proofResult, timeTaken: proofTime } = await measureTime(
+            () => generateProof(pkName, SRS_KEY, PROVING_KEY, input)
         );
 
         const [proof, public_input] = proofResult;
 
-        const { result: verifyResult, timeTaken: verifyTime } = await measureTime(() =>
-            verifyProof(SRS_KEY, VERIFYING_KEY, proof, public_input)
-        );
+        const { result: verifyResult, timeTaken: verifyTime } =
+            await measureTime(() =>
+                verifyProof(vkName, SRS_KEY, VERIFYING_KEY, proof, public_input)
+            );
 
         return { isValid: verifyResult, proofTime, verifyTime };
     } catch (error) {
@@ -58,10 +75,16 @@ function finalizeTests(allPassed, statusDiv) {
 }
 
 // Update the test results in the table
-function updateResults(testName, data, resultsTable, allPassedRef, error = null) {
+function updateResults(
+    testName,
+    data,
+    resultsTable,
+    allPassedRef,
+    error = null
+) {
     let row = document.getElementById(testName);
     if (!row) {
-        row = document.createElement('tr');
+        row = document.createElement("tr");
         row.id = testName;
         row.innerHTML = `
             <td>${testName}</td>
@@ -77,9 +100,13 @@ function updateResults(testName, data, resultsTable, allPassedRef, error = null)
         allPassedRef.value = false; // Use an object to maintain a mutable reference to `allPassed`
         document.getElementById(`${testName}-error`).textContent = error;
     } else {
-        document.getElementById(`${testName}-proof-time`).textContent = data.proofTime;
-        document.getElementById(`${testName}-verify-time`).textContent = data.verifyTime;
-        document.getElementById(`${testName}-pass`).textContent = data.isValid ? "true" : "false";
+        document.getElementById(`${testName}-proof-time`).textContent =
+            data.proofTime;
+        document.getElementById(`${testName}-verify-time`).textContent =
+            data.verifyTime;
+        document.getElementById(`${testName}-pass`).textContent = data.isValid
+            ? "true"
+            : "false";
         if (!data.isValid) allPassedRef.value = false;
     }
 }
@@ -93,34 +120,34 @@ function updateResults(testName, data, resultsTable, allPassedRef, error = null)
         {
             name: "Plonk",
             input: { out: ["55"] },
-            srs: './test-vectors/halo2/plonk_fibonacci_srs.bin',
-            pk: './test-vectors/halo2/plonk_fibonacci_pk.bin',
-            vk: './test-vectors/halo2/plonk_fibonacci_vk.bin',
-            generateProof: mopro_wasm.generate_plonk_proof,
-            verifyProof: mopro_wasm.verify_plonk_proof,
+            srs: "./test-vectors/halo2/plonk_fibonacci_srs.bin",
+            pk: "./test-vectors/halo2/plonk_fibonacci_pk.bin",
+            vk: "./test-vectors/halo2/plonk_fibonacci_vk.bin",
+            generateProof: mopro_wasm.generate_halo2_proof_wasm,
+            verifyProof: mopro_wasm.verify_halo2_proof_wasm,
         },
         {
             name: "HyperPlonk",
             input: { out: ["55"] },
-            srs: './test-vectors/halo2/hyperplonk_fibonacci_srs.bin',
-            pk: './test-vectors/halo2/hyperplonk_fibonacci_pk.bin',
-            vk: './test-vectors/halo2/hyperplonk_fibonacci_vk.bin',
-            generateProof: mopro_wasm.generate_hyperplonk_proof,
-            verifyProof: mopro_wasm.verify_hyperplonk_proof,
+            srs: "./test-vectors/halo2/hyperplonk_fibonacci_srs.bin",
+            pk: "./test-vectors/halo2/hyperplonk_fibonacci_pk.bin",
+            vk: "./test-vectors/halo2/hyperplonk_fibonacci_vk.bin",
+            generateProof: mopro_wasm.generate_halo2_proof_wasm,
+            verifyProof: mopro_wasm.verify_halo2_proof_wasm,
         },
         {
             name: "Gemini",
             input: { out: ["55"] },
-            srs: './test-vectors/halo2/gemini_fibonacci_srs.bin',
-            pk: './test-vectors/halo2/gemini_fibonacci_pk.bin',
-            vk: './test-vectors/halo2/gemini_fibonacci_vk.bin',
-            generateProof: mopro_wasm.generate_gemini_proof,
-            verifyProof: mopro_wasm.verify_gemini_proof,
-        }
+            srs: "./test-vectors/halo2/gemini_fibonacci_srs.bin",
+            pk: "./test-vectors/halo2/gemini_fibonacci_pk.bin",
+            vk: "./test-vectors/halo2/gemini_fibonacci_vk.bin",
+            generateProof: mopro_wasm.generate_halo2_proof_wasm,
+            verifyProof: mopro_wasm.verify_halo2_proof_wasm,
+        },
     ];
 
-    const resultsTable = document.getElementById('test-results');
-    const statusDiv = document.getElementById('test-status');
+    const resultsTable = document.getElementById("test-results");
+    const statusDiv = document.getElementById("test-status");
 
     let currentIndex = 0;
     const allPassedRef = { value: true };
@@ -140,7 +167,13 @@ function updateResults(testName, data, resultsTable, allPassedRef, error = null)
             );
             updateResults(testCase.name, data, resultsTable, allPassedRef);
         } catch (error) {
-            updateResults(testCase.name, null, resultsTable, allPassedRef, error.message);
+            updateResults(
+                testCase.name,
+                null,
+                resultsTable,
+                allPassedRef,
+                error.message
+            );
         }
         currentIndex++;
     }

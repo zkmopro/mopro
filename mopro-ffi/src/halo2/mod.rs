@@ -6,6 +6,7 @@ use anyhow::Result;
 #[macro_export]
 macro_rules! halo2_app {
     ($result:ty, $err:ty) => {
+        #[cfg(not(target_arch = "wasm32"))]
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn generate_halo2_proof(
             srs_path: String,
@@ -23,6 +24,7 @@ macro_rules! halo2_app {
             Ok(result.into())
         }
 
+        #[cfg(not(target_arch = "wasm32"))]
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn verify_halo2_proof(
             srs_path: String,
@@ -37,6 +39,72 @@ macro_rules! halo2_app {
                 })?;
             verifying_fn(&srs_path, &vk_path, proof, public_input)
                 .map_err(|e| <$err>::Halo2Error(format!("error verifying proof: {}", e)))
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), wasm_bindgen)]
+        pub fn generate_halo2_proof_wasm(
+            name: String,
+            srs_key: &[u8],
+            proving_key: &[u8],
+            input: wasm_bindgen::JsValue,
+        ) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue> {
+            let input: std::collections::HashMap<String, Vec<String>> =
+                serde_wasm_bindgen::from_value(input).map_err(|e| {
+                    wasm_bindgen::JsValue::from_str(&format!("Failed to parse input: {}", e))
+                })?;
+
+            let proving_fn = get_halo2_proving_circuit(&name).map_err(|e| {
+                wasm_bindgen::JsValue::from_str(&format!("error getting proving circuit: {}", e))
+            })?;
+
+            // Generate proof
+            let (proof, public_input) = proving_fn(srs_key, proving_key, input)
+                .map_err(|e| wasm_bindgen::JsValue::from_str(&format!("halo2 error: {}", e)))?;
+
+            // Serialize the output back into JsValue
+            serde_wasm_bindgen::to_value(&(proof, public_input)).map_err(|e| {
+                wasm_bindgen::JsValue::from_str(&format!("Serialization failed: {}", e))
+            })
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        #[cfg_attr(not(feature = "no_uniffi_exports"), wasm_bindgen)]
+        pub fn verify_halo2_proof_wasm(
+            name: String,
+            srs_key: &[u8],
+            verifying_key: &[u8],
+            proof: wasm_bindgen::JsValue,
+            public_inputs: wasm_bindgen::JsValue,
+        ) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue> {
+            let proof: Vec<u8> = serde_wasm_bindgen::from_value(proof).map_err(|e| {
+                wasm_bindgen::JsValue::from_str(&format!("Failed to parse proof: {}", e))
+            })?;
+            let public_inputs: Vec<u8> =
+                serde_wasm_bindgen::from_value(public_inputs).map_err(|e| {
+                    wasm_bindgen::JsValue::from_str(&format!(
+                        "Failed to parse public_inputs: {}",
+                        e
+                    ))
+                })?;
+
+            let verifying_fn =
+                get_halo2_verifying_circuit(&name).map_err(|e| {
+                    wasm_bindgen::JsValue::from_str(&format!(
+                        "error getting verification circuit: {}",
+                        e
+                    ))
+                })?;
+
+            let is_valid =
+                verifying_fn(srs_key, verifying_key, proof, public_inputs).map_err(|e| {
+                    wasm_bindgen::JsValue::from_str(&format!("error verifying proof: {}", e))
+                })?;
+
+            // Serialize the output back into JsValue
+            serde_wasm_bindgen::to_value(&is_valid).map_err(|e| {
+                wasm_bindgen::JsValue::from_str(&format!("Serialization failed: {}", e))
+            })
         }
     };
 }
@@ -117,10 +185,19 @@ macro_rules! set_halo2_circuits {
     };
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 pub type Halo2ProveFn =
     fn(&str, &str, HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
 
+#[cfg(not(target_arch = "wasm32"))]
 pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
+
+#[cfg(target_arch = "wasm32")]
+pub type Halo2ProveFn =
+    fn(&[u8], &[u8], HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
+
+#[cfg(target_arch = "wasm32")]
+pub type Halo2VerifyFn = fn(&[u8], &[u8], Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
 
 #[cfg(all(test, feature = "no_uniffi_exports"))]
 mod test {
@@ -128,6 +205,7 @@ mod test {
     use std::collections::HashMap;
 
     #[test]
+    #[cfg(not(target_arch = "wasm32"))]
     fn test_generate_and_verify_plonk_proof() {
         halo2_app!(mopro_ffi::Halo2ProofResult, mopro_ffi::MoproError);
 
@@ -160,6 +238,7 @@ mod test {
     }
 
     #[test]
+    #[cfg(not(target_arch = "wasm32"))]
     fn test_generate_and_verify_hyperplonk_proof() {
         halo2_app!(mopro_ffi::Halo2ProofResult, mopro_ffi::MoproError);
 
@@ -192,6 +271,7 @@ mod test {
     }
 
     #[test]
+    #[cfg(not(target_arch = "wasm32"))]
     fn test_generate_and_verify_gemini_proof() {
         halo2_app!(mopro_ffi::Halo2ProofResult, mopro_ffi::MoproError);
 

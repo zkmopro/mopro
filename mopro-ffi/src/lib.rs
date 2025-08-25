@@ -53,7 +53,7 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 #[cfg(feature = "noir")]
 pub use noir::{generate_noir_proof, verify_noir_proof};
 
-#[cfg(not(feature = "circom"))]
+#[cfg(any(not(feature = "circom"), target_arch = "wasm32"))]
 #[macro_export]
 macro_rules! circom_app {
     ($result:ty, $proof:ty, $err:ty, $proof_lib:ty) => {
@@ -106,7 +106,7 @@ macro_rules! halo2_app {
     };
 }
 
-#[cfg(not(feature = "noir"))]
+#[cfg(any(not(feature = "noir"), target_arch = "wasm32"))]
 #[macro_export]
 macro_rules! noir_app {
     ($err:ty) => {
@@ -227,6 +227,8 @@ pub struct Halo2ProofResult {
 macro_rules! app {
     () => {
         mopro_ffi::uniffi_setup!();
+        #[cfg(target_arch = "wasm32")]
+        use wasm_bindgen::prelude::wasm_bindgen;
         uniffi::setup_scaffolding!();
 
         // This should be declared into this macro due to Uniffi's limitation

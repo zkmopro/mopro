@@ -3054,53 +3054,28 @@ dependencies = [
  "camino",
  "circom-prover",
  "color-eyre",
+ "console_error_panic_hook",
  "gemini-fibonacci",
+ "getrandom 0.2.15",
  "hyperplonk-fibonacci",
  "noir",
  "num-bigint",
  "plonk-fibonacci",
  "rust-witness",
  "serde",
+ "serde-wasm-bindgen",
  "serde_json",
  "serial_test",
  "thiserror 2.0.12",
  "toml 0.8.22",
  "uniffi",
  "uuid",
+ "wasm-bindgen",
+ "wasm-bindgen-console-logger",
+ "wasm-bindgen-futures",
+ "wasm-bindgen-rayon",
+ "wasm-bindgen-test",
  "witnesscalc-adapter",
-]
-
-[[package]]
-name = "mopro-wasm"
-version = "0.1.0"
-dependencies = [
- "console_error_panic_hook",
- "gemini-fibonacci",
- "getrandom 0.2.15",
- "hyperplonk-fibonacci",
- "plonk-fibonacci",
- "rand 0.8.5",
- "serde-wasm-bindgen",
- "wasm-bindgen",
- "wasm-bindgen-console-logger",
- "wasm-bindgen-futures",
- "wasm-bindgen-rayon",
- "wasm-bindgen-test",
-]
-
-[[package]]
-name = "mopro-wasm-lib"
-version = "0.1.0"
-dependencies = [
- "console_error_panic_hook",
- "getrandom 0.2.15",
- "mopro-wasm",
- "serde-wasm-bindgen",
- "wasm-bindgen",
- "wasm-bindgen-console-logger",
- "wasm-bindgen-futures",
- "wasm-bindgen-rayon",
- "wasm-bindgen-test",
 ]
 
 [[package]]
@@ -5165,14 +5140,22 @@ dependencies = [
 name = "test-e2e"
 version = "0.1.0"
 dependencies = [
+ "console_error_panic_hook",
  "gemini-fibonacci",
+ "getrandom 0.2.15",
  "halo2-keccak-256",
  "hyperplonk-fibonacci",
+ "log",
  "mopro-ffi",
- "mopro-wasm",
  "plonk-fibonacci",
  "rust-witness",
+ "serde-wasm-bindgen",
  "thiserror 2.0.12",
+ "wasm-bindgen",
+ "wasm-bindgen-console-logger",
+ "wasm-bindgen-futures",
+ "wasm-bindgen-rayon",
+ "wasm-bindgen-test",
  "witnesscalc-adapter",
 ]
 
@@ -5786,6 +5769,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "458f7a779bf54acc9f347480ac654f68407d3aab21269a6e3c9f922acd9e2da9"
 dependencies = [
  "getrandom 0.3.2",
+ "js-sys",
+ "wasm-bindgen",
 ]
 
 [[package]]

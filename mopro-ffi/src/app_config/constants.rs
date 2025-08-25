@@ -14,6 +14,8 @@ pub const ANDROID_UNIFFI_DIR: &str = "uniffi";
 pub const ANDROID_PACKAGE_NAME: &str = "mopro";
 pub const ANDROID_KT_FILE: &str = "mopro.kt";
 
+pub const WEB_BINDINGS_DIR: &str = "MoproWasmBindings";
+
 pub const ARCH_X86_64: &str = "x86_64";
 pub const ARCH_ARM_64: &str = "aarch64";
 pub const ARCH_I686: &str = "x86";
@@ -232,6 +234,37 @@ impl Arch for AndroidArch {
 
     fn env_var_name() -> &'static str {
         ANDROID_ARCHS_ENV
+    }
+}
+
+pub struct WebArch;
+
+impl Arch for WebArch {
+    fn platform() -> Box<dyn Platform> {
+        Box::new(WebPlatform)
+    }
+
+    fn as_str(&self) -> &'static str {
+        "wasm32-unknown-unknown"
+    }
+
+    fn parse_from_str<S: AsRef<str>>(_s: S) -> Self {
+        WebArch
+    }
+
+    fn all_strings() -> Vec<&'static str> {
+        vec!["wasm32-unknown-unknown"]
+    }
+
+    fn all_display_strings() -> Vec<(String, String)> {
+        vec![(
+            "wasm32-unknown-unknown".to_string(),
+            "WebAssembly".to_string(),
+        )]
+    }
+
+    fn env_var_name() -> &'static str {
+        "WEB_ARCHS"
     }
 }
 
