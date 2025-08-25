@@ -23,12 +23,15 @@ struct ContentView: View {
     @State private var generatedHalo2Proof: Data?
     @State private var halo2PublicInputs: Data?
     @State private var generatedNoirProof: Data?
+    @State private var noirVerificationKey: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
     private let witnesscalc_zkeyPath = Bundle.main.path(forResource: "multiplier2_witnesscalc_final", ofType: "zkey")!
     private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
     private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
     private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
+    private let noirSrsPath = Bundle.main.path(forResource: "noir_multiplier2", ofType: "srs")!
     private let noirCircuitPath = Bundle.main.path(forResource: "noir_multiplier2", ofType: "json")!
+    private let noirVkPath = Bundle.main.path(forResource: "noir_multiplier2", ofType: "vk")!
    
     var body: some View {
         VStack(spacing: 10) {
@@ -255,54 +258,109 @@ extension ContentView {
     }
     
     func runNoirProveAction() {
-        textViewText += "Generating Noir proof... "
+        textViewText += "Generating Noir proof...\n"
+
         do {
-            // Prepare inputs
-            let inputs = ["3", "5"]
-                        
-            let start = CFAbsoluteTimeGetCurrent()
-            
-            let srsPath: String? = nil
-            
-            // Generate Proof
-            generatedNoirProof = try generateNoirProof(circuitPath: noirCircuitPath, srsPath: srsPath, inputs: inputs)
-            
-            let end = CFAbsoluteTimeGetCurrent()
-            let timeTaken = end - start
-            
-            textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
-            
-            isNoirVerifyButtonEnabled = true
+            let inputs: [String] = ["3", "5"]
+            let onChain = true  // Use Keccak for Solidity compatibility
+            let lowMemoryMode = false
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    // First, try to load existing verification key from file, or generate new one
+                    let vk: Data
+                    if let existingVkData = try? Data(contentsOf: URL(fileURLWithPath: noirVkPath)) {
+                        vk = existingVkData
+                        DispatchQueue.main.async {
+                            textViewText += "Using existing verification key...\n"
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            textViewText += "Generating verification key...\n"
+                        }
+                        vk = try getNoirVerificationKey(circuitPath: noirCircuitPath, srsPath: noirSrsPath, onChain: onChain, lowMemoryMode: lowMemoryMode)
+                    }
+                    noirVerificationKey = vk
+
+                    DispatchQueue.main.async {
+                        textViewText += "Generating proof with verification key...\n"
+                    }
+                    let start = CFAbsoluteTimeGetCurrent()
+                    
+                    // Generate the proof with all required parameters
+                    let proofData = try generateNoirProof(
+                        circuitPath: noirCircuitPath, 
+                        srsPath: noirSrsPath, 
+                        inputs: inputs, 
+                        onChain: onChain, 
+                        vk: vk, 
+                        lowMemoryMode: lowMemoryMode
+                    )
+
+                    let end = CFAbsoluteTimeGetCurrent()
+                    let timeTaken = end - start
+
+                    DispatchQueue.main.async {
+                        generatedNoirProof = proofData
+                        textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
+                        isNoirVerifyButtonEnabled = true
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        textViewText += "Proof generation failed: \(error.localizedDescription)\n"
+                    }
+                }
+            }
+
         } catch {
-            textViewText += "\nProof generation failed: \(error.localizedDescription)\n"
+            textViewText += "Error setting up proof generation: \(error.localizedDescription)\n"
         }
     }
     
     func runNoirVerifyAction() {
-        guard let proof = generatedNoirProof else {
-            textViewText += "Proof has not been generated yet.\n"
+        guard let proofData = generatedNoirProof else {
+            textViewText += "Error: Proof data is not available. Generate proof first.\n"
             return
         }
         
-        textViewText += "Verifying Noir proof... "
-        do {
+        guard let vk = noirVerificationKey else {
+            textViewText += "Error: Verification key is not available. Generate proof first.\n"
+            return
+        }
+
+        textViewText += "Verifying Noir proof...\n"
+
+        DispatchQueue.global(qos: .userInitiated).async {
             let start = CFAbsoluteTimeGetCurrent()
-            
-            let isValid = try verifyNoirProof(circuitPath: noirCircuitPath, proof: proof)
-            let end = CFAbsoluteTimeGetCurrent()
-            let timeTaken = end - start
-            
-            
-            if isValid {
-                textViewText += "\(String(format: "%.3f", timeTaken))s 2️⃣\n"
-            } else {
-                textViewText += "\nProof verification failed.\n"
+            do {
+                let onChain = true  // Use Keccak for Solidity compatibility
+                let lowMemoryMode = false
+                
+                // Verify the proof with all required parameters
+                let isValid = try verifyNoirProof(
+                    circuitPath: noirCircuitPath, 
+                    proof: proofData, 
+                    onChain: onChain, 
+                    vk: vk, 
+                    lowMemoryMode: lowMemoryMode
+                )
+
+                let end = CFAbsoluteTimeGetCurrent()
+                let timeTaken = end - start
+
+                DispatchQueue.main.async {
+                    if isValid {
+                        textViewText += "\(String(format: "%.3f", timeTaken))s 2️⃣\n"
+                    } else {
+                        textViewText += "\nProof verification failed.\n"
+                    }
+                    isNoirVerifyButtonEnabled = false
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    textViewText += "Verification failed: \(error.localizedDescription)\n"
+                }
             }
-            isNoirVerifyButtonEnabled = false
-        } catch let error as MoproError {
-            print("\nMoproError: \(error)")
-        } catch {
-            print("\nUnexpected error: \(error)")
         }
     }
 }

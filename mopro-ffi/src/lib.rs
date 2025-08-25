@@ -51,7 +51,7 @@ pub use circom_prover::graph;
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 
 #[cfg(feature = "noir")]
-pub use noir::{generate_noir_proof, verify_noir_proof};
+pub use noir::{generate_noir_proof, get_noir_verification_key, verify_noir_proof};
 
 #[cfg(not(feature = "circom"))]
 #[macro_export]
@@ -110,20 +110,47 @@ macro_rules! halo2_app {
 #[macro_export]
 macro_rules! noir_app {
     ($err:ty) => {
-        // TODO: fix this if CLI template can be customized
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn generate_noir_proof(
             circuit_path: String,
             srs_path: Option<String>,
             inputs: Vec<String>,
+            on_chain: bool,
+            vk: Vec<u8>,
+            low_memory_mode: bool,
         ) -> Result<Vec<u8>, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
+            mopro_ffi::generate_noir_proof(
+                circuit_path,
+                srs_path,
+                inputs,
+                on_chain,
+                vk,
+                low_memory_mode,
+            )
+            .map_err(|e| <$err>::NoirError(format!("Generate Proof error: {}", e)))
         }
 
-        // TODO: fix this if CLI template can be customized
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> Result<bool, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
+        fn verify_noir_proof(
+            circuit_path: String,
+            proof: Vec<u8>,
+            on_chain: bool,
+            vk: Vec<u8>,
+            low_memory_mode: bool,
+        ) -> Result<bool, $err> {
+            mopro_ffi::verify_noir_proof(circuit_path, proof, on_chain, vk, low_memory_mode)
+                .map_err(|e| <$err>::NoirError(format!("Verify Proof error: {}", e)))
+        }
+
+        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+        fn get_noir_verification_key(
+            circuit_path: String,
+            srs_path: Option<String>,
+            on_chain: bool,
+            low_memory_mode: bool,
+        ) -> Result<Vec<u8>, $err> {
+            mopro_ffi::get_noir_verification_key(circuit_path, srs_path, on_chain, low_memory_mode)
+                .map_err(|e| <$err>::NoirError(format!("Get Verification Key error: {}", e)))
         }
     };
 }
@@ -214,8 +241,19 @@ pub struct Halo2ProofResult {
 /// ```
 ///
 /// # Noir Example
+///
+/// Noir integration supports two hash functions for different use cases:
+/// - **Poseidon hash**: Default choice, optimized for performance and off-chain verification
+/// - **Keccak256 hash**: Required for Solidity verifier compatibility and on-chain verification
+///
+/// The hash function is automatically selected based on the `on_chain` parameter:
+/// - `on_chain = false` → Uses Poseidon (better performance)
+/// - `on_chain = true` → Uses Keccak256 (Solidity compatible)
+///
+/// Reference: https://noir-lang.org/docs/how_to/how-to-solidity-verifier
+///
 /// You don't need to generate Witness Generation functions first, like `Circom` or `Halo2` does.
-/// All you need to do is to setup the Mopro FFi library as below.
+/// All you need to do is to setup the Mopro FFI library as below.
 ///
 /// ```ignore
 /// // Setup the Mopro FFI library
