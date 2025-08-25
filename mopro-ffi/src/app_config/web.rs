@@ -53,6 +53,10 @@ impl PlatformBuilder for WebPlatform {
             bindings_out.to_str().unwrap(),
         ]);
 
+        cmd.env(
+            "RUSTFLAGS",
+            "-C target-feature=+atomics,+bulk-memory -C link-arg=--max-memory=4294967296",
+        );
         cmd.current_dir(&project_dir);
 
         let status = cmd.status().expect("Failed to run wasm-pack");
