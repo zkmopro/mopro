@@ -88,13 +88,12 @@ macro_rules! halo2_app {
                     ))
                 })?;
 
-            let verifying_fn =
-                get_halo2_verifying_circuit(&name).map_err(|e| {
-                    wasm_bindgen::JsValue::from_str(&format!(
-                        "error getting verification circuit: {}",
-                        e
-                    ))
-                })?;
+            let verifying_fn = get_halo2_verifying_circuit(&name).map_err(|e| {
+                wasm_bindgen::JsValue::from_str(&format!(
+                    "error getting verification circuit: {}",
+                    e
+                ))
+            })?;
 
             let is_valid =
                 verifying_fn(srs_key, verifying_key, proof, public_inputs).map_err(|e| {
