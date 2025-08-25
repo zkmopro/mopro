@@ -228,7 +228,9 @@ macro_rules! app {
     () => {
         mopro_ffi::uniffi_setup!();
         #[cfg(target_arch = "wasm32")]
-        use wasm_bindgen::prelude::wasm_bindgen;
+        use wasm_bindgen::prelude::*;
+        #[cfg(target_arch = "wasm32")]
+        use wasm_bindgen_rayon::init_thread_pool;
         uniffi::setup_scaffolding!();
 
         // This should be declared into this macro due to Uniffi's limitation
