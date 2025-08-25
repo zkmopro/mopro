@@ -163,6 +163,10 @@ jobs:
           echo "Check override chrome version"
           google-chrome --version
           cd mopro-wasm
+          # Temporarily remove packages with noir dependencies from workspace
+          sed -i '/"mopro-ffi",/d' ../Cargo.toml
+          sed -i '/"test-e2e",/d' ../Cargo.toml
+          sed -i '/"cli",/d' ../Cargo.toml
           wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
   # TODO: remove this commented test-e2e job
   # test-e2e:
@@ -359,7 +363,13 @@ jobs:
           cd test-e2e
           echo "install rust-src component"
           rustup component add rust-src --toolchain nightly-2024-07-18
-          cargo run --bin web
+          # Temporarily remove packages with noir dependencies from workspace
+          sed -i '/"mopro-ffi",/d' ../Cargo.toml
+          sed -i '/"test-e2e",/d' ../Cargo.toml
+          sed -i '/"cli",/d' ../Cargo.toml
+          # Run wasm-pack directly instead of using the web binary
+          cd mopro-wasm-lib
+          rustup run nightly-2024-07-18 wasm-pack build --target web --out-dir ../MoproWasmBindings
   test-halo2-wasm-web:
     runs-on: ubuntu-latest
     needs:
