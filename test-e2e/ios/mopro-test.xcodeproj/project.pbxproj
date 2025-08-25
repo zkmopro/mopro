@@ -20,6 +20,10 @@
 		60A8E4382C40404300D3A953 /* plonk_fibonacci_srs.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */; };
 		60A8E4392C40404300D3A953 /* plonk_fibonacci_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */; };
 		60A8E43A2C40404300D3A953 /* plonk_fibonacci_vk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */; };
+		E163B5752E5CBE8400B246AE /* noir_multiplier2.vk in Resources */ = {isa = PBXBuildFile; fileRef = E163B5742E5CBE8400B246AE /* noir_multiplier2.vk */; };
+		E163B5762E5CBE8400B246AE /* noir_multiplier2.srs in Resources */ = {isa = PBXBuildFile; fileRef = E163B5732E5CBE8400B246AE /* noir_multiplier2.srs */; };
+		E163B5772E5CBE8400B246AE /* noir_multiplier2.vk in Resources */ = {isa = PBXBuildFile; fileRef = E163B5742E5CBE8400B246AE /* noir_multiplier2.vk */; };
+		E163B5782E5CBE8400B246AE /* noir_multiplier2.srs in Resources */ = {isa = PBXBuildFile; fileRef = E163B5732E5CBE8400B246AE /* noir_multiplier2.srs */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +52,8 @@
 		60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_srs.bin; path = "../../test-vectors/halo2/plonk_fibonacci_srs.bin"; sourceTree = "<group>"; };
 		60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_pk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_pk.bin"; sourceTree = "<group>"; };
 		60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = plonk_fibonacci_vk.bin; path = "../../test-vectors/halo2/plonk_fibonacci_vk.bin"; sourceTree = "<group>"; };
+		E163B5732E5CBE8400B246AE /* noir_multiplier2.srs */ = {isa = PBXFileReference; lastKnownFileType = file; path = noir_multiplier2.srs; sourceTree = "<group>"; };
+		E163B5742E5CBE8400B246AE /* noir_multiplier2.vk */ = {isa = PBXFileReference; lastKnownFileType = file; path = noir_multiplier2.vk; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +86,8 @@
 		4CF977E22C2BCF0000CE1139 = {
 			isa = PBXGroup;
 			children = (
+				E163B5732E5CBE8400B246AE /* noir_multiplier2.srs */,
+				E163B5742E5CBE8400B246AE /* noir_multiplier2.vk */,
 				60A8E4362C40404300D3A953 /* plonk_fibonacci_pk.bin */,
 				60A8E4352C40404200D3A953 /* plonk_fibonacci_srs.bin */,
 				60A8E4372C40404300D3A953 /* plonk_fibonacci_vk.bin */,
@@ -211,6 +219,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E163B5772E5CBE8400B246AE /* noir_multiplier2.vk in Resources */,
+				E163B5782E5CBE8400B246AE /* noir_multiplier2.srs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,6 +234,8 @@
 				60A8E43A2C40404300D3A953 /* plonk_fibonacci_vk.bin in Resources */,
 				2A80982E2E03488700917619 /* multiplier2_witnesscalc_final.zkey in Resources */,
 				60A8E4382C40404300D3A953 /* plonk_fibonacci_srs.bin in Resources */,
+				E163B5752E5CBE8400B246AE /* noir_multiplier2.vk in Resources */,
+				E163B5762E5CBE8400B246AE /* noir_multiplier2.srs in Resources */,
 				4CF977F32C2BCF0300CE1139 /* Assets.xcassets in Resources */,
 				60A8E4392C40404300D3A953 /* plonk_fibonacci_pk.bin in Resources */,
 			);
