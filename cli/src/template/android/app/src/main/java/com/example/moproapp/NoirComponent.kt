@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import org.json.JSONObject
 import uniffi.mopro.generateNoirProof
 import uniffi.mopro.verifyNoirProof
+import uniffi.mopro.getNoirVerificationKey
 import java.io.File
 import java.io.InputStream
 
@@ -33,6 +34,7 @@ fun NoirComponent() {
     var verificationTime by remember { mutableStateOf("") }
     var verificationResult by remember { mutableStateOf("") }
     var proofBytes by remember { mutableStateOf<ByteArray?>(null) }
+    var verificationKey by remember { mutableStateOf<ByteArray?>(null) }
 
     // Status states
     var isGeneratingProof by remember { mutableStateOf(false) }
@@ -41,6 +43,16 @@ fun NoirComponent() {
 
     val circuitFile = getFilePathFromAssets("noir_multiplier2.json")
     val srsFile = getFilePathFromAssets("noir_multiplier2.srs")
+    val vkFile = getFilePathFromAssets("noir_multiplier2.vk")
+    
+    // Load existing verification key from assets
+    val existingVk = remember {
+        try {
+            context.assets.open("noir_multiplier2.vk").readBytes()
+        } catch (e: Exception) {
+            null
+        }
+    }
 
 
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
@@ -78,10 +90,27 @@ fun NoirComponent() {
                     Thread(
                         Runnable {
                             try {
-                                val inputs = listOf("5", "3")
+                                val inputs = listOf("3", "5")
+                                val onChain = true  // Use Keccak for Solidity compatibility
+                                val lowMemoryMode = false
 
+                                // First, get or use existing verification key
+                                val vk = existingVk ?: run {
+                                    statusMessage = "Generating verification key..."
+                                    getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
+                                }
+                                verificationKey = vk
+
+                                statusMessage = "Generating proof with verification key..."
                                 val startTime = System.currentTimeMillis()
-                                proofBytes = generateNoirProof(circuitFile, srsFile, inputs)
+                                proofBytes = generateNoirProof(
+                                    circuitFile,
+                                    srsFile,
+                                    inputs,
+                                    onChain,
+                                    vk,
+                                    lowMemoryMode
+                                )
                                 val endTime = System.currentTimeMillis()
                                 val duration = endTime - startTime
 
@@ -118,18 +147,31 @@ fun NoirComponent() {
                         Runnable {
                             try {
                                 proofBytes?.let { proof ->
+                                    verificationKey?.let { vk ->
+                                        val onChain = true  // Use Keccak for Solidity compatibility
+                                        val lowMemoryMode = false
 
-                                    val startTime = System.currentTimeMillis()
-                                    val result = verifyNoirProof(circuitFile, proof)
-                                    val endTime = System.currentTimeMillis()
-                                    val duration = endTime - startTime
+                                        val startTime = System.currentTimeMillis()
+                                        val result = verifyNoirProof(
+                                            circuitFile,
+                                            proof,
+                                            onChain,
+                                            vk,
+                                            lowMemoryMode
+                                        )
+                                        val endTime = System.currentTimeMillis()
+                                        val duration = endTime - startTime
 
-                                    verificationTime = "Verification time: $duration ms"
-                                    verificationResult = "Verification result: $result"
-                                    if (result)
-                                        statusMessage = "Proof verified successfully!" 
-                                    else 
-                                        statusMessage = "Proof verification failed!"
+                                        verificationTime = "Verification time: $duration ms"
+                                        verificationResult = "Verification result: $result"
+                                        if (result)
+                                            statusMessage = "Proof verified successfully!" 
+                                        else 
+                                            statusMessage = "Proof verification failed!"
+                                    } ?: run {
+                                        verificationResult = "No verification key available"
+                                        statusMessage = "Please generate a proof first to get verification key"
+                                    }
                                 } ?: run {
                                     verificationResult = "No proof available"
                                     statusMessage = "Please generate a proof first"
