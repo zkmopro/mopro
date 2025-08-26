@@ -6,7 +6,6 @@ use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
 use mopro_ffi::app_config::constants::{AndroidArch, AndroidPlatform, Arch, IosPlatform, Mode};
-use std::collections::HashSet;
 use std::env;
 
 use mopro_ffi::app_config::build_from_str_arch;
@@ -45,13 +44,7 @@ pub fn build_project(
 
     // Check if the config file exists, if not create a default one
     if !config_path.exists() {
-        let default_config = Config {
-            build_mode: Some("".to_string()),
-            target_adapters: Some(HashSet::new()),
-            target_platforms: Some(HashSet::new()),
-            ios: Some(HashSet::new()),
-            android: Some(HashSet::new()),
-        };
+        let default_config = Config::default();
         write_config(&config_path, &default_config)?;
     }
     let mut config = read_config(&config_path)?;

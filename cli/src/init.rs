@@ -82,13 +82,7 @@ pub fn init_project(
 
     // Check if the config file exists, if not create a default one
     if !config_path.exists() {
-        let default_config = Config {
-            build_mode: Some("".to_string()),
-            target_adapters: Some(HashSet::new()),
-            target_platforms: Some(HashSet::new()),
-            ios: Some(HashSet::new()),
-            android: Some(HashSet::new()),
-        };
+        let default_config = Config::default();
         write_config(&config_path, &default_config)?;
     }
     // Read & Write config for selected adapter
