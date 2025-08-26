@@ -157,7 +157,7 @@ pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<Option<P
 
     let confirm = Confirm::with_theme(&ColorfulTheme::default())
         .with_prompt(format!(
-            "Run `mopro build --bindings {}` now to generate them?",
+            "Run `mopro build --platforms {}` now to generate them?",
             platform.as_str()
         ))
         .default(true)
