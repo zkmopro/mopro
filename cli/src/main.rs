@@ -48,6 +48,18 @@ enum Commands {
         platforms: Option<Vec<String>>,
         #[arg(long, num_args = 1.., help = "Specify the architectures to build for (e.g., 'aarch64-apple-ios', 'aarch64-apple-ios-sim', x86_64-apple-ios, x86_64-linux-android, i686-linux-android, armv7-linux-androideabi, aarch64-linux-android).")]
         architectures: Option<Vec<String>>,
+        #[arg(
+            long,
+            help = "Automatically run mopro update after build",
+            conflicts_with = "no_auto_update"
+        )]
+        auto_update: bool,
+        #[arg(
+            long,
+            help = "Skip running mopro update and disable the prompt",
+            conflicts_with = "auto_update"
+        )]
+        no_auto_update: bool,
         #[arg(long, help = "Show instruction message for build")]
         show: bool,
     },
@@ -117,13 +129,15 @@ fn main() {
             mode,
             platforms,
             architectures,
+            auto_update,
+            no_auto_update,
             show,
         } => {
             if *show {
                 print::print_build_success_message();
                 return;
             }
-            match build::build_project(mode, platforms, architectures) {
+            match build::build_project(mode, platforms, architectures, *auto_update, *no_auto_update) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
             }
