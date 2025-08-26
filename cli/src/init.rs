@@ -24,6 +24,7 @@ trait ProvingSystem {
 pub fn init_project(
     arg_adapter: &Option<String>,
     arg_project_name: &Option<String>,
+    quiet: bool,
 ) -> anyhow::Result<()> {
     let project_name: String = match arg_project_name.as_deref() {
         None => Input::with_theme(&ColorfulTheme::default())
@@ -96,7 +97,10 @@ pub fn init_project(
     write_config(&config_path, &config)?;
 
     // Print out the instructions
-    print_init_instructions(project_name);
+    if !quiet {
+        // Print out the instructions
+        print_init_instructions(project_name);
+    }
 
     Ok(())
 }
