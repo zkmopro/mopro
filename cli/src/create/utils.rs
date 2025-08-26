@@ -6,7 +6,9 @@ use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 
+use anyhow::Ok;
 use anyhow::Result;
+use dialoguer::{theme::ColorfulTheme, Confirm};
 use include_dir::include_dir;
 use include_dir::Dir;
 use indicatif::ProgressBar;
@@ -16,7 +18,7 @@ use zip::ZipArchive;
 
 use mopro_ffi::app_config::constants::{ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
 
-use crate::constants::Platform;
+use crate::{build::build_project, constants::Platform, style};
 
 pub fn copy_android_bindings(
     android_bindings_dir: &Path,
@@ -145,10 +147,31 @@ pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<Option<P
 
     let bindings_dir = project_dir.join(bindings_dir_name);
     if bindings_dir.exists() && fs::read_dir(&bindings_dir)?.count() > 0 {
-        Ok(Some(bindings_dir))
-    } else {
-        Ok(None)
+        return Ok(Some(bindings_dir));
     }
+    style::print_yellow(format!(
+        "{} are required to create the template.",
+        bindings_dir_name
+    ));
+    println!();
+
+    let confirm = Confirm::with_theme(&ColorfulTheme::default())
+        .with_prompt(format!(
+            "Run `mopro build --platforms {}` now to generate them?",
+            platform.as_str()
+        ))
+        .default(true)
+        .interact()?;
+
+    if confirm {
+        build_project(&None, &Some(vec![platform.as_str().to_string()]), &None)?;
+
+        if bindings_dir.exists() && fs::read_dir(&bindings_dir)?.count() > 0 {
+            return Ok(Some(bindings_dir));
+        }
+    }
+
+    Ok(None)
 }
 
 pub fn download_and_extract_template(url: &str, dest: &Path, platform: &str) -> Result<()> {
