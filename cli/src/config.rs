@@ -15,6 +15,8 @@ pub struct Config {
     pub(crate) target_platforms: Option<HashSet<String>>,
     pub(crate) ios: Option<HashSet<String>>,
     pub(crate) android: Option<HashSet<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) auto_update: Option<bool>,
 }
 
 impl Config {

@@ -88,6 +88,7 @@ pub fn init_project(
             target_platforms: Some(HashSet::new()),
             ios: Some(HashSet::new()),
             android: Some(HashSet::new()),
+            auto_update: None,
         };
         write_config(&config_path, &default_config)?;
     }

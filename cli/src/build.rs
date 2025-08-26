@@ -22,12 +22,15 @@ use crate::print::print_build_success_message;
 use crate::style;
 use crate::style::blue_bold;
 use crate::style::print_green_bold;
+use crate::update::update_bindings;
 use crate::utils::PlatformSelector;
 
 pub fn build_project(
     arg_mode: &Option<String>,
     arg_platforms: &Option<Vec<String>>,
     arg_architectures: &Option<Vec<String>>,
+    auto_update_flag: bool,
+    no_auto_update_flag: bool,
 ) -> Result<()> {
     // Detect `Cargo.toml` file before starting build process
     let current_dir = env::current_dir()?;
@@ -51,6 +54,7 @@ pub fn build_project(
             target_platforms: Some(HashSet::new()),
             ios: Some(HashSet::new()),
             android: Some(HashSet::new()),
+            auto_update: None,
         };
         write_config(&config_path, &default_config)?;
     }
@@ -119,6 +123,8 @@ pub fn build_project(
             &Some(mode.as_str().to_string()),
             arg_platforms,
             arg_architectures,
+            auto_update_flag,
+            no_auto_update_flag,
         )?;
         return Ok(());
     }
@@ -135,6 +141,8 @@ pub fn build_project(
                 &Some(mode.as_str().to_string()),
                 arg_platforms,
                 arg_architectures,
+                auto_update_flag,
+                no_auto_update_flag,
             )?;
             return Ok(());
         }
@@ -183,6 +191,8 @@ pub fn build_project(
                 &Some(mode.as_str().to_string()),
                 arg_platforms,
                 arg_architectures,
+                auto_update_flag,
+                no_auto_update_flag,
             )?;
             return Ok(());
         }
@@ -230,6 +240,13 @@ pub fn build_project(
     }
 
     print_binding_message(&platform.platforms)?;
+    handle_auto_update(
+        &config_path,
+        &mut config,
+        auto_update_flag,
+        no_auto_update_flag,
+    )?;
+    print_build_success_message();
 
     Ok(())
 }
@@ -264,7 +281,6 @@ fn print_binding_message(platforms: &Vec<Platform>) -> anyhow::Result<()> {
         let text = format!("- {}/{}", current_dir.display(), platform.binding_dir());
         println!("{}", blue_bold(text.to_string()));
     }
-    print_build_success_message();
     Ok(())
 }
 
@@ -276,6 +292,51 @@ fn copy_mopro_wasm_lib() -> anyhow::Result<()> {
         const WASM_TEMPLATE_DIR: Dir =
             include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
         copy_embedded_dir(&WASM_TEMPLATE_DIR, &target_dir)?;
+    }
+
+    Ok(())
+}
+
+fn handle_auto_update(
+    config_path: &std::path::Path,
+    config: &mut Config,
+    auto_update_flag: bool,
+    no_auto_update_flag: bool,
+) -> Result<()> {
+    if auto_update_flag {
+        update_bindings()?;
+        return Ok(());
+    }
+
+    if no_auto_update_flag {
+        return Ok(());
+    }
+
+    if let Some(auto) = config.auto_update {
+        if auto {
+            update_bindings()?;
+        }
+        return Ok(());
+    }
+
+    println!();
+    let run_now = Confirm::with_theme(&ColorfulTheme::default())
+        .with_prompt("Run `mopro update` now to copy them into your platform projects?")
+        .default(true)
+        .interact()?;
+
+    if run_now {
+        update_bindings()?;
+    }
+
+    let remember = Confirm::with_theme(&ColorfulTheme::default())
+        .with_prompt("Remember this choice for future builds?")
+        .default(false)
+        .interact()?;
+
+    if remember {
+        config.auto_update = Some(run_now);
+        write_config(&config_path.to_path_buf(), config)?;
     }
 
     Ok(())
