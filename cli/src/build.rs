@@ -29,8 +29,7 @@ pub fn build_project(
     arg_mode: &Option<String>,
     arg_platforms: &Option<Vec<String>>,
     arg_architectures: &Option<Vec<String>>,
-    auto_update_flag: bool,
-    no_auto_update_flag: bool,
+    auto_update_flag: Option<bool>,
 ) -> Result<()> {
     // Detect `Cargo.toml` file before starting build process
     let current_dir = env::current_dir()?;
@@ -124,7 +123,6 @@ pub fn build_project(
             arg_platforms,
             arg_architectures,
             auto_update_flag,
-            no_auto_update_flag,
         )?;
         return Ok(());
     }
@@ -142,7 +140,6 @@ pub fn build_project(
                 arg_platforms,
                 arg_architectures,
                 auto_update_flag,
-                no_auto_update_flag,
             )?;
             return Ok(());
         }
@@ -192,7 +189,6 @@ pub fn build_project(
                 arg_platforms,
                 arg_architectures,
                 auto_update_flag,
-                no_auto_update_flag,
             )?;
             return Ok(());
         }
@@ -240,12 +236,7 @@ pub fn build_project(
     }
 
     print_binding_message(&platform.platforms)?;
-    handle_auto_update(
-        &config_path,
-        &mut config,
-        auto_update_flag,
-        no_auto_update_flag,
-    )?;
+    handle_auto_update(&config_path, &mut config, auto_update_flag)?;
     print_build_success_message();
 
     Ok(())
@@ -300,15 +291,12 @@ fn copy_mopro_wasm_lib() -> anyhow::Result<()> {
 fn handle_auto_update(
     config_path: &std::path::Path,
     config: &mut Config,
-    auto_update_flag: bool,
-    no_auto_update_flag: bool,
+    auto_update_flag: Option<bool>,
 ) -> Result<()> {
-    if auto_update_flag {
-        update_bindings()?;
-        return Ok(());
-    }
-
-    if no_auto_update_flag {
+    if let Some(auto_update_flag) = auto_update_flag {
+        if auto_update_flag {
+            update_bindings()?;
+        }
         return Ok(());
     }
 
