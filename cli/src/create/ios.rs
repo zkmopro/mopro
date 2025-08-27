@@ -35,9 +35,10 @@ impl Create for Ios {
         if let Some(bindings_dir) = ios_bindings_dir {
             copy_ios_bindings(bindings_dir, target_dir.clone())?;
         } else {
-            return Err(Error::msg(
-                "No iOS bindings found. Please run 'mopro build' to generate them.",
-            ));
+            return Err(Error::msg(format!(
+                "{} are required to create the template. Please run 'mopro build' to generate them.",
+                Platform::Ios.binding_dir()
+            )));
         }
         copy_keys(target_dir)?;
 
