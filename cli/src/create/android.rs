@@ -31,9 +31,10 @@ impl Create for Android {
         if let Some(bindings_dir) = android_bindings_dir {
             copy_android_bindings(&bindings_dir, &app_dir, "java")?;
         } else {
-            return Err(Error::msg(
-                "No Android bindings found. Please run 'mopro build' to generate them.",
-            ));
+            return Err(Error::msg(format!(
+                "{} are required to create the template. Please run 'mopro build' to generate them.",
+                Platform::Android.binding_dir()
+            )));
         }
 
         let assets_dir = app_dir.join("src/main/assets");
