@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mopro.mopro_app.getFilePathFromAssets
-import uniffi.mopro.*
+import uniffi.MoproBindings.*
 
 @Composable
 fun MultiplierComponent() {

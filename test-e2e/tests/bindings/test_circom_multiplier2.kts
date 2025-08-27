@@ -1,4 +1,4 @@
-import uniffi.mopro.*
+import uniffi.MoproBindings.*
 
 try {
     var zkeyPath = "../test-vectors/circom/multiplier2_final.zkey"

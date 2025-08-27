@@ -133,6 +133,24 @@ pub fn project_name_from_toml(project_dir: &Path) -> anyhow::Result<String> {
     project_name.ok_or(anyhow::anyhow!("Failed to find project name in Cargo.toml"))
 }
 
+pub fn to_pascal_case(s: &str) -> String {
+    s.split('_')
+        .filter(|segment| !segment.is_empty())
+        .map(|segment| {
+            let mut chars = segment.chars();
+            match chars.next() {
+                Some(first) => {
+                    let mut out = String::new();
+                    out.extend(first.to_uppercase());
+                    out.push_str(&chars.as_str().to_lowercase());
+                    out
+                }
+                None => String::new(),
+            }
+        })
+        .collect()
+}
+
 fn get_project_dir() -> PathBuf {
     std::env::var("CARGO_MANIFEST_DIR")
         .map(PathBuf::from)

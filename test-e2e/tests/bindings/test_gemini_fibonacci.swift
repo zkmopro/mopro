@@ -1,5 +1,5 @@
 import Foundation
-import mopro_bindings
+import MoproBindings
 
 do {
   let srsPath = "../../../test-vectors/halo2/gemini_fibonacci_srs.bin"

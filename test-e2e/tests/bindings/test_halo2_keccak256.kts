@@ -1,4 +1,4 @@
-import uniffi.mopro.*
+import uniffi.MoproBindings.*
 
 try {
     val srsPath = "../test-vectors/halo2/keccak256_srs.bin"

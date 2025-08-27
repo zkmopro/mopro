@@ -93,7 +93,7 @@ This section dives into two key challenges we addressed:
 
 #### Why Static Linking?
 
-UniFFI exports Swift bindings as a static archive (`libmopro_bindings.a`). Static linking ensures all Rust symbols are available at link-time, simplifying Xcode integration. However, it bundles all Rust dependencies (Barretenberg Backend, rayon, big-integer math), resulting in larger archive sizes.
+UniFFI exports Swift bindings as a static archive (`libMoproBindings.a`). Static linking ensures all Rust symbols are available at link-time, simplifying Xcode integration. However, it bundles all Rust dependencies (Barretenberg Backend, rayon, big-integer math), resulting in larger archive sizes.
 
 #### Baseline Size
 
