@@ -12,7 +12,7 @@ pub const ANDROID_BINDINGS_DIR: &str = "MoproAndroidBindings";
 pub const ANDROID_JNILIBS_DIR: &str = "jniLibs";
 pub const ANDROID_UNIFFI_DIR: &str = "uniffi";
 pub const ANDROID_PACKAGE_NAME: &str = "mopro";
-pub const ANDROID_KT_FILE: &str = "mopro.kt";
+pub const ANDROID_KT_FILE: &str = "MoproBindings.kt";
 
 pub const ARCH_X86_64: &str = "x86_64";
 pub const ARCH_ARM_64: &str = "aarch64";

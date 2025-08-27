@@ -11,8 +11,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mopro.mopro_app.getFilePathFromAssets
-import uniffi.mopro.generateNoirProof
-import uniffi.mopro.verifyNoirProof
+import uniffi.MoproBindings.generateNoirProof
+import uniffi.MoproBindings.verifyNoirProof
 
 @Composable
 fun NoirComponent() {

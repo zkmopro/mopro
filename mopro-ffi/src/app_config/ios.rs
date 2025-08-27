@@ -13,7 +13,7 @@ use super::constants::{
     IOS_XCFRAMEWORKS_DIR,
 };
 use super::mktemp_local;
-use super::{cleanup_tmp_local, project_name_from_toml};
+use super::{cleanup_tmp_local, project_name_from_toml, to_pascal_case};
 use super::{install_arch, PlatformBuilder};
 
 // Maintained for backwards compatibility
@@ -37,8 +37,9 @@ impl PlatformBuilder for IosPlatform {
         target_archs: Vec<Self::Arch>,
         params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
-        let uniffi_style_identifier = project_name_from_toml(project_dir)
+        let crate_name = project_name_from_toml(project_dir)
             .expect("Failed to get project name from Cargo.toml");
+        let uniffi_style_identifier = to_pascal_case(&crate_name);
 
         // Names for the files that will be outputted (can be changed)
         let bindings_dir_name = IOS_BINDINGS_DIR;
@@ -50,6 +51,7 @@ impl PlatformBuilder for IosPlatform {
         let lib_name = format!("lib{uniffi_style_identifier}.a");
         let header_name = format!("{uniffi_style_identifier}FFI.h");
         let modulemap_name = format!("{uniffi_style_identifier}FFI.modulemap");
+        let cargo_lib_name = format!("lib{crate_name}.a");
 
         // Paths for the generated files
         let build_dir_path = project_dir.join("build");
@@ -70,7 +72,7 @@ impl PlatformBuilder for IosPlatform {
                         "{}/{}/{}",
                         arch.as_str(),
                         mode.as_str(),
-                        lib_name
+                        cargo_lib_name
                     ))
                 })
                 .collect();
@@ -122,7 +124,7 @@ impl PlatformBuilder for IosPlatform {
             "{}/{}/{}",
             target_archs[0].as_str(),
             mode.as_str(),
-            lib_name.replace(".a", ".dylib")
+            cargo_lib_name.replace(".a", ".dylib")
         ));
 
         generate_ios_bindings(&out_dylib_path, &swift_bindings_dir)

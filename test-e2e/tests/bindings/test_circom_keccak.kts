@@ -1,4 +1,4 @@
-import uniffi.mopro.*
+import uniffi.MoproBindings.*
 
 try {
     var zkeyPath = "../test-vectors/circom/keccak256_256_test_final.zkey"

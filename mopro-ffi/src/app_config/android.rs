@@ -8,7 +8,7 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
 
-use crate::app_config::{project_name_from_toml, PlatformBuilder};
+use crate::app_config::{project_name_from_toml, to_pascal_case, PlatformBuilder};
 
 use super::cleanup_tmp_local;
 use super::constants::{
@@ -37,8 +37,9 @@ impl PlatformBuilder for AndroidPlatform {
         target_archs: Vec<Self::Arch>,
         _params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
-        let uniffi_style_identifier = project_name_from_toml(project_dir)
+        let crate_name = project_name_from_toml(project_dir)
             .expect("Failed to get project name from Cargo.toml");
+        let uniffi_style_identifier = to_pascal_case(&crate_name);
 
         // Names for the files that will be outputted (can be changed)
         let binding_dir_name = ANDROID_BINDINGS_DIR;
@@ -47,6 +48,7 @@ impl PlatformBuilder for AndroidPlatform {
 
         // Names for the generated files by uniffi
         let lib_name = format!("lib{}.so", &uniffi_style_identifier);
+        let cargo_lib_name = format!("lib{}.so", &crate_name);
         let gen_android_module_name = &uniffi_style_identifier;
         let gen_android_kt_file_name = format!("{}.kt", &uniffi_style_identifier);
 
@@ -62,23 +64,35 @@ impl PlatformBuilder for AndroidPlatform {
         install_ndk();
         let mut latest_out_lib_path = PathBuf::new();
         for arch in target_archs {
-            latest_out_lib_path =
-                build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode).context(
-                    format!("Failed to build for architecture: {}", arch.as_str()),
-                )?;
+            latest_out_lib_path = build_for_arch(
+                arch,
+                &lib_name,
+                &cargo_lib_name,
+                &build_dir,
+                &bindings_out,
+                mode,
+            )
+            .context(format!(
+                "Failed to build for architecture: {}",
+                arch.as_str()
+            ))?;
         }
 
         generate_android_bindings(&latest_out_lib_path, &bindings_out)
             .expect("Failed to generate bindings");
 
-        reformat_kotlin_package(
-            gen_android_module_name,
-            &gen_android_kt_file_name,
-            out_android_package_name,
-            &out_android_kt_file_name,
-            &bindings_out,
-        )
-        .expect("Failed to reformat generated Kotlin package");
+        if gen_android_module_name != out_android_package_name
+            || gen_android_kt_file_name != out_android_kt_file_name
+        {
+            reformat_kotlin_package(
+                gen_android_module_name,
+                &gen_android_kt_file_name,
+                out_android_package_name,
+                &out_android_kt_file_name,
+                &bindings_out,
+            )
+            .expect("Failed to reformat generated Kotlin package");
+        }
 
         move_bindings(&bindings_out, &bindings_dest);
         cleanup_tmp_local(&build_dir);
@@ -90,6 +104,7 @@ impl PlatformBuilder for AndroidPlatform {
 fn build_for_arch(
     arch: AndroidArch,
     lib_name: &str,
+    cargo_lib_name: &str,
     build_dir: &Path,
     bindings_out: &Path,
     mode: Mode,
@@ -126,11 +141,12 @@ fn build_for_arch(
     };
 
     let out_lib_path = build_dir.join(format!(
-        "{}/{}/{}/{}",
+        "{}/{}/{}/{}/{}",
         build_dir.display(),
         arch_str,
         mode.as_str(),
-        lib_name
+        lib_name,
+        cargo_lib_name,
     ));
     let out_lib_dest = bindings_out.join(format!("jniLibs/{folder}/{lib_name}"));
 
@@ -142,7 +158,7 @@ fn build_for_arch(
     fs::create_dir_all(parent_dir).context("Failed to create jniLibs directory")?;
     fs::copy(&out_lib_path, &out_lib_dest).context("Failed to copy file")?;
 
-    Ok(out_lib_path)
+    Ok(out_lib_dest)
 }
 
 fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
