@@ -116,12 +116,7 @@ fn main() {
                 print::print_build_success_message();
                 return;
             }
-            match build::build_project(
-                mode,
-                platforms,
-                architectures,
-                false,
-            ) {
+            match build::build_project(mode, platforms, architectures, false) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
             }

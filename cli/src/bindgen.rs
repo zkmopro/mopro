@@ -185,12 +185,7 @@ pub fn bindgen(
         )?;
     }
     // Run the build command
-    build_project(
-        arg_mode,
-        arg_platforms,
-        arg_architectures,
-        true,
-    )?;
+    build_project(arg_mode, arg_platforms, arg_architectures, true)?;
 
     // Copy the bindings folder to the output directory
     fs::create_dir_all(&output_base_dir)?;
@@ -259,6 +254,6 @@ fn generate_witness_functions(
         }
     }
 
-    content.push_str("}");
+    content.push('}');
     content
 }
