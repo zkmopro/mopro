@@ -10,6 +10,7 @@ use self::constants::{Arch, Mode, PlatformBuilder, BUILD_MODE_ENV};
 pub mod android;
 pub mod constants;
 pub mod ios;
+pub mod web;
 
 /// Builds bindings for the specified platform using environment variables to determine
 /// the build mode, project directory, and target architectures.
