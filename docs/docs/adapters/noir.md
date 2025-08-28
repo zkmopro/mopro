@@ -8,7 +8,7 @@ You can explore real examples of how the Noir adapter works in these projects:
 
 -   [mopro-zkemail-nr](https://github.com/zkmopro/mopro-zkemail-nr)
 -   [stealthnote-mobile](https://github.com/vivianjeng/stealthnote-mobile)
--   [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e)
+-   [mopro-wallet-connect-noir](https://github.com/moven0831/mopro-wallet-connect-noir)
 
 ## Setting Up the Rust Project
 
@@ -33,21 +33,18 @@ The Noir adapter depends on [`zkmopro/noir-rs`](https://github.com/zkmopro/noir-
 
 ## Hash Function Selection
 
-The Noir adapter supports two hash functions for different use cases:
+The Noir adapter supports two functions as oracle hash options for different use cases:
 
 - **Poseidon hash**: Default choice, optimized for performance and off-chain verification
-- **Keccak256 hash**: Required for Solidity verifier compatibility and on-chain verification
+- **Keccak256 hash**: Gas-efficient, required for Solidity verifier compatibility and on-chain verification
 
-The hash function is automatically selected based on the `on_chain` parameter in the main proving functions, or you can use the hash-specific functions directly.
+The hash function is automatically selected based on the `on_chain` parameter.
 
-### New Features
+### Key Features
 
-The updated Noir adapter introduces several key enhancements:
-
-- **Pre-generated Verification Keys**: Support for using existing verification keys (`vk` parameter) instead of deriving them from circuits each time, significantly improving performance.
-- **Low Memory Mode**: Optional memory optimization for resource-constrained mobile environments (`low_memory_mode` parameter).
-- **Oracle Hash Abstraction**: Flexible hash function selection enabling seamless switching between Poseidon and Keccak256 based on deployment requirements.
-- **Enhanced Error Handling**: Improved error reporting with `Result<T, MoproError>` return types for better debugging and error management.
+- **Automatic Hash Selection**: Automatically chooses between Poseidon (performance) and Keccak256 (EVM compatibility) based on your use case
+- **Memory Optimization**: Low memory mode available for mobile devices
+- **Cross-Platform**: Works across iOS, Android, and other supported platforms
 
 ## Proving and Verifying Functions
 
@@ -55,9 +52,9 @@ The updated Noir adapter introduces several key enhancements:
 
 Please follow this guide to generate the SRS for your Noir circuit: [Downloading SRS (Structured Reference String)](https://github.com/zkmopro/noir-rs?tab=readme-ov-file#downloading-srs-structured-reference-string)
 
-### Main Proving Function
+## Rust API
 
-The main proving function automatically selects the appropriate hash function based on the `on_chain` parameter:
+The Noir adapter provides three main functions that automatically handle hash function selection based on the `on_chain` parameter:
 
 ```rust
 pub fn generate_noir_proof(
@@ -68,21 +65,7 @@ pub fn generate_noir_proof(
     vk: Vec<u8>,
     low_memory_mode: bool,
 ) -> Result<Vec<u8>, MoproError>;
-```
 
--   `circuit_path`: Path to the compiled Noir `.json` circuit.
--   `srs_path`: Optional path to the structured reference string.
--   `inputs`: A list of strings representing public/private inputs.
--   `on_chain`: If `true`, uses Keccak256 hash for Solidity compatibility; if `false`, uses Poseidon hash.
--   `vk`: Pre-generated verification key bytes.
--   `low_memory_mode`: Enables memory optimization for resource-constrained environments.
--   Returns a serialized proof (`Vec<u8>`).
-
-### Main Verifying Function
-
-The main verification function automatically uses the appropriate hash function based on the `on_chain` parameter:
-
-```rust
 pub fn verify_noir_proof(
     circuit_path: String,
     proof: Vec<u8>,
@@ -90,224 +73,30 @@ pub fn verify_noir_proof(
     vk: Vec<u8>,
     low_memory_mode: bool,
 ) -> Result<bool, MoproError>;
-```
 
--   `circuit_path`: Path to the compiled Noir `.json` circuit.
--   `proof`: The serialized proof to verify.
--   `on_chain`: Must match the value used during proof generation.
--   `vk`: Pre-generated verification key bytes.
--   `low_memory_mode`: Enables memory optimization for resource-constrained environments.
--   Returns `true` if the proof is valid.
-
-### Hash-Specific Functions
-
-#### Poseidon Hash Functions (Off-chain)
-
-For explicit Poseidon hash usage (better performance, off-chain verification):
-
-```rust
-pub fn generate_noir_proof_with_poseidon(
+pub fn get_noir_verification_key(
     circuit_path: String,
     srs_path: Option<String>,
-    inputs: Vec<String>,
-    vk: Vec<u8>,
-    low_memory_mode: bool,
-) -> Result<Vec<u8>, MoproError>;
-
-pub fn verify_noir_proof_with_poseidon(
-    circuit_path: String,
-    proof: Vec<u8>,
-    vk: Vec<u8>,
-    low_memory_mode: bool,
-) -> Result<bool, MoproError>;
-
-pub fn get_noir_verification_poseidon_key(
-    circuit_path: String,
-    srs_path: Option<String>,
+    on_chain: bool,
     low_memory_mode: bool,
 ) -> Result<Vec<u8>, MoproError>;
 ```
 
-#### Keccak256 Hash Functions (On-chain)
+### Parameters
 
-For explicit Keccak256 hash usage (Solidity compatible, on-chain verification):
+- `circuit_path`: Path to the compiled Noir `.json` circuit
+- `srs_path`: Optional path to the structured reference string
+- `inputs`: List of strings representing public/private inputs (proof generation only)
+- `proof`: The serialized proof to verify (verification only)
+- `on_chain`: If `true`, uses Keccak256 hash for Solidity compatibility; if `false`, uses Poseidon hash for better performance
+- `vk`: Pre-generated verification key bytes
+- `low_memory_mode`: Enables memory optimization for resource-constrained environments
 
-```rust
-pub fn generate_noir_proof_with_keccak(
-    circuit_path: String,
-    srs_path: Option<String>,
-    inputs: Vec<String>,
-    disable_zk: bool,
-    vk: Vec<u8>,
-    low_memory_mode: bool,
-) -> Result<Vec<u8>, MoproError>;
+### Usage Notes
 
-pub fn verify_noir_proof_with_keccak(
-    circuit_path: String,
-    proof: Vec<u8>,
-    disable_zk: bool,
-    vk: Vec<u8>,
-    low_memory_mode: bool,
-) -> Result<bool, MoproError>;
-
-pub fn get_noir_verification_keccak_key(
-    circuit_path: String,
-    srs_path: Option<String>,
-    low_memory_mode: bool,
-) -> Result<Vec<u8>, MoproError>;
-```
-
-Note: `disable_zk` parameter allows generating proofs without zero-knowledge properties for testing purposes.
-
-## Using the Library
-
-### iOS API
-
-#### Main Functions
-
-```swift
-public func generateNoirProof(
-    circuitPath: String,
-    srsPath: String?,
-    inputs: [String],
-    onChain: Bool,
-    vk: Data,
-    lowMemoryMode: Bool
-) throws -> Data
-
-public func verifyNoirProof(
-    circuitPath: String,
-    proof: Data,
-    onChain: Bool,
-    vk: Data,
-    lowMemoryMode: Bool
-) throws -> Bool
-```
-
-#### Hash-Specific Functions
-
-```swift
-// Poseidon (off-chain)
-public func generateNoirProofWithPoseidon(
-    circuitPath: String,
-    srsPath: String?,
-    inputs: [String],
-    vk: Data,
-    lowMemoryMode: Bool
-) throws -> Data
-
-public func verifyNoirProofWithPoseidon(
-    circuitPath: String,
-    proof: Data,
-    vk: Data,
-    lowMemoryMode: Bool
-) throws -> Bool
-
-public func getNoirVerificationPoseidonKey(
-    circuitPath: String,
-    srsPath: String?,
-    lowMemoryMode: Bool
-) throws -> Data
-
-// Keccak256 (on-chain)
-public func generateNoirProofWithKeccak(
-    circuitPath: String,
-    srsPath: String?,
-    inputs: [String],
-    disableZk: Bool,
-    vk: Data,
-    lowMemoryMode: Bool
-) throws -> Data
-
-public func verifyNoirProofWithKeccak(
-    circuitPath: String,
-    proof: Data,
-    disableZk: Bool,
-    vk: Data,
-    lowMemoryMode: Bool
-) throws -> Bool
-
-public func getNoirVerificationKeccakKey(
-    circuitPath: String,
-    srsPath: String?,
-    lowMemoryMode: Bool
-) throws -> Data
-```
-
-### Android API
-
-#### Main Functions
-
-```kotlin
-fun generateNoirProof(
-    circuitPath: kotlin.String,
-    srsPath: kotlin.String?,
-    inputs: List<kotlin.String>,
-    onChain: kotlin.Boolean,
-    vk: kotlin.ByteArray,
-    lowMemoryMode: kotlin.Boolean,
-): kotlin.ByteArray
-
-fun verifyNoirProof(
-    circuitPath: kotlin.String,
-    proof: kotlin.ByteArray,
-    onChain: kotlin.Boolean,
-    vk: kotlin.ByteArray,
-    lowMemoryMode: kotlin.Boolean,
-): kotlin.Boolean
-```
-
-#### Hash-Specific Functions
-
-```kotlin
-// Poseidon (off-chain)
-fun generateNoirProofWithPoseidon(
-    circuitPath: kotlin.String,
-    srsPath: kotlin.String?,
-    inputs: List<kotlin.String>,
-    vk: kotlin.ByteArray,
-    lowMemoryMode: kotlin.Boolean,
-): kotlin.ByteArray
-
-fun verifyNoirProofWithPoseidon(
-    circuitPath: kotlin.String,
-    proof: kotlin.ByteArray,
-    vk: kotlin.ByteArray,
-    lowMemoryMode: kotlin.Boolean,
-): kotlin.Boolean
-
-fun getNoirVerificationPoseidonKey(
-    circuitPath: kotlin.String,
-    srsPath: kotlin.String?,
-    lowMemoryMode: kotlin.Boolean,
-): kotlin.ByteArray
-
-// Keccak256 (on-chain)
-fun generateNoirProofWithKeccak(
-    circuitPath: kotlin.String,
-    srsPath: kotlin.String?,
-    inputs: List<kotlin.String>,
-    disableZk: kotlin.Boolean,
-    vk: kotlin.ByteArray,
-    lowMemoryMode: kotlin.Boolean,
-): kotlin.ByteArray
-
-fun verifyNoirProofWithKeccak(
-    circuitPath: kotlin.String,
-    proof: kotlin.ByteArray,
-    disableZk: kotlin.Boolean,
-    vk: kotlin.ByteArray,
-    lowMemoryMode: kotlin.Boolean,
-): kotlin.Boolean
-
-fun getNoirVerificationKeccakKey(
-    circuitPath: kotlin.String,
-    srsPath: kotlin.String?,
-    lowMemoryMode: kotlin.Boolean,
-): kotlin.ByteArray
-```
-
-The Noir adapter exposes the equivalent functions and types to be used in both iOS and Android projects.
+- **Hash Selection**: Set `on_chain = true` for Ethereum/EVM compatibility, or `on_chain = false` for better performance
+- **Verification Keys**: Pre-generate verification keys using `get_noir_verification_key` and reuse them for better performance
+- **Memory Optimization**: Enable `low_memory_mode = true` for resource-constrained mobile environments
 
 ## Platform Support
 
