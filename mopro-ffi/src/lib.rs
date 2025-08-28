@@ -110,6 +110,7 @@ macro_rules! halo2_app {
 #[macro_export]
 macro_rules! noir_app {
     ($err:ty) => {
+        // TODO: fix this if CLI template can be customized
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn generate_noir_proof(
             circuit_path: String,
@@ -119,17 +120,10 @@ macro_rules! noir_app {
             vk: Vec<u8>,
             low_memory_mode: bool,
         ) -> Result<Vec<u8>, $err> {
-            mopro_ffi::generate_noir_proof(
-                circuit_path,
-                srs_path,
-                inputs,
-                on_chain,
-                vk,
-                low_memory_mode,
-            )
-            .map_err(|e| <$err>::NoirError(format!("Generate Proof error: {}", e)))
+            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
         }
 
+        // TODO: fix this if CLI template can be customized
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn verify_noir_proof(
             circuit_path: String,
@@ -138,10 +132,10 @@ macro_rules! noir_app {
             vk: Vec<u8>,
             low_memory_mode: bool,
         ) -> Result<bool, $err> {
-            mopro_ffi::verify_noir_proof(circuit_path, proof, on_chain, vk, low_memory_mode)
-                .map_err(|e| <$err>::NoirError(format!("Verify Proof error: {}", e)))
+            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
         }
 
+        // TODO: fix this if CLI template can be customized
         #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
         fn get_noir_verification_key(
             circuit_path: String,
@@ -149,8 +143,7 @@ macro_rules! noir_app {
             on_chain: bool,
             low_memory_mode: bool,
         ) -> Result<Vec<u8>, $err> {
-            mopro_ffi::get_noir_verification_key(circuit_path, srs_path, on_chain, low_memory_mode)
-                .map_err(|e| <$err>::NoirError(format!("Get Verification Key error: {}", e)))
+            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
         }
     };
 }

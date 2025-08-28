@@ -1,10 +1,15 @@
+// --- Noir Example of using Ultra Honk proving and verifying circuits ---
+
+// Module containing the Noir circuit logic (Multiplier2)
+
 #[cfg(test)]
 mod noir_tests {
     // Import the generated functions from the uniffi bindings
-
+    use serial_test::serial;
     use super::*;
 
     #[test]
+    #[serial]
     fn test_noir_multiplier2() {
         let srs_path = "./test-vectors/noir/noir_multiplier2.srs".to_string();
         let circuit_path = "./test-vectors/noir/noir_multiplier2.json".to_string();
@@ -36,6 +41,7 @@ mod noir_tests {
     }
 
     #[test]
+    #[serial]
     fn test_noir_multiplier2_with_existing_vk() {
         let srs_path = "./test-vectors/noir/noir_multiplier2.srs".to_string();
         let circuit_path = "./test-vectors/noir/noir_multiplier2.json".to_string();
