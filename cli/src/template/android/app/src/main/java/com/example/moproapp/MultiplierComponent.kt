@@ -1,3 +1,5 @@
+package com.example.moproapp
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,11 +22,12 @@ import uniffi.mopro.ProofLib
 
 @Composable
 fun MultiplierComponent() {
-    var initTime by remember { mutableStateOf("init time:") }
     var provingTime by remember { mutableStateOf("proving time:") }
     var verifyingTime by remember { mutableStateOf("verifying time: ") }
     var valid by remember { mutableStateOf("valid:") }
     var output by remember { mutableStateOf("output:") }
+    var isGeneratingCircomProof by remember { mutableStateOf(false) }
+    var isVerifyingProof by remember { mutableStateOf(false) }
     var res by remember {
         mutableStateOf(
             CircomProofResult(
@@ -47,26 +50,40 @@ fun MultiplierComponent() {
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
         Button(
             onClick = {
+                isGeneratingCircomProof = true
                 Thread(
                     Runnable {
-                        val startTime = System.currentTimeMillis()
-                        res = generateCircomProof(zkeyPath, input_str, ProofLib.ARKWORKS)
-                        val endTime = System.currentTimeMillis()
-                        provingTime = "proving time: " + (endTime - startTime).toString() + " ms"
+                        try {
+                            val startTime = System.currentTimeMillis()
+                            res = generateCircomProof(zkeyPath, input_str, ProofLib.ARKWORKS)
+                            val endTime = System.currentTimeMillis()
+                            provingTime = "proving time: " + (endTime - startTime).toString() + " ms"
+                        } finally {
+                            isGeneratingCircomProof = false
+                        }
                     }
                 ).start()
             },
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 20.dp),
+            enabled = !isGeneratingCircomProof && !isVerifyingProof
         ) { Text(text = "generate proof") }
         Button(
             onClick = {
-                val startTime = System.currentTimeMillis()
-                valid = "valid: " + verifyCircomProof(zkeyPath, res, ProofLib.ARKWORKS).toString()
-                val endTime = System.currentTimeMillis()
-                verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
-                output = "output: " + res.inputs
+                isVerifyingProof = true
+                Thread {
+                    try {
+                        val startTime = System.currentTimeMillis()
+                        valid = "valid: " + verifyCircomProof(zkeyPath, res, ProofLib.ARKWORKS).toString()
+                        val endTime = System.currentTimeMillis()
+                        verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
+                        output = "output: " + res.inputs
+                    } finally {
+                        isVerifyingProof = false
+                    }
+                }.start()
             },
-            modifier = Modifier.padding(top = 120.dp)
+            modifier = Modifier.padding(top = 120.dp),
+            enabled = !isGeneratingCircomProof && !isVerifyingProof && res.proof.a.x.isNotEmpty()
         ) { Text(text = "verify proof") }
         Text(
             text = "Multiplier proof",

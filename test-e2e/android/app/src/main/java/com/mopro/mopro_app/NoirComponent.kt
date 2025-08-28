@@ -1,3 +1,5 @@
+package com.mopro.mopro_app
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,10 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mopro.mopro_app.getFilePathFromAssets
+import org.json.JSONObject
 import uniffi.mopro.generateNoirProof
 import uniffi.mopro.verifyNoirProof
 import uniffi.mopro.getNoirVerificationKey
+import java.io.File
+import java.io.InputStream
 
 @Composable
 fun NoirComponent() {
@@ -39,7 +43,6 @@ fun NoirComponent() {
 
     val circuitFile = getFilePathFromAssets("noir_multiplier2.json")
     val srsFile = getFilePathFromAssets("noir_multiplier2.srs")
-    val vkFile = getFilePathFromAssets("noir_multiplier2.vk")
     
     // Load existing verification key from assets
     val existingVk = remember {
@@ -237,4 +240,4 @@ fun NoirComponent() {
             }
         }
     }
-}
+} 

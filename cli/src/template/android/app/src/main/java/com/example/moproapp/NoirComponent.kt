@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,7 +42,6 @@ fun NoirComponent() {
 
     val circuitFile = getFilePathFromAssets("noir_multiplier2.json")
     val srsFile = getFilePathFromAssets("noir_multiplier2.srs")
-    val vkFile = getFilePathFromAssets("noir_multiplier2.vk")
     
     // Load existing verification key from assets
     val existingVk = remember {
@@ -128,7 +126,7 @@ fun NoirComponent() {
                         }
                     ).start()
                 },
-                modifier = Modifier.padding(top = 20.dp).testTag("noirGenerateProofButton"),
+                modifier = Modifier.padding(top = 20.dp),
                 enabled = !isGeneratingProof && !isVerifyingProof
             ) { 
                 Text(text = "Generate Proof")
@@ -187,7 +185,7 @@ fun NoirComponent() {
                         }
                     ).start()
                 },
-                modifier = Modifier.padding(top = 20.dp).testTag("noirVerifyProofButton"),
+                modifier = Modifier.padding(top = 20.dp),
                 enabled = !isGeneratingProof && !isVerifyingProof && proofBytes != null
             ) { 
                 Text(text = "Verify Proof") 

@@ -1,7 +1,5 @@
 package com.example.moproapp
 
-import com.example.moproapp.MultiplierComponent
-import com.example.moproapp.NoirComponent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
