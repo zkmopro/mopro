@@ -10,7 +10,7 @@ use uniffi::SwiftBindingGenerator;
 
 use super::constants::{
     Arch, IosArch, IosPlatform, Mode, ARCH_ARM_64, ARCH_X86_64, IOS_BINDINGS_DIR, IOS_SWIFT_FILE,
-    IOS_XCFRAMEWORKS_DIR,
+    IOS_XCFRAMEWORKS_DIR, SKIP_BUILDING_BINDINGS_ENV,
 };
 use super::mktemp_local;
 use super::{cleanup_tmp_local, project_name_from_toml};
@@ -85,8 +85,14 @@ impl PlatformBuilder for IosPlatform {
                 if params.using_noir {
                     build_cmd.env("IPHONEOS_DEPLOYMENT_TARGET", "15.0");
                 }
+                // The dependencies of Noir libraries need iOS 15 and above.
+                if params.using_noir {
+                    build_cmd.env("IPHONEOS_DEPLOYMENT_TARGET", "15.0");
+                }
                 build_cmd
                     .arg("--lib")
+                    .env_remove("CARGO_MAKEFLAGS") // Remove CARGO_MAKEFLAGS to avoid deadlock when run inside the build script
+                    .env(SKIP_BUILDING_BINDINGS_ENV, "1") // Remove the environment variable that indicates that we want to build bindings to prevent build.rs from running build bindings again
                     .env("CARGO_BUILD_TARGET_DIR", &build_dir_path)
                     .env("CARGO_BUILD_TARGET", arch.as_str())
                     .spawn()

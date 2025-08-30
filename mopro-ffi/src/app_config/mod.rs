@@ -5,11 +5,48 @@ use std::process::Command;
 use toml::Value;
 use uuid::Uuid;
 
-use self::constants::{Arch, Mode, PlatformBuilder, BUILD_MODE_ENV};
+use self::constants::{
+    AndroidPlatform, Arch, IosPlatform, Mode, PlatformBuilder, ANDROID_ARCHS_ENV, BUILD_MODE_ENV,
+    IOS_ARCHS_ENV, SKIP_BUILDING_BINDINGS_ENV,
+};
 
 pub mod android;
 pub mod constants;
 pub mod ios;
+
+/// Generates bindings for both iOS and Android platforms.
+///
+/// Can be executed manually or from a Cargo build script. If run inside a build script,
+/// it reacts to `BUILD_BINDINGS_ENV` and emits the appropriate `cargo:` directives.
+pub fn generate_bindings() {
+    let is_build_script = std::env::var_os("OUT_DIR").is_some();
+    let should_not_build = std::env::var_os(SKIP_BUILDING_BINDINGS_ENV).is_some();
+
+    if is_build_script {
+        println!("cargo:rerun-if-env-changed={}", SKIP_BUILDING_BINDINGS_ENV);
+        println!("cargo:rerun-if-env-changed={}", BUILD_MODE_ENV);
+        println!("cargo:rerun-if-env-changed={}", IOS_ARCHS_ENV);
+        println!("cargo:rerun-if-env-changed={}", ANDROID_ARCHS_ENV);
+        println!("cargo:rerun-if-changed=.");
+
+        if should_not_build {
+            println!(
+                "cargo:warning=build.rs: skipping bindings generation — \
+                 {} is set.",
+                SKIP_BUILDING_BINDINGS_ENV
+            );
+            return;
+        }
+
+        println!(
+            "cargo:warning=build.rs: generating bindings — \
+             this might take a while..."
+        );
+    }
+
+    build_from_env::<IosPlatform>();
+    build_from_env::<AndroidPlatform>();
+}
 
 /// Builds bindings for the specified platform using environment variables to determine
 /// the build mode, project directory, and target architectures.

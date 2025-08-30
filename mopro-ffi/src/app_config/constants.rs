@@ -1,5 +1,6 @@
 use color_eyre::eyre::ContextCompat;
 
+pub const SKIP_BUILDING_BINDINGS_ENV: &str = "SKIP_BUILDING_BINDINGS";
 pub const BUILD_MODE_ENV: &str = "CONFIGURATION";
 pub const IOS_ARCHS_ENV: &str = "IOS_ARCHS";
 pub const ANDROID_ARCHS_ENV: &str = "ANDROID_ARCHS";
