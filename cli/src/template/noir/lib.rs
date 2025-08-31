@@ -12,7 +12,7 @@ mod noir_tests {
         let srs_path = "./test-vectors/noir/noir_multiplier2.srs".to_string();
         let circuit_path = "./test-vectors/noir/noir_multiplier2.json".to_string();
         let circuit_inputs = vec!["3".to_string(), "5".to_string()];
-        let result = generate_noir_proof(
+        let result = noir::generate_noir_proof(
             circuit_path.clone(),
             Some(srs_path.clone()),
             circuit_inputs.clone(),

@@ -112,6 +112,18 @@ impl AdapterSelector {
         }
     }
 
+    pub fn dev_dep_template(&self, cargo_toml_path: &str) {
+        if self.contains(Adapter::Circom) {
+            Circom::dev_dep_template(cargo_toml_path).unwrap();
+        }
+        if self.contains(Adapter::Halo2) {
+            Halo2::dev_dep_template(cargo_toml_path).unwrap();
+        }
+        if self.contains(Adapter::Noir) {
+            Noir::dev_dep_template(cargo_toml_path).unwrap();
+        }
+    }
+
     pub fn lib_template(&self, lib_rs_path: &str) {
         if self.contains(Adapter::Circom) {
             Circom::lib_template(lib_rs_path).unwrap();

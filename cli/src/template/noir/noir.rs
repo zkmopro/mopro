@@ -9,7 +9,7 @@ use noir_rs::{
 use crate::MoproError;
 
 #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-fn generate_noir_proof(
+pub(crate) fn generate_noir_proof(
     circuit_path: String,
     srs_path: Option<String>,
     inputs: Vec<String>,
@@ -27,7 +27,7 @@ fn generate_noir_proof(
 }
 
 #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> Result<bool, MoproError> {
+pub(crate) fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> Result<bool, MoproError> {
     let circuit_bytecode = get_bytecode(circuit_path);
     let vk = get_honk_verification_key(circuit_bytecode.as_str(), false).unwrap();
     verify_ultra_honk(proof, vk).map_err(|e| MoproError::NoirError(format!("Verify Error: {}", e)))
@@ -44,7 +44,6 @@ fn get_bytecode(circuit_path: String) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate as mopro_ffi;
     use serde::Deserialize;
     use std::{collections::HashMap, fs};
 
@@ -62,7 +61,7 @@ mod tests {
         assert!(verify_noir_proof(
             MULTIPLIER2_CIRCUIT_FILE.to_string(),
             proof
-        ));
+        ).is_ok());
     }
 
     #[test]
@@ -79,7 +78,7 @@ mod tests {
         )
         .unwrap();
 
-        assert!(verify_noir_proof(CIRCUIT_FILE.to_string(), proof));
+        assert!(verify_noir_proof(CIRCUIT_FILE.to_string(), proof).is_ok());
     }
 
     #[cfg(feature = "no_uniffi_exports")]
