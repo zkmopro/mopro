@@ -32,6 +32,16 @@ rust-witness = "0.1"
         replace_string_in_file(file_path, target, replacement)
     }
 
+    fn dev_dep_template(file_path: &str) -> Result<()> {
+        let replacement = r#"
+# CIRCOM_DEV_DEPENDENCIES
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.94"
+    "#;
+        let target = "# CIRCOM_DEV_DEPENDENCIES";
+        replace_string_in_file(file_path, target, replacement)
+    }
+
     fn lib_template(file_path: &str) -> Result<()> {
         let circom_lib_rs = match TEMPLATE_DIR.get_file("lib.rs") {
             Some(file) => file.contents(),
