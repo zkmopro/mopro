@@ -28,5 +28,12 @@ anyhow = "1.0.99"
 
 [build-dependencies]
 # CIRCOM_BUILD_DEPENDENCIES
+# HALO2_BUILD_DEPENDENCIES
+# NOIR_BUILD_DEPENDENCIES
+
+[dev-dependencies]
+# CIRCOM_DEV_DEPENDENCIES
+# HALO2_DEV_DEPENDENCIES
+# NOIR_DEV_DEPENDENCIES
     "# // TODO - make build dependencies also configurable
 }

@@ -26,6 +26,15 @@ noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", featur
         replace_string_in_file(file_path, target, replacement)
     }
 
+    fn dev_dep_template(file_path: &str) -> Result<()> {
+        let replacement = r#"
+# NOIR_DEV_DEPENDENCIES
+serial_test = "3.0.0"
+"#;
+        let target = "# NOIR_DEV_DEPENDENCIES";
+        replace_string_in_file(file_path, target, replacement)
+    }
+
     fn lib_template(file_path: &str) -> Result<()> {
         let noir_lib_rs = match TEMPLATE_DIR.get_file("lib.rs") {
             Some(file) => file.contents(),

@@ -4,6 +4,11 @@ use crate::MoproError;
 
 use anyhow::Result;
 
+pub type Halo2ProveFn =
+    fn(&str, &str, HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
+
+pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
+
 #[derive(Debug, Clone, uniffi::Record)]
 pub struct Halo2ProofResult {
     pub proof: Vec<u8>,
@@ -11,24 +16,24 @@ pub struct Halo2ProofResult {
 }
 
 #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-fn generate_halo2_proof(
+pub(crate) fn generate_halo2_proof(
     srs_path: String,
     pk_path: String,
     circuit_inputs: std::collections::HashMap<String, Vec<String>>,
 ) -> Result<Halo2ProofResult, MoproError> {
     let name = std::path::Path::new(pk_path.as_str()).file_name().unwrap();
-    let proving_fn = get_halo2_proving_circuit(name.to_str().unwrap())
+    let proving_fn = crate::get_halo2_proving_circuit(name.to_str().unwrap())
         .map_err(|e| MoproError::Halo2Error(format!("error getting proving circuit: {}", e)))?;
     let result = proving_fn(&srs_path, &pk_path, circuit_inputs)
-        .map(|(proof, inputs)| mopro_ffi::Halo2ProofResult { proof, inputs })
-        .map_err(|e| mopro_ffi::MoproError::Halo2Error(format!("halo2 error: {}", e)))
+        .map(|(proof, inputs)| Halo2ProofResult { proof, inputs })
+        .map_err(|e| MoproError::Halo2Error(format!("halo2 error: {}", e)))
         .unwrap();
 
     Ok(result.into())
 }
 
 #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-fn verify_halo2_proof(
+pub(crate) fn verify_halo2_proof(
     srs_path: String,
     vk_path: String,
     proof: Vec<u8>,
@@ -36,7 +41,7 @@ fn verify_halo2_proof(
 ) -> Result<bool, MoproError> {
     let name = std::path::Path::new(vk_path.as_str()).file_name().unwrap();
     let verifying_fn =
-        get_halo2_verifying_circuit(name.to_str().unwrap()).map_err(|e| {
+        crate::get_halo2_verifying_circuit(name.to_str().unwrap()).map_err(|e| {
             MoproError::Halo2Error(format!("error getting verification circuit: {}", e))
         })?;
     verifying_fn(&srs_path, &vk_path, proof, public_input)
@@ -99,40 +104,33 @@ fn verify_halo2_proof(
 #[macro_export]
 macro_rules! set_halo2_circuits {
     ($(($prove_key:expr, $prove_fn:expr, $verify_key:expr, $verify_fn:expr)),+ $(,)?) => {
-        fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<mopro_ffi::Halo2ProveFn, mopro_ffi::MoproError> {
+        fn get_halo2_proving_circuit(circuit_pk: &str) -> Result<halo2::Halo2ProveFn, MoproError> {
             match circuit_pk {
                 $(
                     $prove_key => Ok($prove_fn),
                 )+
-                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk)))
+                _ => Err(MoproError::Halo2Error(format!("Unknown proving key: {}", circuit_pk)))
             }
         }
 
-        fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<mopro_ffi::Halo2VerifyFn, mopro_ffi::MoproError> {
+        fn get_halo2_verifying_circuit(circuit_vk: &str) -> Result<halo2::Halo2VerifyFn, MoproError> {
             match circuit_vk {
                 $(
                     $verify_key => Ok($verify_fn),
                 )+
-                _ => Err(mopro_ffi::MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk)))
+                _ => Err(MoproError::Halo2Error(format!("Unknown verifying key: {}", circuit_vk)))
             }
         }
     };
 }
 
-pub type Halo2ProveFn =
-    fn(&str, &str, HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
-
-pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
-
 #[cfg(all(test, feature = "no_uniffi_exports"))]
 mod test {
-    use crate as mopro_ffi;
+    use super::*;
     use std::collections::HashMap;
 
     #[test]
     fn test_generate_and_verify_plonk_proof() {
-        halo2_app!(mopro_ffi::Halo2ProofResult, mopro_ffi::MoproError);
-
         set_halo2_circuits! {
             ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
         }
@@ -163,8 +161,6 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_hyperplonk_proof() {
-        halo2_app!(mopro_ffi::Halo2ProofResult, mopro_ffi::MoproError);
-
         set_halo2_circuits! {
             ("hyperplonk_fibonacci_pk.bin", hyperplonk_fibonacci::prove, "hyperplonk_fibonacci_vk.bin", hyperplonk_fibonacci::verify),
         }
@@ -195,8 +191,6 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_gemini_proof() {
-        halo2_app!(mopro_ffi::Halo2ProofResult, mopro_ffi::MoproError);
-
         set_halo2_circuits! {
             ("gemini_fibonacci_pk.bin", gemini_fibonacci::prove, "gemini_fibonacci_vk.bin", gemini_fibonacci::verify),
         }

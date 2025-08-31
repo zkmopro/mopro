@@ -19,9 +19,15 @@ trait ProvingSystem {
     fn dep_template(_file_path: &str) -> Result<()> {
         Ok(())
     }
+
     fn build_dep_template(_file_path: &str) -> Result<()> {
         Ok(())
     }
+
+    fn dev_dep_template(_file_path: &str) -> Result<()> {
+        Ok(())
+    }
+
 
     fn lib_template(_file_path: &str) -> Result<()> {
         Ok(())
@@ -80,6 +86,7 @@ pub fn init_project(
         replace_project_name(cargo_toml_path, &project_name)?;
         adapter_sel.dep_template(cargo_toml_path);
         adapter_sel.build_dep_template(cargo_toml_path);
+        adapter_sel.dev_dep_template(cargo_toml_path);
     }
 
     if let Some(build_rs_path) = project_dir.join("build.rs").to_str() {
