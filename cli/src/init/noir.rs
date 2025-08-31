@@ -15,12 +15,4 @@ impl ProvingSystem for Noir {
         let target = "// NOIR_TEMPLATE";
         replace_string_in_file(file_path, target, &String::from_utf8_lossy(noir_lib_rs))
     }
-
-    fn dep_template(_file_path: &str) -> Result<()> {
-        Ok(())
-    }
-
-    fn build_template(_file_path: &str) -> Result<()> {
-        Ok(())
-    }
 }
