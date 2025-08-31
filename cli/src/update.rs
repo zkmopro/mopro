@@ -69,7 +69,7 @@ pub fn update_bindings() -> Result<()> {
 /// Recursively updates all directories in the current directory that match `target_dir_name`.
 /// If `gracefully` is `true`, existing directories are preserved and only overlapping files are overwritten.
 /// This is useful for shared folders across multiple bindings (e.g., Android JNI libs).
-fn update_folder(
+pub fn update_folder(
     source_dir: &Path,
     target_dir_name: &str,
     gracefully: bool,
@@ -114,7 +114,7 @@ fn update_folder(
     Ok(updated_paths)
 }
 
-fn update_file(source_file: &Path, target_file_name: &str) -> Result<Vec<String>> {
+pub fn update_file(source_file: &Path, target_file_name: &str) -> Result<Vec<String>> {
     let mut updated_file_paths = Vec::new();
     if !source_file.exists() {
         return Err(anyhow::anyhow!(

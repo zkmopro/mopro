@@ -6,10 +6,12 @@ use crate::constants::Platform;
 use crate::create::utils::{
     check_bindings, copy_android_bindings, copy_dir, copy_keys, download_and_extract_template,
 };
-use crate::print::print_footer_message;
-use crate::style::print_green_bold;
+use crate::update::{update_file, update_folder};
 
-use mopro_ffi::app_config::constants::{IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR};
+use mopro_ffi::app_config::constants::{
+    ANDROID_JNILIBS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ANDROID_UNIFFI_DIR, IOS_SWIFT_FILE,
+    IOS_XCFRAMEWORKS_DIR,
+};
 
 pub struct Flutter;
 
@@ -38,32 +40,24 @@ impl Create for Flutter {
         let flutter_dir = project_dir.join("flutter-app-main");
         fs::rename(flutter_dir, &target_dir)?;
 
-        let mopro_flutter_plugin_dir = target_dir.join("mopro_flutter_plugin");
-
         // Handle iOS if provided
         if let Some(ios_dir) = ios_bindings_dir {
             let xcframeworks_dir = ios_dir.join(IOS_XCFRAMEWORKS_DIR);
             let mopro_swift_file = ios_dir.join(IOS_SWIFT_FILE);
-
-            let ios_target_dir = mopro_flutter_plugin_dir.join("ios");
-            let mopro_bindings_dir = ios_target_dir.join(IOS_XCFRAMEWORKS_DIR);
-            let classes_dir = ios_target_dir.join("Classes");
-
-            fs::remove_dir_all(&mopro_bindings_dir)?;
-            fs::create_dir(&mopro_bindings_dir)?;
-            copy_dir(&xcframeworks_dir, &mopro_bindings_dir)?;
-
-            fs::remove_file(classes_dir.join(IOS_SWIFT_FILE))?;
-            fs::copy(mopro_swift_file, classes_dir.join(IOS_SWIFT_FILE))?;
+            let _ = update_folder(&xcframeworks_dir, IOS_XCFRAMEWORKS_DIR, false)?;
+            let _ = update_file(&mopro_swift_file, IOS_SWIFT_FILE)?;
         }
 
         // Handle Android if provided
         if let Some(android_dir) = android_bindings_dir {
-            copy_android_bindings(
-                &android_dir,
-                &mopro_flutter_plugin_dir.join("android"),
-                "kotlin",
-            )?;
+            let jnilib_path = android_dir.join(ANDROID_JNILIBS_DIR);
+            let kotlin_path = android_dir
+                .join(ANDROID_UNIFFI_DIR)
+                .join(ANDROID_PACKAGE_NAME)
+                .join(ANDROID_KT_FILE);
+
+            let _ = update_file(&kotlin_path, ANDROID_KT_FILE)?;
+            let _ = update_folder(&jnilib_path, ANDROID_JNILIBS_DIR, true)?;
         }
 
         // Keys
