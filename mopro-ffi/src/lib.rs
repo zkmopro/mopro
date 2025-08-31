@@ -31,21 +31,10 @@ macro_rules! uniffi_setup {
     };
 }
 
-#[cfg(feature = "circom")]
-mod circom;
 #[cfg(feature = "halo2")]
 mod halo2;
 #[cfg(feature = "noir")]
 mod noir;
-
-#[cfg(feature = "circom")]
-pub use circom::{generate_circom_proof_wtns, verify_circom_proof};
-
-#[cfg(feature = "circom")]
-pub use circom_prover::{prover, witness};
-
-#[cfg(feature = "circom-witnesscalc")]
-pub use circom_prover::graph;
 
 #[cfg(feature = "halo2")]
 pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
@@ -53,31 +42,6 @@ pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
 #[cfg(feature = "noir")]
 pub use noir::{generate_noir_proof, get_noir_verification_key, verify_noir_proof};
 
-#[cfg(not(feature = "circom"))]
-#[macro_export]
-macro_rules! circom_app {
-    ($result:ty, $proof:ty, $err:ty, $proof_lib:ty) => {
-        // TODO: fix this if CLI template can be customized
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn generate_circom_proof(
-            zkey_path: String,
-            circuit_inputs: String,
-            proof_lib: $proof_lib,
-        ) -> Result<$result, $err> {
-            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
-        }
-
-        // TODO: fix this if CLI template can be customized
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_circom_proof(
-            zkey_path: String,
-            proof_result: $result,
-            proof_lib: $proof_lib,
-        ) -> Result<bool, $err> {
-            panic!("Circom is not enabled in this build. Please pass `circom` feature to `mopro-ffi` to enable Circom.")
-        }
-    };
-}
 
 #[cfg(not(feature = "halo2"))]
 #[macro_export]
@@ -158,37 +122,6 @@ pub enum MoproError {
     NoirError(String),
 }
 
-//
-// Circom Proof
-//
-#[derive(Debug, Clone)]
-pub struct CircomProofResult {
-    pub proof: CircomProof,
-    pub inputs: Vec<String>,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct CircomProof {
-    pub a: G1,
-    pub b: G2,
-    pub c: G1,
-    pub protocol: String,
-    pub curve: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct G1 {
-    pub x: String,
-    pub y: String,
-    pub z: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct G2 {
-    pub x: Vec<String>,
-    pub y: Vec<String>,
-    pub z: Vec<String>,
-}
 //
 // Halo2 Proof
 //
@@ -301,114 +234,6 @@ macro_rules! app {
             }
         }
         // End of Halo2 Section
-
-        //
-        // Circom Section
-        //
-        #[derive(Debug, Clone, uniffi::Record)]
-        pub struct CircomProofResult {
-            pub proof: CircomProof,
-            pub inputs: Vec<String>,
-        }
-
-        impl From<mopro_ffi::CircomProofResult> for CircomProofResult {
-            fn from(result: mopro_ffi::CircomProofResult) -> Self {
-                Self {
-                    proof: result.proof.into(),
-                    inputs: result.inputs,
-                }
-            }
-        }
-
-        impl Into<mopro_ffi::CircomProofResult> for CircomProofResult {
-            fn into(self) -> mopro_ffi::CircomProofResult {
-                mopro_ffi::CircomProofResult {
-                    proof: self.proof.into(),
-                    inputs: self.inputs,
-                }
-            }
-        }
-
-        #[derive(Debug, Clone, Default, uniffi::Record)]
-        pub struct G1 {
-            pub x: String,
-            pub y: String,
-            pub z: String,
-        }
-
-        #[derive(Debug, Clone, Default, uniffi::Record)]
-        pub struct G2 {
-            pub x: Vec<String>,
-            pub y: Vec<String>,
-            pub z: Vec<String>,
-        }
-
-        #[derive(Debug, Clone, Default, uniffi::Record)]
-        pub struct CircomProof {
-            pub a: G1,
-            pub b: G2,
-            pub c: G1,
-            pub protocol: String,
-            pub curve: String,
-        }
-
-        impl From<mopro_ffi::CircomProof> for CircomProof {
-            fn from(proof: mopro_ffi::CircomProof) -> Self {
-                CircomProof {
-                    a: G1 {
-                        x: proof.a.x,
-                        y: proof.a.y,
-                        z: proof.a.z,
-                    },
-                    b: G2 {
-                        x: proof.b.x,
-                        y: proof.b.y,
-                        z: proof.b.z,
-                    },
-                    c: G1 {
-                        x: proof.c.x,
-                        y: proof.c.y,
-                        z: proof.c.z,
-                    },
-                    protocol: proof.protocol,
-                    curve: proof.curve,
-                }
-            }
-        }
-
-        impl Into<mopro_ffi::CircomProof> for CircomProof {
-            fn into(self) -> mopro_ffi::CircomProof {
-                mopro_ffi::CircomProof {
-                    a: mopro_ffi::G1 {
-                        x: self.a.x,
-                        y: self.a.y,
-                        z: self.a.z,
-                    },
-                    b: mopro_ffi::G2 {
-                        x: self.b.x,
-                        y: self.b.y,
-                        z: self.b.z,
-                    },
-                    c: mopro_ffi::G1 {
-                        x: self.c.x,
-                        y: self.c.y,
-                        z: self.c.z,
-                    },
-                    protocol: self.protocol,
-                    curve: self.curve,
-                }
-            }
-        }
-        // End of Circom Section
-
-        #[derive(Debug, Clone, Default, uniffi::Enum)]
-        pub enum ProofLib {
-            #[default]
-            Arkworks,
-            Rapidsnark,
-        }
-
-        mopro_ffi::circom_app!(CircomProofResult, CircomProof, MoproError, ProofLib);
 
         mopro_ffi::halo2_app!(Halo2ProofResult, MoproError);
 
