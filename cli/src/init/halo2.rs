@@ -19,10 +19,13 @@ impl ProvingSystem for Halo2 {
     }
 
     fn dep_template(file_path: &str) -> Result<()> {
-        let replacement =
-	         "plonk-fibonacci = { package = \"plonk-fibonacci\", git = \"https://github.com/sifnoc/plonkish-fibonacci-sample.git\" } 
-hyperplonk-fibonacci = { package = \"hyperplonk-fibonacci\", git = \"https://github.com/sifnoc/plonkish-fibonacci-sample.git\" } 
-gemini-fibonacci = { package = \"gemini-fibonacci\", git = \"https://github.com/sifnoc/plonkish-fibonacci-sample.git\" }";
+        let replacement = r#"
+    # HALO2_DEPENDENCIES
+    plonk-fibonacci   = { package = "plonk-fibonacci",   git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+    hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+    gemini-fibonacci  = { package = "gemini-fibonacci",  git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+    "#;
+
         let target = "# HALO2_DEPENDENCIES";
         replace_string_in_file(file_path, target, replacement)
     }
