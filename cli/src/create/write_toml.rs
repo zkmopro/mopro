@@ -26,34 +26,3 @@ wasm-bindgen-rayon = { version = "1.2.2", features = ["no-bundler"] }
 wasm-bindgen-test = "0.3.42"
 "#
 }
-
-pub fn init_toml() -> &'static str {
-    r#"
-[package]
-name = "MOPRO_TEMPLATE_PROJECT_NAME"
-version = "0.1.0"
-edition = "2021"
-
-[lib]
-crate-type = ["lib", "cdylib", "staticlib"]
-
-# Adapters for different proof systems
-[features]
-default = ["<FEATURES>"]
-
-[dependencies]
-mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi"] }
-rust-witness = "0.1"
-num-bigint = "0.4.0"
-thiserror = "2.0.12"
-# HALO2_DEPENDENCIES
-
-# NOIR_DEPENDENCIES
-
-[build-dependencies]
-rust-witness = "0.1"
-
-# CIRCOM_DEPENDENCIES
-    "#
-}
