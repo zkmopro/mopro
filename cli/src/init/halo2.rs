@@ -26,8 +26,4 @@ gemini-fibonacci = { package = \"gemini-fibonacci\", git = \"https://github.com/
         let target = "# HALO2_DEPENDENCIES";
         replace_string_in_file(file_path, target, replacement)
     }
-
-    fn build_template(_: &str) -> Result<()> {
-        Ok(())
-    }
 }

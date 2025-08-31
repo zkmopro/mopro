@@ -1,5 +1,4 @@
 use crate::config::{read_config, write_config, Config};
-use crate::create::write_toml;
 use crate::print::print_init_instructions;
 use crate::utils::contains_adapter;
 use adapter::{Adapter, AdapterSelector};
@@ -16,9 +15,18 @@ mod halo2;
 mod noir;
 
 trait ProvingSystem {
-    fn dep_template(file_path: &str) -> Result<()>;
+    fn dep_template(file_path: &str) -> Result<()> {
+        Ok(())
+    }
+    fn build_dep_template(file_path: &str) -> Result<()> {
+        Ok(())
+    }
+
     fn lib_template(file_path: &str) -> Result<()>;
-    fn build_template(file_path: &str) -> Result<()>;
+
+    fn build_template(file_path: &str) -> Result<()> {
+        Ok(())
+    }
 }
 
 pub fn init_project(
@@ -68,6 +76,7 @@ pub fn init_project(
             adapter_sel.adapters.iter().map(|a| a.as_str()).collect(),
         )?;
         adapter_sel.dep_template(cargo_toml_path);
+        adapter_sel.build_dep_template(cargo_toml_path);
     }
 
     if let Some(build_rs_path) = project_dir.join("build.rs").to_str() {
