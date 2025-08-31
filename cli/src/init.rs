@@ -13,6 +13,7 @@ pub mod adapter;
 mod circom;
 mod halo2;
 mod noir;
+mod write_toml;
 
 trait ProvingSystem {
     fn dep_template(file_path: &str) -> Result<()> {
