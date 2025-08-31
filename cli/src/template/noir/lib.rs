@@ -1,3 +1,8 @@
+// --- Noir Example of proving and verifying circuits ---
+
+#[macro_use]
+mod noir;
+
 #[cfg(test)]
 mod noir_tests {
     use super::*;
