@@ -2606,9 +2606,6 @@ name = "mopro-ffi"
 version = "0.2.0"
 dependencies = [
  "anyhow",
- "ark-bls12-381",
- "ark-bn254",
- "ark-ff 0.5.0",
  "camino",
  "color-eyre",
  "gemini-fibonacci",

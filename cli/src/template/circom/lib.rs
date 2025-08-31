@@ -18,9 +18,9 @@ mod circom_tests {
     fn test_multiplier2() {
         let zkey_path = "./test-vectors/circom/multiplier2_final.zkey".to_string();
         let circuit_inputs = "{\"a\": 2, \"b\": 3}".to_string();
-        let result = generate_circom_proof(zkey_path.clone(), circuit_inputs, ProofLib::Arkworks);
+        let result = circom::generate_circom_proof(zkey_path.clone(), circuit_inputs, circom::ProofLib::Arkworks);
         assert!(result.is_ok());
         let proof = result.unwrap();
-        assert!(verify_circom_proof(zkey_path, proof, ProofLib::Arkworks).is_ok());
+        assert!(circom::verify_circom_proof(zkey_path, proof, circom::ProofLib::Arkworks).is_ok());
     }
 }
