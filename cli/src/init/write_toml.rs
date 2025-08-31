@@ -10,7 +10,9 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 # Adapters for different proof systems
 [features]
-default = ["<FEATURES>"]
+default = []
+
+no_uniffi_exports = []
 
 [dependencies]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }

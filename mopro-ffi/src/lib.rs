@@ -31,87 +31,6 @@ macro_rules! uniffi_setup {
     };
 }
 
-#[cfg(feature = "halo2")]
-mod halo2;
-#[cfg(feature = "noir")]
-mod noir;
-
-#[cfg(feature = "halo2")]
-pub use halo2::{Halo2ProveFn, Halo2VerifyFn};
-
-#[cfg(feature = "noir")]
-pub use noir::{generate_noir_proof, get_noir_verification_key, verify_noir_proof};
-
-
-#[cfg(not(feature = "halo2"))]
-#[macro_export]
-macro_rules! halo2_app {
-    ($result:ty, $err:ty) => {
-        // TODO: fix this if CLI template can be customized
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn generate_halo2_proof(
-            srs_path: String,
-            pk_path: String,
-            circuit_inputs: std::collections::HashMap<String, Vec<String>>,
-        ) -> Result<$result, $err> {
-            panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
-        }
-
-        // TODO: fix this if CLI template can be customized
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_halo2_proof(
-            srs_path: String,
-            vk_path: String,
-            proof: Vec<u8>,
-            public_input: Vec<u8>,
-        ) -> Result<bool, $err> {
-            panic!("Halo2 is not enabled in this build. Please pass `halo2` feature to `mopro-ffi` to enable Halo2.")
-        }
-    };
-}
-
-#[cfg(not(feature = "noir"))]
-#[macro_export]
-macro_rules! noir_app {
-    ($err:ty) => {
-        // TODO: fix this if CLI template can be customized
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn generate_noir_proof(
-            circuit_path: String,
-            srs_path: Option<String>,
-            inputs: Vec<String>,
-            on_chain: bool,
-            vk: Vec<u8>,
-            low_memory_mode: bool,
-        ) -> Result<Vec<u8>, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
-        }
-
-        // TODO: fix this if CLI template can be customized
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn verify_noir_proof(
-            circuit_path: String,
-            proof: Vec<u8>,
-            on_chain: bool,
-            vk: Vec<u8>,
-            low_memory_mode: bool,
-        ) -> Result<bool, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
-        }
-
-        // TODO: fix this if CLI template can be customized
-        #[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-        fn get_noir_verification_key(
-            circuit_path: String,
-            srs_path: Option<String>,
-            on_chain: bool,
-            low_memory_mode: bool,
-        ) -> Result<Vec<u8>, $err> {
-            panic!("Noir is not enabled in this build. Please pass `noir` feature to `mopro-ffi` to enable Noir.")
-        }
-    };
-}
-
 #[derive(Debug, thiserror::Error)]
 pub enum MoproError {
     #[error("CircomError: {0}")]
@@ -122,14 +41,6 @@ pub enum MoproError {
     NoirError(String),
 }
 
-//
-// Halo2 Proof
-//
-#[derive(Debug, Clone)]
-pub struct Halo2ProofResult {
-    pub proof: Vec<u8>,
-    pub inputs: Vec<u8>,
-}
 
 /// This macro is used to setup the Mopro FFI library
 /// It should be included in the `lib.rs` file of the project
@@ -215,28 +126,5 @@ macro_rules! app {
                 }
             }
         }
-
-        //
-        // Halo2 Section
-        //
-        #[derive(Debug, Clone, uniffi::Record)]
-        pub struct Halo2ProofResult {
-            pub proof: Vec<u8>,
-            pub inputs: Vec<u8>,
-        }
-
-        impl From<mopro_ffi::Halo2ProofResult> for Halo2ProofResult {
-            fn from(result: mopro_ffi::Halo2ProofResult) -> Self {
-                Self {
-                    proof: result.proof,
-                    inputs: result.inputs,
-                }
-            }
-        }
-        // End of Halo2 Section
-
-        mopro_ffi::halo2_app!(Halo2ProofResult, MoproError);
-
-        mopro_ffi::noir_app!(MoproError);
     };
 }

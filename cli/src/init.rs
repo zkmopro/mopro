@@ -16,16 +16,22 @@ mod noir;
 mod write_toml;
 
 trait ProvingSystem {
-    fn dep_template(file_path: &str) -> Result<()> {
+    fn dep_template(_file_path: &str) -> Result<()> {
         Ok(())
     }
-    fn build_dep_template(file_path: &str) -> Result<()> {
+    fn build_dep_template(_file_path: &str) -> Result<()> {
         Ok(())
     }
 
-    fn lib_template(file_path: &str) -> Result<()>;
+    fn lib_template(_file_path: &str) -> Result<()> {
+        Ok(())
+    }
 
-    fn build_template(file_path: &str) -> Result<()> {
+    fn mod_template(_lib_file_path: &str) -> Result<()> {
+        Ok(())
+    }
+
+    fn build_template(_file_path: &str) -> Result<()> {
         Ok(())
     }
 }
@@ -72,10 +78,6 @@ pub fn init_project(
 
     if let Some(cargo_toml_path) = project_dir.join("Cargo.toml").to_str() {
         replace_project_name(cargo_toml_path, &project_name)?;
-        replace_features(
-            cargo_toml_path,
-            adapter_sel.adapters.iter().map(|a| a.as_str()).collect(),
-        )?;
         adapter_sel.dep_template(cargo_toml_path);
         adapter_sel.build_dep_template(cargo_toml_path);
     }
@@ -86,6 +88,7 @@ pub fn init_project(
 
     if let Some(lib_rs_path) = project_dir.join("src").join("lib.rs").to_str() {
         adapter_sel.lib_template(lib_rs_path);
+        adapter_sel.mod_template(lib_rs_path);
     }
 
     // Store selection
@@ -188,17 +191,6 @@ pub fn copy_embedded_dir(
 fn replace_project_name(file_path: &str, project_name: &str) -> Result<()> {
     let target = "MOPRO_TEMPLATE_PROJECT_NAME";
     replace_string_in_file(file_path, target, project_name)
-}
-
-fn replace_features(file_path: &str, adapters: Vec<&str>) -> Result<()> {
-    let target = "\"<FEATURES>\"";
-
-    let features: Vec<String> = adapters
-        .iter()
-        .map(|adapter| format!("\"mopro-ffi/{adapter}\""))
-        .collect();
-
-    replace_string_in_file(file_path, target, &features.join(", "))
 }
 
 pub fn replace_string_in_file(file_path: &str, target: &str, replacement: &str) -> Result<()> {

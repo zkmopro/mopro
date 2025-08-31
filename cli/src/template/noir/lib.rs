@@ -1,6 +1,8 @@
 // --- Noir Example of using Ultra Honk proving and verifying circuits ---
 
 // Module containing the Noir circuit logic (Multiplier2)
+#[macro_use]
+mod noir;
 
 #[cfg(test)]
 mod noir_tests {
