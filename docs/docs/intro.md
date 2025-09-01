@@ -32,6 +32,14 @@ These benefits help bring your ZK protocol to a broader, more mainstream audienc
 
 Mopro takes each proving system and wraps it as an **adapter** written in Rust. These adapters provide a unified interface for ZK proof generation regardless of the backend (e.g., Circom, Noir, Halo2). Mopro then uses [UniFFI](https://github.com/mozilla/uniffi-rs) to generate native bindings for **Swift (iOS)** and **Kotlin (Android)** from Rust code. These bindings can then be reused in cross-platform frameworks like **React Native** and **Flutter**, with ready-to-use templates for each platform.
 
+## 🏗️ Architecture Overview
+
+The interactive diagram below shows the complete mopro architecture, illustrating how different components interact across the entire stack. You can zoom and pan around the diagram, and hover over components to learn more about their role in the system.
+
+import ArchitectureDiagram from '@site/src/components/ArchitectureDiagram';
+
+<ArchitectureDiagram />
+
 ## 👩‍💻 Who It's For
 
 ### 📱 ZK Mobile App Developers
