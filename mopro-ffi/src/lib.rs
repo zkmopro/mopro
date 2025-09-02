@@ -41,7 +41,6 @@ pub enum MoproError {
     NoirError(String),
 }
 
-
 /// This macro is used to setup the Mopro FFI library
 /// It should be included in the `lib.rs` file of the project
 ///
