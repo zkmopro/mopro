@@ -1,3 +1,4 @@
+use crate::MoproError;
 use circom_prover::{
     prover::{
         circom::{
@@ -6,15 +7,13 @@ use circom_prover::{
         },
         ProofLib as CircomProverProofLib,
     },
-    witness::WitnessFn,
     CircomProver,
 };
 use num_bigint::BigUint;
 use std::str::FromStr;
-use crate::MoproError;
 
- //
-// Circom Section
+//
+// Data structures for Circom proof representation
 //
 #[derive(Debug, Clone, uniffi::Record)]
 pub struct CircomProofResult {
@@ -50,129 +49,6 @@ pub enum ProofLib {
     #[default]
     Arkworks,
     Rapidsnark,
-}
-
-impl Into<CircomProverProofLib> for ProofLib {
-    fn into(self) -> CircomProverProofLib {
-        match self {
-            ProofLib::Arkworks => CircomProverProofLib::Arkworks,
-            ProofLib::Rapidsnark => CircomProverProofLib::Rapidsnark,
-        }
-    }
-}
-
-#[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-pub(crate) fn generate_circom_proof(
-    zkey_path: String,
-    circuit_inputs: String,
-    proof_lib: ProofLib,
-) -> Result<CircomProofResult, MoproError> {
-    let chosen_proof_lib = proof_lib.into();
-    let name = match std::path::Path::new(zkey_path.as_str()).file_name() {
-        Some(v) => v,
-        None => {
-            return Err(MoproError::CircomError(format!(
-                "failed to parse file name from zkey_path"
-            )))
-        }
-    };
-    let witness_fn = crate::get_circom_wtns_fn(name.to_str().unwrap())
-        .map_err(|e| MoproError::CircomError(format!("Unknown ZKEY: {}", e)))?;
-    let result = generate_circom_proof_wtns(
-        chosen_proof_lib,
-        zkey_path,
-        circuit_inputs,
-        witness_fn,
-    )
-    .map_err(|e| MoproError::CircomError(format!("Unknown ZKEY: {}", e)))
-    .unwrap();
-
-    Ok(result.into())
-}
-
-#[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
-pub(crate) fn verify_circom_proof(
-    zkey_path: String,
-    proof_result: CircomProofResult,
-    proof_lib: ProofLib,
-) -> Result<bool, MoproError> {
-    let chosen_proof_lib = proof_lib.into();
-    CircomProver::verify(
-        chosen_proof_lib,
-        circom_prover::prover::CircomProof {
-            proof: proof_result.proof.into(),
-            pub_inputs: proof_result.inputs.into(),
-        },
-        zkey_path,
-    ).map_err(|e| MoproError::CircomError(format!("Verification error: {}", e)))
-}
-
-/// Set the circuits that can be proven by the mopro library
-/// Provide the circuits that you want to be able to generate proofs for
-/// as a list of pairs of the form `zkey`, `wtns_fn`
-/// Where `zkey` is the name of the zkey file
-/// and `wtns_fn` is the function that generates the witness for the circuit.
-///
-/// ## How to use:
-/// You should only use this macro once, in the same module as the `mopro_ffi::app!()`
-/// To use this macro, make sure to have `mopro-ffi/circom` feature enabled
-///
-/// #### Example:
-///
-///
-/// ```ignore
-/// mopro_ffi::app!();
-///
-/// set_circom_circuits! {
-///   ("circuit1.zkey", circuit1_witness_fn),
-///   ("circuit2.zkey", circuit2_witness_fn),
-/// }
-/// ```
-///
-///
-/// ## For Advanced Users:
-/// This macro is abstracting away the implementation of
-/// `get_circom_wtns_fn(circuit: &str) -> Result<circom_prover::witness::WitnessFn>`.
-/// You can choose to implement it directly with your custom logic:
-///
-/// #### Example:
-/// ```ignore
-/// fn get_circom_wtns_fn(circuit: &str) -> Result<circom_prover::witness::WitnessFn> {
-///    match circuit {
-///       "circuit1.zkey" => Ok(circuit1_witness_fn),
-///      _ => Err(MoproError::CircomError(format!("Unknown ZKEY: {}", circuit).to_string()))
-///   }
-/// }
-/// ```
-macro_rules! set_circom_circuits {
-    ($(($key:expr, $func:expr)),+ $(,)?) => {
-        fn get_circom_wtns_fn(circuit: &str) -> Result<circom_prover::witness::WitnessFn, MoproError> {
-            match circuit {
-                $(
-                   $key => Ok($func),
-                )+
-                _ => Err(MoproError::CircomError(format!("Unknown ZKEY: {}", circuit)))
-            }
-        }
-    };
-}
-
-pub fn generate_circom_proof_wtns(
-    proof_lib: CircomProverProofLib,
-    zkey_path: String,
-    json_input_str: String,
-    witness_fn: WitnessFn,
-) -> anyhow::Result<CircomProofResult> {
-    let ret = CircomProver::prove(proof_lib, witness_fn, json_input_str, zkey_path)?;
-    let (proof, public_inputs) = match ret.proof.curve.as_ref() {
-        CURVE_BN254 => (ret.proof.into(), ret.pub_inputs.into()),
-        CURVE_BLS12_381 => (ret.proof.into(), ret.pub_inputs.into()),
-        _ => anyhow::bail!("Not unsupported curve"),
-    };
-    Ok(CircomProofResult {
-        proof,
-        inputs: public_inputs,
-    })
 }
 
 //
@@ -253,136 +129,242 @@ impl From<G2> for CircomProverG2 {
     }
 }
 
+impl Into<CircomProverProofLib> for ProofLib {
+    fn into(self) -> CircomProverProofLib {
+        match self {
+            ProofLib::Arkworks => CircomProverProofLib::Arkworks,
+            ProofLib::Rapidsnark => CircomProverProofLib::Rapidsnark,
+        }
+    }
+}
+
+//
+// Main functions for proof generation and verification
+//
+
+#[uniffi::export]
+pub(crate) fn generate_circom_proof(
+    zkey_path: String,
+    circuit_inputs: String,
+    proof_lib: ProofLib,
+) -> Result<CircomProofResult, MoproError> {
+    let name = std::path::Path::new(zkey_path.as_str())
+        .file_name()
+        .ok_or_else(|| {
+            MoproError::CircomError("failed to parse file name from zkey_path".to_string())
+        })?;
+
+    let witness_fn = crate::circom_get(name.to_str().unwrap()).ok_or_else(|| {
+        MoproError::CircomError(format!("Unknown ZKEY: {}", name.to_string_lossy()))
+    })?;
+
+    let ret = CircomProver::prove(
+        proof_lib.into(),
+        witness_fn.as_ref().clone(),
+        circuit_inputs,
+        zkey_path,
+    )
+    .map_err(|e| MoproError::CircomError(format!("Generate Proof error: {}", e)))?;
+
+    let (proof, pub_inputs) = match ret.proof.curve.as_ref() {
+        CURVE_BN254 | CURVE_BLS12_381 => (ret.proof.into(), ret.pub_inputs.into()),
+        _ => {
+            return Err(MoproError::CircomError(format!(
+                "Unsupported curve: {}",
+                ret.proof.curve
+            )))
+        }
+    };
+
+    Ok(CircomProofResult {
+        proof,
+        inputs: pub_inputs,
+    })
+}
+
+#[uniffi::export]
+pub(crate) fn verify_circom_proof(
+    zkey_path: String,
+    proof_result: CircomProofResult,
+    proof_lib: ProofLib,
+) -> Result<bool, MoproError> {
+    let chosen_proof_lib = proof_lib.into();
+    CircomProver::verify(
+        chosen_proof_lib,
+        circom_prover::prover::CircomProof {
+            proof: proof_result.proof.into(),
+            pub_inputs: proof_result.inputs.into(),
+        },
+        zkey_path,
+    )
+    .map_err(|e| MoproError::CircomError(format!("Verification error: {}", e)))
+}
+
+#[macro_export]
+macro_rules! set_circom_circuits {
+    // Accept any number of (key, func) pairs
+    ($(($key:expr, $func:expr)),+ $(,)?) => {
+        use std::collections::HashMap;
+        use std::sync::{Arc, OnceLock, RwLock};
+
+        // Adjust the path if these types live elsewhere
+        use circom_prover::witness::WitnessFn;
+
+        pub type CircomKey = String;
+        pub type CircomVal = Arc<WitnessFn>;
+        pub type CircomMap = HashMap<CircomKey, CircomVal>;
+
+        pub static CIRCOM_CIRCUITS: OnceLock<RwLock<CircomMap>> = OnceLock::new();
+
+        /// Accessor that initializes the map on first use with the pairs
+        #[inline]
+        pub fn circom_circuits() -> &'static RwLock<CircomMap> {
+            CIRCOM_CIRCUITS.get_or_init(|| {
+                let mut m: CircomMap = HashMap::new();
+                $(
+                    // store as Arc so callers can cheaply clone handles
+                    let _ = m.insert($key.to_string(), Arc::new($func));
+                )+
+                RwLock::new(m)
+            })
+        }
+
+        /// Insert or replace a circuit mapping.
+        #[inline]
+        pub fn circom_register<K: Into<String>>(key: K, wf: WitnessFn) {
+            let mut g = circom_circuits().write().expect("CIRCOM_CIRCUITS poisoned");
+            g.insert(key.into(), Arc::new(wf));
+        }
+
+        /// Get a circuit mapping by name.
+        #[inline]
+        pub fn circom_get(key: &str) -> Option<Arc<WitnessFn>> {
+            let g = circom_circuits().read().expect("CIRCOM_CIRCUITS poisoned");
+            g.get(key).cloned()
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use anyhow::Context;
     use anyhow::Result;
+    use circom_prover::prover::PublicInputs;
     use num_bigint::BigInt;
     use std::collections::HashMap;
     use std::str::FromStr;
 
-    #[cfg(feature = "witnesscalc")]
-    mod witnesscalc {
-        use super::*;
-        use crate as mopro_ffi;
+    const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
 
-        // Only build the witness functions for tests, don't bundle them into
-        // the final library
-        witnesscalc_adapter::witness!(multiplier2_witnesscalc);
+    witnesscalc_adapter::witness!(multiplier2_witnesscalc);
 
-        #[test]
-        fn test_circom_macros() {
-            set_circom_circuits! {
-                ("multiplier2_final.zkey", circom_prover::witness::WitnessFn::WitnessCalc(multiplier2_witnesscalc_witness)),
-            }
+    rust_witness::witness!(multiplier2);
 
-            const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
+    #[test]
+    fn test_witnesscalc_proof() -> Result<()> {
+        // Override the default witness function for this test
+        crate::circom_register(
+            "multiplier2_final.zkey",
+            circom_prover::witness::WitnessFn::WitnessCalc(multiplier2_witnesscalc_witness),
+        );
 
-            let mut inputs = HashMap::new();
-            let a = BigInt::from_str(
-                "21888242871839275222246405745257275088548364400416034343698204186575808495616",
-            )
-            .unwrap();
-            let b = BigInt::from(1u8);
-            inputs.insert("a".to_string(), vec![a.to_string()]);
-            inputs.insert("b".to_string(), vec![b.to_string()]);
+        let (input_str, expected_output) = prepare_inputs();
 
-            let input_str = serde_json::to_string(&inputs).unwrap();
-            let proof = generate_circom_proof(
-                ZKEY_PATH.to_string(),
-                input_str,
-                ProofLib::Arkworks,
-            )
+        // Generate Proof
+        let p = generate_circom_proof(ZKEY_PATH.to_string(), input_str, ProofLib::Arkworks)
             .expect("Proof generation failed");
 
-            let is_valid = verify_circom_proof(
-                ZKEY_PATH.to_string(),
-                proof,
-                ProofLib::Arkworks,
-            )
-            .expect("Proof verification failed");
+        let CircomProofResult { proof, inputs } = p.clone();
 
-            assert!(is_valid, "Expected the proof to be valid");
-        }
+        assert!(!proof.protocol.is_empty());
+        assert!(!proof.curve.is_empty());
+
+        let pub_inputs: PublicInputs = inputs.into();
+        assert_eq!(pub_inputs.0, expected_output);
+
+        // Step 3: Verify Proof
+        let is_valid = verify_circom_proof(ZKEY_PATH.to_string(), p, ProofLib::Arkworks)
+            .context("Proof verification failed")?;
+        assert!(is_valid);
+
+        Ok(())
     }
 
-    mod rustwitness {
-        use super::*;
-        use circom_prover::prover::{PublicInputs};
+    #[test]
+    fn test_rustwitness_prove() -> Result<()> {
+        // Override the default witness function for this test
+        crate::circom_register(
+            "multiplier2_final.zkey",
+            circom_prover::witness::WitnessFn::RustWitness(multiplier2_witness),
+        );
 
-        // Only build the witness functions for tests, don't bundle them into
-        // the final library
-        rust_witness::witness!(multiplier2);
-        rust_witness::witness!(multiplier2bls);
-        rust_witness::witness!(keccak256256test);
-        rust_witness::witness!(hashbenchbls);
+        let (input_str, expected_output) = prepare_inputs();
 
-        #[test]
-        fn test_circom_macros() {
-            const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
-
-            let mut inputs = HashMap::new();
-            let a = BigInt::from_str(
-                "21888242871839275222246405745257275088548364400416034343698204186575808495616",
-            )
-            .unwrap();
-            let b = BigInt::from(1u8);
-            inputs.insert("a".to_string(), vec![a.to_string()]);
-            inputs.insert("b".to_string(), vec![b.to_string()]);
-
-            let input_str = serde_json::to_string(&inputs).unwrap();
-            let proof = generate_circom_proof(
-                ZKEY_PATH.to_string(),
-                input_str,
-                ProofLib::Arkworks,
-            )
+        // Generate Proof
+        let p = generate_circom_proof(ZKEY_PATH.to_string(), input_str, ProofLib::Arkworks)
             .expect("Proof generation failed");
 
-            let is_valid = verify_circom_proof(
-                ZKEY_PATH.to_string(),
-                proof,
-                ProofLib::Arkworks,
-            )
-            .expect("Proof verification failed");
+        let CircomProofResult { proof, inputs } = p.clone();
 
-            assert!(is_valid, "Expected the proof to be valid");
-        }
+        assert!(!proof.protocol.is_empty());
+        assert!(!proof.curve.is_empty());
 
-        #[test]
-        fn test_prove() -> Result<()> {
-            // Create a new MoproCircom instance
-            let zkey_path = "../test-vectors/circom/multiplier2_final.zkey".to_string();
+        let pub_inputs: PublicInputs = inputs.into();
+        assert_eq!(pub_inputs.0, expected_output);
 
-            let mut inputs = HashMap::new();
-            let a = BigInt::from_str(
-                "21888242871839275222246405745257275088548364400416034343698204186575808495616",
-            )
-            .unwrap();
-            let b = BigInt::from(1u8);
-            let c = a.clone() * b.clone();
-            inputs.insert("a".to_string(), vec![a.to_string()]);
-            inputs.insert("b".to_string(), vec![b.to_string()]);
-            // output = [public output c, public input a]
-            let expected_output = vec![
-                c.clone().to_biguint().unwrap(),
-                a.clone().to_biguint().unwrap(),
-            ];
+        // Step 3: Verify Proof
+        let is_valid = verify_circom_proof(ZKEY_PATH.to_string(), p, ProofLib::Arkworks)
+            .context("Proof verification failed")?;
+        assert!(is_valid);
 
-            // Generate Proof
-            let input_str = serde_json::to_string(&inputs).unwrap();
-            let p = generate_circom_proof(zkey_path.clone(), input_str, ProofLib::Arkworks)?;
-            let proof = p.proof.clone();
-            let pub_inputs: PublicInputs = p.inputs.clone().into();
+        Ok(())
+    }
 
-            assert!(!proof.protocol.is_empty());
-            assert!(!proof.curve.is_empty());
-            assert_eq!(pub_inputs.0, expected_output);
+    #[test]
+    fn test_rapidsnark_prove() -> Result<()> {
+        // Override the default witness function for this test
+        crate::circom_register(
+            "multiplier2_final.zkey",
+            circom_prover::witness::WitnessFn::RustWitness(multiplier2_witness),
+        );
 
-            // Step 3: Verify Proof
-            let is_valid = verify_circom_proof(zkey_path, p, ProofLib::Arkworks)?;
-            assert!(is_valid);
+        let (input_str, expected_output) = prepare_inputs();
 
-            Ok(())
-        }
+        // Generate Proof
+        let p = generate_circom_proof(ZKEY_PATH.to_string(), input_str, ProofLib::Rapidsnark)
+            .expect("Proof generation failed");
+
+        let CircomProofResult { proof, inputs } = p.clone();
+
+        assert!(!proof.protocol.is_empty());
+        assert!(!proof.curve.is_empty());
+
+        let pub_inputs: PublicInputs = inputs.into();
+        assert_eq!(pub_inputs.0, expected_output);
+
+        // Step 3: Verify Proof
+        let is_valid = verify_circom_proof(ZKEY_PATH.to_string(), p, ProofLib::Rapidsnark)
+            .context("Proof verification failed")?;
+        assert!(is_valid);
+
+        Ok(())
+    }
+
+    fn prepare_inputs() -> (String, Vec<BigUint>) {
+        let mut inputs = HashMap::new();
+        let a = BigInt::from_str(
+            "21888242871839275222246405745257275088548364400416034343698204186575808495616",
+        )
+        .unwrap();
+        let b = BigInt::from(1u8);
+        inputs.insert("a".to_string(), vec![a.to_string()]);
+        inputs.insert("b".to_string(), vec![b.to_string()]);
+        let input_str = serde_json::to_string(&inputs).unwrap();
+
+        let c = a.clone() * b.clone();
+        // output = [public output c, public input a]
+        let expected_output = vec![c.to_biguint().unwrap(), a.to_biguint().unwrap()];
+        (input_str, expected_output)
     }
 }

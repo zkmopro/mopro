@@ -28,7 +28,6 @@ trait ProvingSystem {
         Ok(())
     }
 
-
     fn lib_template(_file_path: &str) -> Result<()> {
         Ok(())
     }
@@ -42,10 +41,7 @@ trait ProvingSystem {
     }
 }
 
-pub fn init_project(
-    arg_adapter: &Option<String>,
-    arg_project_name: &Option<String>,
-) -> Result<()> {
+pub fn init_project(arg_adapter: &Option<String>, arg_project_name: &Option<String>) -> Result<()> {
     let project_name: String = match arg_project_name.as_deref() {
         None => Input::with_theme(&ColorfulTheme::default())
             .with_prompt("Project name")
