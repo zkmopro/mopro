@@ -8,13 +8,13 @@ use noir_rs::{
 
 use crate::MoproError;
 
-#[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+#[uniffi::export]
 pub(crate) fn generate_noir_proof(
     circuit_path: String,
     srs_path: Option<String>,
     inputs: Vec<String>,
 ) -> Result<Vec<u8>, MoproError> {
-        let circuit_bytecode = get_bytecode(circuit_path);
+    let circuit_bytecode = get_bytecode(circuit_path);
 
     // Setup the SRS
     setup_srs_from_bytecode(circuit_bytecode.as_str(), srs_path.as_deref(), false).unwrap();
@@ -23,10 +23,10 @@ pub(crate) fn generate_noir_proof(
     let witness = from_vec_str_to_witness_map(inputs.iter().map(|s| s.as_str()).collect()).unwrap();
 
     prove_ultra_honk(circuit_bytecode.as_str(), witness, false)
-    .map_err(|e| MoproError::NoirError(format!("Generate Proof error: {}", e)))
+        .map_err(|e| MoproError::NoirError(format!("Generate Proof error: {}", e)))
 }
 
-#[cfg_attr(not(feature = "no_uniffi_exports"), uniffi::export)]
+#[uniffi::export]
 pub(crate) fn verify_noir_proof(circuit_path: String, proof: Vec<u8>) -> Result<bool, MoproError> {
     let circuit_bytecode = get_bytecode(circuit_path);
     let vk = get_honk_verification_key(circuit_bytecode.as_str(), false).unwrap();
@@ -58,10 +58,7 @@ mod tests {
         let witness = vec!["3".to_string(), "5".to_string()];
         let proof =
             generate_noir_proof(MULTIPLIER2_CIRCUIT_FILE.to_string(), None, witness).unwrap();
-        assert!(verify_noir_proof(
-            MULTIPLIER2_CIRCUIT_FILE.to_string(),
-            proof
-        ).is_ok());
+        assert!(verify_noir_proof(MULTIPLIER2_CIRCUIT_FILE.to_string(), proof).is_ok());
     }
 
     #[test]
@@ -81,12 +78,9 @@ mod tests {
         assert!(verify_noir_proof(CIRCUIT_FILE.to_string(), proof).is_ok());
     }
 
-    #[cfg(feature = "no_uniffi_exports")]
     #[test]
     #[serial_test::serial]
     fn test_macro_proof_zkemail() {
-        noir_app!(mopro_ffi::MoproError);
-
         // Load input data from the JSON file for the test case
         let json_str = fs::read_to_string(INPUT_FILE).unwrap();
         let witness = to_zkemail_witness(json_str.as_str());

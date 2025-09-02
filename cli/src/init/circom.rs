@@ -14,7 +14,7 @@ impl ProvingSystem for Circom {
     fn dep_template(file_path: &str) -> Result<()> {
         let replacement = r#"
 # CIRCOM_DEPENDENCIES
-circom-prover = { git = "https://github.com/zkmopro/mopro.git" }
+circom-prover = { git = "https://github.com/zkmopro/mopro.git", features = ["rapidsnark"] }
 rust-witness  = "0.1"
 num-bigint    = "0.4.0"
     "#;
@@ -38,6 +38,8 @@ rust-witness = "0.1"
 # CIRCOM_DEV_DEPENDENCIES
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.94"
+
+witnesscalc-adapter = "0.1"
     "#;
         let target = "# CIRCOM_DEV_DEPENDENCIES";
         replace_string_in_file(file_path, target, replacement)
@@ -69,8 +71,11 @@ serde_json = "1.0.94"
     }
 
     fn build_template(file_path: &str) -> Result<()> {
-        let replacement =
-            "rust_witness::transpile::transpile_wasm(\"./test-vectors/circom\".to_string());";
+        let replacement = r#"
+rust_witness::transpile::transpile_wasm("./test-vectors/circom".to_string());
+witnesscalc_adapter::build_and_link("../test-vectors/circom/witnesscalc");
+"#;
+
         let target = "// CIRCOM_TEMPLATE";
         replace_string_in_file(file_path, target, replacement)
     }

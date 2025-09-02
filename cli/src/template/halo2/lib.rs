@@ -12,9 +12,8 @@ set_halo2_circuits! {
 
 #[cfg(test)]
 mod halo2_tests {
+    use crate::halo2::{generate_halo2_proof, verify_halo2_proof};
     use std::collections::HashMap;
-
-    use super::*;
 
     #[test]
     fn test_plonk_fibonacci() {
@@ -23,10 +22,10 @@ mod halo2_tests {
         let vk_path = "./test-vectors/halo2/plonk_fibonacci_vk.bin".to_string();
         let mut circuit_inputs = HashMap::new();
         circuit_inputs.insert("out".to_string(), vec!["55".to_string()]);
-        let result = halo2::generate_halo2_proof(srs_path.clone(), pk_path.clone(), circuit_inputs);
+        let result = generate_halo2_proof(srs_path.clone(), pk_path.clone(), circuit_inputs);
         assert!(result.is_ok());
         let halo2_proof_result = result.unwrap();
-        let valid = halo2::verify_halo2_proof(
+        let valid = verify_halo2_proof(
             srs_path,
             vk_path,
             halo2_proof_result.proof,
@@ -43,10 +42,10 @@ mod halo2_tests {
         let vk_path = "./test-vectors/halo2/hyperplonk_fibonacci_vk.bin".to_string();
         let mut circuit_inputs = HashMap::new();
         circuit_inputs.insert("out".to_string(), vec!["55".to_string()]);
-        let result = halo2::generate_halo2_proof(srs_path.clone(), pk_path.clone(), circuit_inputs);
+        let result = generate_halo2_proof(srs_path.clone(), pk_path.clone(), circuit_inputs);
         assert!(result.is_ok());
         let halo2_proof_result = result.unwrap();
-        let valid = halo2::verify_halo2_proof(
+        let valid = verify_halo2_proof(
             srs_path,
             vk_path,
             halo2_proof_result.proof,
@@ -63,10 +62,10 @@ mod halo2_tests {
         let vk_path = "./test-vectors/halo2/gemini_fibonacci_vk.bin".to_string();
         let mut circuit_inputs = HashMap::new();
         circuit_inputs.insert("out".to_string(), vec!["55".to_string()]);
-        let result = halo2::generate_halo2_proof(srs_path.clone(), pk_path.clone(), circuit_inputs);
+        let result = generate_halo2_proof(srs_path.clone(), pk_path.clone(), circuit_inputs);
         assert!(result.is_ok());
         let halo2_proof_result = result.unwrap();
-        let valid = halo2::verify_halo2_proof(
+        let valid = verify_halo2_proof(
             srs_path,
             vk_path,
             halo2_proof_result.proof,

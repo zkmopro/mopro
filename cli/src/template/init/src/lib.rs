@@ -24,10 +24,8 @@ fn mopro_uniffi_hello_world() -> String {
 
 #[cfg(test)]
 mod uniffi_tests {
-    use super::*;
-
     #[test]
     fn test_mopro_uniffi_hello_world() {
-        assert_eq!(mopro_uniffi_hello_world(), "Hello, World!");
+        assert_eq!(super::mopro_uniffi_hello_world(), "Hello, World!");
     }
 }
