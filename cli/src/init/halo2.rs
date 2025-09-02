@@ -1,10 +1,10 @@
-use std::fs;
-use std::path::Path;
 use super::replace_string_in_file;
 use super::ProvingSystem;
 use anyhow::Result;
 use include_dir::include_dir;
 use include_dir::Dir;
+use std::fs;
+use std::path::Path;
 
 pub struct Halo2;
 

@@ -1,10 +1,10 @@
-use std::fs;
-use std::path::Path;
 use super::replace_string_in_file;
 use super::ProvingSystem;
 use anyhow::Result;
 use include_dir::include_dir;
 use include_dir::Dir;
+use std::fs;
+use std::path::Path;
 
 pub struct Circom;
 
@@ -26,6 +26,7 @@ num-bigint    = "0.4.0"
     fn build_dep_template(file_path: &str) -> Result<()> {
         let replacement = r#"
 # CIRCOM_BUILD_DEPENDENCIES
+witnesscalc-adapter = "0.1"
 rust-witness = "0.1"
     "#;
         let target = "# CIRCOM_BUILD_DEPENDENCIES";

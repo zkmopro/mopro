@@ -28,7 +28,6 @@ trait ProvingSystem {
         Ok(())
     }
 
-
     fn lib_template(_file_path: &str) -> Result<()> {
         Ok(())
     }
