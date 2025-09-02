@@ -12,8 +12,6 @@ crate-type = ["lib", "cdylib", "staticlib"]
 [features]
 default = []
 
-no_uniffi_exports = []
-
 [dependencies]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
 mopro-ffi = { path = "../mopro-ffi", features = ["uniffi"] }
@@ -21,9 +19,7 @@ thiserror = "2.0.12"
 anyhow = "1.0.99"
 
 # CIRCOM_DEPENDENCIES
-
 # HALO2_DEPENDENCIES
-
 # NOIR_DEPENDENCIES
 
 [build-dependencies]
