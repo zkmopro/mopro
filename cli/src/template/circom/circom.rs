@@ -158,13 +158,8 @@ pub(crate) fn generate_circom_proof(
         MoproError::CircomError(format!("Unknown ZKEY: {}", name.to_string_lossy()))
     })?;
 
-    let ret = CircomProver::prove(
-        proof_lib.into(),
-        witness_fn.as_ref().clone(),
-        circuit_inputs,
-        zkey_path,
-    )
-    .map_err(|e| MoproError::CircomError(format!("Generate Proof error: {}", e)))?;
+    let ret = CircomProver::prove(proof_lib.into(), witness_fn, circuit_inputs, zkey_path)
+        .map_err(|e| MoproError::CircomError(format!("Generate Proof error: {}", e)))?;
 
     let (proof, pub_inputs) = match ret.proof.curve.as_ref() {
         CURVE_BN254 | CURVE_BLS12_381 => (ret.proof.into(), ret.pub_inputs.into()),
@@ -204,54 +199,40 @@ pub(crate) fn verify_circom_proof(
 macro_rules! set_circom_circuits {
     // Accept any number of (key, func) pairs
     ($(($key:expr, $func:expr)),+ $(,)?) => {
-        use std::collections::HashMap;
-        use std::sync::{Arc, OnceLock, RwLock};
 
         // Adjust the path if these types live elsewhere
         use circom_prover::witness::WitnessFn;
 
-        pub type CircomKey = String;
-        pub type CircomVal = Arc<WitnessFn>;
-        pub type CircomMap = HashMap<CircomKey, CircomVal>;
+        const CIRCOM_CIRCUITS: &[(&'static str, WitnessFn)] = &[
+            $(
+                ($key, $func),
+            )+
+        ];
 
-        pub static CIRCOM_CIRCUITS: OnceLock<RwLock<CircomMap>> = OnceLock::new();
-
-        /// Accessor that initializes the map on first use with the pairs
         #[inline]
-        pub fn circom_circuits() -> &'static RwLock<CircomMap> {
-            CIRCOM_CIRCUITS.get_or_init(|| {
-                let mut m: CircomMap = HashMap::new();
-                $(
-                    // store as Arc so callers can cheaply clone handles
-                    let _ = m.insert($key.to_string(), Arc::new($func));
-                )+
-                RwLock::new(m)
-            })
+        pub fn circom_get(name: &str) -> Option<WitnessFn> {
+            #[cfg(test)]
+            {
+                if let Some(v) = $crate::circom::tests::circom_get_override_val(name) {
+                    return Some(v);
+                }
+            }
+            CIRCOM_CIRCUITS.iter()
+                .find(|(k, _)| *k == name)
+                .map(|(_, v)| *v)
         }
-
-        /// Insert or replace a circuit mapping.
-        #[inline]
-        pub fn circom_register<K: Into<String>>(key: K, wf: WitnessFn) {
-            let mut g = circom_circuits().write().expect("CIRCOM_CIRCUITS poisoned");
-            g.insert(key.into(), Arc::new(wf));
-        }
-
-        /// Get a circuit mapping by name.
-        #[inline]
-        pub fn circom_get(key: &str) -> Option<Arc<WitnessFn>> {
-            let g = circom_circuits().read().expect("CIRCOM_CIRCUITS poisoned");
-            g.get(key).cloned()
-        }
-    }
+    };
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
+    use crate::WitnessFn;
     use anyhow::Context;
     use anyhow::Result;
     use circom_prover::prover::PublicInputs;
     use num_bigint::BigInt;
+    use std::cell::RefCell;
     use std::collections::HashMap;
     use std::str::FromStr;
 
@@ -261,13 +242,34 @@ mod tests {
 
     rust_witness::witness!(multiplier2);
 
+    thread_local! {
+        static CIRCOM_OVERRIDE: RefCell<Option<HashMap<&'static str, WitnessFn>>> =
+            RefCell::new(None);
+    }
+
+    pub fn set_circom_override_for_test<I>(pairs: I)
+    where
+        I: IntoIterator<Item = (&'static str, WitnessFn)>,
+    {
+        let mut m = HashMap::new();
+        for (k, v) in pairs {
+            m.insert(k, v);
+        }
+        CIRCOM_OVERRIDE.with(|c| *c.borrow_mut() = Some(m));
+    }
+
+    pub fn circom_get_override_val(name: &str) -> Option<WitnessFn> {
+        return CIRCOM_OVERRIDE
+            .with(|cell| cell.borrow().as_ref().and_then(|m| m.get(name).cloned()));
+    }
+
     #[test]
     fn test_witnesscalc_proof() -> Result<()> {
         // Override the default witness function for this test
-        crate::circom_register(
+        set_circom_override_for_test([(
             "multiplier2_final.zkey",
             circom_prover::witness::WitnessFn::WitnessCalc(multiplier2_witnesscalc_witness),
-        );
+        )]);
 
         let (input_str, expected_output) = prepare_inputs();
 
@@ -293,12 +295,6 @@ mod tests {
 
     #[test]
     fn test_rustwitness_prove() -> Result<()> {
-        // Override the default witness function for this test
-        crate::circom_register(
-            "multiplier2_final.zkey",
-            circom_prover::witness::WitnessFn::RustWitness(multiplier2_witness),
-        );
-
         let (input_str, expected_output) = prepare_inputs();
 
         // Generate Proof
@@ -323,12 +319,6 @@ mod tests {
 
     #[test]
     fn test_rapidsnark_prove() -> Result<()> {
-        // Override the default witness function for this test
-        crate::circom_register(
-            "multiplier2_final.zkey",
-            circom_prover::witness::WitnessFn::RustWitness(multiplier2_witness),
-        );
-
         let (input_str, expected_output) = prepare_inputs();
 
         // Generate Proof

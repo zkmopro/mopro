@@ -39,6 +39,7 @@ rust-witness = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.94"
 
+circom-prover = { git = "https://github.com/zkmopro/mopro.git", features = ["rapidsnark", "witnesscalc"] }
 witnesscalc-adapter = "0.1"
     "#;
         let target = "# CIRCOM_DEV_DEPENDENCIES";
