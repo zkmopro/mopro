@@ -17,12 +17,14 @@ struct ContentView: View {
     @State private var generatedHalo2Proof: Data?
     @State private var halo2PublicInputs: Data?
     @State private var generatedNoirProof: Data?
+    @State private var noirVerificationKey: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
     private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
     private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
     private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
     private let noirSrsPath = Bundle.main.path(forResource: "noir_multiplier2.srs", ofType: "")!
     private let noirCircuitPath = Bundle.main.path(forResource: "noir_multiplier2.json", ofType: "")!
+    private let noirVkPath = Bundle.main.path(forResource: "noir_multiplier2.vk", ofType: "")!
     
     var body: some View {
         VStack(spacing: 10) {
@@ -181,28 +183,59 @@ extension ContentView {
         textViewText += "Generating Noir proof...\n"
 
         do {
-            let inputs: [String] = ["5", "3"]
+            let inputs: [String] = ["3", "5"]
+            let onChain = true  // Use Keccak for Solidity compatibility
+            let lowMemoryMode = false
 
             DispatchQueue.global(qos: .userInitiated).async {
-                let start = CFAbsoluteTimeGetCurrent()
                 do {
-                    // Generate the proof
-                    let proofData = try! generateNoirProof(circuitPath: noirCircuitPath, srsPath: noirSrsPath, inputs: inputs)
+                    // First, try to load existing verification key from file, or generate new one
+                    let vk: Data
+                    if let existingVkData = try? Data(contentsOf: URL(fileURLWithPath: noirVkPath)) {
+                        vk = existingVkData
+                        DispatchQueue.main.async {
+                            textViewText += "Using existing verification key...\n"
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            textViewText += "Generating verification key...\n"
+                        }
+                        vk = try getNoirVerificationKey(circuitPath: noirCircuitPath, srsPath: noirSrsPath, onChain: onChain, lowMemoryMode: lowMemoryMode)
+                    }
+                    noirVerificationKey = vk
+
+                    DispatchQueue.main.async {
+                        textViewText += "Generating proof with verification key...\n"
+                    }
+                    let start = CFAbsoluteTimeGetCurrent()
+                    
+                    // Generate the proof with all required parameters
+                    let proofData = try generateNoirProof(
+                        circuitPath: noirCircuitPath, 
+                        srsPath: noirSrsPath, 
+                        inputs: inputs, 
+                        onChain: onChain, 
+                        vk: vk, 
+                        lowMemoryMode: lowMemoryMode
+                    )
 
                     let end = CFAbsoluteTimeGetCurrent()
                     let timeTaken = end - start
 
-                    generatedNoirProof = proofData
-                    textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
-
-                    isNoirVerifyButtonEnabled = true
+                    DispatchQueue.main.async {
+                        generatedNoirProof = proofData
+                        textViewText += "\(String(format: "%.3f", timeTaken))s 1️⃣\n"
+                        isNoirVerifyButtonEnabled = true
+                    }
                 } catch {
-                    textViewText += "Proof generation failed: \(error.localizedDescription)\n"
+                    DispatchQueue.main.async {
+                        textViewText += "Proof generation failed: \(error.localizedDescription)\n"
+                    }
                 }
             }
 
         } catch {
-            textViewText += "Error loading or parsing input JSON: \(error.localizedDescription)\n"
+            textViewText += "Error setting up proof generation: \(error.localizedDescription)\n"
         }
     }
 
@@ -211,27 +244,44 @@ extension ContentView {
             textViewText += "Error: Proof data is not available. Generate proof first.\n"
             return
         }
+        
+        guard let vk = noirVerificationKey else {
+            textViewText += "Error: Verification key is not available. Generate proof first.\n"
+            return
+        }
 
         textViewText += "Verifying Noir proof...\n"
 
         DispatchQueue.global(qos: .userInitiated).async {
             let start = CFAbsoluteTimeGetCurrent()
             do {
-                // Verify the proof
-                let isValid = try! verifyNoirProof(circuitPath: noirCircuitPath, proof: proofData)
+                let onChain = true  // Use Keccak for Solidity compatibility
+                let lowMemoryMode = false
+                
+                // Verify the proof with all required parameters
+                let isValid = try verifyNoirProof(
+                    circuitPath: noirCircuitPath, 
+                    proof: proofData, 
+                    onChain: onChain, 
+                    vk: vk, 
+                    lowMemoryMode: lowMemoryMode
+                )
 
                 let end = CFAbsoluteTimeGetCurrent()
                 let timeTaken = end - start
 
-                if isValid {
-                    textViewText += "\(String(format: "%.3f", timeTaken))s 2️⃣\n"
-                } else {
-                    textViewText += "\nProof verification failed.\n"
+                DispatchQueue.main.async {
+                    if isValid {
+                        textViewText += "\(String(format: "%.3f", timeTaken))s 2️⃣\n"
+                    } else {
+                        textViewText += "\nProof verification failed.\n"
+                    }
+                    isNoirVerifyButtonEnabled = false
                 }
-
-                isNoirVerifyButtonEnabled = false
             } catch {
-                self.textViewText += "Verification failed: \(error.localizedDescription)\n"
+                DispatchQueue.main.async {
+                    textViewText += "Verification failed: \(error.localizedDescription)\n"
+                }
             }
         }
     }

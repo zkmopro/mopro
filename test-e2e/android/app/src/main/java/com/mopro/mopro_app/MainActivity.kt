@@ -1,7 +1,5 @@
 package com.mopro.mopro_app
 
-import MultiplierComponent
-import NoirComponent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.mopro.mopro_app.ui.theme.MoproappTheme
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -46,16 +43,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MoproappTheme {
-                MainScreen()
-            }
+            MainScreen()
         }
     }
 }
 
 @Composable
 fun MainScreen() {
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("Circom", "Halo2", "Noir")
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

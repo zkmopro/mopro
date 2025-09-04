@@ -134,7 +134,7 @@ sudo apt install build-essential cmake m4 nasm libstdc++6
 brew install nasm
 ```
 
-Rust toolchain: `cargo 1.81.0 (2dbb1af80 2024-08-20)`
+Rust toolchain: `cargo 1.89.0 (2948388 2025-08-07)`
 
 In build.rs, add the following code to compile the witness generator cpp and dat sources (<circuit name>.cpp, <circuit name>.dat) into a native library and link to it:
 
