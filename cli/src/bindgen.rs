@@ -133,7 +133,7 @@ pub fn bindgen(
     )?;
 
     // Run the build command
-    build_project(arg_mode, arg_platforms, arg_architectures)?;
+    build_project(arg_mode, arg_platforms, arg_architectures, None)?;
 
     // Copy the bindings folder to the project root
     let ios_bindings_dir = project_dir.join(IOS_BINDINGS_DIR);

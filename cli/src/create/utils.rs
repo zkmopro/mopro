@@ -164,7 +164,12 @@ pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<Option<P
         .interact()?;
 
     if confirm {
-        build_project(&None, &Some(vec![platform.as_str().to_string()]), &None)?;
+        build_project(
+            &None,
+            &Some(vec![platform.as_str().to_string()]),
+            &None,
+            Some(false),
+        )?;
 
         if bindings_dir.exists() && fs::read_dir(&bindings_dir)?.count() > 0 {
             return Ok(Some(bindings_dir));
