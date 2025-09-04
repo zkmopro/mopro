@@ -15,6 +15,26 @@ pub struct Config {
     pub(crate) target_platforms: Option<HashSet<String>>,
     pub(crate) ios: Option<HashSet<String>>,
     pub(crate) android: Option<HashSet<String>>,
+    pub(crate) update: Option<UpdateConfig>,
+}
+
+#[derive(Debug, Default, serde::Deserialize, serde::Serialize, Clone, PartialEq, Eq)]
+pub struct UpdateConfig {
+    pub(crate) ios_dest: Option<String>,
+    pub(crate) android_dest: Option<String>,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            build_mode: Some(String::new()),
+            target_adapters: Some(HashSet::new()),
+            target_platforms: Some(HashSet::new()),
+            ios: Some(HashSet::new()),
+            android: Some(HashSet::new()),
+            update: Some(UpdateConfig::default()),
+        }
+    }
 }
 
 impl Config {

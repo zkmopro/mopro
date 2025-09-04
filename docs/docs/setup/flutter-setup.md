@@ -528,7 +528,7 @@ Don't forget to modify the input values for your specific case!
 -   **Update your ZK circuits** as needed. After making changes, be sure to run:
     ```sh
     mopro build
-    mopro update
+    mopro update --dest ../MyFlutterApp
     ```
     :::warning
     `mopro update` only works if the Android project was created _within_ the Rust project directory during mopro init. Otherwise, you can manually update the bindings by following [Step 2-1](#2-1-use-a-framework) and [Step 3-2](#3-2-include-mopro-bindings-in-the-native-android-module).

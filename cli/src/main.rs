@@ -1,3 +1,4 @@
+use clap::ArgAction;
 use clap::CommandFactory;
 use clap::Parser;
 use clap::Subcommand;
@@ -62,7 +63,20 @@ enum Commands {
         show: Option<String>,
     },
     /// Update the bindings for all platforms
-    Update {},
+    Update {
+        #[arg(
+            long,
+            help = "Optional path to the bindings directory (defaults to CWD)"
+        )]
+        src: Option<String>,
+        #[arg(
+            long,
+            help = "Optional path to the mobile project (recurses if omitted)"
+        )]
+        dest: Option<String>,
+        #[arg(long, action = ArgAction::SetTrue, help = "Suppress interactive prompts")]
+        no_prompt: bool,
+    },
     /// Generate the bindings for the specified platform (NOTE: it only supports circom with rust-witness and arkworks now)
     Bindgen {
         #[arg(long, help = "Specify the build mode (e.g., 'release' or 'debug').")]
@@ -145,7 +159,11 @@ fn main() {
             }
         }
 
-        Commands::Update {} => match update::update_bindings() {
+        Commands::Update {
+            src,
+            dest,
+            no_prompt,
+        } => match update::update_bindings(src, dest, *no_prompt) {
             Ok(_) => {}
             Err(e) => style::print_red_bold(format!("Failed to update bindings: {e:?}")),
         },

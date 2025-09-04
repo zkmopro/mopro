@@ -105,7 +105,7 @@ You should now be able to run the iOS app on the simulator or a device and build
 
     ```sh
     mopro build
-    mopro update
+    mopro update --dest ../MyiOSApp
     ```
 
     :::warning
