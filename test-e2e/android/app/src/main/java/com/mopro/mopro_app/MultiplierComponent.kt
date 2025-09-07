@@ -1,8 +1,11 @@
-import androidx.compose.foundation.layout.*
+package com.mopro.mopro_app
+
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -10,20 +13,23 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mopro.mopro_app.getFilePathFromAssets
-import uniffi.mopro.*
+import uniffi.mopro.CircomProofResult
+import uniffi.mopro.CircomProof
+import uniffi.mopro.G1
+import uniffi.mopro.G2
+import uniffi.mopro.generateCircomProof
+import uniffi.mopro.verifyCircomProof
+import uniffi.mopro.ProofLib
 
 @Composable
 fun MultiplierComponent() {
-    var arkworksProvingTime by remember { mutableStateOf("Proving time: -") }
-    var arkworksVerifyingTime by remember { mutableStateOf("Verifying time: -") }
-    var arkworksValid by remember { mutableStateOf("Valid: -") }
-    var arkworksOutput by remember { mutableStateOf("Output: -") }
-    
-    var rapidsnarkProvingTime by remember { mutableStateOf("Proving time: -") }
-    var rapidsnarkVerifyingTime by remember { mutableStateOf("Verifying time: -") }
-    var rapidsnarkValid by remember { mutableStateOf("Valid: -") }
-    var rapidsnarkOutput by remember { mutableStateOf("Output: -") }
-    
+    var provingTime by remember { mutableStateOf("proving time:") }
+    var verifyingTime by remember { mutableStateOf("verifying time: ") }
+    var valid by remember { mutableStateOf("valid:") }
+    var output by remember { mutableStateOf("output:") }
+    var isGeneratingCircomProof by remember { mutableStateOf(false) }
+    var isGeneratingRapidsnarkProof by remember { mutableStateOf(false) }
+    var isVerifyingProof by remember { mutableStateOf(false) }
     var res by remember {
         mutableStateOf(
             CircomProofResult(
@@ -40,136 +46,93 @@ fun MultiplierComponent() {
     }
 
     val input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
-    val zkeyPath = getFilePathFromAssets("multiplier2_final.zkey")
-    val witnesscalcZkeyPath = getFilePathFromAssets("multiplier2_witnesscalc_final.zkey")
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    val zkeyPath = getFilePathFromAssets("multiplier2_final.zkey")
+
+    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+        Button(
+            onClick = {
+                isGeneratingCircomProof = true
+                Thread(
+                    Runnable {
+                        try {
+                            val startTime = System.currentTimeMillis()
+                            res = generateCircomProof(zkeyPath, input_str, ProofLib.ARKWORKS)
+                            val endTime = System.currentTimeMillis()
+                            provingTime = "proving time: " + (endTime - startTime).toString() + " ms"
+                        } finally {
+                            isGeneratingCircomProof = false
+                        }
+                    }
+                ).start()
+            },
+            modifier = Modifier.padding(top = 20.dp).testTag("circomGenerateProofButton"),
+            enabled = !isGeneratingCircomProof && !isGeneratingRapidsnarkProof && !isVerifyingProof
+        ) { Text(text = "generate proof") }
+        Button(
+            onClick = {
+                isVerifyingProof = true
+                Thread {
+                    try {
+                        val startTime = System.currentTimeMillis()
+                        valid = "valid: " + verifyCircomProof(zkeyPath, res, ProofLib.ARKWORKS).toString()
+                        val endTime = System.currentTimeMillis()
+                        verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
+                        output = "output: " + res.inputs
+                    } finally {
+                        isVerifyingProof = false
+                    }
+                }.start()
+            },
+            modifier = Modifier.padding(top = 120.dp).testTag("circomVerifyProofButton"),
+            enabled = !isGeneratingCircomProof && !isGeneratingRapidsnarkProof && !isVerifyingProof && res.proof.a.x.isNotEmpty()
+        ) { Text(text = "verify proof") }
+        Button(
+            onClick = {
+                isGeneratingRapidsnarkProof = true
+                Thread(
+                    Runnable {
+                        try {
+                            val startTime = System.currentTimeMillis()
+                            res = generateCircomProof(zkeyPath, input_str, ProofLib.RAPIDSNARK)
+                            val endTime = System.currentTimeMillis()
+                            provingTime = "proving time: " + (endTime - startTime).toString() + " ms"
+                        } finally {
+                            isGeneratingRapidsnarkProof = false
+                        }
+                    }
+                ).start()
+            },
+            modifier = Modifier.padding(top = 220.dp).testTag("rapidsnarkGenerateProofButton"),
+            enabled = !isGeneratingCircomProof && !isGeneratingRapidsnarkProof && !isVerifyingProof
+        ) { Text(text = "generate proof (rapidsnark)") }
+        Button(
+            onClick = {
+                isVerifyingProof = true
+                Thread {
+                    try {
+                        val startTime = System.currentTimeMillis()
+                        valid = "valid: " + verifyCircomProof(zkeyPath, res, ProofLib.RAPIDSNARK).toString()
+                        val endTime = System.currentTimeMillis()
+                        verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
+                        output = "output: " + res.inputs
+                    } finally {
+                        isVerifyingProof = false
+                    }
+                }.start()
+            },
+            modifier = Modifier.padding(top = 320.dp).testTag("rapidsnarkVerifyProofButton"),
+            enabled = !isGeneratingCircomProof && !isGeneratingRapidsnarkProof && !isVerifyingProof && res.proof.a.x.isNotEmpty()
+        ) { Text(text = "verify proof (rapidsnark)") }
         Text(
-            text = "Multiplier Proof Demo",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 24.dp)
+            text = "Multiplier proof",
+            modifier = Modifier.padding(bottom = 180.dp),
+            fontWeight = FontWeight.Bold
         )
 
-        // Arkworks Section
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Arkworks",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                
-                Button(
-                    onClick = {
-                        Thread(
-                            Runnable {
-                                val startTime = System.currentTimeMillis()
-                                res = generateCircomProof(zkeyPath, input_str, ProofLib.ARKWORKS)
-                                val endTime = System.currentTimeMillis()
-                                arkworksProvingTime = "Proving time: ${endTime - startTime} ms"
-                            }
-                        ).start()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .testTag("circomGenerateProofButton")
-                ) {
-                    Text("Generate Arkworks Proof")
-                }
-
-                Button(
-                    onClick = {
-                        val startTime = System.currentTimeMillis()
-                        arkworksValid = "Valid: ${verifyCircomProof(zkeyPath, res, ProofLib.ARKWORKS)}"
-                        val endTime = System.currentTimeMillis()
-                        arkworksVerifyingTime = "Verifying time: ${endTime - startTime} ms"
-                        arkworksOutput = "Output: ${res.inputs}"
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .testTag("circomVerifyProofButton")
-                ) {
-                    Text("Verify Arkworks Proof")
-                }
-
-                Text(text = arkworksProvingTime, modifier = Modifier.padding(vertical = 4.dp))
-                Text(text = arkworksVerifyingTime, modifier = Modifier.padding(vertical = 4.dp))
-                Text(text = arkworksValid, modifier = Modifier.padding(vertical = 4.dp))
-                Text(text = arkworksOutput, modifier = Modifier.padding(vertical = 4.dp))
-            }
-        }
-
-        // Rapidsnark Section
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Rapidsnark",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Button(
-                    onClick = {
-                        Thread(
-                            Runnable {
-                                val startTime = System.currentTimeMillis()
-                                res = generateCircomProof(witnesscalcZkeyPath, input_str, ProofLib.RAPIDSNARK)
-                                val endTime = System.currentTimeMillis()
-                                rapidsnarkProvingTime = "Proving time: ${endTime - startTime} ms"
-                            }
-                        ).start()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .testTag("rapidsnarkGenerateProofButton")
-                ) {
-                    Text("Generate Rapidsnark Proof")
-                }
-
-                Button(
-                    onClick = {
-                        val startTime = System.currentTimeMillis()
-                        rapidsnarkValid = "Valid: ${verifyCircomProof(witnesscalcZkeyPath, res, ProofLib.RAPIDSNARK)}"
-                        val endTime = System.currentTimeMillis()
-                        rapidsnarkVerifyingTime = "Verifying time: ${endTime - startTime} ms"
-                        rapidsnarkOutput = "Output: ${res.inputs}"
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .testTag("rapidsnarkVerifyProofButton")
-                ) {
-                    Text("Verify Rapidsnark Proof")
-                }
-
-                Text(text = rapidsnarkProvingTime, modifier = Modifier.padding(vertical = 4.dp))
-                Text(text = rapidsnarkVerifyingTime, modifier = Modifier.padding(vertical = 4.dp))
-                Text(text = rapidsnarkValid, modifier = Modifier.padding(vertical = 4.dp))
-                Text(text = rapidsnarkOutput, modifier = Modifier.padding(vertical = 4.dp))
-            }
-        }
+        Text(text = provingTime, modifier = Modifier.padding(top = 420.dp).width(200.dp))
+        Text(text = valid, modifier = Modifier.padding(top = 450.dp).width(200.dp))
+        Text(text = verifyingTime, modifier = Modifier.padding(top = 480.dp).width(200.dp))
+        Text(text = output, modifier = Modifier.padding(top = 510.dp).width(200.dp))
     }
 }

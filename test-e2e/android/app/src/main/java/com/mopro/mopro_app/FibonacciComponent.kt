@@ -25,6 +25,8 @@ fun FibonacciComponent() {
     var provingTime by remember { mutableStateOf("proving time:") }
     var verifyingTime by remember { mutableStateOf("verifying time: ") }
     var valid by remember { mutableStateOf("valid:") }
+    var isGeneratingProof by remember { mutableStateOf(false) }
+    var isVerifyingProof by remember { mutableStateOf(false) }
     var res by remember {
         mutableStateOf<Halo2ProofResult>(
             Halo2ProofResult(proof = ByteArray(size = 0), inputs = ByteArray(size = 0))
@@ -42,27 +44,41 @@ fun FibonacciComponent() {
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
         Button(
             onClick = {
+                isGeneratingProof = true
                 Thread {
-                    val startTime = System.currentTimeMillis()
-                    res = generateHalo2Proof(srsPath, provingKeyPath, inputs)
-                    val endTime = System.currentTimeMillis()
-                    provingTime =
-                        "proving time: " +
-                                (endTime - startTime).toString() +
-                                " ms"
+                    try {
+                        val startTime = System.currentTimeMillis()
+                        res = generateHalo2Proof(srsPath, provingKeyPath, inputs)
+                        val endTime = System.currentTimeMillis()
+                        provingTime =
+                            "proving time: " +
+                                    (endTime - startTime).toString() +
+                                    " ms"
+                    } finally {
+                        isGeneratingProof = false
+                    }
                 }
                     .start()
             },
-            modifier = Modifier.padding(top = 20.dp).testTag("halo2GenerateProofButton")
+            modifier = Modifier.padding(top = 20.dp).testTag("halo2GenerateProofButton"),
+            enabled = !isGeneratingProof && !isVerifyingProof
         ) { Text(text = "generate proof") }
         Button(
             onClick = {
-                val startTime = System.currentTimeMillis()
-                valid = "valid: " + verifyHalo2Proof(srsPath, verifyingKeyPath, res.proof, res.inputs).toString()
-                val endTime = System.currentTimeMillis()
-                verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
+                isVerifyingProof = true
+                Thread {
+                    try {
+                        val startTime = System.currentTimeMillis()
+                        valid = "valid: " + verifyHalo2Proof(srsPath, verifyingKeyPath, res.proof, res.inputs).toString()
+                        val endTime = System.currentTimeMillis()
+                        verifyingTime = "verifying time: " + (endTime - startTime).toString() + " ms"
+                    } finally {
+                        isVerifyingProof = false
+                    }
+                }.start()
             },
-            modifier = Modifier.padding(top = 120.dp).testTag("halo2VerifyProofButton")
+            modifier = Modifier.padding(top = 120.dp).testTag("halo2VerifyProofButton"),
+            enabled = !isGeneratingProof && !isVerifyingProof && res.proof.isNotEmpty()
         ) { Text(text = "verify proof") }
         Text(
             text = "Halo2 Fibonacci proof",

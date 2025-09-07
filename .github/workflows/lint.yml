@@ -1,0 +1,52 @@
+name: Lint
+
+on:
+  push:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check-typos:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    steps:
+      - uses: actions/checkout@v5
+      - name: install requirements
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: wget
+          version: 1.0
+      - name: Spell Check Repo
+        uses: crate-ci/typos@v1.31.1
+        with:
+          config: ./_typos.toml
+
+  clippy_check:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    env:
+      RUSTFLAGS: "-Dwarnings"
+    steps:
+      - uses: actions/checkout@v5
+      - name: install requirements
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6 protobuf-compiler
+          version: 1.0
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features
+
+  lint:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check formatting
+        run: cargo fmt --all -- --check

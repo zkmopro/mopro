@@ -1,0 +1,336 @@
+.container {
+  width: 100%;
+  height: 600px;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: transparent;
+  overflow: hidden;
+  margin: 20px 0;
+  
+  /* CSS Variables for enhanced dark theme */
+  --arch-roles-bg: rgba(45, 50, 80, 0.4);
+  --arch-roles-text: #94e2ff;
+  --arch-red-bg: rgba(80, 30, 40, 0.5);
+  --arch-red-text: #ff9999;
+  --arch-orange-bg: rgba(120, 70, 40, 0.5);
+  --arch-orange-text: #ffb366;
+  --arch-purple-bg: rgba(60, 40, 80, 0.5);
+  --arch-purple-text: #c99fff;
+  --arch-teal-bg: rgba(30, 70, 60, 0.5);
+  --arch-teal-text: #66d9cc;
+  --arch-component-bg: rgba(60, 60, 65, 0.9);
+  --arch-component-text: #f0f0f0;
+  --arch-role-label-bg: rgba(45, 100, 200, 0.3);
+  --arch-role-label-text: #99c7ff;
+  --arch-role-label-red-bg: rgba(200, 40, 40, 0.4);
+  --arch-role-label-red-text: #ff9999;
+}
+
+[data-theme="light"] .container {
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+  
+  /* Light theme colors */
+  --arch-roles-bg: #E1F5FE;
+  --arch-roles-text: #0277BD;
+  --arch-red-bg: #FFCDD2;
+  --arch-red-text: #D32F2F;
+  --arch-orange-bg: #FFF3E0;
+  --arch-orange-text: #F57C00;
+  --arch-component-bg: #FFFFFF;
+  --arch-component-text: #000000;
+  --arch-role-label-bg: #BBDEFB;
+  --arch-role-label-text: #1976D2;
+  --arch-role-label-red-bg: #FFCDD2;
+  --arch-role-label-red-text: #D32F2F;
+}
+
+[data-theme="dark"] .container {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  
+  /* Dark theme colors - already set in main container */
+}
+
+.controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="light"] .controls {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .controls {
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.controlButton {
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #f0f0f0;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.controlButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.controlButton:active {
+  transform: translateY(1px);
+}
+
+[data-theme="light"] .controlButton {
+  border: 1px solid #ccc;
+  background: white;
+  color: #333;
+}
+
+[data-theme="light"] .controlButton:hover {
+  background: #f5f5f5;
+  border-color: #999;
+}
+
+[data-theme="dark"] .controlButton {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+[data-theme="dark"] .controlButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+
+.diagramContainer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.component {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.component:hover {
+  stroke: var(--arch-component-text);
+  stroke-width: 2;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+}
+
+.connections {
+  opacity: 0.8;
+}
+
+.connections path {
+  transition: all 0.3s ease;
+}
+
+.connections path:hover {
+  opacity: 1;
+  stroke-width: 3;
+}
+
+.tooltip {
+  position: absolute;
+  background: rgba(45, 45, 45, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  max-width: 300px;
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+}
+
+.tooltip h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #e5e7eb;
+  font-weight: 600;
+}
+
+.tooltip p {
+  margin: 0;
+  font-size: 12px;
+  color: #d1d5db;
+  line-height: 1.4;
+}
+
+.links {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.link {
+  display: inline-block;
+  font-size: 11px;
+  color: #fbbf24;
+  text-decoration: none;
+  margin-right: 10px;
+}
+
+.link:hover {
+  text-decoration: underline;
+  color: #f59e0b;
+}
+
+[data-theme="light"] .tooltip {
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: none;
+}
+
+[data-theme="light"] .tooltip h4 {
+  color: #333;
+}
+
+[data-theme="light"] .tooltip p {
+  color: #666;
+}
+
+[data-theme="light"] .links {
+  border-top: 1px solid #eee;
+}
+
+[data-theme="light"] .link {
+  color: #1976D2;
+}
+
+[data-theme="light"] .link:hover {
+  color: #1565C0;
+}
+
+[data-theme="dark"] .tooltip {
+  background: rgba(45, 45, 45, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="dark"] .tooltip h4 {
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .tooltip p {
+  color: #d1d5db;
+}
+
+[data-theme="dark"] .links {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .link {
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .link:hover {
+  color: #f59e0b;
+}
+
+.instructions {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 16px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.instructions p {
+  margin: 0;
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    height: 400px;
+  }
+  
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .controlButton {
+    font-size: 14px;
+    min-width: 28px;
+    height: 28px;
+  }
+  
+  .tooltip {
+    max-width: 250px;
+    font-size: 11px;
+  }
+  
+  .tooltip h4 {
+    font-size: 13px;
+  }
+  
+  .instructions {
+    position: static;
+    transform: none;
+    margin-top: 10px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .container {
+    height: auto;
+    border: 1px solid #ccc;
+  }
+  
+  .controls,
+  .instructions {
+    display: none;
+  }
+}
