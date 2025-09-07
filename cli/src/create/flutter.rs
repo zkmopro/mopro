@@ -1,5 +1,5 @@
 use anyhow::Error;
-use std::{fs, path::PathBuf};
+use std::{env, fs, path::PathBuf};
 
 use super::Create;
 use crate::constants::Platform;
@@ -40,6 +40,10 @@ impl Create for Flutter {
         let flutter_dir = project_dir.join("flutter-app-main");
         fs::rename(flutter_dir, &target_dir)?;
 
+        let mopro_flutter_plugin_dir = target_dir.join("mopro_flutter_plugin");
+        let previous_dir = env::current_dir()?;
+        env::set_current_dir(&mopro_flutter_plugin_dir)?;
+
         // Handle iOS if provided
         if let Some(ios_dir) = ios_bindings_dir {
             let xcframeworks_dir = ios_dir.join(IOS_XCFRAMEWORKS_DIR);
@@ -59,6 +63,7 @@ impl Create for Flutter {
             let _ = update_file(&kotlin_path, ANDROID_KT_FILE)?;
             let _ = update_folder(&jnilib_path, ANDROID_JNILIBS_DIR, true)?;
         }
+        env::set_current_dir(previous_dir)?;
 
         // Keys
         let assets_dir = target_dir.join("assets");
