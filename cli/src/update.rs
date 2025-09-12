@@ -145,7 +145,7 @@ fn detect_platform_paths(dest: &Path) -> Result<Vec<(Platform, PathBuf)>> {
         return Ok(vec![(Platform::Ios, dest.to_path_buf())]);
     }
 
-    if dest.join("build.gradle").exists() || dest.join("build.gradle.kts").exists() {
+    if is_android_project(dest) {
         return Ok(vec![(Platform::Android, dest.to_path_buf())]);
     }
 
@@ -167,6 +167,19 @@ fn is_xcodeproj(path: &Path) -> bool {
         }
     }
     false
+}
+
+fn is_android_project(path: &Path) -> bool {
+    // Check for AndroidManifest.xml in common locations
+    let manifest_locations = [
+        path.join("app/src/main/AndroidManifest.xml"),
+        path.join("src/main/AndroidManifest.xml"),
+        path.join("AndroidManifest.xml"),
+    ];
+
+    let has_manifest = manifest_locations.iter().any(|p| p.exists());
+
+    has_manifest
 }
 
 fn update_platform(src_root: &Path, dest_root: &Path, platform: Platform) -> Result<bool> {
@@ -222,7 +235,9 @@ fn update_platform(src_root: &Path, dest_root: &Path, platform: Platform) -> Res
         }
     };
 
-    print_gray_items(updated_paths.clone());
+    if !updated_paths.is_empty() {
+        print_gray_items(updated_paths.clone());
+    }
     Ok(!updated_paths.is_empty())
 }
 
