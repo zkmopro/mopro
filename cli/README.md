@@ -51,7 +51,19 @@ mopro create
 ### Update bindings
 
 ```sh
-mopro update
+mopro update [--src PATH] [--dest PATH] [--no-prompt]
+```
+
+By default `mopro update` looks for bindings and mobile projects in the current
+directory. Use `--src` to point to a bindings directory and `--dest` to target a
+specific mobile project located elsewhere. Frequently used destinations can be
+stored in `Config.toml` under an `update` section:
+
+```toml
+[update]
+ios_dest = "../MyiOSApp"
+android_dest = "../MyAndroidApp"
+```
 ```
 
 ### Create bindings without Rust project

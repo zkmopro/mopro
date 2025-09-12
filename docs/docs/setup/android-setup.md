@@ -321,7 +321,7 @@ You should now be able to run the Android app (`^`+`R` or `ctrl`+`R`) on the sim
 
     ```sh
     mopro build
-    mopro update
+    mopro update --dest ../MyAndroidApp
     ```
 
     :::warning

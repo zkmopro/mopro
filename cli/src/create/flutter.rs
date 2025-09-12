@@ -48,8 +48,9 @@ impl Create for Flutter {
         if let Some(ios_dir) = ios_bindings_dir {
             let xcframeworks_dir = ios_dir.join(IOS_XCFRAMEWORKS_DIR);
             let mopro_swift_file = ios_dir.join(IOS_SWIFT_FILE);
-            let _ = update_folder(&xcframeworks_dir, IOS_XCFRAMEWORKS_DIR, false)?;
-            let _ = update_file(&mopro_swift_file, IOS_SWIFT_FILE)?;
+            let current_dir = env::current_dir()?;
+            let _ = update_folder(&xcframeworks_dir, &current_dir, IOS_XCFRAMEWORKS_DIR, false)?;
+            let _ = update_file(&mopro_swift_file, &current_dir, IOS_SWIFT_FILE)?;
         }
 
         // Handle Android if provided
@@ -60,8 +61,9 @@ impl Create for Flutter {
                 .join(ANDROID_PACKAGE_NAME)
                 .join(ANDROID_KT_FILE);
 
-            let _ = update_file(&kotlin_path, ANDROID_KT_FILE)?;
-            let _ = update_folder(&jnilib_path, ANDROID_JNILIBS_DIR, true)?;
+            let current_dir = env::current_dir()?;
+            let _ = update_file(&kotlin_path, &current_dir, ANDROID_KT_FILE)?;
+            let _ = update_folder(&jnilib_path, &current_dir, ANDROID_JNILIBS_DIR, true)?;
         }
         env::set_current_dir(previous_dir)?;
 

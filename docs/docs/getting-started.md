@@ -318,7 +318,11 @@ mopro build
 mopro update
 ```
 
-This will automatically detect and update the corresponding bindings in each platform template you've set up.
+This will automatically detect and update the corresponding bindings in each platform template you've set up. If your mobile project lives elsewhere, provide explicit paths:
+
+```sh
+mopro update --src ./my_bindings --dest ../MyMobileApp
+```
 
 ## 7. What's next
 
