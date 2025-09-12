@@ -1,5 +1,7 @@
 # Architectures
 
+## Platform Support
+
 Different platforms use different architectures. This section will guide you in selecting the appropriate architecture for your target platform.
 
 ## iOS

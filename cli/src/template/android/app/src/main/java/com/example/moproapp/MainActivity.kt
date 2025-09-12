@@ -1,6 +1,5 @@
 package com.example.moproapp
 
-import MultiplierComponent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -51,7 +50,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("Circom", "Halo2", "Noir")
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

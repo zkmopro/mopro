@@ -226,7 +226,7 @@ fn update_platform(src_root: &Path, dest_root: &Path, platform: Platform) -> Res
     Ok(!updated_paths.is_empty())
 }
 
-fn update_folder(
+pub fn update_folder(
     source_dir: &Path,
     search_root: &Path,
     target_dir_name: &str,
@@ -269,7 +269,7 @@ fn update_folder(
     Ok(updated_paths)
 }
 
-fn update_file(
+pub fn update_file(
     source_file: &Path,
     search_root: &Path,
     target_file_name: &str,
