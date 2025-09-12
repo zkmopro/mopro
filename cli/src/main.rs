@@ -144,13 +144,7 @@ fn main() {
                 print::print_build_success_message();
                 return;
             }
-            match build::build_project(
-                mode,
-                platforms,
-                architectures,
-                auto_update_flag,
-                false,
-            ) {
+            match build::build_project(mode, platforms, architectures, auto_update_flag, false) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
             }
