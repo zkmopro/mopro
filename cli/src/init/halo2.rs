@@ -8,9 +8,9 @@ use std::path::Path;
 
 pub struct Halo2;
 
-const TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/halo2");
-
 impl ProvingSystem for Halo2 {
+    const TEMPLATE_DIR: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/src/template/halo2");
+
     fn dep_template(file_path: &str) -> Result<()> {
         let replacement = r#"
 # HALO2_DEPENDENCIES
@@ -24,7 +24,7 @@ gemini-fibonacci  = { package = "gemini-fibonacci",  git = "https://github.com/s
     }
 
     fn lib_template(file_path: &str) -> Result<()> {
-        let halo2_lib_rs = match TEMPLATE_DIR.get_file("lib.rs") {
+        let halo2_lib_rs = match Self::TEMPLATE_DIR.get_file("lib.rs") {
             Some(file) => file.contents(),
             None => return Err(anyhow::anyhow!("lib.rs not found in template")),
         };
@@ -34,9 +34,9 @@ gemini-fibonacci  = { package = "gemini-fibonacci",  git = "https://github.com/s
 
     fn mod_template(lib_file_path: &str) -> Result<()> {
         let mod_file = "halo2.rs";
-        let circom_rs = match TEMPLATE_DIR.get_file(mod_file) {
+        let circom_rs = match Self::TEMPLATE_DIR.get_file(mod_file) {
             Some(file) => file.contents(),
-            None => return Err(anyhow::anyhow!("circom.rs not found in template")),
+            None => return Err(anyhow::anyhow!("halo2.rs not found in template")),
         };
 
         // Place the circom.rs in the same directory as lib.rs

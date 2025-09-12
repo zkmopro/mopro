@@ -6,6 +6,7 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
+name = "mopro"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 # Adapters for different proof systems
@@ -28,8 +29,13 @@ anyhow = "1.0.99"
 # NOIR_BUILD_DEPENDENCIES
 
 [dev-dependencies]
+mopro-ffi = { path = "../mopro-ffi", features = ["uniffi-tests"] }
+
 # CIRCOM_DEV_DEPENDENCIES
 # HALO2_DEV_DEPENDENCIES
 # NOIR_DEV_DEPENDENCIES
+
+[patch.crates-io]
+rust-rapidsnark = { git = "https://github.com/ElusAegis/rust-rapidsnark" }
     "# // TODO - make build dependencies also configurable
 }

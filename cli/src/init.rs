@@ -16,6 +16,8 @@ mod noir;
 mod write_toml;
 
 trait ProvingSystem {
+    const TEMPLATE_DIR: Dir<'static>;
+
     fn dep_template(_file_path: &str) -> Result<()> {
         Ok(())
     }
@@ -33,6 +35,25 @@ trait ProvingSystem {
     }
 
     fn mod_template(_lib_file_path: &str) -> Result<()> {
+        Ok(())
+    }
+
+    fn test_template(lib_file_path: &str) -> Result<()> {
+        let tmpl_tests: &Dir = Self::TEMPLATE_DIR
+            .get_dir("tests")
+            .ok_or_else(|| anyhow::anyhow!("tests dir not found in template"))?;
+
+        let dest_tests_dir: &Path = Path::new(lib_file_path)
+            .parent()
+            .ok_or_else(|| anyhow::anyhow!("Invalid file_path: no parent directory"))?
+            .parent()
+            .ok_or_else(|| anyhow::anyhow!("Invalid file_path: no grandparent directory"))?;
+
+        fs::create_dir_all(&dest_tests_dir)
+            .map_err(|e| anyhow::anyhow!("failed to create tests dir: {}", e))?;
+
+        tmpl_tests.extract(&dest_tests_dir)?;
+
         Ok(())
     }
 
@@ -95,6 +116,7 @@ pub fn init_project(
     if let Some(lib_rs_path) = project_dir.join("src").join("lib.rs").to_str() {
         adapter_sel.lib_template(lib_rs_path);
         adapter_sel.mod_template(lib_rs_path);
+        adapter_sel.test_template(lib_rs_path);
     }
 
     // Store selection

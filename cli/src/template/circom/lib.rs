@@ -7,7 +7,8 @@ mod circom;
 rust_witness::witness!(multiplier2);
 
 set_circom_circuits! {
-    ("multiplier2_final.zkey", circom_prover::witness::WitnessFn::RustWitness(multiplier2_witness))
+    ("multiplier2_final.zkey", circom_prover::witness::WitnessFn::RustWitness(multiplier2_witness)),
+    ("multiplier2_bls_final.zkey", circom_prover::witness::WitnessFn::RustWitness(multiplier2_witness)),
 }
 
 #[cfg(test)]
