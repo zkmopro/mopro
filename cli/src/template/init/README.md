@@ -80,8 +80,13 @@ Follow the README in the `flutter` directory. Or [zkmopro/flutter-app/README.md]
 
 After creating templates, you may still need to update the bindings.
 
-Once you've run `mopro build`, be sure to run mopro update to refresh the bindings in each template. This command will automatically locate the corresponding bindings folders and update them accordingly.
+`mopro build` will prompt you to run `mopro update` to refresh the bindings in each template. You can also run it automatically:
 
+```sh
+mopro build --auto-update
+```
+
+Or manually:
 ```sh
 mopro update
 ```

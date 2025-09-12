@@ -39,7 +39,7 @@ mopro init
 ### Build bindings
 
 ```sh
-mopro build
+mopro build --auto-update
 ```
 
 ### Create templates

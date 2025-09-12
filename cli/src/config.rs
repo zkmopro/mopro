@@ -16,6 +16,8 @@ pub struct Config {
     pub(crate) ios: Option<HashSet<String>>,
     pub(crate) android: Option<HashSet<String>>,
     pub(crate) update: Option<UpdateConfig>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) auto_update: Option<bool>,
 }
 
 #[derive(Debug, Default, serde::Deserialize, serde::Serialize, Clone, PartialEq, Eq)]
@@ -33,6 +35,7 @@ impl Default for Config {
             ios: Some(HashSet::new()),
             android: Some(HashSet::new()),
             update: Some(UpdateConfig::default()),
+            auto_update: Some(false),
         }
     }
 }
