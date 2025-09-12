@@ -35,7 +35,7 @@ impl Default for Config {
             ios: Some(HashSet::new()),
             android: Some(HashSet::new()),
             update: Some(UpdateConfig::default()),
-            auto_update: None,
+            auto_update: Some(false),
         }
     }
 }
