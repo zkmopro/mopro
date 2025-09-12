@@ -287,14 +287,14 @@ fn handle_auto_update(
 ) -> Result<()> {
     if let Some(auto_update_flag) = auto_update_flag {
         if auto_update_flag {
-            update_bindings()?;
+            update_bindings(&None, &None, false)?;
         }
         return Ok(());
     }
 
     if let Some(auto) = config.auto_update {
         if auto {
-            update_bindings()?;
+            update_bindings(&None, &None, false)?;
         }
         return Ok(());
     }
@@ -306,7 +306,7 @@ fn handle_auto_update(
         .interact()?;
 
     if run_now {
-        update_bindings()?;
+        update_bindings(&None, &None, false)?;
     }
 
     let remember = Confirm::with_theme(&ColorfulTheme::default())
