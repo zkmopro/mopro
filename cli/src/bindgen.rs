@@ -137,12 +137,14 @@ pub fn bindgen(
     if test_vectors_dir.exists() {
         fs::remove_dir_all(&test_vectors_dir)?;
     }
-    // Copy the entire directory
-    fs_extra::dir::copy(
-        &absolute_circuit_dir,
-        test_vectors_dir.parent().unwrap(),
-        &fs_extra::dir::CopyOptions::new(),
-    )?;
+    // Create the destination directory
+    fs::create_dir_all(&test_vectors_dir)?;
+
+    // Copy the contents of the circuit directory into test-vectors/circom
+    // This ensures files end up in the correct location regardless of source dir name
+    let mut copy_options = fs_extra::dir::CopyOptions::new();
+    copy_options.content_only = true;
+    fs_extra::dir::copy(&absolute_circuit_dir, &test_vectors_dir, &copy_options)?;
 
     let lib_rs_path = project_dir.join("src").join("lib.rs");
     let template_dir: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/circom");
