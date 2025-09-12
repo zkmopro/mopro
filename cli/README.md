@@ -72,6 +72,21 @@ android_dest = "../MyAndroidApp"
 mopro bindgen
 ```
 
+You can customize the bindings generation:
+
+- Choose a witness generator adapter (default `rust-witness`):
+
+  ```sh
+  mopro bindgen --adapter witnesscalc
+  ```
+
+- Specify the output directory for generated bindings:
+
+  ```sh
+  mopro bindgen --output-dir ./output
+  ```
+
+
 ## Development
 
 After cloning the repository, you can install the CLI locally with your changes by running:

@@ -29,6 +29,7 @@ pub fn build_project(
     arg_platforms: &Option<Vec<String>>,
     arg_architectures: &Option<Vec<String>>,
     auto_update_flag: Option<bool>,
+    quiet: bool,
 ) -> Result<()> {
     // Detect `Cargo.toml` file before starting build process
     let current_dir = env::current_dir()?;
@@ -115,6 +116,7 @@ pub fn build_project(
             arg_platforms,
             arg_architectures,
             auto_update_flag,
+            quiet,
         )?;
         return Ok(());
     }
@@ -132,6 +134,7 @@ pub fn build_project(
                 arg_platforms,
                 arg_architectures,
                 auto_update_flag,
+                quiet,
             )?;
             return Ok(());
         }
@@ -181,6 +184,7 @@ pub fn build_project(
                 arg_platforms,
                 arg_architectures,
                 auto_update_flag,
+                quiet,
             )?;
             return Ok(());
         }
@@ -227,7 +231,9 @@ pub fn build_project(
         }?;
     }
 
-    print_binding_message(&platform.platforms)?;
+    if !quiet {
+        print_binding_message(&platform.platforms)?;
+    }
     handle_auto_update(&config_path, &mut config, auto_update_flag)?;
     print_build_success_message();
 
