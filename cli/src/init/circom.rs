@@ -8,9 +8,9 @@ use std::path::Path;
 
 pub struct Circom;
 
-const TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/circom");
-
 impl ProvingSystem for Circom {
+    const TEMPLATE_DIR: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/src/template/circom");
+
     fn dep_template(file_path: &str) -> Result<()> {
         let replacement = r#"
 # CIRCOM_DEPENDENCIES
@@ -47,7 +47,7 @@ witnesscalc-adapter = "0.1"
     }
 
     fn lib_template(file_path: &str) -> Result<()> {
-        let circom_lib_rs = match TEMPLATE_DIR.get_file("lib.rs") {
+        let circom_lib_rs = match Self::TEMPLATE_DIR.get_file("lib.rs") {
             Some(file) => file.contents(),
             None => return Err(anyhow::anyhow!("lib.rs not found in template")),
         };
@@ -57,7 +57,7 @@ witnesscalc-adapter = "0.1"
 
     fn mod_template(lib_file_path: &str) -> Result<()> {
         let mod_file = "circom.rs";
-        let circom_rs = match TEMPLATE_DIR.get_file(mod_file) {
+        let circom_rs = match Self::TEMPLATE_DIR.get_file(mod_file) {
             Some(file) => file.contents(),
             None => return Err(anyhow::anyhow!("circom.rs not found in template")),
         };
@@ -75,6 +75,31 @@ witnesscalc-adapter = "0.1"
         let replacement = r#"
 rust_witness::transpile::transpile_wasm("./test-vectors/circom".to_string());
 witnesscalc_adapter::build_and_link("../test-vectors/circom/witnesscalc");
+
+// For running the uniffi tests on macOS, we need to set the rpath to find the
+// witnesscalc dynamic library at runtime.
+#[cfg(target_os = "macos")]
+{
+    let out_dir = std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap());
+    let wc_dir = out_dir.join("witnesscalc/package/lib");
+
+    if wc_dir.exists() {
+        println!("cargo:rustc-link-arg=-Wl,-rpath,{}", wc_dir.display());
+    } else {
+        panic!(
+            "Expected witnesscalc lib path does not exist: {}",
+            wc_dir.display()
+        );
+    }
+
+    // TODO: Make this universal for all witnesscalc circuit libraries
+    let src = wc_dir.join("libwitnesscalc_multiplier2_witnesscalc.dylib");
+    let dst = wc_dir.join("libwitnesscalc_multiplier2.dylib");
+
+    if src.exists() && !dst.exists() {
+        let _ = std::fs::copy(&src, &dst);
+    }
+}
 "#;
 
         let target = "// CIRCOM_TEMPLATE";

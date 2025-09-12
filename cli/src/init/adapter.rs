@@ -148,6 +148,18 @@ impl AdapterSelector {
         }
     }
 
+    pub fn test_template(&self, lib_rs_path: &str) {
+        if self.contains(Adapter::Circom) {
+            Circom::test_template(lib_rs_path).unwrap();
+        }
+        if self.contains(Adapter::Halo2) {
+            Halo2::test_template(lib_rs_path).unwrap();
+        }
+        if self.contains(Adapter::Noir) {
+            Noir::test_template(lib_rs_path).unwrap();
+        }
+    }
+
     pub fn build_template(&self, build_rs_path: &str) {
         if self.contains(Adapter::Circom) {
             Circom::build_template(build_rs_path).unwrap();
