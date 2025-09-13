@@ -21,10 +21,6 @@ noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", featur
 ], branch = "v1.0.0-beta.3-2" }
     "#;
 
-    const DEV_DEPENDENCIES: &'static str = r#"
-serial_test = "3.0.0"
-    "#;
-
     fn test_template(_lib_file_path: &str) -> Result<()> {
         Ok(())
     }
