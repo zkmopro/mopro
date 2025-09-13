@@ -13,6 +13,7 @@ pub mod adapter;
 mod circom;
 mod halo2;
 mod noir;
+mod proving_system;
 mod write_toml;
 
 trait ProvingSystem {
