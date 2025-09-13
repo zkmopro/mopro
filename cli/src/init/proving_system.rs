@@ -69,10 +69,10 @@ pub(super) trait ProvingSystem {
             .parent()
             .ok_or_else(|| anyhow::anyhow!("Invalid file_path: no grandparent directory"))?;
 
-        fs::create_dir_all(&dest_tests_dir)
+        fs::create_dir_all(dest_tests_dir)
             .map_err(|e| anyhow::anyhow!("failed to create tests dir: {}", e))?;
 
-        tmpl_tests.extract(&dest_tests_dir)?;
+        tmpl_tests.extract(dest_tests_dir)?;
 
         Ok(())
     }
