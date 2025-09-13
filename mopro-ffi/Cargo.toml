@@ -23,9 +23,6 @@ no_uniffi_exports = []
 
 [dependencies]
 uniffi = { workspace = true, features = ["bindgen"] }
-num-bigint = { version = "0.4.3", default-features = false, features = [
-    "rand",
-] }
 toml = { version = "0.8.22", optional = true }
 
 # Error handling
@@ -39,10 +36,3 @@ camino = { version = "1.1.9", optional = true }
 [build-dependencies]
 uuid = { version = "1.9.1", features = ["v4"] }
 camino = "1.1.9"
-
-[dev-dependencies]
-
-# Halo2 dependencies
-plonk-fibonacci = { workspace = true }
-hyperplonk-fibonacci = { workspace = true }
-gemini-fibonacci = { workspace = true }
