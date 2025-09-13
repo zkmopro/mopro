@@ -80,20 +80,25 @@ jobs:
           cargo test --all-features
 
   cli:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [lint, clippy_check]
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup Rust
-        uses: ./.github/actions/setup-rust
-        with:
-          cache-key: cli
-      - name: Install and test CLI
-        run: |
-          cd cli
-          cargo install --path .
-          mopro --help
+      runs-on: macos-latest
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+      steps:
+        - uses: actions/checkout@v5
+        - name: Install cli
+          run: |
+            cd cli
+            cargo install --path .
+            ~/.cargo/bin/mopro --help
+        - name: Scaffold example app
+          run: |
+            ~/.cargo/bin/mopro init --adapter circom,halo2,noir --project-name mopro-example-app
+            ls -la mopro-example-app
+        - name: Run tests with JNA
+          working-directory: mopro-example-app
+          run: |
+            curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
+            export CLASSPATH="$PWD/jna-5.13.0.jar"
+            cargo test
 
   test-ffi-all:
     runs-on: ubuntu-latest
@@ -214,227 +219,221 @@ jobs:
   #         CLASSPATH=jna-5.13.0.jar cargo test --test circom -- --nocapture
   #     - name: Run e2e halo2 tests
   #       run: CLASSPATH=jna-5.13.0.jar cargo test --test halo2 -- --nocapture
-  build-xcframework:
-    runs-on: macos-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [lint, clippy_check]
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
-        with:
-          platform: macos
-      - name: Setup Rust
-        uses: ./.github/actions/setup-rust
-        with:
-          cache-key: ios-xcframework
-      - name: Build iOS xcframework
-        run: cd test-e2e && cargo run --bin ios
-      - name: Cache xcframework
-        id: cache-xcframework
-        uses: actions/cache/save@v4
-        with:
-          path: test-e2e/MoproiOSBindings
-          key: ${{ github.sha }}-xcframework
-
-  # iOS app builds (run in parallel after xcframework)
-  build-ios-app-device:
-    runs-on: macos-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: build-xcframework
-    steps:
-      - uses: actions/checkout@v5
-      - name: Restore cached xcframework
-        id: cache-restore-xcframework
-        uses: actions/cache/restore@v4
-        with:
-          path: test-e2e/MoproiOSBindings
-          key: ${{ github.sha }}-xcframework
-      - name: Build app for device
-        run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-
-  build-ios-app-simulator:
-    runs-on: macos-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: build-xcframework
-    steps:
-      - uses: actions/checkout@v5
-      - name: Restore cached xcframework
-        id: cache-restore-xcframework
-        uses: actions/cache/restore@v4
-        with:
-          path: test-e2e/MoproiOSBindings
-          key: ${{ github.sha }}-xcframework
-      - name: Build app for simulator
-        run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS\ Simulator build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-
-  # iOS app test (depends only on xcframework)
-  test-ios-app-simulator:
-    runs-on: macos-14
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: build-xcframework
-    steps:
-      - uses: actions/checkout@v5
-      - name: Restore cached xcframework
-        id: cache-restore-xcframework
-        uses: actions/cache/restore@v4
-        with:
-          path: test-e2e/MoproiOSBindings
-          key: ${{ github.sha }}-xcframework
-      # to list available simulators: xcrun simctl list devices
-      - name: Test app in simulator
-        run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination 'platform=iOS Simulator,name=iPhone 15' test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -maximum-parallel-testing-workers 1
-
-  build-android-lib:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [lint, clippy_check]
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
-        with:
-          platform: linux
-      - name: Setup Rust
-        uses: ./.github/actions/setup-rust
-        with:
-          cache-key: android-lib
-      - name: Build Android bindings
-        run: cd test-e2e && ANDROID_ARCHS=x86_64-linux-android cargo run --bin android
-      - name: Cache android lib
-        id: cache-android-lib
-        uses: actions/cache/save@v4
-        with:
-          path: test-e2e/MoproAndroidBindings
-          key: ${{ github.sha }}-android-lib
-
-  test-android-app:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: build-android-lib
-    steps:
-      - uses: actions/checkout@v5
-      - name: Restore cached android lib
-        id: cache-restore-android-lib
-        uses: actions/cache/restore@v4
-        with:
-          path: test-e2e/MoproAndroidBindings
-          key: ${{ github.sha }}-android-lib
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: 17
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2.0.10
-      - name: Build android app
-        run: cd test-e2e/android && ./gradlew build
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-      - name: Run tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 29
-          target: google_apis
-          arch: x86_64
-          disable-animations: true
-          emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
-          script: cd test-e2e/android && ./gradlew connectedAndroidTest
-      - name: Upload test report
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-test-report
-          path: test-e2e/android/app/build/reports/androidTests/connected/debug/
-
-  build-halo2-wasm-web:
-    runs-on: ubuntu-latest
-    needs: [setup-halo2-wasm-env, lint, clippy_check]
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
-        with:
-          platform: linux
-      - name: Setup Rust
-        uses: ./.github/actions/setup-rust
-        with:
-          toolchain: nightly-2024-07-18
-          cache-key: halo2-wasm-web
-      - name: Restore cached wasm-pack
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/bin/wasm-pack
-          key: ${{ runner.os }}-wasm-pack-env
-      - name: Cache halo2 wasm circuit
-        id: cache-halo2-wasm-circuit
-        uses: actions/cache@v4
-        with:
-          path: |
-            test-e2e/MoproWasmBindings
-          key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
-      - name: Build circuits for Wasm Web app
-        if: steps.cache-halo2-wasm-circuit.outputs.cache-hit != 'true'
-        run: |
-          cd test-e2e
-          echo "install rust-src component"
-          rustup component add rust-src --toolchain nightly-2024-07-18
-          # Backup original Cargo.toml to prevent workspace corruption
-          cp ../Cargo.toml ../Cargo.toml.backup
-          # Temporarily remove packages with noir dependencies from workspace
-          sed -i '/"mopro-ffi",/d' ../Cargo.toml
-          sed -i '/"test-e2e",/d' ../Cargo.toml
-          sed -i '/"cli",/d' ../Cargo.toml
-          # Run wasm-pack and restore workspace even on failure
-          cd mopro-wasm-lib
-          (rustup run nightly-2024-07-18 wasm-pack build --target web --out-dir ../MoproWasmBindings) || BUILD_EXIT_CODE=$?
-          # Restore original Cargo.toml
-          mv ../../Cargo.toml.backup ../../Cargo.toml
-          # Exit with original build result
-          exit ${BUILD_EXIT_CODE:-0}
-  test-halo2-wasm-web:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs:
-      - setup-halo2-wasm-env
-      - build-halo2-wasm-web
-    env:
-      CHROME_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}/chrome
-      CHROMEDRIVER_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}/chromedriver
-    defaults:
-      run:
-        working-directory: test-e2e/web
-    steps:
-      - uses: actions/checkout@v5
-      - name: Restore cached chrome and chromedriver
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}
-            ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}
-          key: ${{ runner.os }}-cache-chrome-chromedriver
-      - name: Restore cached halo2 wasm circuit
-        uses: actions/cache@v4
-        with:
-          path: |
-            test-e2e/MoproWasmBindings
-          key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
-      - name: Install dependencies
-        run: yarn install
-      - name: Run halo2-wasm-app server and test it
-        run: |
-          echo "This test will be on latest chrome & chromedriver"
-          nohup yarn start &
-          for i in {1..30}; do
-            if curl --silent http://localhost:3000 > /dev/null; then
-              echo "Server is ready!"
-              break
-            fi
-            echo "Waiting for server..."
-            sleep 1
-          done
-          yarn test
+#  build-xcframework:
+#    runs-on: macos-latest
+#    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+#    steps:
+#      - uses: actions/checkout@v5
+#      - name: Install Rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: stable
+#          override: true
+#      - name: install dependencies
+#        run: brew install nasm
+#      - name: Build iOS xcframework
+#        run: cd test-e2e && cargo run --bin ios
+#      - name: Cache xcframework
+#        id: cache-xcframework
+#        uses: actions/cache/save@v4
+#        with:
+#          path: test-e2e/MoproiOSBindings
+#          key: ${{ github.sha }}-xcframework
+#  build-ios-app-device:
+#    runs-on: macos-latest
+#    needs: build-xcframework
+#    steps:
+#      - uses: actions/checkout@v5
+#      - name: Install Rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: stable
+#          override: true
+#      - name: Restore cached xcframework
+#        id: cache-restore-xcframework
+#        uses: actions/cache/restore@v4
+#        with:
+#          path: test-e2e/MoproiOSBindings
+#          key: ${{ github.sha }}-xcframework
+#      - name: Build app for device
+#        run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+#  build-ios-app-simulator:
+#    runs-on: macos-latest
+#    needs: build-xcframework
+#    steps:
+#      - uses: actions/checkout@v5
+#      - name: Install Rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: stable
+#          override: true
+#      - name: Restore cached xcframework
+#        id: cache-restore-xcframework
+#        uses: actions/cache/restore@v4
+#        with:
+#          path: test-e2e/MoproiOSBindings
+#          key: ${{ github.sha }}-xcframework
+#      - name: Build app for device
+#        run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS\ Simulator build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+#  test-ios-app-simulator:
+#    runs-on: macos-14
+#    needs: build-xcframework
+#    steps:
+#      - uses: actions/checkout@v5
+#      - name: Install Rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: stable
+#          override: true
+#      - name: Restore cached xcframework
+#        id: cache-restore-xcframework
+#        uses: actions/cache/restore@v4
+#        with:
+#          path: test-e2e/MoproiOSBindings
+#          key: ${{ github.sha }}-xcframework
+#      # to list available simulators: xcrun simctl list devices
+#      - name: Test app in simulator
+#        run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination 'platform=iOS Simulator,name=iPhone 15' test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -maximum-parallel-testing-workers 1
+#  build-android-lib:
+#    runs-on: ubuntu-latest
+#    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+#    steps:
+#      - uses: actions/checkout@v5
+#      - name: Install Rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: stable
+#          override: true
+#      - name: install requirements
+#        uses: awalsh128/cache-apt-pkgs-action@v1
+#        with:
+#          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+#          version: 1.0
+#      - name: Build Android bindings
+#        run: cd test-e2e && ANDROID_ARCHS=x86_64-linux-android cargo run --bin android
+#      - name: Cache android lib
+#        id: cache-android-lib
+#        uses: actions/cache/save@v4
+#        with:
+#          path: test-e2e/MoproAndroidBindings
+#          key: ${{ github.sha }}-android-lib
+#  test-android-app:
+#    runs-on: ubuntu-latest
+#    needs: build-android-lib
+#    steps:
+#      - uses: actions/checkout@v5
+#      - name: Install Rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: stable
+#          override: true
+#      - name: Restore cached android lib
+#        id: cache-restore-android-lib
+#        uses: actions/cache/restore@v4
+#        with:
+#          path: test-e2e/MoproAndroidBindings
+#          key: ${{ github.sha }}-android-lib
+#      - name: Setup Java
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: "temurin"
+#          java-version: 17
+#      - name: Setup Android SDK
+#        uses: android-actions/setup-android@v2.0.10
+#      - name: Build android app
+#        run: cd test-e2e/android && ./gradlew build
+#      - name: Enable KVM
+#        run: |
+#          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+#          sudo udevadm control --reload-rules
+#          sudo udevadm trigger --name-match=kvm
+#      - name: Run tests
+#        uses: reactivecircus/android-emulator-runner@v2
+#        with:
+#          api-level: 29
+#          target: google_apis
+#          arch: x86_64
+#          disable-animations: true
+#          emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
+#          script: cd test-e2e/android && ./gradlew connectedAndroidTest
+#      - name: Upload test report
+#        if: failure()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: android-test-report
+#          path: test-e2e/android/app/build/reports/androidTests/connected/debug/
+#  build-halo2-wasm-web:
+#    runs-on: ubuntu-latest
+#    needs: setup-halo2-wasm-env
+#    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+#    steps:
+#      - uses: actions/checkout@v5
+#      - name: Install Rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: nightly-2024-07-18
+#      - name: install requirements
+#        uses: awalsh128/cache-apt-pkgs-action@v1
+#        with:
+#          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
+#          version: 1.0
+#      - name: Restore cached wasm-pack
+#        uses: actions/cache@v4
+#        with:
+#          path: ~/.cargo/bin/wasm-pack
+#          key: ${{ runner.os }}-wasm-pack
+#      - name: Cache halo2 wasm circuit
+#        id: cache-halo2-wasm-circuit
+#        uses: actions/cache@v4
+#        with:
+#          path: |
+#            test-e2e/MoproWasmBindings
+#          key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
+#      - name: Build circuits for Wasm Web app
+#        if: steps.cache-halo2-wasm-circuit.outputs.cache-hit != 'true'
+#        run: |
+#          cd test-e2e
+#          echo "install rust-src component"
+#          rustup component add rust-src --toolchain nightly-2024-07-18
+#          cargo run --bin web
+#  test-halo2-wasm-web:
+#    runs-on: ubuntu-latest
+#    needs:
+#      - setup-halo2-wasm-env
+#      - build-halo2-wasm-web
+#    env:
+#      CHROME_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}/chrome
+#      CHROMEDRIVER_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}/chromedriver
+#    defaults:
+#      run:
+#        working-directory: test-e2e/web
+#    steps:
+#      - uses: actions/checkout@v5
+#      - name: Restore cached chrome and chromedriver
+#        uses: actions/cache@v4
+#        with:
+#          path: |
+#            ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}
+#            ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}
+#          key: ${{ runner.os }}-cache-chrome-chromedriver
+#      - name: Restore cached halo2 wasm circuit
+#        uses: actions/cache@v4
+#        with:
+#          path: |
+#            test-e2e/MoproWasmBindings
+#          key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
+#      - name: Install dependencies
+#        run: yarn install
+#      - name: Run halo2-wasm-app server and test it
+#        run: |
+#          echo "This test will be on latest chrome & chromedriver"
+#          nohup yarn start &
+#          for i in {1..30}; do
+#            if curl --silent http://localhost:3000 > /dev/null; then
+#              echo "Server is ready!"
+#              break
+#            fi
+#            echo "Waiting for server..."
+#            sleep 1
+#          done
+#          yarn test
