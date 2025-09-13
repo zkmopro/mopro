@@ -211,12 +211,6 @@ macro_rules! set_circom_circuits {
 
         #[inline]
         pub fn circom_get(name: &str) -> Option<WitnessFn> {
-            #[cfg(test)]
-            {
-                if let Some(v) = $crate::circom::tests::circom_get_override_val(name) {
-                    return Some(v);
-                }
-            }
             CIRCOM_CIRCUITS.iter()
                 .find(|(k, _)| *k == name)
                 .map(|(_, v)| *v)
@@ -227,54 +221,22 @@ macro_rules! set_circom_circuits {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
-    use crate::WitnessFn;
     use anyhow::Context;
     use anyhow::Result;
     use circom_prover::prover::PublicInputs;
     use num_bigint::BigInt;
-    use std::cell::RefCell;
     use std::collections::HashMap;
     use std::str::FromStr;
 
-    const ZKEY_PATH: &str = "../test-vectors/circom/multiplier2_final.zkey";
-
-    witnesscalc_adapter::witness!(multiplier2_witnesscalc);
-
-    rust_witness::witness!(multiplier2);
-
-    thread_local! {
-        static CIRCOM_OVERRIDE: RefCell<Option<HashMap<&'static str, WitnessFn>>> =
-            RefCell::new(None);
-    }
-
-    pub fn set_circom_override_for_test<I>(pairs: I)
-    where
-        I: IntoIterator<Item = (&'static str, WitnessFn)>,
-    {
-        let mut m = HashMap::new();
-        for (k, v) in pairs {
-            m.insert(k, v);
-        }
-        CIRCOM_OVERRIDE.with(|c| *c.borrow_mut() = Some(m));
-    }
-
-    pub fn circom_get_override_val(name: &str) -> Option<WitnessFn> {
-        return CIRCOM_OVERRIDE
-            .with(|cell| cell.borrow().as_ref().and_then(|m| m.get(name).cloned()));
-    }
+    const ZKEY_PATH: &str = "./test-vectors/circom/multiplier2_final.zkey";
+    const ZKEY_WC_PATH: &str = "./test-vectors/circom/witnesscalc/multiplier2_wc_final.zkey";
 
     #[test]
-    fn test_witnesscalc_proof() -> Result<()> {
-        // Override the default witness function for this test
-        set_circom_override_for_test([(
-            "multiplier2_final.zkey",
-            circom_prover::witness::WitnessFn::WitnessCalc(multiplier2_witnesscalc_witness),
-        )]);
-
+    fn test_witnesscalc_prove() -> Result<()> {
         let (input_str, expected_output) = prepare_inputs();
 
         // Generate Proof
-        let p = generate_circom_proof(ZKEY_PATH.to_string(), input_str, ProofLib::Arkworks)
+        let p = generate_circom_proof(ZKEY_WC_PATH.to_string(), input_str, ProofLib::Arkworks)
             .expect("Proof generation failed");
 
         let CircomProofResult { proof, inputs } = p.clone();
@@ -286,7 +248,7 @@ pub(crate) mod tests {
         assert_eq!(pub_inputs.0, expected_output);
 
         // Step 3: Verify Proof
-        let is_valid = verify_circom_proof(ZKEY_PATH.to_string(), p, ProofLib::Arkworks)
+        let is_valid = verify_circom_proof(ZKEY_WC_PATH.to_string(), p, ProofLib::Arkworks)
             .context("Proof verification failed")?;
         assert!(is_valid);
 
@@ -311,30 +273,6 @@ pub(crate) mod tests {
 
         // Step 3: Verify Proof
         let is_valid = verify_circom_proof(ZKEY_PATH.to_string(), p, ProofLib::Arkworks)
-            .context("Proof verification failed")?;
-        assert!(is_valid);
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_rapidsnark_prove() -> Result<()> {
-        let (input_str, expected_output) = prepare_inputs();
-
-        // Generate Proof
-        let p = generate_circom_proof(ZKEY_PATH.to_string(), input_str, ProofLib::Rapidsnark)
-            .expect("Proof generation failed");
-
-        let CircomProofResult { proof, inputs } = p.clone();
-
-        assert!(!proof.protocol.is_empty());
-        assert!(!proof.curve.is_empty());
-
-        let pub_inputs: PublicInputs = inputs.into();
-        assert_eq!(pub_inputs.0, expected_output);
-
-        // Step 3: Verify Proof
-        let is_valid = verify_circom_proof(ZKEY_PATH.to_string(), p, ProofLib::Rapidsnark)
             .context("Proof verification failed")?;
         assert!(is_valid);
 

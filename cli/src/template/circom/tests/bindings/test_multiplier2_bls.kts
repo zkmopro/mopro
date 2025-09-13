@@ -1,7 +1,7 @@
 import uniffi.mopro.*
 
 try {
-    var zkeyPath = "../test-vectors/circom/multiplier2_bls_final.zkey"
+    var zkeyPath = "./test-vectors/circom/multiplier2_bls_final.zkey"
 
     val input_str: String = "{\"b\":[\"5\"],\"a\":[\"3\"]}"
 

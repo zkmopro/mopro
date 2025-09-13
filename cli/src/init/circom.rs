@@ -12,6 +12,7 @@ impl ProvingSystem for Circom {
 
     const DEPENDENCIES: &'static str = r#"
 circom-prover = { git = "https://github.com/zkmopro/mopro.git", features = ["rapidsnark"] }
+witnesscalc-adapter = "0.1"
 rust-witness  = "0.1"
 num-bigint    = "0.4.0"
     "#;
@@ -24,7 +25,6 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.94"
 
 circom-prover = { git = "https://github.com/zkmopro/mopro.git", features = ["rapidsnark", "witnesscalc"] }
-witnesscalc-adapter = "0.1"
     "#;
 
     const BUILD_TEMPLATE: &'static str = r#"
