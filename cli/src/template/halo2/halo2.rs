@@ -130,9 +130,9 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_plonk_proof() {
-        const SRS_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_srs.bin";
-        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_pk.bin";
-        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/plonk_fibonacci_vk.bin";
+        const SRS_KEY_PATH: &str = "./test-vectors/halo2/plonk_fibonacci_srs.bin";
+        const PROVING_KEY_PATH: &str = "./test-vectors/halo2/plonk_fibonacci_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "./test-vectors/halo2/plonk_fibonacci_vk.bin";
 
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec!["55".to_string()]);
@@ -156,9 +156,9 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_hyperplonk_proof() {
-        const SRS_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_srs.bin";
-        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_pk.bin";
-        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/hyperplonk_fibonacci_vk.bin";
+        const SRS_KEY_PATH: &str = "./test-vectors/halo2/hyperplonk_fibonacci_srs.bin";
+        const PROVING_KEY_PATH: &str = "./test-vectors/halo2/hyperplonk_fibonacci_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "./test-vectors/halo2/hyperplonk_fibonacci_vk.bin";
 
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec!["55".to_string()]);
@@ -182,9 +182,9 @@ mod test {
 
     #[test]
     fn test_generate_and_verify_gemini_proof() {
-        const SRS_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_srs.bin";
-        const PROVING_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_pk.bin";
-        const VERIFYING_KEY_PATH: &str = "../test-vectors/halo2/gemini_fibonacci_vk.bin";
+        const SRS_KEY_PATH: &str = "./test-vectors/halo2/gemini_fibonacci_srs.bin";
+        const PROVING_KEY_PATH: &str = "./test-vectors/halo2/gemini_fibonacci_pk.bin";
+        const VERIFYING_KEY_PATH: &str = "./test-vectors/halo2/gemini_fibonacci_vk.bin";
 
         let mut input = HashMap::new();
         input.insert("out".to_string(), vec!["55".to_string()]);
