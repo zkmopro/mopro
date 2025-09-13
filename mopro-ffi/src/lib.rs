@@ -31,16 +31,6 @@ macro_rules! uniffi_setup {
     };
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum MoproError {
-    #[error("CircomError: {0}")]
-    CircomError(String),
-    #[error("Halo2Error: {0}")]
-    Halo2Error(String),
-    #[error("NoirError: {0}")]
-    NoirError(String),
-}
-
 /// This macro is used to setup the Mopro FFI library
 /// It should be included in the `lib.rs` file of the project
 ///
@@ -113,17 +103,6 @@ macro_rules! app {
             Halo2Error(String),
             #[error("NoirError: {0}")]
             NoirError(String),
-        }
-
-        impl From<mopro_ffi::MoproError> for MoproError {
-            fn from(err: mopro_ffi::MoproError) -> Self {
-                match err {
-                    mopro_ffi::MoproError::CircomError(e) => Self::CircomError(e),
-                    mopro_ffi::MoproError::Halo2Error(e) => Self::Halo2Error(e),
-                    mopro_ffi::MoproError::NoirError(e) => Self::NoirError(e),
-                    _ => panic!("Unhandled error type: {}", err),
-                }
-            }
         }
     };
 }
