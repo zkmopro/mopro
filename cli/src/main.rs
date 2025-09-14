@@ -102,6 +102,13 @@ enum Commands {
             help = "path to the circuit directory (it should contain `.wtns` and `.zkey` files)"
         )]
         circuit_dir: Option<String>,
+        #[arg(
+            long,
+            help = "Specify the witness generator adapter (e.g., 'rust-witness' or 'witnesscalc')."
+        )]
+        adapter: Option<String>,
+        #[arg(long, help = "Specify the output directory for bindings.")]
+        output_dir: Option<String>,
         #[arg(long, help = "Show instruction message for build")]
         show: bool,
     },
@@ -120,7 +127,7 @@ fn main() {
                 print::print_init_instructions("<PROJECT NAME>".to_string());
                 return;
             }
-            match init::init_project(adapter, project_name) {
+            match init::init_project(adapter, project_name, false) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to initialize project: {e:?}")),
             }
@@ -137,13 +144,14 @@ fn main() {
                 print::print_build_success_message();
                 return;
             }
-            let auto_update_flag = match (*auto_update, *no_auto_update) {
-                (true, _) => Some(true),
-                (_, true) => Some(false),
-                _ => None,
+            let auto_update_flag = if *auto_update {
+                Some(true)
+            } else if *no_auto_update {
+                Some(false)
+            } else {
+                None
             };
-
-            match build::build_project(mode, platforms, architectures, auto_update_flag) {
+            match build::build_project(mode, platforms, architectures, auto_update_flag, false) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
             }
@@ -194,12 +202,21 @@ fn main() {
             architectures,
             circuit_dir,
             show,
+            adapter,
+            output_dir,
         } => {
             if *show {
                 // TODO: print bindgen instructions
                 return;
             }
-            match bindgen::bindgen(mode, platforms, architectures, circuit_dir) {
+            match bindgen::bindgen(
+                mode,
+                platforms,
+                architectures,
+                circuit_dir,
+                adapter,
+                output_dir,
+            ) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to generate bindings: {e:?}")),
             }

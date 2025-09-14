@@ -169,6 +169,7 @@ pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<Option<P
             &Some(vec![platform.as_str().to_string()]),
             &None,
             Some(false),
+            false,
         )?;
 
         if bindings_dir.exists() && fs::read_dir(&bindings_dir)?.count() > 0 {
