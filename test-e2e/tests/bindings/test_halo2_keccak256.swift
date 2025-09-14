@@ -1,5 +1,5 @@
 import Foundation
-import mopro_bindings
+import MoproBindings
 
 do {
   let srsPath = "../../../test-vectors/halo2/keccak256_srs.bin"
