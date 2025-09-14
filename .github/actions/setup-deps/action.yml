@@ -1,0 +1,24 @@
+name: 'Setup Build Dependencies'
+description: 'Install and cache system dependencies for building'
+inputs:
+  platform:
+    description: 'Platform (linux, macos)'
+    required: false
+    default: 'linux'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Linux dependencies
+      if: inputs.platform == 'linux'
+      uses: awalsh128/cache-apt-pkgs-action@v1
+      with:
+        packages: curl xz-utils build-essential cmake m4 nasm libstdc++6 protobuf-compiler
+        version: 1.0
+    
+    - name: Install macOS dependencies
+      if: inputs.platform == 'macos'
+      shell: bash
+      run: |
+        if ! command -v nasm &> /dev/null; then
+          brew install nasm
+        fi

@@ -1,0 +1,34 @@
+name: 'Setup Rust with Cache'
+description: 'Install Rust toolchain and configure caching'
+inputs:
+  toolchain:
+    description: 'Rust toolchain to install'
+    required: false
+    default: 'stable'
+  cache-key:
+    description: 'Additional cache key'
+    required: false
+    default: ''
+  workspaces:
+    description: 'Workspace directory for caching'
+    required: false
+    default: '.'
+  cache-targets:
+    description: 'Whether to cache compilation targets'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ inputs.toolchain }}
+    
+    - name: Cache cargo registry and build
+      uses: Swatinem/rust-cache@v2
+      with:
+        key: v1-rust-${{ inputs.cache-key }}
+        workspaces: ${{ inputs.workspaces }}
+        cache-targets: ${{ inputs.cache-targets }}
+        cache-on-failure: true
