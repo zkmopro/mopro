@@ -1,5 +1,5 @@
 import java.io.File
-import uniffi.mopro_bindings.*
+import uniffi.MoproBindings.*
 
 fun testNoirMultiplier2() {
     try {
