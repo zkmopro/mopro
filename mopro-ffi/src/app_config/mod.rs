@@ -122,27 +122,12 @@ pub fn project_name_from_toml(project_dir: &Path) -> anyhow::Result<String> {
         .and_then(|lib| lib.as_str())
         .map(|s| s.to_string())
         .or_else(|| {
-            // Convert package name to PascalCase for mobile platform naming conventions
+            // '-' in the package name is replaced with '_' if we don't specify the lib name
+            // So we need to replace '-' with '_' as below
             cargo_toml
                 .get("package")
                 .and_then(|pkg| pkg.get("name"))
-                .and_then(|pkg| {
-                    pkg.as_str().map(|s| {
-                        // Replace hyphens with underscores first, then convert to PascalCase
-                        s.replace("-", "_")
-                            .split('_')
-                            .map(|word| {
-                                let mut chars = word.chars();
-                                match chars.next() {
-                                    None => String::new(),
-                                    Some(first) => {
-                                        first.to_uppercase().collect::<String>() + chars.as_str()
-                                    }
-                                }
-                            })
-                            .collect::<String>()
-                    })
-                })
+                .and_then(|pkg| pkg.as_str().map(|s| s.replace("-", "_")))
         });
 
     project_name.ok_or(anyhow::anyhow!("Failed to find project name in Cargo.toml"))
