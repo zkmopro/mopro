@@ -20,9 +20,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.json.JSONObject
-import uniffi.mopro.generateNoirProof
-import uniffi.mopro.verifyNoirProof
-import uniffi.mopro.getNoirVerificationKey
+import uniffi.MoproBindings.generateNoirProof
+import uniffi.MoproBindings.verifyNoirProof
+import uniffi.MoproBindings.getNoirVerificationKey
 import java.io.File
 import java.io.InputStream
 

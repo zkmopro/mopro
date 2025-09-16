@@ -12,13 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.moproapp.getFilePathFromAssets
-import uniffi.mopro.CircomProofResult
-import uniffi.mopro.CircomProof
-import uniffi.mopro.G1
-import uniffi.mopro.G2
-import uniffi.mopro.generateCircomProof
-import uniffi.mopro.verifyCircomProof
-import uniffi.mopro.ProofLib
+import uniffi.{{PACKAGE_NAME}}.CircomProofResult
+import uniffi.{{PACKAGE_NAME}}.CircomProof
+import uniffi.{{PACKAGE_NAME}}.G1
+import uniffi.{{PACKAGE_NAME}}.G2
+import uniffi.{{PACKAGE_NAME}}.generateCircomProof
+import uniffi.{{PACKAGE_NAME}}.verifyCircomProof
+import uniffi.{{PACKAGE_NAME}}.ProofLib
 
 @Composable
 fun MultiplierComponent() {

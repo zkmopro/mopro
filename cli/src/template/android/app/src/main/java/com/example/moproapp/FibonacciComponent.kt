@@ -15,9 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import uniffi.mopro.Halo2ProofResult
-import uniffi.mopro.generateHalo2Proof
-import uniffi.mopro.verifyHalo2Proof
+import uniffi.{{PACKAGE_NAME}}.Halo2ProofResult
+import uniffi.{{PACKAGE_NAME}}.generateHalo2Proof
+import uniffi.{{PACKAGE_NAME}}.verifyHalo2Proof
 
 @Composable
 fun FibonacciComponent() {

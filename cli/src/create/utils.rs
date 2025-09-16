@@ -17,6 +17,7 @@ use reqwest::blocking::Client;
 use zip::ZipArchive;
 
 use mopro_ffi::app_config::constants::{ANDROID_JNILIBS_DIR, ANDROID_UNIFFI_DIR};
+use mopro_ffi::app_config::{project_name_from_toml, snake_to_pascal_case};
 
 use crate::{build::build_project, constants::Platform, style};
 
@@ -106,6 +107,48 @@ pub fn copy_embedded_dir(dir: &Dir, output_dir: &Path) -> Result<()> {
             }
             None => {
                 copy_embedded_dir(file.as_dir().unwrap(), output_dir)?;
+            }
+        }
+    }
+    Ok(())
+}
+
+pub fn copy_embedded_dir_with_substitution(
+    dir: &Dir,
+    output_dir: &Path,
+    project_dir: &Path,
+) -> Result<()> {
+    // Compute package name for template substitution
+    let uniffi_identifier = project_name_from_toml(project_dir)?;
+    let package_name = snake_to_pascal_case(&uniffi_identifier);
+
+    for file in dir.entries() {
+        let relative_path = file.path();
+        let output_path = output_dir.join(relative_path);
+        // Create directories as needed
+        if let Some(parent) = output_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        // Write the file to the output directory
+        match file.as_file() {
+            Some(file) => {
+                let content = String::from_utf8_lossy(file.contents());
+                let substituted_content = content.replace("{{PACKAGE_NAME}}", &package_name);
+
+                if let Err(e) = fs::write(&output_path, substituted_content.as_bytes()) {
+                    if e.kind() == ErrorKind::AlreadyExists {
+                        println!("File already exists: {output_path:?}");
+                    } else {
+                        return Err(e.into());
+                    }
+                }
+            }
+            None => {
+                copy_embedded_dir_with_substitution(
+                    file.as_dir().unwrap(),
+                    output_dir,
+                    project_dir,
+                )?;
             }
         }
     }

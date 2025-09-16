@@ -16,9 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import uniffi.mopro.Halo2ProofResult
-import uniffi.mopro.generateHalo2Proof
-import uniffi.mopro.verifyHalo2Proof
+import uniffi.MoproBindings.Halo2ProofResult
+import uniffi.MoproBindings.generateHalo2Proof
+import uniffi.MoproBindings.verifyHalo2Proof
 
 @Composable
 fun FibonacciComponent() {
