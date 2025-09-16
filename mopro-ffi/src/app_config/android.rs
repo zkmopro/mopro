@@ -8,12 +8,12 @@ use uniffi::generate_bindings_library_mode;
 use uniffi::CargoMetadataConfigSupplier;
 use uniffi::KotlinBindingGenerator;
 
-use crate::app_config::{project_name_from_toml, PlatformBuilder};
+use crate::app_config::{project_name_from_toml, snake_to_pascal_case, PlatformBuilder};
 
 use super::cleanup_tmp_local;
 use super::constants::{
     AndroidArch, AndroidPlatform, Arch, Mode, ANDROID_BINDINGS_DIR, ANDROID_KT_FILE,
-    ANDROID_PACKAGE_NAME, ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64,
+    ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64,
 };
 use super::install_arch;
 use super::install_ndk;
@@ -40,9 +40,12 @@ impl PlatformBuilder for AndroidPlatform {
         let uniffi_style_identifier = project_name_from_toml(project_dir)
             .expect("Failed to get project name from Cargo.toml");
 
+        // Create PascalCase version for mobile platform naming conventions
+        let pascal_case_identifier = snake_to_pascal_case(&uniffi_style_identifier);
+
         // Names for the files that will be outputted (can be changed)
         let binding_dir_name = ANDROID_BINDINGS_DIR;
-        let out_android_package_name = ANDROID_PACKAGE_NAME;
+        let out_android_package_name = &pascal_case_identifier;
         let out_android_kt_file_name = ANDROID_KT_FILE;
 
         // Names for the generated files by uniffi
@@ -75,7 +78,7 @@ impl PlatformBuilder for AndroidPlatform {
             gen_android_module_name,
             &gen_android_kt_file_name,
             out_android_package_name,
-            &out_android_kt_file_name,
+            out_android_kt_file_name,
             &bindings_out,
         )
         .expect("Failed to reformat generated Kotlin package");
@@ -184,7 +187,7 @@ fn reformat_kotlin_package(
     gen_android_module_name: &str,
     gen_android_kt_file_name: &str,
     out_android_module_name: &str,
-    out_android_kt_file_name: &&str,
+    out_android_kt_file_name: &str,
     bindings_out: &Path,
 ) -> anyhow::Result<()> {
     let generated_kt_file = bindings_out

@@ -106,6 +106,8 @@ pub fn install_arch(arch: String) {
         .unwrap_or_else(|_| panic!("Failed to install target architecture {arch}"));
 }
 
+/// Gets the project name from Cargo.toml in snake_case format (e.g., "mopro_bindings")
+/// This is used for uniffi-style identifiers and library file names
 pub fn project_name_from_toml(project_dir: &Path) -> anyhow::Result<String> {
     let cargo_toml_path = project_dir.join("Cargo.toml");
     let cargo_toml_content =
@@ -131,6 +133,21 @@ pub fn project_name_from_toml(project_dir: &Path) -> anyhow::Result<String> {
         });
 
     project_name.ok_or(anyhow::anyhow!("Failed to find project name in Cargo.toml"))
+}
+
+/// Converts a snake_case identifier to PascalCase (e.g., "mopro_bindings" -> "MoproBindings")
+/// This is used for mobile platform naming conventions (class names, framework names)
+pub fn snake_to_pascal_case(snake_case: &str) -> String {
+    snake_case
+        .split('_')
+        .map(|word| {
+            let mut chars = word.chars();
+            match chars.next() {
+                None => String::new(),
+                Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+            }
+        })
+        .collect::<String>()
 }
 
 fn get_project_dir() -> PathBuf {

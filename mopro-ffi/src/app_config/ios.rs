@@ -13,7 +13,7 @@ use super::constants::{
     IOS_XCFRAMEWORKS_DIR,
 };
 use super::mktemp_local;
-use super::{cleanup_tmp_local, project_name_from_toml};
+use super::{cleanup_tmp_local, project_name_from_toml, snake_to_pascal_case};
 use super::{install_arch, PlatformBuilder};
 
 // Maintained for backwards compatibility
@@ -39,6 +39,9 @@ impl PlatformBuilder for IosPlatform {
     ) -> anyhow::Result<PathBuf> {
         let uniffi_style_identifier = project_name_from_toml(project_dir)
             .expect("Failed to get project name from Cargo.toml");
+
+        // Create PascalCase version for mobile platform naming conventions
+        let pascal_case_identifier = snake_to_pascal_case(&uniffi_style_identifier);
 
         // Names for the files that will be outputted (can be changed)
         let bindings_dir_name = IOS_BINDINGS_DIR;
@@ -164,7 +167,7 @@ impl PlatformBuilder for IosPlatform {
             &framework_out,
             &header_name,
             &modulemap_name,
-            &uniffi_style_identifier,
+            &pascal_case_identifier,
         )
         .expect("Failed to generate header artifacts");
 
