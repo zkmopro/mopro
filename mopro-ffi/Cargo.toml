@@ -15,8 +15,10 @@ name = "mopro_ffi"
 [features]
 default = ["build"]
 
-uniffi = []
-uniffi-tests = ["uniffi", "uniffi/bindgen-tests"]
+uniffi = ["dep:uniffi"]
+uniffi-tests = ["dep:uniffi", "uniffi/bindgen-tests"]
+
+flutter = ["toml", "flutter_rust_bridge"]
 
 halo2 = []
 circom = ["rustwitness", "arkworks"]
@@ -37,13 +39,16 @@ rapidsnark = ["circom-prover/rapidsnark"]
 circom-all = ["rustwitness", "witnesscalc", "arkworks", "rapidsnark"]
 
 [dependencies]
-uniffi = { workspace = true, features = ["bindgen"] }
+uniffi = { workspace = true, features = ["bindgen"], optional = true }
 num-bigint = { version = "0.4.3", default-features = false, features = [
     "rand",
 ] }
 toml = { version = "0.8.22", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.94"
+
+# Flutter
+flutter_rust_bridge = { version = "=2.11.1", optional = true }
 
 # Error handling
 thiserror = "2.0.12"

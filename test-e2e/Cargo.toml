@@ -16,14 +16,18 @@ name = "android"
 [[bin]]
 name = "web"
 
+[[bin]]
+name = "flutter"
+
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = [
-    "uniffi",
-    "halo2",
+    # "uniffi",
+    # "halo2",
     "circom",
-    "noir",
-    "witnesscalc",
-    "rapidsnark",
+    # "noir",
+    # "witnesscalc",
+    # "rapidsnark",
+    "flutter"
 ] }
 mopro-wasm = { path = "../mopro-wasm" }
 

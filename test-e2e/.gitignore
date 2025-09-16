@@ -2,3 +2,4 @@ build/
 MoproAndroidBindings/
 MoproiOSBindings/
 MoproWasmBindings/
+mopro_flutter_bindings/
