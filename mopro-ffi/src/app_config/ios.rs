@@ -131,13 +131,18 @@ impl PlatformBuilder for IosPlatform {
         generate_ios_bindings(&out_dylib_path, &swift_bindings_dir)
             .expect("Failed to generate bindings for iOS");
 
-        fs::rename(
-            swift_bindings_dir.join(&gen_swift_file_name),
-            bindings_out.join(out_swift_file_name),
+        // Fix only the module import names (canImport/import), not function calls
+        let generated_swift_file = swift_bindings_dir.join(&gen_swift_file_name);
+        reformat_swift_module_imports(
+            &generated_swift_file,
+            &uniffi_style_identifier,
+            &pascal_case_identifier,
         )
-        .context(format!(
-            "Failed to rename bindings from {gen_swift_file_name}"
-        ))?;
+        .expect("Failed to reformat Swift module imports");
+
+        fs::rename(generated_swift_file, bindings_out.join(out_swift_file_name)).context(
+            format!("Failed to rename bindings from {gen_swift_file_name}"),
+        )?;
 
         let mut xcbuild_cmd = Command::new("xcodebuild");
         // The dependencies of Noir libraries need iOS 15 and above.
@@ -258,8 +263,21 @@ pub fn regroup_header_artifacts(
 
         // ── move & rename ────────────────────────────────────────
         if modmap_src.exists() {
-            fs::rename(&modmap_src, target_dir.join("module.modulemap"))
-                .with_context(|| format!("moving {modmap_src:?}"))?;
+            let target_modulemap = target_dir.join("module.modulemap");
+            // Read the original modulemap and fix the module name
+            let modulemap_content = fs::read_to_string(&modmap_src)
+                .with_context(|| format!("reading modulemap {modmap_src:?}"))?;
+
+            // Replace the module name to use PascalCase format
+            let fixed_content = fix_modulemap_module_name(&modulemap_content, project_name);
+
+            // Write the fixed content to the new location
+            fs::write(&target_modulemap, fixed_content)
+                .with_context(|| format!("writing fixed modulemap to {target_modulemap:?}"))?;
+
+            // Remove the original
+            fs::remove_file(&modmap_src)
+                .with_context(|| format!("removing original modulemap {modmap_src:?}"))?;
         }
         if header_src.exists() {
             fs::rename(&header_src, target_dir.join(header_name))
@@ -290,4 +308,42 @@ fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Resul
     )
     .map_err(|e| Error::other(e.to_string()))?;
     Ok(())
+}
+
+fn fix_modulemap_module_name(modulemap_content: &str, pascal_case_identifier: &str) -> String {
+    modulemap_content
+        .lines()
+        .map(|line| {
+            if line.contains("module ") && line.contains("FFI {") {
+                // Replace only the module name, keep everything else
+                let trimmed = line.trim();
+                let indent = &line[..line.len() - trimmed.len()];
+                format!("{}module {}FFI {{", indent, pascal_case_identifier)
+            } else {
+                line.to_string()
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+fn reformat_swift_module_imports(
+    swift_file_path: &Path,
+    uniffi_identifier: &str,
+    pascal_case_identifier: &str,
+) -> anyhow::Result<()> {
+    let content =
+        fs::read_to_string(swift_file_path).context("Failed to read generated Swift file")?;
+
+    let modified_content = content
+        .replace(
+            &format!("canImport({}FFI)", uniffi_identifier),
+            &format!("canImport({}FFI)", pascal_case_identifier),
+        )
+        .replace(
+            &format!("import {}FFI", uniffi_identifier),
+            &format!("import {}FFI", pascal_case_identifier),
+        );
+
+    fs::write(swift_file_path, modified_content).context("Failed to write modified Swift file")
 }
