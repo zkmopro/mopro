@@ -3,14 +3,15 @@ use std::{env, fs, path::PathBuf};
 
 use super::Create;
 use crate::constants::Platform;
-use crate::create::utils::{
-    check_bindings, copy_android_bindings, copy_keys, download_and_extract_template,
-};
+use crate::create::utils::{check_bindings, copy_keys, download_and_extract_template};
 use crate::print::print_footer_message;
 use crate::style::print_green_bold;
 use crate::update::{update_file, update_folder};
+use mopro_ffi::app_config::{project_name_from_toml, snake_to_pascal_case};
 
-use mopro_ffi::app_config::constants::{IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR};
+use mopro_ffi::app_config::constants::{
+    ANDROID_JNILIBS_DIR, ANDROID_KT_FILE, ANDROID_UNIFFI_DIR, IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR,
+};
 
 pub struct Flutter;
 
@@ -39,6 +40,13 @@ impl Create for Flutter {
         let flutter_dir = project_dir.join("flutter-app-main");
         fs::rename(flutter_dir, &target_dir)?;
 
+        // Compute dynamic package name based on project (used for template substitution and Android bindings)
+        let uniffi_identifier = project_name_from_toml(&project_dir)?;
+        let package_name = snake_to_pascal_case(&uniffi_identifier);
+
+        // Apply dynamic package name substitution to the downloaded template
+        apply_package_name_substitution(&target_dir, &package_name)?;
+
         let mopro_flutter_plugin_dir = target_dir.join("mopro_flutter_plugin");
         let previous_dir = env::current_dir()?;
         env::set_current_dir(&mopro_flutter_plugin_dir)?;
@@ -54,8 +62,15 @@ impl Create for Flutter {
 
         // Handle Android if provided
         if let Some(android_dir) = android_bindings_dir {
+            let jnilib_path = android_dir.join(ANDROID_JNILIBS_DIR);
+            let kotlin_path = android_dir
+                .join(ANDROID_UNIFFI_DIR)
+                .join(&package_name)
+                .join(ANDROID_KT_FILE);
+
             let current_dir = env::current_dir()?;
-            copy_android_bindings(&android_dir, &current_dir, "kotlin")?;
+            let _ = update_file(&kotlin_path, &current_dir, ANDROID_KT_FILE)?;
+            let _ = update_folder(&jnilib_path, &current_dir, ANDROID_JNILIBS_DIR, true)?;
         }
         env::set_current_dir(previous_dir)?;
 
@@ -82,4 +97,32 @@ impl Create for Flutter {
         );
         print_footer_message();
     }
+}
+
+fn apply_package_name_substitution(target_dir: &PathBuf, package_name: &str) -> Result<(), Error> {
+    // Update MoproFlutterPlugin.kt with {{PACKAGE_NAME}} placeholder
+    let plugin_file = target_dir
+        .join("mopro_flutter_plugin")
+        .join("android")
+        .join("src")
+        .join("main")
+        .join("kotlin")
+        .join("com")
+        .join("example")
+        .join("mopro_flutter")
+        .join("MoproFlutterPlugin.kt");
+
+    if plugin_file.exists() {
+        let content = fs::read_to_string(&plugin_file)?;
+        let updated_content = content.replace("{{PACKAGE_NAME}}", &package_name);
+        fs::write(&plugin_file, updated_content)?;
+        println!(
+            "Updated Flutter template with package name: {}",
+            package_name
+        );
+    } else {
+        println!("Warning: Flutter plugin file not found at expected path");
+    }
+
+    Ok(())
 }
