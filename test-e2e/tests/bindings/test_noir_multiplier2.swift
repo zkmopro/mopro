@@ -1,5 +1,5 @@
 import Foundation
-import MoproBindings
+import mopro_bindings
 
 // Test the generateNoirProof and verifyNoirProof functions
 func testNoirMultiplier2() {

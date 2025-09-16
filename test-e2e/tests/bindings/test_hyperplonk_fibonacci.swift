@@ -1,5 +1,5 @@
 import Foundation
-import MoproBindings
+import mopro_bindings
 
 do {
   let srsPath = "../../../test-vectors/halo2/hyperplonk_fibonacci_srs.bin"

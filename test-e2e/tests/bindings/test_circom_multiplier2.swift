@@ -1,5 +1,5 @@
 import Foundation
-import MoproBindings
+import mopro_bindings
 
 func serializeOutputs(_ stringArray: [String]) -> [UInt8] {
   var bytesArray: [UInt8] = []
