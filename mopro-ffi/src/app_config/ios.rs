@@ -318,7 +318,8 @@ fn fix_modulemap_module_name(modulemap_content: &str, pascal_case_identifier: &s
                 // Replace only the module name, keep everything else
                 let trimmed = line.trim();
                 let indent = &line[..line.len() - trimmed.len()];
-                format!("{}module {}FFI {{", indent, pascal_case_identifier)
+                // Trim the FFI suffix from the module name and replace with PascalCase
+                format!("{}module {} {{", indent, pascal_case_identifier)
             } else {
                 line.to_string()
             }
@@ -335,14 +336,15 @@ fn reformat_swift_module_imports(
     let content =
         fs::read_to_string(swift_file_path).context("Failed to read generated Swift file")?;
 
+    // Trim the FFI suffix from the module name and replace with PascalCase
     let modified_content = content
         .replace(
             &format!("canImport({}FFI)", uniffi_identifier),
-            &format!("canImport({}FFI)", pascal_case_identifier),
+            &format!("canImport({})", pascal_case_identifier),
         )
         .replace(
             &format!("import {}FFI", uniffi_identifier),
-            &format!("import {}FFI", pascal_case_identifier),
+            &format!("import {}", pascal_case_identifier),
         );
 
     fs::write(swift_file_path, modified_content).context("Failed to write modified Swift file")
