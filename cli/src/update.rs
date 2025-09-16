@@ -9,9 +9,9 @@ use crate::constants::Platform;
 use crate::print::print_update_success_message;
 use crate::style::{print_gray_items, print_green_bold};
 use mopro_ffi::app_config::constants::{
-    ANDROID_JNILIBS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ANDROID_UNIFFI_DIR, IOS_SWIFT_FILE,
-    IOS_XCFRAMEWORKS_DIR,
+    ANDROID_JNILIBS_DIR, ANDROID_KT_FILE, ANDROID_UNIFFI_DIR, IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR,
 };
+use mopro_ffi::app_config::{project_name_from_toml, snake_to_pascal_case};
 
 pub fn update_bindings(
     arg_src: &Option<String>,
@@ -211,10 +211,14 @@ fn update_platform(src_root: &Path, dest_root: &Path, platform: Platform) -> Res
             )?);
         }
         Platform::Android => {
+            // Compute dynamic package name based on project
+            let uniffi_identifier = project_name_from_toml(src_root)?;
+            let android_package_name = snake_to_pascal_case(&uniffi_identifier);
+
             let jnilib_path = platform_bindings_dir.join(ANDROID_JNILIBS_DIR);
             let kotlin_path = platform_bindings_dir
                 .join(ANDROID_UNIFFI_DIR)
-                .join(ANDROID_PACKAGE_NAME)
+                .join(&android_package_name)
                 .join(ANDROID_KT_FILE);
 
             updated_paths.extend(update_file(&kotlin_path, dest_root, ANDROID_KT_FILE)?);

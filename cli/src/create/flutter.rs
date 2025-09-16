@@ -3,15 +3,14 @@ use std::{env, fs, path::PathBuf};
 
 use super::Create;
 use crate::constants::Platform;
-use crate::create::utils::{check_bindings, copy_keys, download_and_extract_template};
+use crate::create::utils::{
+    check_bindings, copy_android_bindings, copy_keys, download_and_extract_template,
+};
 use crate::print::print_footer_message;
 use crate::style::print_green_bold;
 use crate::update::{update_file, update_folder};
 
-use mopro_ffi::app_config::constants::{
-    ANDROID_JNILIBS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ANDROID_UNIFFI_DIR, IOS_SWIFT_FILE,
-    IOS_XCFRAMEWORKS_DIR,
-};
+use mopro_ffi::app_config::constants::{IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR};
 
 pub struct Flutter;
 
@@ -55,15 +54,8 @@ impl Create for Flutter {
 
         // Handle Android if provided
         if let Some(android_dir) = android_bindings_dir {
-            let jnilib_path = android_dir.join(ANDROID_JNILIBS_DIR);
-            let kotlin_path = android_dir
-                .join(ANDROID_UNIFFI_DIR)
-                .join(ANDROID_PACKAGE_NAME)
-                .join(ANDROID_KT_FILE);
-
             let current_dir = env::current_dir()?;
-            let _ = update_file(&kotlin_path, &current_dir, ANDROID_KT_FILE)?;
-            let _ = update_folder(&jnilib_path, &current_dir, ANDROID_JNILIBS_DIR, true)?;
+            copy_android_bindings(&android_dir, &current_dir, "kotlin")?;
         }
         env::set_current_dir(previous_dir)?;
 
