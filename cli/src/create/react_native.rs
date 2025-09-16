@@ -10,7 +10,10 @@ use mopro_ffi::app_config::constants::{
     ANDROID_JNILIBS_DIR, ANDROID_KT_FILE, ANDROID_UNIFFI_DIR, IOS_SWIFT_FILE, IOS_XCFRAMEWORKS_DIR,
 };
 use mopro_ffi::app_config::{project_name_from_toml, snake_to_pascal_case};
-use std::{env, fs, path::PathBuf};
+use std::{
+    env, fs,
+    path::{Path, PathBuf},
+};
 
 pub struct ReactNative;
 
@@ -71,7 +74,7 @@ impl Create for ReactNative {
     }
 }
 
-fn apply_package_name_substitution(target_dir: &PathBuf, package_name: &str) -> Result<()> {
+fn apply_package_name_substitution(target_dir: &Path, package_name: &str) -> Result<()> {
     // Update MoproModule.kt with {{PACKAGE_NAME}} placeholder
     let module_file = target_dir
         .join("modules")
@@ -101,7 +104,7 @@ fn apply_package_name_substitution(target_dir: &PathBuf, package_name: &str) -> 
 }
 
 fn update_bindings_in_react_native_module(
-    target_dir: &PathBuf,
+    target_dir: &Path,
     ios_bindings_dir: Option<PathBuf>,
     android_bindings_dir: Option<PathBuf>,
     package_name: &str,
@@ -142,7 +145,7 @@ fn update_bindings_in_react_native_module(
     Ok(())
 }
 
-fn setup_assets_directory(target_dir: &PathBuf) -> Result<()> {
+fn setup_assets_directory(target_dir: &Path) -> Result<()> {
     let assets_dir = target_dir.join("assets/keys");
 
     if assets_dir.exists() {

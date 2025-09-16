@@ -1,5 +1,8 @@
 use anyhow::Error;
-use std::{env, fs, path::PathBuf};
+use std::{
+    env, fs,
+    path::{Path, PathBuf},
+};
 
 use super::Create;
 use crate::constants::Platform;
@@ -99,7 +102,7 @@ impl Create for Flutter {
     }
 }
 
-fn apply_package_name_substitution(target_dir: &PathBuf, package_name: &str) -> Result<(), Error> {
+fn apply_package_name_substitution(target_dir: &Path, package_name: &str) -> Result<(), Error> {
     // Update MoproFlutterPlugin.kt with {{PACKAGE_NAME}} placeholder
     let plugin_file = target_dir
         .join("mopro_flutter_plugin")
@@ -114,7 +117,7 @@ fn apply_package_name_substitution(target_dir: &PathBuf, package_name: &str) -> 
 
     if plugin_file.exists() {
         let content = fs::read_to_string(&plugin_file)?;
-        let updated_content = content.replace("{{PACKAGE_NAME}}", &package_name);
+        let updated_content = content.replace("{{PACKAGE_NAME}}", package_name);
         fs::write(&plugin_file, updated_content)?;
         println!(
             "Updated Flutter template with package name: {}",
