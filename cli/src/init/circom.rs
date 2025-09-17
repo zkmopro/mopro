@@ -30,23 +30,5 @@ circom-prover = { git = "https://github.com/zkmopro/mopro.git", features = ["rap
     const BUILD_TEMPLATE: &'static str = r#"
     rust_witness::transpile::transpile_wasm("./test-vectors/circom".to_string());
     witnesscalc_adapter::build_and_link("./test-vectors/circom/witnesscalc");
-
-    // For running the uniffi tests on macOS with `witnesscalc`,
-    // we need to set the rpath to find the
-    // `witnesscalc` generated dynamic libraries at runtime.
-    #[cfg(target_os = "macos")]
-    {
-        let out_dir = std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap());
-        let wc_dir = out_dir.join("witnesscalc/package/lib");
-
-        if wc_dir.exists() {
-            println!("cargo:rustc-link-arg=-Wl,-rpath,{}", wc_dir.display());
-        } else {
-            panic!(
-                "Expected witnesscalc lib path does not exist: {}",
-                wc_dir.display()
-            );
-        }
-    }
     "#;
 }
