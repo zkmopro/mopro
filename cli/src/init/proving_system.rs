@@ -77,9 +77,9 @@ pub(super) trait ProvingSystem {
         Ok(())
     }
 
-    fn build_template(_file_path: &str) -> anyhow::Result<()> {
+    fn build_template(file_path: &str) -> anyhow::Result<()> {
         let target = format!("// {}_TEMPLATE", Self::ADAPTER.as_str().to_uppercase());
-        append_below_string_in_file(_file_path, &target, Self::BUILD_TEMPLATE)
+        append_below_string_in_file(file_path, &target, Self::BUILD_TEMPLATE)
     }
 }
 
