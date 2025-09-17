@@ -140,11 +140,54 @@ jobs:
             export CLASSPATH="$PWD/jna-5.13.0.jar"
             cargo test --all --all-features
 
-        - name: Upload example app (per-adapter)
+        - name: Install Rust targets
+          run: |
+            rustup target add aarch64-apple-ios
+            rustup target add x86_64-linux-android
+
+        # Android toolchain (SDK + NDK) for building x86_64-linux-android
+        - name: Android SDK
+          if: always()  # required for the android build step below
+          uses: android-actions/setup-android@v3
+
+        - name: Setup NDK
+          uses: nttld/setup-ndk@v1
+          with:
+            ndk-version: r26d
+
+        - name: Build iOS (debug)
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: |
+            "$GITHUB_WORKSPACE/bin/mopro" build \
+              --mode debug \
+              --platforms ios \
+              --architectures aarch64-apple-ios
+
+        - name: Build Android (debug, x86_64)
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: |
+            "$GITHUB_WORKSPACE/bin/mopro" build \
+              --mode debug \
+              --platforms android \
+              --architectures x86_64-linux-android
+
+        - name: Build Web (debug, only for halo2)
+          if: ${{ matrix.adapter == 'halo2' }}
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: |
+            rustup target add wasm32-unknown-unknown
+            printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
+
+        - name: Upload example app (per-adapter, exclude target)
+          if: always()
           uses: actions/upload-artifact@v4
           with:
             name: mopro-example-${{ matrix.adapter }}
-            path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+            path: |
+              ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/**
+              !${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/target/**
+              !${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/**/target/**
+            if-no-files-found: error
 
   test-ffi-all:
     runs-on: ubuntu-latest
