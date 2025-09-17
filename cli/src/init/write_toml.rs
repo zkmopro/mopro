@@ -15,7 +15,7 @@ default = []
 
 [dependencies]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
-mopro-ffi = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor", features = ["uniffi"], default-features = false }
+mopro-ffi = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor", features = ["uniffi"] }
 thiserror = "2.0.12"
 anyhow = "1.0.99"
 
@@ -29,7 +29,7 @@ anyhow = "1.0.99"
 # NOIR_BUILD_DEPENDENCIES
 
 [dev-dependencies]
-mopro-ffi = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor", features = ["uniffi-tests"], default-features = false }
+mopro-ffi = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor", features = ["uniffi-tests"] }
 
 # CIRCOM_DEV_DEPENDENCIES
 # HALO2_DEV_DEPENDENCIES
