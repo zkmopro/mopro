@@ -125,13 +125,16 @@ jobs:
         - name: Make CLI executable
           run: chmod +x ./bin/mopro
 
-        - name: Scaffold example app (single adapter)
+        - name: Scaffold example app (single adapter, outside repo)
+          working-directory: ${{ runner.temp }}
           run: |
-            ./bin/mopro init --adapter ${{ matrix.adapter }} --project-name mopro-example-${{ matrix.adapter }}
+            "$GITHUB_WORKSPACE/bin/mopro" init \
+              --adapter ${{ matrix.adapter }} \
+              --project-name mopro-example-${{ matrix.adapter }}
             ls -la mopro-example-${{ matrix.adapter }}
 
         - name: Run tests with JNA
-          working-directory: mopro-example-${{ matrix.adapter }}
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
           run: |
             curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
             export CLASSPATH="$PWD/jna-5.13.0.jar"
@@ -141,7 +144,7 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: mopro-example-${{ matrix.adapter }}
-            path: mopro-example-${{ matrix.adapter }}
+            path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
 
   test-ffi-all:
     runs-on: ubuntu-latest
