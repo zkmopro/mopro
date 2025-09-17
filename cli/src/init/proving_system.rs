@@ -2,7 +2,6 @@ use crate::init::adapter::Adapter;
 use include_dir::Dir;
 use std::fs;
 use std::io::Write;
-use std::path::Path;
 
 pub(super) trait ProvingSystem {
     const TEMPLATE_DIR: Dir<'static>;
@@ -39,42 +38,6 @@ pub(super) trait ProvingSystem {
         };
         let target = format!("// {}_TEMPLATE", Self::ADAPTER.as_str().to_uppercase());
         append_below_string_in_file(file_path, &target, &String::from_utf8_lossy(circom_lib_rs))
-    }
-
-    fn mod_template(lib_file_path: &str) -> anyhow::Result<()> {
-        let mod_file = format!("{}.rs", Self::ADAPTER.as_str().to_lowercase());
-
-        let content = match Self::TEMPLATE_DIR.get_file(&mod_file) {
-            Some(file) => file.contents(),
-            None => return Err(anyhow::anyhow!("{mod_file} not found in template")),
-        };
-
-        // Place the circom.rs in the same directory as lib.rs
-        let dest_path = Path::new(lib_file_path)
-            .parent()
-            .ok_or_else(|| anyhow::anyhow!("Invalid file_path: no parent directory"))?
-            .join(mod_file);
-
-        fs::write(&dest_path, content).map_err(|e| anyhow::anyhow!("{}", e))
-    }
-
-    fn test_template(lib_file_path: &str) -> anyhow::Result<()> {
-        let tmpl_tests: &Dir = Self::TEMPLATE_DIR
-            .get_dir("tests")
-            .ok_or_else(|| anyhow::anyhow!("tests dir not found in template"))?;
-
-        let dest_tests_dir: &Path = Path::new(lib_file_path)
-            .parent()
-            .ok_or_else(|| anyhow::anyhow!("Invalid file_path: no parent directory"))?
-            .parent()
-            .ok_or_else(|| anyhow::anyhow!("Invalid file_path: no grandparent directory"))?;
-
-        fs::create_dir_all(dest_tests_dir)
-            .map_err(|e| anyhow::anyhow!("failed to create tests dir: {}", e))?;
-
-        tmpl_tests.extract(dest_tests_dir)?;
-
-        Ok(())
     }
 
     fn build_template(file_path: &str) -> anyhow::Result<()> {
