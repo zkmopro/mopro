@@ -90,7 +90,11 @@ fn apply_package_name_substitution(target_dir: &Path, package_name: &str) -> Res
 
     if module_file.exists() {
         let content = fs::read_to_string(&module_file)?;
-        let updated_content = content.replace("{{PACKAGE_NAME}}", package_name);
+        // Replace uniffi.mopro.* with uniffi.{package_name}.*
+        let updated_content = content.replace(
+            "import uniffi.mopro.*",
+            &format!("import uniffi.{}.*", package_name),
+        );
         fs::write(&module_file, updated_content)?;
         println!(
             "Updated React Native template with package name: {}",

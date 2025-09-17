@@ -117,7 +117,11 @@ fn apply_package_name_substitution(target_dir: &Path, package_name: &str) -> Res
 
     if plugin_file.exists() {
         let content = fs::read_to_string(&plugin_file)?;
-        let updated_content = content.replace("{{PACKAGE_NAME}}", package_name);
+        // Replace uniffi.mopro.* with uniffi.{package_name}.*
+        let updated_content = content.replace(
+            "import uniffi.mopro.*",
+            &format!("import uniffi.{}.*", package_name),
+        );
         fs::write(&plugin_file, updated_content)?;
         println!(
             "Updated Flutter template with package name: {}",
