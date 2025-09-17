@@ -34,6 +34,7 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     env:
       RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
+      CIRCOM_PROVER_TEST_WITNESS: "1" # Enable witness generation in circom-prover tests
     steps:
       - uses: actions/checkout@v5
       - name: Setup dependencies
