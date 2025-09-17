@@ -1,6 +1,6 @@
 use crate::config::{read_config, write_config, Config};
+use crate::init::adapter::ADAPTERS;
 use crate::print::print_init_instructions;
-use crate::utils::contains_adapter;
 use adapter::{Adapter, AdapterSelector};
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
@@ -147,74 +147,41 @@ pub fn init_project(
     Ok(())
 }
 
-pub fn copy_embedded_dir(
-    dir: &Dir,
-    output_dir: &Path,
-    adapter_sel: &AdapterSelector,
-) -> Result<()> {
-    for file in dir.entries() {
-        let relative_path = file.path();
-        let output_path = output_dir.join(relative_path);
+pub fn copy_embedded_dir(dir: &Dir, output_root: &Path, sel: &AdapterSelector) -> Result<()> {
+    for entry in dir.entries() {
+        let rel = entry.path();
 
-        // Create directories as needed
-        if let Some(parent) = output_path.parent() {
-            if let Some(path_str) = parent.to_str() {
-                if contains_adapter(path_str, Adapter::Circom)
-                    && !adapter_sel.contains(Adapter::Circom)
-                {
-                    return Ok(());
-                }
-            }
-            if let Some(path_str) = parent.to_str() {
-                if contains_adapter(path_str, Adapter::Halo2)
-                    && !adapter_sel.contains(Adapter::Halo2)
-                {
-                    return Ok(());
-                }
-            }
-            if let Some(path_str) = parent.to_str() {
-                if contains_adapter(path_str, Adapter::Noir) && !adapter_sel.contains(Adapter::Noir)
-                {
-                    return Ok(());
-                }
-            }
-            fs::create_dir_all(parent)?;
+        // Skip entire subtree/file if it's gated by an adapter not in `sel`
+        if should_skip(rel, sel) {
+            continue;
         }
 
-        // Write the file to the output directory
-        match file.as_file() {
-            Some(file) => {
-                if let Some(path_str) = relative_path.to_str() {
-                    if contains_adapter(path_str, Adapter::Circom)
-                        && !adapter_sel.contains(Adapter::Circom)
-                    {
-                        return Ok(());
-                    }
+        let out = output_root.join(rel);
+
+        match entry.as_file() {
+            Some(f) => {
+                if let Some(parent) = out.parent() {
+                    fs::create_dir_all(parent)?;
                 }
-                if let Some(path_str) = relative_path.to_str() {
-                    if contains_adapter(path_str, Adapter::Halo2)
-                        && !adapter_sel.contains(Adapter::Halo2)
-                    {
-                        return Ok(());
-                    }
-                }
-                if let Some(path_str) = relative_path.to_str() {
-                    if contains_adapter(path_str, Adapter::Noir)
-                        && !adapter_sel.contains(Adapter::Noir)
-                    {
-                        return Ok(());
-                    }
-                }
-                if let Err(e) = fs::write(&output_path, file.contents()) {
-                    return Err(e.into());
-                }
+                fs::write(&out, f.contents())?;
             }
             None => {
-                copy_embedded_dir(file.as_dir().unwrap(), output_dir, adapter_sel)?;
+                copy_embedded_dir(entry.as_dir().unwrap(), output_root, sel)?;
             }
         }
     }
     Ok(())
+}
+
+/// Skip if any adapter name is contained in the file/dir name but not selected
+fn should_skip(path: &Path, sel: &AdapterSelector) -> bool {
+    path.file_name()
+        .and_then(|s| s.to_str())
+        .is_some_and(|name| {
+            ADAPTERS
+                .iter()
+                .any(|a| name.contains(a.as_str()) && !sel.contains(*a))
+        })
 }
 
 fn replace_project_name(file_path: &str, project_name: &str) -> Result<()> {

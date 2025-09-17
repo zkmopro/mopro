@@ -10,7 +10,7 @@ pub enum Adapter {
     NoneOfTheAbove,
 }
 
-const ADAPTERS: [Adapter; 4] = [
+pub(super) const ADAPTERS: [Adapter; 4] = [
     Adapter::Circom,
     Adapter::Halo2,
     Adapter::Noir,

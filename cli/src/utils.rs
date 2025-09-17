@@ -3,12 +3,8 @@ use std::collections::{HashMap, HashSet};
 use mopro_ffi::app_config::constants::{AndroidArch, Arch, IosArch};
 
 use crate::{
-    config::Config, constants::Platform, init::adapter::Adapter, select::multi_select, style,
+    config::Config, constants::Platform, select::multi_select, style,
 };
-
-pub fn contains_adapter(path: &str, adapter: Adapter) -> bool {
-    path.to_lowercase().contains(adapter.as_str())
-}
 
 pub struct PlatformSelector {
     pub platforms: Vec<Platform>,
