@@ -95,8 +95,7 @@ macro_rules! app {
 
         // This should be declared into this macro due to Uniffi's limitation
         // Please refer this issue: https://github.com/mozilla/uniffi-rs/issues/2257
-        #[derive(Debug, thiserror::Error)]
-        #[cfg_attr(feature = "uniffi", uniffi::Error)]
+        #[derive(Debug, thiserror::Error, uniffi::Error)]
         pub enum MoproError {
             #[error("CircomError: {0}")]
             CircomError(String),
