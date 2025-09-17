@@ -1,6 +1,5 @@
 use crate::init::adapter::Adapter;
 use crate::init::proving_system::ProvingSystem;
-use anyhow::Result;
 use include_dir::include_dir;
 use include_dir::Dir;
 
@@ -20,8 +19,4 @@ noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", featur
     "android-compat",
 ], branch = "v1.0.0-beta.3-2" }
     "#;
-
-    fn test_template(_lib_file_path: &str) -> Result<()> {
-        Ok(())
-    }
 }

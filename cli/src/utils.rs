@@ -2,9 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use mopro_ffi::app_config::constants::{AndroidArch, Arch, IosArch};
 
-use crate::{
-    config::Config, constants::Platform, select::multi_select, style,
-};
+use crate::{config::Config, constants::Platform, select::multi_select, style};
 
 pub struct PlatformSelector {
     pub platforms: Vec<Platform>,
