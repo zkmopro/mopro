@@ -37,6 +37,7 @@ mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi-
 
 [patch.crates-io]
 rust-rapidsnark = { git = "https://github.com/ElusAegis/rust-rapidsnark" }
+witnesscalc-adapter = { git = "https://github.com/ElusAegis/witnesscalc_adapter" }
 
 [patch."https://github.com/zkmopro/mopro.git"]
 mopro-ffi = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor" }
