@@ -116,8 +116,6 @@ pub fn init_project(
 
     if let Some(lib_rs_path) = project_dir.join("src").join("lib.rs").to_str() {
         adapter_sel.lib_template(lib_rs_path);
-        adapter_sel.mod_template(lib_rs_path);
-        adapter_sel.test_template(lib_rs_path);
     }
 
     // Store selection
