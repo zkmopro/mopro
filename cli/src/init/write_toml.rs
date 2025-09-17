@@ -15,7 +15,7 @@ default = []
 
 [dependencies]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
-mopro-ffi = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor", features = ["uniffi"] }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi"] }
 thiserror = "2.0.12"
 anyhow = "1.0.99"
 
@@ -29,7 +29,7 @@ anyhow = "1.0.99"
 # NOIR_BUILD_DEPENDENCIES
 
 [dev-dependencies]
-mopro-ffi = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor", features = ["uniffi-tests"] }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi-tests"] }
 
 # CIRCOM_DEV_DEPENDENCIES
 # HALO2_DEV_DEPENDENCIES
@@ -37,5 +37,9 @@ mopro-ffi = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "fe
 
 [patch.crates-io]
 rust-rapidsnark = { git = "https://github.com/ElusAegis/rust-rapidsnark" }
+
+[patch."https://github.com/zkmopro/mopro.git"]
+mopro-ffi = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor" }
+circom-prover = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor" }
     "# // TODO - make build dependencies also configurable
 }
