@@ -11,8 +11,7 @@ impl ProvingSystem for Circom {
     const ADAPTER: Adapter = Adapter::Circom;
 
     const DEPENDENCIES: &'static str = r#"
-circom-prover = { git = "https://github.com/zkmopro/mopro.git", features = ["rapidsnark"] }
-witnesscalc-adapter = "0.1"
+circom-prover = { git = "https://github.com/zkmopro/mopro.git" }
 rust-witness  = "0.1"
 num-bigint    = "0.4.0"
     "#;
@@ -23,12 +22,9 @@ rust-witness = "0.1"
     const DEV_DEPENDENCIES: &'static str = r#"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.94"
-
-circom-prover = { git = "https://github.com/zkmopro/mopro.git", features = ["rapidsnark", "witnesscalc"] }
     "#;
 
     const BUILD_TEMPLATE: &'static str = r#"
     rust_witness::transpile::transpile_wasm("./test-vectors/circom".to_string());
-    witnesscalc_adapter::build_and_link("./test-vectors/circom/witnesscalc");
     "#;
 }
