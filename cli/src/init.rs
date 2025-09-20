@@ -16,53 +16,6 @@ mod noir;
 mod proving_system;
 mod write_toml;
 
-trait ProvingSystem {
-    const TEMPLATE_DIR: Dir<'static>;
-
-    fn dep_template(_file_path: &str) -> Result<()> {
-        Ok(())
-    }
-
-    fn build_dep_template(_file_path: &str) -> Result<()> {
-        Ok(())
-    }
-
-    fn dev_dep_template(_file_path: &str) -> Result<()> {
-        Ok(())
-    }
-
-    fn lib_template(_file_path: &str) -> Result<()> {
-        Ok(())
-    }
-
-    fn mod_template(_lib_file_path: &str) -> Result<()> {
-        Ok(())
-    }
-
-    fn test_template(lib_file_path: &str) -> Result<()> {
-        let tmpl_tests: &Dir = Self::TEMPLATE_DIR
-            .get_dir("tests")
-            .ok_or_else(|| anyhow::anyhow!("tests dir not found in template"))?;
-
-        let dest_tests_dir: &Path = Path::new(lib_file_path)
-            .parent()
-            .ok_or_else(|| anyhow::anyhow!("Invalid file_path: no parent directory"))?
-            .parent()
-            .ok_or_else(|| anyhow::anyhow!("Invalid file_path: no grandparent directory"))?;
-
-        fs::create_dir_all(&dest_tests_dir)
-            .map_err(|e| anyhow::anyhow!("failed to create tests dir: {}", e))?;
-
-        tmpl_tests.extract(&dest_tests_dir)?;
-
-        Ok(())
-    }
-
-    fn build_template(_file_path: &str) -> Result<()> {
-        Ok(())
-    }
-}
-
 pub fn init_project(
     arg_adapter: &Option<String>,
     arg_project_name: &Option<String>,
