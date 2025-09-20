@@ -1,14 +1,12 @@
 // --- Noir Example of using Ultra Honk proving and verifying circuits ---
 
 // Module containing the Noir circuit logic (Multiplier2)
-#[macro_use]
 mod noir;
 
 #[cfg(test)]
 mod noir_tests {
-    // Import the generated functions from the uniffi bindings
+    use super::noir::{generate_noir_proof, get_noir_verification_key, verify_noir_proof};
     use serial_test::serial;
-    use super::*;
 
     #[test]
     #[serial]
@@ -19,26 +17,29 @@ mod noir_tests {
         let vk = get_noir_verification_key(
             circuit_path.clone(),
             Some(srs_path.clone()),
-            true,   // on_chain (uses Keccak for Solidity compatibility)
-            false,  // low_memory_mode
-        ).unwrap();
+            true,  // on_chain (uses Keccak for Solidity compatibility)
+            false, // low_memory_mode
+        )
+        .unwrap();
 
         let proof = generate_noir_proof(
             circuit_path.clone(),
             Some(srs_path.clone()),
             circuit_inputs.clone(),
-            true,   // on_chain (uses Keccak for Solidity compatibility)
+            true, // on_chain (uses Keccak for Solidity compatibility)
             vk.clone(),
-            false,  // low_memory_mode
-        ).unwrap();
+            false, // low_memory_mode
+        )
+        .unwrap();
 
         let valid = verify_noir_proof(
             circuit_path,
             proof,
-            true,   // on_chain (uses Keccak for Solidity compatibility)
+            true, // on_chain (uses Keccak for Solidity compatibility)
             vk,
-            false,  // low_memory_mode
-        ).unwrap();
+            false, // low_memory_mode
+        )
+        .unwrap();
         assert!(valid);
     }
 
@@ -58,18 +59,20 @@ mod noir_tests {
             circuit_path.clone(),
             Some(srs_path),
             circuit_inputs,
-            true,   // on_chain (uses Keccak for Solidity compatibility)
+            true, // on_chain (uses Keccak for Solidity compatibility)
             vk.clone(),
-            false,  // low_memory_mode
-        ).unwrap();
+            false, // low_memory_mode
+        )
+        .unwrap();
 
         let valid = verify_noir_proof(
             circuit_path,
             proof,
-            true,   // on_chain (uses Keccak for Solidity compatibility)
+            true, // on_chain (uses Keccak for Solidity compatibility)
             vk,
-            false,  // low_memory_mode
-        ).unwrap();
+            false, // low_memory_mode
+        )
+        .unwrap();
         assert!(valid);
     }
 }

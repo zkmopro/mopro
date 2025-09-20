@@ -17,6 +17,10 @@ serde_json = "1.0.94"
 noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
     "barretenberg",
     "android-compat",
-], branch = "v1.0.0-beta.3-2" }
+], branch = "v1.0.0-beta.8-3" }
+    "#;
+
+    const DEV_DEPENDENCIES: &'static str = r#"
+serial_test = "3.0.0"
     "#;
 }
