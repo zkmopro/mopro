@@ -83,12 +83,14 @@ pub(crate) fn get_noir_verification_key(
     srs_path: Option<String>,
     on_chain: bool,
     low_memory_mode: bool,
-) -> Result<Vec<u8>, String> {
-    if on_chain {
+) -> Result<Vec<u8>, MoproError> {
+    let res = if on_chain {
         get_noir_verification_keccak_key(circuit_path, srs_path, false, low_memory_mode)
     } else {
         get_noir_verification_poseidon_key(circuit_path, srs_path, low_memory_mode)
-    }
+    };
+
+    res.map_err(|e| MoproError::NoirError(format!("Get Verification Key error: {}", e)))
 }
 
 /// Generates a Noir proof using Poseidon as oracle hash
