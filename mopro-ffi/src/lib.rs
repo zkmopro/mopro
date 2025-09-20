@@ -1,5 +1,6 @@
 #![allow(unexpected_cfgs)]
 
+mod adapter_stubs;
 #[cfg(feature = "build")]
 pub mod app_config;
 
