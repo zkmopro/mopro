@@ -121,22 +121,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Download CLI binary
-        uses: actions/download-artifact@v4
+      - name: Prepare template project
+        uses: ./.github/actions/mopro-init-project
         with:
-          name: mopro-bin-${{ runner.os }}
-          path: ./bin
-
-      - name: Make CLI executable
-        run: chmod +x ./bin/mopro
-
-      - name: Scaffold example app (outside repo)
-        working-directory: ${{ runner.temp }}
-        run: |
-          "$GITHUB_WORKSPACE/bin/mopro" init \
-            --adapter ${{ matrix.adapter }} \
-            --project-name mopro-example-${{ matrix.adapter }}
-          ls -la mopro-example-${{ matrix.adapter }}
+          artifact-name: mopro-bin-${{ runner.os }}
+          adapter: ${{ matrix.adapter }}
+          project-name: mopro-example-${{ matrix.adapter }}
+          destination: ${{ runner.temp }}
 
       - name: Run tests with JNA
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
@@ -156,25 +147,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Download CLI binary
-        uses: actions/download-artifact@v4
-        with:
-          name: mopro-bin-macOS
-          path: ./bin
-
-      - name: Make CLI executable
-        run: chmod +x ./bin/mopro
-
       - name: Install Rust target (iOS)
         run: rustup target add aarch64-apple-ios
 
-      - name: Scaffold example app (outside repo)
-        working-directory: ${{ runner.temp }}
-        run: |
-          "$GITHUB_WORKSPACE/bin/mopro" init \
-            --adapter ${{ matrix.adapter }} \
-            --project-name mopro-example-${{ matrix.adapter }}
-          ls -la mopro-example-${{ matrix.adapter }}
+      - name: Prepare template project
+        uses: ./.github/actions/mopro-init-project
+        with:
+          artifact-name: mopro-bin-macOS
+          adapter: ${{ matrix.adapter }}
+          project-name: mopro-example-${{ matrix.adapter }}
+          destination: ${{ runner.temp }}
 
       - name: Build iOS (debug)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
@@ -204,15 +186,6 @@ jobs:
       steps:
         - uses: actions/checkout@v5
 
-        - name: Download CLI binary
-          uses: actions/download-artifact@v4
-          with:
-            name: mopro-bin-${{ runner.os }}
-            path: ./bin
-
-        - name: Make CLI executable
-          run: chmod +x ./bin/mopro
-
         - name: Install Rust target (Android x86_64)
           run: rustup target add x86_64-linux-android
 
@@ -224,13 +197,13 @@ jobs:
           with:
             ndk-version: r26d
 
-        - name: Scaffold example app (outside repo)
-          working-directory: ${{ runner.temp }}
-          run: |
-            "$GITHUB_WORKSPACE/bin/mopro" init \
-              --adapter ${{ matrix.adapter }} \
-              --project-name mopro-example-${{ matrix.adapter }}
-            ls -la mopro-example-${{ matrix.adapter }}
+        - name: Prepare template project
+          uses: ./.github/actions/mopro-init-project
+          with:
+            artifact-name: mopro-bin-${{ runner.os }}
+            adapter: ${{ matrix.adapter }}
+            project-name: mopro-example-${{ matrix.adapter }}
+            destination: ${{ runner.temp }}
 
         - name: Build Android (debug, x86_64)
           working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
@@ -260,25 +233,16 @@ jobs:
       steps:
         - uses: actions/checkout@v5
 
-        - name: Download CLI binary
-          uses: actions/download-artifact@v4
-          with:
-            name: mopro-bin-${{ runner.os }}
-            path: ./bin
-
-        - name: Make CLI executable
-          run: chmod +x ./bin/mopro
-
         - name: Install Rust target (wasm)
           run: rustup target add wasm32-unknown-unknown
 
-        - name: Scaffold example app (outside repo)
-          working-directory: ${{ runner.temp }}
-          run: |
-            "$GITHUB_WORKSPACE/bin/mopro" init \
-              --adapter ${{ matrix.adapter }} \
-              --project-name mopro-example-${{ matrix.adapter }}
-            ls -la mopro-example-${{ matrix.adapter }}
+        - name: Prepare template project
+          uses: ./.github/actions/mopro-init-project
+          with:
+            artifact-name: mopro-bin-${{ runner.os }}
+            adapter: ${{ matrix.adapter }}
+            project-name: mopro-example-${{ matrix.adapter }}
+            destination: ${{ runner.temp }}
 
         - name: Build Web (debug, halo2; auto-confirm prompt)
           working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}

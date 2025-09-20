@@ -1,0 +1,43 @@
+name: 'Download and Init Mopro Project'
+description: 'Fetch the mopro CLI binary artifact and scaffold an example project'
+inputs:
+  artifact-name:
+    description: 'Name of the CLI artifact to download'
+    required: true
+  adapter:
+    description: 'Adapter to initialize the project with'
+    required: true
+  project-name:
+    description: 'Project name to pass to the CLI'
+    required: true
+  destination:
+    description: 'Directory where the project should be created (defaults to $RUNNER_TEMP)'
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - name: Download CLI binary
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: bin
+
+    - name: Make CLI executable
+      shell: bash
+      run: chmod +x bin/mopro
+
+    - name: Initialize project
+      shell: bash
+      run: |
+        set -euo pipefail
+        DEST="${{ inputs.destination }}"
+        if [ -z "${DEST}" ]; then
+          DEST="$RUNNER_TEMP"
+        fi
+        mkdir -p "$DEST"
+        pushd "$DEST" > /dev/null
+        "$GITHUB_WORKSPACE/bin/mopro" init \
+          --adapter "${{ inputs.adapter }}" \
+          --project-name "${{ inputs.project-name }}"
+        ls -la "${{ inputs.project-name }}"
+        popd > /dev/null
