@@ -249,7 +249,13 @@ jobs:
           env:
             CI: "true"
           run: |
-            printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
+            set -euo pipefail
+            # TODO: allow mopro CLI to run fully non-interactive so we can drop the pseudo-tty workaround below
+            if [[ "$RUNNER_OS" == "macOS" ]]; then
+              printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
+            else
+              printf 'y\n' | script -q -c "$GITHUB_WORKSPACE/bin/mopro build --mode debug --platforms web" /dev/null
+            fi
 
   test-ffi-all:
     runs-on: ubuntu-latest
