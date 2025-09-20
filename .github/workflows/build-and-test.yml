@@ -130,7 +130,7 @@ jobs:
       - name: Make CLI executable
         run: chmod +x ./bin/mopro
 
-      - name: Scaffold example app (single adapter, outside repo)
+      - name: Scaffold example app (outside repo)
         working-directory: ${{ runner.temp }}
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" init \
@@ -145,23 +145,38 @@ jobs:
           export CLASSPATH="$PWD/jna-5.13.0.jar"
           cargo test --all --all-features
 
-      - name: Install Rust target (Android x86_64)
-        run: rustup target add x86_64-linux-android
+  cli_build_ios:
+    needs: cli_build
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter: [circom, halo2, noir]
+    runs-on: macos-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    steps:
+      - uses: actions/checkout@v5
 
-      - name: Install Rust target (iOS aarch64) [macOS only]
-        if: runner.os == 'macOS'
+      - name: Download CLI binary
+        uses: actions/download-artifact@v4
+        with:
+          name: mopro-bin-macOS
+          path: ./bin
+
+      - name: Make CLI executable
+        run: chmod +x ./bin/mopro
+
+      - name: Install Rust target (iOS)
         run: rustup target add aarch64-apple-ios
 
-      - name: Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Scaffold example app (outside repo)
+        working-directory: ${{ runner.temp }}
+        run: |
+          "$GITHUB_WORKSPACE/bin/mopro" init \
+            --adapter ${{ matrix.adapter }} \
+            --project-name mopro-example-${{ matrix.adapter }}
+          ls -la mopro-example-${{ matrix.adapter }}
 
-      - name: Setup NDK
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r26d
-
-      - name: Build iOS (debug) [macOS only]
-        if: runner.os == 'macOS'
+      - name: Build iOS (debug)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" build \
@@ -169,31 +184,108 @@ jobs:
             --platforms ios \
             --architectures aarch64-apple-ios
 
-      - name: Build Android (debug, x86_64)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode debug \
-            --platforms android \
-            --architectures x86_64-linux-android
-
-      - name: Build Web (debug, only for halo2)
-        if: ${{ matrix.adapter == 'halo2' }}
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          rustup target add wasm32-unknown-unknown
-          printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
-
-      - name: Upload example app (per-adapter, per-OS, exclude target)
-        if: always()
+      - name: Upload iOS Bindings directory
         uses: actions/upload-artifact@v4
         with:
-          name: mopro-example-${{ matrix.adapter }}-${{ runner.os }}
+          name: ios-${{ matrix.adapter }}-macOS
           path: |
-            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/**
-            !${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/target/**
-            !${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/**/target/**
+            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/MoproiOSBindings
           if-no-files-found: error
+
+  cli_build_android:
+      needs: cli_build
+      strategy:
+        fail-fast: false
+        matrix:
+          os: [macos-latest, ubuntu-latest]
+          adapter: [circom, halo2, noir]
+      runs-on: ${{ matrix.os }}
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+      steps:
+        - uses: actions/checkout@v5
+
+        - name: Download CLI binary
+          uses: actions/download-artifact@v4
+          with:
+            name: mopro-bin-${{ runner.os }}
+            path: ./bin
+
+        - name: Make CLI executable
+          run: chmod +x ./bin/mopro
+
+        - name: Install Rust target (Android x86_64)
+          run: rustup target add x86_64-linux-android
+
+        - name: Android SDK
+          uses: android-actions/setup-android@v3
+
+        - name: Setup NDK
+          uses: nttld/setup-ndk@v1
+          with:
+            ndk-version: r26d
+
+        - name: Scaffold example app (outside repo)
+          working-directory: ${{ runner.temp }}
+          run: |
+            "$GITHUB_WORKSPACE/bin/mopro" init \
+              --adapter ${{ matrix.adapter }} \
+              --project-name mopro-example-${{ matrix.adapter }}
+            ls -la mopro-example-${{ matrix.adapter }}
+
+        - name: Build Android (debug, x86_64)
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: |
+            "$GITHUB_WORKSPACE/bin/mopro" build \
+              --mode debug \
+              --platforms android \
+              --architectures x86_64-linux-android
+
+        - name: Upload Android build (exclude target)
+          uses: actions/upload-artifact@v4
+          with:
+            name: android-${{ matrix.adapter }}-${{ runner.os }}
+            path: |
+              ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/MoproAndroidBindings
+            if-no-files-found: error
+
+  cli_build_web:
+      needs: cli_build
+      strategy:
+        fail-fast: false
+        matrix:
+          os: [macos-latest, ubuntu-latest]
+          adapter: [halo2]   # web build only for halo2
+      runs-on: ${{ matrix.os }}
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
+      steps:
+        - uses: actions/checkout@v5
+
+        - name: Download CLI binary
+          uses: actions/download-artifact@v4
+          with:
+            name: mopro-bin-${{ runner.os }}
+            path: ./bin
+
+        - name: Make CLI executable
+          run: chmod +x ./bin/mopro
+
+        - name: Install Rust target (wasm)
+          run: rustup target add wasm32-unknown-unknown
+
+        - name: Scaffold example app (outside repo)
+          working-directory: ${{ runner.temp }}
+          run: |
+            "$GITHUB_WORKSPACE/bin/mopro" init \
+              --adapter ${{ matrix.adapter }} \
+              --project-name mopro-example-${{ matrix.adapter }}
+            ls -la mopro-example-${{ matrix.adapter }}
+
+        - name: Build Web (debug, halo2; auto-confirm prompt)
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          env:
+            CI: "true"
+          run: |
+            printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
 
   test-ffi-all:
     runs-on: ubuntu-latest
