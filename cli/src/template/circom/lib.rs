@@ -5,13 +5,9 @@
 mod circom;
 
 rust_witness::witness!(multiplier2);
-rust_witness::witness!(multiplier2bls);
-witnesscalc_adapter::witness!(multiplier2_wc);
 
 set_circom_circuits! {
     ("multiplier2_final.zkey", circom_prover::witness::WitnessFn::RustWitness(multiplier2_witness)),
-    ("multiplier2_bls_final.zkey", circom_prover::witness::WitnessFn::RustWitness(multiplier2bls_witness)),
-    ("multiplier2_wc_final.zkey", circom_prover::witness::WitnessFn::WitnessCalc(multiplier2_wc_witness)),
 }
 
 #[cfg(test)]
