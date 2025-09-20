@@ -81,7 +81,11 @@ jobs:
           cargo test --all-features
 
   cli_build:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - uses: actions/checkout@v5
@@ -98,96 +102,98 @@ jobs:
           ~/.cargo/bin/mopro --help
           ~/.cargo/bin/mopro --version || true
 
-      - name: Upload CLI binary
+      - name: Upload CLI binary (${{ runner.os }})
         uses: actions/upload-artifact@v4
         with:
-          name: mopro-bin
+          name: mopro-bin-${{ runner.os }}
           path: ~/.cargo/bin/mopro
           if-no-files-found: error
 
   cli_template_tests:
-      needs: cli_build
-      runs-on: macos-latest
-      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-      strategy:
-        fail-fast: false
-        matrix:
-          adapter: [circom, halo2, noir]
-      steps:
-        - uses: actions/checkout@v5
+    needs: cli_build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        adapter: [circom, halo2, noir]
+    runs-on: ${{ matrix.os }}
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    steps:
+      - uses: actions/checkout@v5
 
-        - name: Download CLI binary
-          uses: actions/download-artifact@v4
-          with:
-            name: mopro-bin
-            path: ./bin
+      - name: Download CLI binary
+        uses: actions/download-artifact@v4
+        with:
+          name: mopro-bin-${{ runner.os }}
+          path: ./bin
 
-        - name: Make CLI executable
-          run: chmod +x ./bin/mopro
+      - name: Make CLI executable
+        run: chmod +x ./bin/mopro
 
-        - name: Scaffold example app (single adapter, outside repo)
-          working-directory: ${{ runner.temp }}
-          run: |
-            "$GITHUB_WORKSPACE/bin/mopro" init \
-              --adapter ${{ matrix.adapter }} \
-              --project-name mopro-example-${{ matrix.adapter }}
-            ls -la mopro-example-${{ matrix.adapter }}
+      - name: Scaffold example app (single adapter, outside repo)
+        working-directory: ${{ runner.temp }}
+        run: |
+          "$GITHUB_WORKSPACE/bin/mopro" init \
+            --adapter ${{ matrix.adapter }} \
+            --project-name mopro-example-${{ matrix.adapter }}
+          ls -la mopro-example-${{ matrix.adapter }}
 
-        - name: Run tests with JNA
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: |
-            curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
-            export CLASSPATH="$PWD/jna-5.13.0.jar"
-            cargo test --all --all-features
+      - name: Run tests with JNA
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: |
+          curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
+          export CLASSPATH="$PWD/jna-5.13.0.jar"
+          cargo test --all --all-features
 
-        - name: Install Rust targets
-          run: |
-            rustup target add aarch64-apple-ios
-            rustup target add x86_64-linux-android
+      - name: Install Rust target (Android x86_64)
+        run: rustup target add x86_64-linux-android
 
-        # Android toolchain (SDK + NDK) for building x86_64-linux-android
-        - name: Android SDK
-          if: always()  # required for the android build step below
-          uses: android-actions/setup-android@v3
+      - name: Install Rust target (iOS aarch64) [macOS only]
+        if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-ios
 
-        - name: Setup NDK
-          uses: nttld/setup-ndk@v1
-          with:
-            ndk-version: r26d
+      - name: Android SDK
+        uses: android-actions/setup-android@v3
 
-        - name: Build iOS (debug)
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: |
-            "$GITHUB_WORKSPACE/bin/mopro" build \
-              --mode debug \
-              --platforms ios \
-              --architectures aarch64-apple-ios
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26d
 
-        - name: Build Android (debug, x86_64)
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: |
-            "$GITHUB_WORKSPACE/bin/mopro" build \
-              --mode debug \
-              --platforms android \
-              --architectures x86_64-linux-android
+      - name: Build iOS (debug) [macOS only]
+        if: runner.os == 'macOS'
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: |
+          "$GITHUB_WORKSPACE/bin/mopro" build \
+            --mode debug \
+            --platforms ios \
+            --architectures aarch64-apple-ios
 
-        - name: Build Web (debug, only for halo2)
-          if: ${{ matrix.adapter == 'halo2' }}
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: |
-            rustup target add wasm32-unknown-unknown
-            printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
+      - name: Build Android (debug, x86_64)
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: |
+          "$GITHUB_WORKSPACE/bin/mopro" build \
+            --mode debug \
+            --platforms android \
+            --architectures x86_64-linux-android
 
-        - name: Upload example app (per-adapter, exclude target)
-          if: always()
-          uses: actions/upload-artifact@v4
-          with:
-            name: mopro-example-${{ matrix.adapter }}
-            path: |
-              ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/**
-              !${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/target/**
-              !${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/**/target/**
-            if-no-files-found: error
+      - name: Build Web (debug, only for halo2)
+        if: ${{ matrix.adapter == 'halo2' }}
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: |
+          rustup target add wasm32-unknown-unknown
+          printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
+
+      - name: Upload example app (per-adapter, per-OS, exclude target)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mopro-example-${{ matrix.adapter }}-${{ runner.os }}
+          path: |
+            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/**
+            !${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/target/**
+            !${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/**/target/**
+          if-no-files-found: error
 
   test-ffi-all:
     runs-on: ubuntu-latest
