@@ -111,12 +111,20 @@ impl AdapterSelector {
     pub fn lib_template(&self, lib_rs_path: &str) {
         if self.contains(Adapter::Circom) {
             Circom::lib_template(lib_rs_path).unwrap();
+        } else {
+            Circom::lib_stub_template(lib_rs_path).unwrap();
         }
+
         if self.contains(Adapter::Halo2) {
             Halo2::lib_template(lib_rs_path).unwrap();
+        } else {
+            Halo2::lib_stub_template(lib_rs_path).unwrap();
         }
+
         if self.contains(Adapter::Noir) {
             Noir::lib_template(lib_rs_path).unwrap();
+        } else {
+            Noir::lib_stub_template(lib_rs_path).unwrap();
         }
     }
 
