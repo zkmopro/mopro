@@ -320,7 +320,7 @@ jobs:
   test-wasm-halo2:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [setup-halo2-wasm-env, lint, clippy_check]
+    needs: [setup-halo2-wasm-env]
     env:
       CHROME_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}/chrome
       CHROMEDRIVER_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}/chromedriver
