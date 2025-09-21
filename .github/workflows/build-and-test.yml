@@ -144,11 +144,10 @@ jobs:
         adapter: [circom, halo2, noir]
     runs-on: macos-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    env:
+      SIM_ID: B64BE4CA-A0E2-4EB3-8154-276A88B13945   # iPhone 17 Pro Max (iOS 26.0, arm64)
     steps:
       - uses: actions/checkout@v5
-
-      - name: Install Rust target (iOS)
-        run: rustup target add aarch64-apple-ios
 
       - name: Prepare template project
         uses: ./.github/actions/mopro-init-project
@@ -158,21 +157,81 @@ jobs:
           project-name: mopro-example-${{ matrix.adapter }}
           destination: ${{ runner.temp }}
 
-      - name: Build iOS (debug)
+      - name: Build iOS (debug; device+sim arm64 only)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" build \
             --mode debug \
             --platforms ios \
-            --architectures aarch64-apple-ios
+            --architectures aarch64-apple-ios aarch64-apple-ios-sim
 
-      - name: Upload iOS Bindings directory
+      - name: Create iOS framework
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: mopro create --framework ios
+
+      - name: Prepare Xcode (select + first launch)
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app
+          sudo xcodebuild -runFirstLaunch
+          xcodebuild -version
+
+      # Ensure both device and simulator platforms exist (iOS 26.0)
+      - name: Install iOS platforms (device + simulator)
+        run: |
+          xcodebuild -downloadPlatform iOS
+          xcodebuild -downloadPlatform iOSSimulator || true
+          xcrun simctl list runtimes
+          xcrun simctl list devices
+
+      # ---- Xcode builds ----
+      - name: Xcode build (device, codesign off)
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: |
+          xcodebuild \
+            -project ios/MoproApp.xcodeproj \
+            -scheme MoproApp \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Xcode build (simulator, arm64 only)
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: |
+          # Boot the specific simulator (no-op if already booted)
+          xcrun simctl bootstatus "$SIM_ID" -b || xcrun simctl boot "$SIM_ID"
+          xcodebuild \
+            -project ios/MoproApp.xcodeproj \
+            -scheme MoproApp \
+            -configuration Debug \
+            -destination "id=${SIM_ID}" \
+            -sdk iphonesimulator \
+            ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Xcode test (simulator, arm64 only)
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: |
+          xcrun simctl bootstatus "$SIM_ID" -b || true
+          xcodebuild \
+            -project ios/MoproApp.xcodeproj \
+            -scheme MoproApp \
+            -configuration Debug \
+            -destination "id=${SIM_ID}" \
+            -sdk iphonesimulator \
+            ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            -maximum-parallel-testing-workers 1 \
+            test
+
+      - name: Upload Xcode results (failure)
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ios-${{ matrix.adapter }}-macOS
+          name: ios-xcode-results-${{ matrix.adapter }}
           path: |
-            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/MoproiOSBindings
-          if-no-files-found: error
+            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/ios/build/**/*.xcresult
 
   cli_build_android:
       needs: cli_build
@@ -357,100 +416,6 @@ jobs:
           mv ../Cargo.toml.backup ../Cargo.toml
           # Exit with original test result
           exit ${TEST_EXIT_CODE:-0}
-  # TODO: remove this commented test-e2e job
-  # test-e2e:
-  #   runs-on: ubuntu-latest
-  #   if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-  #   steps:
-  #     - uses: actions/checkout@v5
-  #     - name: Install Rust toolchain
-  #       uses: actions-rs/toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         override: true
-  #     - name: Run e2e circom tests
-  #       # TODO: Fix this custom jar thing
-  #       run: |
-  #         cd test-e2e
-  #         curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
-  #         CLASSPATH=jna-5.13.0.jar cargo test --test circom -- --nocapture
-  #     - name: Run e2e halo2 tests
-  #       run: CLASSPATH=jna-5.13.0.jar cargo test --test halo2 -- --nocapture
-#  build-xcframework:
-#    runs-on: macos-latest
-#    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-#    steps:
-#      - uses: actions/checkout@v5
-#      - name: Install Rust toolchain
-#        uses: actions-rs/toolchain@v1
-#        with:
-#          toolchain: stable
-#          override: true
-#      - name: install dependencies
-#        run: brew install nasm
-#      - name: Build iOS xcframework
-#        run: cd test-e2e && cargo run --bin ios
-#      - name: Cache xcframework
-#        id: cache-xcframework
-#        uses: actions/cache/save@v4
-#        with:
-#          path: test-e2e/MoproiOSBindings
-#          key: ${{ github.sha }}-xcframework
-#  build-ios-app-device:
-#    runs-on: macos-latest
-#    needs: build-xcframework
-#    steps:
-#      - uses: actions/checkout@v5
-#      - name: Install Rust toolchain
-#        uses: actions-rs/toolchain@v1
-#        with:
-#          toolchain: stable
-#          override: true
-#      - name: Restore cached xcframework
-#        id: cache-restore-xcframework
-#        uses: actions/cache/restore@v4
-#        with:
-#          path: test-e2e/MoproiOSBindings
-#          key: ${{ github.sha }}-xcframework
-#      - name: Build app for device
-#        run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-#  build-ios-app-simulator:
-#    runs-on: macos-latest
-#    needs: build-xcframework
-#    steps:
-#      - uses: actions/checkout@v5
-#      - name: Install Rust toolchain
-#        uses: actions-rs/toolchain@v1
-#        with:
-#          toolchain: stable
-#          override: true
-#      - name: Restore cached xcframework
-#        id: cache-restore-xcframework
-#        uses: actions/cache/restore@v4
-#        with:
-#          path: test-e2e/MoproiOSBindings
-#          key: ${{ github.sha }}-xcframework
-#      - name: Build app for device
-#        run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination generic/platform=iOS\ Simulator build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-#  test-ios-app-simulator:
-#    runs-on: macos-14
-#    needs: build-xcframework
-#    steps:
-#      - uses: actions/checkout@v5
-#      - name: Install Rust toolchain
-#        uses: actions-rs/toolchain@v1
-#        with:
-#          toolchain: stable
-#          override: true
-#      - name: Restore cached xcframework
-#        id: cache-restore-xcframework
-#        uses: actions/cache/restore@v4
-#        with:
-#          path: test-e2e/MoproiOSBindings
-#          key: ${{ github.sha }}-xcframework
-#      # to list available simulators: xcrun simctl list devices
-#      - name: Test app in simulator
-#        run: xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj -scheme mopro-test -destination 'platform=iOS Simulator,name=iPhone 15' test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -maximum-parallel-testing-workers 1
 #  build-android-lib:
 #    runs-on: ubuntu-latest
 #    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
