@@ -76,7 +76,7 @@ pub(crate) fn verify_noir_proof(
 /// on the intended use case:
 ///
 /// - `on_chain = true`: Uses Keccak hash for Solidity verifier compatibility
-/// - `on_chain = false`: Uses Poseidon hash for better performance
+/// - `on_chain = false`: Uses Poseidon hash fotr better performance
 #[uniffi::export]
 pub(crate) fn get_noir_verification_key(
     circuit_path: String,

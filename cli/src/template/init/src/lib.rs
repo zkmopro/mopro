@@ -16,6 +16,9 @@ fn mopro_uniffi_hello_world() -> String {
     "Hello, World!".to_string()
 }
 
+#[macro_use]
+mod stubs;
+
 // CIRCOM_TEMPLATE
 
 // HALO2_TEMPLATE
