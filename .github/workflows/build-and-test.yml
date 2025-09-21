@@ -167,7 +167,8 @@ jobs:
 
       - name: Create iOS framework
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: mopro create --framework ios
+        run: |
+          "$GITHUB_WORKSPACE/bin/mopro" create --framework ios
 
       - name: Prepare Xcode (select + first launch)
         run: |
@@ -271,9 +272,10 @@ jobs:
         - name: Create Android framework
           working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
           run: |
-            mopro create --framework android
+            "$GITHUB_WORKSPACE/bin/mopro" create --framework android
 
         - name: Build android app
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
           run: cd android && ./gradlew build
 
         - name: Enable KVM
@@ -290,14 +292,14 @@ jobs:
             arch: x86_64
             disable-animations: true
             emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
-            script: cd android && ./gradlew connectedAndroidTest
+            script: cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android && ./gradlew connectedAndroidTest
 
         - name: Upload test report
           if: failure()
           uses: actions/upload-artifact@v4
           with:
             name: android-test-report
-            path: test-e2e/android/app/build/reports/androidTests/connected/debug/
+            path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android/app/build/reports/androidTests/connected/debug/
 
   cli_build_web:
       needs: cli_build
