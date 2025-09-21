@@ -59,7 +59,7 @@ pub fn build_project(
     write_config(&config_path, &config)?;
 
     // Platform selection
-    let target_selection =
+    let mut target_selection =
         TargetSelection::resolve_targets(arg_platforms, arg_architectures, &mut config);
     write_config(&config_path, &config)?;
 
@@ -71,54 +71,50 @@ pub fn build_project(
     // | Web       | No     | Yes   | No   |
     //
     // Note: 'Yes' indicates that the adapter is compatible with the platform.
+    let web_selected = target_selection.contains_platform(Platform::Web);
+    let mut needs_wasm_copy = false;
 
-    // Noir only supports `iOS` and `Android` platform.
-    if config.adapter_contains(Adapter::Noir) && target_selection.contains_platform(Platform::Web) {
-        style::print_yellow(
-            "Noir doesn't support Web platform, choose different platform".to_string(),
-        );
-        return build_project(
-            &Some(mode.as_str().to_string()),
-            &None,
-            &None,
-            auto_update_flag,
-            quiet,
-        );
-    }
-
-    // Notification when the user selects the 'circom' adapter and includes the 'web' platform in the selection.
-    if config.adapter_eq(Adapter::Circom) && target_selection.contains_platform(Platform::Web) {
-        let confirm = Confirm::with_theme(&ColorfulTheme::default())
-                .with_prompt("WASM code for Circom will not be generated for the web platform due to lack of support. Do you want to continue?")
-                .default(true)
-                .interact()?;
-
-        if !confirm {
-            return build_project(
-                &Some(mode.as_str().to_string()),
-                arg_platforms,
-                arg_architectures,
-                auto_update_flag,
-                quiet,
-            );
+    if web_selected {
+        if config.adapter_contains(Adapter::Noir) {
+            if prompt_confirmation("Noir doesn't support Web platform, continue anyway?", true)? {
+                style::print_yellow("Build will not be done for the Web platform.".to_string());
+                target_selection.remove_platform(Platform::Web);
+            } else {
+                return build_project(
+                    &Some(mode.as_str().to_string()),
+                    &None,
+                    &None,
+                    auto_update_flag,
+                    quiet,
+                );
+            }
         }
 
-        copy_mopro_wasm_lib()?;
-    }
-
-    // Notification when the user selects the 'halo2' adapter and includes the 'web' platform in the selection.
-    if config.adapter_contains(Adapter::Halo2) && target_selection.contains_platform(Platform::Web)
-    {
-        let confirm = Confirm::with_theme(&ColorfulTheme::default())
-                .with_prompt("Halo2 WASM code will only be generated for the web platform. Do you want to continue?")
-                .default(true)
-                .interact()?;
-
-        if !confirm {
-            style::print_yellow("Aborted build for web platform".to_string());
-            std::process::exit(0);
+        if config.adapter_contains(Adapter::Circom) {
+            if prompt_confirmation(
+                "Circom doesn't support Web platform, continue anyway?",
+                true,
+            )? {
+                style::print_yellow("Build will not be done for the Web platform.".to_string());
+                target_selection.remove_platform(Platform::Web);
+                needs_wasm_copy = true;
+            } else {
+                return build_project(
+                    &Some(mode.as_str().to_string()),
+                    &None,
+                    &None,
+                    auto_update_flag,
+                    quiet,
+                );
+            }
         }
 
+        if config.adapter_contains(Adapter::Halo2) {
+            needs_wasm_copy = true;
+        }
+    }
+
+    if needs_wasm_copy {
         copy_mopro_wasm_lib()?;
     }
 
@@ -131,20 +127,24 @@ pub fn build_project(
 
         for not_allowed_arch in not_allowed_archs {
             if target_selection.contains_architecture(not_allowed_arch) {
-                style::print_yellow(
-                    format!(
-                        "Noir doesn't support the following architecture: {not_allowed_arch}, choose other architectures",
-                    )
-                    .to_string(),
-                );
-
-                return build_project(
-                    &Some(mode.as_str().to_string()),
-                    arg_platforms,
-                    &None,
-                    auto_update_flag,
-                    quiet,
-                );
+                if prompt_confirmation(
+                    "Noir doesn't support {not_allowed_arch}, continue anyway?",
+                    true,
+                )? {
+                    style::print_yellow(
+                        "Build will not be done for the {not_allowed_arch} architecture."
+                            .to_string(),
+                    );
+                    target_selection.remove_architecture(not_allowed_arch);
+                } else {
+                    return build_project(
+                        &Some(mode.as_str().to_string()),
+                        &None,
+                        &None,
+                        auto_update_flag,
+                        quiet,
+                    );
+                }
             }
         }
     }
@@ -218,6 +218,18 @@ fn copy_mopro_wasm_lib() -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+fn prompt_confirmation(prompt: &str, default_yes: bool) -> anyhow::Result<bool> {
+    let theme = ColorfulTheme::default();
+    let mut confirm = Confirm::with_theme(&theme);
+    confirm.with_prompt(prompt).default(default_yes);
+
+    if let Some(value) = confirm.interact_opt()? {
+        return Ok(value);
+    } else {
+        Ok(default_yes)
+    }
 }
 
 fn handle_auto_update(

@@ -86,6 +86,31 @@ impl TargetSelection {
             .map(|selection| selection.architectures.to_strings())
     }
 
+    pub(super) fn remove_platform(&mut self, platform: Platform) {
+        self.selections
+            .retain(|selection| selection.platform != platform);
+    }
+
+    pub(super) fn remove_architecture(&mut self, arch: &str) {
+        for selection in &mut self.selections {
+            match &mut selection.architectures {
+                PlatformArchitectures::Ios(archs) => {
+                    archs.retain(|a| a.as_str() != arch);
+                }
+                PlatformArchitectures::Android(archs) => {
+                    archs.retain(|a| a.as_str() != arch);
+                }
+                PlatformArchitectures::Web => {}
+            }
+        }
+        self.selections
+            .retain(|selection| match &selection.architectures {
+                PlatformArchitectures::Ios(archs) => !archs.is_empty(),
+                PlatformArchitectures::Android(archs) => !archs.is_empty(),
+                PlatformArchitectures::Web => true,
+            });
+    }
+
     fn persist(&self, config: &mut Config) {
         let platform_set: HashSet<String> = self
             .selections
