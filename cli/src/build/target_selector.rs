@@ -1,215 +1,331 @@
+use std::collections::HashSet;
+use std::sync::Once;
+
 use mopro_ffi::app_config::constants::{AndroidArch, Arch, IosArch};
-use std::collections::HashMap;
 
-use crate::{
-    config::Config, constants::Platform, select::multi_select, style,
-};
+use crate::{config::Config, constants::Platform, select::multi_select, style};
 
-pub(super) struct TargetSelector {
-    arch_map: HashMap<Platform, Vec<String>>,
+#[derive(Debug, Clone)]
+pub(super) struct TargetSelection {
+    selections: Vec<PlatformSelection>,
 }
 
-impl TargetSelector {
-    /// Create a new TargetSelector instance based on CLI arguments and existing config.
-    /// If CLI arguments are not provided, it will prompt the user for selections.
-    /// The selected platforms and architectures will be written back to the config
-    /// for future preselection.
-    pub(super) fn new_with_config(
+#[derive(Debug, Clone)]
+pub(super) struct PlatformSelection {
+    platform: Platform,
+    architectures: PlatformArchitectures,
+}
+
+#[derive(Debug, Clone)]
+pub(super) enum PlatformArchitectures {
+    Ios(Vec<IosArch>),
+    Android(Vec<AndroidArch>),
+    Web,
+}
+
+impl TargetSelection {
+    pub(super) fn select_target(
         arg_platforms: &Option<Vec<String>>,
         arg_architectures: &Option<Vec<String>>,
         config: &mut Config,
     ) -> Self {
-        let selected_platforms = if let Some(raw_platforms) = arg_platforms {
-            let valid_platforms: Vec<(usize, Platform)> = raw_platforms
-                .iter()
-                .enumerate()
-                .map(|(i, p)| (i, Platform::parse_from_str(p)))
-                .filter(|(_, p)| Option::is_some(p))
-                .map(|(i, p)| (i, Option::unwrap(p)))
-                .collect();
-            if valid_platforms.is_empty() {
-                style::print_yellow(
-                    "Ignoring unknown platform(s) provided via CLI arguments: {}.".to_string(),
-                );
-                Self::select_platform(config)
+        let (platforms_from_args, invalid_platforms) = parse_platforms(arg_platforms);
+
+        if !invalid_platforms.is_empty() {
+            style::print_yellow(format!(
+                "Ignoring unknown platform(s) provided via CLI arguments: {}.",
+                invalid_platforms.join(", ")
+            ));
+        }
+
+        let platforms = if !platforms_from_args.is_empty() {
+            platforms_from_args
+        } else {
+            prompt_platforms(config)
+        };
+
+        let parsed_arg_arch = parse_architectures(&platforms, arg_architectures);
+        if !parsed_arg_arch.invalid.is_empty() {
+            style::print_yellow(format!(
+                "Ignoring unknown architecture(s) provided via CLI arguments: {}.",
+                parsed_arg_arch.invalid.join(", ")
+            ));
+        }
+
+        let selections = resolve_architectures(&platforms, config, parsed_arg_arch);
+
+        let selection = Self { selections };
+        selection.persist(config);
+        selection
+    }
+
+    pub(super) fn contains_platform(&self, platform: Platform) -> bool {
+        self.selections
+            .iter()
+            .any(|selection| selection.platform == platform)
+    }
+
+    pub(super) fn contains_architecture(&self, arch: &str) -> bool {
+        self.selections
+            .iter()
+            .any(|selection| selection.architectures.contains(arch))
+    }
+
+    pub(super) fn platforms(&self) -> impl Iterator<Item = Platform> + '_ {
+        self.selections.iter().map(|selection| selection.platform)
+    }
+
+    pub(super) fn iter(&self) -> impl Iterator<Item = &PlatformSelection> {
+        self.selections.iter()
+    }
+
+    pub(super) fn architecture_strings_for(&self, platform: Platform) -> Option<Vec<String>> {
+        self.selections
+            .iter()
+            .find(|selection| selection.platform == platform)
+            .map(|selection| selection.architectures.to_strings())
+    }
+
+    fn persist(&self, config: &mut Config) {
+        let platform_set: HashSet<String> = self
+            .selections
+            .iter()
+            .map(|selection| selection.platform.as_str().to_string())
+            .collect();
+        config.target_platforms = Some(platform_set);
+
+        config.ios = self
+            .architecture_strings_for(Platform::Ios)
+            .map(|archs| archs.into_iter().collect());
+
+        config.android = self
+            .architecture_strings_for(Platform::Android)
+            .map(|archs| archs.into_iter().collect());
+    }
+}
+
+impl PlatformSelection {
+    pub(super) fn platform(&self) -> Platform {
+        self.platform
+    }
+
+    pub(super) fn architecture_strings(&self) -> Vec<String> {
+        self.architectures.to_strings()
+    }
+}
+
+impl PlatformArchitectures {
+    fn to_strings(&self) -> Vec<String> {
+        match self {
+            PlatformArchitectures::Ios(archs) => {
+                archs.iter().map(|arch| arch.as_str().to_string()).collect()
+            }
+            PlatformArchitectures::Android(archs) => {
+                archs.iter().map(|arch| arch.as_str().to_string()).collect()
+            }
+            PlatformArchitectures::Web => Vec::new(),
+        }
+    }
+
+    fn contains(&self, arch: &str) -> bool {
+        match self {
+            PlatformArchitectures::Ios(archs) => {
+                archs.iter().any(|candidate| candidate.as_str() == arch)
+            }
+            PlatformArchitectures::Android(archs) => {
+                archs.iter().any(|candidate| candidate.as_str() == arch)
+            }
+            PlatformArchitectures::Web => false,
+        }
+    }
+}
+
+struct ArgArch {
+    ios: Vec<IosArch>,
+    android: Vec<AndroidArch>,
+    invalid: Vec<String>,
+}
+
+fn parse_platforms(arg_platforms: &Option<Vec<String>>) -> (Vec<Platform>, Vec<String>) {
+    if let Some(raw_platforms) = arg_platforms {
+        let mut platforms = Vec::new();
+        let mut invalid = Vec::new();
+
+        for value in raw_platforms {
+            if let Some(platform) = Platform::parse_from_str(value) {
+                if !platforms.contains(&platform) {
+                    platforms.push(platform);
+                }
             } else {
-                if valid_platforms.len() < raw_platforms.len() {
-                    style::print_yellow(format!(
-                        "Invalid platform(s) selected. Only {:?} platform(s) is created.",
-                        &valid_platforms
-                    ));
-                }
-                valid_platforms.iter().map(|(_, p)| *p).collect()
-            }
-        } else {
-            Self::select_platform(config)
-        };
-
-        let mut arch_map = HashMap::new();
-
-        if let Some(architectures) = arg_architectures {
-            let mut ios_archs: Vec<String> = architectures
-                .iter()
-                .filter(|&arch| IosArch::all_strings().contains(&arch.as_str()))
-                .cloned()
-                .collect();
-            let mut android_archs: Vec<String> = architectures
-                .iter()
-                .filter(|&arch| AndroidArch::all_strings().contains(&arch.as_str()))
-                .cloned()
-                .collect();
-
-            if ios_archs.is_empty() && selected_platforms.contains(&Platform::Ios) {
-                ios_archs = Self::select_architectures(Platform::Ios, config);
-            }
-
-            if android_archs.is_empty() && selected_platforms.contains(&Platform::Android) {
-                android_archs = Self::select_architectures(Platform::Android, config);
-            }
-
-            arch_map.insert(Platform::Ios, ios_archs);
-            arch_map.insert(Platform::Android, android_archs);
-
-            if selected_platforms.contains(&Platform::Web) {
-                arch_map.insert(Platform::Web, vec![]);
-            }
-        } else {
-            for platform in selected_platforms.iter() {
-                let archs = Self::select_architectures(*platform, config);
-                arch_map.insert(*platform, archs);
+                invalid.push(value.clone());
             }
         }
 
-        Self::update_config(config, selected_platforms, &mut arch_map);
-
-        Self { arch_map }
+        (platforms, invalid)
+    } else {
+        (Vec::new(), Vec::new())
     }
+}
 
-    pub(super) fn is_platform_selected(&self, platform: Platform) -> bool {
-        self.arch_map.contains_key(&platform)
-    }
+fn resolve_architectures(
+    platforms: &[Platform],
+    config: &Config,
+    arg_arch: ArgArch,
+) -> Vec<PlatformSelection> {
+    let mut selections = Vec::with_capacity(platforms.len());
 
-    pub(super) fn is_architecture_selected(&self, arch: &str) -> bool {
-        for arch_list in self.arch_map.values() {
-            if arch_list.contains(&arch.to_string()) {
-                return true;
-            }
-        }
+    let ArgArch { ios, android, .. } = arg_arch;
 
-        false
-    }
-
-    pub(super) fn get_arch_for_platform(&self, platform: Platform) -> Vec<&String> {
-        self.arch_map
-            .get(&platform)
-            .map(|v| v.iter().collect())
-            .unwrap_or_default()
-    }
-
-    pub(super) fn get_platforms(&self) -> Vec<&Platform> {
-        self.arch_map.keys().collect()
-    }
-
-    /// For the better UX - users don't need to select again if failed build happens in the next step,
-    /// `select` updates `platforms` in the config file.
-    fn select_platform(config: &Config) -> Vec<Platform> {
-        let platforms = Platform::all_strings();
-        // defaults based on previous selections or none
-        let defaults: Vec<bool> = if config.target_platforms.is_none() {
-            vec![false; platforms.len()]
+    if platforms.contains(&Platform::Ios) {
+        let ios_platform_arch = if !ios.is_empty() {
+            PlatformArchitectures::Ios(ios)
         } else {
-            platforms
-                .iter()
-                .map(|&platform| config.target_platforms.as_ref().unwrap().contains(platform))
-                .collect()
+            PlatformArchitectures::Ios(prompt_architectures(
+                Platform::Ios,
+                config.ios.as_ref(),
+                IosArch::all_strings(),
+            ))
         };
 
-        let platform_sel = multi_select(
-            "Select platform(s) to build for (multiple selection with space)",
-            "No platforms selected. Please select at least one platform.",
-            platforms,
-            defaults,
-        );
-
-        platform_sel
-            .iter()
-            .map(|&i| Platform::from_idx(i))
-            .collect::<Vec<Platform>>()
+        selections.push(PlatformSelection {
+            platform: Platform::Ios,
+            architectures: ios_platform_arch,
+        });
     }
 
-    fn select_architectures(platform: Platform, config: &Config) -> Vec<String> {
-        let options: Vec<&str> = match platform {
-            Platform::Ios => IosArch::all_strings(),
-            Platform::Android => AndroidArch::all_strings(),
-            Platform::Web => return vec![],
+    if platforms.contains(&Platform::Android) {
+        let android_platform_arch = if !android.is_empty() {
+            PlatformArchitectures::Android(android)
+        } else {
+            PlatformArchitectures::Android(prompt_architectures(
+                Platform::Android,
+                config.android.as_ref(),
+                AndroidArch::all_strings(),
+            ))
         };
 
-        let defaults: Vec<bool> = match platform {
-            Platform::Ios => {
-                if let Some(ios_arch) = config.ios.as_ref() {
-                    options
-                        .iter()
-                        .map(|&arch| ios_arch.contains(arch))
-                        .collect()
-                } else {
-                    vec![false; options.len()]
+        selections.push(PlatformSelection {
+            platform: Platform::Android,
+            architectures: android_platform_arch,
+        });
+    }
+
+    if platforms.contains(&Platform::Web) {
+        selections.push(PlatformSelection {
+            platform: Platform::Web,
+            architectures: PlatformArchitectures::Web,
+        });
+    }
+
+    selections
+}
+
+fn prompt_platforms(config: &Config) -> Vec<Platform> {
+    let platforms = Platform::all_strings();
+    let defaults: Vec<bool> = platforms
+        .iter()
+        .map(|platform| {
+            config
+                .target_platforms
+                .as_ref()
+                .map(|set| set.contains(*platform))
+                .unwrap_or(false)
+        })
+        .collect();
+
+    let selected = multi_select(
+        "Select platform(s) to build for (multiple selection with space)",
+        "No platforms selected. Please select at least one platform.",
+        platforms.clone(),
+        defaults,
+    );
+
+    selected.into_iter().map(Platform::from_idx).collect()
+}
+
+fn prompt_architectures<A: Arch>(
+    platform: Platform,
+    previous: Option<&HashSet<String>>,
+    options: Vec<&'static str>,
+) -> Vec<A> {
+    print_architecture_hint();
+
+    let defaults: Vec<bool> = options
+        .iter()
+        .map(|option| previous.map(|set| set.contains(*option)).unwrap_or(false))
+        .collect();
+
+    let selected = multi_select(
+        &format!(
+            "Select architecture(s) for {} (multiple selection with space)",
+            platform.binding_name()
+        ),
+        "No architectures selected. Please select at least one architecture.",
+        options.clone(),
+        defaults,
+    );
+
+    selected
+        .into_iter()
+        .map(|idx| A::parse_from_str(options[idx]))
+        .collect()
+}
+
+fn parse_architectures(platforms: &[Platform], arg_architectures: &Option<Vec<String>>) -> ArgArch {
+    let allow_ios = platforms.contains(&Platform::Ios);
+    let allow_android = platforms.contains(&Platform::Android);
+
+    let mut invalid = Vec::new();
+    let mut ios_arch = Vec::new();
+    let mut android_arch = Vec::new();
+
+    if let Some(values) = arg_architectures {
+        for value in values {
+            if allow_ios {
+                if let Some(arch) = parse_ios_arch(value) {
+                    ios_arch.push(arch);
+                    continue;
                 }
             }
-            Platform::Android => {
-                if let Some(android_arch) = config.android.as_ref() {
-                    options
-                        .iter()
-                        .map(|&arch| android_arch.contains(arch))
-                        .collect()
-                } else {
-                    vec![false; options.len()]
+
+            if allow_android {
+                if let Some(arch) = parse_android_arch(value) {
+                    android_arch.push(arch);
+                    continue;
                 }
             }
-            Platform::Web => vec![],
-        };
 
-        Self::print_architecture_message();
-
-        let arch_sel = multi_select(
-            &format!(
-                "Select architecture(s) for {} (multiple selection with space)",
-                platform.binding_name()
-            ),
-            "No architectures selected. Please select at least one architecture.",
-            options.clone(),
-            defaults,
-        );
-
-        arch_sel
-            .iter()
-            .map(|&i| options[i].to_string())
-            .collect::<Vec<String>>()
+            invalid.push(value.clone());
+        }
     }
 
-    fn update_config(
-        config: &mut Config,
-        selected_platforms: Vec<Platform>,
-        arch_map: &mut HashMap<Platform, Vec<String>>,
-    ) {
-        config.target_platforms = Some(
-            selected_platforms
-                .iter()
-                .map(|p| p.as_str().to_string())
-                .collect(),
-        );
-
-        config.ios = arch_map
-            .get(&Platform::Ios)
-            .map(|v| v.iter().cloned().collect());
-        config.android = arch_map
-            .get(&Platform::Android)
-            .map(|v| v.iter().cloned().collect());
+    ArgArch {
+        ios: ios_arch,
+        android: android_arch,
+        invalid,
     }
+}
 
-    fn print_architecture_message() {
+fn parse_ios_arch(value: &str) -> Option<IosArch> {
+    IosArch::all_strings()
+        .into_iter()
+        .find(|candidate| candidate.eq_ignore_ascii_case(value))
+        .map(IosArch::parse_from_str)
+}
+
+fn parse_android_arch(value: &str) -> Option<AndroidArch> {
+    AndroidArch::all_strings()
+        .into_iter()
+        .find(|candidate| candidate.eq_ignore_ascii_case(value))
+        .map(AndroidArch::parse_from_str)
+}
+
+fn print_architecture_hint() {
+    static PRINTED: Once = Once::new();
+    PRINTED.call_once(|| {
         println!(
             "📚 To learn more about the architecture selection, \n    visit: {}",
             style::blue_bold("https://zkmopro.org/docs/architectures".to_string())
         );
-    }
+    });
 }
