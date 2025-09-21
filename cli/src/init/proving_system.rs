@@ -41,10 +41,7 @@ pub(super) trait ProvingSystem {
     }
 
     fn lib_stub_template(file_path: &str) -> anyhow::Result<()> {
-        let stub = format!(
-            "mopro_ffi::{}_stub!();",
-            Self::ADAPTER.as_str().to_lowercase()
-        );
+        let stub = format!("{}_stub!();", Self::ADAPTER.as_str().to_lowercase());
         let target = format!("// {}_TEMPLATE", Self::ADAPTER.as_str().to_uppercase());
         append_below_string_in_file(file_path, &target, stub.as_str())
     }
