@@ -41,18 +41,18 @@ macro_rules! circom_stub {
 
             #[uniffi::export]
             pub(crate) fn generate_circom_proof(
-                zkey_path: String,
-                circuit_inputs: String,
-                proof_lib: ProofLib,
+                _zkey_path: String,
+                _circuit_inputs: String,
+                _proof_lib: ProofLib,
             ) -> Result<CircomProofResult, MoproError> {
                 panic!("Circom is not enabled in this build. Please select \"circom\" adapter when initializing the project.");
             }
 
             #[uniffi::export]
             pub(crate) fn verify_circom_proof(
-                zkey_path: String,
-                proof_result: CircomProofResult,
-                proof_lib: ProofLib,
+                _zkey_path: String,
+                _proof_result: CircomProofResult,
+                _proof_lib: ProofLib,
             ) -> Result<bool, MoproError> {
                 panic!("Circom is not enabled in this build. Please select \"circom\" adapter when initializing the project.");
             }
@@ -74,19 +74,19 @@ macro_rules! halo2_stub {
 
             #[uniffi::export]
             pub(crate) fn generate_halo2_proof(
-                srs_path: String,
-                pk_path: String,
-                circuit_inputs: std::collections::HashMap<String, Vec<String>>,
+                _srs_path: String,
+                _pk_path: String,
+                _circuit_inputs: std::collections::HashMap<String, Vec<String>>,
             ) -> Result<Halo2ProofResult, MoproError> {
                 panic!("Halo2 is not enabled in this build. Please select \"halo2\" adapter when initializing the project.");
             }
 
             #[uniffi::export]
             pub(crate) fn verify_halo2_proof(
-                srs_path: String,
-                vk_path: String,
-                proof: Vec<u8>,
-                public_input: Vec<u8>,
+                _srs_path: String,
+                _vk_path: String,
+                _proof: Vec<u8>,
+                _public_input: Vec<u8>,
             ) -> Result<bool, MoproError> {
                 panic!("Halo2 is not enabled in this build. Please select \"halo2\" adapter when initializing the project.");
             }
@@ -102,23 +102,23 @@ macro_rules! noir_stub {
 
             #[uniffi::export]
             pub(crate) fn generate_noir_proof(
-                circuit_path: String,
-                srs_path: Option<String>,
-                inputs: Vec<String>,
-                on_chain: bool,
-                vk: Vec<u8>,
-                low_memory_mode: bool,
+                _circuit_path: String,
+                _srs_path: Option<String>,
+                _inputs: Vec<String>,
+                _on_chain: bool,
+                _vk: Vec<u8>,
+                _low_memory_mode: bool,
             ) -> Result<Vec<u8>, MoproError> {
                 panic!("Noir is not enabled in this build. Please select \"noir\" adapter when initializing the project.");
             }
 
             #[uniffi::export]
             pub(crate) fn verify_noir_proof(
-                circuit_path: String,
-                proof: Vec<u8>,
-                on_chain: bool,
-                vk: Vec<u8>,
-                low_memory_mode: bool,
+                _circuit_path: String,
+                _proof: Vec<u8>,
+                _on_chain: bool,
+                _vk: Vec<u8>,
+                _low_memory_mode: bool,
             ) -> Result<bool, MoproError> {
                 panic!("Noir is not enabled in this build. Please select \"noir\" adapter when initializing the project.");
 
@@ -127,10 +127,10 @@ macro_rules! noir_stub {
 
             #[uniffi::export]
             pub(crate) fn get_noir_verification_key(
-                circuit_path: String,
-                srs_path: Option<String>,
-                on_chain: bool,
-                low_memory_mode: bool,
+                _circuit_path: String,
+                _srs_path: Option<String>,
+                _on_chain: bool,
+                _low_memory_mode: bool,
             ) -> Result<Vec<u8>, MoproError> {
                 panic!("Noir is not enabled in this build. Please select \"noir\" adapter when initializing the project.");
 
