@@ -163,6 +163,9 @@ jobs:
             --platforms ios \
             --architectures aarch64-apple-ios aarch64-apple-ios-sim
 
+      - name: Clean the `build` dir to save space
+        run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
+
       - name: Create iOS framework
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
@@ -264,6 +267,9 @@ jobs:
               --mode debug \
               --platforms android \
               --architectures x86_64-linux-android
+
+        - name: Clean the `build` dir to save space
+          run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
 
         - name: Create Android framework
           working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
