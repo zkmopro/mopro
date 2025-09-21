@@ -1,8 +1,6 @@
 use anyhow::Result;
-use anyhow::{Context, Ok};
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
-use dialoguer::Select;
 use include_dir::include_dir;
 use include_dir::Dir;
 use mopro_ffi::app_config::constants::{AndroidArch, AndroidPlatform, Arch, IosPlatform, Mode};
@@ -11,6 +9,7 @@ use std::env;
 use mopro_ffi::app_config::build_from_str_arch;
 use mopro_ffi::app_config::ios::IosBindingsParams;
 
+use crate::build::mode_selector::select_mode;
 use crate::config::read_config;
 use crate::config::write_config;
 use crate::config::Config;
@@ -22,7 +21,10 @@ use crate::style;
 use crate::style::blue_bold;
 use crate::style::print_green_bold;
 use crate::update::update_bindings;
-use crate::utils::PlatformSelector;
+use target_selector::TargetSelector;
+
+mod mode_selector;
+mod target_selector;
 
 pub fn build_project(
     arg_mode: &Option<String>,
@@ -67,34 +69,8 @@ pub fn build_project(
     write_config(&config_path, &config)?;
 
     // Platform selection
-    let mut platform: PlatformSelector = match arg_platforms {
-        None => PlatformSelector::select(&mut config),
-        Some(p) => {
-            let valid_platforms: Vec<String> = p
-                .iter()
-                .filter(|&platform| Platform::all_strings().contains(&platform.as_str()))
-                .map(|platform| platform.to_owned())
-                .collect();
-
-            if valid_platforms.is_empty() {
-                style::print_yellow(
-                    "No platforms selected. Please select at least one platform.".to_string(),
-                );
-                PlatformSelector::select(&mut config)
-            } else {
-                if valid_platforms.len() != p.len() {
-                    style::print_yellow(
-                        format!(
-                            "Invalid platform(s) selected. Only {:?} platform(s) is created.",
-                            &valid_platforms
-                        )
-                        .to_string(),
-                    );
-                }
-                PlatformSelector::construct_with_config(valid_platforms, &mut config)
-            }
-        }
-    };
+    let target_selector: TargetSelector =
+        TargetSelector::new_with_config(arg_platforms, arg_architectures, &mut config);
     write_config(&config_path, &config)?;
 
     // Supported adapters and platforms:
@@ -107,43 +83,44 @@ pub fn build_project(
     // Note: 'Yes' indicates that the adapter is compatible with the platform.
 
     // Noir only supports `iOS` and `Android` platform.
-    if config.adapter_contains(Adapter::Noir) && platform.contains(Platform::Web) {
+    if config.adapter_contains(Adapter::Noir) && target_selector.is_platform_selected(Platform::Web)
+    {
         style::print_yellow(
             "Noir doesn't support Web platform, choose different platform".to_string(),
         );
-        build_project(
+        return build_project(
             &Some(mode.as_str().to_string()),
-            arg_platforms,
-            arg_architectures,
+            &None,
+            &None,
             auto_update_flag,
             quiet,
-        )?;
-        return Ok(());
+        );
     }
 
     // Notification when the user selects the 'circom' adapter and includes the 'web' platform in the selection.
-    if config.adapter_eq(Adapter::Circom) && platform.contains(Platform::Web) {
+    if config.adapter_eq(Adapter::Circom) && target_selector.is_platform_selected(Platform::Web) {
         let confirm = Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("WASM code for Circom will not be generated for the web platform due to lack of support. Do you want to continue?")
                 .default(true)
                 .interact()?;
 
         if !confirm {
-            build_project(
+            return build_project(
                 &Some(mode.as_str().to_string()),
                 arg_platforms,
                 arg_architectures,
                 auto_update_flag,
                 quiet,
-            )?;
-            return Ok(());
+            );
         }
 
         copy_mopro_wasm_lib()?;
     }
 
     // Notification when the user selects the 'halo2' adapter and includes the 'web' platform in the selection.
-    if config.adapter_contains(Adapter::Halo2) && platform.contains(Platform::Web) {
+    if config.adapter_contains(Adapter::Halo2)
+        && target_selector.is_platform_selected(Platform::Web)
+    {
         let confirm = Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("Halo2 WASM code will only be generated for the web platform. Do you want to continue?")
                 .default(true)
@@ -157,14 +134,6 @@ pub fn build_project(
         copy_mopro_wasm_lib()?;
     }
 
-    // Architecture selection for iOS or Android
-    let selected_architectures = if let Some(archs) = arg_architectures {
-        platform.construct_archs(archs, &mut config)
-    } else {
-        platform.select_archs(&mut config)
-    };
-    write_config(&config_path, &config)?;
-
     // Noir doesn't support `I686Linux` and `Armv7LinuxAbi`
     if config.adapter_contains(Adapter::Noir) {
         let not_allowed_archs = vec![
@@ -172,33 +141,32 @@ pub fn build_project(
             AndroidArch::Armv7LinuxAbi.as_str(),
         ];
 
-        if platform.contains_archs(not_allowed_archs.as_slice()) {
-            style::print_yellow(
-                format!(
-                    "Noir doesn't support following architectures: {not_allowed_archs:?}, choose other architectures",
-                )
-                .to_string(),
-            );
-            build_project(
-                &Some(mode.as_str().to_string()),
-                arg_platforms,
-                arg_architectures,
-                auto_update_flag,
-                quiet,
-            )?;
-            return Ok(());
+        for not_allowed_arch in not_allowed_archs {
+            if target_selector.is_architecture_selected(not_allowed_arch) {
+                style::print_yellow(
+                    format!(
+                        "Noir doesn't support the following architecture: {not_allowed_arch}, choose other architectures",
+                    )
+                    .to_string(),
+                );
+
+                return build_project(
+                    &Some(mode.as_str().to_string()),
+                    arg_platforms,
+                    &None,
+                    auto_update_flag,
+                    quiet,
+                );
+            }
         }
     }
 
-    for p in platform.platforms.clone() {
+    let platforms = target_selector.get_platforms();
+
+    for p in &platforms {
         let platform_str: &str = p.as_str();
 
-        let mut platform_arch = vec![];
-        if p != Platform::Web {
-            platform_arch.extend(selected_architectures.get(platform_str).context(format!(
-                "No architectures selected for platform: {platform_str}"
-            ))?);
-        }
+        let platform_arch: Vec<&String> = target_selector.get_arch_for_platform(**p);
 
         match p {
             Platform::Ios => build_from_str_arch::<IosPlatform>(
@@ -232,7 +200,7 @@ pub fn build_project(
     }
 
     if !quiet {
-        print_binding_message(&platform.platforms)?;
+        print_binding_message(&platforms)?;
     }
     handle_auto_update(&config_path, &mut config, auto_update_flag)?;
     print_build_success_message();
@@ -240,29 +208,7 @@ pub fn build_project(
     Ok(())
 }
 
-fn select_mode(config: &mut Config) -> Result<Mode> {
-    let theme = ColorfulTheme::default();
-    let mut selection = Select::with_theme(&theme);
-
-    // Get default based on previous selection.
-    if let Some(build_mode) = config.build_mode.clone() {
-        if let Some(idx) = Mode::idx(build_mode.as_ref()) {
-            selection.default(idx);
-        }
-    };
-
-    let idx = selection
-        .with_prompt("Build mode")
-        .items(Mode::all_strings().as_ref())
-        .interact()?;
-
-    // update user's selection
-    config.build_mode = Some(Mode::from_idx(idx).as_str().to_string());
-
-    Ok(Mode::from_idx(idx))
-}
-
-fn print_binding_message(platforms: &Vec<Platform>) -> anyhow::Result<()> {
+fn print_binding_message(platforms: &Vec<&Platform>) -> anyhow::Result<()> {
     let current_dir = env::current_dir()?;
     print_green_bold("✨ Bindings Built Successfully! ✨".to_string());
     println!("The Mopro bindings have been successfully generated and are available in the following directories:\n");

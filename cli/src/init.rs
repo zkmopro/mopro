@@ -1,7 +1,6 @@
 use crate::config::{read_config, write_config, Config};
 use crate::create::write_toml;
 use crate::print::print_init_instructions;
-use crate::utils::contains_adapter;
 use adapter::{Adapter, AdapterSelector};
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
@@ -205,4 +204,8 @@ pub fn replace_string_in_file(file_path: &str, target: &str, replacement: &str) 
     file.write_all(modified_content.as_bytes())?;
 
     Ok(())
+}
+
+fn contains_adapter(path: &str, adapter: Adapter) -> bool {
+    path.to_lowercase().contains(adapter.as_str())
 }
