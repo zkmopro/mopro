@@ -9,7 +9,6 @@ use std::env;
 use mopro_ffi::app_config::build_from_str_arch;
 use mopro_ffi::app_config::ios::IosBindingsParams;
 
-use crate::build::mode_selector::select_mode;
 use crate::config::read_config;
 use crate::config::write_config;
 use crate::config::Config;
@@ -21,10 +20,11 @@ use crate::style;
 use crate::style::blue_bold;
 use crate::style::print_green_bold;
 use crate::update::update_bindings;
-use target_selector::TargetSelection;
+use mode_resolver::resolve_mode;
+use target_resolver::TargetSelection;
 
-mod mode_selector;
-mod target_selector;
+mod mode_resolver;
+mod target_resolver;
 
 pub fn build_project(
     arg_mode: &Option<String>,
@@ -55,22 +55,12 @@ pub fn build_project(
     let mut config = read_config(&config_path)?;
 
     // Mode selection, select `release` or `debug`
-    let mode: Mode = match arg_mode.as_deref() {
-        None => select_mode(&mut config)?,
-        Some(m) => {
-            if Mode::all_strings().contains(&m) {
-                Mode::parse_from_str(m)
-            } else {
-                style::print_yellow("Invalid mode selected. Please choose a valid mode (e.g., 'release' or 'debug').".to_string());
-                select_mode(&mut config)?
-            }
-        }
-    };
+    let mode: Mode = resolve_mode(arg_mode, &mut config)?;
     write_config(&config_path, &config)?;
 
     // Platform selection
     let target_selection =
-        TargetSelection::select_target(arg_platforms, arg_architectures, &mut config);
+        TargetSelection::resolve_targets(arg_platforms, arg_architectures, &mut config);
     write_config(&config_path, &config)?;
 
     // Supported adapters and platforms:

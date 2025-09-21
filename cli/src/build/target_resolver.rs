@@ -24,7 +24,7 @@ pub(super) enum PlatformArchitectures {
 }
 
 impl TargetSelection {
-    pub(super) fn select_target(
+    pub(super) fn resolve_targets(
         arg_platforms: &Option<Vec<String>>,
         arg_architectures: &Option<Vec<String>>,
         config: &mut Config,
