@@ -144,8 +144,6 @@ jobs:
         adapter: [circom, halo2, noir]
     runs-on: macos-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    env:
-      SIM_ID: B64BE4CA-A0E2-4EB3-8154-276A88B13945   # iPhone 17 Pro Max (iOS 26.0, arm64)
     steps:
       - uses: actions/checkout@v5
 
@@ -200,12 +198,11 @@ jobs:
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           # Boot the specific simulator (no-op if already booted)
-          xcrun simctl bootstatus "$SIM_ID" -b || xcrun simctl boot "$SIM_ID"
           xcodebuild \
             -project ios/MoproApp.xcodeproj \
             -scheme MoproApp \
             -configuration Debug \
-            -destination "id=${SIM_ID}" \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
             -sdk iphonesimulator \
             ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
@@ -214,12 +211,11 @@ jobs:
       - name: Xcode test (simulator, arm64 only)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
-          xcrun simctl bootstatus "$SIM_ID" -b || true
           xcodebuild \
             -project ios/MoproApp.xcodeproj \
             -scheme MoproApp \
             -configuration Debug \
-            -destination "id=${SIM_ID}" \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
             -sdk iphonesimulator \
             ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
@@ -276,7 +272,7 @@ jobs:
 
         - name: Build android app
           working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: cd android && ./gradlew build
+          run: cd android && chmod +x gradlew && ./gradlew build
 
         - name: Enable KVM
           run: |
