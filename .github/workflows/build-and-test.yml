@@ -238,15 +238,12 @@ jobs:
       strategy:
         fail-fast: false
         matrix:
-          os: [macos-latest, ubuntu-latest]
+          os: ubuntu-latest
           adapter: [circom, halo2, noir]
       runs-on: ${{ matrix.os }}
       if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
       steps:
         - uses: actions/checkout@v5
-
-        - name: Install Rust target (Android x86_64)
-          run: rustup target add x86_64-linux-android
 
         - name: Android SDK
           uses: android-actions/setup-android@v3
@@ -272,13 +269,36 @@ jobs:
               --platforms android \
               --architectures x86_64-linux-android
 
-        - name: Upload Android build (exclude target)
+        - name: Create Android framework
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: |
+            mopro create --framework android
+
+        - name: Build android app
+          run: cd android && ./gradlew build
+
+        - name: Enable KVM
+          run: |
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+            sudo udevadm control --reload-rules
+            sudo udevadm trigger --name-match=kvm
+
+        - name: Run tests
+          uses: reactivecircus/android-emulator-runner@v2
+          with:
+            api-level: 29
+            target: google_apis
+            arch: x86_64
+            disable-animations: true
+            emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
+            script: cd android && ./gradlew connectedAndroidTest
+
+        - name: Upload test report
+          if: failure()
           uses: actions/upload-artifact@v4
           with:
-            name: android-${{ matrix.adapter }}-${{ runner.os }}
-            path: |
-              ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/MoproAndroidBindings
-            if-no-files-found: error
+            name: android-test-report
+            path: test-e2e/android/app/build/reports/androidTests/connected/debug/
 
   cli_build_web:
       needs: cli_build
@@ -416,74 +436,6 @@ jobs:
           mv ../Cargo.toml.backup ../Cargo.toml
           # Exit with original test result
           exit ${TEST_EXIT_CODE:-0}
-#  build-android-lib:
-#    runs-on: ubuntu-latest
-#    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-#    steps:
-#      - uses: actions/checkout@v5
-#      - name: Install Rust toolchain
-#        uses: actions-rs/toolchain@v1
-#        with:
-#          toolchain: stable
-#          override: true
-#      - name: install requirements
-#        uses: awalsh128/cache-apt-pkgs-action@v1
-#        with:
-#          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
-#          version: 1.0
-#      - name: Build Android bindings
-#        run: cd test-e2e && ANDROID_ARCHS=x86_64-linux-android cargo run --bin android
-#      - name: Cache android lib
-#        id: cache-android-lib
-#        uses: actions/cache/save@v4
-#        with:
-#          path: test-e2e/MoproAndroidBindings
-#          key: ${{ github.sha }}-android-lib
-#  test-android-app:
-#    runs-on: ubuntu-latest
-#    needs: build-android-lib
-#    steps:
-#      - uses: actions/checkout@v5
-#      - name: Install Rust toolchain
-#        uses: actions-rs/toolchain@v1
-#        with:
-#          toolchain: stable
-#          override: true
-#      - name: Restore cached android lib
-#        id: cache-restore-android-lib
-#        uses: actions/cache/restore@v4
-#        with:
-#          path: test-e2e/MoproAndroidBindings
-#          key: ${{ github.sha }}-android-lib
-#      - name: Setup Java
-#        uses: actions/setup-java@v4
-#        with:
-#          distribution: "temurin"
-#          java-version: 17
-#      - name: Setup Android SDK
-#        uses: android-actions/setup-android@v2.0.10
-#      - name: Build android app
-#        run: cd test-e2e/android && ./gradlew build
-#      - name: Enable KVM
-#        run: |
-#          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-#          sudo udevadm control --reload-rules
-#          sudo udevadm trigger --name-match=kvm
-#      - name: Run tests
-#        uses: reactivecircus/android-emulator-runner@v2
-#        with:
-#          api-level: 29
-#          target: google_apis
-#          arch: x86_64
-#          disable-animations: true
-#          emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
-#          script: cd test-e2e/android && ./gradlew connectedAndroidTest
-#      - name: Upload test report
-#        if: failure()
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: android-test-report
-#          path: test-e2e/android/app/build/reports/androidTests/connected/debug/
 #  build-halo2-wasm-web:
 #    runs-on: ubuntu-latest
 #    needs: setup-halo2-wasm-env
