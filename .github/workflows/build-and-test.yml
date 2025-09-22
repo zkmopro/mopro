@@ -86,6 +86,7 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
+    needs: [lint, clippy_check]
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - uses: actions/checkout@v5
@@ -252,7 +253,7 @@ jobs:
             -project ios/MoproApp.xcodeproj \
             -scheme MoproApp \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=18.5' \
             -sdk iphonesimulator \
             ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
@@ -294,7 +295,7 @@ jobs:
             -project ios/MoproApp.xcodeproj \
             -scheme MoproApp \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=18.5' \
             -sdk iphonesimulator \
             ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
