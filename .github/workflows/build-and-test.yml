@@ -171,20 +171,6 @@ jobs:
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" create --framework ios
 
-      - name: Prepare Xcode (select + first launch)
-        run: |
-          sudo xcode-select -s /Applications/Xcode.app
-          sudo xcodebuild -runFirstLaunch
-          xcodebuild -version
-
-      # Ensure both device and simulator platforms exist (iOS 26.0)
-      - name: Install iOS platforms (device + simulator)
-        run: |
-          xcodebuild -downloadPlatform iOS
-          xcodebuild -downloadPlatform iOSSimulator || true
-          xcrun simctl list runtimes
-          xcrun simctl list devices
-
       # ---- Xcode builds ----
       - name: Xcode build (device, codesign off)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
