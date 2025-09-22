@@ -136,7 +136,7 @@ jobs:
           export CLASSPATH="$PWD/jna-5.13.0.jar"
           cargo test --all --all-features
 
-  cli_build_ios:
+  cli_build_ios_prepare:
     needs: cli_build
     strategy:
       fail-fast: false
@@ -171,7 +171,40 @@ jobs:
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" create --framework ios
 
-      # ---- Xcode builds ----
+      - name: Remove build artifacts before packaging
+        run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
+
+      - name: Archive prepared project
+        run: |
+          cd ${{ runner.temp }}
+          tar -czf mopro-example-${{ matrix.adapter }}.tar.gz mopro-example-${{ matrix.adapter }}
+
+      - name: Upload prepared project
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-project-${{ matrix.adapter }}
+          path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}.tar.gz
+          if-no-files-found: error
+
+  cli_build_ios_device:
+    needs: cli_build_ios_prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter: [circom, halo2, noir]
+    runs-on: macos-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ios-project-${{ matrix.adapter }}
+          path: ${{ runner.temp }}
+
+      - name: Extract prepared project
+        run: |
+          cd ${{ runner.temp }}
+          tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
+
       - name: Xcode build (device, codesign off)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
@@ -181,12 +214,40 @@ jobs:
             -configuration Debug \
             -destination 'generic/platform=iOS' \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            -resultBundlePath ${{ runner.temp }}/MoproApp-device.xcresult \
+            -derivedDataPath ${{ runner.temp }}/DerivedData \
             build
+
+      - name: Upload Xcode results (failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-xcode-device-results-${{ matrix.adapter }}
+          path: |
+            ${{ runner.temp }}/MoproApp-device.xcresult
+
+  cli_build_ios_simulator:
+    needs: cli_build_ios_prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter: [circom, halo2, noir]
+    runs-on: macos-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ios-project-${{ matrix.adapter }}
+          path: ${{ runner.temp }}
+
+      - name: Extract prepared project
+        run: |
+          cd ${{ runner.temp }}
+          tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
 
       - name: Xcode build (simulator, arm64 only)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
-          # Boot the specific simulator (no-op if already booted)
           xcodebuild \
             -project ios/MoproApp.xcodeproj \
             -scheme MoproApp \
@@ -195,7 +256,36 @@ jobs:
             -sdk iphonesimulator \
             ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            -resultBundlePath ${{ runner.temp }}/MoproApp-simulator-build.xcresult \
+            -derivedDataPath ${{ runner.temp }}/DerivedData \
             build
+
+      - name: Upload Xcode results (failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-xcode-simulator-build-results-${{ matrix.adapter }}
+          path: |
+            ${{ runner.temp }}/MoproApp-simulator-build.xcresult
+
+  cli_test_ios_simulator:
+    needs: cli_build_ios_prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter: [circom, halo2, noir]
+    runs-on: macos-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ios-project-${{ matrix.adapter }}
+          path: ${{ runner.temp }}
+
+      - name: Extract prepared project
+        run: |
+          cd ${{ runner.temp }}
+          tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
 
       - name: Xcode test (simulator, arm64 only)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
@@ -209,15 +299,17 @@ jobs:
             ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             -maximum-parallel-testing-workers 1 \
+            -resultBundlePath ${{ runner.temp }}/MoproApp-simulator-test.xcresult \
+            -derivedDataPath ${{ runner.temp }}/DerivedData \
             test
 
       - name: Upload Xcode results (failure)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ios-xcode-results-${{ matrix.adapter }}
+          name: ios-xcode-simulator-test-results-${{ matrix.adapter }}
           path: |
-            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/ios/build/**/*.xcresult
+            ${{ runner.temp }}/MoproApp-simulator-test.xcresult
 
   cli_build_android:
       needs: cli_build
