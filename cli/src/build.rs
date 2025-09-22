@@ -226,7 +226,7 @@ fn prompt_confirmation(prompt: &str, default_yes: bool) -> anyhow::Result<bool> 
     confirm.with_prompt(prompt).default(default_yes);
 
     if let Some(value) = confirm.interact_opt()? {
-        return Ok(value);
+        Ok(value)
     } else {
         Ok(default_yes)
     }
