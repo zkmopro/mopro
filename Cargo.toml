@@ -1,19 +1,14 @@
 [workspace]
 members = [
     "mopro-ffi",
-    "test-e2e",
     "cli",
     "mopro-wasm",
-    "test-e2e/mopro-wasm-lib",
     "circom-prover",
 ]
 resolver = "2"
 exclude = ["mopro-example-app"]
 
 [workspace.dependencies]
-plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 rust-witness = "0.1"
 
 uniffi = { version = "=0.29.0" }

@@ -5,4 +5,6 @@ fn main() {
         #[cfg(feature = "witnesscalc")]
         witnesscalc_adapter::build_and_link("./test-vectors");
     }
+
+    println!("cargo:rerun-if-env-changed=CIRCOM_PROVER_TEST_WITNESS");
 }

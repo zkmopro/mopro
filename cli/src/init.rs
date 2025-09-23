@@ -1,7 +1,6 @@
 use crate::config::{read_config, write_config, Config};
-use crate::create::write_toml;
+use crate::init::adapter::ADAPTERS;
 use crate::print::print_init_instructions;
-use crate::utils::contains_adapter;
 use adapter::{Adapter, AdapterSelector};
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
@@ -14,18 +13,14 @@ pub mod adapter;
 mod circom;
 mod halo2;
 mod noir;
-
-trait ProvingSystem {
-    fn dep_template(file_path: &str) -> Result<()>;
-    fn lib_template(file_path: &str) -> Result<()>;
-    fn build_template(file_path: &str) -> Result<()>;
-}
+mod proving_system;
+mod write_toml;
 
 pub fn init_project(
     arg_adapter: &Option<String>,
     arg_project_name: &Option<String>,
     quiet: bool,
-) -> anyhow::Result<()> {
+) -> Result<()> {
     let project_name: String = match arg_project_name.as_deref() {
         None => Input::with_theme(&ColorfulTheme::default())
             .with_prompt("Project name")
@@ -63,11 +58,9 @@ pub fn init_project(
 
     if let Some(cargo_toml_path) = project_dir.join("Cargo.toml").to_str() {
         replace_project_name(cargo_toml_path, &project_name)?;
-        replace_features(
-            cargo_toml_path,
-            adapter_sel.adapters.iter().map(|a| a.as_str()).collect(),
-        )?;
         adapter_sel.dep_template(cargo_toml_path);
+        adapter_sel.build_dep_template(cargo_toml_path);
+        adapter_sel.dev_dep_template(cargo_toml_path);
     }
 
     if let Some(build_rs_path) = project_dir.join("build.rs").to_str() {
@@ -105,90 +98,46 @@ pub fn init_project(
     Ok(())
 }
 
-pub fn copy_embedded_dir(
-    dir: &Dir,
-    output_dir: &Path,
-    adapter_sel: &AdapterSelector,
-) -> Result<()> {
-    for file in dir.entries() {
-        let relative_path = file.path();
-        let output_path = output_dir.join(relative_path);
+pub fn copy_embedded_dir(dir: &Dir, output_root: &Path, sel: &AdapterSelector) -> Result<()> {
+    for entry in dir.entries() {
+        let rel = entry.path();
 
-        // Create directories as needed
-        if let Some(parent) = output_path.parent() {
-            if let Some(path_str) = parent.to_str() {
-                if contains_adapter(path_str, Adapter::Circom)
-                    && !adapter_sel.contains(Adapter::Circom)
-                {
-                    return Ok(());
-                }
-            }
-            if let Some(path_str) = parent.to_str() {
-                if contains_adapter(path_str, Adapter::Halo2)
-                    && !adapter_sel.contains(Adapter::Halo2)
-                {
-                    return Ok(());
-                }
-            }
-            if let Some(path_str) = parent.to_str() {
-                if contains_adapter(path_str, Adapter::Noir) && !adapter_sel.contains(Adapter::Noir)
-                {
-                    return Ok(());
-                }
-            }
-            fs::create_dir_all(parent)?;
+        // Skip entire subtree/file if it's gated by an adapter not in `sel`
+        if should_skip(rel, sel) {
+            continue;
         }
 
-        // Write the file to the output directory
-        match file.as_file() {
-            Some(file) => {
-                if let Some(path_str) = relative_path.to_str() {
-                    if contains_adapter(path_str, Adapter::Circom)
-                        && !adapter_sel.contains(Adapter::Circom)
-                    {
-                        return Ok(());
-                    }
+        let out = output_root.join(rel);
+
+        match entry.as_file() {
+            Some(f) => {
+                if let Some(parent) = out.parent() {
+                    fs::create_dir_all(parent)?;
                 }
-                if let Some(path_str) = relative_path.to_str() {
-                    if contains_adapter(path_str, Adapter::Halo2)
-                        && !adapter_sel.contains(Adapter::Halo2)
-                    {
-                        return Ok(());
-                    }
-                }
-                if let Some(path_str) = relative_path.to_str() {
-                    if contains_adapter(path_str, Adapter::Noir)
-                        && !adapter_sel.contains(Adapter::Noir)
-                    {
-                        return Ok(());
-                    }
-                }
-                if let Err(e) = fs::write(&output_path, file.contents()) {
-                    return Err(e.into());
-                }
+                fs::write(&out, f.contents())?;
             }
             None => {
-                copy_embedded_dir(file.as_dir().unwrap(), output_dir, adapter_sel)?;
+                copy_embedded_dir(entry.as_dir().unwrap(), output_root, sel)?;
             }
         }
     }
     Ok(())
 }
 
+/// Skip if any adapter name is contained in the file/dir name but not selected
+fn should_skip(path: &Path, sel: &AdapterSelector) -> bool {
+    path.file_name()
+        .and_then(|s| s.to_str())
+        .is_some_and(|name| {
+            ADAPTERS
+                .iter()
+                .any(|a| name.contains(a.as_str()) && !sel.contains(*a))
+        })
+}
+
 fn replace_project_name(file_path: &str, project_name: &str) -> Result<()> {
     let target = "MOPRO_TEMPLATE_PROJECT_NAME";
     replace_string_in_file(file_path, target, project_name)
-}
-
-fn replace_features(file_path: &str, adapters: Vec<&str>) -> Result<()> {
-    let target = "\"<FEATURES>\"";
-
-    let features: Vec<String> = adapters
-        .iter()
-        .map(|adapter| format!("\"mopro-ffi/{adapter}\""))
-        .collect();
-
-    replace_string_in_file(file_path, target, &features.join(", "))
 }
 
 pub fn replace_string_in_file(file_path: &str, target: &str, replacement: &str) -> Result<()> {

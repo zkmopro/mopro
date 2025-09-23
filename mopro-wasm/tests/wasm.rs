@@ -13,9 +13,9 @@ wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 #[cfg(feature = "plonk")]
 pub fn prove_and_verify_plonk_proof() {
     // Read all at once
-    const SRS_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/plonk_fibonacci_srs.bin");
-    const PROVING_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/plonk_fibonacci_pk.bin");
-    const VERIFYING_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/plonk_fibonacci_vk.bin");
+    const SRS_KEY: &[u8] = include_bytes!("../test-vectors/halo2/plonk_fibonacci_srs.bin");
+    const PROVING_KEY: &[u8] = include_bytes!("../test-vectors/halo2/plonk_fibonacci_pk.bin");
+    const VERIFYING_KEY: &[u8] = include_bytes!("../test-vectors/halo2/plonk_fibonacci_vk.bin");
 
     // Test input
     let mut input = HashMap::new();
@@ -36,11 +36,10 @@ pub fn prove_and_verify_plonk_proof() {
 #[cfg(feature = "hyperplonk")]
 pub fn prove_and_verify_hyperplonk_proof() {
     // Read all at once
-    const SRS_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/hyperplonk_fibonacci_srs.bin");
-    const PROVING_KEY: &[u8] =
-        include_bytes!("../../test-vectors/halo2/hyperplonk_fibonacci_pk.bin");
+    const SRS_KEY: &[u8] = include_bytes!("../test-vectors/halo2/hyperplonk_fibonacci_srs.bin");
+    const PROVING_KEY: &[u8] = include_bytes!("../test-vectors/halo2/hyperplonk_fibonacci_pk.bin");
     const VERIFYING_KEY: &[u8] =
-        include_bytes!("../../test-vectors/halo2/hyperplonk_fibonacci_vk.bin");
+        include_bytes!("../test-vectors/halo2/hyperplonk_fibonacci_vk.bin");
 
     // Test input
     let mut input = HashMap::new();
@@ -61,9 +60,9 @@ pub fn prove_and_verify_hyperplonk_proof() {
 #[cfg(feature = "gemini")]
 pub fn prove_and_verify_gemini_proof() {
     // Read all at once
-    const SRS_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/gemini_fibonacci_srs.bin");
-    const PROVING_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/gemini_fibonacci_pk.bin");
-    const VERIFYING_KEY: &[u8] = include_bytes!("../../test-vectors/halo2/gemini_fibonacci_vk.bin");
+    const SRS_KEY: &[u8] = include_bytes!("../test-vectors/halo2/gemini_fibonacci_srs.bin");
+    const PROVING_KEY: &[u8] = include_bytes!("../test-vectors/halo2/gemini_fibonacci_pk.bin");
+    const VERIFYING_KEY: &[u8] = include_bytes!("../test-vectors/halo2/gemini_fibonacci_vk.bin");
 
     // Test input
     let mut input = HashMap::new();
