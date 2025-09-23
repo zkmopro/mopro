@@ -35,8 +35,5 @@ mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi-
 # HALO2_DEV_DEPENDENCIES
 # NOIR_DEV_DEPENDENCIES
 
-[patch."https://github.com/zkmopro/mopro.git"]
-mopro-ffi = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor" }
-circom-prover = { git = "https://github.com/ElusAegis/mopro-halo2.git", branch = "feat/adapter-refactor" }
     "# // TODO - make build dependencies also configurable
 }
