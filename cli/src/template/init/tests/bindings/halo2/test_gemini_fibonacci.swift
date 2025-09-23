@@ -1,5 +1,5 @@
 import Foundation
-import mopro
+// GENERATED LIB IMPORT PLACEHOLDER
 
 do {
     let srsPath = "../../../test-vectors/halo2/gemini_fibonacci_srs.bin"

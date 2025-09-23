@@ -6,7 +6,6 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "mopro"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 # Adapters for different proof systems

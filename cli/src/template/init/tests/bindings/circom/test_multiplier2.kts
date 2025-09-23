@@ -1,4 +1,4 @@
-import uniffi.mopro.*
+// GENERATED LIB IMPORT PLACEHOLDER
 
 try {
     var zkeyPath = "./test-vectors/circom/multiplier2_final.zkey"
