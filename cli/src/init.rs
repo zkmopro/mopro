@@ -155,7 +155,3 @@ pub fn replace_string_in_file(file_path: &str, target: &str, replacement: &str) 
 
     Ok(())
 }
-
-fn contains_adapter(path: &str, adapter: Adapter) -> bool {
-    path.to_lowercase().contains(adapter.as_str())
-}
