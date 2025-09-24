@@ -1,8 +1,10 @@
 // --- Halo2 Example of using Plonk proving and verifying circuits ---
 
 // Module containing the Halo2 circuit logic (FibonacciMoproCircuit)
+#[macro_use]
+mod halo2;
 
-mopro_ffi::set_halo2_circuits! {
+set_halo2_circuits! {
     ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
     ("hyperplonk_fibonacci_pk.bin", hyperplonk_fibonacci::prove, "hyperplonk_fibonacci_vk.bin", hyperplonk_fibonacci::verify),
     ("gemini_fibonacci_pk.bin", gemini_fibonacci::prove, "gemini_fibonacci_vk.bin", gemini_fibonacci::verify),
@@ -10,9 +12,8 @@ mopro_ffi::set_halo2_circuits! {
 
 #[cfg(test)]
 mod halo2_tests {
+    use crate::halo2::{generate_halo2_proof, verify_halo2_proof};
     use std::collections::HashMap;
-
-    use super::*;
 
     #[test]
     fn test_plonk_fibonacci() {

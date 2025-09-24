@@ -1,28 +1,26 @@
-use super::replace_string_in_file;
-use super::ProvingSystem;
-use anyhow::Result;
+use crate::init::adapter::Adapter;
+use crate::init::proving_system::ProvingSystem;
 use include_dir::include_dir;
 use include_dir::Dir;
+
 pub struct Noir;
 
 impl ProvingSystem for Noir {
-    fn lib_template(file_path: &str) -> Result<()> {
-        let template_dir: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/noir");
-        let noir_lib_rs = match template_dir.get_file("lib.rs") {
-            Some(file) => file.contents(),
-            None => return Err(anyhow::anyhow!("lib.rs not found in template")),
-        };
-        let target = "// NOIR_TEMPLATE";
-        replace_string_in_file(file_path, target, &String::from_utf8_lossy(noir_lib_rs))
-    }
+    const TEMPLATE_DIR: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/src/template/noir");
 
-    fn dep_template(file_path: &str) -> Result<()> {
-        let replacement = "serial_test = \"3.2.0\"";
-        let target = "# NOIR_DEPENDENCIES";
-        replace_string_in_file(file_path, target, replacement)
-    }
+    const ADAPTER: Adapter = Adapter::Noir;
 
-    fn build_template(_file_path: &str) -> Result<()> {
-        Ok(())
-    }
+    const DEPENDENCIES: &'static str = r#"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.94"
+
+noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
+    "barretenberg",
+    "android-compat",
+], branch = "v1.0.0-beta.8-3" }
+    "#;
+
+    const DEV_DEPENDENCIES: &'static str = r#"
+serial_test = "3.0.0"
+    "#;
 }

@@ -18,52 +18,17 @@ default = ["build"]
 uniffi = []
 uniffi-tests = ["uniffi", "uniffi/bindgen-tests"]
 
-halo2 = []
-circom = ["rustwitness", "arkworks"]
-noir = ["noir_rs"]
-
 build = ["toml", "uuid", "camino"]
 no_uniffi_exports = []
 
-# circom features
-## witness
-rustwitness = ["circom-prover/rustwitness", "rust-witness"]
-witnesscalc = ["circom-prover/witnesscalc", "witnesscalc-adapter"]
-circom-witnesscalc = ["circom-prover/circom-witnesscalc"]
-## proof
-arkworks = ["circom-prover/arkworks"]
-rapidsnark = ["circom-prover/rapidsnark"]
-## include all circom features
-circom-all = ["rustwitness", "witnesscalc", "arkworks", "rapidsnark"]
-
 [dependencies]
 uniffi = { workspace = true, features = ["bindgen"] }
-num-bigint = { version = "0.4.3", default-features = false, features = [
-    "rand",
-] }
 toml = { version = "0.8.22", optional = true }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0.94"
 
 # Error handling
 thiserror = "2.0.12"
 anyhow = "1.0.86"
 color-eyre = "0.6.3"
-
-# circom deps
-rust-witness = { workspace = true, optional = true }
-witnesscalc-adapter = { version = "0.1", optional = true }
-circom-prover = { path = "../circom-prover", optional = true }
-
-# noir deps
-# build for Android
-noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
-    "barretenberg",
-    "android-compat",
-], branch = "v1.0.0-beta.8-3", optional = true }
-
-# ZKP generation# build for iOS
-# noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg"], optional = true }
 
 uuid = { version = "1.9.1", features = ["v4"], optional = true }
 camino = { version = "1.1.9", optional = true }
@@ -71,18 +36,3 @@ camino = { version = "1.1.9", optional = true }
 [build-dependencies]
 uuid = { version = "1.9.1", features = ["v4"] }
 camino = "1.1.9"
-rust-witness = { workspace = true, optional = true }
-witnesscalc-adapter = { version = "0.1", optional = true }
-
-[dev-dependencies]
-serial_test = "3.0.0"
-
-# circom deps
-ark-ff = { version = "0.5.0" }
-ark-bn254 = { version = "=0.5.0" }
-ark-bls12-381 = { version = "=0.5.0" }
-
-# Halo2 dependencies
-plonk-fibonacci = { workspace = true }
-hyperplonk-fibonacci = { workspace = true }
-gemini-fibonacci = { workspace = true }

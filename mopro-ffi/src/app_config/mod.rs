@@ -40,10 +40,10 @@ pub fn build_from_str_arch<Builder: PlatformBuilder>(
     params: Builder::Params,
 ) -> anyhow::Result<PathBuf> {
     if target_archs.is_empty() {
-        return Err(anyhow::anyhow!(
+        anyhow::bail!(
             "No target architectures specified for {} bindings",
             Builder::identifier()
-        ));
+        );
     }
 
     let target_archs: Vec<Builder::Arch> = target_archs

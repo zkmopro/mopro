@@ -196,6 +196,10 @@ fn reformat_kotlin_package(
         .join(out_android_module_name)
         .join(out_android_kt_file_name);
 
+    if generated_kt_file.eq(&out_android_kt_file) {
+        return Ok(());
+    }
+
     fs::create_dir(bindings_out.join("uniffi").join(out_android_module_name))
         .context("Failed to create new package directory")?;
     fs::rename(generated_kt_file, &out_android_kt_file).context("Failed to move kotlin file")?;

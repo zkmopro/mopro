@@ -1,12 +1,4 @@
-// Here we're calling a macro exported with Uniffi. This macro will
-// write some functions and bind them to FFI type.
-// These functions include:
-// - `generate_circom_proof`
-// - `verify_circom_proof`
-// - `generate_halo2_proof`
-// - `verify_halo2_proof`
-// - `generate_noir_proof`
-// - `verify_noir_proof`
+// Initializes the shared UniFFI scaffolding and defines the `MoproError` enum.
 mopro_ffi::app!();
 
 /// You can also customize the bindings by #[uniffi::export]
@@ -16,6 +8,9 @@ fn mopro_uniffi_hello_world() -> String {
     "Hello, World!".to_string()
 }
 
+#[macro_use]
+mod stubs;
+
 // CIRCOM_TEMPLATE
 
 // HALO2_TEMPLATE
@@ -24,10 +19,8 @@ fn mopro_uniffi_hello_world() -> String {
 
 #[cfg(test)]
 mod uniffi_tests {
-    use super::*;
-
     #[test]
     fn test_mopro_uniffi_hello_world() {
-        assert_eq!(mopro_uniffi_hello_world(), "Hello, World!");
+        assert_eq!(super::mopro_uniffi_hello_world(), "Hello, World!");
     }
 }
