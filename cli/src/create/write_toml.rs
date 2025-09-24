@@ -13,7 +13,7 @@ mopro-wasm = { git = "https://github.com/zkmopro/mopro",features = [
     "gemini",
     "hyperplonk",
     "plonk",
-]}
+], tag = "v0.2.x"}
 
 [target.wasm32-unknown-unknown.dependencies]
 console_error_panic_hook = "0.1.7"
@@ -42,8 +42,8 @@ crate-type = ["lib", "cdylib", "staticlib"]
 default = ["<FEATURES>"]
 
 [dependencies]
-mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi"] }
+mopro-wasm = { git = "https://github.com/zkmopro/mopro.git", tag = "v0.2.x" }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi"], tag = "v0.2.x" }
 rust-witness = "0.1"
 num-bigint = "0.4.0"
 thiserror = "2.0.12"
