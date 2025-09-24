@@ -1,5 +1,5 @@
 import Foundation
-import mopro
+// GENERATED LIB IMPORT PLACEHOLDER
 
 do {
     let zkeyPath = "../../../test-vectors/circom/multiplier2_final.zkey"

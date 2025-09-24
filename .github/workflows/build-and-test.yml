@@ -382,6 +382,107 @@ jobs:
             name: android-test-report
             path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android/app/build/reports/androidTests/connected/debug/
 
+  cli_create_react_native:
+    needs: cli_build
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter: [circom, halo2, noir]
+    runs-on: macos-14
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
+    steps:
+      - uses: actions/checkout@v5
+
+      # Build mopro example project for iOS + Android first, and create RN frameworks
+      - name: Prepare template project
+        uses: ./.github/actions/mopro-init-project
+        with:
+          artifact-name: mopro-bin-macOS
+          adapter: ${{ matrix.adapter }}
+          project-name: mopro-example-${{ matrix.adapter }}
+          destination: ${{ runner.temp }}
+
+      - name: Build iOS (debug; device+sim arm64 only)
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: |
+          "$GITHUB_WORKSPACE/bin/mopro" build \
+            --mode debug \
+            --platforms ios \
+            --architectures aarch64-apple-ios aarch64-apple-ios-sim
+
+      - name: Build Android (debug, x86_64)
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: |
+          "$GITHUB_WORKSPACE/bin/mopro" build \
+            --mode debug \
+            --platforms android \
+            --architectures x86_64-linux-android
+
+      - name: Clean mopro build dir
+        run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
+
+      - name: Create React Native frameworks
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+        run: $GITHUB_WORKSPACE/bin/mopro create --framework react-native
+
+      # ---- Node & deps ----
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install JS packages
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+        run: npm ci
+
+      - name: Expo prebuild (generate ios/ & android/)
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+        env:
+          EXPO_NO_INTERACTIVE: '1'
+        run: npx expo prebuild --clean
+
+      # ---- iOS build (headless) ----
+      - name: Install iOS Pods
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/ios
+        run: pod install
+
+      - name: Build iOS (Debug, iphonesimulator)
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+        run: |
+          xcodebuild \
+            -workspace ios/*.xcworkspace \
+            -scheme reactnativeapp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build
+
+      # ---- Android build (headless) ----
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Android SDK (cmdline only)
+        uses: android-actions/setup-android@v3
+
+      - name: Assemble Android Debug (no emulator)
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android
+        run: ./gradlew --no-daemon --stacktrace assembleDebug
+
+      - name: Upload native build outputs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rn-build-outputs-${{ matrix.adapter }}
+          path: |
+            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/ios/build/**/*.log
+            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android/app/build/outputs/**
+          if-no-files-found: ignore
+
   cli_build_web:
       needs: cli_build
       strategy:

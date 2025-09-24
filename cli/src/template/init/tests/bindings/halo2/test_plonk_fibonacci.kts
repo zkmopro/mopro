@@ -1,4 +1,4 @@
-import uniffi.mopro.*
+// GENERATED LIB IMPORT PLACEHOLDER
 
 try {
     val srsPath = "./test-vectors/halo2/plonk_fibonacci_srs.bin"
