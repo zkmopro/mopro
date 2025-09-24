@@ -3,7 +3,7 @@ use mopro_ffi::app_config::constants::{ANDROID_BINDINGS_DIR, IOS_BINDINGS_DIR};
 //
 // Platform Section
 //
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Platform {
     Ios,
     Android,
@@ -39,12 +39,11 @@ impl Platform {
             .expect("Unsupported Platform")
     }
 
-    pub fn parse_from_str(s: &str) -> Self {
+    pub fn parse_from_str(s: &str) -> Option<Self> {
         PLATFORMS
             .iter()
             .find(|info| info.str.to_lowercase() == s.to_lowercase())
             .map(|info| info.platform)
-            .expect("Unsupported Platform String")
     }
 
     pub fn all_strings() -> Vec<&'static str> {

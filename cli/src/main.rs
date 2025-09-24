@@ -16,7 +16,6 @@ mod print;
 mod select;
 mod style;
 mod update;
-mod utils;
 
 /// CLI for creating a mopro project.
 #[derive(Parser, Debug)]

@@ -41,9 +41,6 @@ impl Default for Config {
 }
 
 impl Config {
-    pub fn adapter_eq(&self, adapter: Adapter) -> bool {
-        self.target_adapters == Some(HashSet::from([String::from(adapter.as_str())]))
-    }
     pub fn adapter_contains(&self, adapter: Adapter) -> bool {
         if let Some(adapters) = &self.target_adapters {
             adapters.contains(adapter.as_str())
