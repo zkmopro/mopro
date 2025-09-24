@@ -272,7 +272,7 @@ cargo install --path .
     mopro build # with mopro CLI
     ```
 
-    and choose `iOS`.
+    and choose `Android`.
 
 -   To test for Android e2e app
 

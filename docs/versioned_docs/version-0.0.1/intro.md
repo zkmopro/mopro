@@ -10,7 +10,7 @@ How? Mopro connects different adapters with different platforms. You can think o
 
 ![mopro adapters and platforms](/img/roadmap.png)
 
-Note that the above is a work in progress, and the dashed lines indicate things that are still experimental and/or in an an early stage.
+Note that the above is a work in progress, and the dashed lines indicate things that are still experimental and/or in an early stage.
 
 If you just want to get started using mopro, see [getting started](getting-started).
 
