@@ -38,7 +38,7 @@ impl Create for Flutter {
             Self::NAME,
         )?;
 
-        let flutter_dir = project_dir.join(&format!("flutter-app-{version}"));
+        let flutter_dir = project_dir.join(format!("flutter-app-{version}"));
         fs::rename(flutter_dir, &target_dir)?;
 
         let mopro_flutter_plugin_dir = target_dir.join("mopro_flutter_plugin");
