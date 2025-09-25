@@ -58,17 +58,17 @@ pub fn init_project(
 
     if let Some(cargo_toml_path) = project_dir.join("Cargo.toml").to_str() {
         replace_project_name(cargo_toml_path, &project_name)?;
-        adapter_sel.dep_template(cargo_toml_path);
-        adapter_sel.build_dep_template(cargo_toml_path);
-        adapter_sel.dev_dep_template(cargo_toml_path);
+        adapter_sel.dep_template(cargo_toml_path)?;
+        adapter_sel.build_dep_template(cargo_toml_path)?;
+        adapter_sel.dev_dep_template(cargo_toml_path)?;
     }
 
     if let Some(build_rs_path) = project_dir.join("build.rs").to_str() {
-        adapter_sel.build_template(build_rs_path);
+        adapter_sel.build_template(build_rs_path)?;
     }
 
     if let Some(lib_rs_path) = project_dir.join("src").join("lib.rs").to_str() {
-        adapter_sel.lib_template(lib_rs_path);
+        adapter_sel.lib_template(lib_rs_path)?;
     }
 
     if let Some(test_bindings_dir_path) = project_dir.join("tests").join("bindings").to_str() {

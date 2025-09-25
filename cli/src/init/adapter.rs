@@ -72,72 +72,77 @@ impl AdapterSelector {
         }
     }
 
-    pub fn dep_template(&self, cargo_toml_path: &str) {
+    pub fn dep_template(&self, cargo_toml_path: &str) -> anyhow::Result<()> {
         if self.contains(Adapter::Circom) {
-            Circom::dep_template(cargo_toml_path).unwrap();
+            Circom::dep_template(cargo_toml_path)?;
         }
         if self.contains(Adapter::Halo2) {
-            Halo2::dep_template(cargo_toml_path).unwrap();
+            Halo2::dep_template(cargo_toml_path)?;
         }
         if self.contains(Adapter::Noir) {
-            Noir::dep_template(cargo_toml_path).unwrap();
+            Noir::dep_template(cargo_toml_path)?;
         }
+        Ok(())
     }
 
-    pub fn build_dep_template(&self, cargo_toml_path: &str) {
+    pub fn build_dep_template(&self, cargo_toml_path: &str) -> anyhow::Result<()> {
         if self.contains(Adapter::Circom) {
-            Circom::build_dep_template(cargo_toml_path).unwrap();
+            Circom::build_dep_template(cargo_toml_path)?;
         }
         if self.contains(Adapter::Halo2) {
-            Halo2::build_dep_template(cargo_toml_path).unwrap();
+            Halo2::build_dep_template(cargo_toml_path)?;
         }
         if self.contains(Adapter::Noir) {
-            Noir::build_dep_template(cargo_toml_path).unwrap();
+            Noir::build_dep_template(cargo_toml_path)?;
         }
+        Ok(())
     }
 
-    pub fn dev_dep_template(&self, cargo_toml_path: &str) {
+    pub fn dev_dep_template(&self, cargo_toml_path: &str) -> anyhow::Result<()> {
         if self.contains(Adapter::Circom) {
-            Circom::dev_dep_template(cargo_toml_path).unwrap();
+            Circom::dev_dep_template(cargo_toml_path)?;
         }
         if self.contains(Adapter::Halo2) {
-            Halo2::dev_dep_template(cargo_toml_path).unwrap();
+            Halo2::dev_dep_template(cargo_toml_path)?;
         }
         if self.contains(Adapter::Noir) {
-            Noir::dev_dep_template(cargo_toml_path).unwrap();
+            Noir::dev_dep_template(cargo_toml_path)?;
         }
+        Ok(())
     }
 
-    pub fn lib_template(&self, lib_rs_path: &str) {
+    pub fn lib_template(&self, lib_rs_path: &str) -> anyhow::Result<()> {
         if self.contains(Adapter::Circom) {
-            Circom::lib_template(lib_rs_path).unwrap();
+            Circom::lib_template(lib_rs_path)?;
         } else {
-            Circom::lib_stub_template(lib_rs_path).unwrap();
+            Circom::lib_stub_template(lib_rs_path)?;
         }
 
         if self.contains(Adapter::Halo2) {
-            Halo2::lib_template(lib_rs_path).unwrap();
+            Halo2::lib_template(lib_rs_path)?;
         } else {
-            Halo2::lib_stub_template(lib_rs_path).unwrap();
+            Halo2::lib_stub_template(lib_rs_path)?;
         }
 
         if self.contains(Adapter::Noir) {
-            Noir::lib_template(lib_rs_path).unwrap();
+            Noir::lib_template(lib_rs_path)?;
         } else {
-            Noir::lib_stub_template(lib_rs_path).unwrap();
+            Noir::lib_stub_template(lib_rs_path)?;
         }
+        Ok(())
     }
 
-    pub fn build_template(&self, build_rs_path: &str) {
+    pub fn build_template(&self, build_rs_path: &str) -> anyhow::Result<()> {
         if self.contains(Adapter::Circom) {
-            Circom::build_template(build_rs_path).unwrap();
+            Circom::build_template(build_rs_path)?;
         }
         if self.contains(Adapter::Halo2) {
-            Halo2::build_template(build_rs_path).unwrap();
+            Halo2::build_template(build_rs_path)?;
         }
         if self.contains(Adapter::Noir) {
-            Noir::build_template(build_rs_path).unwrap();
+            Noir::build_template(build_rs_path)?;
         }
+        Ok(())
     }
 
     pub fn contains(&self, adapter: Adapter) -> bool {
