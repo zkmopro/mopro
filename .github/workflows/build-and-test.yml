@@ -45,6 +45,8 @@ jobs:
         uses: ./.github/actions/setup-rust
         with:
           cache-key: clippy
+      - name: Install Clippy
+        run: rustup component add clippy
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features
 
@@ -57,6 +59,8 @@ jobs:
         uses: ./.github/actions/setup-rust
         with:
           cache-key: format
+      - name: Install rustfmt
+        run: rustup component add rustfmt
       - name: Check formatting
         run: cargo fmt --all -- --check
 
