@@ -77,7 +77,7 @@ mopro update
 or
 
 ```sh
-mopro udpate [--src PATH] [--dest PATH] [--no-prompt]
+mopro update [--src PATH] [--dest PATH] [--no-prompt]
 ```
 
 By default `mopro update` looks for bindings and mobile projects in the current
