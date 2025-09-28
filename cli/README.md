@@ -1,12 +1,18 @@
-# mopro-cli
+# MoPro CLI
 
-**Mopro CLI** is a developer-friendly command-line tool that simplifies building native mobile apps with mopro-ffi. It streamlines the integration process and offers powerful customization options.
+**What is MoPro?**
+
+MoPro stands for **Mobile Prover** — a framework designed to simplify the development of client-side zero-knowledge (ZK) proof systems on mobile platforms.
+
+👉 Visit [zkmopro.org](https://zkmopro.org) to learn more about using MoPro and MoPro CLI.
+
+**Mopro CLI** is a developer-friendly command-line tool that simplifies building native mobile apps with `mopro-ffi`. It streamlines the integration process and offers powerful customization options.
 
 ## Key Features
 
--   **Modular:** Choose one or more adapters from mopro-ffi—currently supporting Circom, Halo2, and Noir. You can also integrate your own Rust crate. See [Custom Adapters](https://zkmopro.org/docs/adapters/overview#custom-adapters) for details.
+-   **Modular:** Choose one or more adapters from `mopro-ffi`—currently supporting Circom, Halo2, and Noir. You can also integrate your own Rust crate. See [Custom Adapters](https://zkmopro.org/docs/adapters/overview#custom-adapters) for details.
 -   **Versatile:** Generate templates for various platforms including _Swift (Xcode)_, _Kotlin (Android Studio)_, _React Native_, _Flutter_, and _Web_.
--   **Automated:** Skip the tedious setup—`mopro` CLI automates UniFFI bindings and configures Xcode and Android Studio for you.
+-   **Automated:** Skip the tedious setup—`mopro` CLI automates [UniFFI](https://github.com/mozilla/uniffi-rs) bindings and configures Xcode and Android Studio for you.
 
 ## Usage
 
@@ -14,6 +20,14 @@
 
 ```sh
 cargo install mopro-cli
+```
+
+-   Install the latest change on GitHub
+
+```sh
+git clone https://github.com/zkmopro/mopro
+cd mopro/cli
+cargo install --path .
 ```
 
 ### Help
@@ -39,6 +53,12 @@ mopro init
 ### Build bindings
 
 ```sh
+mopro build
+```
+
+or 
+
+```sh
 mopro build --auto-update
 ```
 
@@ -51,7 +71,13 @@ mopro create
 ### Update bindings
 
 ```sh
-mopro update [--src PATH] [--dest PATH] [--no-prompt]
+mopro update
+```
+
+or
+
+```sh
+mopro udpate [--src PATH] [--dest PATH] [--no-prompt]
 ```
 
 By default `mopro update` looks for bindings and mobile projects in the current
@@ -64,7 +90,6 @@ stored in `Config.toml` under an `update` section:
 ios_dest = "../MyiOSApp"
 android_dest = "../MyAndroidApp"
 ```
-```
 
 ### Create bindings without Rust project
 
@@ -74,18 +99,17 @@ mopro bindgen
 
 You can customize the bindings generation:
 
-- Choose a witness generator adapter (default `rust-witness`):
+-   Choose a witness generator adapter (default `rust-witness`):
 
-  ```sh
-  mopro bindgen --adapter witnesscalc
-  ```
+    ```sh
+    mopro bindgen --adapter witnesscalc
+    ```
 
-- Specify the output directory for generated bindings:
+-   Specify the output directory for generated bindings:
 
-  ```sh
-  mopro bindgen --output-dir ./output
-  ```
-
+    ```sh
+    mopro bindgen --output-dir ./output
+    ```
 
 ## Development
 
