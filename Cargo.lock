@@ -2170,7 +2170,7 @@ dependencies = [
  "fs_extra",
  "include_dir",
  "indicatif",
- "mopro-ffi 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mopro-ffi",
  "reqwest",
  "serde",
  "toml 0.9.2",
@@ -2181,21 +2181,6 @@ dependencies = [
 [[package]]
 name = "mopro-ffi"
 version = "0.3.0"
-dependencies = [
- "anyhow",
- "camino",
- "color-eyre",
- "thiserror 2.0.12",
- "toml 0.8.22",
- "uniffi",
- "uuid",
-]
-
-[[package]]
-name = "mopro-ffi"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ef423d77a633b5279866226984f4884f63f9fc8e8ac2b417ffbefebf7cfdb8c"
 dependencies = [
  "anyhow",
  "camino",
