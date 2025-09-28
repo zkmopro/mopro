@@ -6,7 +6,6 @@ members = [
     "circom-prover",
 ]
 resolver = "2"
-exclude = ["mopro-example-app"]
 
 [workspace.dependencies]
 rust-witness = "0.1"
