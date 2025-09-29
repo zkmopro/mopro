@@ -16,7 +16,7 @@ flutter = ["mopro-ffi/flutter"]
 
 [dependencies]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "flutter-ffi } // TODO: change back to main
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "flutter-ffi" } # TODO: change back to main
 thiserror = "2.0.12"
 anyhow = "1.0.99"
 
@@ -30,7 +30,7 @@ anyhow = "1.0.99"
 # NOIR_BUILD_DEPENDENCIES
 
 [dev-dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi-tests"] }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "flutter-ffi", features = ["uniffi-tests"] } # TODO: change back to main
 
 # CIRCOM_DEV_DEPENDENCIES
 # HALO2_DEV_DEPENDENCIES

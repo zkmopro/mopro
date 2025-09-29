@@ -1,7 +1,6 @@
 #[macro_use]
 mod stubs;
 
-#[macro_use]
 mod error;
 pub use error::MoproError;
 
@@ -11,7 +10,7 @@ mopro_ffi::app!();
 /// You can also customize the bindings by #[uniffi::export]
 /// Reference: https://mozilla.github.io/uniffi-rs/latest/proc_macro/index.html
 #[cfg_attr(feature = "uniffi", uniffi::export)]
-fn mopro_hello_world() -> String {
+pub fn mopro_hello_world() -> String {
     "Hello, World!".to_string()
 }
 

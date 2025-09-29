@@ -2,7 +2,7 @@
 
 // Module containing the Noir circuit logic (Multiplier2)
 mod noir;
-use noir::{generate_noir_proof, get_noir_verification_key, verify_noir_proof,};
+pub use noir::{generate_noir_proof, get_noir_verification_key, verify_noir_proof,};
 
 #[cfg(test)]
 mod noir_tests {
