@@ -2,29 +2,29 @@
 macro_rules! circom_stub {
     () => {
         mod circom_stub {
-            use crate::MoproError;
+            use crate::error::MoproError;
 
-            #[cfg_attr(feature = "uniffi", uniffi::Record)]
+            #[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
             pub struct CircomProofResult {
                 pub proof: CircomProof,
                 pub inputs: Vec<String>,
             }
 
-            #[cfg_attr(feature = "uniffi", uniffi::Record)]
+            #[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
             pub struct G1 {
                 pub x: String,
                 pub y: String,
                 pub z: String,
             }
 
-            #[cfg_attr(feature = "uniffi", uniffi::Record)]
+            #[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
             pub struct G2 {
                 pub x: Vec<String>,
                 pub y: Vec<String>,
                 pub z: Vec<String>,
             }
 
-            #[cfg_attr(feature = "uniffi", uniffi::Record)]
+            #[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
             pub struct CircomProof {
                 pub a: G1,
                 pub b: G2,
@@ -33,7 +33,7 @@ macro_rules! circom_stub {
                 pub curve: String,
             }
 
-            #[cfg_attr(feature = "uniffi", uniffi::Enum)]
+            #[cfg_attr(feature = "uniffi", derive(uniffi::Enum))]
             pub enum ProofLib {
                 Arkworks,
                 Rapidsnark,
