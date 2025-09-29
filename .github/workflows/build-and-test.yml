@@ -160,11 +160,11 @@ jobs:
           project-name: mopro-example-${{ matrix.adapter }}
           destination: ${{ runner.temp }}
 
-      - name: Build iOS (debug; device+sim arm64 only)
+      - name: Build iOS (release; device+sim arm64 only)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode debug \
+            --mode release \
             --platforms ios \
             --architectures aarch64-apple-ios aarch64-apple-ios-sim
 
@@ -343,11 +343,11 @@ jobs:
             project-name: mopro-example-${{ matrix.adapter }}
             destination: ${{ runner.temp }}
 
-        - name: Build Android (debug, x86_64)
+        - name: Build Android (release, x86_64)
           working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
           run: |
             "$GITHUB_WORKSPACE/bin/mopro" build \
-              --mode debug \
+              --mode release \
               --platforms android \
               --architectures x86_64-linux-android
 
@@ -410,11 +410,11 @@ jobs:
             project-name: mopro-example-${{ matrix.adapter }}
             destination: ${{ runner.temp }}
 
-        - name: Build Flutter (debug)
+        - name: Build Flutter (release)
           working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
           run: |
             "$GITHUB_WORKSPACE/bin/mopro" build \
-              --mode debug \
+              --mode release \
               --platforms flutter 
 
         - name: Clean the `build` dir to save space
@@ -449,19 +449,19 @@ jobs:
           project-name: mopro-example-${{ matrix.adapter }}
           destination: ${{ runner.temp }}
 
-      - name: Build iOS (debug; device+sim arm64 only)
+      - name: Build iOS (release; device+sim arm64 only)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode debug \
+            --mode release \
             --platforms ios \
             --architectures aarch64-apple-ios aarch64-apple-ios-sim
 
-      - name: Build Android (debug, x86_64)
+      - name: Build Android (release, x86_64)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode debug \
+            --mode release \
             --platforms android \
             --architectures x86_64-linux-android
 
