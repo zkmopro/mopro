@@ -40,7 +40,7 @@ impl PlatformBuilder for FlutterPlatform {
         let cargo_toml_path = project_dir
             .join(FLUTTER_BINDINGS_DIR)
             .join("rust/Cargo.toml");
-        ensure_workspace_toml(&cargo_toml_path.to_string_lossy().to_string());
+        ensure_workspace_toml(cargo_toml_path.to_string_lossy().as_ref());
 
         // Import user defined crates
         let third_party_crate_name = raw_project_name_from_toml(project_dir)?;
@@ -49,7 +49,7 @@ impl PlatformBuilder for FlutterPlatform {
                 "add",
                 &third_party_crate_name,
                 "--path",
-                &project_dir.to_string_lossy().to_string(),
+                project_dir.to_string_lossy().as_ref(),
                 "--no-default-features",
                 "--features",
                 "flutter",
@@ -65,7 +65,7 @@ impl PlatformBuilder for FlutterPlatform {
         replace_relative_path_with_absolute(
             &cargo_toml_path,
             &third_party_crate_name,
-            &project_dir,
+            project_dir,
         )?;
 
         // Patch cargokit build script
