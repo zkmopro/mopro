@@ -3,6 +3,7 @@ use color_eyre::eyre::ContextCompat;
 pub const BUILD_MODE_ENV: &str = "CONFIGURATION";
 pub const IOS_ARCHS_ENV: &str = "IOS_ARCHS";
 pub const ANDROID_ARCHS_ENV: &str = "ANDROID_ARCHS";
+pub const FLUTTER_ARCHS_ENV: &str = "FLUTTER_ARCHS";
 
 pub const IOS_BINDINGS_DIR: &str = "MoproiOSBindings";
 pub const IOS_SWIFT_FILE: &str = "mopro.swift";
@@ -14,11 +15,15 @@ pub const ANDROID_UNIFFI_DIR: &str = "uniffi";
 pub const ANDROID_PACKAGE_NAME: &str = "mopro";
 pub const ANDROID_KT_FILE: &str = "mopro.kt";
 
+pub const WEB_BINDINGS_DIR: &str = "MoproWasmBindings";
+
 pub const ARCH_X86_64: &str = "x86_64";
 pub const ARCH_ARM_64: &str = "aarch64";
 pub const ARCH_I686: &str = "x86";
 pub const ARCH_ARM_V7_ABI: &str = "armeabi-v7a";
 pub const ARCH_ARM_64_V8: &str = "arm64-v8a";
+
+pub const FLUTTER_BINDINGS_DIR: &str = "mopro_flutter_bindings";
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Mode {
@@ -235,6 +240,131 @@ impl Arch for AndroidArch {
     }
 }
 
+pub struct WebArch;
+
+impl Arch for WebArch {
+    fn platform() -> Box<dyn Platform> {
+        Box::new(WebPlatform)
+    }
+
+    fn as_str(&self) -> &'static str {
+        "wasm32-unknown-unknown"
+    }
+
+    fn parse_from_str<S: AsRef<str>>(_s: S) -> Self {
+        WebArch
+    }
+
+    fn all_strings() -> Vec<&'static str> {
+        vec!["wasm32-unknown-unknown"]
+    }
+
+    fn all_display_strings() -> Vec<(String, String)> {
+        vec![(
+            "wasm32-unknown-unknown".to_string(),
+            "WebAssembly".to_string(),
+        )]
+    }
+
+    fn env_var_name() -> &'static str {
+        "WEB_ARCHS"
+    }
+}
+
+// TODO: reuse iOS, Android constants
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+
+pub enum FlutterArch {
+    Aarch64Apple,
+    Aarch64AppleSim,
+    X8664Apple,
+    X8664Linux,
+    I686Linux,
+    Armv7LinuxAbi,
+    Aarch64Linux,
+}
+struct FlutterArchInfo {
+    arch: FlutterArch,
+    str: &'static str,
+    description: &'static str,
+}
+
+const FLUTTER_ARCHS: [FlutterArchInfo; 7] = [
+    FlutterArchInfo {
+        arch: FlutterArch::Aarch64Apple,
+        str: "aarch64-apple-ios",
+        description: "64-bit iOS devices (iPhone/iPad)",
+    },
+    FlutterArchInfo {
+        arch: FlutterArch::Aarch64AppleSim,
+        str: "aarch64-apple-ios-sim",
+        description: "ARM64 iOS simulator on Apple Silicon Macs",
+    },
+    FlutterArchInfo {
+        arch: FlutterArch::X8664Apple,
+        str: "x86_64-apple-ios",
+        description: "x86_64 iOS simulator on Intel Macs",
+    },
+    FlutterArchInfo {
+        arch: FlutterArch::X8664Linux,
+        str: "x86_64-linux-android",
+        description: "64-bit Android emulators (x86_64 architecture)",
+    },
+    FlutterArchInfo {
+        arch: FlutterArch::I686Linux,
+        str: "i686-linux-android",
+        description: "32-bit Android emulators (x86 architecture, legacy)",
+    },
+    FlutterArchInfo {
+        arch: FlutterArch::Armv7LinuxAbi,
+        str: "armv7-linux-androideabi",
+        description: "32-bit ARM devices (older Android smartphones/tablets)",
+    },
+    FlutterArchInfo {
+        arch: FlutterArch::Aarch64Linux,
+        str: "aarch64-linux-android",
+        description: "64-bit ARM devices (modern Android smartphones/tablets)",
+    },
+];
+
+impl Arch for FlutterArch {
+    fn platform() -> Box<dyn Platform> {
+        Box::new(FlutterPlatform)
+    }
+
+    fn as_str(&self) -> &'static str {
+        FLUTTER_ARCHS
+            .iter()
+            .find(|info| info.arch == *self)
+            .map(|info| info.str)
+            .expect("Unsupported iOS Arch")
+    }
+
+    fn parse_from_str<S: AsRef<str>>(s: S) -> Self {
+        FLUTTER_ARCHS
+            .iter()
+            .find(|info| info.str.to_lowercase() == s.as_ref().to_lowercase())
+            .map(|info| info.arch)
+            .context(format!("Unsupported iOS Arch '{}'", s.as_ref()))
+            .unwrap()
+    }
+
+    fn all_strings() -> Vec<&'static str> {
+        FLUTTER_ARCHS.iter().map(|info| info.str).collect()
+    }
+
+    fn all_display_strings() -> Vec<(String, String)> {
+        FLUTTER_ARCHS
+            .iter()
+            .map(|info| (info.str.to_string(), info.description.to_string()))
+            .collect()
+    }
+
+    fn env_var_name() -> &'static str {
+        FLUTTER_ARCHS_ENV
+    }
+}
+
 //
 // Platform Section
 //
@@ -278,5 +408,13 @@ pub struct WebPlatform;
 impl Platform for WebPlatform {
     fn identifier() -> &'static str {
         "Web Bindings Builder"
+    }
+}
+
+pub struct FlutterPlatform;
+
+impl Platform for FlutterPlatform {
+    fn identifier() -> &'static str {
+        "Flutter Bindings Builder"
     }
 }

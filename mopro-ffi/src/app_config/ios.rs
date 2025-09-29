@@ -133,7 +133,8 @@ impl PlatformBuilder for IosPlatform {
             bindings_out.join(out_swift_file_name),
         )
         .context(format!(
-            "Failed to rename bindings from {gen_swift_file_name}"
+            "Failed to rename bindings from {}/{gen_swift_file_name}",
+            swift_bindings_dir.display(),
         ))?;
 
         let mut xcbuild_cmd = Command::new("xcodebuild");
