@@ -180,8 +180,10 @@ pub fn build_project(
                     "--no-default-features",
                     "--features",
                     "flutter",
-                    "--release",
                 ]);
+                if mode == Mode::Release {
+                    command.arg("--release");
+                }
 
                 let status = command.status()?;
 
