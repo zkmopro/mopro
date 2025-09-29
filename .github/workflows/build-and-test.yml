@@ -385,6 +385,44 @@ jobs:
           with:
             name: android-test-report
             path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android/app/build/reports/androidTests/connected/debug/
+  
+  cli_build_flutter:
+      needs: cli_build
+      strategy:
+        fail-fast: false
+        matrix:
+          adapter: [circom, halo2, noir]
+      runs-on: ubuntu-latest
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+      steps:
+        - uses: actions/checkout@v5
+
+        - name: Prepare template project
+          uses: ./.github/actions/mopro-init-project
+          with:
+            artifact-name: mopro-bin-${{ runner.os }}
+            adapter: ${{ matrix.adapter }}
+            project-name: mopro-example-${{ matrix.adapter }}
+            destination: ${{ runner.temp }}
+
+        - name: Build Flutter (debug)
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: |
+            "$GITHUB_WORKSPACE/bin/mopro" build \
+              --mode debug \
+              --platforms flutter 
+
+        - name: Clean the `build` dir to save space
+          run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
+
+        - name: Create Flutter framework
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: |
+            "$GITHUB_WORKSPACE/bin/mopro" create --framework flutter
+
+        - name: Build flutter app
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: cd flutter && flutter pub get
 
   cli_create_react_native:
     needs: cli_build
