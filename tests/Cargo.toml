@@ -1,0 +1,29 @@
+[package]
+name = "tests"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "ios"
+path = "bin/ios.rs"
+
+[[bin]]
+name = "android"
+path = "bin/android.rs"
+
+
+[[bin]]
+name = "flutter"
+path = "bin/flutter.rs"
+
+[lib]
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[features]
+default = ["uniffi"]
+uniffi = ["mopro-ffi/uniffi"]
+flutter = ["mopro-ffi/flutter"]
+
+[dependencies]
+mopro-ffi = { path = "../mopro-ffi"}
+thiserror = "2.0.12"

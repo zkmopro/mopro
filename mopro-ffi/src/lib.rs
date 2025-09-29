@@ -20,6 +20,7 @@ macro_rules! uniffi_setup {
     () => {
         // `::uniffi` must be available in the caller’s extern-prelude.
         extern crate mopro_ffi as uniffi;
+        uniffi::setup_scaffolding!();
     };
 }
 
@@ -29,6 +30,28 @@ macro_rules! uniffi_setup {
     () => {
         // No-op when `uniffi` feature isn't enabled in `mopro_ffi`.
     };
+}
+
+#[cfg(feature = "flutter")]
+pub use flutter_rust_bridge::*;
+
+#[cfg(feature = "flutter")]
+#[macro_export]
+macro_rules! flutter_setup {
+    () => {
+        // ::uniffi must be available in the caller’s extern-prelude.
+        extern crate mopro_ffi as flutter_rust_bridge;
+        pub fn init_app() {
+            // Default utilities - feel free to customize
+            flutter_rust_bridge::setup_default_user_utils();
+        }
+    };
+}
+
+#[cfg(not(feature = "flutter"))]
+#[macro_export]
+macro_rules! flutter_setup {
+    () => {};
 }
 
 /// This macro is used to setup the Mopro FFI library
@@ -91,7 +114,7 @@ macro_rules! uniffi_setup {
 macro_rules! app {
     () => {
         mopro_ffi::uniffi_setup!();
-        uniffi::setup_scaffolding!();
+        mopro_ffi::flutter_setup!();
 
         // This should be declared into this macro due to Uniffi's limitation
         // Please refer this issue: https://github.com/mozilla/uniffi-rs/issues/2257
