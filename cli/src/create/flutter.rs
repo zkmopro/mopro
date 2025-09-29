@@ -1,17 +1,12 @@
 use anyhow::Error;
-use std::{env, fs, path::PathBuf};
+use mopro_ffi::app_config::project_name_from_toml;
+use std::{fs, path::PathBuf};
 
 use super::Create;
 use crate::constants::Platform;
 use crate::create::utils::{check_bindings, copy_keys, download_and_extract_template};
 use crate::print::print_footer_message;
 use crate::style::print_green_bold;
-use crate::update::{update_file, update_folder};
-
-use mopro_ffi::app_config::constants::{
-    ANDROID_JNILIBS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME, ANDROID_UNIFFI_DIR, IOS_SWIFT_FILE,
-    IOS_XCFRAMEWORKS_DIR,
-};
 
 pub struct Flutter;
 
@@ -20,8 +15,7 @@ impl Create for Flutter {
 
     fn create(project_dir: PathBuf) -> Result<(), Error> {
         // Check both bindings
-        let ios_bindings_dir = check_bindings(&project_dir, Platform::Ios)?;
-        let android_bindings_dir = check_bindings(&project_dir, Platform::Android)?;
+        let _ = check_bindings(&project_dir, Platform::Flutter)?;
 
         let target_dir = project_dir.join(Self::NAME);
         if target_dir.exists() {
@@ -32,40 +26,40 @@ impl Create for Flutter {
         }
 
         download_and_extract_template(
-            "https://github.com/zkmopro/flutter-app/archive/refs/heads/main.zip",
+            // "https://github.com/zkmopro/flutter-app/archive/refs/heads/main.zip",
+            "https://github.com/zkmopro/flutter-app/archive/refs/heads/frb-refactor-circom-halo2.zip", // TODO: change back to main
             &project_dir,
             Self::NAME,
         )?;
 
-        let flutter_dir = project_dir.join("flutter-app-main");
+        // let flutter_dir = project_dir.join("flutter-app-main");
+        let flutter_dir = project_dir.join("flutter-app-frb-refactor-circom-halo2"); // TODO: change back to main
         fs::rename(flutter_dir, &target_dir)?;
 
-        let mopro_flutter_plugin_dir = target_dir.join("mopro_flutter_plugin");
-        let previous_dir = env::current_dir()?;
-        env::set_current_dir(&mopro_flutter_plugin_dir)?;
+        // update podspecs
+        let podspec_path = target_dir.join("pubspec.yaml");
+        let podspec_content = fs::read_to_string(podspec_path.clone())?;
+        let updated_content = podspec_content.replace(
+            "path: ./mopro_flutter_bindings",
+            "path: ../mopro_flutter_bindings",
+        );
+        fs::write(&podspec_path, updated_content)?;
 
-        // Handle iOS if provided
-        if let Some(ios_dir) = ios_bindings_dir {
-            let xcframeworks_dir = ios_dir.join(IOS_XCFRAMEWORKS_DIR);
-            let mopro_swift_file = ios_dir.join(IOS_SWIFT_FILE);
-            let current_dir = env::current_dir()?;
-            let _ = update_folder(&xcframeworks_dir, &current_dir, IOS_XCFRAMEWORKS_DIR, false)?;
-            let _ = update_file(&mopro_swift_file, &current_dir, IOS_SWIFT_FILE)?;
-        }
+        // remove mopro_flutter_bindings in flutter to avoid confusion
+        fs::remove_dir_all(target_dir.join("mopro_flutter_bindings"))?;
 
-        // Handle Android if provided
-        if let Some(android_dir) = android_bindings_dir {
-            let jnilib_path = android_dir.join(ANDROID_JNILIBS_DIR);
-            let kotlin_path = android_dir
-                .join(ANDROID_UNIFFI_DIR)
-                .join(ANDROID_PACKAGE_NAME)
-                .join(ANDROID_KT_FILE);
-
-            let current_dir = env::current_dir()?;
-            let _ = update_file(&kotlin_path, &current_dir, ANDROID_KT_FILE)?;
-            let _ = update_folder(&jnilib_path, &current_dir, ANDROID_JNILIBS_DIR, true)?;
-        }
-        env::set_current_dir(previous_dir)?;
+        // Update library name
+        let main_path = target_dir.join("lib/main.dart");
+        let main_content = fs::read_to_string(main_path.clone())?;
+        let project_name = project_name_from_toml(&project_dir)?;
+        let updated_content = main_content.replace(
+            "import 'package:mopro_flutter_bindings/src/rust/third_party/test_e2e.dart';",
+            &format!(
+                "import 'package:mopro_flutter_bindings/src/rust/third_party/{}.dart';",
+                project_name
+            ),
+        );
+        fs::write(&main_path, updated_content)?;
 
         // Keys
         let assets_dir = target_dir.join("assets");
