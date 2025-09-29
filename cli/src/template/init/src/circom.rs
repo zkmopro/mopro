@@ -15,27 +15,31 @@ use std::str::FromStr;
 //
 // Data structures for Circom proof representation
 //
-#[derive(Debug, Clone, uniffi::Record)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
 pub struct CircomProofResult {
     pub proof: CircomProof,
     pub inputs: Vec<String>,
 }
 
-#[derive(Debug, Clone, Default, uniffi::Record)]
+#[derive(Debug, Clone, Default)]
+#[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
 pub struct G1 {
     pub x: String,
     pub y: String,
     pub z: String,
 }
 
-#[derive(Debug, Clone, Default, uniffi::Record)]
+#[derive(Debug, Clone, Default)]
+#[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
 pub struct G2 {
     pub x: Vec<String>,
     pub y: Vec<String>,
     pub z: Vec<String>,
 }
 
-#[derive(Debug, Clone, Default, uniffi::Record)]
+#[derive(Debug, Clone, Default)]
+#[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
 pub struct CircomProof {
     pub a: G1,
     pub b: G2,
@@ -44,7 +48,8 @@ pub struct CircomProof {
     pub curve: String,
 }
 
-#[derive(Debug, Clone, Default, uniffi::Enum)]
+#[derive(Debug, Clone, Default)]
+#[cfg_attr(feature = "uniffi", derive(uniffi::Enum))]
 pub enum ProofLib {
     #[default]
     Arkworks,
@@ -142,8 +147,8 @@ impl Into<CircomProverProofLib> for ProofLib {
 // Main functions for proof generation and verification
 //
 
-#[uniffi::export]
-pub(crate) fn generate_circom_proof(
+#[cfg_attr(feature = "uniffi", uniffi::export)]
+pub fn generate_circom_proof(
     zkey_path: String,
     circuit_inputs: String,
     proof_lib: ProofLib,
@@ -177,8 +182,8 @@ pub(crate) fn generate_circom_proof(
     })
 }
 
-#[uniffi::export]
-pub(crate) fn verify_circom_proof(
+#[cfg_attr(feature = "uniffi", uniffi::export)]
+pub fn verify_circom_proof(
     zkey_path: String,
     proof_result: CircomProofResult,
     proof_lib: ProofLib,
@@ -210,7 +215,7 @@ macro_rules! set_circom_circuits {
         ];
 
         #[inline]
-        pub fn circom_get(name: &str) -> Option<WitnessFn> {
+        pub(crate) fn circom_get(name: &str) -> Option<WitnessFn> {
             CIRCOM_CIRCUITS.iter()
                 .find(|(k, _)| *k == name)
                 .map(|(_, v)| *v)

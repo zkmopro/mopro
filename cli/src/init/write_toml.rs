@@ -10,11 +10,13 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 # Adapters for different proof systems
 [features]
-default = []
+default = ["uniffi"]
+uniffi = ["mopro-ffi/uniffi"]
+flutter = ["mopro-ffi/flutter"]
 
 [dependencies]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi"] }
+mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "flutter-ffi } // TODO: change back to main
 thiserror = "2.0.12"
 anyhow = "1.0.99"
 

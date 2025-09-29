@@ -55,6 +55,7 @@ pub fn update_bindings(
                 .and_then(|u| match platform {
                     Platform::Ios => u.ios_dest.as_ref(),
                     Platform::Android => u.android_dest.as_ref(),
+                    Platform::Flutter => None, // TODO: Add Flutter dest
                     Platform::Web => None,
                 })
                 .map(PathBuf::from);
@@ -225,6 +226,15 @@ fn update_platform(src_root: &Path, dest_root: &Path, platform: Platform) -> Res
                 true,
             )?);
         }
+        // TODO: fix flutter update
+        Platform::Flutter => {
+            updated_paths.extend(update_folder(
+                &platform_bindings_dir,
+                dest_root,
+                binding_dir_name,
+                false,
+            )?);
+        }
         Platform::Web => {
             updated_paths.extend(update_folder(
                 &platform_bindings_dir,
@@ -269,14 +279,16 @@ pub fn update_folder(
                 fs::remove_dir_all(path)?;
             }
 
-            fs_extra::dir::copy(
+            if let Err(e) = fs_extra::dir::copy(
                 source_dir,
                 path.parent().unwrap(),
                 &fs_extra::dir::CopyOptions::new()
                     .overwrite(true)
                     .copy_inside(true),
-            )?;
-
+            ) {
+                eprintln!("Copy failed: {:?}", e.kind);
+                return Err(e.into());
+            }
             updated_paths.push(path.display().to_string());
         }
     }
@@ -320,6 +332,7 @@ fn maybe_store_dest(config: &mut Config, platform: Platform, dest: &Path) -> Res
     let existing = match platform {
         Platform::Ios => &update_cfg.ios_dest,
         Platform::Android => &update_cfg.android_dest,
+        Platform::Flutter => &None, // TODO: fix flutter update
         Platform::Web => &None,
     };
     if existing.is_none() {
@@ -343,6 +356,7 @@ impl UpdateConfigExt for UpdateConfig {
         match platform {
             Platform::Ios => self.ios_dest = Some(dest),
             Platform::Android => self.android_dest = Some(dest),
+            Platform::Flutter => {} // TODO: fix flutter update
             Platform::Web => {}
         }
     }
