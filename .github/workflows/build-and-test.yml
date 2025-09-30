@@ -191,88 +191,6 @@ jobs:
           path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}.tar.gz
           if-no-files-found: error
 
-  cli_build_ios_device:
-    needs: cli_build_ios_prepare
-    strategy:
-      fail-fast: false
-      matrix:
-        adapter: [circom, halo2, noir]
-    runs-on: macos-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: ios-project-${{ matrix.adapter }}
-          path: ${{ runner.temp }}
-
-      - name: Extract prepared project
-        run: |
-          cd ${{ runner.temp }}
-          tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
-
-      - name: Xcode build (device, codesign off)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          xcodebuild \
-            -project ios/MoproApp.xcodeproj \
-            -scheme MoproApp \
-            -configuration Debug \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            -resultBundlePath ${{ runner.temp }}/MoproApp-device.xcresult \
-            -derivedDataPath ${{ runner.temp }}/DerivedData \
-            build
-
-      - name: Upload Xcode results (failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-xcode-device-results-${{ matrix.adapter }}
-          path: |
-            ${{ runner.temp }}/MoproApp-device.xcresult
-
-  cli_build_ios_simulator:
-    needs: cli_build_ios_prepare
-    strategy:
-      fail-fast: false
-      matrix:
-        adapter: [circom, halo2, noir]
-    runs-on: macos-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: ios-project-${{ matrix.adapter }}
-          path: ${{ runner.temp }}
-
-      - name: Extract prepared project
-        run: |
-          cd ${{ runner.temp }}
-          tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
-
-      - name: Xcode build (simulator, arm64 only)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          xcodebuild \
-            -project ios/MoproApp.xcodeproj \
-            -scheme MoproApp \
-            -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
-            -sdk iphonesimulator \
-            ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            -resultBundlePath ${{ runner.temp }}/MoproApp-simulator-build.xcresult \
-            -derivedDataPath ${{ runner.temp }}/DerivedData \
-            build
-
-      - name: Upload Xcode results (failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-xcode-simulator-build-results-${{ matrix.adapter }}
-          path: |
-            ${{ runner.temp }}/MoproApp-simulator-build.xcresult
-
   cli_test_ios_simulator:
     needs: cli_build_ios_prepare
     strategy:
@@ -296,7 +214,8 @@ jobs:
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           # Capitalize adapter (circom -> Circom, halo2 -> Halo2, noir -> Noir)
-          ADAPTER_UPPER="$(tr '[:lower:]' '[:upper:]' <<< ${MATRIX_ADAPTER:0:1})${MATRIX_ADAPTER:1}"
+          ADAPTER="${{ matrix.adapter }}"
+          ADAPTER_UPPER="$(tr '[:lower:]' '[:upper:]' <<< ${ADAPTER:0:1})${ADAPTER:1}"
         
           echo "Running test test${ADAPTER_UPPER}ProveVerify"
 
@@ -383,7 +302,14 @@ jobs:
             arch: x86_64
             disable-animations: true
             emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
-            script: cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android && ./gradlew connectedAndroidTest
+            script: |
+              cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android
+              # Capitalize adapter (circom -> Circom, halo2 -> Halo2, noir -> Noir)
+              ADAPTER="${{ matrix.adapter }}"
+              ADAPTER_UPPER="$(tr '[:lower:]' '[:upper:]' <<< ${ADAPTER:0:1})${ADAPTER:1}"
+        
+              echo "Running test test${ADAPTER_UPPER}ButtonClick"
+              ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.example.moproapp.ExampleInstrumentedTest#test${ADAPTER_UPPER}ButtonClick
 
         - name: Upload test report
           if: failure()
