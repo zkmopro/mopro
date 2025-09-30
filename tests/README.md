@@ -18,7 +18,7 @@ cargo run --bin android
 ## Flutter FFI
 
 > [!IMPORTANT]  
-> The `flutter` feature cannot be enabled with `uniffi` feature together
+> The `flutter` feature cannot be enbaled with `uniffi` feature together
 
 ### Dart
 
