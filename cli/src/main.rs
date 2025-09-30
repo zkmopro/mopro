@@ -64,6 +64,33 @@ enum Commands {
     },
     /// Create templates for the specified platform
     Create {
+        #[arg(
+            long,
+            help = "Specify the adapter to use (e.g., 'circom', 'halo2', 'noir', or 'circom,halo2')."
+        )]
+        adapter: Option<String>,
+        #[arg(long)]
+        project_name: Option<String>,
+        #[arg(long, help = "Show instruction message for create")]
+        show_init: bool,
+        #[arg(long, help = "Specify the build mode (e.g., 'release' or 'debug').")]
+        mode: Option<String>,
+        #[arg(long, num_args = 1.., help = "Specify the platforms to build for (e.g., 'ios', 'android').")]
+        platforms: Option<Vec<String>>,
+        #[arg(long, num_args = 1.., help = "Specify the architectures to build for (e.g., 'aarch64-apple-ios', 'aarch64-apple-ios-sim', x86_64-apple-ios, x86_64-linux-android, i686-linux-android, armv7-linux-androideabi, aarch64-linux-android).")]
+        architectures: Option<Vec<String>>,
+        #[arg(
+            long,
+            help = "Automatically run mopro update after build",
+            conflicts_with = "no_auto_update"
+        )]
+        auto_update: bool,
+        #[arg(
+            long,
+            help = "Skip running mopro update and disable the prompt",
+            conflicts_with = "auto_update"
+        )]
+        no_auto_update: bool,
         #[arg(long, help = "Specify the framework")]
         framework: Option<String>,
         #[arg(
@@ -71,7 +98,7 @@ enum Commands {
             value_name = "FRAMEWORK",
             help = "Show instruction message for create (e.g., 'ios', 'android', 'web', 'flutter', 'react-native')."
         )]
-        show: Option<String>,
+        show_create: Option<String>,
     },
     /// Update the bindings for all platforms
     Update {
@@ -155,9 +182,38 @@ fn main() {
                 Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
             }
         }
-
-        Commands::Create { framework, show } => {
-            if let Some(framework) = show {
+        Commands::Create {
+            adapter,
+            project_name,
+            show_init,
+            mode,
+            platforms,
+            architectures,
+            auto_update,
+            no_auto_update,
+            framework,
+            show_create,
+        } => {
+            if *show_init {
+                print::print_init_instructions(("<PROJECT_NAME>".to_string()));
+                return;
+            }
+            match init::init_project(adapter, project_name, false) {
+                Ok(_) => {}
+                Err(e) => style::print_red_bold(format!("Failed to initialize project: {e:?}")),
+            }
+            let auto_update_flag = if *auto_update {
+                Some(true)
+            } else if *no_auto_update {
+                Some(false)
+            } else {
+                None
+            };
+            match build::build_project(mode, platforms, architectures, auto_update_flag, false) {
+                Ok(_) => {}
+                Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
+            }
+            if let Some(framework) = show_create {
                 if framework.trim().is_empty() {
                     Cli::command()
                         .find_subcommand_mut("create")
