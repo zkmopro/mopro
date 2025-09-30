@@ -19,8 +19,8 @@ use crate::MoproError;
 ///
 /// - `on_chain = true`: Uses Keccak hash for Solidity verifier compatibility
 /// - `on_chain = false`: Uses Poseidon hash for better performance
-#[cfg_attr(feature = "uniffi", uniffi::export)]
-pub fn generate_noir_proof(
+#[uniffi::export]
+pub(crate) fn generate_noir_proof(
     circuit_path: String,
     srs_path: Option<String>,
     inputs: Vec<String>,
@@ -44,8 +44,8 @@ pub fn generate_noir_proof(
 ///
 /// - `on_chain = true`: Verifies Keccak-based proof (Solidity compatible)
 /// - `on_chain = false`: Verifies Poseidon-based proof (performance optimized)
-#[cfg_attr(feature = "uniffi", uniffi::export)]
-pub fn verify_noir_proof(
+#[uniffi::export]
+pub(crate) fn verify_noir_proof(
     circuit_path: String,
     proof: Vec<u8>,
     on_chain: bool,
@@ -77,8 +77,8 @@ pub fn verify_noir_proof(
 ///
 /// - `on_chain = true`: Uses Keccak hash for Solidity verifier compatibility
 /// - `on_chain = false`: Uses Poseidon hash fotr better performance
-#[cfg_attr(feature = "uniffi", uniffi::export)]
-pub fn get_noir_verification_key(
+#[uniffi::export]
+pub(crate) fn get_noir_verification_key(
     circuit_path: String,
     srs_path: Option<String>,
     on_chain: bool,

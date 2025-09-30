@@ -1,4 +1,4 @@
-use mopro_ffi::app_config::constants::{ANDROID_BINDINGS_DIR, FLUTTER_BINDINGS_DIR, IOS_BINDINGS_DIR, WEB_BINDINGS_DIR};
+use mopro_ffi::app_config::constants::{ANDROID_BINDINGS_DIR, IOS_BINDINGS_DIR};
 
 //
 // Platform Section
@@ -7,7 +7,6 @@ use mopro_ffi::app_config::constants::{ANDROID_BINDINGS_DIR, FLUTTER_BINDINGS_DI
 pub enum Platform {
     Ios,
     Android,
-    Flutter,
     Web,
 }
 
@@ -16,7 +15,7 @@ struct PlatformInfo {
     str: &'static str,
 }
 
-const PLATFORMS: [PlatformInfo; 4] = [
+const PLATFORMS: [PlatformInfo; 3] = [
     PlatformInfo {
         platform: Platform::Ios,
         str: "ios",
@@ -24,10 +23,6 @@ const PLATFORMS: [PlatformInfo; 4] = [
     PlatformInfo {
         platform: Platform::Android,
         str: "android",
-    },
-    PlatformInfo {
-        platform: Platform::Flutter,
-        str: "flutter",
     },
     PlatformInfo {
         platform: Platform::Web,
@@ -63,7 +58,6 @@ impl Platform {
         match self {
             Self::Ios => "iOS",
             Self::Android => "Android",
-            Self::Flutter => "Flutter",
             Self::Web => "WASM",
         }
     }
@@ -72,8 +66,7 @@ impl Platform {
         match self {
             Self::Ios => IOS_BINDINGS_DIR,
             Self::Android => ANDROID_BINDINGS_DIR,
-            Self::Flutter => FLUTTER_BINDINGS_DIR,
-            Self::Web => WEB_BINDINGS_DIR,
+            Self::Web => "MoproWasmBindings",
         }
     }
 }
