@@ -295,12 +295,18 @@ jobs:
       - name: Xcode test (simulator, arm64 only)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
+          # Capitalize adapter (circom -> Circom, halo2 -> Halo2, noir -> Noir)
+          ADAPTER_UPPER="$(tr '[:lower:]' '[:upper:]' <<< ${MATRIX_ADAPTER:0:1})${MATRIX_ADAPTER:1}"
+        
+          echo "Running test test${ADAPTER_UPPER}ProveVerify"
+
           xcodebuild \
             -project ios/MoproApp.xcodeproj \
             -scheme MoproApp \
             -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
             -sdk iphonesimulator \
+            -only-testing:MoproAppUITests/ExampleAppUITests/test${ADAPTER_UPPER}ProveVerify \
             ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             -maximum-parallel-testing-workers 1 \
