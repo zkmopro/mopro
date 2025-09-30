@@ -225,7 +225,7 @@ jobs:
             -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
             -sdk iphonesimulator \
-            -only-testing:MoproAppUITests/ExampleAppUITests/test${ADAPTER_UPPER}ProveVerify \
+            -only-testing:MoproAppUITests/MoproAppUITests/test${ADAPTER_UPPER}ProveVerify \
             ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             -maximum-parallel-testing-workers 1 \
@@ -306,7 +306,7 @@ jobs:
               cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android
               # Capitalize adapter (circom -> Circom, halo2 -> Halo2, noir -> Noir)
               ADAPTER="${{ matrix.adapter }}"
-              ADAPTER_UPPER="$(tr '[:lower:]' '[:upper:]' <<< ${ADAPTER:0:1})${ADAPTER:1}"
+              ADAPTER_UPPER="$(echo "${ADAPTER:0:1}" | tr '[:lower:]' '[:upper:]')${ADAPTER:1}"
         
               echo "Running test test${ADAPTER_UPPER}ButtonClick"
               ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.example.moproapp.ExampleInstrumentedTest#test${ADAPTER_UPPER}ButtonClick
@@ -581,12 +581,13 @@ jobs:
    needs:
      - setup_halo2_wasm_env
      - cli_build_web
+   strategy:
+      fail-fast: false
+      matrix:
+        adapter: [halo2]
    env:
      CHROME_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}/chrome
-     CHROMEDRIVER_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}/chromedriver
-   defaults:
-     run:
-       working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
+     CHROMEDRIVER_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}/chromedriver  
    steps:
      - uses: actions/checkout@v5
      - name: Restore cached chrome and chromedriver
@@ -596,16 +597,18 @@ jobs:
            ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}
            ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}
          key: ${{ runner.os }}-cache-chrome-chromedriver
-      - name: Cache halo2 wasm web
-        id: cache-halo2-wasm-web
-        uses: actions/cache@v4
-        with:
+     - name: Cache halo2 wasm web
+       id: cache-halo2-wasm-web
+       uses: actions/cache@v4
+       with:
           path: |
             ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
           key: ${{ runner.os }}-halo2-wasm-web-${{ github.sha }}
      - name: Install dependencies
+       working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
        run: yarn install
      - name: Run halo2-wasm-app server and test it
+       working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
        run: |
          echo "This test will be on latest chrome & chromedriver"
          nohup yarn start &

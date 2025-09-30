@@ -23,7 +23,7 @@ struct ContentView: View {
     @State private var generatedNoirProof: Data?
     @State private var noirVerificationKey: Data?
     private let zkeyPath = Bundle.main.path(forResource: "multiplier2_final", ofType: "zkey")!
-    private let witnesscalc_zkeyPath = Bundle.main.path(forResource: "multiplier2_witnesscalc_final", ofType: "zkey")!
+    private let witnesscalc_zkeyPath = Bundle.main.path(forResource: "multiplier2_wc_final", ofType: "zkey")!
     private let srsPath = Bundle.main.path(forResource: "plonk_fibonacci_srs.bin", ofType: "")!
     private let vkPath = Bundle.main.path(forResource: "plonk_fibonacci_vk.bin", ofType: "")!
     private let pkPath = Bundle.main.path(forResource: "plonk_fibonacci_pk.bin", ofType: "")!
