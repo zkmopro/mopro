@@ -16,7 +16,6 @@ path = "src/main.rs"
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = [
     "build",
-    "uniffi",
 ], default-features = false }
 
 clap = { version = "4.0", features = ["derive"] }

@@ -7,8 +7,3 @@ graph.bin
 
 *.xcframework/
 node_modules
-
-mopro_flutter_bindings
-MoproAndroidBindings
-MoproiOSBindings
-build/

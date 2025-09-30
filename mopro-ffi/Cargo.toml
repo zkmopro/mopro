@@ -15,21 +15,15 @@ name = "mopro_ffi"
 [features]
 default = ["build"]
 
-uniffi = ["dep:uniffi"]
+uniffi = []
 uniffi-tests = ["uniffi", "uniffi/bindgen-tests"]
-
-flutter = ["toml", "flutter_rust_bridge"]
 
 build = ["toml", "uuid", "camino"]
 no_uniffi_exports = []
 
 [dependencies]
-# UniFFI
-uniffi = { workspace = true, features = ["bindgen"], optional = true }
+uniffi = { workspace = true, features = ["bindgen"] }
 toml = { version = "0.8.22", optional = true }
-
-# Flutter
-flutter_rust_bridge = { version = "=2.11.1", optional = true }
 
 # Error handling
 thiserror = "2.0.12"
