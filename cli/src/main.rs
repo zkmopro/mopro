@@ -195,7 +195,7 @@ fn main() {
             show_create,
         } => {
             if *show_init {
-                print::print_init_instructions(("<PROJECT_NAME>".to_string()));
+                print::print_init_instructions("<PROJECT_NAME>".to_string());
                 return;
             }
             match init::init_project(adapter, project_name, false) {
