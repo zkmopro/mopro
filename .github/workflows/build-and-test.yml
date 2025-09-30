@@ -397,11 +397,6 @@ jobs:
       steps:
         - uses: actions/checkout@v5
 
-        - uses: subosito/flutter-action@v2
-          with:
-            flutter-version: '3.35.4'
-            channel: 'stable'
-
         - name: Prepare template project
           uses: ./.github/actions/mopro-init-project
           with:
