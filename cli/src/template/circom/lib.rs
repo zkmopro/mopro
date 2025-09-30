@@ -3,9 +3,7 @@
 // Module containing the Circom circuit logic (Multiplier2)
 #[macro_use]
 mod circom;
-pub use circom::{
-    generate_circom_proof, verify_circom_proof, CircomProof, CircomProofResult, ProofLib, G1, G2,
-};
+pub use circom::{generate_circom_proof, verify_circom_proof, CircomProofResult, ProofLib, G1, G2};
 
 mod witness {
     rust_witness::witness!(multiplier2);
