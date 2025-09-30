@@ -306,7 +306,9 @@ jobs:
               cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android
               # Capitalize adapter (circom -> Circom, halo2 -> Halo2, noir -> Noir)
               ADAPTER="${{ matrix.adapter }}"
-              ADAPTER_UPPER="$(echo "${ADAPTER:0:1}" | tr '[:lower:]' '[:upper:]')${ADAPTER:1}"
+              FIRST=$(printf '%s' "$ADAPTER" | cut -c1 | tr '[:lower:]' '[:upper:]')
+              REST=$(printf '%s' "$ADAPTER" | cut -c2-)
+              ADAPTER_UPPER="$FIRST$REST"
         
               echo "Running test test${ADAPTER_UPPER}ButtonClick"
               ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.example.moproapp.ExampleInstrumentedTest#test${ADAPTER_UPPER}ButtonClick

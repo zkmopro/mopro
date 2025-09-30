@@ -6,7 +6,12 @@
   "author": "Jinhwan",
   "license": "MIT",
   "scripts": {
-    "start": "yarn lite-server"
+    "build": "cd .. && cargo run --bin web",
+    "start": "yarn lite-server",
+    "test": "node index.js"
+  },
+  "dependencies": {
+    "selenium-webdriver": "4.27.0"
   },
   "devDependencies": {
     "lite-server": "^2.6.1"
