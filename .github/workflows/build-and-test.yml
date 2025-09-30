@@ -14,7 +14,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  check-typos:
+  check_typos:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
@@ -68,7 +68,7 @@ jobs:
   circom-prover:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [lint, clippy_check]
+    needs: [lint, clippy_check, check_typos]
     steps:
       - uses: actions/checkout@v5
       - name: Setup dependencies
@@ -90,7 +90,7 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
-    needs: [lint, clippy_check]
+    needs: [lint, clippy_check, check_typos]
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - uses: actions/checkout@v5
@@ -309,6 +309,8 @@ jobs:
               FIRST=$(printf '%s' "$ADAPTER" | cut -c1 | tr '[:lower:]' '[:upper:]')
               REST=$(printf '%s' "$ADAPTER" | cut -c2-)
               ADAPTER_UPPER="$FIRST$REST"
+
+              chmod +x gradlew
         
               echo "Running test test${ADAPTER_UPPER}ButtonClick"
               ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.example.moproapp.ExampleInstrumentedTest#test${ADAPTER_UPPER}ButtonClick
@@ -481,7 +483,7 @@ jobs:
   test-ffi-all:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [lint, clippy_check]
+    needs: [lint, clippy_check, check_typos]
     steps:
       - uses: actions/checkout@v5
       - name: Setup dependencies
@@ -498,7 +500,7 @@ jobs:
   setup_halo2_wasm_env:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [lint, clippy_check]
+    needs: [lint, clippy_check, check_typos]
     outputs:
       chrome-dir: ${{ steps.parsed-chrome-chromedriver-dir.outputs.chrome-dir }}
       chromedriver-dir: ${{ steps.parsed-chrome-chromedriver-dir.outputs.chromedriver-dir }}
