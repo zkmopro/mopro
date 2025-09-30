@@ -15,3 +15,4 @@ fn mopro_uniffi_hello_world() -> String {
 pub fn mopro_flutter_hello_world() -> String {
     mopro_hello_world()
 }
+

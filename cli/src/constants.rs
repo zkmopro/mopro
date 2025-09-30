@@ -1,6 +1,4 @@
-use mopro_ffi::app_config::constants::{
-    ANDROID_BINDINGS_DIR, FLUTTER_BINDINGS_DIR, IOS_BINDINGS_DIR, WEB_BINDINGS_DIR,
-};
+use mopro_ffi::app_config::constants::{ANDROID_BINDINGS_DIR, FLUTTER_BINDINGS_DIR, IOS_BINDINGS_DIR, WEB_BINDINGS_DIR};
 
 //
 // Platform Section
