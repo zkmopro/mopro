@@ -189,6 +189,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "ark-circom-witnesscalc"
+version = "0.1.0"
+source = "git+https://github.com/HarryR/ark-circom-witnesscalc.git#590afa5d354be1ff5eaa2d16bf3831c15614e1f8"
+dependencies = [
+ "anyhow",
+ "ark-bn254",
+ "ark-crypto-primitives",
+ "ark-ec",
+ "ark-ff 0.5.0",
+ "ark-groth16",
+ "ark-relations",
+ "ark-serialize 0.5.0",
+ "ark-std 0.5.0",
+ "byteorder",
+ "circom-witnesscalc 0.2.2",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "ark-crypto-primitives"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -823,6 +844,7 @@ dependencies = [
  "anyhow",
  "ark-bls12-381",
  "ark-bn254",
+ "ark-circom-witnesscalc",
  "ark-crypto-primitives",
  "ark-ec",
  "ark-ff 0.5.0",
@@ -832,7 +854,7 @@ dependencies = [
  "ark-serialize 0.5.0",
  "ark-std 0.5.0",
  "byteorder",
- "circom-witnesscalc",
+ "circom-witnesscalc 0.2.1",
  "hex-literal",
  "num",
  "num-bigint",
@@ -873,6 +895,34 @@ dependencies = [
  "tempfile",
  "thiserror 2.0.12",
  "winnow",
+ "wtns-file",
+]
+
+[[package]]
+name = "circom-witnesscalc"
+version = "0.2.2"
+source = "git+https://github.com/HarryR/circom-witnesscalc#40cfe1e641b267265dd252921de78b52915ed3fc"
+dependencies = [
+ "anyhow",
+ "ark-bn254",
+ "ark-ff 0.5.0",
+ "ark-serialize 0.5.0",
+ "bindgen",
+ "byteorder",
+ "indicatif",
+ "libc",
+ "memmap2",
+ "num-bigint",
+ "num-traits",
+ "prost",
+ "prost-build",
+ "rand 0.8.5",
+ "ruint",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.16",
+ "winnow 0.7.12",
  "wtns-file",
 ]
 

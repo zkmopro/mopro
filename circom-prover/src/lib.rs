@@ -13,6 +13,9 @@ use witness::WitnessFn;
 #[cfg(feature = "witnesscalc")]
 pub use witnesscalc_adapter;
 
+#[cfg(feature = "ark-circom-witnesscalc")]
+pub use ark_circom_witnesscalc;
+
 #[cfg(feature = "circom-witnesscalc")]
 #[doc(hidden)]
 pub mod __macro_deps {
@@ -38,6 +41,22 @@ impl CircomProver {
 
     pub fn verify(proof_lib: ProofLib, proof: CircomProof, zkey_path: String) -> Result<bool> {
         prover::verify(proof_lib, zkey_path, proof)
+    }
+
+    #[cfg(feature = "ark-circom-witnesscalc")]
+    pub fn prove_to_json(
+        json_input_str: &str,
+        ark_pkey_data: &[u8],
+        cwc_graph_data: &[u8],
+        r1cs_data: &[u8],
+    ) -> Result<String> {
+        let (proof, public_inputs) = ark_circom_witnesscalc::proof_oneshot(json_input_str, ark_pkey_data, cwc_graph_data, r1cs_data);
+        ark_circom_witnesscalc::proof_to_json(&proof, &public_inputs)
+    }
+
+    #[cfg(feature = "ark-circom-witnesscalc")]
+    pub fn verify_json(vkey_json: &str, proof_json: &str) -> Result<bool> {
+        ark_circom_witnesscalc::verify_proof_json(vkey_json, proof_json)
     }
 }
 
