@@ -160,11 +160,11 @@ jobs:
           project-name: mopro-example-${{ matrix.adapter }}
           destination: ${{ runner.temp }}
 
-      - name: Build iOS (debug; device+sim arm64 only)
+      - name: Build iOS (release; device+sim arm64 only)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode debug \
+            --mode release \
             --platforms ios \
             --architectures aarch64-apple-ios aarch64-apple-ios-sim
 
@@ -268,11 +268,11 @@ jobs:
             project-name: mopro-example-${{ matrix.adapter }}
             destination: ${{ runner.temp }}
 
-        - name: Build Android (debug, x86_64)
+        - name: Build Android (release, x86_64)
           working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
           run: |
             "$GITHUB_WORKSPACE/bin/mopro" build \
-              --mode debug \
+              --mode release \
               --platforms android \
               --architectures x86_64-linux-android
 
@@ -321,6 +321,49 @@ jobs:
           with:
             name: android-test-report
             path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android/app/build/reports/androidTests/connected/debug/
+  
+  cli_build_flutter:
+      needs: cli_build
+      strategy:
+        fail-fast: false
+        matrix:
+          adapter: [circom, halo2, noir]
+      runs-on: ubuntu-latest
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+      steps:
+        - uses: actions/checkout@v5
+
+        - uses: subosito/flutter-action@v2
+          with:
+            flutter-version: '3.35.4'
+            channel: 'stable'
+
+        - name: Prepare template project
+          uses: ./.github/actions/mopro-init-project
+          with:
+            artifact-name: mopro-bin-${{ runner.os }}
+            adapter: ${{ matrix.adapter }}
+            project-name: mopro-example-${{ matrix.adapter }}
+            destination: ${{ runner.temp }}
+
+        - name: Build Flutter (release)
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: |
+            "$GITHUB_WORKSPACE/bin/mopro" build \
+              --mode release \
+              --platforms flutter 
+
+        - name: Clean the `build` dir to save space
+          run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
+
+        - name: Create Flutter framework
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: |
+            "$GITHUB_WORKSPACE/bin/mopro" create --framework flutter
+
+        - name: Build flutter app
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: cd flutter && flutter pub get
 
   cli_create_react_native:
     needs: cli_build
@@ -342,19 +385,19 @@ jobs:
           project-name: mopro-example-${{ matrix.adapter }}
           destination: ${{ runner.temp }}
 
-      - name: Build iOS (debug; device+sim arm64 only)
+      - name: Build iOS (release; device+sim arm64 only)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode debug \
+            --mode release \
             --platforms ios \
             --architectures aarch64-apple-ios aarch64-apple-ios-sim
 
-      - name: Build Android (debug, x86_64)
+      - name: Build Android (release, x86_64)
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode debug \
+            --mode release \
             --platforms android \
             --architectures x86_64-linux-android
 
@@ -568,18 +611,7 @@ jobs:
           echo "Check override chrome version"
           google-chrome --version
           cd mopro-wasm
-          # Backup original Cargo.toml to prevent workspace corruption
-          cp ../Cargo.toml ../Cargo.toml.backup
-          # Temporarily remove packages with noir dependencies from workspace
-          sed -i '/"mopro-ffi",/d' ../Cargo.toml
-          sed -i '/"test-e2e",/d' ../Cargo.toml
-          sed -i '/"cli",/d' ../Cargo.toml
-          # Run tests and restore workspace even on failure
-          (wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features) || TEST_EXIT_CODE=$?
-          # Restore original Cargo.toml
-          mv ../Cargo.toml.backup ../Cargo.toml
-          # Exit with original test result
-          exit ${TEST_EXIT_CODE:-0}
+          wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
   test_halo2_wasm_web:
    runs-on: ubuntu-latest
    needs:

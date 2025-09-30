@@ -170,6 +170,30 @@ pub fn build_project(
                 let arch_refs: Vec<&String> = arch_strings.iter().collect();
                 build_from_str_arch::<AndroidPlatform>(mode, &current_dir, arch_refs, ())?;
             }
+            Platform::Flutter => {
+                let platform_str = selection.platform().as_str();
+                let mut command = std::process::Command::new("cargo");
+                command.args([
+                    "run",
+                    "--bin",
+                    platform_str,
+                    "--no-default-features",
+                    "--features",
+                    "flutter",
+                ]);
+                if mode == Mode::Release {
+                    command.arg("--release");
+                }
+
+                let status = command.status()?;
+
+                if !status.success() {
+                    return Err(anyhow::anyhow!(
+                        "Output with status code {}",
+                        status.code().unwrap()
+                    ));
+                }
+            }
             Platform::Web => {
                 let platform_str = selection.platform().as_str();
                 let mut command = std::process::Command::new("cargo");

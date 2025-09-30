@@ -9,14 +9,15 @@ pub type Halo2ProveFn =
 
 pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
 
-#[derive(Debug, Clone, uniffi::Record)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
 pub struct Halo2ProofResult {
     pub proof: Vec<u8>,
     pub inputs: Vec<u8>,
 }
 
-#[uniffi::export]
-pub(crate) fn generate_halo2_proof(
+#[cfg_attr(feature = "uniffi", uniffi::export)]
+pub fn generate_halo2_proof(
     srs_path: String,
     pk_path: String,
     circuit_inputs: std::collections::HashMap<String, Vec<String>>,
@@ -32,8 +33,8 @@ pub(crate) fn generate_halo2_proof(
     Ok(result.into())
 }
 
-#[uniffi::export]
-pub(crate) fn verify_halo2_proof(
+#[cfg_attr(feature = "uniffi", uniffi::export)]
+pub fn verify_halo2_proof(
     srs_path: String,
     vk_path: String,
     proof: Vec<u8>,

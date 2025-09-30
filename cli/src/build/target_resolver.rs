@@ -20,6 +20,7 @@ pub(super) struct PlatformSelection {
 pub(super) enum PlatformArchitectures {
     Ios(Vec<IosArch>),
     Android(Vec<AndroidArch>),
+    Flutter,
     Web,
 }
 
@@ -100,6 +101,7 @@ impl TargetSelection {
                 PlatformArchitectures::Android(archs) => {
                     archs.retain(|a| a.as_str() != arch);
                 }
+                PlatformArchitectures::Flutter => {}
                 PlatformArchitectures::Web => {}
             }
         }
@@ -107,6 +109,7 @@ impl TargetSelection {
             .retain(|selection| match &selection.architectures {
                 PlatformArchitectures::Ios(archs) => !archs.is_empty(),
                 PlatformArchitectures::Android(archs) => !archs.is_empty(),
+                PlatformArchitectures::Flutter => true,
                 PlatformArchitectures::Web => true,
             });
     }
@@ -148,6 +151,7 @@ impl PlatformArchitectures {
             PlatformArchitectures::Android(archs) => {
                 archs.iter().map(|arch| arch.as_str().to_string()).collect()
             }
+            PlatformArchitectures::Flutter => Vec::new(),
             PlatformArchitectures::Web => Vec::new(),
         }
     }
@@ -160,6 +164,7 @@ impl PlatformArchitectures {
             PlatformArchitectures::Android(archs) => {
                 archs.iter().any(|candidate| candidate.as_str() == arch)
             }
+            PlatformArchitectures::Flutter => false,
             PlatformArchitectures::Web => false,
         }
     }
@@ -232,6 +237,13 @@ fn resolve_architectures(
         selections.push(PlatformSelection {
             platform: Platform::Android,
             architectures: android_platform_arch,
+        });
+    }
+
+    if platforms.contains(&Platform::Flutter) {
+        selections.push(PlatformSelection {
+            platform: Platform::Flutter,
+            architectures: PlatformArchitectures::Flutter,
         });
     }
 
