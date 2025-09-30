@@ -420,7 +420,9 @@ jobs:
           if-no-files-found: ignore
 
   cli_build_web:
-      needs: cli_build
+      needs: 
+        - cli_build
+        - setup_halo2_wasm_env
       strategy:
         fail-fast: false
         matrix:
@@ -433,6 +435,12 @@ jobs:
 
         - name: Install Rust target (wasm)
           run: rustup target add wasm32-unknown-unknown
+
+        - name: Restore cached wasm-pack
+          uses: actions/cache@v4
+          with:
+            path: ~/.cargo/bin/wasm-pack
+            key: ${{ runner.os }}-wasm-pack-env
 
         - name: Prepare template project
           uses: ./.github/actions/mopro-init-project
@@ -448,12 +456,25 @@ jobs:
             CI: "true"
           run: |
             set -euo pipefail
+            rustup component add rust-src --toolchain nightly-2024-07-18
             # TODO: allow mopro CLI to run fully non-interactive so we can drop the pseudo-tty workaround below
             if [[ "$RUNNER_OS" == "macOS" ]]; then
               printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
             else
               printf 'y\n' | script -q -c "$GITHUB_WORKSPACE/bin/mopro build --mode debug --platforms web" /dev/null
             fi
+        - name: Create Web framework (debug, halo2)
+          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+          run: |
+            "$GITHUB_WORKSPACE/bin/mopro" create --framework web
+
+        - name: Cache halo2 wasm web
+          id: cache-halo2-wasm-web
+          uses: actions/cache@v4
+          with:
+            path: |
+              ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
+            key: ${{ runner.os }}-halo2-wasm-web-${{ github.sha }}
 
   test-ffi-all:
     runs-on: ubuntu-latest
@@ -472,7 +493,7 @@ jobs:
       - name: Run ffi tests
         run: cd mopro-ffi && cargo test --release --all-features
 
-  setup-halo2-wasm-env:
+  setup_halo2_wasm_env:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     needs: [lint, clippy_check]
@@ -515,13 +536,13 @@ jobs:
             ${{ steps.parsed-chrome-chromedriver-dir.outputs.chromedriver-dir }}
           key: ${{ runner.os }}-cache-chrome-chromedriver
 
-  test-wasm-halo2:
+  cli_test_halo2_wasm:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [setup-halo2-wasm-env]
+    needs: [setup_halo2_wasm_env]
     env:
-      CHROME_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}/chrome
-      CHROMEDRIVER_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}/chromedriver
+      CHROME_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}/chrome
+      CHROMEDRIVER_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}/chromedriver
     steps:
       - uses: actions/checkout@v5
       - name: Restore cached wasm-pack
@@ -533,8 +554,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}
-            ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}
+            ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}
+            ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}
           key: ${{ runner.os }}-cache-chrome-chromedriver
       - name: Run wasm halo2 tests
         run: |
@@ -555,78 +576,45 @@ jobs:
           mv ../Cargo.toml.backup ../Cargo.toml
           # Exit with original test result
           exit ${TEST_EXIT_CODE:-0}
-#  build-halo2-wasm-web:
-#    runs-on: ubuntu-latest
-#    needs: setup-halo2-wasm-env
-#    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-#    steps:
-#      - uses: actions/checkout@v5
-#      - name: Install Rust toolchain
-#        uses: actions-rs/toolchain@v1
-#        with:
-#          toolchain: nightly-2024-07-18
-#      - name: install requirements
-#        uses: awalsh128/cache-apt-pkgs-action@v1
-#        with:
-#          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
-#          version: 1.0
-#      - name: Restore cached wasm-pack
-#        uses: actions/cache@v4
-#        with:
-#          path: ~/.cargo/bin/wasm-pack
-#          key: ${{ runner.os }}-wasm-pack
-#      - name: Cache halo2 wasm circuit
-#        id: cache-halo2-wasm-circuit
-#        uses: actions/cache@v4
-#        with:
-#          path: |
-#            test-e2e/MoproWasmBindings
-#          key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
-#      - name: Build circuits for Wasm Web app
-#        if: steps.cache-halo2-wasm-circuit.outputs.cache-hit != 'true'
-#        run: |
-#          cd test-e2e
-#          echo "install rust-src component"
-#          rustup component add rust-src --toolchain nightly-2024-07-18
-#          cargo run --bin web
-#  test-halo2-wasm-web:
-#    runs-on: ubuntu-latest
-#    needs:
-#      - setup-halo2-wasm-env
-#      - build-halo2-wasm-web
-#    env:
-#      CHROME_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}/chrome
-#      CHROMEDRIVER_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}/chromedriver
-#    defaults:
-#      run:
-#        working-directory: test-e2e/web
-#    steps:
-#      - uses: actions/checkout@v5
-#      - name: Restore cached chrome and chromedriver
-#        uses: actions/cache@v4
-#        with:
-#          path: |
-#            ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}
-#            ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}
-#          key: ${{ runner.os }}-cache-chrome-chromedriver
-#      - name: Restore cached halo2 wasm circuit
-#        uses: actions/cache@v4
-#        with:
-#          path: |
-#            test-e2e/MoproWasmBindings
-#          key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
-#      - name: Install dependencies
-#        run: yarn install
-#      - name: Run halo2-wasm-app server and test it
-#        run: |
-#          echo "This test will be on latest chrome & chromedriver"
-#          nohup yarn start &
-#          for i in {1..30}; do
-#            if curl --silent http://localhost:3000 > /dev/null; then
-#              echo "Server is ready!"
-#              break
-#            fi
-#            echo "Waiting for server..."
-#            sleep 1
-#          done
-#          yarn test
+  test_halo2_wasm_web:
+   runs-on: ubuntu-latest
+   needs:
+     - setup_halo2_wasm_env
+     - cli_build_web
+   env:
+     CHROME_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}/chrome
+     CHROMEDRIVER_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}/chromedriver
+   defaults:
+     run:
+       working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
+   steps:
+     - uses: actions/checkout@v5
+     - name: Restore cached chrome and chromedriver
+       uses: actions/cache@v4
+       with:
+         path: |
+           ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}
+           ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}
+         key: ${{ runner.os }}-cache-chrome-chromedriver
+      - name: Cache halo2 wasm web
+        id: cache-halo2-wasm-web
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
+          key: ${{ runner.os }}-halo2-wasm-web-${{ github.sha }}
+     - name: Install dependencies
+       run: yarn install
+     - name: Run halo2-wasm-app server and test it
+       run: |
+         echo "This test will be on latest chrome & chromedriver"
+         nohup yarn start &
+         for i in {1..30}; do
+           if curl --silent http://localhost:3000 > /dev/null; then
+             echo "Server is ready!"
+             break
+           fi
+           echo "Waiting for server..."
+           sleep 1
+         done
+         yarn test
