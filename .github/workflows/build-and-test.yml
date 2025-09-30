@@ -654,7 +654,18 @@ jobs:
           echo "Check override chrome version"
           google-chrome --version
           cd mopro-wasm
-          wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
+          # Backup original Cargo.toml to prevent workspace corruption
+          cp ../Cargo.toml ../Cargo.toml.backup
+          # Temporarily remove packages with noir dependencies from workspace
+          sed -i '/"mopro-ffi",/d' ../Cargo.toml
+          sed -i '/"test-e2e",/d' ../Cargo.toml
+          sed -i '/"cli",/d' ../Cargo.toml
+          # Run tests and restore workspace even on failure
+          (wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features) || TEST_EXIT_CODE=$?
+          # Restore original Cargo.toml
+          mv ../Cargo.toml.backup ../Cargo.toml
+          # Exit with original test result
+          exit ${TEST_EXIT_CODE:-0}
 #  build-halo2-wasm-web:
 #    runs-on: ubuntu-latest
 #    needs: setup-halo2-wasm-env
