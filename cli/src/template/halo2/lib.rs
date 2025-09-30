@@ -3,7 +3,7 @@
 // Module containing the Halo2 circuit logic (FibonacciMoproCircuit)
 #[macro_use]
 mod halo2;
-pub use halo2::{generate_halo2_proof, verify_halo2_proof, Halo2ProofResult};
+use halo2::{generate_halo2_proof, verify_halo2_proof, Halo2ProofResult};
 
 set_halo2_circuits! {
     ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
