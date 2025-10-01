@@ -2161,7 +2161,7 @@ dependencies = [
 
 [[package]]
 name = "mopro-cli"
-version = "0.3.1-alpha.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -2170,7 +2170,7 @@ dependencies = [
  "fs_extra",
  "include_dir",
  "indicatif",
- "mopro-ffi 0.3.1-alpha.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mopro-ffi 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest",
  "serde",
  "toml 0.9.2",
@@ -2180,7 +2180,7 @@ dependencies = [
 
 [[package]]
 name = "mopro-ffi"
-version = "0.3.1-alpha.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "camino",
@@ -2193,9 +2193,9 @@ dependencies = [
 
 [[package]]
 name = "mopro-ffi"
-version = "0.3.1-alpha.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e99c3aaa630c12da7721d69de96d92f84883179d919fded5e57282c17b087e1d"
+checksum = "06ed794e7c9ea6ebdf9f39522f257058d06eb547ca6c74010c7db9e60c009a22"
 dependencies = [
  "anyhow",
  "camino",

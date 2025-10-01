@@ -14,7 +14,7 @@ default = []
 
 [dependencies]
 mopro-wasm = { git = "https://github.com/zkmopro/mopro.git", branch = "v0.2.x" }
-mopro-ffi = { version = "0.3.1-alpha.0", features = ["uniffi"] }
+mopro-ffi = { version = "0.3.1", features = ["uniffi"] }
 thiserror = "2.0.12"
 anyhow = "1.0.99"
 
@@ -28,7 +28,7 @@ anyhow = "1.0.99"
 # NOIR_BUILD_DEPENDENCIES
 
 [dev-dependencies]
-mopro-ffi = { version = "0.3.1-alpha.0", features = ["uniffi-tests"] }
+mopro-ffi = { version = "0.3.1", features = ["uniffi-tests"] }
 
 # CIRCOM_DEV_DEPENDENCIES
 # HALO2_DEV_DEPENDENCIES
