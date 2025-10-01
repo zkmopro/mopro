@@ -11,6 +11,9 @@ fn mopro_uniffi_hello_world() -> String {
 #[macro_use]
 mod stubs;
 
+mod error;
+pub use error::MoproError;
+
 // CIRCOM_TEMPLATE
 
 // HALO2_TEMPLATE

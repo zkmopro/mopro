@@ -13,8 +13,8 @@ crate-type = ["lib", "cdylib", "staticlib"]
 default = []
 
 [dependencies]
-mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi"] }
+mopro-wasm = { git = "https://github.com/zkmopro/mopro.git", branch = "v0.2.x" }
+mopro-ffi = { version = "0.3.1-alpha.0", features = ["uniffi"] }
 thiserror = "2.0.12"
 anyhow = "1.0.99"
 
@@ -28,7 +28,7 @@ anyhow = "1.0.99"
 # NOIR_BUILD_DEPENDENCIES
 
 [dev-dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", features = ["uniffi-tests"] }
+mopro-ffi = { version = "0.3.1-alpha.0", features = ["uniffi-tests"] }
 
 # CIRCOM_DEV_DEPENDENCIES
 # HALO2_DEV_DEPENDENCIES

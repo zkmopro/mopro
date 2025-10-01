@@ -231,7 +231,7 @@ mopro-wasm = { git = \"https://github.com/zkmopro/mopro.git\", features = [
     \"gemini\",
     \"hyperplonk\",
     \"plonk\",
-] }
+], branch = \"v0.2.x\" }
 
 [target.wasm32-unknown-unknown.dependencies]
 console_error_panic_hook = \"0.1.7\"

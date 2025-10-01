@@ -26,13 +26,16 @@ impl Create for ReactNative {
                 target_dir.display()
             )));
         }
+        let version = "0.2.0";
         download_and_extract_template(
-            "https://codeload.github.com/zkmopro/react-native-app/zip/refs/heads/main",
+            &format!(
+                "https://codeload.github.com/zkmopro/react-native-app/zip/refs/tags/v{version}"
+            ),
             &project_dir,
             Self::NAME,
         )?;
 
-        let react_native_dir = project_dir.join("react-native-app-main");
+        let react_native_dir = project_dir.join(format!("react-native-app-{version}"));
         fs::rename(react_native_dir, &target_dir)?;
 
         let mopro_module_dir = target_dir.join("modules/mopro");

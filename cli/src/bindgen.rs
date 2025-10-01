@@ -164,8 +164,8 @@ pub fn bindgen(
         let cargo_toml_str = cargo_toml_path.to_str().unwrap();
         replace_string_in_file(
             cargo_toml_str,
-            "mopro-ffi = { git = \"https://github.com/zkmopro/mopro.git\", features = [\"uniffi\"] }",
-            "mopro-ffi = { git = \"https://github.com/zkmopro/mopro.git\", features = [\"uniffi\", \"witnesscalc\"] }",
+            "mopro-ffi = { version = \"0.3.1-alpha.0\", features = [\"uniffi\"] }",
+            "mopro-ffi = { version = \"0.3.1-alpha.0\", features = [\"uniffi\", \"witnesscalc\"] }",
         )?;
         replace_string_in_file(cargo_toml_str, "rust-witness = \"0.1\"\n", "")?;
         replace_string_in_file(

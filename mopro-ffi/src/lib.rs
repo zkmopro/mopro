@@ -20,6 +20,7 @@ macro_rules! uniffi_setup {
     () => {
         // `::uniffi` must be available in the caller’s extern-prelude.
         extern crate mopro_ffi as uniffi;
+        uniffi::setup_scaffolding!();
     };
 }
 
@@ -91,18 +92,5 @@ macro_rules! uniffi_setup {
 macro_rules! app {
     () => {
         mopro_ffi::uniffi_setup!();
-        uniffi::setup_scaffolding!();
-
-        // This should be declared into this macro due to Uniffi's limitation
-        // Please refer this issue: https://github.com/mozilla/uniffi-rs/issues/2257
-        #[derive(Debug, thiserror::Error, uniffi::Error)]
-        pub enum MoproError {
-            #[error("CircomError: {0}")]
-            CircomError(String),
-            #[error("Halo2Error: {0}")]
-            Halo2Error(String),
-            #[error("NoirError: {0}")]
-            NoirError(String),
-        }
     };
 }

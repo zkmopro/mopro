@@ -1,6 +1,6 @@
 [package]
 name = "mopro-cli"
-version = "0.3.0"
+version = "0.3.1-alpha.0"
 edition = "2021"
 description = "A CLI tool for creating a mobile native app with Mopro FFI"
 license = "MIT OR Apache-2.0"
@@ -14,7 +14,7 @@ name = "mopro"
 path = "src/main.rs"
 
 [dependencies]
-mopro-ffi = { version = "0.3.0", features = [
+mopro-ffi = { version = "0.3.1-alpha.0", features = [
     "build",
 ], default-features = false }
 

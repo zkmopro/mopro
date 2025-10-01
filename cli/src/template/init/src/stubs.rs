@@ -2,7 +2,7 @@
 macro_rules! circom_stub {
     () => {
         mod circom_stub {
-            use crate::MoproError;
+            use crate::error::MoproError;
 
             #[derive(uniffi::Record)]
             pub struct CircomProofResult {
@@ -64,7 +64,7 @@ macro_rules! circom_stub {
 macro_rules! halo2_stub {
     () => {
         mod halo2_stub {
-            use crate::MoproError;
+            use crate::error::MoproError;
 
             #[derive(uniffi::Record)]
             pub struct Halo2ProofResult {
@@ -98,7 +98,7 @@ macro_rules! halo2_stub {
 macro_rules! noir_stub {
     () => {
         mod noir_stub {
-            use crate::MoproError;
+            use crate::error::MoproError;
 
             #[uniffi::export]
             pub(crate) fn generate_noir_proof(

@@ -31,13 +31,14 @@ impl Create for Flutter {
             )));
         }
 
+        let version = "0.2.0";
         download_and_extract_template(
-            "https://github.com/zkmopro/flutter-app/archive/refs/heads/main.zip",
+            &format!("https://github.com/zkmopro/flutter-app/archive/refs/tags/v{version}.zip"),
             &project_dir,
             Self::NAME,
         )?;
 
-        let flutter_dir = project_dir.join("flutter-app-main");
+        let flutter_dir = project_dir.join(format!("flutter-app-{version}"));
         fs::rename(flutter_dir, &target_dir)?;
 
         let mopro_flutter_plugin_dir = target_dir.join("mopro_flutter_plugin");
