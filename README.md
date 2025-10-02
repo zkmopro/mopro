@@ -164,7 +164,7 @@ cd circom-prover
 cargo test --all-features
 ```
 
-To run specific witness generator or proof generator
+To run with specific witness generator and/or proof generator
 
 ```sh
 cd circom-prover
@@ -281,7 +281,7 @@ cargo install --path .
     open android -a Android\ Studio
     ```
 
-    Similar to the iOS app, choose an Android emulatro to run on.
+    Similar to the iOS app, choose an Android emulator to run on.
 
     Or you can use
 
