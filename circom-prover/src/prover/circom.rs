@@ -15,6 +15,7 @@ use ark_ff::{BigInteger, PrimeField};
 use ark_serialize::CanonicalDeserialize;
 use num::BigUint;
 use num_traits::Zero;
+use serde::{Deserialize, Serialize};
 
 pub const PROTOCOL_GROTH16: &str = "groth16";
 pub const CURVE_BN254: &str = "bn128";
@@ -57,7 +58,7 @@ impl From<Inputs> for Vec<bls12_381_Fr> {
 }
 
 // Follow the interface: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/snarkjs/index.d.cts
-#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct G1 {
     pub x: BigUint,
     pub y: BigUint,
@@ -112,7 +113,7 @@ impl G1 {
     }
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct G2 {
     pub x: [BigUint; 2],
     pub y: [BigUint; 2],
@@ -184,7 +185,7 @@ impl G2 {
     }
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Proof {
     pub a: G1,
     pub b: G2,
