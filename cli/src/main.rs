@@ -73,6 +73,7 @@ enum Commands {
         )]
         show: Option<String>,
     },
+    /// One command to initialize and build the project
     Construct {
         #[arg(
             long,
@@ -237,21 +238,7 @@ fn main() {
                 print::print_init_instructions("<PROJECT_NAME>".to_string());
                 return;
             }
-            match init::init_project(adapter, project_name, false) {
-                Ok(_) => {}
-                Err(e) => style::print_red_bold(format!("Failed to initialize project: {e:?}")),
-            }
-            let auto_update_flag = if *auto_update {
-                Some(true)
-            } else if *no_auto_update {
-                Some(false)
-            } else {
-                None
-            };
-            match build::build_project(mode, platforms, architectures, auto_update_flag, false) {
-                Ok(_) => {}
-                Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
-            }
+            
             if let Some(framework) = show_create {
                 if framework.trim().is_empty() {
                     Cli::command()
@@ -274,6 +261,21 @@ fn main() {
                 return;
             }
 
+            match init::init_project(adapter, project_name, false) {
+                Ok(_) => {}
+                Err(e) => style::print_red_bold(format!("Failed to initialize project: {e:?}")),
+            }
+            let auto_update_flag = if *auto_update {
+                Some(true)
+            } else if *no_auto_update {
+                Some(false)
+            } else {
+                None
+            };
+            match build::build_project(mode, platforms, architectures, auto_update_flag, false) {
+                Ok(_) => {}
+                Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
+            }
             // Handles platform-aware creation (React Native + Flutter)
             match create::create_project(framework) {
                 Ok(_) => {}
