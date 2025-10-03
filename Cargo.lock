@@ -842,6 +842,7 @@ dependencies = [
  "rayon",
  "rust-rapidsnark",
  "rust-witness",
+ "serde",
  "serde_json",
  "uuid",
  "witnesscalc-adapter",
@@ -2468,6 +2469,7 @@ dependencies = [
  "num-integer",
  "num-traits",
  "rand 0.8.5",
+ "serde",
 ]
 
 [[package]]
