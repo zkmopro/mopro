@@ -1,6 +1,6 @@
 [package]
 name = "circom-prover"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 description = "Circom prover is a Rust library for generating and verifying proofs for Circom circuits."
 license = "MIT OR Apache-2.0"
