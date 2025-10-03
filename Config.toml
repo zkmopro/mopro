@@ -1,0 +1,6 @@
+build_mode = "debug"
+target_adapters = []
+target_platforms = ["web"]
+auto_update = false
+
+[update]
