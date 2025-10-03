@@ -56,7 +56,7 @@ mopro init
 mopro build
 ```
 
-or 
+or
 
 ```sh
 mopro build --auto-update
@@ -110,6 +110,14 @@ You can customize the bindings generation:
     ```sh
     mopro bindgen --output-dir ./output
     ```
+
+### Generate the whole project with one command (experimental)
+
+A simplified command for `mopro init`, `mopro build` and `mopro create`.
+
+```sh
+mopro construct
+```
 
 ## Development
 
