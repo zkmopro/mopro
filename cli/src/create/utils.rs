@@ -133,6 +133,7 @@ pub fn copy_dir(input_dir: &Path, output_dir: &Path) -> Result<()> {
 pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
     let key_dirs = [
         include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom"),
+        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom/witnesscalc"),
         include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2"),
         include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/noir"),
     ];

@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import uniffi.mopro.Halo2ProofResult
@@ -59,7 +60,7 @@ fun FibonacciComponent() {
                 }
                     .start()
             },
-            modifier = Modifier.padding(top = 20.dp),
+            modifier = Modifier.padding(top = 20.dp).testTag("halo2GenerateProofButton"),
             enabled = !isGeneratingProof && !isVerifyingProof
         ) { Text(text = "generate proof") }
         Button(
@@ -76,7 +77,7 @@ fun FibonacciComponent() {
                     }
                 }.start()
             },
-            modifier = Modifier.padding(top = 120.dp),
+            modifier = Modifier.padding(top = 120.dp).testTag("halo2VerifyProofButton"),
             enabled = !isGeneratingProof && !isVerifyingProof && res.proof.isNotEmpty()
         ) { Text(text = "verify proof") }
         Text(

@@ -15,6 +15,7 @@
 		2A5992352CC7750C00135402 /* plonk_fibonacci_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 2A5992302CC7750C00135402 /* plonk_fibonacci_pk.bin */; };
 		2A5992392CC77A7E00135402 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A5992372CC77A7E00135402 /* MoproBindings.xcframework */; };
 		2A59923A2CC77A7E00135402 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5992362CC77A7E00135402 /* mopro.swift */; };
+		2A6489512E8BA1F1004450F0 /* multiplier2_wc_final.zkey in Resources */ = {isa = PBXBuildFile; fileRef = 2A6489502E8BA1F1004450F0 /* multiplier2_wc_final.zkey */; };
 		E11808962E5CBDB000B8B284 /* noir_multiplier2.vk in Resources */ = {isa = PBXBuildFile; fileRef = E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */; };
 		E11808972E5CBDB000B8B284 /* noir_multiplier2.vk in Resources */ = {isa = PBXBuildFile; fileRef = E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */; };
 		E11808982E5CBDB000B8B284 /* noir_multiplier2.vk in Resources */ = {isa = PBXBuildFile; fileRef = E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */; };
@@ -49,6 +50,7 @@
 		2A5992322CC7750C00135402 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = plonk_fibonacci_vk.bin; sourceTree = "<group>"; };
 		2A5992362CC77A7E00135402 /* mopro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro.swift; sourceTree = "<group>"; };
 		2A5992372CC77A7E00135402 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
+		2A6489502E8BA1F1004450F0 /* multiplier2_wc_final.zkey */ = {isa = PBXFileReference; lastKnownFileType = file; path = multiplier2_wc_final.zkey; sourceTree = "<group>"; };
 		E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */ = {isa = PBXFileReference; lastKnownFileType = file; path = noir_multiplier2.vk; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -111,6 +113,7 @@
 				2A4190682DF1CCE6004F1A4F /* noir_multiplier2.json */,
 				2A41906A2DF1CCED004F1A4F /* noir_multiplier2.srs */,
 				E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */,
+				2A6489502E8BA1F1004450F0 /* multiplier2_wc_final.zkey */,
 			);
 			sourceTree = "<group>";
 		};
@@ -259,6 +262,7 @@
 				2A41906B2DF1CCED004F1A4F /* noir_multiplier2.srs in Resources */,
 				2A5992352CC7750C00135402 /* plonk_fibonacci_pk.bin in Resources */,
 				2A59922F2CC7750200135402 /* multiplier2_final.zkey in Resources */,
+				2A6489512E8BA1F1004450F0 /* multiplier2_wc_final.zkey in Resources */,
 				2A4190692DF1CCE6004F1A4F /* noir_multiplier2.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
