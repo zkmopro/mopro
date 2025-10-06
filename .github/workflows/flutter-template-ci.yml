@@ -1,0 +1,77 @@
+name: Flutter Template CI 
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches:[main]
+jobs:
+  flutter-e2e:
+    name: Test Flutter Template
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      #--- Setup Build Deps & Rust ---
+      - name: Setup system dependencies
+        uses: ./.github/actions/setup-Deps
+        with:
+          platform: linux
+
+      - name: Setup Rust
+        uses: ./.github/actions/setup-rust
+        with:
+          toolchain: stable
+          cache-key: flutter-Template
+          cache-targets: true
+      
+      #-- Build MoPro CLI Binary
+      
+      - name: Build mopro CLI
+        working-directory: CLI
+        run: cargo build --release
+      
+      - name: Upload CLI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mopro-cli 
+          path: cli/target/release/mopro
+
+      # --- Create Flutter Template using MoPro ---
+
+      - name: Generate Flutter project using MoPro
+        uses: ./.github/actions/action.yml
+        with:
+          artifact-name: mopro-cli
+          adapter: circom
+          project-name: mopro_flutter_test
+          destination: ${{ runner.temp }}
+      
+      # --- Setup Flutter ---
+      - name: Setup Flutter 
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.3"
+          channel: stable
+          cache: true
+
+      # --- Setup Flutter ---
+      - name: Setup Flutter 
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.3"
+          channel: stable
+          cache: true
+      # --- Run Flutter Tests ---
+      - name: Run integration tests
+        working-directory: ${{ runner.temp }}/mopro_flutter_test
+        run: flutter test integration_test/plugin_integration_test.dart
+      
+      - name: Run unit tests
+        working-directory: ${{ runner.temp }}/mopro_flutter_test
+        run: flutter test 
+        
+
+
