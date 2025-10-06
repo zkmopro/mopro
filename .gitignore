@@ -12,3 +12,4 @@ mopro_flutter_bindings
 MoproAndroidBindings
 MoproiOSBindings
 build/
+tmp

@@ -530,6 +530,37 @@ jobs:
             ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android/app/build/outputs/**
           if-no-files-found: ignore
 
+      # ---- React Native e2e tests ----
+      - name: Run React Native iOS e2e tests (npm)
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+        run: |
+          echo "Running iOS e2e tests via npm script"
+          npm run e2e:test:ios
+        continue-on-error: false
+
+      - name: Run React Native Android e2e tests (emulator)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
+          script: |
+            cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+            echo "Running Android e2e tests via npm script"
+            npm run e2e:test:android
+
+      - name: Upload RN e2e artifacts (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rn-e2e-outputs-${{ matrix.adapter }}
+          path: |
+            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android/app/build/outputs/**
+            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/ios/build/**
+          if-no-files-found: ignore
+
   cli_build_web:
       needs: cli_build
       strategy:
