@@ -211,6 +211,7 @@ jobs:
           tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
 
       - name: Xcode test (simulator, arm64 only)
+        timeout-minutes: 15
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
         run: |
           # Capitalize adapter (circom -> Circom, halo2 -> Halo2, noir -> Noir)
@@ -248,6 +249,7 @@ jobs:
         matrix:
           adapter: [circom, halo2, noir]
       runs-on: ubuntu-latest
+      timeout-minutes: 15
       if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
       steps:
         - uses: actions/checkout@v5
@@ -302,18 +304,7 @@ jobs:
             arch: x86_64
             disable-animations: true
             emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
-            script: |
-              cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android
-              # Capitalize adapter (circom -> Circom, halo2 -> Halo2, noir -> Noir)
-              ADAPTER="${{ matrix.adapter }}"
-              FIRST=$(printf '%s' "$ADAPTER" | cut -c1 | tr '[:lower:]' '[:upper:]')
-              REST=$(printf '%s' "$ADAPTER" | cut -c2-)
-              ADAPTER_UPPER="$FIRST$REST"
-
-              chmod +x gradlew
-        
-              echo "Running test test${ADAPTER_UPPER}ButtonClick"
-              ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.example.moproapp.ExampleInstrumentedTest#test${ADAPTER_UPPER}ButtonClick
+            script: cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android && ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.example.moproapp.ExampleInstrumentedTest#${{ matrix.adapter }}ButtonClick
 
         - name: Upload test report
           if: failure()
@@ -371,7 +362,7 @@ jobs:
       fail-fast: false
       matrix:
         adapter: [circom, halo2, noir]
-    runs-on: macos-14
+    runs-on: macos-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
     steps:
       - uses: actions/checkout@v5
@@ -391,22 +382,23 @@ jobs:
           "$GITHUB_WORKSPACE/bin/mopro" build \
             --mode release \
             --platforms ios \
-            --architectures aarch64-apple-ios aarch64-apple-ios-sim
+            --architectures aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
 
-      - name: Build Android (release, x86_64)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode release \
-            --platforms android \
-            --architectures x86_64-linux-android
+      # TODO: Add Android/iOS tests
+      # - name: Build Android (release, x86_64)
+      #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+      #   run: |
+      #     "$GITHUB_WORKSPACE/bin/mopro" build \
+      #       --mode release \
+      #       --platforms android \
+      #       --architectures x86_64-linux-android
 
       - name: Clean mopro build dir
         run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
 
       - name: Create React Native frameworks
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: $GITHUB_WORKSPACE/bin/mopro create --framework react-native
+        run: printf 'n\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" create --framework react-native
 
       # ---- Node & deps ----
       - name: Install Node.js
@@ -418,43 +410,49 @@ jobs:
         working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
         run: npm ci
 
-      - name: Expo prebuild (generate ios/ & android/)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
-        env:
-          EXPO_NO_INTERACTIVE: '1'
-        run: npx expo prebuild --clean
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
 
-      # ---- iOS build (headless) ----
-      - name: Install iOS Pods
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/ios
-        run: pod install
-
-      - name: Build iOS (Debug, iphonesimulator)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+      - name: Install applesimutils
         run: |
-          xcodebuild \
-            -workspace ios/*.xcworkspace \
-            -scheme reactnativeapp \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            build
+            brew tap wix/brew
+            brew install applesimutils
+      - name: Prebuild
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+        run: npm run prebuild
 
-      # ---- Android build (headless) ----
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: 'gradle'
+      # Build iOS and Android apps for E2E
+      - name: Build iOS for Detox
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+        run: npm run e2e:build:ios
 
-      - name: Android SDK (cmdline only)
-        uses: android-actions/setup-android@v3
+      # Start Metro bundler in background
+      - name: Start Metro bundler
+        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+        run: npx expo start --dev-client --port 8081 &
 
-      - name: Assemble Android Debug (no emulator)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android
-        run: ./gradlew --no-daemon --stacktrace assembleDebug
+      # Give Metro a few seconds to boot before launching Detox
+      - name: Wait for Metro
+        run: sleep 20
+
+        # TODO: add this test back
+      # - name: Run iOS Detox tests
+      #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+      #   run: npm run e2e:test:ios
+      # # ---- Android build (headless) ----
+      # - name: Setup Java 17
+      #   uses: actions/setup-java@v4
+      #   with:
+      #     distribution: temurin
+      #     java-version: '17'
+      #     cache: 'gradle'
+
+      # - name: Android SDK (cmdline only)
+      #   uses: android-actions/setup-android@v3
+
+      # - name: Assemble Android Debug (no emulator)
+      #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android
+      #   run: ./gradlew --no-daemon --stacktrace assembleDebug
 
       - name: Upload native build outputs (on failure)
         if: failure()

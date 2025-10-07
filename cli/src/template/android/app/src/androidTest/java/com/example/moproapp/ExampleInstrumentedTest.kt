@@ -47,11 +47,11 @@ class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.mopro.moproapp", appContext.packageName)
+        assertEquals("com.example.moproapp", appContext.packageName)
     }
 
     @Test
-    fun testCircomButtonClick() {
+    fun circomButtonClick() {
         composeTestRule.setContent { MultiplierComponent() }
         
         composeTestRule.onNodeWithTag("circomGenerateProofButton").performClick()
@@ -64,7 +64,7 @@ class ExampleInstrumentedTest {
     }
 
     @Test 
-    fun testNoirButtonClick() {
+    fun noirButtonClick() {
         composeTestRule.setContent { NoirComponent() }
 
         composeTestRule.onNodeWithTag("noirGenerateProofButton").performClick()
@@ -77,7 +77,7 @@ class ExampleInstrumentedTest {
     }
 
     @Test
-    fun testRapidsnarkButtonClick() {
+    fun rapidsnarkButtonClick() {
         composeTestRule.setContent { MultiplierComponent() }
 
         composeTestRule.onNodeWithTag("rapidsnarkGenerateProofButton").performClick()
@@ -90,7 +90,7 @@ class ExampleInstrumentedTest {
     }
 
     @Test
-    fun testHalo2ButtonClick() {
+    fun halo2ButtonClick() {
         composeTestRule.setContent { FibonacciComponent() }
 
         composeTestRule.onNodeWithTag("halo2GenerateProofButton").performClick()
