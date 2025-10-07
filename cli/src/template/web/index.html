@@ -21,14 +21,14 @@
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Mopro WASM Test</h1>
+    <h1 style="text-align: center;">Mopro Browser Test</h1>
     <table style="margin-top: 20px; text-align: left">
         <thead>
             <tr>
-                <th>Proving System</th>
-                <th>Proof Gemeration Time (ms)</th>
-                <th>Proof Verification Time (ms)</th>
-                <th>Proof Validity</th>
+                <th>Test</th>
+                <th>Proof Time (ms)</th>
+                <th>Verify Time (ms)</th>
+                <th>Test Pass</th>
                 <th>Error</th>
             </tr>
         </thead>
@@ -36,6 +36,9 @@
             <!-- Rows will be dynamically updated here -->
         </tbody>
     </table>
-    <script src="./index.js"></script>
+    <div id="test-status" style="margin-top: 20px; text-align: center; font-size: 1.2em; font-weight: bold;">
+        <!-- Status will be dynamically updated -->
+    </div>
+    <script src="./test_mopro.js"></script>
 </body>
 </html>

@@ -2,4 +2,4 @@
 extend-ignore-re = ["(?i).*groth.*"]
 
 [files]
-extend-exclude = ["**/zkemail.json", "**/noir_multiplier2.json"]
+extend-exclude = ["**/zkemail.json", "**/noir_multiplier2.json", "**/project.pbxproj"]
