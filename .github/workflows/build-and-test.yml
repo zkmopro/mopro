@@ -369,15 +369,35 @@ jobs:
             sudo udevadm control --reload-rules
             sudo udevadm trigger --name-match=kvm
 
-        - name: Run tests
+        - name: Show disk usage (before cleanup)
+          run: df -h || true
+
+        - name: Free common caches to save disk space
+          run: |
+            echo 'Removing Gradle caches and temporary files to reduce disk usage'
+            rm -rf ~/.gradle/caches || true
+            rm -rf ~/.android/avd/*/snapshots || true
+            sudo du -sh /var/lib/apt/lists || true
+            sudo apt-get clean || true
+            rm -rf $RUNNER_TEMP/* || true
+
+        - name: Show disk usage (after cleanup)
+          run: df -h || true
+
+        - name: Run tests (on emulator)
           uses: reactivecircus/android-emulator-runner@v2
           with:
             api-level: 29
             target: google_apis
             arch: x86_64
             disable-animations: true
-            emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
-            script: cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android && ./gradlew connectedAndroidTest
+            # Use a smaller memory footprint to reduce disk/swap usage on runner
+            emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 1024 -cores 1"
+            script: |
+              cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android
+              # Show workspace size to help debug disk pressure
+              du -sh . || true
+              ./gradlew --no-daemon --no-build-cache --max-workers=1 connectedAndroidTest
 
         - name: Upload test report
           if: failure()
