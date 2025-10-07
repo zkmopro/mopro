@@ -98,8 +98,8 @@ This repository contains the following components:
         </tr>
         <tr>
             <td>
-                <a href="https://github.com/zkmopro/mopro/tree/main/test-e2e">
-                    test-e2e
+                <a href="https://github.com/zkmopro/mopro/tree/main/tests">
+                    tests
                 </a>
             </td>
             <td>
