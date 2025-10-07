@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -126,7 +127,7 @@ fun NoirComponent() {
                         }
                     ).start()
                 },
-                modifier = Modifier.padding(top = 20.dp),
+                modifier = Modifier.padding(top = 20.dp).testTag("noirGenerateProofButton"),
                 enabled = !isGeneratingProof && !isVerifyingProof
             ) { 
                 Text(text = "Generate Proof")
@@ -185,7 +186,7 @@ fun NoirComponent() {
                         }
                     ).start()
                 },
-                modifier = Modifier.padding(top = 20.dp),
+                modifier = Modifier.padding(top = 20.dp).testTag("noirVerifyProofButton"),
                 enabled = !isGeneratingProof && !isVerifyingProof && proofBytes != null
             ) { 
                 Text(text = "Verify Proof") 
