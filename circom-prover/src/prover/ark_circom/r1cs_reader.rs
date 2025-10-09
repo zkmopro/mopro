@@ -73,7 +73,6 @@ impl<E: Pairing> R1CSFile<E> {
 
         let num_sections = reader.read_u32::<LittleEndian>()?;
 
-        // todo: handle sec_size correctly
         // section type -> file offset
         let mut sec_offsets = HashMap::<u32, u64>::new();
         let mut sec_sizes = HashMap::<u32, u64>::new();
@@ -235,14 +234,28 @@ fn read_constraints<R: Read, E: Pairing>(
             "Invalid constraints section size: too small for expected number of constraints",
         )));
     }
+    // Read exactly `size` bytes from this section and ensure nothing remains.
+    let mut limited = reader.by_ref().take(size);
+
     let mut vec = Vec::with_capacity(header.n_constraints as usize);
     for _ in 0..header.n_constraints {
         vec.push((
-            read_constraint_vec::<&mut R, E>(&mut reader)?,
-            read_constraint_vec::<&mut R, E>(&mut reader)?,
-            read_constraint_vec::<&mut R, E>(&mut reader)?,
+            read_constraint_vec::<&mut _, E>(&mut limited)?,
+            read_constraint_vec::<&mut _, E>(&mut limited)?,
+            read_constraint_vec::<&mut _, E>(&mut limited)?,
         ));
     }
+
+    // Validate that the section was fully consumed
+    let mut extra = [0u8; 1];
+    let bytes_read = limited.read(&mut extra)?;
+    if bytes_read != 0 {
+        return Err(IoError(Error::new(
+            ErrorKind::InvalidData,
+            "Unexpected trailing bytes in constraints section",
+        )));
+    }
+
     Ok(vec)
 }
 
