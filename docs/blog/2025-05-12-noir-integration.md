@@ -120,7 +120,7 @@ Expanding support to these platforms is a significant challenge. The `barretenbe
 
 ## Case Study: Stealthnote Mobile App
 
-During the [NoirHack 2025 (April 14th to May 10th)](https://www.noirhack.com/), the Mopro team participated by building a mobile-native Noir application. Our project was inspired by [**Stealthnote**](https://stealthnote.xyz/), originally created by Saleel. Stealthnote is a web-based app that allows users to sign in with Google OAuth and prove ownership of their organizational email address. It leverages a Noir circuit to generate a zero-knowledge proof from the JWT issued by Google OAuth. You can read more about the original project in [Saleel’s blog post](https://saleel.xyz/blog/stealthnote/).
+During the NoirHack 2025 (April 14th to May 10th), the Mopro team participated by building a mobile-native Noir application. Our project was inspired by [**Stealthnote**](https://stealthnote.xyz/), originally created by Saleel. Stealthnote is a web-based app that allows users to sign in with Google OAuth and prove ownership of their organizational email address. It leverages a Noir circuit to generate a zero-knowledge proof from the JWT issued by Google OAuth. You can read more about the original project in [Saleel’s blog post](https://saleel.xyz/blog/stealthnote/).
 
 We aim to enhance performance and user experience by building a fully native mobile app. At the same time, we want to demonstrate that the current Mopro + Noir stack is fully capable of supporting mobile-native development. Therefore, we decided to build a mobile version of Stealthnote.
 
