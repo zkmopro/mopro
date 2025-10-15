@@ -48,7 +48,8 @@ enum Commands {
         #[arg(long, num_args = 1.., help = "Specify the architectures to build for (e.g., 'aarch64-apple-ios', 'aarch64-apple-ios-sim', x86_64-apple-ios, x86_64-linux-android, i686-linux-android, armv7-linux-androideabi, aarch64-linux-android).")]
         architectures: Option<Vec<String>>,
         #[arg(
-            long,
+            long, 
+            num_args = 1..,
             help = "Automatically run mopro update after build",
             conflicts_with = "no_auto_update"
         )]
