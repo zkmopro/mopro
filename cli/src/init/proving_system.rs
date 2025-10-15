@@ -87,7 +87,7 @@ pub fn replace_test_bindings_lib_import(
     let project_lib_name = project_name.replace('-', "_");
 
     // We expect a structure of `tests/bindings/<adapter>/*.(kts|swift)`
-    for file in fs::read_dir(&test_bindings_dir)? {
+    for file in fs::read_dir(test_bindings_dir)? {
         let file = file?;
         let file_path = file.path();
 

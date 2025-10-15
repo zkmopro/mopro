@@ -1,5 +1,5 @@
 use super::{circom::Circom, halo2::Halo2, noir::Noir};
-use crate::init::proving_system::{ProvingSystem, replace_test_bindings_lib_import};
+use crate::init::proving_system::{replace_test_bindings_lib_import, ProvingSystem};
 use crate::{select::multi_select, style};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
