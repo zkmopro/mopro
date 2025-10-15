@@ -1,5 +1,5 @@
 use super::{circom::Circom, halo2::Halo2, noir::Noir};
-use crate::init::proving_system::ProvingSystem;
+use crate::init::proving_system::{replace_test_bindings_lib_import, ProvingSystem};
 use crate::{select::multi_select, style};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -142,6 +142,26 @@ impl AdapterSelector {
         if self.contains(Adapter::Noir) {
             Noir::build_template(build_rs_path)?;
         }
+        Ok(())
+    }
+
+    pub fn build_bindings_lib(
+        &self,
+        bindings_lib_path: &str,
+        project_name: &str,
+    ) -> anyhow::Result<()> {
+        if self.contains(Adapter::Circom) {
+            Circom::build_bindings_lib(bindings_lib_path, project_name)?;
+        }
+        if self.contains(Adapter::Halo2) {
+            Halo2::build_bindings_lib(bindings_lib_path, project_name)?;
+        }
+        if self.contains(Adapter::Noir) {
+            Noir::build_bindings_lib(bindings_lib_path, project_name)?;
+        }
+        // copy ffi bindings test
+        let ffi_bindings_dir_path = format!("{}/{}", bindings_lib_path, "ffi");
+        replace_test_bindings_lib_import(ffi_bindings_dir_path.as_str(), project_name)?;
         Ok(())
     }
 

@@ -72,7 +72,7 @@ pub fn init_project(
     }
 
     if let Some(test_bindings_dir_path) = project_dir.join("tests").join("bindings").to_str() {
-        replace_test_bindings_lib_import(test_bindings_dir_path, project_name.as_str())?;
+        adapter_sel.build_bindings_lib(test_bindings_dir_path, project_name.as_str())?;
     }
 
     // Store selection
@@ -97,50 +97,6 @@ pub fn init_project(
     if !quiet {
         // Print out the instructions
         print_init_instructions(project_name);
-    }
-
-    Ok(())
-}
-
-/// Replace the placeholder import lines in the test bindings files with the actual import statements
-/// based on the project name and file type (Kotlin or Swift).
-fn replace_test_bindings_lib_import(test_bindings_dir: &str, project_name: &str) -> Result<()> {
-    let project_lib_name = project_name.replace('-', "_");
-
-    // We expect a structure of `tests/bindings/<adapter>/*.(kts|swift)`
-    for bundle in fs::read_dir(test_bindings_dir)? {
-        let bundle = bundle?;
-        let bundle_path = bundle.path();
-
-        if !bundle_path.is_dir() {
-            continue;
-        }
-
-        for file in fs::read_dir(&bundle_path)? {
-            let file = file?;
-            let file_path = file.path();
-
-            if !file_path.is_file() {
-                continue;
-            }
-
-            let target = "// GENERATED LIB IMPORT PLACEHOLDER";
-            let replacement = match file_path.extension().and_then(|ext| ext.to_str()) {
-                Some("kts") => Some(format!("import uniffi.{}.*", project_lib_name)),
-                Some("swift") => Some(format!("import {}", project_lib_name)),
-                _ => None,
-            };
-
-            if let Some(line) = replacement {
-                replace_string_in_file(
-                    file_path
-                        .to_str()
-                        .ok_or(anyhow::anyhow!("Invalid test binding file path"))?,
-                    target,
-                    &line,
-                )?;
-            }
-        }
     }
 
     Ok(())
