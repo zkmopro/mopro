@@ -1,732 +1,657 @@
 name: Build and Test
 
 on:
-  push:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
+    push:
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+            - ready_for_review
 
 env:
-  CARGO_TERM_COLOR: always
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    CARGO_TERM_COLOR: always
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  check-typos:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install minimal dependencies
-        uses: awalsh128/cache-apt-pkgs-action@v1
-        with:
-          packages: wget
-          version: 1.0
-      - name: Spell Check Repo
-        uses: crate-ci/typos@v1.31.1
-        with:
-          config: ./_typos.toml
+    check_typos:
+        runs-on: ubuntu-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        steps:
+            - uses: actions/checkout@v5
+            - name: Install minimal dependencies
+              uses: awalsh128/cache-apt-pkgs-action@v1
+              with:
+                  packages: wget
+                  version: 1.0
+            - name: Spell Check Repo
+              uses: crate-ci/typos@v1.31.1
+              with:
+                  config: ./_typos.toml
 
-  clippy_check:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    env:
-      RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
-      CIRCOM_PROVER_TEST_WITNESS: "1" # Enable witness generation in circom-prover tests
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
-        with:
-          platform: linux
-      - name: Setup Rust
-        uses: ./.github/actions/setup-rust
-        with:
-          cache-key: clippy
-      - name: Install Clippy
-        run: rustup component add clippy
-      - name: Run Clippy
-        run: cargo clippy --all-targets --all-features
-
-  lint:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup Rust
-        uses: ./.github/actions/setup-rust
-        with:
-          cache-key: format
-      - name: Install rustfmt
-        run: rustup component add rustfmt
-      - name: Check formatting
-        run: cargo fmt --all -- --check
-
-  # Test jobs (run in parallel, depend on lint jobs)
-  circom-prover:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [lint, clippy_check]
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
-        with:
-          platform: linux
-      - name: Setup Rust
-        uses: ./.github/actions/setup-rust
-        with:
-          cache-key: circom-prover
-      - name: Circom prover tests
-        run: |
-          cd circom-prover
-          cargo test --all-features
-
-  cli_build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    needs: [lint, clippy_check]
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Install Rust components
-        run: |
-          rustup show
-          rustup component add clippy rustfmt
-
-      - name: Build & install CLI
-        run: |
-          cd cli
-          cargo install --path . --locked
-          ~/.cargo/bin/mopro --help
-          ~/.cargo/bin/mopro --version || true
-
-      - name: Upload CLI binary (${{ runner.os }})
-        uses: actions/upload-artifact@v4
-        with:
-          name: mopro-bin-${{ runner.os }}
-          path: ~/.cargo/bin/mopro
-          if-no-files-found: error
-
-  cli_template_tests:
-    needs: cli_build
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-        adapter: [circom, halo2, noir]
-    runs-on: ${{ matrix.os }}
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Prepare template project
-        uses: ./.github/actions/mopro-init-project
-        with:
-          artifact-name: mopro-bin-${{ runner.os }}
-          adapter: ${{ matrix.adapter }}
-          project-name: mopro-example-${{ matrix.adapter }}
-          destination: ${{ runner.temp }}
-
-      - name: Run tests with JNA
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
-          export CLASSPATH="$PWD/jna-5.13.0.jar"
-          cargo test --all --all-features
-
-  cli_build_ios_prepare:
-    needs: cli_build
-    strategy:
-      fail-fast: false
-      matrix:
-        adapter: [circom, halo2, noir]
-    runs-on: macos-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Prepare template project
-        uses: ./.github/actions/mopro-init-project
-        with:
-          artifact-name: mopro-bin-macOS
-          adapter: ${{ matrix.adapter }}
-          project-name: mopro-example-${{ matrix.adapter }}
-          destination: ${{ runner.temp }}
-
-      - name: Build iOS (release; device+sim arm64 only)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode release \
-            --platforms ios \
-            --architectures aarch64-apple-ios aarch64-apple-ios-sim
-
-      - name: Clean the `build` dir to save space
-        run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
-
-      - name: Create iOS framework
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          "$GITHUB_WORKSPACE/bin/mopro" create --framework ios
-
-      - name: Remove build artifacts before packaging
-        run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
-
-      - name: Archive prepared project
-        run: |
-          cd ${{ runner.temp }}
-          tar -czf mopro-example-${{ matrix.adapter }}.tar.gz mopro-example-${{ matrix.adapter }}
-
-      - name: Upload prepared project
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-project-${{ matrix.adapter }}
-          path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}.tar.gz
-          if-no-files-found: error
-
-  cli_build_ios_device:
-    needs: cli_build_ios_prepare
-    strategy:
-      fail-fast: false
-      matrix:
-        adapter: [circom, halo2, noir]
-    runs-on: macos-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: ios-project-${{ matrix.adapter }}
-          path: ${{ runner.temp }}
-
-      - name: Extract prepared project
-        run: |
-          cd ${{ runner.temp }}
-          tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
-
-      - name: Xcode build (device, codesign off)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          xcodebuild \
-            -project ios/MoproApp.xcodeproj \
-            -scheme MoproApp \
-            -configuration Debug \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            -resultBundlePath ${{ runner.temp }}/MoproApp-device.xcresult \
-            -derivedDataPath ${{ runner.temp }}/DerivedData \
-            build
-
-      - name: Upload Xcode results (failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-xcode-device-results-${{ matrix.adapter }}
-          path: |
-            ${{ runner.temp }}/MoproApp-device.xcresult
-
-  cli_build_ios_simulator:
-    needs: cli_build_ios_prepare
-    strategy:
-      fail-fast: false
-      matrix:
-        adapter: [circom, halo2, noir]
-    runs-on: macos-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: ios-project-${{ matrix.adapter }}
-          path: ${{ runner.temp }}
-
-      - name: Extract prepared project
-        run: |
-          cd ${{ runner.temp }}
-          tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
-
-      - name: Xcode build (simulator, arm64 only)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          xcodebuild \
-            -project ios/MoproApp.xcodeproj \
-            -scheme MoproApp \
-            -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
-            -sdk iphonesimulator \
-            ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            -resultBundlePath ${{ runner.temp }}/MoproApp-simulator-build.xcresult \
-            -derivedDataPath ${{ runner.temp }}/DerivedData \
-            build
-
-      - name: Upload Xcode results (failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-xcode-simulator-build-results-${{ matrix.adapter }}
-          path: |
-            ${{ runner.temp }}/MoproApp-simulator-build.xcresult
-
-  cli_test_ios_simulator:
-    needs: cli_build_ios_prepare
-    strategy:
-      fail-fast: false
-      matrix:
-        adapter: [circom, halo2, noir]
-    runs-on: macos-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: ios-project-${{ matrix.adapter }}
-          path: ${{ runner.temp }}
-
-      - name: Extract prepared project
-        run: |
-          cd ${{ runner.temp }}
-          tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
-
-      - name: Xcode test (simulator, arm64 only)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          xcodebuild \
-            -project ios/MoproApp.xcodeproj \
-            -scheme MoproApp \
-            -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
-            -sdk iphonesimulator \
-            ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            -maximum-parallel-testing-workers 1 \
-            -resultBundlePath ${{ runner.temp }}/MoproApp-simulator-test.xcresult \
-            -derivedDataPath ${{ runner.temp }}/DerivedData \
-            test
-
-      - name: Upload Xcode results (failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-xcode-simulator-test-results-${{ matrix.adapter }}
-          path: |
-            ${{ runner.temp }}/MoproApp-simulator-test.xcresult
-
-  cli_build_android:
-      needs: cli_build
-      strategy:
-        fail-fast: false
-        matrix:
-          adapter: [circom, halo2, noir]
-      runs-on: ubuntu-latest
-      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-      steps:
-        - uses: actions/checkout@v5
-
-        - name: Android SDK
-          uses: android-actions/setup-android@v3
-
-        - name: Setup NDK
-          uses: nttld/setup-ndk@v1
-          with:
-            ndk-version: r26d
-
-        - name: Prepare template project
-          uses: ./.github/actions/mopro-init-project
-          with:
-            artifact-name: mopro-bin-${{ runner.os }}
-            adapter: ${{ matrix.adapter }}
-            project-name: mopro-example-${{ matrix.adapter }}
-            destination: ${{ runner.temp }}
-
-        - name: Build Android (release, x86_64)
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: |
-            "$GITHUB_WORKSPACE/bin/mopro" build \
-              --mode release \
-              --platforms android \
-              --architectures x86_64-linux-android
-
-        - name: Clean the `build` dir to save space
-          run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
-
-        - name: Create Android framework
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: |
-            "$GITHUB_WORKSPACE/bin/mopro" create --framework android
-
-        - name: Build android app
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: cd android && chmod +x gradlew && ./gradlew build
-
-        - name: Enable KVM
-          run: |
-            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-            sudo udevadm control --reload-rules
-            sudo udevadm trigger --name-match=kvm
-
-        - name: Run tests
-          uses: reactivecircus/android-emulator-runner@v2
-          with:
-            api-level: 29
-            target: google_apis
-            arch: x86_64
-            disable-animations: true
-            emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
-            script: cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android && ./gradlew connectedAndroidTest
-
-        - name: Upload test report
-          if: failure()
-          uses: actions/upload-artifact@v4
-          with:
-            name: android-test-report
-            path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android/app/build/reports/androidTests/connected/debug/
-  
-  cli_build_flutter:
-      needs: cli_build
-      strategy:
-        fail-fast: false
-        matrix:
-          adapter: [circom, halo2, noir]
-      runs-on: ubuntu-latest
-      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-      steps:
-        - uses: actions/checkout@v5
-
-        - uses: subosito/flutter-action@v2
-          with:
-            flutter-version: '3.35.4'
-            channel: 'stable'
-
-        - name: Prepare template project
-          uses: ./.github/actions/mopro-init-project
-          with:
-            artifact-name: mopro-bin-${{ runner.os }}
-            adapter: ${{ matrix.adapter }}
-            project-name: mopro-example-${{ matrix.adapter }}
-            destination: ${{ runner.temp }}
-
-        - name: Build Flutter (release)
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: |
-            "$GITHUB_WORKSPACE/bin/mopro" build \
-              --mode release \
-              --platforms flutter 
-
-        - name: Clean the `build` dir to save space
-          run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
-
-        - name: Create Flutter framework
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: |
-            "$GITHUB_WORKSPACE/bin/mopro" create --framework flutter
-
-        - name: Build flutter app
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          run: cd flutter && flutter pub get
-
-  cli_create_react_native:
-    needs: cli_build
-    strategy:
-      fail-fast: false
-      matrix:
-        adapter: [circom, halo2, noir]
-    runs-on: macos-14
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
-    steps:
-      - uses: actions/checkout@v5
-
-      # Build mopro example project for iOS + Android first, and create RN frameworks
-      - name: Prepare template project
-        uses: ./.github/actions/mopro-init-project
-        with:
-          artifact-name: mopro-bin-macOS
-          adapter: ${{ matrix.adapter }}
-          project-name: mopro-example-${{ matrix.adapter }}
-          destination: ${{ runner.temp }}
-
-      - name: Build iOS (release; device+sim arm64 only)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode release \
-            --platforms ios \
-            --architectures aarch64-apple-ios aarch64-apple-ios-sim
-
-      - name: Build Android (release, x86_64)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: |
-          "$GITHUB_WORKSPACE/bin/mopro" build \
-            --mode release \
-            --platforms android \
-            --architectures x86_64-linux-android
-
-      - name: Clean mopro build dir
-        run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
-
-      - name: Create React Native frameworks
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-        run: $GITHUB_WORKSPACE/bin/mopro create --framework react-native
-
-      # ---- Node & deps ----
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install JS packages
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
-        run: npm ci
-
-      - name: Expo prebuild (generate ios/ & android/)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+    clippy_check:
+        runs-on: ubuntu-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         env:
-          EXPO_NO_INTERACTIVE: '1'
-        run: npx expo prebuild --clean
+            RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
+            CIRCOM_PROVER_TEST_WITNESS: "1" # Enable witness generation in circom-prover tests
+        steps:
+            - uses: actions/checkout@v5
+            - name: Setup dependencies
+              uses: ./.github/actions/setup-deps
+              with:
+                  platform: linux
+            - name: Setup Rust
+              uses: ./.github/actions/setup-rust
+              with:
+                  cache-key: clippy
+            - name: Install Clippy
+              run: rustup component add clippy
+            - name: Run Clippy
+              run: cargo clippy --all-targets --all-features
 
-      # ---- iOS build (headless) ----
-      - name: Install iOS Pods
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/ios
-        run: pod install
+    lint:
+        runs-on: ubuntu-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        steps:
+            - uses: actions/checkout@v5
+            - name: Setup Rust
+              uses: ./.github/actions/setup-rust
+              with:
+                  cache-key: format
+            - name: Install rustfmt
+              run: rustup component add rustfmt
+            - name: Check formatting
+              run: cargo fmt --all -- --check
 
-      - name: Build iOS (Debug, iphonesimulator)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
-        run: |
-          xcodebuild \
-            -workspace ios/*.xcworkspace \
-            -scheme reactnativeapp \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            build
+    # Test jobs (run in parallel, depend on lint jobs)
+    circom-prover:
+        runs-on: ubuntu-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        needs: [lint, clippy_check, check_typos]
+        steps:
+            - uses: actions/checkout@v5
+            - name: Setup dependencies
+              uses: ./.github/actions/setup-deps
+              with:
+                  platform: linux
+            - name: Setup Rust
+              uses: ./.github/actions/setup-rust
+              with:
+                  cache-key: circom-prover
+            - name: Circom prover tests
+              run: |
+                  cd circom-prover
+                  cargo test --all-features
 
-      # ---- Android build (headless) ----
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: 'gradle'
+    cli_build:
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [macos-latest, ubuntu-latest]
+        runs-on: ${{ matrix.os }}
+        needs: [lint, clippy_check, check_typos]
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        steps:
+            - uses: actions/checkout@v5
 
-      - name: Android SDK (cmdline only)
-        uses: android-actions/setup-android@v3
+            - name: Install Rust components
+              run: |
+                  rustup show
+                  rustup component add clippy rustfmt
 
-      - name: Assemble Android Debug (no emulator)
-        working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android
-        run: ./gradlew --no-daemon --stacktrace assembleDebug
+            - name: Build & install CLI
+              run: |
+                  cd cli
+                  cargo install --path . --locked
+                  ~/.cargo/bin/mopro --help
+                  ~/.cargo/bin/mopro --version || true
 
-      - name: Upload native build outputs (on failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: rn-build-outputs-${{ matrix.adapter }}
-          path: |
-            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/ios/build/**/*.log
-            ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android/app/build/outputs/**
-          if-no-files-found: ignore
+            - name: Upload CLI binary (${{ runner.os }})
+              uses: actions/upload-artifact@v4
+              with:
+                  name: mopro-bin-${{ runner.os }}
+                  path: ~/.cargo/bin/mopro
+                  if-no-files-found: error
 
-  cli_build_web:
-      needs: cli_build
-      strategy:
-        fail-fast: false
-        matrix:
-          os: [macos-latest, ubuntu-latest]
-          adapter: [halo2]   # web build only for halo2
-      runs-on: ${{ matrix.os }}
-      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
-      steps:
-        - uses: actions/checkout@v5
+    cli_template_tests:
+        needs: cli_build
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [macos-latest, ubuntu-latest]
+                adapter: [circom, halo2, noir, none]
+        runs-on: ${{ matrix.os }}
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        steps:
+            - uses: actions/checkout@v5
 
-        - name: Install Rust target (wasm)
-          run: rustup target add wasm32-unknown-unknown
+            - name: Prepare template project
+              uses: ./.github/actions/mopro-init-project
+              with:
+                  artifact-name: mopro-bin-${{ runner.os }}
+                  adapter: ${{ matrix.adapter }}
+                  project-name: mopro-example-${{ matrix.adapter }}
+                  destination: ${{ runner.temp }}
 
-        - name: Prepare template project
-          uses: ./.github/actions/mopro-init-project
-          with:
-            artifact-name: mopro-bin-${{ runner.os }}
-            adapter: ${{ matrix.adapter }}
-            project-name: mopro-example-${{ matrix.adapter }}
-            destination: ${{ runner.temp }}
+            - name: Run tests with JNA
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: |
+                  curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
+                  export CLASSPATH="$PWD/jna-5.13.0.jar"
+                  cargo test --all --all-features
 
-        - name: Build Web (debug, halo2; auto-confirm prompt)
-          working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-          env:
-            CI: "true"
-          run: |
-            set -euo pipefail
-            # TODO: allow mopro CLI to run fully non-interactive so we can drop the pseudo-tty workaround below
-            if [[ "$RUNNER_OS" == "macOS" ]]; then
-              printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
-            else
-              printf 'y\n' | script -q -c "$GITHUB_WORKSPACE/bin/mopro build --mode debug --platforms web" /dev/null
-            fi
+    cli_build_ios_prepare:
+        needs: cli_build
+        strategy:
+            fail-fast: false
+            matrix:
+                adapter: [circom, halo2, noir]
+        runs-on: macos-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        steps:
+            - uses: actions/checkout@v5
 
-  test-ffi-all:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [lint, clippy_check]
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
-        with:
-          platform: linux
-      - name: Setup Rust
-        uses: ./.github/actions/setup-rust
-        with:
-          cache-key: ffi
-      - name: Run ffi tests
-        run: cd mopro-ffi && cargo test --release --all-features
+            - name: Prepare template project
+              uses: ./.github/actions/mopro-init-project
+              with:
+                  artifact-name: mopro-bin-macOS
+                  adapter: ${{ matrix.adapter }}
+                  project-name: mopro-example-${{ matrix.adapter }}
+                  destination: ${{ runner.temp }}
 
-  setup-halo2-wasm-env:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [lint, clippy_check]
-    outputs:
-      chrome-dir: ${{ steps.parsed-chrome-chromedriver-dir.outputs.chrome-dir }}
-      chromedriver-dir: ${{ steps.parsed-chrome-chromedriver-dir.outputs.chromedriver-dir }}
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup Rust
-        uses: ./.github/actions/setup-rust
-        with:
-          toolchain: nightly-2024-07-18
-          cache-key: wasm-env
-      - name: Cache wasm-pack
-        id: cache-wasm-pack
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/bin/wasm-pack
-          key: ${{ runner.os }}-wasm-pack-env
-      - name: Install wasm-pack
-        if: steps.cache-wasm-pack.outputs.cache-hit != 'true'
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - name: Setup Chrome and ChromeDriver
-        uses: browser-actions/setup-chrome@v1
-        id: setup-chrome-chromedriver
-        with:
-          chrome-version: 130
-          install-chromedriver: true
-      - name: Parse Chrome and ChromeDriver Directories
-        id: parsed-chrome-chromedriver-dir
-        run: |
-          echo "chrome-dir=$(dirname ${{ steps.setup-chrome-chromedriver.outputs.chrome-path }})" >> $GITHUB_OUTPUT
-          echo "chromedriver-dir=$(dirname ${{ steps.setup-chrome-chromedriver.outputs.chromedriver-path }})" >> $GITHUB_OUTPUT
-      - name: Cache Chrome and ChromeDriver
-        id: cache-chrome-chromedriver
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ steps.parsed-chrome-chromedriver-dir.outputs.chrome-dir }}
-            ${{ steps.parsed-chrome-chromedriver-dir.outputs.chromedriver-dir }}
-          key: ${{ runner.os }}-cache-chrome-chromedriver
+            - name: Build iOS (release; device+sim arm64 only)
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: |
+                  "$GITHUB_WORKSPACE/bin/mopro" build \
+                    --mode release \
+                    --platforms ios \
+                    --architectures aarch64-apple-ios aarch64-apple-ios-sim
 
-  test-wasm-halo2:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    needs: [setup-halo2-wasm-env]
-    env:
-      CHROME_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}/chrome
-      CHROMEDRIVER_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}/chromedriver
-    steps:
-      - uses: actions/checkout@v5
-      - name: Restore cached wasm-pack
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/bin/wasm-pack
-          key: ${{ runner.os }}-wasm-pack-env
-      - name: Restore cached chrome and chromedriver
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}
-            ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}
-          key: ${{ runner.os }}-cache-chrome-chromedriver
-      - name: Run wasm halo2 tests
-        run: |
-          echo "Override default chrome path for 'wasm-pack test'"
-          sudo ln -sf $CHROME_BIN /opt/google/chrome/chrome
-          echo "Check override chrome version"
-          google-chrome --version
-          cd mopro-wasm
-          wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
-#  build-halo2-wasm-web:
-#    runs-on: ubuntu-latest
-#    needs: setup-halo2-wasm-env
-#    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-#    steps:
-#      - uses: actions/checkout@v5
-#      - name: Install Rust toolchain
-#        uses: actions-rs/toolchain@v1
-#        with:
-#          toolchain: nightly-2024-07-18
-#      - name: install requirements
-#        uses: awalsh128/cache-apt-pkgs-action@v1
-#        with:
-#          packages: curl xz-utils build-essential cmake m4 nasm libstdc++6
-#          version: 1.0
-#      - name: Restore cached wasm-pack
-#        uses: actions/cache@v4
-#        with:
-#          path: ~/.cargo/bin/wasm-pack
-#          key: ${{ runner.os }}-wasm-pack
-#      - name: Cache halo2 wasm circuit
-#        id: cache-halo2-wasm-circuit
-#        uses: actions/cache@v4
-#        with:
-#          path: |
-#            test-e2e/MoproWasmBindings
-#          key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
-#      - name: Build circuits for Wasm Web app
-#        if: steps.cache-halo2-wasm-circuit.outputs.cache-hit != 'true'
-#        run: |
-#          cd test-e2e
-#          echo "install rust-src component"
-#          rustup component add rust-src --toolchain nightly-2024-07-18
-#          cargo run --bin web
-#  test-halo2-wasm-web:
-#    runs-on: ubuntu-latest
-#    needs:
-#      - setup-halo2-wasm-env
-#      - build-halo2-wasm-web
-#    env:
-#      CHROME_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}/chrome
-#      CHROMEDRIVER_BIN: ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}/chromedriver
-#    defaults:
-#      run:
-#        working-directory: test-e2e/web
-#    steps:
-#      - uses: actions/checkout@v5
-#      - name: Restore cached chrome and chromedriver
-#        uses: actions/cache@v4
-#        with:
-#          path: |
-#            ${{ needs.setup-halo2-wasm-env.outputs.chrome-dir }}
-#            ${{ needs.setup-halo2-wasm-env.outputs.chromedriver-dir }}
-#          key: ${{ runner.os }}-cache-chrome-chromedriver
-#      - name: Restore cached halo2 wasm circuit
-#        uses: actions/cache@v4
-#        with:
-#          path: |
-#            test-e2e/MoproWasmBindings
-#          key: ${{ runner.os }}-halo2-wasm-circuit-${{ github.sha }}
-#      - name: Install dependencies
-#        run: yarn install
-#      - name: Run halo2-wasm-app server and test it
-#        run: |
-#          echo "This test will be on latest chrome & chromedriver"
-#          nohup yarn start &
-#          for i in {1..30}; do
-#            if curl --silent http://localhost:3000 > /dev/null; then
-#              echo "Server is ready!"
-#              break
-#            fi
-#            echo "Waiting for server..."
-#            sleep 1
-#          done
-#          yarn test
+            - name: Clean the `build` dir to save space
+              run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
+
+            - name: Create iOS framework
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: |
+                  "$GITHUB_WORKSPACE/bin/mopro" create --framework ios
+
+            - name: Remove build artifacts before packaging
+              run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
+
+            - name: Archive prepared project
+              run: |
+                  cd ${{ runner.temp }}
+                  tar -czf mopro-example-${{ matrix.adapter }}.tar.gz mopro-example-${{ matrix.adapter }}
+
+            - name: Upload prepared project
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ios-project-${{ matrix.adapter }}
+                  path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}.tar.gz
+                  if-no-files-found: error
+
+    cli_test_ios_simulator:
+        needs: cli_build_ios_prepare
+        strategy:
+            fail-fast: false
+            matrix:
+                adapter: [circom, halo2, noir]
+        runs-on: macos-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        steps:
+            - uses: actions/download-artifact@v4
+              with:
+                  name: ios-project-${{ matrix.adapter }}
+                  path: ${{ runner.temp }}
+
+            - name: Extract prepared project
+              run: |
+                  cd ${{ runner.temp }}
+                  tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
+
+            - name: Xcode test (simulator, arm64 only)
+              timeout-minutes: 15
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: |
+                  # Capitalize adapter (circom -> Circom, halo2 -> Halo2, noir -> Noir)
+                  ADAPTER="${{ matrix.adapter }}"
+                  ADAPTER_UPPER="$(tr '[:lower:]' '[:upper:]' <<< ${ADAPTER:0:1})${ADAPTER:1}"
+
+                  echo "Running test test${ADAPTER_UPPER}ProveVerify"
+
+                  xcodebuild \
+                    -project ios/MoproApp.xcodeproj \
+                    -scheme MoproApp \
+                    -configuration Debug \
+                    -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
+                    -sdk iphonesimulator \
+                    -only-testing:MoproAppUITests/MoproAppUITests/test${ADAPTER_UPPER}ProveVerify \
+                    ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
+                    CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+                    -maximum-parallel-testing-workers 1 \
+                    -resultBundlePath ${{ runner.temp }}/MoproApp-simulator-test.xcresult \
+                    -derivedDataPath ${{ runner.temp }}/DerivedData \
+                    test
+
+            - name: Upload Xcode results (failure)
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ios-xcode-simulator-test-results-${{ matrix.adapter }}
+                  path: |
+                      ${{ runner.temp }}/MoproApp-simulator-test.xcresult
+
+    cli_build_android:
+        needs: cli_build
+        strategy:
+            fail-fast: false
+            matrix:
+                adapter: [circom, halo2, noir]
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        steps:
+            - uses: actions/checkout@v5
+
+            - name: Android SDK
+              uses: android-actions/setup-android@v3
+
+            - name: Setup NDK
+              uses: nttld/setup-ndk@v1
+              with:
+                  ndk-version: r26d
+
+            - name: Prepare template project
+              uses: ./.github/actions/mopro-init-project
+              with:
+                  artifact-name: mopro-bin-${{ runner.os }}
+                  adapter: ${{ matrix.adapter }}
+                  project-name: mopro-example-${{ matrix.adapter }}
+                  destination: ${{ runner.temp }}
+
+            - name: Build Android (release, x86_64)
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: |
+                  "$GITHUB_WORKSPACE/bin/mopro" build \
+                    --mode release \
+                    --platforms android \
+                    --architectures x86_64-linux-android
+
+            - name: Clean the `build` dir to save space
+              run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
+
+            - name: Create Android framework
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: |
+                  "$GITHUB_WORKSPACE/bin/mopro" create --framework android
+
+            - name: Build android app
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: cd android && chmod +x gradlew && ./gradlew build
+
+            - name: Enable KVM
+              run: |
+                  echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+                  sudo udevadm control --reload-rules
+                  sudo udevadm trigger --name-match=kvm
+
+            - name: Run tests
+              uses: reactivecircus/android-emulator-runner@v2
+              with:
+                  api-level: 29
+                  target: google_apis
+                  arch: x86_64
+                  disable-animations: true
+                  emulator-options: "-no-snapshot -no-boot-anim -no-window -gpu swiftshader_indirect -memory 2048 -cores 1"
+                  script: cd ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android && ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.example.moproapp.ExampleInstrumentedTest#${{ matrix.adapter }}ButtonClick
+
+            - name: Upload test report
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: android-test-report
+                  path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android/app/build/reports/androidTests/connected/debug/
+
+    cli_build_flutter:
+        needs: cli_build
+        strategy:
+            fail-fast: false
+            matrix:
+                adapter: [circom, halo2, noir]
+        runs-on: ubuntu-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: subosito/flutter-action@v2
+              with:
+                  flutter-version: "3.35.4"
+                  channel: "stable"
+
+            - name: Prepare template project
+              uses: ./.github/actions/mopro-init-project
+              with:
+                  artifact-name: mopro-bin-${{ runner.os }}
+                  adapter: ${{ matrix.adapter }}
+                  project-name: mopro-example-${{ matrix.adapter }}
+                  destination: ${{ runner.temp }}
+
+            - name: Build Flutter (release)
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: |
+                  "$GITHUB_WORKSPACE/bin/mopro" build \
+                    --mode release \
+                    --platforms flutter
+
+            - name: Clean the `build` dir to save space
+              run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
+
+            - name: Create Flutter framework
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: |
+                  "$GITHUB_WORKSPACE/bin/mopro" create --framework flutter
+
+            - name: Build flutter app
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: cd flutter && flutter pub get
+
+    cli_create_react_native:
+        needs: cli_build
+        strategy:
+            fail-fast: false
+            matrix:
+                adapter: [circom, halo2, noir]
+        runs-on: macos-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
+        steps:
+            - uses: actions/checkout@v5
+
+            # Build mopro example project for iOS + Android first, and create RN frameworks
+            - name: Prepare template project
+              uses: ./.github/actions/mopro-init-project
+              with:
+                  artifact-name: mopro-bin-macOS
+                  adapter: ${{ matrix.adapter }}
+                  project-name: mopro-example-${{ matrix.adapter }}
+                  destination: ${{ runner.temp }}
+
+            - name: Build iOS (release; device+sim arm64 only)
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: |
+                  "$GITHUB_WORKSPACE/bin/mopro" build \
+                    --mode release \
+                    --platforms ios \
+                    --architectures aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
+
+            # TODO: Add Android/iOS tests
+            # - name: Build Android (release, x86_64)
+            #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+            #   run: |
+            #     "$GITHUB_WORKSPACE/bin/mopro" build \
+            #       --mode release \
+            #       --platforms android \
+            #       --architectures x86_64-linux-android
+
+            - name: Clean mopro build dir
+              run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
+
+            - name: Create React Native frameworks
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: printf 'n\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" create --framework react-native
+
+            # ---- Node & deps ----
+            - name: Install Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+
+            - name: Install JS packages
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+              run: npm ci
+
+            - name: Install Expo CLI
+              run: npm install -g expo-cli
+
+            - name: Install applesimutils
+              run: |
+                  brew tap wix/brew
+                  brew install applesimutils
+            - name: Prebuild
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+              run: npm run prebuild
+
+            # Build iOS and Android apps for E2E
+            - name: Build iOS for Detox
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+              run: npm run e2e:build:ios
+
+            # Start Metro bundler in background
+            - name: Start Metro bundler
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+              run: npx expo start --dev-client --port 8081 &
+
+            # Give Metro a few seconds to boot before launching Detox
+            - name: Wait for Metro
+              run: sleep 20
+
+              # TODO: add this test back
+            # - name: Run iOS Detox tests
+            #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+            #   run: npm run e2e:test:ios
+            # # ---- Android build (headless) ----
+            # - name: Setup Java 17
+            #   uses: actions/setup-java@v4
+            #   with:
+            #     distribution: temurin
+            #     java-version: '17'
+            #     cache: 'gradle'
+
+            # - name: Android SDK (cmdline only)
+            #   uses: android-actions/setup-android@v3
+
+            # - name: Assemble Android Debug (no emulator)
+            #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android
+            #   run: ./gradlew --no-daemon --stacktrace assembleDebug
+
+            - name: Upload native build outputs (on failure)
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: rn-build-outputs-${{ matrix.adapter }}
+                  path: |
+                      ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/ios/build/**/*.log
+                      ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native/android/app/build/outputs/**
+                  if-no-files-found: ignore
+
+    cli_build_web:
+        needs:
+            - cli_build
+            - setup_halo2_wasm_env
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [macos-latest, ubuntu-latest]
+                adapter: [halo2] # web build only for halo2
+        runs-on: ${{ matrix.os }}
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
+        steps:
+            - uses: actions/checkout@v5
+
+            - name: Install Rust target (wasm)
+              run: rustup target add wasm32-unknown-unknown
+
+            - name: Restore cached wasm-pack
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cargo/bin/wasm-pack
+                  key: ${{ runner.os }}-wasm-pack-env
+
+            - name: Prepare template project
+              uses: ./.github/actions/mopro-init-project
+              with:
+                  artifact-name: mopro-bin-${{ runner.os }}
+                  adapter: ${{ matrix.adapter }}
+                  project-name: mopro-example-${{ matrix.adapter }}
+                  destination: ${{ runner.temp }}
+
+            - name: Build Web (debug, halo2; auto-confirm prompt)
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              env:
+                  CI: "true"
+              run: |
+                  set -euo pipefail
+                  rustup component add rust-src --toolchain nightly-2024-07-18
+                  # TODO: allow mopro CLI to run fully non-interactive so we can drop the pseudo-tty workaround below
+                  if [[ "$RUNNER_OS" == "macOS" ]]; then
+                    printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
+                  else
+                    printf 'y\n' | script -q -c "$GITHUB_WORKSPACE/bin/mopro build --mode debug --platforms web" /dev/null
+                  fi
+            - name: Create Web framework (debug, halo2)
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
+              run: |
+                  "$GITHUB_WORKSPACE/bin/mopro" create --framework web
+
+            - name: Cache halo2 wasm web
+              id: cache-halo2-wasm-web
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
+                  key: ${{ runner.os }}-halo2-wasm-web-${{ github.sha }}
+
+    test-ffi-all:
+        runs-on: ubuntu-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        needs: [lint, clippy_check, check_typos]
+        steps:
+            - uses: actions/checkout@v5
+            - name: Setup dependencies
+              uses: ./.github/actions/setup-deps
+              with:
+                  platform: linux
+            - name: Setup Rust
+              uses: ./.github/actions/setup-rust
+              with:
+                  cache-key: ffi
+            - name: Run ffi tests
+              run: cd mopro-ffi && cargo test --release --all-features
+
+    setup_halo2_wasm_env:
+        runs-on: ubuntu-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        needs: [lint, clippy_check, check_typos]
+        outputs:
+            chrome-dir: ${{ steps.parsed-chrome-chromedriver-dir.outputs.chrome-dir }}
+            chromedriver-dir: ${{ steps.parsed-chrome-chromedriver-dir.outputs.chromedriver-dir }}
+        steps:
+            - uses: actions/checkout@v5
+            - name: Setup Rust
+              uses: ./.github/actions/setup-rust
+              with:
+                  toolchain: nightly-2024-07-18
+                  cache-key: wasm-env
+            - name: Cache wasm-pack
+              id: cache-wasm-pack
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cargo/bin/wasm-pack
+                  key: ${{ runner.os }}-wasm-pack-env
+            - name: Install wasm-pack
+              if: steps.cache-wasm-pack.outputs.cache-hit != 'true'
+              run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+            - name: Setup Chrome and ChromeDriver
+              uses: browser-actions/setup-chrome@v1
+              id: setup-chrome-chromedriver
+              with:
+                  chrome-version: 130
+                  install-chromedriver: true
+            - name: Parse Chrome and ChromeDriver Directories
+              id: parsed-chrome-chromedriver-dir
+              run: |
+                  echo "chrome-dir=$(dirname ${{ steps.setup-chrome-chromedriver.outputs.chrome-path }})" >> $GITHUB_OUTPUT
+                  echo "chromedriver-dir=$(dirname ${{ steps.setup-chrome-chromedriver.outputs.chromedriver-path }})" >> $GITHUB_OUTPUT
+            - name: Cache Chrome and ChromeDriver
+              id: cache-chrome-chromedriver
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ${{ steps.parsed-chrome-chromedriver-dir.outputs.chrome-dir }}
+                      ${{ steps.parsed-chrome-chromedriver-dir.outputs.chromedriver-dir }}
+                  key: ${{ runner.os }}-cache-chrome-chromedriver
+
+    cli_test_halo2_wasm:
+        runs-on: ubuntu-latest
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+        needs: [setup_halo2_wasm_env]
+        env:
+            CHROME_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}/chrome
+            CHROMEDRIVER_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}/chromedriver
+        steps:
+            - uses: actions/checkout@v5
+            - name: Restore cached wasm-pack
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cargo/bin/wasm-pack
+                  key: ${{ runner.os }}-wasm-pack-env
+            - name: Restore cached chrome and chromedriver
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}
+                      ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}
+                  key: ${{ runner.os }}-cache-chrome-chromedriver
+            - name: Run wasm halo2 tests
+              run: |
+                  echo "Override default chrome path for 'wasm-pack test'"
+                  sudo ln -sf $CHROME_BIN /opt/google/chrome/chrome
+                  echo "Check override chrome version"
+                  google-chrome --version
+                  cd mopro-wasm
+                  wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
+    test_halo2_wasm_web:
+        runs-on: ubuntu-latest
+        needs:
+            - setup_halo2_wasm_env
+            - cli_build_web
+        strategy:
+            fail-fast: false
+            matrix:
+                adapter: [halo2]
+        env:
+            CHROME_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}/chrome
+            CHROMEDRIVER_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}/chromedriver
+        steps:
+            - uses: actions/checkout@v5
+            - name: Restore cached chrome and chromedriver
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}
+                      ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}
+                  key: ${{ runner.os }}-cache-chrome-chromedriver
+            - name: Cache halo2 wasm web
+              id: cache-halo2-wasm-web
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
+                  key: ${{ runner.os }}-halo2-wasm-web-${{ github.sha }}
+            - name: Install dependencies
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
+              run: yarn install
+            - name: Run halo2-wasm-app server and test it
+              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
+              run: |
+                  echo "This test will be on latest chrome & chromedriver"
+                  nohup yarn start &
+                  for i in {1..30}; do
+                    if curl --silent http://localhost:3000 > /dev/null; then
+                      echo "Server is ready!"
+                      break
+                    fi
+                    echo "Waiting for server..."
+                    sleep 1
+                  done
+                  yarn test

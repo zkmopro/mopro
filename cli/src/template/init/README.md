@@ -124,8 +124,13 @@ After running `mopro build`, be sure to run `mopro update` to refresh the bindin
 Run tests before building bindings
 
 ```sh
+curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
+export CLASSPATH=jna-5.13.0.jar
 cargo test
 ```
+
+> [!WARNING]  
+> Currently, it isn’t supported by the Noir prover.
 
 Run wasm tests with `wasm-pack`
 

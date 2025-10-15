@@ -238,8 +238,8 @@ fn main() {
             if *show_init {
                 print::print_init_instructions("<PROJECT_NAME>".to_string());
                 return;
-            }
-            
+            }            
+
             if let Some(framework) = show_create {
                 if framework.trim().is_empty() {
                     Cli::command()
