@@ -120,7 +120,7 @@ jobs:
             fail-fast: false
             matrix:
                 os: [macos-latest, ubuntu-latest]
-                adapter: [circom, halo2, noir]
+                adapter: [circom, halo2, noir, none]
         runs-on: ${{ matrix.os }}
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:

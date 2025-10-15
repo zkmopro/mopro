@@ -1,4 +1,5 @@
 use crate::init::adapter::Adapter;
+use crate::init::replace_string_in_file;
 use include_dir::Dir;
 use std::fs;
 use std::io::Write;
@@ -50,6 +51,11 @@ pub(super) trait ProvingSystem {
         let target = format!("// {}_TEMPLATE", Self::ADAPTER.as_str().to_uppercase());
         append_below_string_in_file(file_path, &target, Self::BUILD_TEMPLATE)
     }
+
+    fn build_bindings_lib(bindings_lib_path: &str, project_name: &str) -> anyhow::Result<()> {
+        let test_bindings_dir = format!("{}/{}", bindings_lib_path, Self::ADAPTER.as_str());
+        replace_test_bindings_lib_import(&test_bindings_dir, project_name)
+    }
 }
 
 fn append_below_string_in_file(
@@ -68,6 +74,44 @@ fn append_below_string_in_file(
 
     // Write the modified content back to the file
     file.write_all(modified_content.as_bytes())?;
+
+    Ok(())
+}
+
+/// Replace the placeholder import lines in the test bindings files with the actual import statements
+/// based on the project name and file type (Kotlin or Swift).
+pub fn replace_test_bindings_lib_import(
+    test_bindings_dir: &str,
+    project_name: &str,
+) -> anyhow::Result<()> {
+    let project_lib_name = project_name.replace('-', "_");
+
+    // We expect a structure of `tests/bindings/<adapter>/*.(kts|swift)`
+    for file in fs::read_dir(&test_bindings_dir)? {
+        let file = file?;
+        let file_path = file.path();
+
+        if !file_path.is_file() {
+            continue;
+        }
+
+        let target = "// GENERATED LIB IMPORT PLACEHOLDER";
+        let replacement = match file_path.extension().and_then(|ext| ext.to_str()) {
+            Some("kts") => Some(format!("import uniffi.{}.*", project_lib_name)),
+            Some("swift") => Some(format!("import {}", project_lib_name)),
+            _ => None,
+        };
+
+        if let Some(line) = replacement {
+            replace_string_in_file(
+                file_path
+                    .to_str()
+                    .ok_or(anyhow::anyhow!("Invalid test binding file path"))?,
+                target,
+                &line,
+            )?;
+        }
+    }
 
     Ok(())
 }
