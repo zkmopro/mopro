@@ -97,7 +97,7 @@
     },
     {
         "name": "Mopro dApp On-chain Verification (Noir)",
-        "description": "Minimal Flutter template for Sepolia on-chain verification via Mopro & Noir.",
+        "description": "Minimal Flutter template for Sepolia on-chain verification via Mopro & Noir",
         "links": {
             "github": "https://github.com/moven0831/mopro-wallet-connect-noir",
             "website": "https://ethglobal.com/showcase/moirpro-e347p"
@@ -113,7 +113,7 @@
     },
     {
         "name": "MobiScale",
-        "description": "Cryptographic Photo-Identity Verification using Apple's Secure Enclave and RISC-0 ZK Proofs.",
+        "description": "Cryptographic Photo-Identity Verification using Apple's Secure Enclave and RISC-0 ZK Proofs",
         "links": {
             "github": "https://github.com/ElusAegis/MobiScale",
             "website": "https://ethglobal.com/showcase/mobiscale-n9vj6"
@@ -145,7 +145,7 @@
     },
     {
         "name": "ZKAge Proof Mobile",
-        "description": "ZK Age Proof Mobile: Verify your age, without revealing any personal information.",
+        "description": "ZK Age Proof Mobile: Verify your age, without revealing any personal information",
         "links": {
             "github": "https://github.com/Ty-HA/zkage-proof-mobile",
             "website": "https://ethglobal.com/showcase/zkage-proof-mobile-2yroo"
@@ -153,10 +153,34 @@
     },
     {
         "name": "👀Proov!",
-        "description": "Fotos & Videos with Built-in Truth: Tamper-proof media with ZK verifiable origins and authenticity.",
+        "description": "Fotos & Videos with Built-in Truth: Tamper-proof media with ZK verifiable origins and authenticity",
         "links": {
             "github": "https://github.com/undefinedlab/PROOV_ZK",
             "website": "https://ethglobal.com/showcase/eyes-proov-at10u"
+        }
+    },
+    {
+        "name": "zkETHer",
+        "description": "Privacy-focused ERC20 with a robust mixer-style circuit implementation, enabling secure and confidential transactions",
+        "links": {
+            "github": "https://github.com/yashsharma22003/zkETHer-Protocol",
+            "website": "https://ethglobal.com/showcase/zkether-geppk"
+        }
+    },
+    {
+        "name": "ZeroSurf",
+        "description": "Mobile browser with ZK-based age verification using Anon Aadhaar",
+        "links": {
+            "github": "https://github.com/Krane-Apps/zerosurf-anon-aadhaar",
+            "website": "https://ethglobal.com/showcase/zerosurf-9988k"
+        }
+    },
+    {
+        "name": "AccessFi",
+        "description": "NFC-powered privacy-first event payments enabling tap-to-pay tickets and frictionless access.",
+        "links": {
+            "github": "https://github.com/coderwithsense/EthGlobalDelhi",
+            "website": "https://ethglobal.com/showcase/accessfi-8v4ns"
         }
     }
 ]
