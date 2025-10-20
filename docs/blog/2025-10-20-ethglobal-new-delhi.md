@@ -39,6 +39,8 @@ AccessFI reimagines event payments with NFC-powered privacy. Users receive P-256
 
 The system eliminates payment friction with 5-second NFC transactions that work on any EVM chain. Privacy is maintained through zero-knowledge proofs that verify user eligibility without exposing personal data. A single card handles all event interactions: tap-to-buy tickets, tap-to-register, tap-to-pay for concessions.
 
+![AccessFI Flow](/img/ethglobal-new-delhi-accessfi.jpg)
+
 ## Application Track: General Privacy
 
 ### 🥇 First Prize: zkETHer
@@ -49,6 +51,28 @@ zkETHer implements a privacy-preserving protocol for ERC20 tokens, functioning a
 The protocol uses X25519 (ECDH) for key exchange, HKDF-SHA256 for deriving secrets, and Poseidon2 hash for commitments. Mopro enables computationally intensive ZK proofs to be generated directly on phones, making privacy accessible without specialized hardware.
 
 The circuit implementation is robust, though real-world feasibility needs improvement for production deployment. The architecture demonstrates how mobile-first proving can bring mixer-style privacy to standard ERC20 tokens.
+
+<div style={{display: 'flex', justifyContent: 'center', margin: '1.5rem 0'}}>
+  <table style={{border: '2px solid #444', borderRadius: '8px', padding: '1rem', maxWidth: '500px'}}>
+    <tbody>
+      <tr>
+        <td style={{padding: '1rem', textAlign: 'center'}}>
+          <p style={{fontStyle: 'italic', marginBottom: '1rem', color: '#888', fontSize: '0.95rem'}}>
+            zkETHer demo: Privacy-preserving ERC20 mixer with mobile ZK proving
+          </p>
+          <video
+            width="400"
+            controls
+            style={{borderRadius: '4px', maxWidth: '100%'}}
+          >
+            <source src="https://ethglobal.storage/projects/geppk/video/high.mp4?t=1760977955579" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 ### 🥈 Second Prize: Wisk
 > [View Project](https://ethglobal.com/showcase/wisk-gdvfw) | [GitHub](https://github.com/YadlaMani/wisk)
