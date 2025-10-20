@@ -9,9 +9,26 @@ authors:
 tags: [ethglobal, hackathon]
 ---
 
+import Tweet from '@site/src/components/Tweet';
+
 At [ETHGlobal New Delhi](https://ethglobal.com/events/newdelhi/prizes#ethereum-foundation) this September, the Mopro and zkPDF teams sponsored two tracks focused on bringing general privacy to Ethereum. The hackathon delivered impressive projects that pushed boundaries in both infrastructure and application development.
 
 Several submissions exceeded expectations with standout UX features. **Deeplink integration** enables seamless transitions between mobile apps and browsers, allowing native mobile proving across existing browser applications that require ZK (like age verification for websites). **NFC integration** demonstrated tap-to-prove and tap-to-verify capabilities, creating an experience as intuitive as Apple Pay. These implementations show the maturity of client-side ZK proving and its readiness for real-world adoption.
+
+<div style={{display: 'flex', justifyContent: 'center', margin: '2rem 0'}}>
+  <table style={{border: '2px solid #444', borderRadius: '8px', padding: '1rem', maxWidth: '500px'}}>
+    <tbody>
+      <tr>
+        <td style={{padding: '1rem', textAlign: 'center'}}>
+          <p style={{fontStyle: 'italic', marginBottom: '1rem', color: '#888', fontSize: '0.95rem'}}>
+            [ZeroSurf](#-third-prize-zerosurf) demo: Privacy-preserving age verification with deeplink integration
+          </p>
+          <Tweet tweetId="1979055018683556051" width="400px" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 ## Infrastructure Track: Client-Side Privacy
 
@@ -38,7 +55,7 @@ The circuit implementation is robust, though real-world feasibility needs improv
 
 Wisk rethinks background verification for the digital age with zkPDF. Instead of sharing documents with third parties, users prove specific claims about government-issued certificates without revealing the full content.
 
-The system integrates with [India's DigiLocker](https://www.digilocker.gov.in/) to verify official PDFs. Using zkPDF, Wisk validates the government's digital signature embedded in PDFs and generates zero-knowledge SNARK proofs for requested fields (name, PAN number, credentials). The entire process happens in the browser—raw documents never leave the user's device.
+The system integrates with [India's DigiLocker](https://www.digilocker.gov.in/) to verify official PDFs. Using zkPDF, Wisk validates the government's digital signature embedded in PDFs and generates ZKPs for requested fields (name, PAN number, credentials). The entire process happens in the browser—raw documents never leave the user's device.
 
 ### 🥉 Third Prize: ZeroSurf
 > [View Project](https://ethglobal.com/showcase/zerosurf-9988k) | [GitHub](https://github.com/Krane-Apps/zerosurf-anon-aadhaar)
