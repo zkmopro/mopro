@@ -40,6 +40,9 @@ const config: Config = {
             'https://github.com/zkmopro/mopro/tree/main/docs',
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
+          blogSidebarCount: 'ALL',
+          blogSidebarTitle: 'All Posts',
+          postsPerPage: 3,
         },
         theme: {
           customCss: './src/css/custom.css',
