@@ -182,5 +182,13 @@
             "github": "https://github.com/coderwithsense/EthGlobalDelhi",
             "website": "https://ethglobal.com/showcase/accessfi-8v4ns"
         }
+    },
+    {
+        "name": "Poll.cc",
+        "description": "Public voting on social issues",
+        "links": {
+            "website": "https://poll.cc/",
+            "ios": "https://apps.apple.com/pl/app/poll-cc-public-voting-app/id6749456689"
+        }
     }
 ]
