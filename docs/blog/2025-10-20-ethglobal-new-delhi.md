@@ -110,8 +110,8 @@ Mobile integration remains an open challenge. While TLSNotary works well on desk
 
 ### Unified ZK Registry System
 
-The ZK identity landscape is fragmented. Projects like Anon Aadhaar, passport verification systems, and zkPDF each maintain separate on-chain registries. Users face redundant verifications, and developers must integrate with each system independently.
+The ZK identity landscape is fragmented. Projects like [Anon Aadhaar](https://github.com/anon-aadhaar), passport-based zkID solutions, and zkPDF each maintain separate on-chain registries. Users face redundant verifications, and developers must integrate with each system independently.
 
 [ERC-7812](https://eips.ethereum.org/EIPS/eip-7812) proposes a solution: a singleton on-chain registry using Sparse Merkle Trees to store commitments to private data. Statements can be verified via ZK proofs without revealing underlying information.
 
-With unified client libraries built around ERC-7812 and integrated with Mopro, developers would call one API after generating proofs on-device—regardless of proof type. The real power emerges in cross-application identity: a user proves their age once with Anon Aadhaar in one Mopro app, committing to ERC-7812. Later, a different Mopro app verifies that commitment without re-proving. The unified registry enables seamless credential reuse across the mobile ecosystem while preserving privacy.
+With unified client libraries built around ERC-7812 and integrated with Mopro, developers would call one API after generating proofs on-device, regardless of proof type. The real power emerges in cross-application identity: a user proves their age once with Anon Aadhaar in one Mopro app, committing to ERC-7812. Later, a Mopro app using different schemes verifies that commitment without re-proving. The unified registry enables seamless credential reuse across the mobile applications while preserving privacy.
