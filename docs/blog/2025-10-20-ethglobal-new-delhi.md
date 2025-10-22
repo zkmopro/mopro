@@ -37,7 +37,7 @@ Several submissions exceeded expectations with standout UX features. **Deeplink 
 
 AccessFI reimagines event payments with NFC-powered privacy. Users receive P-256 compatible SECP256k1 NFC cards linked to their wallets, enabling instant tap-to-pay for tickets, registration, food, and merchandise while preserving privacy through deterministic encryption.
 
-The system eliminates payment friction with 5-second NFC transactions that work on any EVM chain. Privacy is maintained through zero-knowledge proofs that verify user eligibility without exposing personal data. A single card handles all event interactions: tap-to-buy tickets, tap-to-register, tap-to-pay for concessions.
+The system eliminates payment friction with 5-second NFC transactions that work on any EVM chain. Privacy is maintained through ZK proofs that verify user eligibility without exposing personal data. A single card handles all event interactions: tap-to-buy tickets, tap-to-register, tap-to-pay for concessions.
 
 ![AccessFI Flow](/img/ethglobal-new-delhi-accessfi.jpg)
 
@@ -46,7 +46,7 @@ The system eliminates payment friction with 5-second NFC transactions that work 
 ### 🥇 First Prize: zkETHer
 > [View Project](https://ethglobal.com/showcase/zkether-geppk) | [GitHub](https://github.com/yashsharma22003/zkETHer-Protocol)
 
-zkETHer implements a privacy-preserving protocol for ERC20 tokens, functioning as a non-custodial mixer. Users deposit fixed amounts by submitting cryptographic commitments to an on-chain Merkle tree, then withdraw to new addresses using zero-knowledge proofs generated on their mobile devices.
+zkETHer implements a privacy-preserving protocol for ERC20 tokens, functioning as a non-custodial mixer. Users deposit fixed amounts by submitting cryptographic commitments to an on-chain Merkle tree, then withdraw to new addresses using ZK proofs generated on their mobile devices.
 
 The protocol uses X25519 (ECDH) for key exchange, HKDF-SHA256 for deriving secrets, and Poseidon2 hash for commitments. Mopro enables computationally intensive ZK proofs to be generated directly on phones, making privacy accessible without specialized hardware.
 
@@ -88,7 +88,7 @@ ZeroSurf is a mobile browser with built-in ZK age verification using [Anon Aadha
 
 The implementation showcases how deeplinks can bridge mobile browsers and ZK proving apps, creating frictionless user experiences for privacy-preserving authentication.
 
-## Key Takeaways
+## Key Takeaways & Future Explorations
 
 The hackathon revealed several promising directions for client-side privacy:
 
@@ -96,7 +96,9 @@ The hackathon revealed several promising directions for client-side privacy:
 
 **Photo-identity integrity** emerged as a recurring theme across multiple projects, adding security layers to identity verification. Integrating solutions like [Rarimo's Bionetta](https://docs.rarimo.com/zkml-bionetta/) and zkCamera with mobile-native proving through Mopro could strengthen this approach.
 
-## Future Explorations
+We're excited to see more UX innovations emerge in future hackathons. Whether it's tap-to-prove bringing native mobile experiences, smooth deeplink transitions between apps and browsers, or entirely new interaction patterns—the goal is providing developers with easy-to-use building blocks. By modularizing these patterns in Mopro, we can transform what took teams days to build during the hackathon into features that take minutes to integrate.
+
+Beyond these UX enhancements, there are also two fundamental challenges worth exploring:
 
 ### zkTLS and Mobile Proving
 
@@ -106,22 +108,10 @@ zkTLS enables portable, verifiable data from any HTTPS connection without server
 
 Mobile integration remains an open challenge. While TLSNotary works well on desktop, coordinating MPC between mobile apps and browsers presents unique technical hurdles. Solving this would unlock powerful use cases: proving income from banking apps, verifying social media reputation, or demonstrating transaction history—all without sharing credentials or raw data.
 
-This represents an audacious but valuable exploration for the mobile proving ecosystem. Success would enable trustless verification of any web2 data directly from mobile devices.
-
 ### Unified ZK Registry System
 
-The ZK identity landscape is fragmented. Projects like Anon Aadhaar, passport verification systems, and zkPDF each maintain separate on-chain registries for their proofs. Users juggling multiple credentials face redundant verifications, and developers must integrate with each system independently.
+The ZK identity landscape is fragmented. Projects like [Anon Aadhaar](https://github.com/anon-aadhaar), passport-based zkID solutions, and zkPDF each maintain separate on-chain registries. Users face redundant verifications, and developers must integrate with each system independently.
 
-[ERC-7812](https://eips.ethereum.org/EIPS/eip-7812) proposes a solution: a singleton on-chain registry for storing commitments to private data. The registry uses Sparse Merkle Trees to maintain provable statements that can be verified via zero-knowledge proofs without revealing underlying data.
+[ERC-7812](https://eips.ethereum.org/EIPS/eip-7812) proposes a solution: a singleton on-chain registry using Sparse Merkle Trees to store commitments to private data. Statements can be verified via ZK proofs without revealing underlying information.
 
-The architecture enables **multiple proof integration** through specialized Registrars. One Registrar might handle Anon Aadhaar commitments, another manages passport proofs, and a third processes zkPDF credentials—all writing to the same EvidenceDB. Each Registrar operates in an isolated namespace while benefiting from shared infrastructure.
-
-**Revocation support** comes naturally from the SMT structure, which maintains idempotent add/remove operations. When a credential is revoked, its commitment can be removed from the tree while maintaining cryptographic proofs of the registry's state before and after.
-
-Key benefits of a unified identity system:
-- **Cross-chain portability**: A single Merkle root represents the entire registry state, enabling cheap cross-chain proof verification
-- **Proof reusability**: Credentials proven once can be referenced across applications without re-verification
-- **Centralized trust model**: Users trust one immutable, permissionless contract instead of multiple registries
-- **Interoperability**: Different proof systems coexist, allowing developers to choose optimal solutions for their use cases
-
-This would reduce deployment friction, improve interoperability, and lower costs for projects building ZK applications. Future hackathons should explore standards and implementations that move us toward this unified vision.
+With unified client libraries built around ERC-7812 and integrated with Mopro, developers would call one API after generating proofs on-device, regardless of proof type. The real power emerges in cross-application identity: a user proves their age once with Anon Aadhaar in one Mopro app, committing to ERC-7812. Later, a Mopro app using different schemes verifies that commitment without re-proving. The unified registry enables seamless credential reuse across the mobile applications while preserving privacy.
