@@ -56,6 +56,7 @@ pub fn update_bindings(
                     Platform::Ios => u.ios_dest.as_ref(),
                     Platform::Android => u.android_dest.as_ref(),
                     Platform::Flutter => None, // TODO: Add Flutter dest
+                    Platform::ReactNative => None, // TODO: Add React Native dest
                     Platform::Web => None,
                 })
                 .map(PathBuf::from);
@@ -235,6 +236,14 @@ fn update_platform(src_root: &Path, dest_root: &Path, platform: Platform) -> Res
                 false,
             )?);
         }
+        Platform::ReactNative => {
+            updated_paths.extend(update_folder(
+                &platform_bindings_dir,
+                dest_root,
+                binding_dir_name,
+                false,
+            )?);
+        }
         Platform::Web => {
             updated_paths.extend(update_folder(
                 &platform_bindings_dir,
@@ -332,7 +341,8 @@ fn maybe_store_dest(config: &mut Config, platform: Platform, dest: &Path) -> Res
     let existing = match platform {
         Platform::Ios => &update_cfg.ios_dest,
         Platform::Android => &update_cfg.android_dest,
-        Platform::Flutter => &None, // TODO: fix flutter update
+        Platform::Flutter => &None,     // TODO: fix flutter update
+        Platform::ReactNative => &None, // TODO: Add React Native dest
         Platform::Web => &None,
     };
     if existing.is_none() {
@@ -357,6 +367,7 @@ impl UpdateConfigExt for UpdateConfig {
             Platform::Ios => self.ios_dest = Some(dest),
             Platform::Android => self.android_dest = Some(dest),
             Platform::Flutter => {} // TODO: fix flutter update
+            Platform::ReactNative => {} // TODO: Add React Native dest
             Platform::Web => {}
         }
     }

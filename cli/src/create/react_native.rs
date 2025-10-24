@@ -1,9 +1,6 @@
 use super::Create;
 use crate::constants::Platform;
-use crate::create::utils::{
-    check_bindings, copy_android_bindings, copy_ios_bindings, copy_keys,
-    download_and_extract_template,
-};
+use crate::create::utils::{check_bindings, copy_dir, copy_keys, download_and_extract_template};
 use crate::print::print_footer_message;
 use crate::style::print_green_bold;
 
@@ -16,8 +13,7 @@ impl Create for ReactNative {
     const NAME: &'static str = "react-native";
 
     fn create(project_dir: PathBuf) -> Result<()> {
-        let ios_bindings_dir = check_bindings(&project_dir, Platform::Ios)?;
-        let android_bindings_dir = check_bindings(&project_dir, Platform::Android)?;
+        let react_native_bindings_dir = check_bindings(&project_dir, Platform::ReactNative)?;
 
         let target_dir = project_dir.join(Self::NAME);
         if target_dir.exists() {
@@ -27,26 +23,19 @@ impl Create for ReactNative {
             )));
         }
         download_and_extract_template(
-            "https://codeload.github.com/zkmopro/react-native-app/zip/refs/heads/main",
+            "https://github.com/zkmopro/react-native-app/archive/refs/heads/ubrn.zip",
             &project_dir,
             Self::NAME,
         )?;
 
-        let react_native_dir = project_dir.join("react-native-app-main");
+        let react_native_dir = project_dir.join("react-native-app-ubrn");
         fs::rename(react_native_dir, &target_dir)?;
 
         let mopro_module_dir = target_dir.join("modules/mopro");
-        if let Some(ios_bindings_dir) = ios_bindings_dir {
-            copy_ios_bindings(ios_bindings_dir, mopro_module_dir.join("ios"))?;
-        }
-
-        if let Some(android_bindings_dir) = android_bindings_dir {
-            copy_android_bindings(
-                &android_bindings_dir,
-                &mopro_module_dir.join("android"),
-                "java",
-            )?;
-        }
+        copy_dir(
+            &react_native_bindings_dir.as_ref().unwrap(),
+            &mopro_module_dir,
+        )?;
 
         let assets_dir = target_dir.join("assets/keys");
         fs::remove_dir_all(&assets_dir)?;

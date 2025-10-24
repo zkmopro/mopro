@@ -15,6 +15,7 @@ pub struct Config {
     pub(crate) target_platforms: Option<HashSet<String>>,
     pub(crate) ios: Option<HashSet<String>>,
     pub(crate) android: Option<HashSet<String>>,
+    pub(crate) react_native: Option<HashSet<String>>,
     pub(crate) update: Option<UpdateConfig>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) auto_update: Option<bool>,
@@ -34,6 +35,7 @@ impl Default for Config {
             target_platforms: Some(HashSet::new()),
             ios: Some(HashSet::new()),
             android: Some(HashSet::new()),
+            react_native: Some(HashSet::new()),
             update: Some(UpdateConfig::default()),
             auto_update: Some(false),
         }
