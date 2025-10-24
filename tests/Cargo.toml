@@ -16,6 +16,11 @@ path = "bin/android.rs"
 name = "flutter"
 path = "bin/flutter.rs"
 
+
+[[bin]]
+name = "react-native"
+path = "bin/react_native.rs"
+
 [lib]
 crate-type = ["lib", "cdylib", "staticlib"]
 
@@ -25,5 +30,5 @@ uniffi = ["mopro-ffi/uniffi"]
 flutter = ["mopro-ffi/flutter"]
 
 [dependencies]
-mopro-ffi = { path = "../mopro-ffi"}
+mopro-ffi = { path = "../mopro-ffi" }
 thiserror = "2.0.12"
