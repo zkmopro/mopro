@@ -11,4 +11,5 @@ node_modules
 mopro_flutter_bindings
 MoproAndroidBindings
 MoproiOSBindings
+MoproReactNativeBindings
 build/

@@ -3,7 +3,9 @@ use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
 use include_dir::include_dir;
 use include_dir::Dir;
+use mopro_ffi::app_config::constants::ReactNativePlatform;
 use mopro_ffi::app_config::constants::{AndroidArch, AndroidPlatform, Arch, IosPlatform, Mode};
+use mopro_ffi::app_config::react_native::ReactNativeBindingsParams;
 use std::env;
 
 use mopro_ffi::app_config::build_from_str_arch;
@@ -193,6 +195,18 @@ pub fn build_project(
                         status.code().unwrap()
                     ));
                 }
+            }
+            Platform::ReactNative => {
+                let arch_strings = selection.architecture_strings();
+                let arch_refs: Vec<&String> = arch_strings.iter().collect();
+                build_from_str_arch::<ReactNativePlatform>(
+                    mode,
+                    &current_dir,
+                    arch_refs,
+                    ReactNativeBindingsParams {
+                        using_noir: config.adapter_contains(Adapter::Noir),
+                    },
+                )?;
             }
             Platform::Web => {
                 let platform_str = selection.platform().as_str();

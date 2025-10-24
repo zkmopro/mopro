@@ -14,6 +14,8 @@ pub mod constants;
 pub mod flutter;
 #[cfg(feature = "uniffi")]
 pub mod ios;
+#[cfg(feature = "uniffi")]
+pub mod react_native;
 
 /// Stub for feature "uniffi"
 #[cfg(not(feature = "uniffi"))]
@@ -27,6 +29,15 @@ pub mod ios {
 /// Stub for feature "uniffi"
 #[cfg(not(feature = "uniffi"))]
 pub mod android {
+    #[inline]
+    pub fn build() {
+        panic!("\"uniffi\" feature is not enabled, please enable it in your Cargo.toml");
+    }
+}
+
+/// Stub for feature "uniffi"
+#[cfg(not(feature = "uniffi"))]
+pub mod react_native {
     #[inline]
     pub fn build() {
         panic!("\"uniffi\" feature is not enabled, please enable it in your Cargo.toml");

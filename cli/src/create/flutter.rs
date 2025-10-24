@@ -26,14 +26,12 @@ impl Create for Flutter {
         }
 
         download_and_extract_template(
-            // "https://github.com/zkmopro/flutter-app/archive/refs/heads/main.zip",
-            "https://github.com/zkmopro/flutter-app/archive/refs/heads/frb-refactor-circom-halo2.zip", // TODO: change back to main
+            "https://github.com/zkmopro/flutter-app/archive/refs/heads/frb.zip",
             &project_dir,
             Self::NAME,
         )?;
 
-        // let flutter_dir = project_dir.join("flutter-app-main");
-        let flutter_dir = project_dir.join("flutter-app-frb-refactor-circom-halo2"); // TODO: change back to main
+        let flutter_dir = project_dir.join("flutter-app-frb");
         fs::rename(flutter_dir, &target_dir)?;
 
         // update podspecs

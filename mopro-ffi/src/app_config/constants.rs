@@ -4,6 +4,7 @@ pub const BUILD_MODE_ENV: &str = "CONFIGURATION";
 pub const IOS_ARCHS_ENV: &str = "IOS_ARCHS";
 pub const ANDROID_ARCHS_ENV: &str = "ANDROID_ARCHS";
 pub const FLUTTER_ARCHS_ENV: &str = "FLUTTER_ARCHS";
+pub const REACT_NATIVE_ARCHS_ENV: &str = "REACT_NATIVE_ARCHS";
 
 pub const IOS_BINDINGS_DIR: &str = "MoproiOSBindings";
 pub const IOS_SWIFT_FILE: &str = "mopro.swift";
@@ -24,6 +25,7 @@ pub const ARCH_ARM_V7_ABI: &str = "armeabi-v7a";
 pub const ARCH_ARM_64_V8: &str = "arm64-v8a";
 
 pub const FLUTTER_BINDINGS_DIR: &str = "mopro_flutter_bindings";
+pub const REACT_NATIVE_BINDINGS_DIR: &str = "MoproReactNativeBindings";
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Mode {
@@ -365,6 +367,100 @@ impl Arch for FlutterArch {
     }
 }
 
+// TODO: reuse iOS, Android constants
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+
+pub enum ReactNativeArch {
+    Aarch64Apple,
+    Aarch64AppleSim,
+    X8664Apple,
+    X8664Linux,
+    I686Linux,
+    Armv7LinuxAbi,
+    Aarch64Linux,
+}
+struct ReactNativeArchInfo {
+    arch: ReactNativeArch,
+    str: &'static str,
+    description: &'static str,
+}
+
+const REACT_NATIVE_ARCHS: [ReactNativeArchInfo; 7] = [
+    ReactNativeArchInfo {
+        arch: ReactNativeArch::Aarch64Apple,
+        str: "aarch64-apple-ios",
+        description: "64-bit iOS devices (iPhone/iPad)",
+    },
+    ReactNativeArchInfo {
+        arch: ReactNativeArch::Aarch64AppleSim,
+        str: "aarch64-apple-ios-sim",
+        description: "ARM64 iOS simulator on Apple Silicon Macs",
+    },
+    ReactNativeArchInfo {
+        arch: ReactNativeArch::X8664Apple,
+        str: "x86_64-apple-ios",
+        description: "x86_64 iOS simulator on Intel Macs",
+    },
+    ReactNativeArchInfo {
+        arch: ReactNativeArch::X8664Linux,
+        str: "x86_64-linux-android",
+        description: "64-bit Android emulators (x86_64 architecture)",
+    },
+    ReactNativeArchInfo {
+        arch: ReactNativeArch::I686Linux,
+        str: "i686-linux-android",
+        description: "32-bit Android emulators (x86 architecture, legacy)",
+    },
+    ReactNativeArchInfo {
+        arch: ReactNativeArch::Armv7LinuxAbi,
+        str: "armv7-linux-androideabi",
+        description: "32-bit ARM devices (older Android smartphones/tablets)",
+    },
+    ReactNativeArchInfo {
+        arch: ReactNativeArch::Aarch64Linux,
+        str: "aarch64-linux-android",
+        description: "64-bit ARM devices (modern Android smartphones/tablets)",
+    },
+];
+
+impl Arch for ReactNativeArch {
+    fn platform() -> Box<dyn Platform> {
+        Box::new(ReactNativePlatform)
+    }
+
+    fn as_str(&self) -> &'static str {
+        REACT_NATIVE_ARCHS
+            .iter()
+            .find(|info| info.arch == *self)
+            .map(|info| info.str)
+            .expect("Unsupported React Native Arch")
+    }
+
+    fn parse_from_str<S: AsRef<str>>(s: S) -> Self {
+        REACT_NATIVE_ARCHS
+            .iter()
+            .find(|info| info.str.to_lowercase() == s.as_ref().to_lowercase())
+            .map(|info| info.arch)
+            .context(format!("Unsupported React Native Arch '{}'", s.as_ref()))
+            .unwrap()
+    }
+
+    fn all_strings() -> Vec<&'static str> {
+        REACT_NATIVE_ARCHS.iter().map(|info| info.str).collect()
+    }
+
+    fn all_display_strings() -> Vec<(String, String)> {
+        REACT_NATIVE_ARCHS
+            .iter()
+            .map(|info| (info.str.to_string(), info.description.to_string()))
+            .collect()
+    }
+
+    fn env_var_name() -> &'static str {
+        REACT_NATIVE_ARCHS_ENV
+    }
+}
+
 //
 // Platform Section
 //
@@ -416,5 +512,13 @@ pub struct FlutterPlatform;
 impl Platform for FlutterPlatform {
     fn identifier() -> &'static str {
         "Flutter Bindings Builder"
+    }
+}
+
+pub struct ReactNativePlatform;
+
+impl Platform for ReactNativePlatform {
+    fn identifier() -> &'static str {
+        "React Native Bindings Builder"
     }
 }
