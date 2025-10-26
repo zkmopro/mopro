@@ -25,6 +25,7 @@ pub struct Config {
 pub struct UpdateConfig {
     pub(crate) ios_dest: Option<String>,
     pub(crate) android_dest: Option<String>,
+    pub(crate) react_native_dest: Option<String>,
 }
 
 impl Default for Config {

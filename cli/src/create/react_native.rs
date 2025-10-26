@@ -5,6 +5,7 @@ use crate::print::print_footer_message;
 use crate::style::print_green_bold;
 
 use anyhow::{Error, Result};
+use mopro_ffi::app_config::constants::REACT_NATIVE_BINDINGS_DIR;
 use std::{fs, path::PathBuf};
 
 pub struct ReactNative;
@@ -31,7 +32,7 @@ impl Create for ReactNative {
         let react_native_dir = project_dir.join("react-native-app-ubrn");
         fs::rename(react_native_dir, &target_dir)?;
 
-        let mopro_module_dir = target_dir.join("modules/mopro");
+        let mopro_module_dir = target_dir.join(REACT_NATIVE_BINDINGS_DIR);
         copy_dir(
             &react_native_bindings_dir.as_ref().unwrap(),
             &mopro_module_dir,
