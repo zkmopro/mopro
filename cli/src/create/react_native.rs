@@ -34,7 +34,7 @@ impl Create for ReactNative {
 
         let mopro_module_dir = target_dir.join(REACT_NATIVE_BINDINGS_DIR);
         copy_dir(
-            &react_native_bindings_dir.as_ref().unwrap(),
+            react_native_bindings_dir.as_ref().unwrap(),
             &mopro_module_dir,
         )?;
 

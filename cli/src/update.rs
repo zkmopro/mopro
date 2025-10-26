@@ -42,7 +42,12 @@ pub fn update_bindings(
         }
     } else {
         let mut updated_any = false;
-        for platform in [Platform::Ios, Platform::Android, Platform::ReactNative, Platform::Web] {
+        for platform in [
+            Platform::Ios,
+            Platform::Android,
+            Platform::ReactNative,
+            Platform::Web,
+        ] {
             let binding_dir_name = platform.binding_dir();
             let platform_bindings_dir = src_dir.join(binding_dir_name);
             if !platform_bindings_dir.exists() {
