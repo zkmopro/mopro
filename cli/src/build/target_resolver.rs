@@ -134,6 +134,10 @@ impl TargetSelection {
         config.android = self
             .architecture_strings_for(Platform::Android)
             .map(|archs| archs.into_iter().collect());
+
+        config.react_native = self
+            .architecture_strings_for(Platform::ReactNative)
+            .map(|archs| archs.into_iter().collect());
     }
 }
 
