@@ -2,23 +2,23 @@
 #include <jni.h>
 #include <jsi/jsi.h>
 #include <ReactCommon/CallInvokerHolder.h>
-#include "my-test-library.h"
+#include "mopro-ffi.h"
 
 namespace jsi = facebook::jsi;
 namespace react = facebook::react;
 
-// Automated testing checks Java_com_mytestlibrary_MyTestLibraryModule and mytestlibrary
+// Automated testing checks Java_com_moproffi_MoproFfiModule and moproffi
 // by comparing the whole line here.
 /*
-Java_com_mytestlibrary_MyTestLibraryModule_nativeMultiply(JNIEnv *env, jclass type, jdouble a, jdouble b) {
-    return mytestlibrary::multiply(a, b);
+Java_com_moproffi_MoproFfiModule_nativeMultiply(JNIEnv *env, jclass type, jdouble a, jdouble b) {
+    return moproffi::multiply(a, b);
 }
 */
 
-// Installer coming from MyTestLibraryModule
+// Installer coming from MoproFfiModule
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_mytestlibrary_MyTestLibraryModule_nativeInstallRustCrate(
+Java_com_moproffi_MoproFfiModule_nativeInstallRustCrate(
     JNIEnv *env,
     jclass type,
     jlong rtPtr,
@@ -32,12 +32,12 @@ Java_com_mytestlibrary_MyTestLibraryModule_nativeInstallRustCrate(
     auto jsCallInvoker = holderCxx->getCallInvoker();
     auto runtime = reinterpret_cast<jsi::Runtime *>(rtPtr);
 
-    return mytestlibrary::installRustCrate(*runtime, jsCallInvoker);
+    return moproffi::installRustCrate(*runtime, jsCallInvoker);
 }
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_mytestlibrary_MyTestLibraryModule_nativeCleanupRustCrate(JNIEnv *env, jclass type, jlong rtPtr) {
+Java_com_moproffi_MoproFfiModule_nativeCleanupRustCrate(JNIEnv *env, jclass type, jlong rtPtr) {
     auto runtime = reinterpret_cast<jsi::Runtime *>(rtPtr);
-    return mytestlibrary::cleanupRustCrate(*runtime);
+    return moproffi::cleanupRustCrate(*runtime);
 }

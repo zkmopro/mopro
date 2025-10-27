@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "my-test-library": ["./src/index"]
+      "mopro-ffi": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

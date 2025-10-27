@@ -1,7 +1,7 @@
 {
-    "name": "my-test-library",
+    "name": "mopro-ffi",
     "version": "0.1.0",
-    "description": "An automated test",
+    "description": "Mopro FFI bindings for React Native",
     "main": "./lib/module/index.js",
     "types": "./lib/typescript/src/index.d.ts",
     "exports": {
@@ -34,7 +34,6 @@
     "scripts": {
       "ubrn:ios": "ubrn build ios --and-generate --release && (cd example/ios && pod install)",
       "ubrn:android": "ubrn build android --and-generate --release --targets aarch64-linux-android",
-      "example": "yarn workspace my-test-library-example",
       "test": "jest",
       "typecheck": "tsc",
       "lint": "eslint \"**/*.{js,ts,tsx}\"",
@@ -49,14 +48,14 @@
     ],
     "repository": {
       "type": "git",
-      "url": "git+https://github.com/jhugman/my-test-library.git"
+      "url": "git+https://github.com/zkmopro/react-native-app.git"
     },
-    "author": "James <noop@nomail.com> (https://nowhere.com/james)",
+    "author": "ZK Mopro Team (https://zkmopro.com)",
     "license": "MIT",
     "bugs": {
-      "url": "https://github.com/jhugman/my-test-library/issues"
+      "url": "https://github.com/zkmopro/react-native-app/issues"
     },
-    "homepage": "https://github.com/jhugman/my-test-library#readme",
+    "homepage": "https://github.com/zkmopro/react-native-app#readme",
     "publishConfig": {
       "registry": "https://registry.npmjs.org/"
     },
@@ -151,11 +150,11 @@
       ]
     },
     "codegenConfig": {
-      "name": "MyTestLibrarySpec",
+      "name": "MoproFFISpec",
       "type": "modules",
       "jsSrcsDir": "src",
       "android": {
-        "javaPackageName": "com.mytestlibrary"
+        "javaPackageName": "com.moproffi"
       }
     },
     "create-react-native-library": {
