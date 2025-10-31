@@ -2389,6 +2389,7 @@ dependencies = [
  "camino",
  "color-eyre",
  "flutter_rust_bridge",
+ "fs_extra",
  "thiserror 2.0.12",
  "toml 0.8.22",
  "uniffi",

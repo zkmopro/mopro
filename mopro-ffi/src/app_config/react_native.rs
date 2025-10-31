@@ -39,9 +39,15 @@ impl PlatformBuilder for ReactNativePlatform {
         // Get the path to the template directory relative to this source file
         let template_dir =
             Path::new(env!("CARGO_MANIFEST_DIR")).join("src/app_config/template/react_native");
-        copy_dir_all(&template_dir, project_dir.join(REACT_NATIVE_BINDINGS_DIR)).with_context(
-            || format!("Failed to copy react_native folder from {:?}", template_dir),
-        )?;
+        let mut copy_options = fs_extra::dir::CopyOptions::new();
+        copy_options.overwrite = true;
+        copy_options.content_only = true;
+        fs_extra::dir::copy(
+            &template_dir,
+            project_dir.join(REACT_NATIVE_BINDINGS_DIR),
+            &copy_options,
+        )
+        .with_context(|| format!("Failed to copy react_native folder from {:?}", template_dir))?;
 
         // Replace the <%PATH_TO_PROJECT%> in the ubrn.config.yaml template with the project directory
         let target_file = project_dir
@@ -112,23 +118,6 @@ fn install_uniffi_bindgen_react_native() -> anyhow::Result<()> {
         }
     }
 
-    Ok(())
-}
-
-fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result<()> {
-    let src = src.as_ref();
-    let dst = dst.as_ref();
-    fs::create_dir_all(dst)?;
-    for entry in fs::read_dir(src)? {
-        let entry = entry?;
-        let file_type = entry.file_type()?;
-        let dest_path = dst.join(entry.file_name());
-        if file_type.is_dir() {
-            copy_dir_all(entry.path(), &dest_path)?;
-        } else {
-            fs::copy(entry.path(), dest_path)?;
-        }
-    }
     Ok(())
 }
 
