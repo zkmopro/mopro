@@ -2364,7 +2364,7 @@ dependencies = [
 
 [[package]]
 name = "mopro-cli"
-version = "0.3.0"
+version = "0.3.2-alpha.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -2383,7 +2383,7 @@ dependencies = [
 
 [[package]]
 name = "mopro-ffi"
-version = "0.3.0"
+version = "0.3.2-alpha.0"
 dependencies = [
  "anyhow",
  "camino",
