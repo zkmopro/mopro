@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::sync::Once;
 
-use mopro_ffi::app_config::constants::{AndroidArch, Arch, IosArch};
+use mopro_ffi::app_config::constants::{AndroidArch, Arch, IosArch, ReactNativeArch};
 
 use crate::{config::Config, constants::Platform, select::multi_select, style};
 
@@ -21,6 +21,7 @@ pub(super) enum PlatformArchitectures {
     Ios(Vec<IosArch>),
     Android(Vec<AndroidArch>),
     Flutter,
+    ReactNative(Vec<ReactNativeArch>),
     Web,
 }
 
@@ -102,6 +103,9 @@ impl TargetSelection {
                     archs.retain(|a| a.as_str() != arch);
                 }
                 PlatformArchitectures::Flutter => {}
+                PlatformArchitectures::ReactNative(archs) => {
+                    archs.retain(|a| a.as_str() != arch);
+                }
                 PlatformArchitectures::Web => {}
             }
         }
@@ -110,6 +114,7 @@ impl TargetSelection {
                 PlatformArchitectures::Ios(archs) => !archs.is_empty(),
                 PlatformArchitectures::Android(archs) => !archs.is_empty(),
                 PlatformArchitectures::Flutter => true,
+                PlatformArchitectures::ReactNative(archs) => !archs.is_empty(),
                 PlatformArchitectures::Web => true,
             });
     }
@@ -128,6 +133,10 @@ impl TargetSelection {
 
         config.android = self
             .architecture_strings_for(Platform::Android)
+            .map(|archs| archs.into_iter().collect());
+
+        config.react_native = self
+            .architecture_strings_for(Platform::ReactNative)
             .map(|archs| archs.into_iter().collect());
     }
 }
@@ -152,6 +161,9 @@ impl PlatformArchitectures {
                 archs.iter().map(|arch| arch.as_str().to_string()).collect()
             }
             PlatformArchitectures::Flutter => Vec::new(),
+            PlatformArchitectures::ReactNative(archs) => {
+                archs.iter().map(|arch| arch.as_str().to_string()).collect()
+            }
             PlatformArchitectures::Web => Vec::new(),
         }
     }
@@ -165,6 +177,9 @@ impl PlatformArchitectures {
                 archs.iter().any(|candidate| candidate.as_str() == arch)
             }
             PlatformArchitectures::Flutter => false,
+            PlatformArchitectures::ReactNative(archs) => {
+                archs.iter().any(|candidate| candidate.as_str() == arch)
+            }
             PlatformArchitectures::Web => false,
         }
     }
@@ -173,6 +188,7 @@ impl PlatformArchitectures {
 struct ArgArch {
     ios: Vec<IosArch>,
     android: Vec<AndroidArch>,
+    react_native: Vec<ReactNativeArch>,
     invalid: Vec<String>,
 }
 
@@ -204,7 +220,12 @@ fn resolve_architectures(
 ) -> Vec<PlatformSelection> {
     let mut selections = Vec::with_capacity(platforms.len());
 
-    let ArgArch { ios, android, .. } = arg_arch;
+    let ArgArch {
+        ios,
+        android,
+        react_native,
+        ..
+    } = arg_arch;
 
     if platforms.contains(&Platform::Ios) {
         let ios_platform_arch = if !ios.is_empty() {
@@ -244,6 +265,23 @@ fn resolve_architectures(
         selections.push(PlatformSelection {
             platform: Platform::Flutter,
             architectures: PlatformArchitectures::Flutter,
+        });
+    }
+
+    if platforms.contains(&Platform::ReactNative) {
+        let react_native_platform_arch = if !react_native.is_empty() {
+            PlatformArchitectures::ReactNative(react_native)
+        } else {
+            PlatformArchitectures::ReactNative(prompt_architectures(
+                Platform::ReactNative,
+                config.react_native.as_ref(),
+                ReactNativeArch::all_strings(),
+            ))
+        };
+
+        selections.push(PlatformSelection {
+            platform: Platform::ReactNative,
+            architectures: react_native_platform_arch,
         });
     }
 
@@ -311,10 +349,12 @@ fn prompt_architectures<A: Arch>(
 fn parse_architectures(platforms: &[Platform], arg_architectures: &Option<Vec<String>>) -> ArgArch {
     let allow_ios = platforms.contains(&Platform::Ios);
     let allow_android = platforms.contains(&Platform::Android);
+    let allow_react_native = platforms.contains(&Platform::ReactNative);
 
     let mut invalid = Vec::new();
     let mut ios_arch = Vec::new();
     let mut android_arch = Vec::new();
+    let mut react_native_arch = Vec::new();
 
     if let Some(values) = arg_architectures {
         for value in values {
@@ -332,6 +372,13 @@ fn parse_architectures(platforms: &[Platform], arg_architectures: &Option<Vec<St
                 }
             }
 
+            if allow_react_native {
+                if let Some(arch) = parse_react_native_arch(value) {
+                    react_native_arch.push(arch);
+                    continue;
+                }
+            }
+
             invalid.push(value.clone());
         }
     }
@@ -339,6 +386,7 @@ fn parse_architectures(platforms: &[Platform], arg_architectures: &Option<Vec<St
     ArgArch {
         ios: ios_arch,
         android: android_arch,
+        react_native: react_native_arch,
         invalid,
     }
 }
@@ -355,6 +403,13 @@ fn parse_android_arch(value: &str) -> Option<AndroidArch> {
         .into_iter()
         .find(|candidate| candidate.eq_ignore_ascii_case(value))
         .map(AndroidArch::parse_from_str)
+}
+
+fn parse_react_native_arch(value: &str) -> Option<ReactNativeArch> {
+    ReactNativeArch::all_strings()
+        .into_iter()
+        .find(|candidate| candidate.eq_ignore_ascii_case(value))
+        .map(ReactNativeArch::parse_from_str)
 }
 
 fn print_architecture_hint() {

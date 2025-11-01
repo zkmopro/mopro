@@ -224,7 +224,7 @@ jobs:
                     -project ios/MoproApp.xcodeproj \
                     -scheme MoproApp \
                     -configuration Debug \
-                    -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
+                    -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0.1' \
                     -sdk iphonesimulator \
                     -only-testing:MoproAppUITests/MoproAppUITests/test${ADAPTER_UPPER}ProveVerify \
                     ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
@@ -376,22 +376,14 @@ jobs:
                   project-name: mopro-example-${{ matrix.adapter }}
                   destination: ${{ runner.temp }}
 
-            - name: Build iOS (release; device+sim arm64 only)
+            - name: Build React Native (release; iOS simulator arm64 + Android x86_64)
               working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
               run: |
+                  rustup target add aarch64-apple-ios-sim x86_64-linux-android
                   "$GITHUB_WORKSPACE/bin/mopro" build \
                     --mode release \
-                    --platforms ios \
-                    --architectures aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
-
-            # TODO: Add Android/iOS tests
-            # - name: Build Android (release, x86_64)
-            #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
-            #   run: |
-            #     "$GITHUB_WORKSPACE/bin/mopro" build \
-            #       --mode release \
-            #       --platforms android \
-            #       --architectures x86_64-linux-android
+                    --platforms react-native \
+                    --architectures aarch64-apple-ios-sim x86_64-linux-android
 
             - name: Clean mopro build dir
               run: rm -rf ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/build
@@ -410,32 +402,32 @@ jobs:
               working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
               run: npm ci
 
-            - name: Install Expo CLI
-              run: npm install -g expo-cli
-
-            - name: Install applesimutils
-              run: |
-                  brew tap wix/brew
-                  brew install applesimutils
-            - name: Prebuild
-              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
-              run: npm run prebuild
-
-            # Build iOS and Android apps for E2E
-            - name: Build iOS for Detox
-              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
-              run: npm run e2e:build:ios
-
-            # Start Metro bundler in background
-            - name: Start Metro bundler
-              working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
-              run: npx expo start --dev-client --port 8081 &
-
-            # Give Metro a few seconds to boot before launching Detox
-            - name: Wait for Metro
-              run: sleep 20
-
               # TODO: add this test back
+            # - name: Install Expo CLI
+            #   run: npm install -g expo-cli
+
+            # - name: Install applesimutils
+            #   run: |
+            #       brew tap wix/brew
+            #       brew install applesimutils
+            # - name: Prebuild
+            #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+            #   run: npm run prebuild
+
+            # # Build iOS and Android apps for E2E
+            # - name: Build iOS for Detox
+            #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+            #   run: npm run e2e:build:ios
+
+            # # Start Metro bundler in background
+            # - name: Start Metro bundler
+            #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
+            #   run: npx expo start --dev-client --port 8081 &
+
+            # # Give Metro a few seconds to boot before launching Detox
+            # - name: Wait for Metro
+            #   run: sleep 20
+
             # - name: Run iOS Detox tests
             #   working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/react-native
             #   run: npm run e2e:test:ios
