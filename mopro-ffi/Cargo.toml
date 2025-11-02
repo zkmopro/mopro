@@ -1,6 +1,6 @@
 [package]
 name = "mopro-ffi"
-version = "0.3.0"
+version = "0.3.2"
 edition = "2021"
 description = "Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple."
 license = "MIT OR Apache-2.0"
