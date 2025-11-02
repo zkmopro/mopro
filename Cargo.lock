@@ -2373,7 +2373,7 @@ dependencies = [
  "fs_extra",
  "include_dir",
  "indicatif",
- "mopro-ffi 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mopro-ffi",
  "reqwest",
  "serde",
  "toml 0.9.2",
@@ -2389,22 +2389,6 @@ dependencies = [
  "camino",
  "color-eyre",
  "flutter_rust_bridge",
- "fs_extra",
- "thiserror 2.0.12",
- "toml 0.8.22",
- "uniffi",
- "uuid",
-]
-
-[[package]]
-name = "mopro-ffi"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d0df5539ac49438a41102432a52acd4ee8a54cb2651e2467d5b6bc18475c96e"
-dependencies = [
- "anyhow",
- "camino",
- "color-eyre",
  "fs_extra",
  "thiserror 2.0.12",
  "toml 0.8.22",
@@ -3747,7 +3731,7 @@ dependencies = [
 name = "tests"
 version = "0.1.0"
 dependencies = [
- "mopro-ffi 0.3.2",
+ "mopro-ffi",
  "thiserror 2.0.12",
 ]
 
