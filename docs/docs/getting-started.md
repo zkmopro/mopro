@@ -101,6 +101,8 @@ $ mopro build
 ? Select platform(s) to build for (multiple selection with space) ›
 ⬚ ios
 ⬚ android
+⬚ flutter
+⬚ react-native
 ⬚ web
 ? Select ios architecture(s) to compile ›
 ⬚ aarch64-apple-ios
@@ -190,7 +192,7 @@ export ANDROID_HOME=~/Library/Android/sdk
 
 ```sh
 npm run ios # for iOS simulator
-npm run ios:device # for iOS device
+open ios/MyTestLibraryExample.xcworkspace # to run on iOS device
 npm run android # for Android emulator/devices
 ```
 
@@ -224,12 +226,14 @@ See more details in [flutter-app](https://github.com/zkmopro/flutter-app)
 
 ### For Circom Circuits
 
--   Ensure `circom` feature is activated in `mopro-ffi`
+-   Choose `circom` adapter with `mopro-cli` (See [2. Initialize adapters](#2-initialize-adapters))
 -   Follow the [Circom documentation](https://docs.circom.io/getting-started/compiling-circuits/) to generate the `.wasm` and `.zkey` files for your circuit.
 -   Place the `.wasm` and `.zkey` files in the `test-vectors/circom` directory.
 -   Generate the execution function using the [`rust_witness`](https://github.com/chancehudson/rust-witness) macro:
     ```rust
-    rust_witness::witness!(circuitname);
+    mod witness {
+        rust_witness::witness!(circuitname);
+    }
     // ⚠️ The name should be the name of the wasm file all lowercase
     // ⚠️ with all special characters removed
     // ⚠️ Avoid using main as your circuit name, as it may cause conflicts during compilation and execution. Use a more descriptive and unique name instead.
@@ -243,8 +247,11 @@ See more details in [flutter-app](https://github.com/zkmopro/flutter-app)
 -   Bind the `.zkey` file to the witness generation function to enable proof generation. This ensures the circuit's proving key is correctly associated with its corresponding witness logic.
     Ensure that the witness function follows the naming convention `circuitname_witness`, as expected by the generated bindings and proof system:
     ```rust
-    mopro_ffi::set_circom_circuits! {
-        ("circuitname.zkey", mopro_ffi::witness::WitnessFn::RustWitness(circuitname_witness))
+    crate::set_circom_circuits! {
+        (
+            "circuitname.zkey",
+            circom_prover::witness::WitnessFn::RustWitness(witness::circuitname_witness)
+        )
     }
     ```
 -   Ensure the circuit input matches your circuit's expected format.
@@ -259,7 +266,7 @@ See more details in [flutter-app](https://github.com/zkmopro/flutter-app)
 
 ### For Halo2 Circuits
 
--   Ensure `halo2` feature is activated in `mopro-ffi`
+-   Choose `halo2` adapter with `mopro-cli` (See [2. Initialize adapters](#2-initialize-adapters))
 -   Build a Halo2 Rust crate with the example: [plonkish-fibonacci-sample](https://github.com/sifnoc/plonkish-fibonacci-sample).<br/>
     Expose the crate with the following public functions:
 
@@ -283,7 +290,7 @@ See more details in [flutter-app](https://github.com/zkmopro/flutter-app)
 -   Prepare the SRS, proving key, and verifying key files. Place the `.bin` files in the `test-vectors/halo2` directory.
 -   Bind the `prove` and `verify` functions with the corresponding proving and verifying keys.
     ```rust
-    mopro_ffi::set_halo2_circuits! {
+    set_halo2_circuits! {
         ("circuitname_pk.bin", rust_crate_name::prove, "circuitname_vk.bin", rust_crate_name::verify)
     }
     ```
@@ -299,7 +306,7 @@ See more details in [flutter-app](https://github.com/zkmopro/flutter-app)
 
 ### For Noir Circuits
 
--   Ensure `noir` feature is activated in `mopro-ffi`
+-   Choose `noir` adapter with `mopro-cli` (See [2. Initialize adapters](#2-initialize-adapters))
 -   Follow the [Noir documentation](http://noir-lang.org/docs/dev) to generate the `.json` and the [Downloading SRS](https://github.com/zkmopro/noir-rs?tab=readme-ov-file#downloading-srs-structured-reference-string) to generate the `.srs` file.
 -   Place the `.json` and `.srs` files in the `test-vectors/noir` directory.
 -   Ensure the circuit input matches your circuit's expected format.
@@ -340,9 +347,5 @@ mopro update --src ./my_bindings --dest ../MyMobileApp
     If a function is missing in Swift, Kotlin, React Native, or Flutter, you can:
 
     -   Add the required Rust crate in `Cargo.toml`
-    -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](setup/rust-setup.md#-customize-the-bindings) guide for details).<br/>
+    -   Annotate your function with `#[uniffi::export]` (See the [Rust setup](setup/rust-setup.md#-customize-the-bindings) guide for details), or make it `pub` in `src/lib.rs` when using Flutter bindings (See [Flutter setup](setup/flutter-setup.md) guide for details).<br/>
         Once exported, the function will be available across all supported platforms.
-        :::warning
-        When using React Native or Flutter, don’t forget to update the module’s API definitions to ensure the framework can access the new Swift/Kotlin bindings.<br/>
-        See more details in [react-native-app](https://github.com/zkmopro/react-native-app) or [flutter-app](https://github.com/zkmopro/flutter-app)
-        :::
