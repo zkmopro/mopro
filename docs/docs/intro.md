@@ -10,7 +10,7 @@ sidebar_position: 1
 
 Mopro simplifies the development of mobile-native apps by offering:
 
--   `mopro-ffi` **simplifies** the manual UniFFI setup process and enables a **modular** approach to proving systems.
+-   `mopro-ffi` **simplifies** the manual FFI setup process and enables a **modular** approach to proving systems.
 -   A powerful **CLI** to scaffold, build, and update projects
 -   Prebuilt **templates** for iOS, Android, React Native, and Flutter
 -   Clear, step-by-step **documentation** to guide developers at every stage
@@ -30,7 +30,9 @@ These benefits help bring your ZK protocol to a broader, more mainstream audienc
 
 ## 🔧 How It Works
 
-Mopro takes each proving system and wraps it as an **adapter** written in Rust. These adapters provide a unified interface for ZK proof generation regardless of the backend (e.g., Circom, Noir, Halo2). Mopro then uses [UniFFI](https://github.com/mozilla/uniffi-rs) to generate native bindings for **Swift (iOS)** and **Kotlin (Android)** from Rust code. These bindings can then be reused in cross-platform frameworks like **React Native** and **Flutter**, with ready-to-use templates for each platform.
+Mopro encapsulates each proving system within a Rust-based **adapter**, providing a unified interface for zero-knowledge proof generation across different backends (e.g., **Circom**, **Noir**, **Halo2**...etc).
+
+Using multiple FFI frameworks — including [UniFFI](https://github.com/mozilla/uniffi-rs), [flutter_rust_bridge](https://github.com/fzyzcjy/flutter_rust_bridge), and [uniffi-bindgen-react-native](https://github.com/jhugman/uniffi-bindgen-react-native) — Mopro automatically generates native bindings for **Swift (iOS)**, **Kotlin (Android)**, **Flutter**, and **React Native**. These bindings can then be integrated easily using the provided platform-specific templates.
 
 ## 🏗️ Architecture Overview
 
