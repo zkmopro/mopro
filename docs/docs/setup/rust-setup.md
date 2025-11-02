@@ -43,14 +43,17 @@ cargo init --lib
 Include the crate in your `Cargo.toml`
 
 ```toml title="Cargo.toml"
+[features]
+default = ["uniffi"]
+uniffi = ["mopro-ffi/uniffi"]
+flutter = ["mopro-ffi/flutter"]
+
 [dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro" }
-uniffi = "0.29"
+mopro-ffi = "0.3"
 thiserror = "2.0.12"
 
 [build-dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro" }
-uniffi = { version = "0.29", features = ["build"] }
+mopro-ffi = "0.3"
 ```
 
 ### 2. Setup the lib
@@ -64,7 +67,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 ### 3. Use `mopro-ffi` macro
 
-The `mopro-ffi` macro exports the default Circom prover interfaces. To enable it, activate the `mopro-ffi` macro in `src/lib.rs`.
+The `mopro-ffi` macro exports several FFI configurations. To enable it, activate the `mopro-ffi` macro in `src/lib.rs`.
 
 ```rust title="src/lib.rs"
 mopro_ffi::app!();
@@ -87,6 +90,20 @@ and another at `src/bin/android.rs`:
 ```rust title="src/bin/android.rs"
 fn main() {
     mopro_ffi::app_config::android::build();
+}
+```
+
+You can also apply this to Flutter and React Native.
+
+```rust title="src/bin/react_native.rs"
+fn main() {
+    mopro_ffi::app_config::react_native::build();
+}
+```
+
+```rust title="src/bin/flutter.rs"
+fn main() {
+    mopro_ffi::app_config::flutter::build();
 }
 ```
 
@@ -127,13 +144,13 @@ Here, we used [rust-witness](https://github.com/chancehudson/rust-witness) as an
 To learn more about `witnesscalc` and `circom-witnesscalc` for Mopro, please check out [circom-prover](https://github.com/zkmopro/mopro/blob/main/circom-prover/README.md#advanced-usage).
 :::
 
-Include the `rust-witness` in your Cargo.toml and enable `circom` feature in `mopro-ffi`:
+Include the `rust-witness` in your Cargo.toml and add `circom-prover` in `Cargo.toml`:
 
 ```toml title="Cargo.toml"
 [dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro", features = ["circom"] } # enable circom feature
-rust-witness = "0.1"
-num-bigint = "0.4"
+circom-prover = "0.1"
+rust-witness  = "0.1"
+num-bigint    = "0.4.0"
 
 [build-dependencies]
 rust-witness = "0.1"
@@ -159,19 +176,38 @@ Here are the example WASM and Zkey files to be downloaded.
 
 :::
 
-### 2. Use `mopro-ffi` macro
+### 2. Add the Helper Template
 
-Bind the corresponding WASM and Zkey files together using `mopro-ffi`.
+Use the Circom helper template by adding a `src/circom.rs` file based on this example: [circom.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/circom.rs).
+This template exposes the Circom prover interface through FFIs and makes it available to mobile native packages.
+
+And add an error handler `src/error.rs` for the mobile native bindings based on this example: [error.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/error.rs).
+
+Enable the `circom` and `error` module in `src/lib.rs`
 
 ```rust title="src/lib.rs"
-mopro_ffi::app!(); // Enable the mopro-ffi macro to generate UniFFI scaffolding.
+mod error;
+pub use error::MoproError;
+mod circom;
+pub use circom::{
+    generate_circom_proof, verify_circom_proof, CircomProof, CircomProofResult, ProofLib, G1, G2,
+};
+```
 
+Then, use the witness function to associate it with a `.zkey` file. This allows the proof generation function to know which witness function to use when generating the proof.
+
+```rust title="src/lib.rs"
 // Activate rust-witness function
-rust_witness::witness!(multiplier2);
+mod witness {
+    rust_witness::witness!(multiplier2);
+}
 
 // Set the witness functions to a zkey
-mopro_ffi::set_circom_circuits! {
-    ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(multiplier2_witness)),
+set_circom_circuits! {
+    (
+        "multiplier2_final.zkey",
+        circom_prover::witness::WitnessFn::RustWitness(witness::multiplier2_witness)
+    ),
 }
 ```
 
@@ -236,13 +272,41 @@ Running your project in `release` mode significantly enhances performance compar
 
 ### 4. What's next
 
-Once the bindings are successfully built, you will see the `MoproiOSBindings` and/or `MoproAndroidBindings` folders.
+Once the bindings are successfully built, you will see the `MoproiOSBindings`, `MoproAndroidBindings`, `MoproReactNativeBindings` and/or `mopro_flutter_bindings` folders.
 
 Next, you have two options:
 
 -   Use the `mopro create` command from the mopro CLI to generate ready-to-use templates for your desired framework (e.g., Swift, Kotlin, React Native, or Flutter).
--   If you already have a mobile app or prefer to manually integrate the bindings, follow the [iOS Setup](ios-setup.md) and/or [Android Setup](android-setup.md) sections.
+-   If you already have a mobile app or prefer to manually integrate the bindings, follow the [iOS Setup](ios-setup.md), [Android Setup](android-setup.md), [React Native Setup](react-native-setup.md) and/or [FLutter Setup](flutter-setup.md) sections.
 -   If you find that some functionality is still missing on mobile, you can refer to the [Customize the Bindings](#-customize-the-bindings) section to learn how to expose additional functions using any Rust crate.
+-   After making changes, be sure to run:
+    ```sh
+    mopro build
+    mopro update
+    ```
+    This ensures the bindings are regenerated and reflect your latest updates.
+
+:::warning
+If you haven’t integrated other adapters and encounter an error like:
+
+```sh
+Cannot find 'generateHalo2Proof' in scope
+```
+
+you can fix it by adding the [stubs.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/stubs.rs) file in `src/stubs.rs` and activating the stubs in `src/lib.rs`:
+
+```rust title="src/lib.rs"
+#[macro_use]
+mod stubs;
+
+// Activate stubs for adapters that are not integrated
+halo2_stub!();
+noir_stub!();
+```
+
+This ensures that missing adapter functions are stubbed, preventing compilation errors while keeping your project runnable.
+
+:::
 
 ---
 
