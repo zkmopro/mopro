@@ -190,5 +190,13 @@
             "website": "https://poll.cc/",
             "ios": "https://apps.apple.com/pl/app/poll-cc-public-voting-app/id6749456689"
         }
+    },
+    {
+        "name": "Solid(ar)ity",
+        "description": "Privacy-First Business Card Sharing",
+        "links": {
+            "github": "https://github.com/kidneyweakx/solidarity",
+            "ios": "https://apps.apple.com/us/app/solid-ar-ity/id6752410250"
+        }
     }
 ]
