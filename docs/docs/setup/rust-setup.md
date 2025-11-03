@@ -316,12 +316,12 @@ This ensures that missing adapter functions are stubbed, preventing compilation 
 
 ### 1. Add Halo2 circuits
 
-Enable `halo2` feature in `mopro-ffi` and import the Halo2 prover as a Rust crate using:
+Import the Halo2 prover as a Rust crate using:
 
 ```toml title="Cargo.toml"
 [dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro", features = ["halo2"] } # enable halo2 feature
 plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+anyhow = "1.0.99"
 ```
 
 :::info
@@ -337,18 +337,31 @@ Download example SRS and key files :
 -   [plonk_fibonacci_pk.bin](https://github.com/zkmopro/mopro/blob/dfb9b286c63f6b418fe27465796c818996558bf7/test-vectors/halo2/plonk_fibonacci_pk.bin)
 -   [plonk_fibonacci_vk.bin](https://github.com/zkmopro/mopro/blob/dfb9b286c63f6b418fe27465796c818996558bf7/test-vectors/halo2/plonk_fibonacci_vk.bin)
 
+Now, add three key files, for example, in `test-vectors/halo2` folder.
+
 :::
 
-### 2. Use `mopro-ffi` macro
+### 2. Add the Helper Template
 
-Now, add three rust files, for example, in `test-vectors/halo2` folder.
+Use the Halo2 helper template by adding a `src/halo2.rs` file based on this example: [halo2.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/halo2.rs).
+This template exposes the Halo2 prover interface through FFIs and makes it available to mobile native packages.
 
-Update the `src/lib.rs` file to look like the following:
+And add an error handler `src/error.rs` for the mobile native bindings based on this example: [error.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/error.rs).
+
+Enable the `halo2` and `error` module in `src/lib.rs`
 
 ```rust title="src/lib.rs"
-mopro_ffi::app!(); // Enable the mopro-ffi macro to generate UniFFI scaffolding.
+mod error;
+pub use error::MoproError;
+mod halo2;
+pub use halo2::{generate_halo2_proof, verify_halo2_proof, Halo2ProofResult};
 
-mopro_ffi::set_halo2_circuits! {
+```
+
+Then, associate each key file with its corresponding execution functions. This ensures the proof generation function knows which function to use when generating a proof.
+
+```rust title="src/lib.rs"
+set_halo2_circuits! {
     ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
 }
 ```
