@@ -525,17 +525,28 @@ Similar to Circom-based Rust project setup [4. What's next](#4-whats-next)
 
 📢 Ensure you've completed the [General Setup](#-general-setup) before proceeding.
 
-If your ZK prover isn’t included, or you already have your own Rust crate,
-you can use the `#[uniffi::export]` procedural macro to define your own functions and generate mobile-native bindings from them.
+If your ZK prover isn’t included, or you already have your own Rust crate, you can use the `#[uniffi::export]` procedural macro to define custom functions and generate mobile-native bindings from them. For Flutter bindings, you can instead make the function `pub` in `src/lib.rs` to expose it.
 
 ### 1. Define exported functions
 
 Export Rust functions using a procedural macro, as shown below:
 
 ```rust title="src/lib.rs"
-mopro_ffi::app!(); // Enable the mopro-ffi macro to generate UniFFI scaffolding.
+mopro_ffi::app!(); // Enable the mopro-ffi macro to setup FFI configuration.
 
+// for all bindings
+#[cfg_attr(feature = "uniffi", uniffi::export)]
+pub fn hello_world() -> String {
+    "Hello, World!".to_string()
+}
+
+// for iOS, Android, and React Native bindings
 #[uniffi::export]
+pub fn hello_world() -> String {
+    "Hello, World!".to_string()
+}
+
+// for Flutter bindings
 pub fn hello_world() -> String {
     "Hello, World!".to_string()
 }
@@ -547,24 +558,24 @@ For more examples and detailed references, check the [UniFFI documentation](http
 
 You may also bring in other Rust crates to extend functionality.
 
-For instance, to use `semaphore-rs`, you can add it like this:
+For instance, to use `semaphore-protocol`, you can add it like this:
 
 ```toml title="Cargo.toml"
 [dependencies]
-semaphore-rs = { git = "https://github.com/semaphore-protocol/semaphore-rs", features = ["serde"] }
+semaphore-protocol = { version = "0.1", features = ["serde"] }
 ```
 
 ```rust title="src/lib.rs"
-mopro_ffi::app!(); // Enable the mopro-ffi macro to generate UniFFI scaffolding.
+mopro_ffi::app!();
 
-use semaphore_rs::group::Group;
-use semaphore_rs::identity::Identity;
-use semaphore_rs::proof::GroupOrMerkleProof;
-use semaphore_rs::proof::Proof;
-use semaphore_rs::proof::SemaphoreProof;
+use semaphore::group::Group;
+use semaphore::identity::Identity;
+use semaphore::proof::GroupOrMerkleProof;
+use semaphore::proof::Proof;
+use semaphore::proof::SemaphoreProof;
 
-#[uniffi::export]
-fn semaphore_prove(
+#[cfg_attr(feature = "uniffi", uniffi::export)]
+pub fn semaphore_prove(
     id_secret: String,
     leaves: Vec<Vec<u8>>,
     message: String,
@@ -593,8 +604,8 @@ fn semaphore_prove(
     return proof_json;
 }
 
-#[uniffi::export]
-fn semaphore_verify(proof: String) -> bool {
+#[cfg_attr(feature = "uniffi", uniffi::export)]
+pub fn semaphore_verify(proof: String) -> bool {
     let proof = SemaphoreProof::import(&proof).unwrap();
     let valid = Proof::verify_proof(proof);
     valid
@@ -607,7 +618,7 @@ fn semaphore_verify(proof: String) -> bool {
     #[cfg(test)]
     mod uniffi_tests {
         use super::*;
-        use semaphore_rs::utils::to_element;
+        use semaphore::utils::to_element;
 
         #[test]
         fn test_mopro_uniffi_hello_world() {
@@ -640,13 +651,22 @@ fn semaphore_verify(proof: String) -> bool {
 
 Similar to Circom-based Rust project setup [3. Generate bindings for iOS and Android](#3-generate-bindings-for-ios-and-android)
 
-Once the bindings are generated, you'll see your exported functions (e.g., `semaphoreProve`, `semaphoreVerify`) included in the generated code—for example, in `MoproiOSBindings/mopro.swift` for iOS and `MoproAndroidBindings/uniffi/mopro/mopro.kt` for Android.
+Once the bindings are generated, you'll see your exported functions (e.g., `semaphoreProve`, `semaphoreVerify`) included in the generated code—for example
 
-You can then use these functions directly within your iOS and/or Android applications as part of the generated bindings.
+-   `MoproiOSBindings/mopro.swift` for iOS
+-   `MoproAndroidBindings/uniffi/mopro/mopro.kt` for Android
+-   `MoproReactNativeBindings/src/generated/rust_example.ts` for React Native
+-   `mopro_flutter_bindings/lib/src/rust/third_party/rust_example.dart` for Flutter
+
+You can then use these functions directly within your iOS, Android, React Native and/or Flutter applications as part of the generated bindings.
 
 ## 📋 Generate Circom bindings
 
-<!-- TODO: update mopro-cli package -->
+Install the CLI with Cargo:
+
+```sh
+cargo install mopro-cli
+```
 
 Install the latest CLI from GitHub:
 
@@ -687,7 +707,7 @@ mopro bindgen --help
 ```
 
 :::warning
-Currently, only the [`rust-witness`](https://github.com/chancehudson/rust-witness) witness generator is supported.
+Currently, only the [`rust-witness`](https://github.com/chancehudson/rust-witness), [`witnesscalc-adapter`](https://github.com/zkmopro/witnesscalc_adapter) witness generator is supported.
 :::
 
 ### 3. What's next
