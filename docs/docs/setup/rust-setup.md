@@ -421,11 +421,19 @@ You’ll need to generate a `.json` file from the compiled circuit for use in th
 Downloading the SRS (Structured Reference String) is optional but recommended, as it can significantly improve proving performance.
 See [Downloading SRS](https://github.com/zkmopro/noir-rs?tab=readme-ov-file#downloading-srs-structured-reference-string) for more details.
 
-### 1. Enable `noir` feature
+### 1. Add `noir` prover
 
 ```toml title="Cargo.toml"
 [dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro", features = ["noir"] } # enable noir feature
+noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
+    "barretenberg",
+    "android-compat",
+], branch = "v1.0.0-beta.8-3" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.94"
+
+[dev-dependencies]
+serial_test = "3.0.0"
 ```
 
 :::warning
@@ -440,7 +448,22 @@ Download example SRS and circuit files :
 -   [noir_multiplier2.json](https://github.com/zkmopro/mopro/blob/3fb330e31f6111ca0cc0aa0a408a491c239ccb93/test-vectors/noir/noir_multiplier2.json)
 -   [noir_multiplier2.srs](https://github.com/zkmopro/mopro/blob/3fb330e31f6111ca0cc0aa0a408a491c239ccb93/test-vectors/noir/noir_multiplier2.srs)
 
+And add them to `test-vectors/noir/` folder.
 :::
+
+Use the Noir helper template by adding a `src/noir.rs` file based on this example: [noir.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/noir.rs).
+This template exposes the Noir prover interface through FFIs and makes it available to mobile native packages.
+
+And add an error handler `src/error.rs` for the mobile native bindings based on this example: [error.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/error.rs).
+
+Enable the `noir` and `error` module in `src/lib.rs`
+
+```rust title="src/lib.rs"
+mod error;
+pub use error::MoproError;
+mod noir;
+pub use noir::{generate_noir_proof, get_noir_verification_key, verify_noir_proof};
+```
 
 :::info
 To verify everything is working correctly, you can write a Rust unit test like the one below to ensure the proof is computed successfully.
@@ -455,16 +478,33 @@ mod noir_tests {
         let srs_path = "./test-vectors/noir/noir_multiplier2.srs".to_string();
         let circuit_path = "./test-vectors/noir/noir_multiplier2.json".to_string();
         let circuit_inputs = vec!["3".to_string(), "5".to_string()];
-        let result = generate_noir_proof(
+        let vk = get_noir_verification_key(
+            circuit_path.clone(),
+            Some(srs_path.clone()),
+            true,  // on_chain (uses Keccak for Solidity compatibility)
+            false, // low_memory_mode
+        )
+        .unwrap();
+
+        let proof = generate_noir_proof(
             circuit_path.clone(),
             Some(srs_path.clone()),
             circuit_inputs.clone(),
-        );
-        assert!(result.is_ok());
-        let proof = result.unwrap();
-        let valid = verify_noir_proof(circuit_path.clone(), proof);
-        assert!(valid.is_ok());
-        assert!(valid.unwrap());
+            true, // on_chain (uses Keccak for Solidity compatibility)
+            vk.clone(),
+            false, // low_memory_mode
+        )
+        .unwrap();
+
+        let valid = verify_noir_proof(
+            circuit_path,
+            proof,
+            true, // on_chain (uses Keccak for Solidity compatibility)
+            vk,
+            false, // low_memory_mode
+        )
+        .unwrap();
+        assert!(valid);
     }
 }
 ```
