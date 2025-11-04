@@ -185,6 +185,13 @@ Don't forget to modify the input values for your specific case!
     :::warning
     The bindings only work **locally** due to the current `Cargo.toml` configuration in `mopro_flutter_bindings/rust/Cargo.toml`.
     You can update the dependency source to point to a GitHub repository or a published crate on crates.io, if you want to make it available **remotely**.
+    If your local source functions differ from the versions on GitHub or crates.io, run
+
+    ```bash
+    mopro build
+    ```
+
+    again in your **local directory**, copy the generated bindings into your Flutter project, and update the source path in `mopro_flutter_bindings/rust/Cargo.toml`.
     :::
 
 -   **Build your mobile app frontend** according to your business logic and user flow.
