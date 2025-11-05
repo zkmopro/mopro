@@ -11,7 +11,7 @@ pub fn build() {
 
     // Check if `wasm-pack` command is available
     let check_status = Command::new("wasm-pack").arg("--version").status();
-    if !check_status.map_or(false, |s| s.success()) {
+    if !check_status.is_ok_and(|s| s.success()) {
         eprintln!("Error: `wasm-pack` command not found. Please install `wasm-pack` to proceed.");
         std::process::exit(1);
     }
