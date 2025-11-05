@@ -20,8 +20,6 @@ Depending on what platforms and adapters you use, there are several prerequisite
 -   Web(WASM)
     -   [wasm-pack](https://drager.github.io/wasm-pack/installer/)
     -   [Download Chrome/ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/)
--   React Native
-    -   [nodejs](https://nodejs.org) >= 20
 
 ## Circuits
 

@@ -8,8 +8,6 @@ Join the Telegram group [here](https://t.me/zkmopro). This is the main place whe
 
 ## Talks
 
-- Talk by @moven0831 at [ETHGlobal New Delhi](https://ethglobal.com/events/newdelhi) (New Delhi, September 2025): [Video](https://youtu.be/wmCZ7cpDi68?si=NJPuFD_Pd0kME_6W)
-- Talk by @vivianjeng at [ETHGlobal Cannes](https://ethglobal.com/events/cannes) (Cannes, July 2025): [Video](https://youtu.be/rNzkeKu3Xtc?si=MIYOBuS6N3aI_SB6) 
 - Talk by @vivianjeng at NoirHack 2025 (Virtual, April 2025): [Video](https://youtu.be/UrT2x3JSKFg?si=VUMU_4issBfM-jVl), [Slides](https://www.canva.com/design/DAGjcBgfBkQ/FrKUhdaEmA7wigCCq-VNrw/view?utm_content=DAGjcBgfBkQ&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h3c3b6657e8)
 - Talk by @vivianjeng at [Devcon 2024](https://devcon.org/) (Bangkok, November 2024): [Video](https://youtu.be/0ziKiYwhJHk?si=NdSJphvnlKkVk_m3), [Slides](https://docs.google.com/presentation/d/1Z6j1wIQCB3BYVDx1msPMXHs0JKR7LXY8pFq4SUXsVXQ/edit?usp=sharing)
 - Talk by @vivianjeng at [IC3 Camp 2024](https://www.initc3.org/events/2024-06-10-ic3-blockchain-camp-2024) (New York City, June 2024): [Slides](https://docs.google.com/presentation/d/1UoHA2C-SB7qmmIcKBA8if5pCtzU4AbdnH0EX59TQcoE/edit?usp=sharing) (no video)

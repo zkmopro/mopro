@@ -43,17 +43,14 @@ cargo init --lib
 Include the crate in your `Cargo.toml`
 
 ```toml title="Cargo.toml"
-[features]
-default = ["uniffi"]
-uniffi = ["mopro-ffi/uniffi"]
-flutter = ["mopro-ffi/flutter"]
-
 [dependencies]
-mopro-ffi = "0.3"
+mopro-ffi = { git = "https://github.com/zkmopro/mopro" }
+uniffi = "0.29"
 thiserror = "2.0.12"
 
 [build-dependencies]
-mopro-ffi = "0.3"
+mopro-ffi = { git = "https://github.com/zkmopro/mopro" }
+uniffi = { version = "0.29", features = ["build"] }
 ```
 
 ### 2. Setup the lib
@@ -67,7 +64,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 ### 3. Use `mopro-ffi` macro
 
-The `mopro-ffi` macro exports several FFI configurations. To enable it, activate the `mopro-ffi` macro in `src/lib.rs`.
+The `mopro-ffi` macro exports the default Circom prover interfaces. To enable it, activate the `mopro-ffi` macro in `src/lib.rs`.
 
 ```rust title="src/lib.rs"
 mopro_ffi::app!();
@@ -90,20 +87,6 @@ and another at `src/bin/android.rs`:
 ```rust title="src/bin/android.rs"
 fn main() {
     mopro_ffi::app_config::android::build();
-}
-```
-
-You can also apply this to Flutter and React Native.
-
-```rust title="src/bin/react_native.rs"
-fn main() {
-    mopro_ffi::app_config::react_native::build();
-}
-```
-
-```rust title="src/bin/flutter.rs"
-fn main() {
-    mopro_ffi::app_config::flutter::build();
 }
 ```
 
@@ -144,13 +127,13 @@ Here, we used [rust-witness](https://github.com/chancehudson/rust-witness) as an
 To learn more about `witnesscalc` and `circom-witnesscalc` for Mopro, please check out [circom-prover](https://github.com/zkmopro/mopro/blob/main/circom-prover/README.md#advanced-usage).
 :::
 
-Include the `rust-witness` in your Cargo.toml and add `circom-prover` in `Cargo.toml`:
+Include the `rust-witness` in your Cargo.toml and enable `circom` feature in `mopro-ffi`:
 
 ```toml title="Cargo.toml"
 [dependencies]
-circom-prover = "0.1"
-rust-witness  = "0.1"
-num-bigint    = "0.4.0"
+mopro-ffi = { git = "https://github.com/zkmopro/mopro", features = ["circom"] } # enable circom feature
+rust-witness = "0.1"
+num-bigint = "0.4"
 
 [build-dependencies]
 rust-witness = "0.1"
@@ -176,38 +159,19 @@ Here are the example WASM and Zkey files to be downloaded.
 
 :::
 
-### 2. Add the Helper Template
+### 2. Use `mopro-ffi` macro
 
-Use the Circom helper template by adding a `src/circom.rs` file based on this example: [circom.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/circom.rs).
-This template exposes the Circom prover interface through FFIs and makes it available to mobile native packages.
-
-And add an error handler `src/error.rs` for the mobile native bindings based on this example: [error.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/error.rs).
-
-Enable the `circom` and `error` module in `src/lib.rs`
+Bind the corresponding WASM and Zkey files together using `mopro-ffi`.
 
 ```rust title="src/lib.rs"
-mod error;
-pub use error::MoproError;
-mod circom;
-pub use circom::{
-    generate_circom_proof, verify_circom_proof, CircomProof, CircomProofResult, ProofLib, G1, G2,
-};
-```
+mopro_ffi::app!(); // Enable the mopro-ffi macro to generate UniFFI scaffolding.
 
-Then, use the witness function to associate it with a `.zkey` file. This allows the proof generation function to know which witness function to use when generating the proof.
-
-```rust title="src/lib.rs"
 // Activate rust-witness function
-mod witness {
-    rust_witness::witness!(multiplier2);
-}
+rust_witness::witness!(multiplier2);
 
 // Set the witness functions to a zkey
-set_circom_circuits! {
-    (
-        "multiplier2_final.zkey",
-        circom_prover::witness::WitnessFn::RustWitness(witness::multiplier2_witness)
-    ),
+mopro_ffi::set_circom_circuits! {
+    ("multiplier2_final.zkey", mopro_ffi::witness::WitnessFn::RustWitness(multiplier2_witness)),
 }
 ```
 
@@ -272,41 +236,13 @@ Running your project in `release` mode significantly enhances performance compar
 
 ### 4. What's next
 
-Once the bindings are successfully built, you will see the `MoproiOSBindings`, `MoproAndroidBindings`, `MoproReactNativeBindings` and/or `mopro_flutter_bindings` folders.
+Once the bindings are successfully built, you will see the `MoproiOSBindings` and/or `MoproAndroidBindings` folders.
 
 Next, you have two options:
 
 -   Use the `mopro create` command from the mopro CLI to generate ready-to-use templates for your desired framework (e.g., Swift, Kotlin, React Native, or Flutter).
--   If you already have a mobile app or prefer to manually integrate the bindings, follow the [iOS Setup](ios-setup.md), [Android Setup](android-setup.md), [React Native Setup](react-native-setup.md) and/or [FLutter Setup](flutter-setup.md) sections.
+-   If you already have a mobile app or prefer to manually integrate the bindings, follow the [iOS Setup](ios-setup.md) and/or [Android Setup](android-setup.md) sections.
 -   If you find that some functionality is still missing on mobile, you can refer to the [Customize the Bindings](#-customize-the-bindings) section to learn how to expose additional functions using any Rust crate.
--   After making changes, be sure to run:
-    ```sh
-    mopro build
-    mopro update
-    ```
-    This ensures the bindings are regenerated and reflect your latest updates.
-
-:::warning
-If you haven’t integrated other adapters and encounter an error like:
-
-```sh
-Cannot find 'generateHalo2Proof' in scope
-```
-
-you can fix it by adding the [stubs.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/stubs.rs) file in `src/stubs.rs` and activating the stubs in `src/lib.rs`:
-
-```rust title="src/lib.rs"
-#[macro_use]
-mod stubs;
-
-// Activate stubs for adapters that are not integrated
-halo2_stub!();
-noir_stub!();
-```
-
-This ensures that missing adapter functions are stubbed, preventing compilation errors while keeping your project runnable.
-
-:::
 
 ---
 
@@ -316,12 +252,12 @@ This ensures that missing adapter functions are stubbed, preventing compilation 
 
 ### 1. Add Halo2 circuits
 
-Import the Halo2 prover as a Rust crate using:
+Enable `halo2` feature in `mopro-ffi` and import the Halo2 prover as a Rust crate using:
 
 ```toml title="Cargo.toml"
 [dependencies]
+mopro-ffi = { git = "https://github.com/zkmopro/mopro", features = ["halo2"] } # enable halo2 feature
 plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
-anyhow = "1.0.99"
 ```
 
 :::info
@@ -337,31 +273,18 @@ Download example SRS and key files :
 -   [plonk_fibonacci_pk.bin](https://github.com/zkmopro/mopro/blob/dfb9b286c63f6b418fe27465796c818996558bf7/test-vectors/halo2/plonk_fibonacci_pk.bin)
 -   [plonk_fibonacci_vk.bin](https://github.com/zkmopro/mopro/blob/dfb9b286c63f6b418fe27465796c818996558bf7/test-vectors/halo2/plonk_fibonacci_vk.bin)
 
-Now, add three key files, for example, in `test-vectors/halo2` folder.
-
 :::
 
-### 2. Add the Helper Template
+### 2. Use `mopro-ffi` macro
 
-Use the Halo2 helper template by adding a `src/halo2.rs` file based on this example: [halo2.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/halo2.rs).
-This template exposes the Halo2 prover interface through FFIs and makes it available to mobile native packages.
+Now, add three rust files, for example, in `test-vectors/halo2` folder.
 
-And add an error handler `src/error.rs` for the mobile native bindings based on this example: [error.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/error.rs).
-
-Enable the `halo2` and `error` module in `src/lib.rs`
+Update the `src/lib.rs` file to look like the following:
 
 ```rust title="src/lib.rs"
-mod error;
-pub use error::MoproError;
-mod halo2;
-pub use halo2::{generate_halo2_proof, verify_halo2_proof, Halo2ProofResult};
+mopro_ffi::app!(); // Enable the mopro-ffi macro to generate UniFFI scaffolding.
 
-```
-
-Then, associate each key file with its corresponding execution functions. This ensures the proof generation function knows which function to use when generating a proof.
-
-```rust title="src/lib.rs"
-set_halo2_circuits! {
+mopro_ffi::set_halo2_circuits! {
     ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
 }
 ```
@@ -421,19 +344,11 @@ You’ll need to generate a `.json` file from the compiled circuit for use in th
 Downloading the SRS (Structured Reference String) is optional but recommended, as it can significantly improve proving performance.
 See [Downloading SRS](https://github.com/zkmopro/noir-rs?tab=readme-ov-file#downloading-srs-structured-reference-string) for more details.
 
-### 1. Add `noir` prover
+### 1. Enable `noir` feature
 
 ```toml title="Cargo.toml"
 [dependencies]
-noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
-    "barretenberg",
-    "android-compat",
-], branch = "v1.0.0-beta.8-3" }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0.94"
-
-[dev-dependencies]
-serial_test = "3.0.0"
+mopro-ffi = { git = "https://github.com/zkmopro/mopro", features = ["noir"] } # enable noir feature
 ```
 
 :::warning
@@ -448,22 +363,7 @@ Download example SRS and circuit files :
 -   [noir_multiplier2.json](https://github.com/zkmopro/mopro/blob/3fb330e31f6111ca0cc0aa0a408a491c239ccb93/test-vectors/noir/noir_multiplier2.json)
 -   [noir_multiplier2.srs](https://github.com/zkmopro/mopro/blob/3fb330e31f6111ca0cc0aa0a408a491c239ccb93/test-vectors/noir/noir_multiplier2.srs)
 
-And add them to `test-vectors/noir/` folder.
 :::
-
-Use the Noir helper template by adding a `src/noir.rs` file based on this example: [noir.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/noir.rs).
-This template exposes the Noir prover interface through FFIs and makes it available to mobile native packages.
-
-And add an error handler `src/error.rs` for the mobile native bindings based on this example: [error.rs](https://github.com/zkmopro/mopro/blob/23265fe5b14154d023278742ffe6289eb629014a/cli/src/template/init/src/error.rs).
-
-Enable the `noir` and `error` module in `src/lib.rs`
-
-```rust title="src/lib.rs"
-mod error;
-pub use error::MoproError;
-mod noir;
-pub use noir::{generate_noir_proof, get_noir_verification_key, verify_noir_proof};
-```
 
 :::info
 To verify everything is working correctly, you can write a Rust unit test like the one below to ensure the proof is computed successfully.
@@ -478,33 +378,16 @@ mod noir_tests {
         let srs_path = "./test-vectors/noir/noir_multiplier2.srs".to_string();
         let circuit_path = "./test-vectors/noir/noir_multiplier2.json".to_string();
         let circuit_inputs = vec!["3".to_string(), "5".to_string()];
-        let vk = get_noir_verification_key(
-            circuit_path.clone(),
-            Some(srs_path.clone()),
-            true,  // on_chain (uses Keccak for Solidity compatibility)
-            false, // low_memory_mode
-        )
-        .unwrap();
-
-        let proof = generate_noir_proof(
+        let result = generate_noir_proof(
             circuit_path.clone(),
             Some(srs_path.clone()),
             circuit_inputs.clone(),
-            true, // on_chain (uses Keccak for Solidity compatibility)
-            vk.clone(),
-            false, // low_memory_mode
-        )
-        .unwrap();
-
-        let valid = verify_noir_proof(
-            circuit_path,
-            proof,
-            true, // on_chain (uses Keccak for Solidity compatibility)
-            vk,
-            false, // low_memory_mode
-        )
-        .unwrap();
-        assert!(valid);
+        );
+        assert!(result.is_ok());
+        let proof = result.unwrap();
+        let valid = verify_noir_proof(circuit_path.clone(), proof);
+        assert!(valid.is_ok());
+        assert!(valid.unwrap());
     }
 }
 ```
@@ -525,28 +408,17 @@ Similar to Circom-based Rust project setup [4. What's next](#4-whats-next)
 
 📢 Ensure you've completed the [General Setup](#-general-setup) before proceeding.
 
-If your ZK prover isn’t included, or you already have your own Rust crate, you can use the `#[uniffi::export]` procedural macro to define custom functions and generate mobile-native bindings from them. For Flutter bindings, you can instead make the function `pub` in `src/lib.rs` to expose it.
+If your ZK prover isn’t included, or you already have your own Rust crate,
+you can use the `#[uniffi::export]` procedural macro to define your own functions and generate mobile-native bindings from them.
 
 ### 1. Define exported functions
 
 Export Rust functions using a procedural macro, as shown below:
 
 ```rust title="src/lib.rs"
-mopro_ffi::app!(); // Enable the mopro-ffi macro to setup FFI configuration.
+mopro_ffi::app!(); // Enable the mopro-ffi macro to generate UniFFI scaffolding.
 
-// for all bindings
-#[cfg_attr(feature = "uniffi", uniffi::export)]
-pub fn hello_world() -> String {
-    "Hello, World!".to_string()
-}
-
-// for iOS, Android, and React Native bindings
 #[uniffi::export]
-pub fn hello_world() -> String {
-    "Hello, World!".to_string()
-}
-
-// for Flutter bindings
 pub fn hello_world() -> String {
     "Hello, World!".to_string()
 }
@@ -558,24 +430,24 @@ For more examples and detailed references, check the [UniFFI documentation](http
 
 You may also bring in other Rust crates to extend functionality.
 
-For instance, to use `semaphore-protocol`, you can add it like this:
+For instance, to use `semaphore-rs`, you can add it like this:
 
 ```toml title="Cargo.toml"
 [dependencies]
-semaphore-protocol = { version = "0.1", features = ["serde"] }
+semaphore-rs = { git = "https://github.com/semaphore-protocol/semaphore-rs", features = ["serde"] }
 ```
 
 ```rust title="src/lib.rs"
-mopro_ffi::app!();
+mopro_ffi::app!(); // Enable the mopro-ffi macro to generate UniFFI scaffolding.
 
-use semaphore::group::Group;
-use semaphore::identity::Identity;
-use semaphore::proof::GroupOrMerkleProof;
-use semaphore::proof::Proof;
-use semaphore::proof::SemaphoreProof;
+use semaphore_rs::group::Group;
+use semaphore_rs::identity::Identity;
+use semaphore_rs::proof::GroupOrMerkleProof;
+use semaphore_rs::proof::Proof;
+use semaphore_rs::proof::SemaphoreProof;
 
-#[cfg_attr(feature = "uniffi", uniffi::export)]
-pub fn semaphore_prove(
+#[uniffi::export]
+fn semaphore_prove(
     id_secret: String,
     leaves: Vec<Vec<u8>>,
     message: String,
@@ -604,8 +476,8 @@ pub fn semaphore_prove(
     return proof_json;
 }
 
-#[cfg_attr(feature = "uniffi", uniffi::export)]
-pub fn semaphore_verify(proof: String) -> bool {
+#[uniffi::export]
+fn semaphore_verify(proof: String) -> bool {
     let proof = SemaphoreProof::import(&proof).unwrap();
     let valid = Proof::verify_proof(proof);
     valid
@@ -618,7 +490,7 @@ pub fn semaphore_verify(proof: String) -> bool {
     #[cfg(test)]
     mod uniffi_tests {
         use super::*;
-        use semaphore::utils::to_element;
+        use semaphore_rs::utils::to_element;
 
         #[test]
         fn test_mopro_uniffi_hello_world() {
@@ -651,22 +523,13 @@ pub fn semaphore_verify(proof: String) -> bool {
 
 Similar to Circom-based Rust project setup [3. Generate bindings for iOS and Android](#3-generate-bindings-for-ios-and-android)
 
-Once the bindings are generated, you'll see your exported functions (e.g., `semaphoreProve`, `semaphoreVerify`) included in the generated code—for example
+Once the bindings are generated, you'll see your exported functions (e.g., `semaphoreProve`, `semaphoreVerify`) included in the generated code—for example, in `MoproiOSBindings/mopro.swift` for iOS and `MoproAndroidBindings/uniffi/mopro/mopro.kt` for Android.
 
--   `MoproiOSBindings/mopro.swift` for iOS
--   `MoproAndroidBindings/uniffi/mopro/mopro.kt` for Android
--   `MoproReactNativeBindings/src/generated/rust_example.ts` for React Native
--   `mopro_flutter_bindings/lib/src/rust/third_party/rust_example.dart` for Flutter
-
-You can then use these functions directly within your iOS, Android, React Native and/or Flutter applications as part of the generated bindings.
+You can then use these functions directly within your iOS and/or Android applications as part of the generated bindings.
 
 ## 📋 Generate Circom bindings
 
-Install the CLI with Cargo:
-
-```sh
-cargo install mopro-cli
-```
+<!-- TODO: update mopro-cli package -->
 
 Install the latest CLI from GitHub:
 
@@ -707,7 +570,7 @@ mopro bindgen --help
 ```
 
 :::warning
-Currently, only the [`rust-witness`](https://github.com/chancehudson/rust-witness), [`witnesscalc-adapter`](https://github.com/zkmopro/witnesscalc_adapter) witness generator is supported.
+Currently, only the [`rust-witness`](https://github.com/chancehudson/rust-witness) witness generator is supported.
 :::
 
 ### 3. What's next
