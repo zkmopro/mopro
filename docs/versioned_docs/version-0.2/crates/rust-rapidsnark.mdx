@@ -1,0 +1,19 @@
+import React, { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+
+export default function RemoteReadme() {
+    const [content, setContent] = useState('');
+
+    useEffect(() => {
+        fetch('https://raw.githubusercontent.com/zkmopro/rust-rapidsnark/refs/heads/main/crates/README.md')
+            .then(res => res.text())
+            .then(text => setContent(text));
+    }, []);
+
+    return <div>
+        <div class="theme-admonition theme-admonition-info admonition_o5H7 alert alert--info">
+            <p>The file is auto generated from loading main branch of <a href="https://github.com/zkmopro/rust-rapidsnark/blob/main/crates/README.md">rust-rapidsnark</a></p>
+        </div>
+        <ReactMarkdown>{content}</ReactMarkdown>
+    </div>;
+}
