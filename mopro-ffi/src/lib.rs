@@ -54,6 +54,16 @@ macro_rules! flutter_setup {
     () => {};
 }
 
+#[macro_export]
+macro_rules! wasm_setup {
+    () => {
+        #[cfg(target_arch = "wasm32")]
+        use wasm_bindgen::prelude::*;
+        #[cfg(target_arch = "wasm32")]
+        use wasm_bindgen_rayon::init_thread_pool;
+    };
+}
+
 /// This macro is used to setup the Mopro FFI library
 /// It should be included in the `lib.rs` file of the project
 ///
@@ -115,5 +125,6 @@ macro_rules! app {
     () => {
         mopro_ffi::uniffi_setup!();
         mopro_ffi::flutter_setup!();
+        mopro_ffi::wasm_setup!();
     };
 }
