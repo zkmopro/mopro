@@ -44,11 +44,29 @@ In this example, we use Circom circuits and their corresponding `.zkey` files. T
 4. **Create a Flutter App**
 
     If you already have Flutter app, you can skip this step.
-    If you don’t have a one, follow [this tutorial](https://codelabs.developers.google.com/codelabs/flutter-codelab-first) to set one up. Or run
+    If you don't have a one, follow [this tutorial](https://codelabs.developers.google.com/codelabs/flutter-codelab-first) to set one up. Or run
 
     ```bash
     flutter create <YOUR_FLUTTER_APP>
     ```
+
+5. **Version Requirements**
+
+    Ensure you meet the following minimum version requirements:
+
+    - **Flutter SDK**: 3.0.0 or higher
+    - **Android**:
+      - `minSdk`: 24
+      - `compileSdk`: 34
+      - `targetSdk`: 34
+    - **JNA**: 5.13.0 (required for Android bindings)
+
+    You can check your Flutter version by running:
+
+    ```bash
+    flutter --version
+    ```
+
 
 ## 1. Copy React Native Module
 
