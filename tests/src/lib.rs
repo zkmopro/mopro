@@ -20,7 +20,10 @@ fn mopro_hello_world() -> String {
 //     mopro_hello_world()
 // }
 
-#[cfg(feature = "wasm")]
+#[cfg_attr(
+    all(feature = "wasm", target_arch = "wasm32"),
+    wasm_bindgen::prelude::wasm_bindgen(js_name = "moproWasmHelloWorld")
+)]
 pub fn mopro_wasm_hello_world() -> String {
     mopro_hello_world()
 }

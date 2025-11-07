@@ -51,6 +51,8 @@ impl PlatformBuilder for WebPlatform {
             mode_cmd,
             "--out-dir",
             bindings_out.to_str().unwrap(),
+            "--features",
+            "wasm",
         ]);
 
         cmd.env(
