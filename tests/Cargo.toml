@@ -18,15 +18,6 @@ thiserror = "2.0.12"
 
 [target.wasm32-unknown-unknown.dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["wasm"] }
-# TODO: only import mopro-ffi and enable wasm features here
-console_error_panic_hook = "0.1.7"
-getrandom = { version = "0.2.15", features = ["js"] }
-log = "0.4"
-serde-wasm-bindgen = "0.6.5"
-wasm-bindgen = { version = "0.2.95", features = ["serde-serialize"] }
-wasm-bindgen-console-logger = "0.1.1"
-wasm-bindgen-futures = "0.4.47"
-wasm-bindgen-rayon = { version = "1.2.2", features = ["no-bundler"] }
 
 [target.wasm32-unknown-unknown.dev-dependencies]
 mopro-ffi = { path = "../mopro-ffi", features = ["wasm"] }

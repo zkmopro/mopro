@@ -3468,16 +3468,8 @@ dependencies = [
 name = "tests"
 version = "0.1.0"
 dependencies = [
- "console_error_panic_hook",
- "getrandom 0.2.15",
- "log",
  "mopro-ffi",
- "serde-wasm-bindgen",
  "thiserror 2.0.12",
- "wasm-bindgen",
- "wasm-bindgen-console-logger",
- "wasm-bindgen-futures",
- "wasm-bindgen-rayon",
 ]
 
 [[package]]

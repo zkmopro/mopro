@@ -54,12 +54,27 @@ macro_rules! flutter_setup {
     () => {};
 }
 
+#[cfg(all(feature = "wasm", target_arch = "wasm32"))]
+pub use console_error_panic_hook;
+#[cfg(all(feature = "wasm", target_arch = "wasm32"))]
+pub use getrandom;
+#[cfg(all(feature = "wasm", target_arch = "wasm32"))]
+pub use serde_wasm_bindgen;
+#[cfg(all(feature = "wasm", target_arch = "wasm32"))]
+pub use wasm_bindgen::*;
+#[cfg(all(feature = "wasm", target_arch = "wasm32"))]
+pub use wasm_bindgen_console_logger;
+#[cfg(all(feature = "wasm", target_arch = "wasm32"))]
+pub use wasm_bindgen_futures;
+#[cfg(all(feature = "wasm", target_arch = "wasm32"))]
+pub use wasm_bindgen_rayon::*;
+
 #[macro_export]
 macro_rules! wasm_setup {
     () => {
-        #[cfg(target_arch = "wasm32")]
+        extern crate mopro_ffi as wasm_bindgen;
+        extern crate mopro_ffi as wasm_bindgen_rayon;
         use wasm_bindgen::prelude::*;
-        #[cfg(target_arch = "wasm32")]
         use wasm_bindgen_rayon::init_thread_pool;
     };
 }
@@ -125,6 +140,7 @@ macro_rules! app {
     () => {
         mopro_ffi::uniffi_setup!();
         mopro_ffi::flutter_setup!();
+        #[cfg(all(feature = "wasm", target_arch = "wasm32"))]
         mopro_ffi::wasm_setup!();
     };
 }
