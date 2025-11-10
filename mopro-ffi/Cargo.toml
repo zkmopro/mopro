@@ -71,3 +71,9 @@ wasm-bindgen-test = { version = "0.3.42" }
 [build-dependencies]
 uuid = { version = "1.9.1", features = ["v4"] }
 camino = "1.1.9"
+
+[dev-dependencies]
+plonk-fibonacci = { package = "plonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+hyperplonk-fibonacci = { package = "hyperplonk-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+gemini-fibonacci = { package = "gemini-fibonacci", git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
+rand = "0.8.5"

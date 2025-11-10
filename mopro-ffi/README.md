@@ -76,6 +76,8 @@ ANDROID_ARCHS=x86_64-linux-android cargo run --bin android # Build for Android x
 
 It will generate bindings for the function you defined with `#[uniffi::export]`. Please checkout [UniFFI | Procedural Macros: Attributes and Derives](https://mozilla.github.io/uniffi-rs/latest/proc_macro/index.html) for more details.
 
+<!-- TODO: Add wasm -->
+
 ### Integration
 
 -   To integrate the generated bindings into your mobile development project, please refer to the appropriate platform-specific setup guides:

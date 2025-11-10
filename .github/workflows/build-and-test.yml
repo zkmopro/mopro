@@ -600,7 +600,7 @@ jobs:
                   sudo ln -sf $CHROME_BIN /opt/google/chrome/chrome
                   echo "Check override chrome version"
                   google-chrome --version
-                  cd mopro-wasm
+                  cd mopro-ffi
                   wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
     test_halo2_wasm_web:
         runs-on: ubuntu-latest
