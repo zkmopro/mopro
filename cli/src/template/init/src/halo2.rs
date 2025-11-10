@@ -4,10 +4,19 @@ use std::error::Error;
 
 use anyhow::Result;
 
+#[cfg(not(target_arch = "wasm32"))]
 pub type Halo2ProveFn =
     fn(&str, &str, HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
 
+#[cfg(not(target_arch = "wasm32"))]
 pub type Halo2VerifyFn = fn(&str, &str, Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
+
+#[cfg(target_arch = "wasm32")]
+pub type Halo2ProveFn =
+    fn(&[u8], &[u8], HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
+
+#[cfg(target_arch = "wasm32")]
+pub type Halo2VerifyFn = fn(&[u8], &[u8], Vec<u8>, Vec<u8>) -> Result<bool, Box<dyn Error>>;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
@@ -46,6 +55,57 @@ pub fn verify_halo2_proof(
     })?;
     verifying_fn(&srs_path, &vk_path, proof, public_input)
         .map_err(|e| MoproError::Halo2Error(format!("error verifying proof: {}", e)))
+}
+
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "generateHalo2Proof"))]
+pub fn generate_halo2_proof_wasm(
+    name: String,
+    srs_key: &[u8],
+    proving_key: &[u8],
+    input: wasm_bindgen::JsValue,
+) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue> {
+    let input: std::collections::HashMap<String, Vec<String>> =
+        serde_wasm_bindgen::from_value(input).map_err(|e| {
+            wasm_bindgen::JsValue::from_str(&format!("Failed to parse input: {}", e))
+        })?;
+
+    let proving_fn = get_halo2_proving_circuit(&name).map_err(|e| {
+        wasm_bindgen::JsValue::from_str(&format!("error getting proving circuit: {}", e))
+    })?;
+
+    // Generate proof
+    let (proof, public_input) = proving_fn(srs_key, proving_key, input)
+        .map_err(|e| wasm_bindgen::JsValue::from_str(&format!("halo2 error: {}", e)))?;
+
+    // Serialize the output back into JsValue
+    serde_wasm_bindgen::to_value(&(proof, public_input))
+        .map_err(|e| wasm_bindgen::JsValue::from_str(&format!("Serialization failed: {}", e)))
+}
+
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "verifyHalo2Proof"))]
+pub fn verify_halo2_proof_wasm(
+    name: String,
+    srs_key: &[u8],
+    verifying_key: &[u8],
+    proof: wasm_bindgen::JsValue,
+    public_inputs: wasm_bindgen::JsValue,
+) -> Result<wasm_bindgen::JsValue, wasm_bindgen::JsValue> {
+    let proof: Vec<u8> = serde_wasm_bindgen::from_value(proof)
+        .map_err(|e| wasm_bindgen::JsValue::from_str(&format!("Failed to parse proof: {}", e)))?;
+    let public_inputs: Vec<u8> = serde_wasm_bindgen::from_value(public_inputs).map_err(|e| {
+        wasm_bindgen::JsValue::from_str(&format!("Failed to parse public_inputs: {}", e))
+    })?;
+
+    let verifying_fn = get_halo2_verifying_circuit(&name).map_err(|e| {
+        wasm_bindgen::JsValue::from_str(&format!("error getting verification circuit: {}", e))
+    })?;
+
+    let is_valid = verifying_fn(srs_key, verifying_key, proof, public_inputs)
+        .map_err(|e| wasm_bindgen::JsValue::from_str(&format!("error verifying proof: {}", e)))?;
+
+    // Serialize the output back into JsValue
+    serde_wasm_bindgen::to_value(&is_valid)
+        .map_err(|e| wasm_bindgen::JsValue::from_str(&format!("Serialization failed: {}", e)))
 }
 
 /// Set the Halo2 circuits that can be used within the mopro library.
@@ -130,6 +190,7 @@ mod test {
     use std::collections::HashMap;
 
     #[test]
+    #[cfg(not(target_arch = "wasm32"))]
     fn test_generate_and_verify_plonk_proof() {
         const SRS_KEY_PATH: &str = "./test-vectors/halo2/plonk_fibonacci_srs.bin";
         const PROVING_KEY_PATH: &str = "./test-vectors/halo2/plonk_fibonacci_pk.bin";
@@ -156,6 +217,7 @@ mod test {
     }
 
     #[test]
+    #[cfg(not(target_arch = "wasm32"))]
     fn test_generate_and_verify_hyperplonk_proof() {
         const SRS_KEY_PATH: &str = "./test-vectors/halo2/hyperplonk_fibonacci_srs.bin";
         const PROVING_KEY_PATH: &str = "./test-vectors/halo2/hyperplonk_fibonacci_pk.bin";
@@ -182,6 +244,7 @@ mod test {
     }
 
     #[test]
+    #[cfg(not(target_arch = "wasm32"))]
     fn test_generate_and_verify_gemini_proof() {
         const SRS_KEY_PATH: &str = "./test-vectors/halo2/gemini_fibonacci_srs.bin";
         const PROVING_KEY_PATH: &str = "./test-vectors/halo2/gemini_fibonacci_pk.bin";

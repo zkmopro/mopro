@@ -1695,7 +1695,7 @@ dependencies = [
 [[package]]
 name = "halo2curves"
 version = "0.3.2"
-source = "git+https://github.com/privacy-scaling-explorations/halo2curves?tag=0.3.2#9f5c50810bbefe779ee5cf1d852b2fe85dc35d5e"
+source = "git+https://github.com/privacy-scaling-explorations/halo2curves.git?tag=0.3.2#9f5c50810bbefe779ee5cf1d852b2fe85dc35d5e"
 dependencies = [
  "ff",
  "group",
@@ -2388,25 +2388,19 @@ dependencies = [
  "anyhow",
  "camino",
  "color-eyre",
+ "console_error_panic_hook",
  "flutter_rust_bridge",
  "fs_extra",
- "thiserror 2.0.12",
- "toml 0.8.22",
- "uniffi",
- "uuid",
-]
-
-[[package]]
-name = "mopro-wasm"
-version = "0.1.0"
-dependencies = [
- "console_error_panic_hook",
  "gemini-fibonacci",
  "getrandom 0.2.15",
  "hyperplonk-fibonacci",
  "plonk-fibonacci",
  "rand 0.8.5",
  "serde-wasm-bindgen",
+ "thiserror 2.0.12",
+ "toml 0.8.22",
+ "uniffi",
+ "uuid",
  "wasm-bindgen",
  "wasm-bindgen-console-logger",
  "wasm-bindgen-futures",
@@ -4273,6 +4267,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "458f7a779bf54acc9f347480ac654f68407d3aab21269a6e3c9f922acd9e2da9"
 dependencies = [
  "getrandom 0.3.2",
+ "js-sys",
+ "wasm-bindgen",
 ]
 
 [[package]]

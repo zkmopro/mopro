@@ -19,7 +19,6 @@ pub use flutter::Flutter;
 mod react_native;
 pub use react_native::ReactNative;
 pub mod utils;
-pub mod write_toml;
 
 pub trait Create {
     const NAME: &'static str;

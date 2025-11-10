@@ -14,6 +14,15 @@ pub fn mopro_hello_world() -> String {
     "Hello, World!".to_string()
 }
 
+#[cfg_attr(
+    feature = "wasm",
+    target_arch = "wasm32",
+    wasm_bindgen(js_name = "moproWasmHelloWorld")
+)]
+pub fn mopro_wasm_hello_world() -> String {
+    "Hello, World!".to_string()
+}
+
 #[cfg(test)]
 mod uniffi_tests {
     #[test]
@@ -21,7 +30,6 @@ mod uniffi_tests {
         assert_eq!(super::mopro_hello_world(), "Hello, World!");
     }
 }
-
 
 // CIRCOM_TEMPLATE
 
