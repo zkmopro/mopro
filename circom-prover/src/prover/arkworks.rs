@@ -114,8 +114,7 @@ fn verify<T: Pairing + FieldSerialization>(
         .iter()
         .map(|v| T::ScalarField::from(v.clone()))
         .collect::<Vec<_>>();
-    let public_inputs_fr = serialized_inputs.to_vec();
     let verified =
-        Groth16::<T, CircomReduction>::verify_with_processed_vk(&pvk, &public_inputs_fr, &proof)?;
+        Groth16::<T, CircomReduction>::verify_with_processed_vk(&pvk, &serialized_inputs, &proof)?;
     Ok(verified)
 }
