@@ -21,7 +21,7 @@ pub fn generate_circom_proof(
         .join()
         .map_err(|_e| anyhow::anyhow!("witness thread panicked"))
         .unwrap();
-    let witnesses_bigint: Vec<BigInt> = witnesses.iter().map(|w| BigInt::from(w.clone())).collect();
+    let witnesses_bigint: Vec<BigInt> = witnesses.into_iter().map(BigInt::from).collect();
     let wtns_buffer = rust_rapidsnark::parse_bigints_to_witness(witnesses_bigint).unwrap();
     let proof = rust_rapidsnark::groth16_prover_zkey_file_wrapper(&zkey_path, wtns_buffer).unwrap();
     let proof_json: serde_json::Value = serde_json::from_str(&proof.proof).unwrap();
