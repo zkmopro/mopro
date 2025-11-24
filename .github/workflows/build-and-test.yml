@@ -18,7 +18,7 @@ jobs:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
             - name: Install minimal dependencies
               uses: awalsh128/cache-apt-pkgs-action@v1
               with:
@@ -36,7 +36,7 @@ jobs:
             RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
             CIRCOM_PROVER_TEST_WITNESS: "1" # Enable witness generation in circom-prover tests
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
             - name: Setup dependencies
               uses: ./.github/actions/setup-deps
               with:
@@ -54,7 +54,7 @@ jobs:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
             - name: Setup Rust
               uses: ./.github/actions/setup-rust
               with:
@@ -70,7 +70,7 @@ jobs:
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         needs: [lint, clippy_check, check_typos]
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
             - name: Setup dependencies
               uses: ./.github/actions/setup-deps
               with:
@@ -93,7 +93,7 @@ jobs:
         needs: [lint, clippy_check, check_typos]
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - name: Install Rust components
               run: |
@@ -124,7 +124,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - name: Prepare template project
               uses: ./.github/actions/mopro-init-project
@@ -150,7 +150,7 @@ jobs:
         runs-on: macos-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - name: Prepare template project
               uses: ./.github/actions/mopro-init-project
@@ -252,7 +252,7 @@ jobs:
         timeout-minutes: 15
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - name: Android SDK
               uses: android-actions/setup-android@v3
@@ -322,7 +322,7 @@ jobs:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - uses: subosito/flutter-action@v2
               with:
@@ -365,7 +365,7 @@ jobs:
         runs-on: macos-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             # Build mopro example project for iOS + Android first, and create RN frameworks
             - name: Prepare template project
@@ -468,7 +468,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - name: Install Rust target (wasm)
               run: rustup target add wasm32-unknown-unknown
@@ -518,7 +518,7 @@ jobs:
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         needs: [lint, clippy_check, check_typos]
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
             - name: Setup dependencies
               uses: ./.github/actions/setup-deps
               with:
@@ -538,7 +538,7 @@ jobs:
             chrome-dir: ${{ steps.parsed-chrome-chromedriver-dir.outputs.chrome-dir }}
             chromedriver-dir: ${{ steps.parsed-chrome-chromedriver-dir.outputs.chromedriver-dir }}
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
             - name: Setup Rust
               uses: ./.github/actions/setup-rust
               with:
@@ -581,7 +581,7 @@ jobs:
             CHROME_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}/chrome
             CHROMEDRIVER_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}/chromedriver
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
             - name: Restore cached wasm-pack
               uses: actions/cache@v4
               with:
@@ -615,7 +615,7 @@ jobs:
             CHROME_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chrome-dir }}/chrome
             CHROMEDRIVER_BIN: ${{ needs.setup_halo2_wasm_env.outputs.chromedriver-dir }}/chromedriver
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
             - name: Restore cached chrome and chromedriver
               uses: actions/cache@v4
               with:
