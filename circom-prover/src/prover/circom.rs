@@ -39,21 +39,13 @@ impl From<&[bls12_381_Fr]> for Inputs {
 
 impl From<Inputs> for Vec<bn254_Fr> {
     fn from(inputs: Inputs) -> Self {
-        inputs
-            .0
-            .iter()
-            .map(|biguint| biguint_to_point(biguint.clone()))
-            .collect()
+        inputs.0.into_iter().map(biguint_to_point).collect()
     }
 }
 
 impl From<Inputs> for Vec<bls12_381_Fr> {
     fn from(inputs: Inputs) -> Self {
-        inputs
-            .0
-            .iter()
-            .map(|biguint| biguint_to_point(biguint.clone()))
-            .collect()
+        inputs.0.into_iter().map(biguint_to_point).collect()
     }
 }
 
@@ -134,13 +126,11 @@ impl G2 {
 
     // BN254
     pub fn to_bn254(self) -> bn254_G2Affine {
-        let c0 = biguint_to_point(self.x[0].clone());
-        let c1 = biguint_to_point(self.x[1].clone());
-        let x = bn254_Fq2::new(c0, c1);
+        let [x0, x1] = self.x;
+        let x = bn254_Fq2::new(biguint_to_point(x0), biguint_to_point(x1));
 
-        let c0 = biguint_to_point(self.y[0].clone());
-        let c1 = biguint_to_point(self.y[1].clone());
-        let y = bn254_Fq2::new(c0, c1);
+        let [y0, y1] = self.y;
+        let y = bn254_Fq2::new(biguint_to_point(y0), biguint_to_point(y1));
 
         if x.is_zero() && y.is_zero() {
             bn254_G2Affine::identity()
@@ -160,13 +150,11 @@ impl G2 {
 
     // BLS12-381
     pub fn to_bls12_381(self) -> bls12_381_G2Affine {
-        let c0 = biguint_to_point(self.x[0].clone());
-        let c1 = biguint_to_point(self.x[1].clone());
-        let x = bls12_381_Fq2::new(c0, c1);
+        let [x0, x1] = self.x;
+        let x = bls12_381_Fq2::new(biguint_to_point(x0), biguint_to_point(x1));
 
-        let c0 = biguint_to_point(self.y[0].clone());
-        let c1 = biguint_to_point(self.y[1].clone());
-        let y = bls12_381_Fq2::new(c0, c1);
+        let [y0, y1] = self.y;
+        let y = bls12_381_Fq2::new(biguint_to_point(y0), biguint_to_point(y1));
 
         if x.is_zero() && y.is_zero() {
             bls12_381_G2Affine::identity()
