@@ -15,14 +15,9 @@ pub fn build() {
     super::build_from_env::<ReactNativePlatform>()
 }
 
-#[derive(Default)]
-pub struct ReactNativeBindingsParams {
-    pub using_noir: bool,
-}
-
 impl PlatformBuilder for ReactNativePlatform {
     type Arch = ReactNativeArch;
-    type Params = ReactNativeBindingsParams;
+    type Params = ();
 
     fn build(
         mode: Mode,

@@ -18,14 +18,9 @@ pub fn build() {
     super::build_from_env::<FlutterPlatform>()
 }
 
-#[derive(Default)]
-pub struct FlutterBindingsParams {
-    pub using_noir: bool,
-}
-
 impl PlatformBuilder for FlutterPlatform {
     type Arch = FlutterArch;
-    type Params = FlutterBindingsParams;
+    type Params = ();
 
     fn build(
         _mode: Mode,
