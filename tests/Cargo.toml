@@ -3,24 +3,6 @@ name = "tests"
 version = "0.1.0"
 edition = "2021"
 
-[[bin]]
-name = "ios"
-path = "bin/ios.rs"
-
-[[bin]]
-name = "android"
-path = "bin/android.rs"
-
-
-[[bin]]
-name = "flutter"
-path = "bin/flutter.rs"
-
-
-[[bin]]
-name = "react-native"
-path = "bin/react_native.rs"
-
 [lib]
 crate-type = ["lib", "cdylib", "staticlib"]
 
@@ -28,7 +10,14 @@ crate-type = ["lib", "cdylib", "staticlib"]
 default = ["uniffi"]
 uniffi = ["mopro-ffi/uniffi"]
 flutter = ["mopro-ffi/flutter"]
+wasm = ["mopro-ffi/wasm"]
 
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
 thiserror = "2.0.12"
+
+[target.wasm32-unknown-unknown.dependencies]
+mopro-ffi = { path = "../mopro-ffi", features = ["wasm"] }
+
+[target.wasm32-unknown-unknown.dev-dependencies]
+mopro-ffi = { path = "../mopro-ffi", features = ["wasm"] }
