@@ -74,7 +74,6 @@ pub fn build_project(
     //
     // Note: 'Yes' indicates that the adapter is compatible with the platform.
     let web_selected = target_selection.contains_platform(Platform::Web);
-    let mut needs_wasm_copy = false;
 
     if web_selected {
         if config.adapter_contains(Adapter::Noir) {
@@ -99,7 +98,6 @@ pub fn build_project(
             )? {
                 style::print_yellow("Build will not be done for the Web platform.".to_string());
                 target_selection.remove_platform(Platform::Web);
-                needs_wasm_copy = true;
             } else {
                 return build_project(
                     &Some(mode.as_str().to_string()),
@@ -110,11 +108,10 @@ pub fn build_project(
                 );
             }
         }
-
-        if config.adapter_contains(Adapter::Halo2) {
-            needs_wasm_copy = true;
-        }
     }
+
+    let needs_wasm_copy = target_selection.contains_platform(Platform::Web)
+        && config.adapter_contains(Adapter::Halo2);
 
     if needs_wasm_copy {
         copy_mopro_wasm_lib()?;
