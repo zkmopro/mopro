@@ -30,6 +30,16 @@ Mopro (Mobile Prover) is a toolkit for ZK app development on mobile. Mopro makes
 
 📖 To learn more about mopro, please refer to the documentation at [zkmopro](https://zkmopro.org/docs/intro).
 
+### Current Version
+
+Latest releases (as of December 2025):
+- **mopro-ffi v0.3.2**
+- **mopro-cli v0.3.2**
+
+These include Flutter support, full Noir integration, proof serialization, and performance improvements.
+
+Check the full [release history](https://github.com/zkmopro/mopro/releases) for details.
+
 ## Repository Structure
 
 This repository contains the following components:
