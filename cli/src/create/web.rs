@@ -21,15 +21,12 @@ impl Create for Web {
         let target_dir = project_dir.join(Self::NAME);
         fs::create_dir(&target_dir)?;
 
-        env::set_current_dir(&target_dir)?;
         fs::write(
             target_dir.join("Cargo.toml"),
             write_toml::mopro_wasm_lib_toml(),
         )?;
         const WEB_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/web");
         copy_embedded_dir(&WEB_TEMPLATE_DIR, &target_dir)?;
-
-        env::set_current_dir(&project_dir)?;
 
         let target_wasm_bindings_dir = target_dir.join("MoproWasmBindings");
         fs::create_dir(target_wasm_bindings_dir.clone())?;
