@@ -379,6 +379,7 @@ jobs:
             - name: Build React Native (release; iOS simulator arm64 + Android x86_64)
               working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
               run: |
+                  rustup default stable
                   rustup target add aarch64-apple-ios-sim x86_64-linux-android
                   "$GITHUB_WORKSPACE/bin/mopro" build \
                     --mode release \
@@ -601,7 +602,7 @@ jobs:
                   echo "Check override chrome version"
                   google-chrome --version
                   cd mopro-ffi
-                  wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --features wasm
+                  wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
     test_halo2_wasm_web:
         runs-on: ubuntu-latest
         needs:
