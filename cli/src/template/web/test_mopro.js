@@ -26,21 +26,28 @@ async function measureTime(callback) {
     return { result, timeTaken: (end - start).toFixed(2) }; // milliseconds
 }
 
+// Get pk and vk from the binary file
+function getNameFromPath(path) {
+    return path.split('/').pop();
+}
+
 // Run a specific test
 async function runTest(testName, input, srs, pk, vk, generateProof, verifyProof) {
     try {
+        const pkName = getNameFromPath(pk);
+        const vkName = getNameFromPath(vk);
         const SRS_KEY = await fetchBinaryFile(srs);
         const PROVING_KEY = await fetchBinaryFile(pk);
         const VERIFYING_KEY = await fetchBinaryFile(vk);
 
         const { result: proofResult, timeTaken: proofTime } = await measureTime(() =>
-            generateProof(SRS_KEY, PROVING_KEY, input)
+            generateProof(pkName, SRS_KEY, PROVING_KEY, input)
         );
 
         const [proof, public_input] = proofResult;
 
         const { result: verifyResult, timeTaken: verifyTime } = await measureTime(() =>
-            verifyProof(SRS_KEY, VERIFYING_KEY, proof, public_input)
+            verifyProof(vkName, SRS_KEY, VERIFYING_KEY, proof, public_input)
         );
 
         return { isValid: verifyResult, proofTime, verifyTime };
@@ -96,8 +103,8 @@ function updateResults(testName, data, resultsTable, allPassedRef, error = null)
             srs: './assets/plonk_fibonacci_srs.bin',
             pk: './assets/plonk_fibonacci_pk.bin',
             vk: './assets/plonk_fibonacci_vk.bin',
-            generateProof: mopro_wasm.generate_plonk_proof,
-            verifyProof: mopro_wasm.verify_plonk_proof,
+            generateProof: mopro_wasm.generateHalo2Proof,
+            verifyProof: mopro_wasm.verifyHalo2Proof,
         },
         {
             name: "HyperPlonk",
@@ -105,8 +112,8 @@ function updateResults(testName, data, resultsTable, allPassedRef, error = null)
             srs: './assets/hyperplonk_fibonacci_srs.bin',
             pk: './assets/hyperplonk_fibonacci_pk.bin',
             vk: './assets/hyperplonk_fibonacci_vk.bin',
-            generateProof: mopro_wasm.generate_hyperplonk_proof,
-            verifyProof: mopro_wasm.verify_hyperplonk_proof,
+            generateProof: mopro_wasm.generateHalo2Proof,
+            verifyProof: mopro_wasm.verifyHalo2Proof,
         },
         {
             name: "Gemini",
@@ -114,8 +121,8 @@ function updateResults(testName, data, resultsTable, allPassedRef, error = null)
             srs: './assets/gemini_fibonacci_srs.bin',
             pk: './assets/gemini_fibonacci_pk.bin',
             vk: './assets/gemini_fibonacci_vk.bin',
-            generateProof: mopro_wasm.generate_gemini_proof,
-            verifyProof: mopro_wasm.verify_gemini_proof,
+            generateProof: mopro_wasm.generateHalo2Proof,
+            verifyProof: mopro_wasm.verifyHalo2Proof,
         }
     ];
 

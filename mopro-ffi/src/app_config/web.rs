@@ -35,6 +35,29 @@ impl PlatformBuilder for WebPlatform {
             panic!("No Cargo.toml found in {:?}", project_dir);
         }
 
+        // Fix package version to meet rust toolchain
+        let mut backtract_cmd = Command::new("cargo");
+        backtract_cmd.args(["update", "-p", "backtrace", "--precise", "0.3.73"]);
+        backtract_cmd.current_dir(project_dir);
+        backtract_cmd
+            .status()
+            .expect("Failed to update backtrace package");
+        if !backtract_cmd.status().is_ok_and(|s| s.success()) {
+            eprintln!("Failed to update backtrace package");
+            std::process::exit(1);
+        }
+
+        let mut indexmap_cmd = Command::new("cargo");
+        indexmap_cmd.args(["update", "-p", "indexmap", "--precise", "2.11.0"]);
+        indexmap_cmd.current_dir(project_dir);
+        indexmap_cmd
+            .status()
+            .expect("Failed to update indexmap package");
+        if !indexmap_cmd.status().is_ok_and(|s| s.success()) {
+            eprintln!("Failed to update indexmap package");
+            std::process::exit(1);
+        }
+
         let mode_cmd = match mode {
             Mode::Release => "--release",
             Mode::Debug => "--dev",
@@ -51,6 +74,9 @@ impl PlatformBuilder for WebPlatform {
             mode_cmd,
             "--out-dir",
             bindings_out.to_str().unwrap(),
+            "--out-name",
+            "mopro_wasm_lib",
+            "--no-default-features",
             "--features",
             "wasm",
         ]);
