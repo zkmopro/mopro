@@ -463,9 +463,8 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                os: [macos-latest, ubuntu-latest]
                 adapter: [halo2] # web build only for halo2
-        runs-on: ${{ matrix.os }}
+        runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
         steps:
             - uses: actions/checkout@v5
