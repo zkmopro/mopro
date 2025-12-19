@@ -1,9 +1,14 @@
 [env]
 CIRCOM_PROVER_TEST_WITNESS = ""
 
+[unstable]
+build-std = ["std", "panic_abort"]
+
 [target.wasm32-unknown-unknown]
-rustflags = ["-C", "target-feature=+atomics,+bulk-memory,+mutable-globals", "-C", "link-arg=--max-memory=4294967296"]
-
-[target.wasm32-unknown-unknown.unstable]
-build-std = "std,panic_abort"
-
+runner = "wasm-pack test --chrome --headless"
+rustflags = [
+    "-C",
+    "target-feature=+atomics,+bulk-memory,+mutable-globals",
+    "-C",
+    "link-arg=--max-memory=4294967296",
+]
