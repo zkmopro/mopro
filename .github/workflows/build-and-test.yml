@@ -486,7 +486,7 @@ jobs:
                   project-name: mopro-example-${{ matrix.adapter }}
                   destination: ${{ runner.temp }}
 
-            - name: Build Web (debug, halo2; auto-confirm prompt)
+            - name: Build Web (release, halo2; auto-confirm prompt)
               working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
               env:
                   CI: "true"
@@ -495,11 +495,11 @@ jobs:
                   rustup component add rust-src --toolchain nightly-2024-07-18
                   # TODO: allow mopro CLI to run fully non-interactive so we can drop the pseudo-tty workaround below
                   if [[ "$RUNNER_OS" == "macOS" ]]; then
-                    printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
+                    printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode release --platforms web
                   else
-                    printf 'y\n' | script -q -c "$GITHUB_WORKSPACE/bin/mopro build --mode debug --platforms web" /dev/null
+                    printf 'y\n' | script -q -c "$GITHUB_WORKSPACE/bin/mopro build --mode release --platforms web" /dev/null
                   fi
-            - name: Create Web framework (debug, halo2)
+            - name: Create Web framework (release, halo2)
               working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
               run: |
                   "$GITHUB_WORKSPACE/bin/mopro" create --framework web
