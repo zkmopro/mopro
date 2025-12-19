@@ -1,8 +1,8 @@
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
-use mopro_ffi::app_config::constants::ReactNativePlatform;
 use mopro_ffi::app_config::constants::{AndroidArch, AndroidPlatform, Arch, IosPlatform, Mode};
+use mopro_ffi::app_config::constants::{ReactNativePlatform, WebPlatform};
 use mopro_ffi::app_config::react_native::ReactNativeBindingsParams;
 use std::env;
 
@@ -196,28 +196,12 @@ pub fn build_project(
                 )?;
             }
             Platform::Web => {
-                let platform_str = selection.platform().as_str();
-                let mut command = std::process::Command::new("cargo");
-                command
-                    .arg("run")
-                    .arg("--bin")
-                    .arg(platform_str)
-                    .arg("--no-default-features")
-                    .arg("--features")
-                    .arg("wasm");
-
-                if mode == Mode::Release {
-                    command.arg("--release");
-                }
-
-                let status = command.status()?;
-
-                if !status.success() {
-                    return Err(anyhow::anyhow!(
-                        "Output with status code {}",
-                        status.code().unwrap()
-                    ));
-                }
+                build_from_str_arch::<WebPlatform>(
+                    mode,
+                    &current_dir,
+                    vec![&"wasm32-unknown-unknown".to_string()],
+                    (),
+                )?;
             }
         }
     }
