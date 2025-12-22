@@ -2373,7 +2373,7 @@ dependencies = [
  "fs_extra",
  "include_dir",
  "indicatif",
- "mopro-ffi 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mopro-ffi",
  "reqwest",
  "serde",
  "toml 0.9.2",
@@ -2406,22 +2406,6 @@ dependencies = [
  "wasm-bindgen-futures",
  "wasm-bindgen-rayon",
  "wasm-bindgen-test",
-]
-
-[[package]]
-name = "mopro-ffi"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ab76ba4b64125efcce020333829de5ceff62661eb0ad2df5c167c7977f317c9"
-dependencies = [
- "anyhow",
- "camino",
- "color-eyre",
- "fs_extra",
- "thiserror 2.0.12",
- "toml 0.8.22",
- "uniffi",
- "uuid",
 ]
 
 [[package]]
@@ -3741,7 +3725,7 @@ dependencies = [
 name = "tests"
 version = "0.1.0"
 dependencies = [
- "mopro-ffi 0.3.3",
+ "mopro-ffi",
  "thiserror 2.0.12",
 ]
 
