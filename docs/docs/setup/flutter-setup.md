@@ -44,11 +44,29 @@ In this example, we use Circom circuits and their corresponding `.zkey` files. T
 4. **Create a Flutter App**
 
     If you already have Flutter app, you can skip this step.
-    If you don’t have a one, follow [this tutorial](https://codelabs.developers.google.com/codelabs/flutter-codelab-first) to set one up. Or run
+    If you don't have a one, follow [this tutorial](https://codelabs.developers.google.com/codelabs/flutter-codelab-first) to set one up. Or run
 
     ```bash
     flutter create <YOUR_FLUTTER_APP>
     ```
+
+5. **Version Requirements**
+
+    Ensure you meet the following minimum version requirements:
+
+    - **Flutter SDK**: 3.0.0 or higher
+    - **Android**:
+      - `minSdk`: 24
+      - `compileSdk`: 34
+      - `targetSdk`: 34
+    - **JNA**: 5.13.0 (required for Android bindings)
+
+    You can check your Flutter version by running:
+
+    ```bash
+    flutter --version
+    ```
+
 
 ## 1. Copy React Native Module
 
@@ -200,6 +218,50 @@ Don't forget to modify the input values for your specific case!
     -   Add the required Rust crate in `Cargo.toml`
     -   Make the function `pub` in `src/lib.rs` to expose it (See the [Rust setup](rust-setup.md#-customize-the-bindings) guide for details).<br/>
         Once exported, the function will be available across all supported platforms.
+
+## ⚠️ Avoid using the `*const ::std::ffi::c_void` type in `lib.rs`
+
+When running Flutter Rust Bridge, this type can cause build errors like:
+
+```sh
+Running Xcode build...
+Xcode build done.                                            3.1s
+Failed to build iOS app
+Error (Xcode): failed to run custom build command for
+`mopro-example-app v0.1.0
+(/Users/...)`
+/Users/.../flutter/ios/Pods/SEVERE:0:0
+```
+
+To identify problematic functions, run:
+
+```sh
+cargo expand --lib
+```
+
+and check for any functions that use `*const ::std::ffi::c_void` as input or output types.
+
+For example, when using `rust_witness::witness!(...)`,
+it may expose public functions that include the `*const ::std::ffi::c_void type`.
+
+To avoid this, wrap the macro inside a private module and expose your own safe public functions instead:
+
+```rust title="src/lib.rs"
+mod witness {
+    rust_witness::witness!(...);
+}
+
+// Expose a safe public function instead of directly using raw pointers
+pub fn generate_circom_proof(
+    zkey_path: String,
+    circuit_inputs: String,
+    proof_lib: ProofLib,
+) -> Result<CircomProofResult, MoproError> {
+    // ...
+}
+```
+
+This approach keeps the FFI layer internal and prevents `*const ::std::ffi::c_void` types from appearing in your public API.
 
 ## ⚠️ Error when running `flutter run --release`
 
