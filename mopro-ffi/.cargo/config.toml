@@ -1,6 +1,3 @@
-[env]
-CIRCOM_PROVER_TEST_WITNESS = ""
-
 [unstable]
 build-std = ["std", "panic_abort"]
 

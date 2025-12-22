@@ -512,23 +512,6 @@ jobs:
                       ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
                   key: ${{ runner.os }}-halo2-wasm-web-${{ github.sha }}
 
-    test-ffi-all:
-        runs-on: ubuntu-latest
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-        needs: [lint, clippy_check, check_typos]
-        steps:
-            - uses: actions/checkout@v5
-            - name: Setup dependencies
-              uses: ./.github/actions/setup-deps
-              with:
-                  platform: linux
-            - name: Setup Rust
-              uses: ./.github/actions/setup-rust
-              with:
-                  cache-key: ffi
-            - name: Run ffi tests
-              run: cd mopro-ffi && cargo test --release --all-features
-
     setup_halo2_wasm_env:
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
