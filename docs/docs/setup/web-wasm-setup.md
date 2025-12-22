@@ -8,7 +8,12 @@ Before proceeding, ensure that **Rust**, **Wasm-Pack** and **Chrome** are instal
 
 This section assumes the existence of a user-defined circuit implementation based on the [PSE Halo2](https://github.com/privacy-scaling-explorations/halo2).
 
-Note that there are multiple Halo2 implementations (e.g., Zcash, PSE, Axiom). Mopro primarily supports the [PSE Halo2](https://github.com/privacy-scaling-explorations/halo2), which is a Plonk backend and works well with [wasm-bindgen-rayon](https://github.com/RReverser/wasm-bindgen-rayon). Refer to the [README](https://github.com/zkmopro/mopro/tree/main/mopro-ffi#introduction-to-wasm-compilation-with-halo2) of mopro-ffi for information about compatibility between Halo2 and Wasm.
+Note that there are multiple Halo2 implementations (e.g., Zcash, PSE, Axiom). Mopro primarily supports the [PSE Halo2](https://github.com/privacy-scaling-explorations/halo2), which is a Plonk backend and works well with [wasm-bindgen-rayon](https://github.com/RReverser/wasm-bindgen-rayon). To enable multithreading in WASM, `wasm-bindgen-rayon` must be used for Halo2.
+
+> Usage with WebAssembly
+> By default, when building to WebAssembly, Rayon will treat it as any other platform without multithreading support and will fall back to sequential iteration. This allows existing code to compile and run successfully with no changes necessary, but it will run slower as it will only use a single CPU core.
+
+from: [Rayon - github](https://github.com/rayon-rs/rayon#usage-with-webassembly)
 
 ## Update `MoproWasmBindings`
 
