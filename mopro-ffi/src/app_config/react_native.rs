@@ -72,12 +72,13 @@ fn install_uniffi_bindgen_react_native() -> anyhow::Result<()> {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
             // Command not found, proceed with installation
             println!("uniffi-bindgen-react-native not found, installing...");
+            let current_path: PathBuf = std::env::current_dir()?;
             let status = Command::new("git")
                 .args([
                     "clone",
                     "https://github.com/jhugman/uniffi-bindgen-react-native.git",
                 ])
-                .current_dir(Path::new(env!("CARGO_MANIFEST_DIR")))
+                .current_dir(current_path.clone())
                 .status()
                 .expect("failed to download uniffi-bindgen-react-native");
             if !status.success() {
@@ -88,10 +89,7 @@ fn install_uniffi_bindgen_react_native() -> anyhow::Result<()> {
 
             let status = Command::new("cargo")
                 .args(["install", "--path", "."])
-                .current_dir(
-                    Path::new(env!("CARGO_MANIFEST_DIR"))
-                        .join("uniffi-bindgen-react-native/crates/ubrn_cli"),
-                )
+                .current_dir(current_path.join("uniffi-bindgen-react-native/crates/ubrn_cli"))
                 .status()
                 .expect("failed to install uniffi-bindgen-react-native");
             if !status.success() {
@@ -99,10 +97,8 @@ fn install_uniffi_bindgen_react_native() -> anyhow::Result<()> {
                     "Failed to install uniffi-bindgen-react-native"
                 ));
             }
-            fs::remove_dir_all(
-                Path::new(env!("CARGO_MANIFEST_DIR")).join("uniffi-bindgen-react-native"),
-            )
-            .expect("failed to remove uniffi-bindgen-react-native");
+            fs::remove_dir_all(current_path.join("uniffi-bindgen-react-native"))
+                .expect("failed to remove uniffi-bindgen-react-native");
         }
         Err(e) => {
             // Other error, propagate it

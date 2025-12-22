@@ -6,76 +6,44 @@ Before proceeding, ensure that **Rust**, **Wasm-Pack** and **Chrome** are instal
 
 ## Support Halo2 Circuit Implementation
 
-This section assumes the existence of a user-defined circuit implementation based on the [PSE Halo2](https://github.com/privacy-scaling-explorations/halo2). 
+This section assumes the existence of a user-defined circuit implementation based on the [PSE Halo2](https://github.com/privacy-scaling-explorations/halo2).
 
-Note that there are multiple Halo2 implementations (e.g., Zcash, PSE, Axiom). Mopro primarily supports the [PSE Halo2](https://github.com/privacy-scaling-explorations/halo2), which is a Plonk backend and works well with [wasm-bindgen-rayon](https://github.com/RReverser/wasm-bindgen-rayon). Refer to the [README](https://github.com/zkmopro/mopro/tree/main/mopro-wasm#introduction-to-wasm-compilation-with-halo2) of mopro-wasm for information about compatibility between Halo2 and Wasm.
+Note that there are multiple Halo2 implementations (e.g., Zcash, PSE, Axiom). Mopro primarily supports the [PSE Halo2](https://github.com/privacy-scaling-explorations/halo2), which is a Plonk backend and works well with [wasm-bindgen-rayon](https://github.com/RReverser/wasm-bindgen-rayon). To enable multithreading in WASM, `wasm-bindgen-rayon` must be used for Halo2.
 
-## Update "mopro-wasm-lib"
+> Usage with WebAssembly
+> By default, when building to WebAssembly, Rayon will treat it as any other platform without multithreading support and will fall back to sequential iteration. This allows existing code to compile and run successfully with no changes necessary, but it will run slower as it will only use a single CPU core.
 
-Once followed ["3. Mopro build"](/docs/getting-started.md#3-build-bindings) for Web(Wasm) in ["Getting Started"](/docs/getting-started.md) page, there is "mopro-wasm-lib" would be generated when it selected with `web` template.
+from: [Rayon - github](https://github.com/rayon-rs/rayon#usage-with-webassembly)
 
-The "mopro-wasm-lib" is the place that compile wasm code eventually. So, it should be updated users Halo2 circuit instead of the example circuit implementations: fibonacci circuit with different backends: "plonk", "hyperplonk" and "gemini".
+## Update `MoproWasmBindings`
 
-### 1. Modify 'Cargo.toml' in the "mopro-wasm-lib"
+Once followed [`mopro init`](/docs/getting-started#2-initialize-adapters) in ["Getting Started"](/docs/getting-started.md) page, there is a Rust project that lets you customize your functions.
+
+### 1. Modify 'Cargo.toml' in the root
 
 The user-defined circuit implementation crate should be added as a dependency manually, as illustrated below:
 
-```rust
-[package]
-name = "mopro-wasm-lib"
-version = "0.1.0"
-edition = "2021"
-
-[lib]
-crate-type = ["rlib", "cdylib"]
-
+```toml
 [dependencies]
-// mopro-wasm = { git = "https://github.com/zkmopro/mopro",features = [
-//     "gemini",
-//     "hyperplonk",
-//     "plonk",
-// ]}
+mopro-ffi = { ... }
+# ...
+# HALO2_DEPENDENCIES
 my-halo2-circuit = { git = "http://github.com/users/my-halo2-circuit.git" }
-
-[target.wasm32-unknown-unknown.dependencies]
-console_error_panic_hook = "0.1.7"
-getrandom = { version = "0.2.15", features = ["js"] }
-serde-wasm-bindgen = "0.6.5"
-wasm-bindgen = { version = "0.2.95", features = ["serde-serialize"] }
-wasm-bindgen-console-logger = "0.1.1"
-wasm-bindgen-futures = "0.4.47"
-wasm-bindgen-rayon = { version = "1.2.2", features = ["no-bundler"] }
-wasm-bindgen-test = "0.3.42"
-
 ```
-
-The `mopro-wasm` crate no longer required for compiling users-defined circuit implementation: **"my-halo2-circuit"** in that case.
 
 ### 2. Create Wrapper Functions for Generate/Verify proof method
 
-To compile Wasm code with the circuit, wrapper functions for generating and verifying proof methods in the user-defined circuit implementation must be created in `mopro-wasm-lib/src/lib.rs`, using the example structure provided below:
+To compile Wasm code with the circuit, wrapper functions for generating and verifying proof methods in the user-defined circuit implementation must be created in `src/lib.rs`, using the example structure provided below:
 
 ```rust
-use my_halo2_circuit;
-
-#[wasm_bindgen]
-pub fn generate_proof(input: JsValue) -> Result<JsValue, JsValue> {
-   // function implementations with `my-halo2-circuit`
-   let proof = my_halo2_circuit::generate_proof(parsed_input);
-   to_value(...)
-}
-
-#[wasm_bindgen]
-pub fn verify_proof(proof: JsValue, public_inputs: JsValue) -> Result<JsValue, JsValue> {
-   // function implementations with `my-halo2-circuit`
-   let result = my_halo2_circuit::verify_proof(parsed_proof, parsed_public_input);
-   to_value(...)
+set_halo2_circuits! {
+    ("my_halo2_circuit_pk.bin", my_halo2_circuit::prove, "my_halo2_circuit_vk.bin", my_halo2_circuit::verify),
 }
 ```
 
 ### 3. Build again for web
 
-To ensure a clean build, remove the existing `MoproWasmBindings` directory in the `mopro-example-app`, which was previously generated with `mopro-wasm-lib`.
+(Optional) To ensure a clean build, remove the existing `MoproWasmBindings` directory in the `mopro-example-app`.
 Then, execute the `mopro build` command again, selecting the "web" platform in `mopro-example-app`:
 
 ```shell
@@ -88,16 +56,32 @@ mopro-example-app $ mopro build
 The wasm code can be imported and used in a web application, as illustrated below:
 
 ```javascript
-const mopro_wasm = await import('./MoproWasmBindings/mopro_wasm_lib.js');
+const mopro_wasm = await import("../MoproWasmBindings/mopro_wasm_lib.js");
 await mopro_wasm.default();
 await mopro_wasm.initThreadPool(navigator.hardwareConcurrency);
 
-async function generateProof (input) {
-      const proof = await mopro_wasm.generate_proof(input);
-      console.log(proof);
+async function fetchBinaryFile(url) {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to load ${url}`);
+    return new Uint8Array(await response.arrayBuffer());
+}
+
+async function generateProof(input) {
+    const name = "my_halo2_circuit_pk";
+    const SRS_KEY = await fetchBinaryFile("./assets/plonk_fibonacci_srs.bin");
+    const PROVING_KEY = await fetchBinaryFile(
+        "./assets/plonk_fibonacci_pk.bin"
+    );
+    const proof = await mopro_wasm.generateHalo2Proof(
+        name,
+        srs_key,
+        proving_key,
+        input
+    );
+    console.log(proof);
 }
 ```
 
 Initializing with `initThreadPool` is necessary to enable multi-threading n WebAssembly within the browser.
 
-Note that the web template generated using the `mopro create` command is currently built only for example circuit implementations: `plonk-fibonacci`, `hyperplonk-fibonacci` and `gemini-fibonacci`. User should modify `index.js` and `index.html` manually if want to use the web template with users' circuit implementation, such as `my-halo2-circuit` in this tutorial.
+Note that the web template generated using the `mopro create` command is currently built only for example circuit implementations: `plonk-fibonacci`, `hyperplonk-fibonacci` and `gemini-fibonacci`. User should modify `test_mopros.js` and `index.html` manually if want to use the web template with users' circuit implementation, such as `my-halo2-circuit` in this tutorial.

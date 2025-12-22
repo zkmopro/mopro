@@ -3,6 +3,7 @@
 // Module containing the Halo2 circuit logic (FibonacciMoproCircuit)
 #[macro_use]
 mod halo2;
+#[cfg(not(target_arch = "wasm32"))]
 pub use halo2::{generate_halo2_proof, verify_halo2_proof, Halo2ProofResult};
 
 set_halo2_circuits! {

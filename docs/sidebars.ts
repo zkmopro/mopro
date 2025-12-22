@@ -65,7 +65,6 @@ const sidebars: SidebarsConfig = {
             label: 'Rust Crates',
             items: [
                 'crates/mopro-ffi',
-                'crates/mopro-wasm',
                 'crates/mopro-cli',
                 'crates/circom-prover',
                 'crates/rust-rapidsnark',

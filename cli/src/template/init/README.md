@@ -87,6 +87,7 @@ mopro build --auto-update
 ```
 
 Or manually:
+
 ```sh
 mopro update
 ```
@@ -108,10 +109,13 @@ After defining your custom functions, run the standard Mopro commands (`mopro bu
 
 ### `wasm_bindgen`
 
-For web (WASM) apps, you can use `#[wasm_bindgen]` in [`mopro-wasm-lib/src/lib.rs`](mopro-wasm-lib/src/lib.rs) to expose custom functions to JavaScript. For example:
+For web (WASM) apps, you can use `#[wasm_bindgen]` in [`src/lib.rs`](src/lib.rs) to expose custom functions to JavaScript. For example:
 
 ```rust
-#[wasm_bindgen(js_name = "moproWasmHelloWorld")]
+#[cfg_attr(
+    all(feature = "wasm", target_arch = "wasm32"),
+    wasm_bindgen(js_name = "moproWasmHelloWorld")
+)]
 pub fn mopro_wasm_hello_world() -> String {
     "Hello, World!".to_string()
 }
@@ -127,26 +131,6 @@ Run tests before building bindings
 curl -L https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar -o jna-5.13.0.jar
 export CLASSPATH=jna-5.13.0.jar
 cargo test
-```
-
-> [!WARNING]  
-> Currently, it isn’t supported by the Noir prover.
-
-Run wasm tests with `wasm-pack`
-
-```sh
-cd mopro-wasm-lib
-```
-
-> [!NOTE]  
-> The `mopro-wasm-lib` crate is created during `mopro build` if you’ve selected the `web` platform.
-
-```sh
-wasm-pack test --safari  # For Safari
-# or
-wasm-pack test --chrome  # For Chrome
-# or
-wasm-pack test --firefox # For Firefox
 ```
 
 ## Community

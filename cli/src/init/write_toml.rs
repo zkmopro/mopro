@@ -13,10 +13,10 @@ crate-type = ["lib", "cdylib", "staticlib"]
 default = ["uniffi"]
 uniffi = ["mopro-ffi/uniffi"]
 flutter = ["mopro-ffi/flutter"]
+wasm = ["mopro-ffi/wasm"]
 
 [dependencies]
-mopro-wasm = { git = "https://github.com/zkmopro/mopro.git" }
-mopro-ffi = "0.3.2"
+mopro-ffi = { version = "0.3" }
 thiserror = "2.0.12"
 anyhow = "1.0.99"
 
@@ -30,11 +30,16 @@ anyhow = "1.0.99"
 # NOIR_BUILD_DEPENDENCIES
 
 [dev-dependencies]
-mopro-ffi = { version = "0.3.2", features = ["uniffi-tests"] }
+mopro-ffi = { version = "0.3", features = ["uniffi-tests"] }
 
 # CIRCOM_DEV_DEPENDENCIES
 # HALO2_DEV_DEPENDENCIES
 # NOIR_DEV_DEPENDENCIES
+
+[target.wasm32-unknown-unknown.dependencies]
+mopro-ffi = { version = "0.3", features = ["wasm"] }
+wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"
 
     "# // TODO - make build dependencies also configurable
 }

@@ -16,6 +16,7 @@ pub mod flutter;
 pub mod ios;
 #[cfg(feature = "uniffi")]
 pub mod react_native;
+pub mod web;
 
 /// Stub for feature "uniffi"
 #[cfg(not(feature = "uniffi"))]

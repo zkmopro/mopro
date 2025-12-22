@@ -1,10 +1,8 @@
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
-use include_dir::include_dir;
-use include_dir::Dir;
-use mopro_ffi::app_config::constants::ReactNativePlatform;
 use mopro_ffi::app_config::constants::{AndroidArch, AndroidPlatform, Arch, IosPlatform, Mode};
+use mopro_ffi::app_config::constants::{ReactNativePlatform, WebPlatform};
 use std::env;
 
 use mopro_ffi::app_config::build_from_str_arch;
@@ -14,7 +12,6 @@ use crate::config::read_config;
 use crate::config::write_config;
 use crate::config::Config;
 use crate::constants::Platform;
-use crate::create::utils::copy_embedded_dir;
 use crate::init::adapter::Adapter;
 use crate::print::print_build_success_message;
 use crate::style;
@@ -109,13 +106,6 @@ pub fn build_project(
         }
     }
 
-    let needs_wasm_copy = target_selection.contains_platform(Platform::Web)
-        && config.adapter_contains(Adapter::Halo2);
-
-    if needs_wasm_copy {
-        copy_mopro_wasm_lib()?;
-    }
-
     // Noir doesn't support `I686Linux` and `Armv7LinuxAbi`
     if config.adapter_contains(Adapter::Noir) {
         let not_allowed_archs = vec![
@@ -198,18 +188,12 @@ pub fn build_project(
                 build_from_str_arch::<ReactNativePlatform>(mode, &current_dir, arch_refs, ())?;
             }
             Platform::Web => {
-                let platform_str = selection.platform().as_str();
-                let mut command = std::process::Command::new("cargo");
-                command.arg("run").arg("--bin").arg(platform_str);
-
-                let status = command.status()?;
-
-                if !status.success() {
-                    return Err(anyhow::anyhow!(
-                        "Output with status code {}",
-                        status.code().unwrap()
-                    ));
-                }
+                build_from_str_arch::<WebPlatform>(
+                    mode,
+                    &current_dir,
+                    vec![&"wasm32-unknown-unknown".to_string()],
+                    (),
+                )?;
             }
         }
     }
@@ -231,47 +215,6 @@ fn print_binding_message(platforms: &[Platform]) -> anyhow::Result<()> {
         let text = format!("- {}/{}", current_dir.display(), platform.binding_dir());
         println!("{}", blue_bold(text.to_string()));
     }
-    Ok(())
-}
-
-fn copy_mopro_wasm_lib() -> anyhow::Result<()> {
-    let cwd = std::env::current_dir()?;
-    let target_dir = cwd.join("mopro-wasm-lib");
-
-    if !target_dir.exists() {
-        const WASM_TEMPLATE_DIR: Dir =
-            include_dir!("$CARGO_MANIFEST_DIR/src/template/mopro-wasm-lib");
-        copy_embedded_dir(&WASM_TEMPLATE_DIR, &target_dir)?;
-    }
-
-    let cargo_toml_path = target_dir.join("Cargo.toml");
-    let cargo_toml = "[package]
-name = \"mopro-wasm-lib\"
-version = \"0.1.0\"
-edition = \"2021\"
-
-[lib]
-crate-type = [\"rlib\", \"cdylib\"]
-
-[dependencies]
-mopro-wasm = { git = \"https://github.com/zkmopro/mopro.git\", features = [
-    \"gemini\",
-    \"hyperplonk\",
-    \"plonk\",
-] }
-
-[target.wasm32-unknown-unknown.dependencies]
-console_error_panic_hook = \"0.1.7\"
-getrandom = { version = \"0.2.15\", features = [\"js\"] }
-serde-wasm-bindgen = \"0.6.5\"
-wasm-bindgen = { version = \"0.2.95\", features = [\"serde-serialize\"] }
-wasm-bindgen-console-logger = \"0.1.1\"
-wasm-bindgen-futures = \"0.4.47\"
-wasm-bindgen-rayon = { version = \"1.2.2\", features = [\"no-bundler\"] }
-wasm-bindgen-test = \"0.3.42\"
-";
-
-    std::fs::write(cargo_toml_path, cargo_toml)?;
     Ok(())
 }
 
