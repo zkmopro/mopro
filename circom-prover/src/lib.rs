@@ -33,7 +33,7 @@ impl CircomProver {
         zkey_path: String,
     ) -> Result<CircomProof> {
         let wit_thread = witness::generate_witness(wit_fn, json_input_str);
-        prover::prove(proof_lib, zkey_path.clone(), wit_thread)
+        prover::prove(proof_lib, zkey_path, wit_thread)
     }
 
     pub fn verify(proof_lib: ProofLib, proof: CircomProof, zkey_path: String) -> Result<bool> {
