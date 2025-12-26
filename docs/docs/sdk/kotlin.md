@@ -91,3 +91,7 @@ val isValid = verifyCircomProof(zkeyPath, proof, ProofLib.ARKWORKS)
 
 Or checkout the [test-e2e](https://github.com/zkmopro/mopro/blob/793626f32ed34dcde382f5f304c301563126bc9d/test-e2e/android/app/src/main/java/com/mopro/mopro_app/MultiplierComponent.kt#L53) app.
 
+:::warning
+The current `mopro-kotlin-package` supports only the Circom `multiplier2` circuit. <br/>
+To use your own circuits, please follow the Getting Started guide and replace the witness function with your own WASM or witness files.
+:::
