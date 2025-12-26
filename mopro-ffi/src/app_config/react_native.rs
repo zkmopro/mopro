@@ -127,32 +127,56 @@ fn generate_react_native_bindings(
         return Err(anyhow::anyhow!("Failed to generate react native bindings"));
     }
 
-    for target_arch in target_archs {
-        let mut platform = "android";
-        if target_arch.as_str().contains("ios") {
-            platform = "ios";
-        }
-        let mut args = vec![
-            "build".to_string(),
-            platform.to_string(),
-            "--and-generate".to_string(),
-        ];
+    let ios_target_string = target_archs
+        .iter()
+        .filter(|arch| arch.as_str().contains("ios"))
+        .map(|arch| arch.as_str())
+        .collect::<Vec<&str>>()
+        .join(",");
+    let android_target_string = target_archs
+        .iter()
+        .filter(|arch| arch.as_str().contains("android"))
+        .map(|arch| arch.as_str())
+        .collect::<Vec<&str>>()
+        .join(",");
+    
+    if !ios_target_string.is_empty() {
+        let platform = "ios";
+        build_for_arch(platform, mode, &ios_target_string, &bindings_dir)?;
+    } else if !android_target_string.is_empty() {
+        let platform = "android";
+        build_for_arch(platform, mode, &android_target_string, &bindings_dir)?;
+    }
 
-        if mode == Mode::Release {
-            args.push("--release".to_string());
-        }
+    Ok(())
+}
 
-        args.push("--targets".to_string());
-        args.push(target_arch.as_str().to_string());
+fn build_for_arch(
+    platform: &str,
+    mode: Mode,
+    target_string: &str,
+    bindings_dir: &Path,
+) -> anyhow::Result<()> {
+    let mut args = vec![
+        "build".to_string(),
+        platform.to_string(),
+        "--and-generate".to_string(),
+    ];
 
-        let status = Command::new("uniffi-bindgen-react-native")
-            .args(&args)
-            .current_dir(&bindings_dir)
-            .status()
-            .expect("failed to build react native bindings");
-        if !status.success() {
-            return Err(anyhow::anyhow!("Failed to build react native bindings"));
-        }
+    if mode == Mode::Release {
+        args.push("--release".to_string());
+    }
+
+    args.push("--targets".to_string());
+    args.push(target_string.to_string());
+
+    let status = Command::new("uniffi-bindgen-react-native")
+        .args(&args)
+        .current_dir(&bindings_dir)
+        .status()
+        .expect("failed to build react native bindings");
+    if !status.success() {
+        return Err(anyhow::anyhow!("Failed to build react native bindings"));
     }
     Ok(())
 }
