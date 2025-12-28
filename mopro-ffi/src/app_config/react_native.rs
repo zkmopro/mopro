@@ -148,6 +148,16 @@ fn generate_react_native_bindings(
         build_for_arch(platform, mode, &android_target_string, &bindings_dir)?;
     }
 
+    // Include the xcframework in the package.json for mopro-react-native-package
+    let npm_status = Command::new("npm")
+        .args(["pkg", "set", "files[]=*.xcframework/**"])
+        .current_dir(bindings_dir)
+        .status()
+        .expect("failed to set files in package.json");
+    if !npm_status.success() {
+        return Err(anyhow::anyhow!("Failed to set files in package.json"));
+    }
+
     Ok(())
 }
 
