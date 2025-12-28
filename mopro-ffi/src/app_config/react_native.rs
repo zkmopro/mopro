@@ -139,7 +139,7 @@ fn generate_react_native_bindings(
         .map(|arch| arch.as_str())
         .collect::<Vec<&str>>()
         .join(",");
-    
+
     if !ios_target_string.is_empty() {
         let platform = "ios";
         build_for_arch(platform, mode, &ios_target_string, &bindings_dir)?;
@@ -172,7 +172,7 @@ fn build_for_arch(
 
     let status = Command::new("uniffi-bindgen-react-native")
         .args(&args)
-        .current_dir(&bindings_dir)
+        .current_dir(bindings_dir)
         .status()
         .expect("failed to build react native bindings");
     if !status.success() {
