@@ -15,37 +15,49 @@ The process includes the following steps:
 
 To get started with building Mopro bindings, refer to the [Getting Started](/docs/getting-started) section.
 If you’d like to generate custom bindings for your own circuits or proving schemes, see the guide:
-[Rust Setup for Android/iOS Bindings](/docs/setup/rust-setup).
+[Rust Setup for Android/iOS Bindings](/docs/setup/rust-setup). Choose the **React Native** platform, or run
 
-Then you will have a `MoproAndroidBindings` and/or `MoproiOSBindings` in the project directory.
+```sh
+mopro build --platform react-native
+```
+
+Then you will have a `MoproReactNativeBindings` in the project directory.
 
 ## Integrate the bindings into a React Native Package
 
-1. Clone the SDK template repository:
+Then, replace the entire bindings directory `MoproReactNativeBindings` with your generated files in the current folder:
 
-```sh
-git clone https://github.com/zkmopro/mopro-react-native-package
+```t
+├── android
+├── babel.config.js
+├── cpp
+├── example # Optional: keep this folder
+├── ios
+├── lib
+├── MoproFfiFramework.xcframework
+├── node_modules
+├── package-lock.json
+├── package.json
+├── README.md
+├── src
+├── tsconfig.build.json
+├── tsconfig.json
+├── turbo.json
+└── ubrn.config.yaml
 ```
 
-2. Replace the generated bindings:
+or running e.g.
 
--   **iOS:** Replace the bindings directory `MoproiOSBindings` with the generated files in the following location:
-    -   `ios/MoproiOSBindings`
--   **Android:** Replace the bindings directory `MoproAndroidBindings/uniffi` and `MoproAndroidBindings/jniLibs` with your generated files in the following location:
-
-    -   `android/src/main/java/uniffi`
-    -   `android/src/main/jniLibs`
-
-3. Define the module API
-
--   **iOS:**
-    -   Define the native module API in [`ios/MoproReactNativePackageModule.swift`](https://github.com/zkmopro/mopro-react-native-package/blob/c859bd92e59c0198a47b2b13bc82e25f193529b6/ios/MoproReactNativePackageModule.swift#L91) to match the React Native type. Please refer to [Expo - Argument Types](https://docs.expo.dev/modules/module-api/#argument-types).
--   **Android:**
-    -   Then define the native module API in [`android/src/main/java/expo/modules/moproreactnativepackage/MoproReactNativePackageModule.kt`](https://github.com/zkmopro/mopro-react-native-package/blob/c859bd92e59c0198a47b2b13bc82e25f193529b6/android/src/main/java/expo/modules/moproreactnativepackage/MoproReactNativePackageModule.kt#L113) to match the React Native type. Please refer to [Expo - Argument Types](https://docs.expo.dev/modules/module-api/#argument-types).
--   **React Native:**
-    -   Define React Native's module APIs to pass messages between React Native and your desired platforms.
-        -   [`src/MoproReactNativePackageModule.ts`](https://github.com/zkmopro/mopro-react-native-package/blob/c859bd92e59c0198a47b2b13bc82e25f193529b6/src/MoproReactNativePackageModule.ts#L9)
-        -   [`src/MoproReactNativePackageView.tsx`](https://github.com/zkmopro/mopro-react-native-package/blob/c859bd92e59c0198a47b2b13bc82e25f193529b6/src/MoproReactNativePackageView.tsx#L9)
+```sh
+cp -R \
+  MoproReactNativeBindings/android \
+  MoproReactNativeBindings/ios \
+  MoproReactNativeBindings/src \
+  MoproReactNativeBindings/lib \
+  MoproReactNativeBindings/MoproFfiFramework.xcframework \
+  MoproReactNativeBindings/package.json \
+  mopro-react-native-package/
+```
 
 ## How to install the React Native SDK via [npm](https://www.npmjs.com/)
 
@@ -62,7 +74,7 @@ Alternatively, you can manually add it to your package.json:
 
 ```json
 "dependencies": {
- "mopro-react-native-package": "github:zkmopro/mopro-react-native-package", // Or change to your own URL
+ "mopro-ffi": "github:zkmopro/mopro-react-native-package", // Or change to your own URL
 }
 ```
 
@@ -71,25 +83,55 @@ Alternatively, you can manually add it to your package.json:
 Here is an example of how to integrate and use this package
 
 ```ts
-import MoproReactNativePackage, { Result } from "mopro-react-native-package";
+import {
+    CircomProofResult,
+    generateCircomProof,
+    ProofLib,
+    verifyCircomProof,
+} from "mopro-ffi";
 
 const circuitInputs = {
     a: [a],
     b: [b],
 };
 
-const proofResult: CircomProofResult =
-    MoproReactNativePackage.generateCircomProof(
-        ZKEY_PATH,
-        JSON.stringify(circuitInputs)
-    );
-
-const isValid: boolean = await MoproReactNativePackage.verifyProof(
+const res: CircomProofResult = await generateCircomProof(
     ZKEY_PATH,
-    parsedProofResult
+    JSON.stringify(circuitInputs),
+    ProofLib.Arkworks
+);
+
+const res: boolean = await verifyCircomProof(
+    ZKEY_PATH,
+    circomProofResult,
+    ProofLib.Arkworks
 );
 
 console.log("Proof verification result:", isValid);
+```
+
+:::note
+To learn how to read a .zkey file from an app, please refer to the [`loadAssets`](https://github.com/zkmopro/react-native-app/blob/7bd97d6256644727253716fddcc4f07c17a61293/src/App.tsx#L30) function in the React Native app.
+:::
+
+:::warning
+The default bindings are built specifically for the `multiplier2` circom circuit. If you'd like to update the circuit or switch to a different proving scheme, please refer to the [How to Build the Package](#how-to-build-the-package) section.<br/>
+Circuit source code: https://github.com/zkmopro/circuit-registry/tree/main/multiplier2<br/>
+Example .zkey file for the circuit: http://ci-keys.zkmopro.org/multiplier2_final.zkey<br/>
+:::
+
+And in `index.js`, for example, replace this with
+
+```diff
+import { AppRegistry } from 'react-native';
+import App from './src/App';
+import { name as appName } from './app.json';
++ import { uniffiInitAsync } from 'mopro-ffi';
+
++ uniffiInitAsync().then(() => {
+    AppRegistry.registerComponent(appName, () => App);
++ });
+
 ```
 
 ## How to run an example app

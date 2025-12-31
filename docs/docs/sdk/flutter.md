@@ -17,7 +17,15 @@ To get started with building Mopro bindings, refer to the [Getting Started](/doc
 If you’d like to generate custom bindings for your own circuits or proving schemes, see the guide:
 [Rust Setup for Android/iOS Bindings](/docs/setup/rust-setup).
 
-Then you will have a `MoproAndroidBindings` and/or `MoproiOSBindings` in the project directory.
+Choose **Flutter** to build the bindings, or run
+
+```sh
+mopro build --platforms flutter
+```
+
+to generate the flutter package.
+
+Then you will have a `mopro_flutter_bindings` in the project directory.
 
 ## Integrate the bindings into a Flutter Package
 
@@ -29,35 +37,42 @@ git clone https://github.com/zkmopro/mopro_flutter_package
 
 2. Replace the generated bindings:
 
--   **iOS:** Replace the bindings directory `MoproiOSBindings` with the generated files in the following location:
-    -   `ios/MoproiOSBindings`
--   **Android:** Replace the bindings directory `MoproAndroidBindings/uniffi` and `MoproAndroidBindings/jniLibs` with your generated files in the following location:
+replace the entire bindings directory `mopro_flutter_package` with your generated files in the current folder:
 
-    -   `android/src/main/kotlin/uniffi`
-    -   `android/src/main/jniLibs`
+```t
+├── android
+├── cargokit
+├── flutter_rust_bridge.yaml
+├── ios
+├── lib
+├── pubspec.yaml
+└── rust
+```
 
-3. Define the module API
+or running e.g.
 
--   **iOS:**
-    -   Define the native module API in [`ios/Classes/MoproFlutterPackagePlugin.swift`](https://github.com/zkmopro/mopro_flutter_package/blob/d0ed1a1ce35b24afca8d8e28ea6dcba230c6b584/ios/Classes/MoproFlutterPackagePlugin.swift#L5) to match the Flutter type. Please refer to [Flutter - Data types support](https://docs.flutter.dev/platform-integration/platform-channels#codec).
--   **Android:**
-    -   Then define the native module API in [`android/src/main/kotlin/com/example/mopro_flutter_package/MoproFlutterPackagePlugin.kt`](https://github.com/zkmopro/mopro_flutter_package/blob/d0ed1a1ce35b24afca8d8e28ea6dcba230c6b584/android/src/main/kotlin/com/example/mopro_flutter_package/MoproFlutterPackagePlugin.kt#L14) to match the Flutter type. Please refer to [Flutter - Data types support](https://docs.flutter.dev/platform-integration/platform-channels#codec).
--   **Flutter:**
-    -   Define Flutter's platform channel APIs to pass messages between Flutter and your desired platforms.
-        -   [`lib/mopro_flutter_package_method_channel.dart`](https://github.com/zkmopro/mopro_flutter_package/blob/d0ed1a1ce35b24afca8d8e28ea6dcba230c6b584/lib/mopro_flutter_package_method_channel.dart#L8)
-        -   [`lib/mopro_flutter_package_platform_interface.dart`](https://github.com/zkmopro/mopro_flutter_package/blob/d0ed1a1ce35b24afca8d8e28ea6dcba230c6b584/lib/mopro_flutter_package_platform_interface.dart#L6)
-        -   [`lib/mopro_flutter_package.dart`](https://github.com/zkmopro/mopro_flutter_package/blob/d0ed1a1ce35b24afca8d8e28ea6dcba230c6b584/lib/mopro_flutter_package.dart#L15)
+```sh
+cp -R \
+  mopro_flutter_bindings/android \
+  mopro_flutter_bindings/cargokit \
+  mopro_flutter_bindings/flutter_rust_bridge.yaml \
+  mopro_flutter_bindings/ios \
+  mopro_flutter_bindings/lib \
+  mopro_flutter_bindings/pubspec.yaml \
+  mopro_flutter_bindings/rust \
+  mopro_flutter_package/
+```
 
 ## How to install the Flutter SDK
 
-Add `mopro_flutter_package` to your project by manually editing `pubspec.yaml`.
+Add `mopro_flutter_bindings` to your project by manually editing `pubspec.yaml`.
 
 ```yaml
 dependencies:
     flutter:
         sdk: flutter
 
-    mopro_flutter_package: # Or change to your own package name
+    mopro_flutter_bindings: # Or change to your own package name
         git:
             url: https://github.com/zkmopro/mopro_flutter_package # Or change to your own URL
 ```
@@ -89,12 +104,27 @@ flutter pub get
 
 Here is an example of how to integrate and use this package
 
+Update the main function to initialize the Rust library before running the app:
+
+```dart
+void main() async {
+  await RustLib.init();
+  runApp(const MyApp());
+}
+```
+
+Import the package and use it:
+
 ```dart
 // Import the package
-import 'package:mopro_flutter_package/mopro_flutter_package.dart';
-import 'package:mopro_flutter_package/mopro_flutter_types.dart';
+import 'package:mopro_flutter_bindings/src/rust/third_party/mopro_example_app.dart'; // Change to your library name
+import 'package:mopro_flutter_bindings/src/rust/frb_generated.dart';
 
-final MoproFlutterPackage _mopro = MoproFlutterPackage();
+final zkeyPath = await copyAssetToFileSystem(
+    'assets/multiplier2_final.zkey',
+)
+
+// Corresponds to the inputs of multiplier2.circom
 const int a = 3;
 const int b = 5;
 final Map<String, List<String>> inputs = {
@@ -104,16 +134,22 @@ final Map<String, List<String>> inputs = {
 // Convert inputs to JSON string
 final String inputsJson = jsonEncode(inputs);
 
-final GenerateProofResult proofResult = await _mopro.generateProof(
-    zkeyPath: zkeyAssetName, // Use the zkey asset path provided in pubspec.yaml (e.g. "assets/multiplier2_final.zkey")
-    inputs: inputsJson,
+// Use the zkey asset path provided in pubspec.yaml
+final CircomProofResult proofResult = await generateCircomProof(
+    zkeyPath: zkeyPath,
+    circuitInputs: inputsJson,
+    proofLib: ProofLib.arkworks,
 );
 
-final bool isValid = await _mopro.verifyProof(
-    zkeyPath: zkeyAssetName, // Use the same zkey asset path
-    proof: proofResult.proof, // Use the generated proof
-    inputs: proofResult.inputs, // Use the public inputs from proof generation
+final bool isValid = await verifyCircomProof(
+    zkeyPath: zkeyPath,
+    proofResult: proofResult,
+    proofLib: ProofLib.arkworks,
 );
+
+print('Generated Proof: ${proofResult.proof}');
+print('Public Inputs/Outputs: ${proofResult.inputs}');
+print('Verification result: $isValid');
 ```
 
 ## How to run an example app
