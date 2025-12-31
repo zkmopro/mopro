@@ -10,16 +10,18 @@ You can explore real examples of how the Noir adapter works in these projects:
 -   [stealthnote-mobile](https://github.com/vivianjeng/stealthnote-mobile)
 -   [mopro-wallet-connect-noir](https://github.com/moven0831/mopro-wallet-connect-noir)
 
+Or follow the mopro CLI [getting started](/docs/getting-started) and select the **Noir** adapter to see how to implement a Noir prover using mopro.
+
 ## Setting Up the Rust Project
 
-To get started, follow the [Rust Setup Guide](/setup/rust-setup.md) and activate the `noir` feature in your `Cargo.toml`:
+To get started, follow the [Rust Setup Guide](/setup/rust-setup.md) and ensure the `noir_rs` package is imported:
 
 ```toml
-[features]
-default = ["mopro-ffi/noir"]
-
 [dependencies]
-mopro-ffi = { version = "0.2" }
+noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
+    "barretenberg",
+    "android-compat",
+], branch = "v1.0.0-beta.8-3" }
 # ...
 ```
 
@@ -35,16 +37,16 @@ The Noir adapter depends on [`zkmopro/noir-rs`](https://github.com/zkmopro/noir-
 
 The Noir adapter supports two functions as oracle hash options for different use cases:
 
-- **Poseidon hash**: Default choice, optimized for performance and off-chain verification
-- **Keccak256 hash**: Gas-efficient, required for Solidity verifier compatibility and on-chain verification
+-   **Poseidon hash**: Default choice, optimized for performance and off-chain verification
+-   **Keccak256 hash**: Gas-efficient, required for Solidity verifier compatibility and on-chain verification
 
 The hash function is automatically selected based on the `on_chain` parameter.
 
 ### Key Features
 
-- **Automatic Hash Selection**: Automatically chooses between Poseidon (performance) and Keccak256 (EVM compatibility) based on your use case
-- **Memory Optimization**: Low memory mode available for mobile devices
-- **Cross-Platform**: Works across iOS, Android, and other supported platforms
+-   **Automatic Hash Selection**: Automatically chooses between Poseidon (performance) and Keccak256 (EVM compatibility) based on your use case
+-   **Memory Optimization**: Low memory mode available for mobile devices
+-   **Cross-Platform**: Works across iOS, Android, and other supported platforms
 
 ## Proving and Verifying Functions
 
@@ -84,19 +86,19 @@ pub fn get_noir_verification_key(
 
 ### Parameters
 
-- `circuit_path`: Path to the compiled Noir `.json` circuit
-- `srs_path`: Optional path to the structured reference string
-- `inputs`: List of strings representing public/private inputs (proof generation only)
-- `proof`: The serialized proof to verify (verification only)
-- `on_chain`: If `true`, uses Keccak256 hash for Solidity compatibility; if `false`, uses Poseidon hash for better performance
-- `vk`: Pre-generated verification key bytes
-- `low_memory_mode`: Enables memory optimization for resource-constrained environments
+-   `circuit_path`: Path to the compiled Noir `.json` circuit
+-   `srs_path`: Optional path to the structured reference string
+-   `inputs`: List of strings representing public/private inputs (proof generation only)
+-   `proof`: The serialized proof to verify (verification only)
+-   `on_chain`: If `true`, uses Keccak256 hash for Solidity compatibility; if `false`, uses Poseidon hash for better performance
+-   `vk`: Pre-generated verification key bytes
+-   `low_memory_mode`: Enables memory optimization for resource-constrained environments
 
 ### Usage Notes
 
-- **Hash Selection**: Set `on_chain = true` for Ethereum/EVM compatibility, or `on_chain = false` for better performance
-- **Verification Keys**: Pre-generate verification keys using `get_noir_verification_key` and reuse them for better performance
-- **Memory Optimization**: Enable `low_memory_mode = true` for resource-constrained mobile environments
+-   **Hash Selection**: Set `on_chain = true` for Ethereum/EVM compatibility, or `on_chain = false` for better performance
+-   **Verification Keys**: Pre-generate verification keys using `get_noir_verification_key` and reuse them for better performance
+-   **Memory Optimization**: Enable `low_memory_mode = true` for resource-constrained mobile environments
 
 ## Platform Support
 
@@ -114,3 +116,70 @@ The Noir adapter supports the following target platforms with Barretenberg backe
 | Linux Desktop           | `x86_64-unknown-linux-gnu` | ✅     |
 
 All platforms use pre-compiled Barretenberg binaries automatically downloaded from [zkmopro/aztec-packages releases](https://github.com/zkmopro/aztec-packages/releases) during the build process.
+
+## Using the Library
+
+After you have specified the circuits you want to use, you can follow the usual steps to build the library and use it in your project.
+
+### iOS API
+
+The Noir adapter exposes the following functions to be used in the iOS project:
+
+### `generateNoirProof`
+
+```swift
+public func generateNoirProof(circuitPath: String, srsPath: String?, inputs: [String], onChain: Bool, vk: Data, lowMemoryMode: Bool)throws  -> Data 
+```
+
+### `verifyNoirProof`
+
+```swift
+public func verifyNoirProof(circuitPath: String, proof: Data, onChain: Bool, vk: Data, lowMemoryMode: Bool)throws  -> Bool  
+```
+
+### `getNoirVerificationKey`
+
+```swift
+public func getNoirVerificationKey(circuitPath: String, srsPath: String?, onChain: Bool, lowMemoryMode: Bool)throws  -> Data  {
+
+```
+
+### Android API
+
+The Noir adapter exposes the equivalent functions and types to be used in the Android project.
+
+### `generateNoirProof`
+
+```kotlin
+fun `generateNoirProof`(
+    `circuitPath`: kotlin.String,
+    `srsPath`: kotlin.String?,
+    `inputs`: List<kotlin.String>,
+    `onChain`: kotlin.Boolean,
+    `vk`: kotlin.ByteArray,
+    `lowMemoryMode`: kotlin.Boolean,
+): kotlin.ByteArray
+```
+
+### `verifyNoirProof`
+
+```kotlin
+fun `verifyNoirProof`(
+    `circuitPath`: kotlin.String,
+    `proof`: kotlin.ByteArray,
+    `onChain`: kotlin.Boolean,
+    `vk`: kotlin.ByteArray,
+    `lowMemoryMode`: kotlin.Boolean,
+): kotlin.Boolean
+```
+
+### `getNoirVerificationKey`
+
+```kotlin
+fun `getNoirVerificationKey`(
+    `circuitPath`: kotlin.String,
+    `srsPath`: kotlin.String?,
+    `onChain`: kotlin.Boolean,
+    `lowMemoryMode`: kotlin.Boolean,
+): kotlin.ByteArray
+```

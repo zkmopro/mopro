@@ -15,8 +15,9 @@ Use Circom to compile your `.circom` file into `.wasm` and `.r1cs` files:
 ```sh
 circom <your_circuit>.circom --wasm --r1cs -o <output_dir>
 ```
-- `<your_circuit>.circom`: your circuit source file
-- `<output_dir>`: directory for output files (e.g., `test-vectors/circom/`)
+
+-   `<your_circuit>.circom`: your circuit source file
+-   `<output_dir>`: directory for output files (e.g., `test-vectors/circom/`)
 
 ### 2. Trusted Setup (Powers of Tau)
 
@@ -59,20 +60,17 @@ See the [circom-prover README](https://github.com/zkmopro/mopro/blob/main/circom
 
 ## Samples
 
-Explore how the Circom adapter is implemented by checking out the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
+Please follow the mopro CLI [getting started](/docs/getting-started) and select the **Circom** adapter to see how to implement a Circom prover using mopro.
 
 ## Setup the rust project
 
 You can follow the instructions in the [Rust Setup](/setup/rust-setup.md) guide to create a new Rust project that builds this library with Circom proofs.
 
-In your `Cargo.toml` file, ensure the `circom` feature is activated for `mopro-ffi`:
+In your `Cargo.toml` file, ensure the `circom-prover` package is imported:
 
 ```toml
-[features]
-default = ["mopro-ffi/circom"]
-
 [dependencies]
-mopro-ffi = { version = "0.2" }
+circom-prover = "0.1"
 # ...
 ```
 
@@ -94,7 +92,7 @@ type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 
 -   Implementing the Witness Function
 
-For simplicity, you can use the `witness!` macro provided by the `rust-witness` crate. This macro generates a witness function for you given the circuit name. You can read more about the `witness!` macro [here](https://github.com/vimwitch/rust-witness).
+For simplicity, you can use the `witness!` macro provided by the `rust-witness` crate. This macro generates a witness function for you given the circuit name. You can read more about the `witness!` macro [here](https://github.com/chancehudson/rust-witness).
 
 -   Adding the `rust-witness` Crate Dependency
 
@@ -151,7 +149,7 @@ rust_witness::witness!(multiplier3);
 rust_witness::witness!(keccak256256test);
 ```
 
-This will generate the witness function for the specified circuit following [the naming convention here](https://github.com/vimwitch/rust-witness?tab=readme-ov-file#rust-witness).
+This will generate the witness function for the specified circuit following [the naming convention here](https://github.com/chancehudson/rust-witness?tab=readme-ov-file#rust-witness).
 
 ### [`witnesscalc_adapter`](https://github.com/zkmopro/witnesscalc_adapter)
 
@@ -178,7 +176,7 @@ To use it, you must first add the `witnesscalc-adapter` crate to your `Cargo.tom
 ```toml
 [dependencies]
 # ...
-mopro-ffi = { version="0.2", features = ["witnesscalc"] } # activate witnesscalc feature
+circom-prover = { version="0.1", features = ["witnesscalc"] } # activate witnesscalc feature
 witnesscalc-adapter = "0.1"
 
 [build-dependencies]
@@ -238,7 +236,7 @@ To use it, you only need to activate the `circom-witnesscalc` feature in `mopro-
 ```toml
 [dependencies]
 # ...
-mopro-ffi = { version= "0.2", features = ["circom-witnesscalc"] } # activate circom-witnesscalc feature
+circom-prover = { version= "0.1", features = ["circom-witnesscalc"] } # activate circom-witnesscalc feature
 ```
 
 -   Use the Mopro helper to enable the graph functionality in your project.
@@ -308,11 +306,11 @@ Mopro now supports 2 Circom provers. You can find more information in [the blog 
 ```toml
 [dependencies]
 # ...
-mopro-ffi = { version= "0.2", features = ["rapidsnark"] } # activate rapidsnark feature
+circom-prover = { version= "0.1", features = ["rapidsnark"] } # activate rapidsnark feature
 
 [build-dependencies]
 # ...
-mopro-ffi = { version= "0.2", features = ["rapidsnark"] } # activate rapidsnark featurer
+circom-prover = { version= "0.1", features = ["rapidsnark"] } # activate rapidsnark featurer
 ```
 
 ## Generate Proofs

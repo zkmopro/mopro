@@ -4,20 +4,17 @@ Mopro supports the use of Halo2 circuits, allowing for both the Halo2 library fr
 
 ## Samples
 
-Explore how the Halo2 adapter is implemented by checking out the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
+Please follow the mopro CLI [getting started](/docs/getting-started) and select the **Halo2** adapter to see how to implement a Halo2 circuit using mopro.
 
 ## Setting Up the Rust Project
 
-You can start by following the general instructions in the [Rust Setup Guide](/setup/rust-setup.md) to create a new Rust project for building libraries with Circom proofs. However, you will need to perform these specific adjustments for Halo2:
+You can start by following the general instructions in the [Rust Setup Guide](/setup/rust-setup.md) to create a new Rust project for building libraries with halo2 proofs. However, you will need to perform these specific adjustments for Halo2:
 
-In your `Cargo.toml` file, ensure the `halo2` feature is activated for `mopro-ffi`:
+In your `Cargo.toml` file, ensure the `halo2` circuit package is imported, e.g. fibonacci circuit:
 
 ```toml
-[features]
-default = ["mopro-ffi/halo2"]
-
 [dependencies]
-mopro-ffi = { version = "0.2" }
+plonk-fibonacci   = { package = "plonk-fibonacci",   git = "https://github.com/sifnoc/plonkish-fibonacci-sample.git" }
 # ...
 ```
 
@@ -36,20 +33,24 @@ The design of the Halo2 adapter minimizes restrictions, allowing flexibility in 
 When generating a proof for a Halo2 circuit, the Mopro will do a call to the proving function that you provide. This function should have the following signature:
 
 ```rust
-pub type Halo2ProveFn = fn(&str, &str, HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
+pub type Halo2ProveFn =
+    fn(&str, &str, HashMap<String, Vec<String>>) -> Result<(Vec<u8>, Vec<u8>), Box<dyn Error>>;
 ```
 
 The first two arguments are the path to the `srs` and `proving` key files, and the third argument is a map of the inputs for the circuit.
 
 It is then your responsibility to load the keys from the path and set up the circuit, as well as to deserialize the inputs and generate the proof. You can use any serialization method you want, as long as you can serialize and deserialize the inputs on the target platform.
 
-The result of the function should be a `GenerateProofResult` struct, which contains the proof and the public inputs in the form of `Vec<u8>`. It is up to you to serialize the proof and the public inputs in a way that you can deserialize.
+The result of the function should be a `Halo2ProofResult` struct, which contains the proof and the public inputs in the form of `Vec<u8>`. It is up to you to serialize the proof and the public inputs in a way that you can deserialize.
 
 ```rust
-pub type GenerateProofResult = (Vec<u8>, Vec<u8>);
+pub struct Halo2ProofResult {
+    pub proof: Vec<u8>,
+    pub inputs: Vec<u8>,
+}
 ```
 
-You can find an example of a proving function in the [Halo2 Fibonacci circuit sample](https://github.com/ElusAegis/halo2-fibonacci-sample/blob/main/src/lib.rs).
+You can find an example of a proving function in the [Halo2 Fibonacci circuit sample](https://github.com/sifnoc/plonkish-fibonacci-sample/blob/main/plonk/src/lib.rs).
 
 ### Verifying Function
 
@@ -66,7 +67,7 @@ Make sure that your deserialization method is compatible with the serialization 
 
 The result of the function should be a `bool`, which indicates whether the proof is valid or not.
 
-You can find an example of a verifying function in the [Halo2 Fibonacci sample project](https://github.com/ElusAegis/halo2-fibonacci-sample/blob/main/src/lib.rs).
+You can find an example of a verifying function in the [Halo2 Fibonacci sample project](https://github.com/sifnoc/plonkish-fibonacci-sample/blob/main/plonk/src/lib.rs).
 
 ### Setting the Halo2 Circuits
 
@@ -75,7 +76,7 @@ To set the Halo2 circuits in your project, you need to use the `set_halo2_circui
 For example:
 
 ```rust
-mopro_ffi::set_halo2_circuits! {
+set_halo2_circuits! {
     ("plonk_fibonacci_pk.bin", plonk_fibonacci::prove, "plonk_fibonacci_vk.bin", plonk_fibonacci::verify),
 }
 ```
