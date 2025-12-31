@@ -12,7 +12,7 @@ MoPro stands for **Mobile Prover** — a framework designed to simplify the deve
 
 -   **Modular:** Choose one or more adapters from `mopro-ffi`—currently supporting Circom, Halo2, and Noir. You can also integrate your own Rust crate. See [Custom Adapters](https://zkmopro.org/docs/adapters/overview#custom-adapters) for details.
 -   **Versatile:** Generate templates for various platforms including _Swift (Xcode)_, _Kotlin (Android Studio)_, _React Native_, _Flutter_, and _Web_.
--   **Automated:** Skip the tedious setup—`mopro` CLI automates [UniFFI](https://github.com/mozilla/uniffi-rs) bindings and configures Xcode and Android Studio for you.
+-   **Automated:** Skip the tedious setup—`mopro` CLI automates [UniFFI](https://github.com/mozilla/uniffi-rs), [`flutter_rust_bridge`](https://github.com/fzyzcjy/flutter_rust_bridge), [`uniffi-bindgen-react-native`](https://github.com/jhugman/uniffi-bindgen-react-native) and [`wasm-bindgen`](https://github.com/wasm-bindgen/wasm-bindgen) with rayon bindings and configures Xcode, Android Studio, flutter, react native, and web for you.
 
 ## Usage
 

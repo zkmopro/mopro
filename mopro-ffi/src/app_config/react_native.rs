@@ -72,12 +72,13 @@ fn install_uniffi_bindgen_react_native() -> anyhow::Result<()> {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
             // Command not found, proceed with installation
             println!("uniffi-bindgen-react-native not found, installing...");
+            let current_path: PathBuf = std::env::current_dir()?;
             let status = Command::new("git")
                 .args([
                     "clone",
                     "https://github.com/jhugman/uniffi-bindgen-react-native.git",
                 ])
-                .current_dir(Path::new(env!("CARGO_MANIFEST_DIR")))
+                .current_dir(current_path.clone())
                 .status()
                 .expect("failed to download uniffi-bindgen-react-native");
             if !status.success() {
@@ -88,10 +89,7 @@ fn install_uniffi_bindgen_react_native() -> anyhow::Result<()> {
 
             let status = Command::new("cargo")
                 .args(["install", "--path", "."])
-                .current_dir(
-                    Path::new(env!("CARGO_MANIFEST_DIR"))
-                        .join("uniffi-bindgen-react-native/crates/ubrn_cli"),
-                )
+                .current_dir(current_path.join("uniffi-bindgen-react-native/crates/ubrn_cli"))
                 .status()
                 .expect("failed to install uniffi-bindgen-react-native");
             if !status.success() {
@@ -99,10 +97,8 @@ fn install_uniffi_bindgen_react_native() -> anyhow::Result<()> {
                     "Failed to install uniffi-bindgen-react-native"
                 ));
             }
-            fs::remove_dir_all(
-                Path::new(env!("CARGO_MANIFEST_DIR")).join("uniffi-bindgen-react-native"),
-            )
-            .expect("failed to remove uniffi-bindgen-react-native");
+            fs::remove_dir_all(current_path.join("uniffi-bindgen-react-native"))
+                .expect("failed to remove uniffi-bindgen-react-native");
         }
         Err(e) => {
             // Other error, propagate it
@@ -131,32 +127,66 @@ fn generate_react_native_bindings(
         return Err(anyhow::anyhow!("Failed to generate react native bindings"));
     }
 
-    for target_arch in target_archs {
-        let mut platform = "android";
-        if target_arch.as_str().contains("ios") {
-            platform = "ios";
-        }
-        let mut args = vec![
-            "build".to_string(),
-            platform.to_string(),
-            "--and-generate".to_string(),
-        ];
+    let ios_target_string = target_archs
+        .iter()
+        .filter(|arch| arch.as_str().contains("ios"))
+        .map(|arch| arch.as_str())
+        .collect::<Vec<&str>>()
+        .join(",");
+    let android_target_string = target_archs
+        .iter()
+        .filter(|arch| arch.as_str().contains("android"))
+        .map(|arch| arch.as_str())
+        .collect::<Vec<&str>>()
+        .join(",");
 
-        if mode == Mode::Release {
-            args.push("--release".to_string());
-        }
+    if !ios_target_string.is_empty() {
+        let platform = "ios";
+        build_for_arch(platform, mode, &ios_target_string, &bindings_dir)?;
+    } else if !android_target_string.is_empty() {
+        let platform = "android";
+        build_for_arch(platform, mode, &android_target_string, &bindings_dir)?;
+    }
 
-        args.push("--targets".to_string());
-        args.push(target_arch.as_str().to_string());
+    // Include the xcframework in the package.json for mopro-react-native-package
+    let npm_status = Command::new("npm")
+        .args(["pkg", "set", "files[]=*.xcframework/**"])
+        .current_dir(bindings_dir)
+        .status()
+        .expect("failed to set files in package.json");
+    if !npm_status.success() {
+        return Err(anyhow::anyhow!("Failed to set files in package.json"));
+    }
 
-        let status = Command::new("uniffi-bindgen-react-native")
-            .args(&args)
-            .current_dir(&bindings_dir)
-            .status()
-            .expect("failed to build react native bindings");
-        if !status.success() {
-            return Err(anyhow::anyhow!("Failed to build react native bindings"));
-        }
+    Ok(())
+}
+
+fn build_for_arch(
+    platform: &str,
+    mode: Mode,
+    target_string: &str,
+    bindings_dir: &Path,
+) -> anyhow::Result<()> {
+    let mut args = vec![
+        "build".to_string(),
+        platform.to_string(),
+        "--and-generate".to_string(),
+    ];
+
+    if mode == Mode::Release {
+        args.push("--release".to_string());
+    }
+
+    args.push("--targets".to_string());
+    args.push(target_string.to_string());
+
+    let status = Command::new("uniffi-bindgen-react-native")
+        .args(&args)
+        .current_dir(bindings_dir)
+        .status()
+        .expect("failed to build react native bindings");
+    if !status.success() {
+        return Err(anyhow::anyhow!("Failed to build react native bindings"));
     }
     Ok(())
 }

@@ -34,8 +34,8 @@ const FeatureList: FeatureItem[] = [
         Svg: require("@site/static/img/blue_angle.svg").default,
         description: (
             <>
-                Support for Circom, Halo2 and Noir. It is also easy to
-                integrate with other proving systems.
+                Support for Circom, Halo2 and Noir. It is also easy to integrate
+                with other proving systems.
             </>
         ),
     },
@@ -56,7 +56,7 @@ const AdditionalFeatureList = [
         title: "WebAssembly (WASM) Support",
         description: (
             <>
-                <a href="https://github.com/zkmopro/mopro/tree/main/mopro-wasm">
+                <a href="https://github.com/zkmopro/mopro/tree/main/mopro-ffi">
                     mopro-wasm
                 </a>
                 : Generates WebAssembly (WASM) with Rayon for browser

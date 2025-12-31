@@ -56,18 +56,6 @@ This repository contains the following components:
         </tr>
         <tr>
             <td>
-                <a href="https://github.com/zkmopro/mopro/tree/main/mopro-wasm">
-                    mopro-wasm
-                </a>
-            </td>
-            <td> WIP
-            </td>
-            <td>
-                Uses <a href="https://github.com/rustwasm/wasm-bindgen">wasm-bindgen</a> to generate bindings for web environments, with rayon support for parallel performance. It includes a build script to streamline ZK integration for WASM projects.
-            </td>
-        </tr>
-        <tr>
-            <td>
                 <a href="https://github.com/zkmopro/mopro/tree/main/cli">
                     mopro-cli
                 </a>
@@ -105,7 +93,7 @@ This repository contains the following components:
             <td>
             </td>
             <td>
-                End-to-end test examples for verifying integrations between mopro-ffi and mopro-wasm.
+                End-to-end test examples for verifying integrations for mopro-ffi.
             </td>
         </tr>
         <tr>
@@ -176,29 +164,6 @@ cargo test --features witnesscalc --features rapidsnark
 
 ### `mopro-ffi`
 
--   To test for circom adapter
-    ```sh
-    cd mopro-ffi
-    cargo test --features circom
-    ```
--   To test for halo2 adapter
-
-    ```sh
-    cd mopro-ffi
-    cargo test --features halo2
-    ```
-
--   To test for noir adapter
-    ```sh
-    cd mopro-ffi
-    cargo test --features noir --release
-    ```
-
-> [!IMPORTANT]  
-> To learn more about `mopro-ffi`, please visit [mopro-ffi](./mopro-ffi/README.md)
-
-### `mopro-wasm`
-
 To test the wasm bindings with `wasm-pack test`
 
 ```sh
@@ -206,7 +171,7 @@ wasm-pack test --chrome --headless -- --all-features
 ```
 
 > [!IMPORTANT]  
-> To learn more about `mopro-wasm`, please visit [mopro-wasm](./mopro-wasm/README.md)
+> To learn more about `mopro-ffi`, please visit [mopro-ffi](./mopro-ffi/README.md)
 
 ### `mopro-cli`
 
@@ -220,11 +185,11 @@ cargo install --path .
 > [!IMPORTANT]  
 > To learn more about `mopro-cli`, please visit [cli](./cli/README.md)
 
-### `test-e2e`
+### `tests`
 
 #### iOS
 
--   Update bindings for iOS e2e app
+-   Update bindings for iOS
 
     ```sh
     cargo run --bin ios
@@ -238,29 +203,9 @@ cargo install --path .
 
     and choose `iOS`.
 
--   To test for iOS e2e app
-
-    ```sh
-    cd test-e2e
-    open ios/mopro-test.xcodeproj
-    ```
-
-    Then choose an iOS simulator to run on.
-
-    Or you can use xcodebuild and choose an iOS simulator to run the test.
-
-    ```sh
-    xcodebuild -project ./test-e2e/ios/mopro-test.xcodeproj \
-        -scheme mopro-test \
-        -destination 'platform=iOS Simulator,name=iPhone 15' \
-        test CODE_SIGN_IDENTITY="" \
-        CODE_SIGNING_REQUIRED=NO \
-        -maximum-parallel-testing-workers 1
-    ```
-
 #### Android
 
--   Update bindings for Android e2e app
+-   Update bindings for Android
 
     ```sh
     cargo run --bin android
@@ -274,23 +219,53 @@ cargo install --path .
 
     and choose `Android`.
 
--   To test for Android e2e app
+#### Flutter
+
+-   Update bindings for Flutter
 
     ```sh
-    cd test-e2e
-    open android -a Android\ Studio
+    cargo run --bin flutter --no-default-features --features flutter
     ```
 
-    Similar to the iOS app, choose an Android emulator to run on.
-
-    Or you can use
+    or
 
     ```sh
-    cd test-e2e/android
-    ./gradlew connectedAndroidTest
+    mopro build # with mopro CLI
     ```
 
-    to run on a connected emulator/device.
+    and choose `flutter`.
+
+#### React Native
+
+-   Update bindings for React Native
+
+    ```sh
+    cargo run --bin react_native
+    ```
+
+    or
+
+    ```sh
+    mopro build # with mopro CLI
+    ```
+
+    and choose `react-native`.
+
+#### Web
+
+-   Update bindings for wasm
+
+    ```sh
+    cargo run --bin web --no-default-features --features wasm
+    ```
+
+    or
+
+    ```sh
+    mopro build # with mopro CLI
+    ```
+
+    and choose `web`.
 
 ### docs
 

@@ -463,9 +463,8 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                os: [macos-latest, ubuntu-latest]
                 adapter: [halo2] # web build only for halo2
-        runs-on: ${{ matrix.os }}
+        runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
         steps:
             - uses: actions/checkout@v6
@@ -487,7 +486,7 @@ jobs:
                   project-name: mopro-example-${{ matrix.adapter }}
                   destination: ${{ runner.temp }}
 
-            - name: Build Web (debug, halo2; auto-confirm prompt)
+            - name: Build Web (release, halo2; auto-confirm prompt)
               working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
               env:
                   CI: "true"
@@ -496,11 +495,11 @@ jobs:
                   rustup component add rust-src --toolchain nightly-2024-07-18
                   # TODO: allow mopro CLI to run fully non-interactive so we can drop the pseudo-tty workaround below
                   if [[ "$RUNNER_OS" == "macOS" ]]; then
-                    printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode debug --platforms web
+                    printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode release --platforms web
                   else
-                    printf 'y\n' | script -q -c "$GITHUB_WORKSPACE/bin/mopro build --mode debug --platforms web" /dev/null
+                    printf 'y\n' | script -q -c "$GITHUB_WORKSPACE/bin/mopro build --mode release --platforms web" /dev/null
                   fi
-            - name: Create Web framework (debug, halo2)
+            - name: Create Web framework (release, halo2)
               working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
               run: |
                   "$GITHUB_WORKSPACE/bin/mopro" create --framework web
@@ -512,23 +511,6 @@ jobs:
                   path: |
                       ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/web
                   key: ${{ runner.os }}-halo2-wasm-web-${{ github.sha }}
-
-    test-ffi-all:
-        runs-on: ubuntu-latest
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-        needs: [lint, clippy_check, check_typos]
-        steps:
-            - uses: actions/checkout@v6
-            - name: Setup dependencies
-              uses: ./.github/actions/setup-deps
-              with:
-                  platform: linux
-            - name: Setup Rust
-              uses: ./.github/actions/setup-rust
-              with:
-                  cache-key: ffi
-            - name: Run ffi tests
-              run: cd mopro-ffi && cargo test --release --all-features
 
     setup_halo2_wasm_env:
         runs-on: ubuntu-latest
@@ -600,7 +582,7 @@ jobs:
                   sudo ln -sf $CHROME_BIN /opt/google/chrome/chrome
                   echo "Check override chrome version"
                   google-chrome --version
-                  cd mopro-wasm
+                  cd mopro-ffi
                   wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
     test_halo2_wasm_web:
         runs-on: ubuntu-latest
