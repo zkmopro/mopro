@@ -1,4 +1,4 @@
-use std::{env, fs, path::PathBuf};
+use std::{fs, path::PathBuf};
 
 use anyhow::Error;
 use include_dir::include_dir;

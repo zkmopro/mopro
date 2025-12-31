@@ -1,7 +1,7 @@
 use anyhow::{Error, Result};
 use include_dir::include_dir;
 use include_dir::Dir;
-use std::{env, fs, path::PathBuf};
+use std::{fs, path::PathBuf};
 
 use super::Create;
 use crate::constants::Platform;
