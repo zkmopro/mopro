@@ -1,7 +1,7 @@
 use anyhow::{Error, Result};
 use include_dir::include_dir;
 use include_dir::Dir;
-use std::{env, fs, path::PathBuf};
+use std::{fs, path::PathBuf};
 
 use super::Create;
 use crate::constants::Platform;
@@ -27,11 +27,9 @@ impl Create for Ios {
         }
         fs::create_dir(&target_dir)?;
 
-        env::set_current_dir(&target_dir)?;
         const IOS_TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/template/ios");
         copy_embedded_dir(&IOS_TEMPLATE_DIR, &target_dir)?;
 
-        env::set_current_dir(&project_dir)?;
         if let Some(bindings_dir) = ios_bindings_dir {
             copy_ios_bindings(bindings_dir, target_dir.clone())?;
         } else {
