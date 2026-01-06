@@ -4,3 +4,4 @@ rust:
 
 android:
     apiLevel: 28
+    useSharedLibrary: true
