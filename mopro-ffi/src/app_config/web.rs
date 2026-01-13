@@ -39,10 +39,10 @@ impl PlatformBuilder for WebPlatform {
         let mut backtract_cmd = Command::new("cargo");
         backtract_cmd.args(["update", "-p", "backtrace", "--precise", "0.3.73"]);
         backtract_cmd.current_dir(project_dir);
-        backtract_cmd
+        let backtrace_status = backtract_cmd
             .status()
             .expect("Failed to update backtrace package");
-        if !backtract_cmd.status().is_ok_and(|s| s.success()) {
+        if !backtrace_status.success() {
             eprintln!("Failed to update backtrace package");
             std::process::exit(1);
         }
@@ -50,10 +50,10 @@ impl PlatformBuilder for WebPlatform {
         let mut indexmap_cmd = Command::new("cargo");
         indexmap_cmd.args(["update", "-p", "indexmap", "--precise", "2.11.0"]);
         indexmap_cmd.current_dir(project_dir);
-        indexmap_cmd
+        let indexmap_status = indexmap_cmd
             .status()
             .expect("Failed to update indexmap package");
-        if !indexmap_cmd.status().is_ok_and(|s| s.success()) {
+        if !indexmap_status.success() {
             eprintln!("Failed to update indexmap package");
             std::process::exit(1);
         }
