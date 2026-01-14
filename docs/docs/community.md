@@ -8,6 +8,8 @@ Join the Telegram group [here](https://t.me/zkmopro). This is the main place whe
 
 ## Talks
 
+- Talk by @moven0831 at [Noircon3 DevConnect 2025](https://devconnect.org/) (Buenos Aires, November 2025): [Video](https://youtu.be/vyhugE8PJUA?si=MpJjitVXUi-ZJ9Rl)
+- Talk by @vivianjeng at [zkID Day DevConnect 2025](https://devconnect.org/) (Buenos Aires, November 2025): [Video](https://streameth.org/6918e24caaaed07b949bbdd1/playlists/69446a85e505fdb0fa31a760?video=69455130e505fdb0fa4e102f), [Slides](https://docs.google.com/presentation/d/1Vy50cLR3EYsPpcqdyRvDJxt6JuUI4dQiOjx33lG8hUM/edit?usp=sharing)
 - Talk by @moven0831 at [ETHGlobal New Delhi](https://ethglobal.com/events/newdelhi) (New Delhi, September 2025): [Video](https://youtu.be/wmCZ7cpDi68?si=NJPuFD_Pd0kME_6W)
 - Talk by @vivianjeng at [ETHGlobal Cannes](https://ethglobal.com/events/cannes) (Cannes, July 2025): [Video](https://youtu.be/rNzkeKu3Xtc?si=MIYOBuS6N3aI_SB6) 
 - Talk by @vivianjeng at NoirHack 2025 (Virtual, April 2025): [Video](https://youtu.be/UrT2x3JSKFg?si=VUMU_4issBfM-jVl), [Slides](https://www.canva.com/design/DAGjcBgfBkQ/FrKUhdaEmA7wigCCq-VNrw/view?utm_content=DAGjcBgfBkQ&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h3c3b6657e8)
