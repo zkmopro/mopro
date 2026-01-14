@@ -114,22 +114,19 @@ impl From<CircomProverG2> for G2 {
 
 impl From<G2> for CircomProverG2 {
     fn from(g2: G2) -> Self {
-        let x =
-            g2.x.iter()
-                .map(|p| BigUint::from_str(p.as_str()).unwrap())
-                .collect::<Vec<BigUint>>();
-        let y =
-            g2.y.iter()
-                .map(|p| BigUint::from_str(p.as_str()).unwrap())
-                .collect::<Vec<BigUint>>();
-        let z =
-            g2.z.iter()
-                .map(|p| BigUint::from_str(p.as_str()).unwrap())
-                .collect::<Vec<BigUint>>();
         CircomProverG2 {
-            x: [x[0].clone(), x[1].clone()],
-            y: [y[0].clone(), y[1].clone()],
-            z: [z[0].clone(), z[1].clone()],
+            x: [
+                BigUint::from_str(g2.x[0].as_str()).unwrap(),
+                BigUint::from_str(g2.x[1].as_str()).unwrap(),
+            ],
+            y: [
+                BigUint::from_str(g2.y[0].as_str()).unwrap(),
+                BigUint::from_str(g2.y[1].as_str()).unwrap(),
+            ],
+            z: [
+                BigUint::from_str(g2.z[0].as_str()).unwrap(),
+                BigUint::from_str(g2.z[1].as_str()).unwrap(),
+            ],
         }
     }
 }
