@@ -29,6 +29,7 @@ pub fn build_project(
     arg_platforms: &Option<Vec<String>>,
     arg_architectures: &Option<Vec<String>>,
     auto_update_flag: Option<bool>,
+    offline: bool,
     quiet: bool,
 ) -> Result<()> {
     // Detect `Cargo.toml` file before starting build process
@@ -82,6 +83,7 @@ pub fn build_project(
                     &None,
                     &None,
                     auto_update_flag,
+                    offline,
                     quiet,
                 );
             }
@@ -100,6 +102,7 @@ pub fn build_project(
                     &None,
                     &None,
                     auto_update_flag,
+                    offline,
                     quiet,
                 );
             }
@@ -130,6 +133,7 @@ pub fn build_project(
                         &None,
                         &None,
                         auto_update_flag,
+                        offline,
                         quiet,
                     );
                 }
@@ -148,6 +152,7 @@ pub fn build_project(
                     mode,
                     &current_dir,
                     arch_refs,
+                    offline,
                     IosBindingsParams {
                         using_noir: config.adapter_contains(Adapter::Noir),
                     },
@@ -156,7 +161,7 @@ pub fn build_project(
             Platform::Android => {
                 let arch_strings = selection.architecture_strings();
                 let arch_refs: Vec<&String> = arch_strings.iter().collect();
-                build_from_str_arch::<AndroidPlatform>(mode, &current_dir, arch_refs, ())?;
+                build_from_str_arch::<AndroidPlatform>(mode, &current_dir, arch_refs, offline, ())?;
             }
             Platform::Flutter => {
                 let platform_str = selection.platform().as_str();
@@ -168,6 +173,11 @@ pub fn build_project(
                     "--no-default-features",
                     "--features",
                     "flutter",
+                    if offline {
+                        "--offline"
+                    } else {
+                        ""
+                    },
                 ]);
                 if mode == Mode::Release {
                     command.arg("--release");
@@ -185,13 +195,14 @@ pub fn build_project(
             Platform::ReactNative => {
                 let arch_strings = selection.architecture_strings();
                 let arch_refs: Vec<&String> = arch_strings.iter().collect();
-                build_from_str_arch::<ReactNativePlatform>(mode, &current_dir, arch_refs, ())?;
+                build_from_str_arch::<ReactNativePlatform>(mode, &current_dir, arch_refs, offline, ())?;
             }
             Platform::Web => {
                 build_from_str_arch::<WebPlatform>(
                     mode,
                     &current_dir,
                     vec![&"wasm32-unknown-unknown".to_string()],
+                    offline,
                     (),
                 )?;
             }

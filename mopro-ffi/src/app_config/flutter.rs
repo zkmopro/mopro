@@ -26,6 +26,7 @@ impl PlatformBuilder for FlutterPlatform {
         _mode: Mode,
         project_dir: &Path,
         _target_archs: Vec<Self::Arch>,
+        _offline: bool, // TODO: see if flutter_rust_bridge_codegen supports offline mode
         _params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
         // Init flutter bindings template

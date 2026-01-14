@@ -35,6 +35,7 @@ impl PlatformBuilder for AndroidPlatform {
         mode: Mode,
         project_dir: &Path,
         target_archs: Vec<Self::Arch>,
+        offline: bool,
         _params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
         let uniffi_style_identifier = project_name_from_toml(project_dir)
@@ -63,7 +64,7 @@ impl PlatformBuilder for AndroidPlatform {
         let mut latest_out_lib_path = PathBuf::new();
         for arch in target_archs {
             latest_out_lib_path =
-                build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode).context(
+                build_for_arch(arch, &lib_name, &build_dir, &bindings_out, offline, mode).context(
                     format!("Failed to build for architecture: {}", arch.as_str()),
                 )?;
         }
@@ -92,6 +93,7 @@ fn build_for_arch(
     lib_name: &str,
     build_dir: &Path,
     bindings_out: &Path,
+    offline: bool,
     mode: Mode,
 ) -> anyhow::Result<PathBuf> {
     let arch_str = arch.as_str();
@@ -108,6 +110,9 @@ fn build_for_arch(
         .arg("--lib");
     if mode == Mode::Release {
         build_cmd.arg("--release");
+    }
+    if offline {
+        build_cmd.arg("--offline");
     }
     build_cmd
         .env("CARGO_BUILD_TARGET_DIR", build_dir)

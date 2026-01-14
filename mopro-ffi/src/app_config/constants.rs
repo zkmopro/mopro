@@ -479,6 +479,7 @@ pub trait PlatformBuilder: Platform {
         mode: Mode,
         project_dir: &std::path::Path,
         target_arch: Vec<Self::Arch>,
+        offline: bool,
         params: Self::Params,
     ) -> anyhow::Result<std::path::PathBuf>;
 }

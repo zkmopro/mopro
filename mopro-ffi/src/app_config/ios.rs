@@ -35,6 +35,7 @@ impl PlatformBuilder for IosPlatform {
         mode: Mode,
         project_dir: &Path,
         target_archs: Vec<Self::Arch>,
+        offline: bool,
         params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
         let uniffi_style_identifier = project_name_from_toml(project_dir)
@@ -84,6 +85,9 @@ impl PlatformBuilder for IosPlatform {
                 // The dependencies of Noir libraries need iOS 15 and above.
                 if params.using_noir {
                     build_cmd.env("IPHONEOS_DEPLOYMENT_TARGET", "15.0");
+                }
+                if offline {
+                    build_cmd.arg("--offline");
                 }
                 build_cmd
                     .arg("--lib")

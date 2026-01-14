@@ -170,6 +170,7 @@ pub fn check_bindings(project_dir: &Path, platform: Platform) -> Result<Option<P
             &Some(vec![platform.as_str().to_string()]),
             &None,
             Some(false),
+            false, //TODO: get offline flag from command line
             false,
         )?;
 

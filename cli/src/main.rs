@@ -36,6 +36,8 @@ enum Commands {
         adapter: Option<String>,
         #[arg(long)]
         project_name: Option<String>,
+        #[arg(long, help = "Specify the output directory for the project.")]
+        output_dir: Option<String>,
         #[arg(long, help = "Show instruction message for init")]
         show: bool,
     },
@@ -60,6 +62,8 @@ enum Commands {
             conflicts_with = "auto_update"
         )]
         no_auto_update: bool,
+        #[arg(long)]
+        offline: bool,
         #[arg(long, help = "Show instruction message for build")]
         show: bool,
     },
@@ -159,13 +163,14 @@ fn main() {
         Commands::Init {
             adapter,
             project_name,
+            output_dir,
             show,
         } => {
             if *show {
-                print::print_init_instructions("<PROJECT NAME>".to_string());
+                print::print_init_instructions("<PROJECT_NAME>".to_string());
                 return;
             }
-            match init::init_project(adapter, project_name, false) {
+            match init::init_project(adapter, project_name, output_dir, false) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to initialize project: {e:?}")),
             }
@@ -176,6 +181,7 @@ fn main() {
             architectures,
             auto_update,
             no_auto_update,
+            offline,
             show,
         } => {
             if *show {
@@ -189,7 +195,7 @@ fn main() {
             } else {
                 None
             };
-            match build::build_project(mode, platforms, architectures, auto_update_flag, false) {
+            match build::build_project(mode, platforms, architectures, auto_update_flag, *offline, false) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
             }
@@ -262,7 +268,7 @@ fn main() {
                 return;
             }
 
-            match init::init_project(adapter, project_name, false) {
+            match init::init_project(adapter, project_name, &None, false) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to initialize project: {e:?}")),
             }
@@ -273,7 +279,8 @@ fn main() {
             } else {
                 None
             };
-            match build::build_project(mode, platforms, architectures, auto_update_flag, false) {
+            let offline = false; //TODO: get offline flag from command line
+            match build::build_project(mode, platforms, architectures, auto_update_flag, offline, false) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to build project: {e:?}")),
             }
