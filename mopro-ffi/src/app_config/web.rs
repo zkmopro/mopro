@@ -34,29 +34,9 @@ impl PlatformBuilder for WebPlatform {
         if !project_dir.join("Cargo.toml").exists() {
             panic!("No Cargo.toml found in {:?}", project_dir);
         }
-
-        // Fix package version to meet rust toolchain
-        let mut backtract_cmd = Command::new("cargo");
-        backtract_cmd.args(["update", "-p", "backtrace", "--precise", "0.3.73"]);
-        backtract_cmd.current_dir(project_dir);
-        let backtrace_status = backtract_cmd
-            .status()
-            .expect("Failed to update backtrace package");
-        if !backtrace_status.success() {
-            eprintln!("Failed to update backtrace package");
-            std::process::exit(1);
-        }
-
-        let mut indexmap_cmd = Command::new("cargo");
-        indexmap_cmd.args(["update", "-p", "indexmap", "--precise", "2.11.0"]);
-        indexmap_cmd.current_dir(project_dir);
-        let indexmap_status = indexmap_cmd
-            .status()
-            .expect("Failed to update indexmap package");
-        if !indexmap_status.success() {
-            eprintln!("Failed to update indexmap package");
-            std::process::exit(1);
-        }
+        patch_package_version(project_dir, "backtrace", "0.3.73")?;
+        patch_package_version(project_dir, "indexmap", "2.11.0")?;
+        patch_package_version(project_dir, "blake2b_simd", "1.0.3")?;
 
         let mode_cmd = match mode {
             Mode::Release => "--release",
@@ -109,4 +89,20 @@ impl PlatformBuilder for WebPlatform {
 
         Ok(bindings_dest)
     }
+}
+
+fn patch_package_version(
+    project_dir: &Path,
+    package_name: &str,
+    version: &str,
+) -> anyhow::Result<()> {
+    let mut cmd = Command::new("cargo");
+    cmd.args(["update", "-p", package_name, "--precise", version]);
+    cmd.current_dir(project_dir);
+    let status = cmd.status().expect("Failed to update package");
+    if !status.success() {
+        eprintln!("Failed to update package");
+        return Err(anyhow::anyhow!("Failed to update package"));
+    }
+    Ok(())
 }
