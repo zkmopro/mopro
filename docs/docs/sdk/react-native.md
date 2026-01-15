@@ -95,13 +95,13 @@ const circuitInputs = {
     b: [b],
 };
 
-const res: CircomProofResult = await generateCircomProof(
+const circomProofResult: CircomProofResult = await generateCircomProof(
     ZKEY_PATH,
     JSON.stringify(circuitInputs),
     ProofLib.Arkworks
 );
 
-const res: boolean = await verifyCircomProof(
+const isValid: boolean = await verifyCircomProof(
     ZKEY_PATH,
     circomProofResult,
     ProofLib.Arkworks
