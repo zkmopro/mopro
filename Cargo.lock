@@ -2397,7 +2397,7 @@ dependencies = [
 
 [[package]]
 name = "mopro-cli"
-version = "0.3.3"
+version = "0.3.4-alpha.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -2416,7 +2416,7 @@ dependencies = [
 
 [[package]]
 name = "mopro-ffi"
-version = "0.3.3"
+version = "0.3.4-alpha.0"
 dependencies = [
  "anyhow",
  "camino",
@@ -2433,7 +2433,6 @@ dependencies = [
  "thiserror 2.0.12",
  "toml 0.8.22",
  "uniffi",
- "uniffi_bindgen",
  "uuid",
  "wasm-bindgen",
  "wasm-bindgen-console-logger",

@@ -1,6 +1,6 @@
 [package]
 name = "mopro-ffi"
-version = "0.3.3"
+version = "0.3.4-alpha.0"
 edition = "2021"
 description = "Mopro is a toolkit for ZK app development on mobile. Mopro makes client-side proving on mobile simple."
 license = "MIT OR Apache-2.0"
@@ -15,7 +15,7 @@ name = "mopro_ffi"
 [features]
 default = ["build"]
 
-uniffi = ["dep:uniffi", "dep:uniffi_bindgen", "fs_extra"]
+uniffi = ["dep:uniffi", "fs_extra"]
 uniffi-tests = ["uniffi", "uniffi/bindgen-tests"]
 
 flutter = ["toml", "flutter_rust_bridge"]
@@ -37,7 +37,6 @@ no_uniffi_exports = []
 [dependencies]
 # UniFFI
 uniffi = { workspace = true, features = ["bindgen"], optional = true }
-uniffi_bindgen = { workspace = true, optional = true }
 toml = { version = "0.8.22", optional = true }
 
 # Flutter
@@ -61,7 +60,9 @@ wasm-bindgen = { version = "0.2.95", features = [
 ], optional = true }
 wasm-bindgen-console-logger = { version = "0.1.1", optional = true }
 wasm-bindgen-futures = { version = "0.4.47", optional = true }
-wasm-bindgen-rayon = { version = "1.2.2", features = ["no-bundler"], optional = true }
+wasm-bindgen-rayon = { version = "1.2.2", features = [
+    "no-bundler",
+], optional = true }
 
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 wasm-bindgen-test = { version = "0.3.42" }
