@@ -163,7 +163,7 @@
         "name": "zkETHer",
         "description": "Privacy-focused ERC20 with a robust mixer-style circuit implementation, enabling secure and confidential transactions",
         "links": {
-            "github": "https://github.com/yashsharma22003/zkETHer-Protocol",
+            "github": "https://github.com/yashsharma22003/zkETHer-app",
             "website": "https://ethglobal.com/showcase/zkether-geppk"
         }
     },
