@@ -4,9 +4,7 @@ use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use uniffi::generate_bindings_library_mode;
-use uniffi::CargoMetadataConfigSupplier;
-use uniffi::SwiftBindingGenerator;
+use uniffi::{generate, GenerateOptions, TargetLanguage};
 
 use super::constants::{
     Arch, IosArch, IosPlatform, Mode, ARCH_ARM_64, ARCH_X86_64, IOS_BINDINGS_DIR, IOS_SWIFT_FILE,
@@ -273,19 +271,20 @@ fn generate_ios_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Resul
         fs::remove_dir_all(binding_dir)?;
     }
 
-    generate_bindings_library_mode(
-        Utf8Path::from_path(dylib_path)
-            .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?,
-        None,
-        &SwiftBindingGenerator,
-        &CargoMetadataConfigSupplier::default(),
-        None,
-        Utf8Path::from_path(binding_dir).ok_or(Error::new(
-            ErrorKind::InvalidInput,
-            "Invalid swift files directory",
-        ))?,
-        true,
-    )
+    generate(GenerateOptions {
+        languages: vec![TargetLanguage::Swift],
+        source: Utf8Path::from_path(dylib_path)
+            .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?
+            .to_path_buf(),
+        out_dir: Utf8Path::from_path(binding_dir)
+            .ok_or(Error::new(
+                ErrorKind::InvalidInput,
+                "Invalid swift files directory",
+            ))?
+            .to_path_buf(),
+        crate_filter: None,
+        ..GenerateOptions::default()
+    })
     .map_err(|e| Error::other(e.to_string()))?;
     Ok(())
 }

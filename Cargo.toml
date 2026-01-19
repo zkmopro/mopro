@@ -5,4 +5,4 @@ resolver = "2"
 [workspace.dependencies]
 rust-witness = "0.1"
 
-uniffi = { version = "=0.29.0" }
+uniffi = { version = "=0.31.0" }

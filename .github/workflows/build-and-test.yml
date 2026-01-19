@@ -224,7 +224,7 @@ jobs:
                     -project ios/MoproApp.xcodeproj \
                     -scheme MoproApp \
                     -configuration Debug \
-                    -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0.1' \
+                    -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.2' \
                     -sdk iphonesimulator \
                     -only-testing:MoproAppUITests/MoproAppUITests/test${ADAPTER_UPPER}ProveVerify \
                     ARCHS=arm64 EXCLUDED_ARCHS='x86_64' ONLY_ACTIVE_ARCH=YES \
@@ -583,7 +583,7 @@ jobs:
                   echo "Check override chrome version"
                   google-chrome --version
                   cd mopro-ffi
-                  wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --all-features
+                  wasm-pack test --chrome --chromedriver $CHROMEDRIVER_BIN --headless -- --no-default-features --features wasm
     test_halo2_wasm_web:
         runs-on: ubuntu-latest
         needs:
