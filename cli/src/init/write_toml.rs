@@ -16,7 +16,7 @@ flutter = ["mopro-ffi/flutter"]
 wasm = ["mopro-ffi/wasm"]
 
 [dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "fix-ci-error" }
+mopro-ffi = { version = "0.3.4" }
 thiserror = "2.0.12"
 anyhow = "1.0.99"
 
@@ -30,14 +30,14 @@ anyhow = "1.0.99"
 # NOIR_BUILD_DEPENDENCIES
 
 [dev-dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "fix-ci-error", features = ["uniffi-tests"] }
+mopro-ffi = { version = "0.3.4", features = ["uniffi-tests"] }
 
 # CIRCOM_DEV_DEPENDENCIES
 # HALO2_DEV_DEPENDENCIES
 # NOIR_DEV_DEPENDENCIES
 
 [target.wasm32-unknown-unknown.dependencies]
-mopro-ffi = { git = "https://github.com/zkmopro/mopro.git", branch = "fix-ci-error", features = ["wasm"] }
+mopro-ffi = { version = "0.3.4", features = ["wasm"] }
 wasm-bindgen = "0.2"
 serde-wasm-bindgen = "0.6"
 
