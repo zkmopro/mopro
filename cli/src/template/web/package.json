@@ -7,13 +7,13 @@
   "license": "MIT",
   "scripts": {
     "build": "cd .. && cargo run --bin web",
-    "start": "yarn lite-server",
+    "start": "serve .",
     "test": "node index.js"
   },
   "dependencies": {
     "selenium-webdriver": "4.27.0"
   },
   "devDependencies": {
-    "lite-server": "^2.6.1"
+    "serve": "^14.2.4"
   }
 }
