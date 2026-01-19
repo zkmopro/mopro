@@ -36,6 +36,27 @@ impl CircomProver {
         prover::prove(proof_lib, zkey_path.clone(), wit_thread)
     }
 
+    #[cfg(feature = "circom-witnesscalc")]
+    pub fn graph_prove(
+        proof_lib: ProofLib,
+        json_input_str: String,
+        graph_bytes: &[u8],
+        zkey_path: String,
+    ) -> Result<CircomProof> {
+        use witnesscalc_adapter::parse_witness_to_bigints;
+
+        let witness_bytes =
+            circom_witnesscalc::calc_witness(json_input_str.as_str(), graph_bytes).unwrap();
+        let witness = parse_witness_to_bigints(&witness_bytes).unwrap();
+        let wit_thread = std::thread::spawn(move || {
+            witness
+                .into_iter()
+                .map(|w| w.to_biguint().unwrap())
+                .collect::<Vec<_>>()
+        });
+        prover::prove(proof_lib, zkey_path.clone(), wit_thread)
+    }
+
     pub fn verify(proof_lib: ProofLib, proof: CircomProof, zkey_path: String) -> Result<bool> {
         prover::verify(proof_lib, zkey_path, proof)
     }
@@ -91,6 +112,26 @@ mod tests {
             WitnessFn::CircomWitnessCalc(multiplier2_witness),
             ProofLib::Arkworks,
         );
+        assert!(verify_proof(proof, ProofLib::Arkworks));
+    }
+
+    #[cfg(all(feature = "circom-witnesscalc", feature = "arkworks"))]
+    #[test]
+    fn test_circom_witnesscalc_arkworks_prove_and_verify_with_graph() {
+        const GRAPH_PATH: &str = "./test-vectors/multiplier2.bin";
+        let inputs = HashMap::from([
+            ("a".to_string(), vec!["1".to_string()]),
+            ("b".to_string(), vec!["2".to_string()]),
+        ]);
+        let input_str = serde_json::to_string(&inputs).unwrap();
+        let graph_bytes = std::fs::read(GRAPH_PATH).unwrap();
+        let proof = CircomProver::graph_prove(
+            ProofLib::Arkworks,
+            input_str,
+            &graph_bytes,
+            ZKEY_PATH.to_string(),
+        )
+        .unwrap();
         assert!(verify_proof(proof, ProofLib::Arkworks));
     }
 
