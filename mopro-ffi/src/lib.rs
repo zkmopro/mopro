@@ -124,7 +124,7 @@ macro_rules! wasm_setup {
 /// - `on_chain = false` → Uses Poseidon (better performance)
 /// - `on_chain = true` → Uses Keccak256 (Solidity compatible)
 ///
-/// Reference: https://noir-lang.org/docs/how_to/how-to-solidity-verifier
+/// Reference: https://barretenberg.aztec.network/docs/how_to_guides/how-to-solidity-verifier/
 ///
 /// You don't need to generate Witness Generation functions first, like `Circom` or `Halo2` does.
 /// All you need to do is to setup the Mopro FFI library as below.
