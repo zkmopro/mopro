@@ -77,8 +77,6 @@ impl R1CSToQAP for CircomReduction {
         domain.fft_in_place(&mut b);
 
         let mut ab = domain.mul_polynomials_in_evaluation_domain(&a, &b);
-        drop(a);
-        drop(b);
 
         domain.ifft_in_place(&mut c);
         D::distribute_powers_and_mul_by_const(&mut c, root_of_unity, F::one());
