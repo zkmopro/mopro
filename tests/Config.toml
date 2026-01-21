@@ -1,0 +1,7 @@
+build_mode = "release"
+target_adapters = []
+target_platforms = ["ios"]
+ios = ["aarch64-apple-ios-sim"]
+auto_update = false
+
+[update]

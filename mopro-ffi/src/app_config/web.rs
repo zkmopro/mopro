@@ -21,6 +21,7 @@ impl PlatformBuilder for WebPlatform {
         mode: Mode,
         project_dir: &Path,
         _target_archs: Vec<Self::Arch>,
+        _offline: bool, // TODO: see if wasm-pack supports offline mode
         _params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
         let _wasm_style_identifier = project_name_from_toml(project_dir)

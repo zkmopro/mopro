@@ -19,6 +19,7 @@ mod write_toml;
 pub fn init_project(
     arg_adapter: &Option<String>,
     arg_project_name: &Option<String>,
+    arg_output_dir: &Option<String>,
     quiet: bool,
 ) -> Result<()> {
     let project_name: String = match arg_project_name.as_deref() {
@@ -46,7 +47,16 @@ pub fn init_project(
     };
 
     let current_dir = env::current_dir()?;
-    let project_dir = current_dir.join(&project_name);
+    let project_dir = if let Some(output_dir) = arg_output_dir {
+        let path = Path::new(output_dir);
+        if path.is_absolute() {
+            path.to_path_buf()
+        } else {
+            current_dir.join(path).to_path_buf()
+        }
+    } else {
+        current_dir.join(&project_name)
+    };
     fs::create_dir(&project_dir)?;
 
     // Change directory to the project directory

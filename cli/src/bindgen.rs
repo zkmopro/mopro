@@ -125,6 +125,7 @@ pub fn bindgen(
     init_project(
         &Some(proving_adapter.as_str().to_string()),
         &Some(project_name.to_string()),
+        &None,
         true,
     )?;
 
@@ -187,7 +188,8 @@ pub fn bindgen(
         )?;
     }
     // Run the build command
-    build_project(arg_mode, arg_platforms, arg_architectures, None, true)?;
+    let offline = false; //TODO: get offline flag from command line
+    build_project(arg_mode, arg_platforms, arg_architectures, None, offline, true)?;
 
     // Copy the bindings folder to the output directory
     fs::create_dir_all(&output_base_dir)?;

@@ -23,6 +23,7 @@ impl PlatformBuilder for ReactNativePlatform {
         mode: Mode,
         project_dir: &Path,
         target_archs: Vec<Self::Arch>,
+        _offline: bool, // TODO: see if uniffi-bindgen-react-native supports offline mode
         _params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
         install_uniffi_bindgen_react_native()?;

@@ -60,6 +60,7 @@ fn build_from_env<Builder: PlatformBuilder>() {
     let mode = get_build_mode();
     let project_dir = get_project_dir();
     let target_archs: Vec<Builder::Arch> = get_target_archs();
+    let offline = false;
     let params = Builder::Params::default();
 
     // Do not build if no target architectures are specified
@@ -67,7 +68,7 @@ fn build_from_env<Builder: PlatformBuilder>() {
         return;
     }
 
-    Builder::build(mode, &project_dir, target_archs, params)
+    Builder::build(mode, &project_dir, target_archs, offline, params)
         .context(format!(
             "Failed to build {} bindings",
             Builder::identifier()
@@ -80,6 +81,7 @@ pub fn build_from_str_arch<Builder: PlatformBuilder>(
     mode: Mode,
     project_dir: &Path,
     target_archs: Vec<&String>,
+    offline: bool,
     params: Builder::Params,
 ) -> anyhow::Result<PathBuf> {
     if target_archs.is_empty() {
@@ -94,7 +96,7 @@ pub fn build_from_str_arch<Builder: PlatformBuilder>(
         .map(Builder::Arch::parse_from_str)
         .collect();
 
-    Builder::build(mode, project_dir, target_archs, params).context(format!(
+    Builder::build(mode, project_dir, target_archs, offline, params).context(format!(
         "Failed to build {} bindings",
         Builder::identifier()
     ))
