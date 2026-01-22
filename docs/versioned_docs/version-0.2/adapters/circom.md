@@ -59,7 +59,7 @@ See the [circom-prover README](https://github.com/zkmopro/mopro/blob/main/circom
 
 ## Samples
 
-Explore how the Circom adapter is implemented by checking out the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
+Explore how the Circom adapter is implemented by checking out the [test-e2e](https://github.com/zkmopro/mopro/tree/main/tests) where we maintain (and test) each adapter.
 
 ## Setup the rust project
 

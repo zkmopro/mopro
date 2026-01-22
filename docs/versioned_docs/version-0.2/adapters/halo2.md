@@ -4,7 +4,7 @@ Mopro supports the use of Halo2 circuits, allowing for both the Halo2 library fr
 
 ## Samples
 
-Explore how the Halo2 adapter is implemented by checking out the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
+Explore how the Halo2 adapter is implemented by checking out the [test-e2e](https://github.com/zkmopro/mopro/tree/main/tests) where we maintain (and test) each adapter.
 
 ## Setting Up the Rust Project
 
