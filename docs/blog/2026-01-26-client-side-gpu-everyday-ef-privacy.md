@@ -6,7 +6,7 @@ authors:
   title: Developer on the Mopro Team
   url: https://github.com/moven0831
   image_url: https://github.com/moven0831.png
-tags: [client-side, gpu, privacy]
+tags: [client-side proving, gpu, post-quantum, privacy, zkp, metal, webgpu]
 ---
 
 *Thanks to Alex Kuzmin, Andy Guzman, Miha Stopar, Sinu, and Zoey for their generous feedback and review.*
