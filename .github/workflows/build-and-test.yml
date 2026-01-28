@@ -108,7 +108,7 @@ jobs:
                   ~/.cargo/bin/mopro --version || true
 
             - name: Upload CLI binary (${{ runner.os }})
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: mopro-bin-${{ runner.os }}
                   path: ~/.cargo/bin/mopro
@@ -185,7 +185,7 @@ jobs:
                   tar -czf mopro-example-${{ matrix.adapter }}.tar.gz mopro-example-${{ matrix.adapter }}
 
             - name: Upload prepared project
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: ios-project-${{ matrix.adapter }}
                   path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}.tar.gz
@@ -236,7 +236,7 @@ jobs:
 
             - name: Upload Xcode results (failure)
               if: failure()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: ios-xcode-simulator-test-results-${{ matrix.adapter }}
                   path: |
@@ -308,7 +308,7 @@ jobs:
 
             - name: Upload test report
               if: failure()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: android-test-report
                   path: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}/android/app/build/reports/androidTests/connected/debug/
@@ -448,7 +448,7 @@ jobs:
 
             - name: Upload native build outputs (on failure)
               if: failure()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: rn-build-outputs-${{ matrix.adapter }}
                   path: |
