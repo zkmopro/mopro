@@ -44,7 +44,7 @@ The system eliminates payment friction with 5-second NFC transactions that work 
 ## Application Track: General Privacy
 
 ### 🥇 First Prize: zkETHer
-> [View Project](https://ethglobal.com/showcase/zkether-geppk) | [GitHub](https://github.com/yashsharma22003/zkETHer-Protocol)
+> [View Project](https://ethglobal.com/showcase/zkether-geppk) | [GitHub](https://github.com/yashsharma22003/zkETHer-app)
 
 zkETHer implements a privacy-preserving protocol for ERC20 tokens, functioning as a non-custodial mixer. Users deposit fixed amounts by submitting cryptographic commitments to an on-chain Merkle tree, then withdraw to new addresses using ZK proofs generated on their mobile devices.
 
