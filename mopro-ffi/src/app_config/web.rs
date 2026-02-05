@@ -5,7 +5,7 @@ use std::{fs, path::PathBuf};
 use crate::app_config::cleanup_tmp_local;
 use crate::app_config::constants::{Mode, PlatformBuilder, WebArch, WebPlatform, WEB_BINDINGS_DIR};
 
-use super::{mktemp_local, project_name_from_toml};
+use super::mktemp_local;
 
 // Maintained for backwards compatibility
 #[inline]
@@ -23,17 +23,14 @@ impl PlatformBuilder for WebPlatform {
         _target_archs: Vec<Self::Arch>,
         _params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
-        let _wasm_style_identifier = project_name_from_toml(project_dir)
-            .expect("Failed to get project name from Cargo.toml");
+        if !project_dir.join("Cargo.toml").exists() {
+            panic!("No Cargo.toml found in {:?}", project_dir);
+        }
         let build_dir_path = project_dir.join("build");
         let work_dir = mktemp_local(&build_dir_path);
         let bindings_out = work_dir.join(WEB_BINDINGS_DIR);
         fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
         let bindings_dest = Path::new(&project_dir).join(WEB_BINDINGS_DIR);
-
-        if !project_dir.join("Cargo.toml").exists() {
-            panic!("No Cargo.toml found in {:?}", project_dir);
-        }
         patch_package_version(project_dir, "indexmap", "2.11.4")?;
         patch_package_version(project_dir, "backtrace", "0.3.73")?;
         patch_package_version(project_dir, "blake2b_simd", "1.0.3")?;
