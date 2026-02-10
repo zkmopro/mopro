@@ -34,9 +34,10 @@ impl PlatformBuilder for WebPlatform {
         if !project_dir.join("Cargo.toml").exists() {
             panic!("No Cargo.toml found in {:?}", project_dir);
         }
+        patch_package_version(project_dir, "indexmap", "2.11.4")?;
         patch_package_version(project_dir, "backtrace", "0.3.73")?;
-        patch_package_version(project_dir, "indexmap", "2.11.0")?;
         patch_package_version(project_dir, "blake2b_simd", "1.0.3")?;
+        patch_package_version(project_dir, "wasip2", "1.0.1+wasi-0.2.4")?;
 
         let mode_cmd = match mode {
             Mode::Release => "--release",

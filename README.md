@@ -167,7 +167,7 @@ cargo test --features witnesscalc --features rapidsnark
 To test the wasm bindings with `wasm-pack test`
 
 ```sh
-wasm-pack test --chrome --headless -- --all-features
+wasm-pack test --chrome --headless -- --no-default-features --features wasm
 ```
 
 > [!IMPORTANT]  

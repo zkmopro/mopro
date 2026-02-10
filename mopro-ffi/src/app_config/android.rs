@@ -4,9 +4,7 @@ use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use uniffi::generate_bindings_library_mode;
-use uniffi::CargoMetadataConfigSupplier;
-use uniffi::KotlinBindingGenerator;
+use uniffi::{generate, GenerateOptions, TargetLanguage};
 
 use crate::app_config::{project_name_from_toml, PlatformBuilder};
 
@@ -163,19 +161,20 @@ fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::R
     let config_path = parent_dir.join("uniffi_config.toml");
     fs::write(&config_path, content).expect("Failed to write uniffi_config.toml");
 
-    generate_bindings_library_mode(
-        Utf8Path::from_path(dylib_path)
-            .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?,
-        None,
-        &KotlinBindingGenerator,
-        &CargoMetadataConfigSupplier::default(),
-        None,
-        Utf8Path::from_path(binding_dir).ok_or(Error::new(
-            ErrorKind::InvalidInput,
-            "Invalid kotlin files directory",
-        ))?,
-        true,
-    )
+    generate(GenerateOptions {
+        languages: vec![TargetLanguage::Kotlin],
+        source: Utf8Path::from_path(dylib_path)
+            .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?
+            .to_path_buf(),
+        out_dir: Utf8Path::from_path(binding_dir)
+            .ok_or(Error::new(
+                ErrorKind::InvalidInput,
+                "Invalid kotlin files directory",
+            ))?
+            .to_path_buf(),
+        crate_filter: None,
+        ..GenerateOptions::default()
+    })
     .map_err(|e| Error::other(e.to_string()))?;
     Ok(())
 }

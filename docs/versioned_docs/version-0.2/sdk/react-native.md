@@ -86,7 +86,7 @@ const proofResult: CircomProofResult =
 
 const isValid: boolean = await MoproReactNativePackage.verifyProof(
     ZKEY_PATH,
-    parsedProofResult
+    proofResult
 );
 
 console.log("Proof verification result:", isValid);
