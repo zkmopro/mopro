@@ -4,7 +4,7 @@ Mopro supports the integration of Circom circuits. For this, you need to have pr
 
 ## Samples
 
-Explore how the Circom adapter is implemented by checking out this sample project [mopro-app](https://github.com/vimwitch/mopro-app) or the [test-e2e](https://github.com/zkmopro/mopro/tree/main/test-e2e) where we maintain (and test) each adapter.
+Explore how the Circom adapter is implemented by checking out this sample project [mopro-app](https://github.com/vimwitch/mopro-app) or the [test-e2e](https://github.com/zkmopro/mopro/tree/main/tests) where we maintain (and test) each adapter.
 
 ## Setup the rust project
 
