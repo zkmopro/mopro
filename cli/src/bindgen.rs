@@ -130,7 +130,6 @@ pub fn bindgen(
 
     let project_dir = env::current_dir()?;
     let test_vectors_dir = project_dir.join("test-vectors").join("circom");
-    fs::create_dir_all(&test_vectors_dir)?;
 
     // Copy the entire directory recursively
     // Remove the destination directory if it exists to avoid conflicts
