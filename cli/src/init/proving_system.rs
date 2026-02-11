@@ -2,7 +2,6 @@ use crate::init::adapter::Adapter;
 use crate::init::replace_string_in_file;
 use include_dir::Dir;
 use std::fs;
-use std::io::Write;
 
 pub(super) trait ProvingSystem {
     const TEMPLATE_DIR: Dir<'static>;
@@ -64,18 +63,11 @@ fn append_below_string_in_file(
     replacement: &str,
 ) -> anyhow::Result<()> {
     // Read the entire content of the file
-    let content = fs::read_to_string(file_path)?;
-
     // Replace the target string with the replacement string
-    let modified_content = content.replace(target, &format!("{target}\n{replacement}"));
-
     // Open the file in write mode, which truncates the file content
-    let mut file = fs::File::create(file_path)?;
-
     // Write the modified content back to the file
-    file.write_all(modified_content.as_bytes())?;
-
-    Ok(())
+    let combined = format!("{target}\n{replacement}");
+    replace_string_in_file(file_path, target, &combined)
 }
 
 /// Replace the placeholder import lines in the test bindings files with the actual import statements
