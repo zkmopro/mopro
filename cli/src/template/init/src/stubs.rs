@@ -149,3 +149,38 @@ macro_rules! noir_stub {
         };
     };
 }
+
+#[macro_export]
+macro_rules! gnark_stub {
+    () => {
+        mod gnark_stub {
+            use crate::error::MoproError;
+
+            #[derive(Debug, Clone)]
+            #[cfg_attr(feature = "uniffi", derive(uniffi::Record))]
+            pub struct GnarkProofResult {
+                pub proof: String,
+                pub public_inputs: String,
+            }
+
+            #[cfg_attr(feature = "uniffi", uniffi::export)]
+            pub fn generate_gnark_proof(
+                _r1cs_path: String,
+                _pk_path: String,
+                _witness_json: String,
+            ) -> Result<GnarkProofResult, MoproError> {
+                panic!("Gnark is not enabled in this build. Please select \"gnark\" adapter when initializing the project.");
+            }
+
+            #[cfg_attr(feature = "uniffi", uniffi::export)]
+            pub fn verify_gnark_proof(
+                _r1cs_path: String,
+                _vk_path: String,
+                _proof_result: GnarkProofResult,
+            ) -> Result<bool, MoproError> {
+                panic!("Gnark is not enabled in this build. Please select \"gnark\" adapter when initializing the project.");
+            }
+        }
+        pub use gnark_stub::{generate_gnark_proof, verify_gnark_proof, GnarkProofResult};
+    };
+}

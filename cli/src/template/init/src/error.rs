@@ -7,4 +7,6 @@ pub enum MoproError {
     Halo2Error(String),
     #[error("NoirError: {0}")]
     NoirError(String),
+    #[error("GnarkError: {0}")]
+    GnarkError(String),
 }
