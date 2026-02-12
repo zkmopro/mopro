@@ -1,4 +1,4 @@
-use super::{circom::Circom, halo2::Halo2, noir::Noir};
+use super::{circom::Circom, gnark::Gnark, halo2::Halo2, noir::Noir};
 use crate::init::proving_system::{replace_test_bindings_lib_import, ProvingSystem};
 use crate::{select::multi_select, style};
 
@@ -7,13 +7,15 @@ pub enum Adapter {
     Circom,
     Halo2,
     Noir,
+    Gnark,
     NoneOfTheAbove,
 }
 
-pub(super) const ADAPTERS: [Adapter; 4] = [
+pub(super) const ADAPTERS: [Adapter; 5] = [
     Adapter::Circom,
     Adapter::Halo2,
     Adapter::Noir,
+    Adapter::Gnark,
     Adapter::NoneOfTheAbove,
 ];
 
@@ -23,6 +25,7 @@ impl Adapter {
             Adapter::Circom => "circom",
             Adapter::Halo2 => "halo2",
             Adapter::Noir => "noir",
+            Adapter::Gnark => "gnark",
             Adapter::NoneOfTheAbove => "none of the above",
         }
     }
@@ -82,6 +85,9 @@ impl AdapterSelector {
         if self.contains(Adapter::Noir) {
             Noir::dep_template(cargo_toml_path)?;
         }
+        if self.contains(Adapter::Gnark) {
+            Gnark::dep_template(cargo_toml_path)?;
+        }
         Ok(())
     }
 
@@ -95,6 +101,9 @@ impl AdapterSelector {
         if self.contains(Adapter::Noir) {
             Noir::build_dep_template(cargo_toml_path)?;
         }
+        if self.contains(Adapter::Gnark) {
+            Gnark::build_dep_template(cargo_toml_path)?;
+        }
         Ok(())
     }
 
@@ -107,6 +116,9 @@ impl AdapterSelector {
         }
         if self.contains(Adapter::Noir) {
             Noir::dev_dep_template(cargo_toml_path)?;
+        }
+        if self.contains(Adapter::Gnark) {
+            Gnark::dev_dep_template(cargo_toml_path)?;
         }
         Ok(())
     }
@@ -129,6 +141,12 @@ impl AdapterSelector {
         } else {
             Noir::lib_stub_template(lib_rs_path)?;
         }
+
+        if self.contains(Adapter::Gnark) {
+            Gnark::lib_template(lib_rs_path)?;
+        } else {
+            Gnark::lib_stub_template(lib_rs_path)?;
+        }
         Ok(())
     }
 
@@ -141,6 +159,9 @@ impl AdapterSelector {
         }
         if self.contains(Adapter::Noir) {
             Noir::build_template(build_rs_path)?;
+        }
+        if self.contains(Adapter::Gnark) {
+            Gnark::build_template(build_rs_path)?;
         }
         Ok(())
     }
@@ -158,6 +179,9 @@ impl AdapterSelector {
         }
         if self.contains(Adapter::Noir) {
             Noir::build_bindings_lib(bindings_lib_path, project_name)?;
+        }
+        if self.contains(Adapter::Gnark) {
+            Gnark::build_bindings_lib(bindings_lib_path, project_name)?;
         }
         // copy ffi bindings test
         let ffi_bindings_dir_path = format!("{}/{}", bindings_lib_path, "ffi");
