@@ -893,14 +893,14 @@ dependencies = [
 [[package]]
 name = "circom-witnesscalc"
 version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba3fb734f91de7e7002678ea3238fddfd4ee7afd33e9ed975176f4a94794a55a"
+source = "git+https://github.com/iden3/circom-witnesscalc?branch=main#2e03ba73c3d47dd7af4d7741a4e4f79498f95ab7"
 dependencies = [
  "anyhow",
  "ark-bn254",
  "ark-ff 0.5.0",
  "ark-serialize 0.5.0",
  "bindgen",
+ "bitvec",
  "byteorder",
  "indicatif",
  "libc",
