@@ -120,11 +120,17 @@ jobs:
             fail-fast: false
             matrix:
                 os: [macos-latest, ubuntu-latest]
-                adapter: [circom, halo2, noir, none]
+                adapter: [circom, halo2, noir, gnark, none]
         runs-on: ${{ matrix.os }}
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
             - uses: actions/checkout@v6
+
+            - name: Setup Go (for gnark adapter)
+              if: matrix.adapter == 'gnark'
+              uses: actions/setup-go@v5
+              with:
+                  go-version: "1.24"
 
             - name: Prepare template project
               uses: ./.github/actions/mopro-init-project
@@ -146,11 +152,17 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                adapter: [circom, halo2, noir]
+                adapter: [circom, halo2, noir, gnark]
         runs-on: macos-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
             - uses: actions/checkout@v6
+
+            - name: Setup Go (for gnark adapter)
+              if: matrix.adapter == 'gnark'
+              uses: actions/setup-go@v5
+              with:
+                  go-version: "1.24"
 
             - name: Prepare template project
               uses: ./.github/actions/mopro-init-project
@@ -196,7 +208,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                adapter: [circom, halo2, noir]
+                adapter: [circom, halo2, noir, gnark]
         runs-on: macos-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
@@ -247,12 +259,18 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                adapter: [circom, halo2, noir]
+                adapter: [circom, halo2, noir, gnark]
         runs-on: ubuntu-latest
         timeout-minutes: 15
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
             - uses: actions/checkout@v6
+
+            - name: Setup Go (for gnark adapter)
+              if: matrix.adapter == 'gnark'
+              uses: actions/setup-go@v5
+              with:
+                  go-version: "1.24"
 
             - name: Android SDK
               uses: android-actions/setup-android@v3
@@ -318,11 +336,17 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                adapter: [circom, halo2, noir]
+                adapter: [circom, halo2, noir, gnark]
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
             - uses: actions/checkout@v6
+
+            - name: Setup Go (for gnark adapter)
+              if: matrix.adapter == 'gnark'
+              uses: actions/setup-go@v5
+              with:
+                  go-version: "1.24"
 
             - uses: subosito/flutter-action@v2
               with:
@@ -361,11 +385,17 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                adapter: [circom, halo2, noir]
+                adapter: [circom, halo2, noir, gnark]
         runs-on: macos-latest
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
         steps:
             - uses: actions/checkout@v6
+
+            - name: Setup Go (for gnark adapter)
+              if: matrix.adapter == 'gnark'
+              uses: actions/setup-go@v5
+              with:
+                  go-version: "1.24"
 
             # Build mopro example project for iOS + Android first, and create RN frameworks
             - name: Prepare template project

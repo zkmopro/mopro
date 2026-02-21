@@ -11,6 +11,7 @@ use std::{env, fs, io::Write, path::Path};
 
 pub mod adapter;
 mod circom;
+mod gnark;
 mod halo2;
 mod noir;
 mod proving_system;

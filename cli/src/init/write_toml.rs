@@ -23,11 +23,13 @@ anyhow = "1.0.99"
 # CIRCOM_DEPENDENCIES
 # HALO2_DEPENDENCIES
 # NOIR_DEPENDENCIES
+# GNARK_DEPENDENCIES
 
 [build-dependencies]
 # CIRCOM_BUILD_DEPENDENCIES
 # HALO2_BUILD_DEPENDENCIES
 # NOIR_BUILD_DEPENDENCIES
+# GNARK_BUILD_DEPENDENCIES
 
 [dev-dependencies]
 mopro-ffi = { version = "0.3.4", features = ["uniffi-tests"] }
@@ -35,6 +37,7 @@ mopro-ffi = { version = "0.3.4", features = ["uniffi-tests"] }
 # CIRCOM_DEV_DEPENDENCIES
 # HALO2_DEV_DEPENDENCIES
 # NOIR_DEV_DEPENDENCIES
+# GNARK_DEV_DEPENDENCIES
 
 [target.wasm32-unknown-unknown.dependencies]
 mopro-ffi = { version = "0.3.4", features = ["wasm"] }
