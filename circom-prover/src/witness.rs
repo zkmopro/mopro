@@ -11,7 +11,7 @@ use witnesscalc_adapter::parse_witness_to_bigints;
 type RustWitnessWtnsFn = fn(HashMap<String, Vec<BigInt>>) -> Vec<BigInt>;
 /// Witness function signature for witnesscalc_adapter (inputs) -> witness
 type WitnesscalcWtnsFn = fn(&str) -> anyhow::Result<Vec<u8>>;
-/// Witness function signature for circom-witnesscalc (inputs, graph_path) -> witness
+/// Witness function signature for circom-witnesscalc (json_input) -> witness
 type CircomWitnessCalcWtnsFn = fn(&str) -> anyhow::Result<Vec<u8>>;
 
 #[derive(Debug, Clone, Copy)]
