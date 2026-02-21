@@ -75,7 +75,7 @@ mod tests {
     #[cfg(all(feature = "rustwitness", feature = "arkworks"))]
     #[test]
     fn test_rustwitness_arkworks_bls12_381_prove_and_verify() {
-        rust_witness::witness!(multiplier2);
+        rust_witness::witness!(multiplier2bls);
         let inputs = HashMap::from([
             ("a".to_string(), vec!["1".to_string()]),
             ("b".to_string(), vec!["2".to_string()]),
@@ -83,7 +83,7 @@ mod tests {
         let zkey_path = "./test-vectors/multiplier2_bls.zkey";
         let input_str = serde_json::to_string(&inputs).unwrap();
         let proof_lib = ProofLib::Arkworks;
-        let witness_fn = WitnessFn::RustWitness(multiplier2_witness);
+        let witness_fn = WitnessFn::RustWitness(multiplier2bls_witness);
         let proof =
             CircomProver::prove(proof_lib, witness_fn, input_str, zkey_path.to_string()).unwrap();
         let valid = CircomProver::verify(proof_lib, proof, zkey_path.to_string()).unwrap();
