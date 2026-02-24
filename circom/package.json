@@ -1,0 +1,15 @@
+{
+  "name": "circom-circuits",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "sh scripts/build_circuits.sh"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "snarkjs": "^0.7.6"
+  }
+}
