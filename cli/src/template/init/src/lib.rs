@@ -41,3 +41,5 @@ mod uniffi_tests {
 // HALO2_TEMPLATE
 
 // NOIR_TEMPLATE
+
+// GNARK_TEMPLATE
