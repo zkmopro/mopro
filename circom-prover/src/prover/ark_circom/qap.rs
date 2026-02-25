@@ -65,10 +65,17 @@ impl R1CSToQAP for CircomReduction {
         domain.ifft_in_place(&mut b);
 
         let root_of_unity = {
-            let domain_size_double = 2 * domain_size;
-            let domain_double =
-                D::new(domain_size_double).ok_or(SynthesisError::PolynomialDegreeTooLarge)?;
-            domain_double.element(1)
+            let s = F::TWO_ADICITY as u64;
+            let power = ark_std::log2(domain_size) as u64;
+            let exp = 1u64 << (s - power - 1);
+
+            if s == 32 {
+                // BLS12-381: snarkjs uses a different primitive root
+                F::TWO_ADIC_ROOT_OF_UNITY.pow([5u64]).pow([exp])
+            } else {
+                // BN254 (s=28) and others: arkworks root matches snarkjs
+                F::TWO_ADIC_ROOT_OF_UNITY.pow([exp])
+            }
         };
         D::distribute_powers_and_mul_by_const(&mut a, root_of_unity, F::one());
         D::distribute_powers_and_mul_by_const(&mut b, root_of_unity, F::one());
