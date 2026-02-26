@@ -75,12 +75,12 @@ mod tests {
     #[cfg(all(feature = "rustwitness", feature = "arkworks"))]
     #[test]
     fn test_rustwitness_arkworks_bls12_381_prove_and_verify() {
-        rust_witness::witness!(multiplexer);
+        rust_witness::witness!(mux);
         let inputs = HashMap::from([("in".to_string(), vec!["42".to_string()])]);
-        let zkey_path = "./test-vectors/multiplexer_final.zkey";
+        let zkey_path = "./test-vectors/mux.zkey";
         let input_str = serde_json::to_string(&inputs).unwrap();
         let proof_lib = ProofLib::Arkworks;
-        let witness_fn = WitnessFn::RustWitness(multiplexer_witness);
+        let witness_fn = WitnessFn::RustWitness(mux_witness);
         let proof =
             CircomProver::prove(proof_lib, witness_fn, input_str, zkey_path.to_string()).unwrap();
         let valid = CircomProver::verify(proof_lib, proof, zkey_path.to_string()).unwrap();

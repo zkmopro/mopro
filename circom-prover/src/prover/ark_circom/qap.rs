@@ -61,39 +61,76 @@ impl R1CSToQAP for CircomReduction {
                 *c_i = a * b;
             });
 
-        domain.ifft_in_place(&mut a);
-        domain.ifft_in_place(&mut b);
+        let s = F::TWO_ADICITY as u64;
+        let power = ark_std::log2(domain_size) as u64;
+        let k: u64 = if s == 32 { 5 } else { 1 };
 
-        let root_of_unity = {
-            let s = F::TWO_ADICITY as u64;
-            let power = ark_std::log2(domain_size) as u64;
-            let exp = 1u64 << (s - power - 1);
-
-            if s == 32 {
-                // BLS12-381: snarkjs uses a different primitive root
-                F::TWO_ADIC_ROOT_OF_UNITY.pow([5u64]).pow([exp])
-            } else {
-                // BN254 (s=28) and others: arkworks root matches snarkjs
-                F::TWO_ADIC_ROOT_OF_UNITY.pow([exp])
-            }
+        // Get snarkjs-compatible generator for this domain size
+        let snarkjs_omega = {
+            let exp = 1u64 << (s - power);
+            F::TWO_ADIC_ROOT_OF_UNITY.pow([k]).pow([exp])
         };
-        D::distribute_powers_and_mul_by_const(&mut a, root_of_unity, F::one());
-        D::distribute_powers_and_mul_by_const(&mut b, root_of_unity, F::one());
+        let snarkjs_omega_inv = snarkjs_omega.inverse().unwrap();
 
-        domain.fft_in_place(&mut a);
-        domain.fft_in_place(&mut b);
+        // Coset shift = snarkjs w[power+1]
+        let inc = {
+            let exp = 1u64 << (s - power - 1);
+            F::TWO_ADIC_ROOT_OF_UNITY.pow([k]).pow([exp])
+        };
 
-        let mut ab = domain.mul_polynomials_in_evaluation_domain(&a, &b);
+        if k != 1 {
+            // Use manual DFT with snarkjs's roots
+            let n_inv = F::from(domain_size as u64).inverse().unwrap();
 
-        domain.ifft_in_place(&mut c);
-        D::distribute_powers_and_mul_by_const(&mut c, root_of_unity, F::one());
-        domain.fft_in_place(&mut c);
+            manual_ifft(&mut a, snarkjs_omega_inv, n_inv, domain_size);
+            manual_ifft(&mut b, snarkjs_omega_inv, n_inv, domain_size);
 
-        ab.par_iter_mut()
-            .zip(c)
-            .for_each(|(ab_i, c_i)| *ab_i -= &c_i);
+            apply_powers(&mut a, inc);
+            apply_powers(&mut b, inc);
 
-        Ok(ab)
+            manual_fft(&mut a, snarkjs_omega, domain_size);
+            manual_fft(&mut b, snarkjs_omega, domain_size);
+
+            let mut ab: Vec<F> = a.iter().zip(&b).map(|(&ai, &bi)| ai * bi).collect();
+
+            manual_ifft(&mut c, snarkjs_omega_inv, n_inv, domain_size);
+            apply_powers(&mut c, inc);
+            manual_fft(&mut c, snarkjs_omega, domain_size);
+
+            ab.par_iter_mut()
+                .zip(c)
+                .for_each(|(ab_i, c_i)| *ab_i -= &c_i);
+
+            Ok(ab)
+        } else {
+            // BN254: use arkworks FFT as before (original CircomReduction logic)
+            domain.ifft_in_place(&mut a);
+            domain.ifft_in_place(&mut b);
+
+            let root_of_unity = {
+                let domain_double =
+                    D::new(2 * domain_size).ok_or(SynthesisError::PolynomialDegreeTooLarge)?;
+                domain_double.element(1)
+            };
+
+            D::distribute_powers_and_mul_by_const(&mut a, root_of_unity, F::one());
+            D::distribute_powers_and_mul_by_const(&mut b, root_of_unity, F::one());
+
+            domain.fft_in_place(&mut a);
+            domain.fft_in_place(&mut b);
+
+            let mut ab = domain.mul_polynomials_in_evaluation_domain(&a, &b);
+
+            domain.ifft_in_place(&mut c);
+            D::distribute_powers_and_mul_by_const(&mut c, root_of_unity, F::one());
+            domain.fft_in_place(&mut c);
+
+            ab.par_iter_mut()
+                .zip(c)
+                .for_each(|(ab_i, c_i)| *ab_i -= &c_i);
+
+            Ok(ab)
+        }
     }
 
     fn h_query_scalars<F: PrimeField, D: EvaluationDomain<F>>(
@@ -113,4 +150,62 @@ impl R1CSToQAP for CircomReduction {
         domain.ifft_in_place(&mut scalars);
         Ok(scalars.into_par_iter().skip(1).step_by(2).collect())
     }
+}
+
+fn manual_fft<F: PrimeField>(vals: &mut Vec<F>, omega: F, n: usize) {
+    let log_n = ark_std::log2(n) as usize;
+
+    // Bit-reverse permutation
+    for i in 0..n {
+        let j = bit_reverse(i, log_n);
+        if i < j {
+            vals.swap(i, j);
+        }
+    }
+
+    // Cooley-Tukey
+    let mut len = 2;
+    while len <= n {
+        let half = len / 2;
+        let step = n / len;
+        // omega_len = omega^step = primitive len-th root
+        let omega_len = omega.pow([step as u64]);
+
+        for start in (0..n).step_by(len) {
+            let mut w = F::one();
+            for j in 0..half {
+                let u = vals[start + j];
+                let v = vals[start + j + half] * w;
+                vals[start + j] = u + v;
+                vals[start + j + half] = u - v;
+                w *= omega_len;
+            }
+        }
+        len <<= 1;
+    }
+}
+
+fn manual_ifft<F: PrimeField>(vals: &mut Vec<F>, omega_inv: F, n_inv: F, n: usize) {
+    manual_fft(vals, omega_inv, n);
+    // Scale by 1/n
+    for v in vals.iter_mut() {
+        *v *= n_inv;
+    }
+}
+
+fn apply_powers<F: PrimeField>(vals: &mut Vec<F>, base: F) {
+    let mut pow = F::one();
+    for v in vals.iter_mut() {
+        *v *= pow;
+        pow *= base;
+    }
+}
+
+fn bit_reverse(mut x: usize, log_n: usize) -> usize {
+    let mut result = 0;
+    for _ in 0..log_n {
+        result = (result << 1) | (x & 1);
+        x >>= 1;
+    }
+    result
 }
