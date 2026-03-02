@@ -136,6 +136,7 @@ pub fn copy_keys(target_dir: std::path::PathBuf) -> Result<()> {
         include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/circom/witnesscalc"),
         include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/halo2"),
         include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/noir"),
+        include_dir!("$CARGO_MANIFEST_DIR/src/template/init/test-vectors/gnark"),
     ];
     key_dirs
         .iter()
