@@ -1,16 +1,26 @@
 package com.example.moproapp
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,32 +29,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.json.JSONObject
 import uniffi.mopro.generateNoirProof
-import uniffi.mopro.verifyNoirProof
 import uniffi.mopro.getNoirVerificationKey
-import java.io.File
-import java.io.InputStream
+import uniffi.mopro.verifyNoirProof
 
 @Composable
 fun NoirComponent() {
     val context = LocalContext.current
-    var provingTime by remember { mutableStateOf("") }
-    var proofResult by remember { mutableStateOf("") }
-    var verificationTime by remember { mutableStateOf("") }
-    var verificationResult by remember { mutableStateOf("") }
+    var provingTime by remember { mutableStateOf<String?>(null) }
+    var proofResult by remember { mutableStateOf<String?>(null) }
+    var verificationTime by remember { mutableStateOf<String?>(null) }
+    var verificationResult by remember { mutableStateOf<String?>(null) }
     var proofBytes by remember { mutableStateOf<ByteArray?>(null) }
     var verificationKey by remember { mutableStateOf<ByteArray?>(null) }
-
-    // Status states
     var isGeneratingProof by remember { mutableStateOf(false) }
     var isVerifyingProof by remember { mutableStateOf(false) }
     var statusMessage by remember { mutableStateOf("Ready to generate proof") }
 
     val circuitFile = getFilePathFromAssets("noir_multiplier2.json")
     val srsFile = getFilePathFromAssets("noir_multiplier2.srs")
-    
-    // Load existing verification key from assets
+
     val existingVk = remember {
         try {
             context.assets.open("noir_multiplier2.vk").readBytes()
@@ -53,54 +57,66 @@ fun NoirComponent() {
         }
     }
 
+    val isBusy = isGeneratingProof || isVerifyingProof
+    val scrollState = rememberScrollState()
 
-    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "Noir Multiplier2",
-                modifier = Modifier.padding(bottom = 20.dp),
-                fontWeight = FontWeight.Bold,
-                fontSize = 22.sp
-            )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "Noir Multiplier",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp
+        )
+        Text(
+            text = "Proves a × b = c using Noir (e.g. 3 × 5) with Keccak for Solidity.",
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
-            // Status message with prominent styling
-            Text(
-                text = statusMessage,
-                modifier = Modifier.padding(bottom = 24.dp),
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                fontWeight = if (isGeneratingProof || isVerifyingProof) FontWeight.Bold else FontWeight.Normal
-            )
-
-            // Progress indicator when operations are running
-            if (isGeneratingProof || isVerifyingProof) {
-                CircularProgressIndicator(
-                    modifier = Modifier.padding(bottom = 16.dp)
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.outlinedCardColors()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = statusMessage,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    fontWeight = if (isBusy) FontWeight.SemiBold else FontWeight.Normal
                 )
-            }
+                if (isBusy) {
+                    CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+                }
 
-            Button(
-                onClick = {
-                    isGeneratingProof = true
-                    provingTime = ""
-                    proofResult = ""
-                    statusMessage = "Generating proof... This may take some time"
-
-                    Thread(
-                        Runnable {
+                Button(
+                    onClick = {
+                        isGeneratingProof = true
+                        provingTime = null
+                        proofResult = null
+                        statusMessage = "Generating proof…"
+                        Thread {
                             try {
                                 val inputs = listOf("3", "5")
-                                val onChain = true  // Use Keccak for Solidity compatibility
+                                val onChain = true
                                 val lowMemoryMode = false
-
-                                // First, get or use existing verification key
-                                val vk = existingVk ?: run {
-                                    statusMessage = "Generating verification key..."
+                                val vk: ByteArray = existingVk ?: run {
+                                    statusMessage = "Generating verification key…"
                                     getNoirVerificationKey(circuitFile, srsFile, onChain, lowMemoryMode)
                                 }
                                 verificationKey = vk
-
-                                statusMessage = "Generating proof with verification key..."
+                                statusMessage = "Generating proof…"
                                 val startTime = System.currentTimeMillis()
                                 proofBytes = generateNoirProof(
                                     circuitFile,
@@ -111,45 +127,35 @@ fun NoirComponent() {
                                     lowMemoryMode
                                 )
                                 val endTime = System.currentTimeMillis()
-                                val duration = endTime - startTime
-
-                                provingTime = "Proving time: $duration ms"
-                                proofResult = "Proof generated: ${proofBytes?.size ?: 0} bytes"
-                                statusMessage = "Proof generation completed"
+                                provingTime = "${endTime - startTime} ms"
+                                proofResult = "Proof: ${proofBytes?.size ?: 0} bytes"
+                                statusMessage = "Proof generated"
                             } catch (e: Exception) {
-                                provingTime = "Proving failed"
+                                provingTime = "Failed"
                                 proofResult = "Error: ${e.message}"
-                                statusMessage = "Proof generation failed"
+                                statusMessage = "Proof failed"
                                 e.printStackTrace()
                             } finally {
                                 isGeneratingProof = false
                             }
-                        }
-                    ).start()
-                },
-                modifier = Modifier.padding(top = 20.dp).testTag("noirGenerateProofButton"),
-                enabled = !isGeneratingProof && !isVerifyingProof
-            ) { 
-                Text(text = "Generate Proof")
-            }
+                        }.start()
+                    },
+                    modifier = Modifier.fillMaxWidth().testTag("noirGenerateProofButton"),
+                    enabled = !isBusy
+                ) { Text("Generate proof") }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    isVerifyingProof = true
-                    verificationTime = ""
-                    verificationResult = ""
-                    statusMessage = "Verifying proof..."
-
-                    Thread(
-                        Runnable {
+                Button(
+                    onClick = {
+                        isVerifyingProof = true
+                        verificationTime = null
+                        verificationResult = null
+                        statusMessage = "Verifying proof…"
+                        Thread {
                             try {
                                 proofBytes?.let { proof ->
                                     verificationKey?.let { vk ->
-                                        val onChain = true  // Use Keccak for Solidity compatibility
+                                        val onChain = true
                                         val lowMemoryMode = false
-
                                         val startTime = System.currentTimeMillis()
                                         val result = verifyNoirProof(
                                             circuitFile,
@@ -159,85 +165,57 @@ fun NoirComponent() {
                                             lowMemoryMode
                                         )
                                         val endTime = System.currentTimeMillis()
-                                        val duration = endTime - startTime
-
-                                        verificationTime = "Verification time: $duration ms"
-                                        verificationResult = "Verification result: $result"
-                                        if (result)
-                                            statusMessage = "Proof verified successfully!" 
-                                        else 
-                                            statusMessage = "Proof verification failed!"
+                                        verificationTime = "${endTime - startTime} ms"
+                                        verificationResult = result.toString()
+                                        statusMessage = if (result) "Verified successfully" else "Verification failed"
                                     } ?: run {
-                                        verificationResult = "No verification key available"
-                                        statusMessage = "Please generate a proof first to get verification key"
+                                        verificationResult = "No verification key"
+                                        statusMessage = "Generate a proof first"
                                     }
                                 } ?: run {
-                                    verificationResult = "No proof available"
-                                    statusMessage = "Please generate a proof first"
+                                    verificationResult = "No proof"
+                                    statusMessage = "Generate a proof first"
                                 }
                             } catch (e: Exception) {
-                                verificationTime = "Verification failed"
+                                verificationTime = "Failed"
                                 verificationResult = "Error: ${e.message}"
-                                statusMessage = "Proof verification error"
+                                statusMessage = "Verification error"
                                 e.printStackTrace()
                             } finally {
                                 isVerifyingProof = false
                             }
-                        }
-                    ).start()
-                },
-                modifier = Modifier.padding(top = 20.dp).testTag("noirVerifyProofButton"),
-                enabled = !isGeneratingProof && !isVerifyingProof && proofBytes != null
-            ) { 
-                Text(text = "Verify Proof") 
+                        }.start()
+                    },
+                    modifier = Modifier.fillMaxWidth().testTag("noirVerifyProofButton"),
+                    enabled = !isBusy && proofBytes != null
+                ) { Text("Verify proof") }
             }
+        }
 
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Results displayed in a more organized way
-            if (provingTime.isNotEmpty() || proofResult.isNotEmpty() || 
-                verificationTime.isNotEmpty() || verificationResult.isNotEmpty()) {
-
-                Text(
-                    text = "Results",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                if (provingTime.isNotEmpty()) {
-                    Text(
-                        text = provingTime,
-                        modifier = Modifier.padding(top = 4.dp).width(280.dp),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                if (proofResult.isNotEmpty()) {
-                    Text(
-                        text = proofResult,
-                        modifier = Modifier.padding(top = 4.dp).width(280.dp),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                if (verificationTime.isNotEmpty()) {
-                    Text(
-                        text = verificationTime,
-                        modifier = Modifier.padding(top = 4.dp).width(280.dp),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                if (verificationResult.isNotEmpty()) {
-                    Text(
-                        text = verificationResult,
-                        modifier = Modifier.padding(top = 4.dp).width(280.dp),
-                        textAlign = TextAlign.Center,
-                        fontWeight = if (verificationResult.contains("true")) FontWeight.Bold else FontWeight.Normal
-                    )
+        if (provingTime != null || proofResult != null || verificationTime != null || verificationResult != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text("Results", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    provingTime?.let { Text("Proving: $it", style = MaterialTheme.typography.bodyMedium) }
+                    proofResult?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                    verificationTime?.let { Text("Verifying: $it", style = MaterialTheme.typography.bodyMedium) }
+                    verificationResult?.let {
+                        Text(
+                            "Valid: $it",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = if (it == "true") FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
-} 
+}
