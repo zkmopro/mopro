@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A2376232F553BFF00D4B3B4 /* cubic_circuit.pk in Resources */ = {isa = PBXBuildFile; fileRef = 2A2376202F553BFF00D4B3B4 /* cubic_circuit.pk */; };
+		2A2376242F553BFF00D4B3B4 /* cubic_circuit.vk in Resources */ = {isa = PBXBuildFile; fileRef = 2A2376222F553BFF00D4B3B4 /* cubic_circuit.vk */; };
+		2A2376252F553BFF00D4B3B4 /* cubic_circuit.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = 2A2376212F553BFF00D4B3B4 /* cubic_circuit.r1cs */; };
 		2A4190692DF1CCE6004F1A4F /* noir_multiplier2.json in Resources */ = {isa = PBXBuildFile; fileRef = 2A4190682DF1CCE6004F1A4F /* noir_multiplier2.json */; };
 		2A41906B2DF1CCED004F1A4F /* noir_multiplier2.srs in Resources */ = {isa = PBXBuildFile; fileRef = 2A41906A2DF1CCED004F1A4F /* noir_multiplier2.srs */; };
 		2A59922F2CC7750200135402 /* multiplier2_final.zkey in Resources */ = {isa = PBXBuildFile; fileRef = 2A59922E2CC7750200135402 /* multiplier2_final.zkey */; };
@@ -39,6 +42,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2A2376202F553BFF00D4B3B4 /* cubic_circuit.pk */ = {isa = PBXFileReference; lastKnownFileType = file; path = cubic_circuit.pk; sourceTree = "<group>"; };
+		2A2376212F553BFF00D4B3B4 /* cubic_circuit.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; path = cubic_circuit.r1cs; sourceTree = "<group>"; };
+		2A2376222F553BFF00D4B3B4 /* cubic_circuit.vk */ = {isa = PBXFileReference; lastKnownFileType = file; path = cubic_circuit.vk; sourceTree = "<group>"; };
 		2A4190682DF1CCE6004F1A4F /* noir_multiplier2.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = noir_multiplier2.json; sourceTree = "<group>"; };
 		2A41906A2DF1CCED004F1A4F /* noir_multiplier2.srs */ = {isa = PBXFileReference; lastKnownFileType = file; path = noir_multiplier2.srs; sourceTree = "<group>"; };
 		2A5991EC2CC7722900135402 /* MoproApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoproApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -114,6 +120,9 @@
 				2A41906A2DF1CCED004F1A4F /* noir_multiplier2.srs */,
 				E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */,
 				2A6489502E8BA1F1004450F0 /* multiplier2_wc_final.zkey */,
+				2A2376202F553BFF00D4B3B4 /* cubic_circuit.pk */,
+				2A2376212F553BFF00D4B3B4 /* cubic_circuit.r1cs */,
+				2A2376222F553BFF00D4B3B4 /* cubic_circuit.vk */,
 			);
 			sourceTree = "<group>";
 		};
@@ -264,6 +273,9 @@
 				2A59922F2CC7750200135402 /* multiplier2_final.zkey in Resources */,
 				2A6489512E8BA1F1004450F0 /* multiplier2_wc_final.zkey in Resources */,
 				2A4190692DF1CCE6004F1A4F /* noir_multiplier2.json in Resources */,
+				2A2376232F553BFF00D4B3B4 /* cubic_circuit.pk in Resources */,
+				2A2376242F553BFF00D4B3B4 /* cubic_circuit.vk in Resources */,
+				2A2376252F553BFF00D4B3B4 /* cubic_circuit.r1cs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

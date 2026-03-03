@@ -90,6 +90,19 @@ class ExampleInstrumentedTest {
     }
 
     @Test
+    fun gnarkButtonClick() {
+        composeTestRule.setContent { GnarkComponent() }
+        
+        composeTestRule.onNodeWithTag("gnarkGenerateProofButton").performClick()
+        composeTestRule.onNodeWithTag("gnarkGenerateProofButton").assertIsDisplayed()
+        
+        waitForProofCompletion("gnarkVerifyProofButton", maxWaitSeconds = 10)
+        
+        composeTestRule.onNodeWithTag("gnarkVerifyProofButton").performClick()
+        composeTestRule.onNodeWithTag("gnarkVerifyProofButton").assertIsDisplayed()
+    }
+
+    @Test
     fun halo2ButtonClick() {
         composeTestRule.setContent { FibonacciComponent() }
 

@@ -28,32 +28,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import uniffi.mopro.Halo2ProofResult
-import uniffi.mopro.generateHalo2Proof
-import uniffi.mopro.verifyHalo2Proof
+import uniffi.mopro.generateGnarkProof
+import uniffi.mopro.verifyGnarkProof
+import uniffi.mopro.GnarkProofResult
 
 @Composable
-fun FibonacciComponent() {
+fun GnarkComponent() {
     var provingTime by remember { mutableStateOf<String?>(null) }
     var verifyingTime by remember { mutableStateOf<String?>(null) }
     var valid by remember { mutableStateOf<String?>(null) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     var isGeneratingProof by remember { mutableStateOf(false) }
     var isVerifyingProof by remember { mutableStateOf(false) }
-    var res by remember {
-        mutableStateOf<Halo2ProofResult>(
-            Halo2ProofResult(proof = ByteArray(size = 0), inputs = ByteArray(size = 0))
-        )
-    }
+    var proofResult by remember { mutableStateOf<GnarkProofResult?>(null) }
 
-    val srsPath = getFilePathFromAssets("plonk_fibonacci_srs.bin")
-    val provingKeyPath = getFilePathFromAssets("plonk_fibonacci_pk.bin")
-    val verifyingKeyPath = getFilePathFromAssets("plonk_fibonacci_vk.bin")
+    val r1csPath = getFilePathFromAssets("cubic_circuit.r1cs")
+    val pkPath = getFilePathFromAssets("cubic_circuit.pk")
+    val vkPath = getFilePathFromAssets("cubic_circuit.vk")
+    // Cubic circuit: x^3 + x + 5 = Y. For X=3: 27+3+5=35
+    val witnessJson = """{"X": "3", "Y": "35"}"""
 
-    val inputs = mutableMapOf<String, List<String>>()
-    inputs["out"] = listOf("55")
-
-    val scrollState = rememberScrollState()
     val isBusy = isGeneratingProof || isVerifyingProof
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
@@ -64,13 +60,13 @@ fun FibonacciComponent() {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Halo2 Fibonacci",
+            text = "Gnark Cubic",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             fontSize = 22.sp
         )
         Text(
-            text = "Proves the 10th Fibonacci number is 55 using Plonk.",
+            text = "Proves x³ + x + 5 = Y (e.g. X=3 → Y=35) using Groth16 BN254.",
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -99,18 +95,24 @@ fun FibonacciComponent() {
                         provingTime = null
                         valid = null
                         verifyingTime = null
+                        errorMessage = null
                         Thread {
                             try {
                                 val startTime = System.currentTimeMillis()
-                                res = generateHalo2Proof(srsPath, provingKeyPath, inputs)
+                                proofResult = generateGnarkProof(r1csPath, pkPath, witnessJson)
                                 val endTime = System.currentTimeMillis()
                                 provingTime = "${endTime - startTime} ms"
+                            } catch (e: Exception) {
+                                provingTime = "Failed"
+                                errorMessage = e.message ?: "Proof generation failed"
+                                proofResult = null
+                                e.printStackTrace()
                             } finally {
                                 isGeneratingProof = false
                             }
                         }.start()
                     },
-                    modifier = Modifier.fillMaxWidth().testTag("halo2GenerateProofButton"),
+                    modifier = Modifier.fillMaxWidth().testTag("gnarkGenerateProofButton"),
                     enabled = !isBusy
                 ) {
                     Text("Generate proof")
@@ -120,27 +122,39 @@ fun FibonacciComponent() {
                     onClick = {
                         isVerifyingProof = true
                         verifyingTime = null
+                        valid = null
+                        errorMessage = null
+                        val currentProof = proofResult
+                        if (currentProof == null) {
+                            valid = "false"
+                            isVerifyingProof = false
+                            return@Button
+                        }
                         Thread {
                             try {
                                 val startTime = System.currentTimeMillis()
-                                val result = verifyHalo2Proof(srsPath, verifyingKeyPath, res.proof, res.inputs)
+                                val isValid = verifyGnarkProof(r1csPath, vkPath, currentProof)
                                 val endTime = System.currentTimeMillis()
                                 verifyingTime = "${endTime - startTime} ms"
-                                valid = result.toString()
+                                valid = isValid.toString()
+                            } catch (e: Exception) {
+                                verifyingTime = "Failed"
+                                errorMessage = e.message ?: "Verification failed"
+                                e.printStackTrace()
                             } finally {
                                 isVerifyingProof = false
                             }
                         }.start()
                     },
-                    modifier = Modifier.fillMaxWidth().testTag("halo2VerifyProofButton"),
-                    enabled = !isBusy && res.proof.isNotEmpty()
+                    modifier = Modifier.fillMaxWidth().testTag("gnarkVerifyProofButton"),
+                    enabled = !isBusy && proofResult != null
                 ) {
                     Text("Verify proof")
                 }
             }
         }
 
-        if (provingTime != null || verifyingTime != null || valid != null) {
+        if (provingTime != null || verifyingTime != null || valid != null || errorMessage != null) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -152,7 +166,14 @@ fun FibonacciComponent() {
                     Text("Results", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                     provingTime?.let { Text("Proving: $it", style = MaterialTheme.typography.bodyMedium) }
                     verifyingTime?.let { Text("Verifying: $it", style = MaterialTheme.typography.bodyMedium) }
-                    valid?.let { Text("Valid: $it", style = MaterialTheme.typography.bodyMedium, fontWeight = if (it == "true") FontWeight.Bold else FontWeight.Normal) }
+                    valid?.let {
+                        Text(
+                            "Valid: $it",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = if (it == "true") FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
+                    errorMessage?.let { Text("Error: $it", style = MaterialTheme.typography.bodyMedium) }
                 }
             }
         }
