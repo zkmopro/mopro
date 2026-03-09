@@ -1,12 +1,12 @@
 ---
 slug: mopro-ai-tutorial
-title: "From Zero to ZK: Build a Mobile Proof App with mopro-ai"
+title: "From Zero to ZK: Vibe a ZK Mobile App with mopro-ai"
 authors:
   name: Moven Tsai
   title: Developer on the Mopro Team
   url: https://github.com/moven0831
   image_url: https://github.com/moven0831.png
-tags: [mopro, mopro-ai, mobile-proving, zkp, tutorial, flutter]
+tags: [agentic-coding, ai, mobile-proving, zkp, tutorial, flutter]
 ---
 
 ## TL;DR
