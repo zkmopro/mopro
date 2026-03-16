@@ -11,9 +11,9 @@ tags: [agentic-coding, ai, mobile-proving, zkp, tutorial, flutter]
 
 ## TL;DR
 
-- **The problem**: Building a mobile ZK app requires wrangling Rust toolchains, Circom compilation, platform SDKs, and FFI wiring. Most developers never get past setup.
-- **The tool**: [mopro-ai](https://github.com/zkmopro/mopro-ai) is a structured playbook that lets AI coding agents drive the full mopro lifecycle accurately, from project init to on-device proof verification.
-- **Demo result**: Starting from a single prompt, an AI agent scaffolded [vibe-app](https://github.com/moven0831/vibe-app), a complete Flutter app that generates and verifies Groth16 proofs of Poseidon hash preimage knowledge, entirely on-device. This post walks you through exactly how that happened.
+- **The problem**: Building a mobile app with zero-knowledge (ZK) proofs requires complex environment setup and multiple toolchains. Most developers never get past the setup stage.
+- **The tool**: [mopro-ai](https://github.com/zkmopro/mopro-ai) is a playbook that lets AI coding agents build ZK mobile apps for you.
+- **Demo result**: Starting from a single prompt, an AI agent built [vibe-app](https://github.com/moven0831/vibe-app), a Flutter app that generates and verifies ZK proofs entirely on-device.
 
 ## The Problem: ZK on Mobile Is Still Too Hard
 
@@ -32,6 +32,18 @@ Each layer has its own failure modes and error messages. A developer who is prof
 
 [mopro-ai](https://github.com/zkmopro/mopro-ai) is not just a plugin. It is a *manual* with structured knowledge that lets AI agents use mopro accurately and fluently instead of guessing at CLI flags and build sequences.
 
+To install in Claude Code:
+
+```bash
+/plugin marketplace add zkmopro/mopro-ai
+/plugin install mopro
+```
+
+| ![mopro-ai-plugin](/img/mopro-ai-plugins.png) |
+|:--:|
+| Plugin Installation for mopro-ai |
+
+
 The playbook covers the full mopro lifecycle:
 
 | Command | What it does |
@@ -49,17 +61,6 @@ Beyond slash commands, skills also activate automatically based on context. Ment
 Crucially, mopro-ai includes guardrails that prevent common agent mistakes: never chain build + create in one step (builds take minutes and must be confirmed before proceeding), always pass `--platforms flutter` for Flutter apps (not `--platforms ios`, which produces incompatible native-only bindings), always use non-interactive CLI flags to avoid blocking on prompts, and never re-run a build without user confirmation. It also encodes error recovery paths and environment diagnostics.
 
 mopro-ai is built on open standards, specifically [Agent Skills](https://agentskills.org) for auto-triggered workflows and [AGENTS.md](https://github.com/anthropics/agent-specification) for universal agent instructions, so it works across Claude Code, Cursor, VS Code Copilot, Codex CLI, and Gemini CLI.
-
-To install in Claude Code:
-
-```bash
-/plugin marketplace add zkmopro/mopro-ai
-/plugin install mopro
-```
-
-| ![mopro-ai-plugin](/img/mopro-ai-plugins.png) |
-|:--:|
-| Plugin Installation for mopro-ai |
 
 ## What We Are Building
 
