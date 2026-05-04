@@ -118,6 +118,12 @@ Our current implementation draws heavily from the zkPassport team’s work, whic
 
 Expanding support to these platforms is a significant challenge. The `barretenberg` backend, written in C++ and built with CMake, is large and complex, making cross-compilation non-trivial. While we’re evaluating the effort required to support additional architectures, we’re also hopeful that the Noir or zkPassport teams may address this gap in the future.
 
+:::note Update (noir-rs v1.0.0-beta.19)
+
+As of `noir-rs` `v1.0.0-beta.19`, mopro pulls Barretenberg via the official [`barretenberg-rs`](https://crates.io/crates/barretenberg-rs) crate from crates.io rather than the `publish-bb.yml` pipeline in `zkmopro/aztec-packages` referenced above. The `x86_64-apple-ios` target was also dropped in that upgrade — `barretenberg-rs` does not ship prebuilt binaries for the Intel iOS simulator. The rest of the support matrix is unchanged.
+
+:::
+
 ## Case Study: Stealthnote Mobile App
 
 During the NoirHack 2025 (April 14th to May 10th), the Mopro team participated by building a mobile-native Noir application. Our project was inspired by [**Stealthnote**](https://stealthnote.xyz/), originally created by Saleel. Stealthnote is a web-based app that allows users to sign in with Google OAuth and prove ownership of their organizational email address. It leverages a Noir circuit to generate a zero-knowledge proof from the JWT issued by Google OAuth. You can read more about the original project in [Saleel’s blog post](https://saleel.xyz/blog/stealthnote/).
