@@ -101,6 +101,8 @@ fn build_for_arch(
         .arg("ndk")
         .arg("-t")
         .arg(arch_str)
+        .arg("-p")
+        .arg("30") // API 30 minimum
         .arg("build")
         .arg("--link-libcxx-shared")
         .arg("--lib");
