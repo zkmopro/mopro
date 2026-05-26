@@ -16,7 +16,7 @@ flutter = ["mopro-ffi/flutter"]
 wasm = ["mopro-ffi/wasm"]
 
 [dependencies]
-mopro-ffi = { version = "0.3.4" }
+mopro-ffi = { version = "=0.3.6" }
 thiserror = "2.0.12"
 anyhow = "1.0.99"
 
@@ -32,7 +32,7 @@ anyhow = "1.0.99"
 # GNARK_BUILD_DEPENDENCIES
 
 [dev-dependencies]
-mopro-ffi = { version = "0.3.4", features = ["uniffi-tests"] }
+mopro-ffi = { version = "=0.3.6", features = ["uniffi-tests"] }
 
 # CIRCOM_DEV_DEPENDENCIES
 # HALO2_DEV_DEPENDENCIES
@@ -40,7 +40,7 @@ mopro-ffi = { version = "0.3.4", features = ["uniffi-tests"] }
 # GNARK_DEV_DEPENDENCIES
 
 [target.wasm32-unknown-unknown.dependencies]
-mopro-ffi = { version = "0.3.4", features = ["wasm"] }
+mopro-ffi = { version = "=0.3.6", features = ["wasm"] }
 wasm-bindgen = "0.2"
 serde-wasm-bindgen = "0.6"
 
