@@ -12,6 +12,14 @@ use noir_rs::{
 
 use crate::MoproError;
 
+// Shim for `__libc_single_threaded`, referenced by the Aztec barretenberg
+// Android prebuilt but never exported by bionic. 0 means "multithreaded";
+// libc++ only reads it as a fast-path hint.
+#[cfg(target_os = "android")]
+#[no_mangle]
+#[used]
+pub static __libc_single_threaded: u8 = 0;
+
 /// Generates a Noir proof with automatic hash function selection
 ///
 /// This is the main proof generation function that automatically chooses
