@@ -522,12 +522,16 @@ jobs:
                   CI: "true"
               run: |
                   set -euo pipefail
-                  rustup component add rust-src --toolchain nightly-2024-07-18
+                  rustup component add rust-src --toolchain nightly-2025-02-20
                   # TODO: allow mopro CLI to run fully non-interactive so we can drop the pseudo-tty workaround below
                   if [[ "$RUNNER_OS" == "macOS" ]]; then
                     printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode release --platforms web
                   else
-                    printf 'y\n' | script -q -c "$GITHUB_WORKSPACE/bin/mopro build --mode release --platforms web" /dev/null
+                    printf 'y\n' | script -q -e -c "$GITHUB_WORKSPACE/bin/mopro build --mode release --platforms web" /dev/null
+                  fi
+                  if [ ! -d MoproWasmBindings ]; then
+                    echo "::error::wasm build did not produce MoproWasmBindings/"
+                    exit 1
                   fi
             - name: Create Web framework (release, halo2)
               working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
@@ -554,7 +558,7 @@ jobs:
             - name: Setup Rust
               uses: ./.github/actions/setup-rust
               with:
-                  toolchain: nightly-2024-07-18
+                  toolchain: nightly-2025-02-20
                   cache-key: wasm-env
             - name: Cache wasm-pack
               id: cache-wasm-pack
