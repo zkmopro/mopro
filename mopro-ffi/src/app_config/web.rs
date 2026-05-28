@@ -44,7 +44,7 @@ impl PlatformBuilder for WebPlatform {
         let mut cmd = Command::new("rustup");
         cmd.args([
             "run",
-            "nightly-2024-07-18",
+            "nightly-2025-02-20",
             "wasm-pack",
             "build",
             "--target",
