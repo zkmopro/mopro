@@ -110,8 +110,10 @@ fn build_for_arch(
         .arg("ndk")
         .arg("-t")
         .arg(arch_str)
+        // Raise the min API: the barretenberg Android prebuilt imports symbols
+        // (e.g. __tls_get_addr, API 29 on x86_64) absent from cargo-ndk's default 21.
         .arg("--platform")
-        .arg("30") // API 30 minimum
+        .arg("30")
         .arg("build")
         .arg("--link-libcxx-shared")
         .arg("--lib");
@@ -120,9 +122,8 @@ fn build_for_arch(
     }
 
     // barretenberg-rs's build.rs matches "linux" before "android", so for
-    // *-linux-android it downloads the Linux glibc/libstdc++ prebuilt, whose
-    // symbols Android can't resolve at dlopen. It reads BB_LIB_DIR ahead of its
-    // own download, so point that at the correct Android prebuilt instead.
+    // *-linux-android it fetches the glibc prebuilt Android can't dlopen.
+    // BB_LIB_DIR overrides that download; point it at the correct archive.
     if let Some(bb_lib_dir) = setup_barretenberg_android_lib(arch, project_dir, build_dir)? {
         build_cmd.env("BB_LIB_DIR", &bb_lib_dir);
     }
