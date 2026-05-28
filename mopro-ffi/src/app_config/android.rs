@@ -61,9 +61,11 @@ impl PlatformBuilder for AndroidPlatform {
         let mut latest_out_lib_path = PathBuf::new();
         for arch in target_archs {
             latest_out_lib_path =
-                build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode).context(
-                    format!("Failed to build for architecture: {}", arch.as_str()),
-                )?;
+                build_for_arch(arch, &lib_name, project_dir, &build_dir, &bindings_out, mode)
+                    .context(format!(
+                        "Failed to build for architecture: {}",
+                        arch.as_str()
+                    ))?;
         }
 
         generate_android_bindings(&latest_out_lib_path, &bindings_out)
@@ -88,6 +90,7 @@ impl PlatformBuilder for AndroidPlatform {
 fn build_for_arch(
     arch: AndroidArch,
     lib_name: &str,
+    project_dir: &Path,
     build_dir: &Path,
     bindings_out: &Path,
     mode: Mode,
@@ -109,6 +112,15 @@ fn build_for_arch(
     if mode == Mode::Release {
         build_cmd.arg("--release");
     }
+
+    // barretenberg-rs's build.rs matches "linux" before "android", so for
+    // *-linux-android it downloads the Linux glibc/libstdc++ prebuilt, whose
+    // symbols Android can't resolve at dlopen. It reads BB_LIB_DIR ahead of its
+    // own download, so point that at the correct Android prebuilt instead.
+    if let Some(bb_lib_dir) = setup_barretenberg_android_lib(arch, project_dir, build_dir)? {
+        build_cmd.env("BB_LIB_DIR", &bb_lib_dir);
+    }
+
     build_cmd
         .env("CARGO_BUILD_TARGET_DIR", build_dir)
         .env("CARGO_BUILD_TARGET", arch_str)
@@ -143,6 +155,110 @@ fn build_for_arch(
     fs::copy(&out_lib_path, &out_lib_dest).context("Failed to copy file")?;
 
     Ok(out_lib_path)
+}
+
+/// Fetch the correct barretenberg Android static library for `arch` and return
+/// the dir to expose via `BB_LIB_DIR`. `None` when the project does not use
+/// barretenberg-rs or the arch has no published Android prebuilt.
+fn setup_barretenberg_android_lib(
+    arch: AndroidArch,
+    project_dir: &Path,
+    build_dir: &Path,
+) -> anyhow::Result<Option<PathBuf>> {
+    // Aztec only publishes static Android prebuilts for arm64 and x86_64.
+    let bb_arch = match arch {
+        AndroidArch::X8664Linux => "x86_64-android",
+        AndroidArch::Aarch64Linux => "arm64-android",
+        _ => return Ok(None),
+    };
+
+    let Some(version) = barretenberg_rs_version(project_dir)? else {
+        return Ok(None);
+    };
+
+    let dest = build_dir.join("bb-android-prebuilt").join(bb_arch);
+    let lib = dest.join("libbb-external.a");
+    if lib.exists() {
+        return Ok(Some(dest));
+    }
+    fs::create_dir_all(&dest).context("Failed to create barretenberg prebuilt dir")?;
+
+    let url = format!(
+        "https://github.com/AztecProtocol/aztec-packages/releases/download/v{version}/barretenberg-static-{bb_arch}.tar.gz"
+    );
+    let tarball = dest.join("barretenberg-static.tar.gz");
+
+    let status = Command::new("curl")
+        .args(["-L", "-f", "-o"])
+        .arg(&tarball)
+        .arg(&url)
+        .status()
+        .context("Failed to run curl for barretenberg Android prebuilt")?;
+    if !status.success() {
+        anyhow::bail!("Failed to download barretenberg Android prebuilt from {url}");
+    }
+
+    let status = Command::new("tar")
+        .arg("-xzf")
+        .arg(&tarball)
+        .arg("-C")
+        .arg(&dest)
+        .status()
+        .context("Failed to run tar for barretenberg Android prebuilt")?;
+    if !status.success() {
+        anyhow::bail!("Failed to extract barretenberg Android prebuilt");
+    }
+    let _ = fs::remove_file(&tarball);
+
+    if !lib.exists() {
+        anyhow::bail!(
+            "barretenberg Android prebuilt extracted but libbb-external.a is missing in {}",
+            dest.display()
+        );
+    }
+    Ok(Some(dest))
+}
+
+/// Resolve the pinned barretenberg-rs version from `project_dir`'s `Cargo.lock`
+/// (generating one if absent). `None` when the crate is not a dependency.
+fn barretenberg_rs_version(project_dir: &Path) -> anyhow::Result<Option<String>> {
+    let lock_path = project_dir.join("Cargo.lock");
+    if !lock_path.exists() {
+        // We need the resolved version before cargo ndk would create the lock.
+        let status = Command::new("cargo")
+            .arg("generate-lockfile")
+            .arg("--manifest-path")
+            .arg(project_dir.join("Cargo.toml"))
+            .status()
+            .context("Failed to run cargo generate-lockfile")?;
+        if !status.success() {
+            return Ok(None);
+        }
+    }
+    let lock = match fs::read_to_string(&lock_path) {
+        Ok(lock) => lock,
+        Err(_) => return Ok(None),
+    };
+    Ok(parse_barretenberg_rs_version(&lock))
+}
+
+/// Extract the `barretenberg-rs` package version from a `Cargo.lock` body.
+fn parse_barretenberg_rs_version(lock: &str) -> Option<String> {
+    let mut lines = lock.lines();
+    while let Some(line) = lines.next() {
+        if line.trim() == r#"name = "barretenberg-rs""# {
+            for next in lines.by_ref() {
+                let trimmed = next.trim();
+                if let Some(rest) = trimmed.strip_prefix(r#"version = ""#) {
+                    return rest.strip_suffix('"').map(str::to_string);
+                }
+                if trimmed == "[[package]]" {
+                    break;
+                }
+            }
+        }
+    }
+    None
 }
 
 fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
@@ -216,4 +332,69 @@ fn reformat_kotlin_package(
     );
     fs::write(&out_android_kt_file, modified_content)
         .context("Failed to write modified Kotlin file")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_barretenberg_rs_version;
+
+    #[test]
+    fn parses_barretenberg_rs_version_from_lockfile() {
+        let lock = r#"
+[[package]]
+name = "anyhow"
+version = "1.0.86"
+
+[[package]]
+name = "barretenberg-rs"
+version = "4.2.0-aztecnr-rc.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "camino"
+version = "1.1.9"
+"#;
+        assert_eq!(
+            parse_barretenberg_rs_version(lock).as_deref(),
+            Some("4.2.0-aztecnr-rc.2")
+        );
+    }
+
+    #[test]
+    fn returns_none_when_barretenberg_rs_absent() {
+        let lock = r#"
+[[package]]
+name = "anyhow"
+version = "1.0.86"
+
+[[package]]
+name = "camino"
+version = "1.1.9"
+"#;
+        assert_eq!(parse_barretenberg_rs_version(lock), None);
+    }
+
+    #[test]
+    fn does_not_confuse_a_dependency_mention_with_the_package_entry() {
+        // A dependency mention must not be read as the package's version stanza.
+        let lock = r#"
+[[package]]
+name = "noir"
+version = "1.0.0-beta.19"
+dependencies = [
+ "barretenberg-rs",
+]
+
+[[package]]
+name = "barretenberg-rs"
+version = "4.3.0"
+"#;
+        assert_eq!(
+            parse_barretenberg_rs_version(lock).as_deref(),
+            Some("4.3.0")
+        );
+    }
 }
