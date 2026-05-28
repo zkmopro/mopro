@@ -60,12 +60,18 @@ impl PlatformBuilder for AndroidPlatform {
         install_ndk();
         let mut latest_out_lib_path = PathBuf::new();
         for arch in target_archs {
-            latest_out_lib_path =
-                build_for_arch(arch, &lib_name, project_dir, &build_dir, &bindings_out, mode)
-                    .context(format!(
-                        "Failed to build for architecture: {}",
-                        arch.as_str()
-                    ))?;
+            latest_out_lib_path = build_for_arch(
+                arch,
+                &lib_name,
+                project_dir,
+                &build_dir,
+                &bindings_out,
+                mode,
+            )
+            .context(format!(
+                "Failed to build for architecture: {}",
+                arch.as_str()
+            ))?;
         }
 
         generate_android_bindings(&latest_out_lib_path, &bindings_out)
