@@ -261,7 +261,9 @@ jobs:
             matrix:
                 adapter: [circom, halo2, noir, gnark]
         runs-on: ubuntu-latest
-        timeout-minutes: 20
+        # noir does a second NDK-linked build for uniffi metadata (Zig strips the
+        # .symtab bindgen needs), so it needs more headroom than the others.
+        timeout-minutes: ${{ matrix.adapter == 'noir' && 30 || 20 }}
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
             - uses: actions/checkout@v6

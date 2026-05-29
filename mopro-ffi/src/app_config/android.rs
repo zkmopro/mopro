@@ -59,8 +59,9 @@ impl PlatformBuilder for AndroidPlatform {
 
         install_ndk();
         let mut latest_out_lib_path = PathBuf::new();
+        let mut zig_linked_arch: Option<AndroidArch> = None;
         for arch in target_archs {
-            latest_out_lib_path = build_for_arch(
+            let (out_lib_path, zig_linked) = build_for_arch(
                 arch,
                 &lib_name,
                 project_dir,
@@ -72,9 +73,23 @@ impl PlatformBuilder for AndroidPlatform {
                 "Failed to build for architecture: {}",
                 arch.as_str()
             ))?;
+            latest_out_lib_path = out_lib_path;
+            if zig_linked {
+                zig_linked_arch.get_or_insert(arch);
+            }
         }
 
-        generate_android_bindings(&latest_out_lib_path, &bindings_out)
+        // uniffi-bindgen reads the static `.symtab`, which Zig drops. When the
+        // shipped lib is Zig-linked, generate bindings from a separate NDK-linked
+        // build instead (identical metadata, keeps `.symtab`; it can't run, but
+        // bindgen never runs it).
+        let bindgen_lib_path = match zig_linked_arch {
+            Some(arch) => build_bindgen_lib(arch, &lib_name, project_dir, &build_dir)
+                .context("Failed to build NDK lib for binding generation")?,
+            None => latest_out_lib_path,
+        };
+
+        generate_android_bindings(&bindgen_lib_path, &bindings_out)
             .expect("Failed to generate bindings");
 
         reformat_kotlin_package(
@@ -100,7 +115,7 @@ fn build_for_arch(
     build_dir: &Path,
     bindings_out: &Path,
     mode: Mode,
-) -> anyhow::Result<PathBuf> {
+) -> anyhow::Result<(PathBuf, bool)> {
     let arch_str = arch.as_str();
     install_arch(arch_str.to_string());
     let cpp_lib_dest = bindings_out.join("jniLibs");
@@ -163,6 +178,53 @@ fn build_for_arch(
     fs::create_dir_all(parent_dir).context("Failed to create jniLibs directory")?;
     fs::copy(&out_lib_path, &out_lib_dest).context("Failed to copy file")?;
 
+    Ok((out_lib_path, bb_lib_dir.is_some()))
+}
+
+/// Build `arch` with the NDK's own linker (no Zig), solely to extract uniffi
+/// metadata. Zig drops the static `.symtab` uniffi-bindgen reads; the NDK linker
+/// keeps it. The result can't run (barretenberg's `std::__1` libc++ stays
+/// unresolved) but bindgen never runs it. Built in debug into a separate target
+/// dir so it never touches the shipped Zig-linked jniLibs.
+fn build_bindgen_lib(
+    arch: AndroidArch,
+    lib_name: &str,
+    project_dir: &Path,
+    build_dir: &Path,
+) -> anyhow::Result<PathBuf> {
+    let arch_str = arch.as_str();
+    let bindgen_target = build_dir.join("bindgen");
+    let bb_lib_dir = setup_barretenberg_android_lib(arch, project_dir, build_dir)?;
+
+    let mut build_cmd = Command::new("cargo");
+    build_cmd
+        .arg("ndk")
+        .arg("-t")
+        .arg(arch_str)
+        .arg("--platform")
+        .arg("30")
+        .arg("build")
+        .arg("--link-libcxx-shared")
+        .arg("--lib");
+    if let Some(bb_lib_dir) = &bb_lib_dir {
+        build_cmd.env("BB_LIB_DIR", bb_lib_dir);
+    }
+    build_cmd
+        .env("CARGO_BUILD_TARGET_DIR", &bindgen_target)
+        .env("CARGO_BUILD_TARGET", arch_str)
+        .env("CARGO_NDK_OUTPUT_PATH", bindgen_target.join("jniLibs"))
+        .spawn()
+        .expect("Failed to spawn cargo build for bindgen lib")
+        .wait()
+        .expect("cargo build (bindgen lib) errored");
+
+    let out_lib_path = bindgen_target.join(arch_str).join("debug").join(lib_name);
+    if !out_lib_path.exists() {
+        anyhow::bail!(
+            "NDK bindgen lib missing at {} (needed for uniffi metadata)",
+            out_lib_path.display()
+        );
+    }
     Ok(out_lib_path)
 }
 
