@@ -280,6 +280,14 @@ jobs:
               with:
                   ndk-version: r26d
 
+            # The barretenberg prebuilt is Zig-built against upstream libc++ (std::__1),
+            # incompatible with the NDK's std::__ndk1; link with Zig so it resolves.
+            - name: Setup Zig (for noir/barretenberg libc++ ABI)
+              if: matrix.adapter == 'noir'
+              uses: mlugg/setup-zig@v2
+              with:
+                  version: 0.16.0
+
             - name: Prepare template project
               uses: ./.github/actions/mopro-init-project
               with:

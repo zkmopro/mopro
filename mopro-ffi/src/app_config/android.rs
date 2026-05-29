@@ -105,6 +105,10 @@ fn build_for_arch(
     install_arch(arch_str.to_string());
     let cpp_lib_dest = bindings_out.join("jniLibs");
 
+    // barretenberg-rs's build.rs matches "linux" before "android" and fetches a
+    // glibc prebuilt Android can't dlopen; BB_LIB_DIR overrides it with the right one.
+    let bb_lib_dir = setup_barretenberg_android_lib(arch, project_dir, build_dir)?;
+
     let mut build_cmd = Command::new("cargo");
     build_cmd
         .arg("ndk")
@@ -121,11 +125,9 @@ fn build_for_arch(
         build_cmd.arg("--release");
     }
 
-    // barretenberg-rs's build.rs matches "linux" before "android", so for
-    // *-linux-android it fetches the glibc prebuilt Android can't dlopen.
-    // BB_LIB_DIR overrides that download; point it at the correct archive.
-    if let Some(bb_lib_dir) = setup_barretenberg_android_lib(arch, project_dir, build_dir)? {
-        build_cmd.env("BB_LIB_DIR", &bb_lib_dir);
+    if let Some(bb_lib_dir) = &bb_lib_dir {
+        build_cmd.env("BB_LIB_DIR", bb_lib_dir);
+        configure_zig_linker(&mut build_cmd, arch, build_dir)?;
     }
 
     build_cmd
@@ -224,6 +226,130 @@ fn setup_barretenberg_android_lib(
         );
     }
     Ok(Some(dest))
+}
+
+/// Link the final Android library through Zig so the barretenberg prebuilt's
+/// libc++ (`std::__1`) symbols resolve at runtime. The NDK's `std::__ndk1` libc++
+/// is ABI-incompatible and can't satisfy them; only the linker is overridden, so
+/// the NDK still compiles everything else.
+fn configure_zig_linker(
+    build_cmd: &mut Command,
+    arch: AndroidArch,
+    build_dir: &Path,
+) -> anyhow::Result<()> {
+    let zig_ok = Command::new("zig")
+        .arg("version")
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false);
+    if !zig_ok {
+        anyhow::bail!(
+            "Building the Noir (barretenberg) adapter for Android requires Zig on PATH \
+             (https://ziglang.org/download/). The prebuilt barretenberg static library is \
+             built with Zig's libc++ (std::__1) and must be linked with Zig so those symbols \
+             resolve at runtime; the NDK's libc++ (std::__ndk1) is ABI-incompatible."
+        );
+    }
+
+    let ndk = android_ndk_home()?;
+    let host = ndk_host_tag();
+    let sysroot = ndk
+        .join("toolchains")
+        .join("llvm")
+        .join("prebuilt")
+        .join(host)
+        .join("sysroot");
+    let triple = arch.as_str(); // e.g. x86_64-linux-android
+    let api = "30";
+
+    let triple_lib = sysroot.join("usr").join("lib").join(triple);
+    let crt_dir = triple_lib.join(api);
+    let arch_include = sysroot.join("usr").join("include").join(triple);
+    let generic_include = sysroot.join("usr").join("include");
+
+    fs::create_dir_all(build_dir).context("Failed to create build dir for Zig linker config")?;
+    let build_dir_abs = fs::canonicalize(build_dir).context("Failed to resolve build dir")?;
+
+    // Zig ships no Android libc, so point it at the NDK's bionic + arch headers
+    // (sys_include_dir is the arch dir, where the kernel `asm/` headers live).
+    let libc_conf = build_dir_abs.join(format!("zig-android-libc-{triple}.txt"));
+    fs::write(
+        &libc_conf,
+        format!(
+            "include_dir={}\nsys_include_dir={}\ncrt_dir={}\nmsvc_lib_dir=\nkernel32_lib_dir=\ngcc_dir=\n",
+            generic_include.display(),
+            arch_include.display(),
+            crt_dir.display(),
+        ),
+    )
+    .context("Failed to write Zig libc config")?;
+
+    // `zig cc` bakes in Zig's static `__1` libc++ (resolving barretenberg's `-lc++`);
+    // the trailing `-lc++_shared` keeps the NDK's `__ndk1` libc++ for other C++.
+    let wrapper = build_dir_abs.join(format!("zig-android-cc-{triple}.sh"));
+    fs::write(
+        &wrapper,
+        format!(
+            "#!/bin/sh\nset -e\nexport ZIG_LIBC=\"{libc}\"\nexec zig cc -target {triple} \
+             -L \"{crt}\" -L \"{tl}\" \"$@\" -lc++_shared\n",
+            libc = libc_conf.display(),
+            triple = triple,
+            crt = crt_dir.display(),
+            tl = triple_lib.display(),
+        ),
+    )
+    .context("Failed to write Zig linker wrapper")?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms = fs::metadata(&wrapper)?.permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&wrapper, perms)?;
+    }
+
+    // cargo-ndk forces `CARGO_TARGET_<triple>_LINKER`, so set the linker via
+    // RUSTFLAGS instead (wins), preserving any caller RUSTFLAGS.
+    let linker_flag = format!("-Clinker={}", wrapper.display());
+    let rustflags = match std::env::var("RUSTFLAGS") {
+        Ok(existing) if !existing.trim().is_empty() => format!("{existing} {linker_flag}"),
+        _ => linker_flag,
+    };
+    build_cmd.env("RUSTFLAGS", rustflags);
+
+    Ok(())
+}
+
+/// Locate the Android NDK from the usual environment variables.
+fn android_ndk_home() -> anyhow::Result<PathBuf> {
+    for var in [
+        "ANDROID_NDK_HOME",
+        "ANDROID_NDK_ROOT",
+        "ANDROID_NDK",
+        "NDK_HOME",
+        "NDK_PATH",
+    ] {
+        if let Ok(value) = std::env::var(var) {
+            if !value.is_empty() {
+                let path = PathBuf::from(value);
+                if path.exists() {
+                    return Ok(path);
+                }
+            }
+        }
+    }
+    anyhow::bail!(
+        "Could not locate the Android NDK. Set ANDROID_NDK_HOME to your NDK install; it is \
+         required to link the Noir adapter for Android with Zig."
+    );
+}
+
+/// NDK prebuilt host directory tag. Apple Silicon uses the x86_64 tools.
+fn ndk_host_tag() -> &'static str {
+    match std::env::consts::OS {
+        "macos" => "darwin-x86_64",
+        "windows" => "windows-x86_64",
+        _ => "linux-x86_64",
+    }
 }
 
 /// Resolve the pinned barretenberg-rs version from `project_dir`'s `Cargo.lock`
