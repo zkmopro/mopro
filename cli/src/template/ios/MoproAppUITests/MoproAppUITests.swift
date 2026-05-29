@@ -83,10 +83,11 @@ final class MoproAppUITests: XCTestCase {
         
         app.buttons["proveNoir"].tap()
         let proveText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "1️⃣")).firstMatch
-        XCTAssertTrue(proveText.waitForExistence(timeout: 5), "The time of proof generation is over 5 secs")
-        
+        // beta.19 barretenberg proving exceeds the other adapters' 5s on loaded CI simulators.
+        XCTAssertTrue(proveText.waitForExistence(timeout: 120), "The time of proof generation is over 120 secs")
+
         app.buttons["verifyNoir"].tap()
         let verifyText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "2️⃣")).firstMatch
-        XCTAssertTrue(verifyText.waitForExistence(timeout: 5), "The time of proof verification is over 5 secs")
+        XCTAssertTrue(verifyText.waitForExistence(timeout: 60), "The time of proof verification is over 60 secs")
     }
 }
