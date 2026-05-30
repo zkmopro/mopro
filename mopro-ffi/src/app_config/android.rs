@@ -179,11 +179,10 @@ fn build_for_arch(
     Ok((out_lib_path, bb_lib_dir.is_some()))
 }
 
-/// Build `arch` with the NDK's own linker (no Zig), solely to extract uniffi
-/// metadata. Zig drops the static `.symtab` uniffi-bindgen reads; the NDK linker
-/// keeps it. The result can't run (barretenberg's `std::__1` libc++ stays
-/// unresolved) but bindgen never runs it. Built in debug into a separate target
-/// dir so it never touches the shipped Zig-linked jniLibs.
+/// Build `arch` with the NDK linker (no Zig) only to extract uniffi metadata:
+/// Zig drops the `.symtab` uniffi-bindgen reads, the NDK keeps it. The lib can't
+/// run (barretenberg's `std::__1` libc++ is unresolved) but bindgen never runs
+/// it; a separate debug target dir keeps the shipped Zig-linked jniLibs untouched.
 fn build_bindgen_lib(
     arch: AndroidArch,
     lib_name: &str,
@@ -245,7 +244,11 @@ fn setup_barretenberg_android_lib(
         return Ok(None);
     };
 
-    let dest = build_dir.join("bb-android-prebuilt").join(bb_arch);
+    // Cache per version: a noir-rs bump changes the prebuilt, and `build/` isn't
+    // wiped between builds, so an arch-only key would relink a stale .a.
+    let dest = build_dir
+        .join("bb-android-prebuilt")
+        .join(format!("{bb_arch}-{version}"));
     let lib = dest.join("libbb-external.a");
     if lib.exists() {
         return Ok(Some(dest));
@@ -425,13 +428,16 @@ fn barretenberg_rs_version(project_dir: &Path) -> anyhow::Result<Option<String>>
             .status()
             .context("Failed to run cargo generate-lockfile")?;
         if !status.success() {
-            return Ok(None);
+            anyhow::bail!(
+                "cargo generate-lockfile failed; cannot resolve the barretenberg-rs version \
+                 needed to fetch the correct Android prebuilt"
+            );
         }
     }
-    let lock = match fs::read_to_string(&lock_path) {
-        Ok(lock) => lock,
-        Err(_) => return Ok(None),
-    };
+    // A missing/unreadable lock is a real error, not "crate absent": returning
+    // None would silently relink the wrong (glibc) prebuilt and break dlopen.
+    let lock = fs::read_to_string(&lock_path)
+        .with_context(|| format!("Failed to read {}", lock_path.display()))?;
     Ok(parse_barretenberg_rs_version(&lock))
 }
 
