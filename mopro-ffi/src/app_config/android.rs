@@ -79,10 +79,8 @@ impl PlatformBuilder for AndroidPlatform {
             }
         }
 
-        // uniffi-bindgen reads the static `.symtab`, which Zig drops. When the
-        // shipped lib is Zig-linked, generate bindings from a separate NDK-linked
-        // build instead (identical metadata, keeps `.symtab`; it can't run, but
-        // bindgen never runs it).
+        // Zig strips the `.symtab` uniffi-bindgen needs, so when the shipped lib
+        // is Zig-linked, generate bindings from a separate NDK-linked build.
         let bindgen_lib_path = match zig_linked_arch {
             Some(arch) => build_bindgen_lib(arch, &lib_name, project_dir, &build_dir)
                 .context("Failed to build NDK lib for binding generation")?,
@@ -574,7 +572,6 @@ version = "1.1.9"
 
     #[test]
     fn does_not_confuse_a_dependency_mention_with_the_package_entry() {
-        // A dependency mention must not be read as the package's version stanza.
         let lock = r#"
 [[package]]
 name = "noir"
