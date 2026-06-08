@@ -107,7 +107,7 @@ Our current implementation draws heavily from the zkPassport team’s work, whic
 | --------- | ----------------------------- | ------- |
 | iOS       | `aarch64-apple-ios`           | ✅      |
 | iOS       | `aarch64-apple-ios-sim`       | ✅      |
-| iOS       | `x86_64-apple-ios`            | ✅      |
+| iOS       | `x86_64-apple-ios`            | ❌      |
 | Android   | `x86_64-linux-android`        | ✅      |
 | Android   | `i686-linux-android`          | ❌      |
 | Android   | `armv7-linux-androideabi`     | ❌      |

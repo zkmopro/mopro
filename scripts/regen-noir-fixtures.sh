@@ -14,7 +14,12 @@ TARGET_DIR="$CIRCUIT_DIR/target"
 TEMPLATE_VEC="$ROOT/cli/src/template/init/test-vectors/noir"
 TOPLEVEL_VEC="$ROOT/test-vectors/noir"
 
-echo "[1/4] Compiling multiplier2 with $(nargo --version | head -1)"
+NARGO_VER="$(nargo --version | head -1)"
+echo "[1/4] Compiling multiplier2 with ${NARGO_VER}"
+if [[ "${NARGO_VER}" != *"1.0.0-beta.19"* ]]; then
+    echo "error: expected nargo v1.0.0-beta.19, got: ${NARGO_VER}" >&2
+    exit 1
+fi
 ( cd "$CIRCUIT_DIR" && nargo compile )
 
 echo "[2/4] Downloading SRS and computing Keccak + Poseidon VKs"
