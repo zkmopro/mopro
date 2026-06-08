@@ -223,8 +223,7 @@ jobs:
                   tar -xzf mopro-example-${{ matrix.adapter }}.tar.gz
 
             - name: Xcode test (simulator, arm64 only)
-              # noir retries flaky proving (see RETRY_FLAGS below), so it needs more headroom.
-              timeout-minutes: ${{ matrix.adapter == 'noir' && 25 || 15 }}
+              timeout-minutes: 15
               working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
               run: |
                   # Capitalize adapter (circom -> Circom, halo2 -> Halo2, noir -> Noir)
@@ -232,14 +231,6 @@ jobs:
                   ADAPTER_UPPER="$(tr '[:lower:]' '[:upper:]' <<< ${ADAPTER:0:1})${ADAPTER:1}"
 
                   echo "Running test test${ADAPTER_UPPER}ProveVerify"
-
-                  # barretenberg beta.19 proving is bimodal on the simulator (usually <5s,
-                  # occasionally stalls past the 120s timeout). Retry noir so one bad roll
-                  # doesn't fail the build; keep other adapters strict to catch real regressions.
-                  RETRY_FLAGS=""
-                  if [ "$ADAPTER" = "noir" ]; then
-                    RETRY_FLAGS="-retry-tests-on-failure -test-iterations 3"
-                  fi
 
                   xcodebuild \
                     -project ios/MoproApp.xcodeproj \
@@ -253,7 +244,6 @@ jobs:
                     -maximum-parallel-testing-workers 1 \
                     -resultBundlePath ${{ runner.temp }}/MoproApp-simulator-test.xcresult \
                     -derivedDataPath ${{ runner.temp }}/DerivedData \
-                    $RETRY_FLAGS \
                     test
 
             - name: Upload Xcode results (failure)
@@ -271,9 +261,7 @@ jobs:
             matrix:
                 adapter: [circom, halo2, noir, gnark]
         runs-on: ubuntu-latest
-        # noir does a second NDK-linked build for uniffi metadata (Zig strips the
-        # .symtab bindgen needs), so it needs more headroom than the others.
-        timeout-minutes: ${{ matrix.adapter == 'noir' && 30 || 20 }}
+        timeout-minutes: 30
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
             - uses: actions/checkout@v6
@@ -292,8 +280,8 @@ jobs:
               with:
                   ndk-version: r26d
 
-            # The barretenberg prebuilt is Zig-built against upstream libc++ (std::__1),
-            # incompatible with the NDK's std::__ndk1; link with Zig so it resolves.
+            # The barretenberg prebuilt is Zig-built instead of NDK
+            # link libc++ with Zig so it resolves.
             - name: Setup Zig (for noir/barretenberg libc++ ABI)
               if: matrix.adapter == 'noir'
               uses: mlugg/setup-zig@v2
