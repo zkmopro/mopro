@@ -1,7 +1,0 @@
-[package]
-name = "noir_multiplier2"
-type = "bin"
-authors = ["zkmopro"]
-compiler_version = ">=0.30.0"
-
-[dependencies]

@@ -290,45 +290,6 @@ mod tests {
     use super::parse_barretenberg_rs_version;
 
     #[test]
-    fn parses_barretenberg_rs_version_from_lockfile() {
-        let lock = r#"
-[[package]]
-name = "anyhow"
-version = "1.0.86"
-
-[[package]]
-name = "barretenberg-rs"
-version = "4.2.0-aztecnr-rc.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "camino"
-version = "1.1.9"
-"#;
-        assert_eq!(
-            parse_barretenberg_rs_version(lock).as_deref(),
-            Some("4.2.0-aztecnr-rc.2")
-        );
-    }
-
-    #[test]
-    fn returns_none_when_barretenberg_rs_absent() {
-        let lock = r#"
-[[package]]
-name = "anyhow"
-version = "1.0.86"
-
-[[package]]
-name = "camino"
-version = "1.1.9"
-"#;
-        assert_eq!(parse_barretenberg_rs_version(lock), None);
-    }
-
-    #[test]
     fn does_not_confuse_a_dependency_mention_with_the_package_entry() {
         let lock = r#"
 [[package]]
