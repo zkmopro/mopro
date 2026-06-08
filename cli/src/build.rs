@@ -5,6 +5,7 @@ use mopro_ffi::app_config::constants::{AndroidArch, AndroidPlatform, Arch, IosPl
 use mopro_ffi::app_config::constants::{ReactNativePlatform, WebPlatform};
 use std::env;
 
+use mopro_ffi::app_config::android::AndroidBindingsParams;
 use mopro_ffi::app_config::build_from_str_arch;
 use mopro_ffi::app_config::ios::IosBindingsParams;
 
@@ -21,6 +22,7 @@ use crate::update::update_bindings;
 use mode_resolver::resolve_mode;
 use target_resolver::TargetSelection;
 
+mod android_noir;
 mod mode_resolver;
 mod target_resolver;
 
@@ -156,7 +158,12 @@ pub fn build_project(
             Platform::Android => {
                 let arch_strings = selection.architecture_strings();
                 let arch_refs: Vec<&String> = arch_strings.iter().collect();
-                build_from_str_arch::<AndroidPlatform>(mode, &current_dir, arch_refs, ())?;
+                let params = if config.adapter_contains(Adapter::Noir) {
+                    android_noir::android_bindings_params(&current_dir, &arch_refs)?
+                } else {
+                    AndroidBindingsParams::default()
+                };
+                build_from_str_arch::<AndroidPlatform>(mode, &current_dir, arch_refs, params)?;
             }
             Platform::Flutter => {
                 let platform_str = selection.platform().as_str();

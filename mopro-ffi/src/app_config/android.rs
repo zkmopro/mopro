@@ -1,5 +1,6 @@
 use anyhow::Context;
 use camino::Utf8Path;
+use std::collections::HashMap;
 use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
@@ -23,7 +24,31 @@ pub fn build() {
     super::build_from_env::<AndroidPlatform>()
 }
 
-pub type AndroidBindingsParams = ();
+/// Per-architecture build overrides a caller can inject into the `cargo ndk`
+/// invocation (e.g. the CLI, on behalf of an adapter that needs special linking).
+/// Keyed in [`AndroidBindingsParams::arch_overrides`] by target triple.
+#[derive(Default, Clone)]
+pub struct ArchBuildConfig {
+    /// Extra environment variables for this arch's `cargo ndk` invocation.
+    pub extra_env: Vec<(String, String)>,
+    /// Flags appended to `RUSTFLAGS` for this arch (e.g. `-Clinker=<wrapper>`).
+    pub extra_rustflags: Vec<String>,
+}
+
+/// Generic knobs that let a caller tailor the Android build without `mopro-ffi`
+/// knowing about any specific adapter. Defaults to a plain, unmodified build.
+#[derive(Default)]
+pub struct AndroidBindingsParams {
+    /// Per-target-triple overrides, keyed by [`AndroidArch::as_str`].
+    pub arch_overrides: HashMap<String, ArchBuildConfig>,
+    /// `--platform` (min Android API) passed to `cargo ndk`; cargo-ndk's own
+    /// default is used when `None`.
+    pub min_sdk_version: Option<u32>,
+    /// Generate uniffi bindings from a separate NDK-linked build. Needed when the
+    /// shipped lib is produced by a custom linker that strips the `.symtab`
+    /// uniffi-bindgen reads (e.g. Zig); the shipped jniLibs are left untouched.
+    pub relink_with_ndk_for_bindgen: bool,
+}
 
 impl PlatformBuilder for AndroidPlatform {
     type Arch = AndroidArch;
@@ -33,7 +58,7 @@ impl PlatformBuilder for AndroidPlatform {
         mode: Mode,
         project_dir: &Path,
         target_archs: Vec<Self::Arch>,
-        _params: Self::Params,
+        params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
         let uniffi_style_identifier = project_name_from_toml(project_dir)
             .expect("Failed to get project name from Cargo.toml");
@@ -59,32 +84,24 @@ impl PlatformBuilder for AndroidPlatform {
 
         install_ndk();
         let mut latest_out_lib_path = PathBuf::new();
-        let mut zig_linked_arch: Option<AndroidArch> = None;
+        let mut bindgen_arch: Option<AndroidArch> = None;
         for arch in target_archs {
-            let (out_lib_path, zig_linked) = build_for_arch(
-                arch,
-                &lib_name,
-                project_dir,
-                &build_dir,
-                &bindings_out,
-                mode,
-            )
-            .context(format!(
-                "Failed to build for architecture: {}",
-                arch.as_str()
-            ))?;
-            latest_out_lib_path = out_lib_path;
-            if zig_linked {
-                zig_linked_arch.get_or_insert(arch);
-            }
+            latest_out_lib_path =
+                build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode, &params).context(
+                    format!("Failed to build for architecture: {}", arch.as_str()),
+                )?;
+            bindgen_arch.get_or_insert(arch);
         }
 
-        // Zig strips the `.symtab` uniffi-bindgen needs, so when the shipped lib
-        // is Zig-linked, generate bindings from a separate NDK-linked build.
-        let bindgen_lib_path = match zig_linked_arch {
-            Some(arch) => build_bindgen_lib(arch, &lib_name, project_dir, &build_dir)
-                .context("Failed to build NDK lib for binding generation")?,
-            None => latest_out_lib_path,
+        // A custom linker can strip the `.symtab` uniffi-bindgen needs, so when
+        // asked, generate bindings from a separate NDK-linked build.
+        let bindgen_lib_path = if params.relink_with_ndk_for_bindgen {
+            let arch = bindgen_arch
+                .context("No target architectures provided for binding generation")?;
+            build_bindgen_lib(arch, &lib_name, &build_dir, &params)
+                .context("Failed to build NDK lib for binding generation")?
+        } else {
+            latest_out_lib_path
         };
 
         generate_android_bindings(&bindgen_lib_path, &bindings_out)
@@ -109,41 +126,28 @@ impl PlatformBuilder for AndroidPlatform {
 fn build_for_arch(
     arch: AndroidArch,
     lib_name: &str,
-    project_dir: &Path,
     build_dir: &Path,
     bindings_out: &Path,
     mode: Mode,
-) -> anyhow::Result<(PathBuf, bool)> {
+    params: &AndroidBindingsParams,
+) -> anyhow::Result<PathBuf> {
     let arch_str = arch.as_str();
     install_arch(arch_str.to_string());
     let cpp_lib_dest = bindings_out.join("jniLibs");
 
-    // barretenberg-rs's build.rs matches "linux" before "android" and fetches a
-    // glibc prebuilt Android can't dlopen; BB_LIB_DIR overrides it with the right one.
-    let bb_lib_dir = setup_barretenberg_android_lib(arch, project_dir, build_dir)?;
-
     let mut build_cmd = Command::new("cargo");
-    build_cmd
-        .arg("ndk")
-        .arg("-t")
-        .arg(arch_str)
-        // Raise the min API: the barretenberg Android prebuilt imports symbols
-        // (e.g. __tls_get_addr, API 29 on x86_64) absent from cargo-ndk's default 21.
-        .arg("--platform")
-        .arg("30")
-        .arg("build")
-        .arg("--link-libcxx-shared")
-        .arg("--lib");
+    build_cmd.arg("ndk").arg("-t").arg(arch_str);
+    if let Some(min_sdk) = params.min_sdk_version {
+        build_cmd.arg("--platform").arg(min_sdk.to_string());
+    }
+    build_cmd.arg("build").arg("--link-libcxx-shared").arg("--lib");
     if mode == Mode::Release {
         build_cmd.arg("--release");
     }
 
-    if let Some(bb_lib_dir) = &bb_lib_dir {
-        build_cmd.env("BB_LIB_DIR", bb_lib_dir);
-        configure_zig_linker(&mut build_cmd, arch, build_dir)?;
-    }
+    apply_arch_config(&mut build_cmd, params.arch_overrides.get(arch_str));
 
-    build_cmd
+    let status = build_cmd
         .env("CARGO_BUILD_TARGET_DIR", build_dir)
         .env("CARGO_BUILD_TARGET", arch_str)
         .env("CARGO_NDK_OUTPUT_PATH", cpp_lib_dest)
@@ -151,6 +155,9 @@ fn build_for_arch(
         .expect("Failed to spawn cargo build")
         .wait()
         .expect("cargo build errored");
+    if !status.success() {
+        anyhow::bail!("cargo ndk build failed for {arch_str}");
+    }
 
     let folder = match arch {
         AndroidArch::X8664Linux => ARCH_X86_64,
@@ -159,13 +166,7 @@ fn build_for_arch(
         AndroidArch::Aarch64Linux => ARCH_ARM_64_V8,
     };
 
-    let out_lib_path = build_dir.join(format!(
-        "{}/{}/{}/{}",
-        build_dir.display(),
-        arch_str,
-        mode.as_str(),
-        lib_name
-    ));
+    let out_lib_path = build_dir.join(arch_str).join(mode.as_str()).join(lib_name);
     let out_lib_dest = bindings_out.join(format!("jniLibs/{folder}/{lib_name}"));
 
     let parent_dir = out_lib_dest.parent().context(format!(
@@ -176,37 +177,57 @@ fn build_for_arch(
     fs::create_dir_all(parent_dir).context("Failed to create jniLibs directory")?;
     fs::copy(&out_lib_path, &out_lib_dest).context("Failed to copy file")?;
 
-    Ok((out_lib_path, bb_lib_dir.is_some()))
+    Ok(out_lib_path)
 }
 
-/// Build `arch` with the NDK linker (no Zig) only to extract uniffi metadata:
-/// Zig drops the `.symtab` uniffi-bindgen reads, the NDK keeps it. The lib can't
-/// run (barretenberg's `std::__1` libc++ is unresolved) but bindgen never runs
-/// it; a separate debug target dir keeps the shipped Zig-linked jniLibs untouched.
+/// Apply caller-supplied env vars and `RUSTFLAGS` additions to a `cargo ndk` command.
+fn apply_arch_config(build_cmd: &mut Command, config: Option<&ArchBuildConfig>) {
+    let Some(config) = config else {
+        return;
+    };
+    for (key, value) in &config.extra_env {
+        build_cmd.env(key, value);
+    }
+    if !config.extra_rustflags.is_empty() {
+        let extra = config.extra_rustflags.join(" ");
+        // Preserve any RUSTFLAGS the caller already set in the environment.
+        let rustflags = match std::env::var("RUSTFLAGS") {
+            Ok(existing) if !existing.trim().is_empty() => format!("{existing} {extra}"),
+            _ => extra,
+        };
+        build_cmd.env("RUSTFLAGS", rustflags);
+    }
+}
+
+/// Build `arch` with the plain NDK linker only to extract uniffi metadata: a
+/// custom linker (e.g. Zig) can drop the `.symtab` uniffi-bindgen reads, which the
+/// NDK linker keeps. This lib may not run, but bindgen never runs it; a separate
+/// target dir keeps the shipped jniLibs untouched. Caller env (e.g. an overriding
+/// lib dir) is applied, but `extra_rustflags` is not — this build must use the NDK
+/// linker.
 fn build_bindgen_lib(
     arch: AndroidArch,
     lib_name: &str,
-    project_dir: &Path,
     build_dir: &Path,
+    params: &AndroidBindingsParams,
 ) -> anyhow::Result<PathBuf> {
     let arch_str = arch.as_str();
     let bindgen_target = build_dir.join("bindgen");
-    let bb_lib_dir = setup_barretenberg_android_lib(arch, project_dir, build_dir)?;
 
     let mut build_cmd = Command::new("cargo");
-    build_cmd
-        .arg("ndk")
-        .arg("-t")
-        .arg(arch_str)
-        .arg("--platform")
-        .arg("30")
-        .arg("build")
-        .arg("--link-libcxx-shared")
-        .arg("--lib");
-    if let Some(bb_lib_dir) = &bb_lib_dir {
-        build_cmd.env("BB_LIB_DIR", bb_lib_dir);
+    build_cmd.arg("ndk").arg("-t").arg(arch_str);
+    if let Some(min_sdk) = params.min_sdk_version {
+        build_cmd.arg("--platform").arg(min_sdk.to_string());
     }
-    build_cmd
+    build_cmd.arg("build").arg("--link-libcxx-shared").arg("--lib");
+
+    if let Some(config) = params.arch_overrides.get(arch_str) {
+        for (key, value) in &config.extra_env {
+            build_cmd.env(key, value);
+        }
+    }
+
+    let status = build_cmd
         .env("CARGO_BUILD_TARGET_DIR", &bindgen_target)
         .env("CARGO_BUILD_TARGET", arch_str)
         .env("CARGO_NDK_OUTPUT_PATH", bindgen_target.join("jniLibs"))
@@ -214,6 +235,9 @@ fn build_bindgen_lib(
         .expect("Failed to spawn cargo build for bindgen lib")
         .wait()
         .expect("cargo build (bindgen lib) errored");
+    if !status.success() {
+        anyhow::bail!("cargo ndk build (bindgen lib) failed for {arch_str}");
+    }
 
     let out_lib_path = bindgen_target.join(arch_str).join("debug").join(lib_name);
     if !out_lib_path.exists() {
@@ -223,241 +247,6 @@ fn build_bindgen_lib(
         );
     }
     Ok(out_lib_path)
-}
-
-/// Fetch the correct barretenberg Android static library for `arch` and return
-/// the dir to expose via `BB_LIB_DIR`. `None` when the project does not use
-/// barretenberg-rs or the arch has no published Android prebuilt.
-fn setup_barretenberg_android_lib(
-    arch: AndroidArch,
-    project_dir: &Path,
-    build_dir: &Path,
-) -> anyhow::Result<Option<PathBuf>> {
-    // Aztec only publishes static Android prebuilts for arm64 and x86_64.
-    let bb_arch = match arch {
-        AndroidArch::X8664Linux => "x86_64-android",
-        AndroidArch::Aarch64Linux => "arm64-android",
-        _ => return Ok(None),
-    };
-
-    let Some(version) = barretenberg_rs_version(project_dir)? else {
-        return Ok(None);
-    };
-
-    // Cache per version: a noir-rs bump changes the prebuilt, and `build/` isn't
-    // wiped between builds, so an arch-only key would relink a stale .a.
-    let dest = build_dir
-        .join("bb-android-prebuilt")
-        .join(format!("{bb_arch}-{version}"));
-    let lib = dest.join("libbb-external.a");
-    if lib.exists() {
-        return Ok(Some(dest));
-    }
-    fs::create_dir_all(&dest).context("Failed to create barretenberg prebuilt dir")?;
-
-    let url = format!(
-        "https://github.com/AztecProtocol/aztec-packages/releases/download/v{version}/barretenberg-static-{bb_arch}.tar.gz"
-    );
-    let tarball = dest.join("barretenberg-static.tar.gz");
-
-    let status = Command::new("curl")
-        .args(["-L", "-f", "-o"])
-        .arg(&tarball)
-        .arg(&url)
-        .status()
-        .context("Failed to run curl for barretenberg Android prebuilt")?;
-    if !status.success() {
-        anyhow::bail!("Failed to download barretenberg Android prebuilt from {url}");
-    }
-
-    let status = Command::new("tar")
-        .arg("-xzf")
-        .arg(&tarball)
-        .arg("-C")
-        .arg(&dest)
-        .status()
-        .context("Failed to run tar for barretenberg Android prebuilt")?;
-    if !status.success() {
-        anyhow::bail!("Failed to extract barretenberg Android prebuilt");
-    }
-    let _ = fs::remove_file(&tarball);
-
-    if !lib.exists() {
-        anyhow::bail!(
-            "barretenberg Android prebuilt extracted but libbb-external.a is missing in {}",
-            dest.display()
-        );
-    }
-    Ok(Some(dest))
-}
-
-/// Link the final Android library through Zig so the barretenberg prebuilt's
-/// libc++ (`std::__1`) symbols resolve at runtime. The NDK's `std::__ndk1` libc++
-/// is ABI-incompatible and can't satisfy them; only the linker is overridden, so
-/// the NDK still compiles everything else.
-fn configure_zig_linker(
-    build_cmd: &mut Command,
-    arch: AndroidArch,
-    build_dir: &Path,
-) -> anyhow::Result<()> {
-    let zig_ok = Command::new("zig")
-        .arg("version")
-        .output()
-        .map(|o| o.status.success())
-        .unwrap_or(false);
-    if !zig_ok {
-        anyhow::bail!(
-            "Building the Noir (barretenberg) adapter for Android requires Zig on PATH \
-             (https://ziglang.org/download/). The prebuilt barretenberg static library is \
-             built with Zig's libc++ (std::__1) and must be linked with Zig so those symbols \
-             resolve at runtime; the NDK's libc++ (std::__ndk1) is ABI-incompatible."
-        );
-    }
-
-    let ndk = android_ndk_home()?;
-    let host = ndk_host_tag();
-    let sysroot = ndk
-        .join("toolchains")
-        .join("llvm")
-        .join("prebuilt")
-        .join(host)
-        .join("sysroot");
-    let triple = arch.as_str(); // e.g. x86_64-linux-android
-    let api = "30";
-
-    let triple_lib = sysroot.join("usr").join("lib").join(triple);
-    let crt_dir = triple_lib.join(api);
-    let arch_include = sysroot.join("usr").join("include").join(triple);
-    let generic_include = sysroot.join("usr").join("include");
-
-    fs::create_dir_all(build_dir).context("Failed to create build dir for Zig linker config")?;
-    let build_dir_abs = fs::canonicalize(build_dir).context("Failed to resolve build dir")?;
-
-    // Zig ships no Android libc, so point it at the NDK's bionic + arch headers
-    // (sys_include_dir is the arch dir, where the kernel `asm/` headers live).
-    let libc_conf = build_dir_abs.join(format!("zig-android-libc-{triple}.txt"));
-    fs::write(
-        &libc_conf,
-        format!(
-            "include_dir={}\nsys_include_dir={}\ncrt_dir={}\nmsvc_lib_dir=\nkernel32_lib_dir=\ngcc_dir=\n",
-            generic_include.display(),
-            arch_include.display(),
-            crt_dir.display(),
-        ),
-    )
-    .context("Failed to write Zig libc config")?;
-
-    // `zig cc` bakes in Zig's static `__1` libc++ (resolving barretenberg's `-lc++`);
-    // the trailing `-lc++_shared` keeps the NDK's `__ndk1` libc++ for other C++.
-    let wrapper = build_dir_abs.join(format!("zig-android-cc-{triple}.sh"));
-    fs::write(
-        &wrapper,
-        format!(
-            "#!/bin/sh\nset -e\nexport ZIG_LIBC=\"{libc}\"\nexec zig cc -target {triple} \
-             -L \"{crt}\" -L \"{tl}\" \"$@\" -lc++_shared\n",
-            libc = libc_conf.display(),
-            triple = triple,
-            crt = crt_dir.display(),
-            tl = triple_lib.display(),
-        ),
-    )
-    .context("Failed to write Zig linker wrapper")?;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let mut perms = fs::metadata(&wrapper)?.permissions();
-        perms.set_mode(0o755);
-        fs::set_permissions(&wrapper, perms)?;
-    }
-
-    // cargo-ndk forces `CARGO_TARGET_<triple>_LINKER`, so set the linker via
-    // RUSTFLAGS instead (wins), preserving any caller RUSTFLAGS.
-    let linker_flag = format!("-Clinker={}", wrapper.display());
-    let rustflags = match std::env::var("RUSTFLAGS") {
-        Ok(existing) if !existing.trim().is_empty() => format!("{existing} {linker_flag}"),
-        _ => linker_flag,
-    };
-    build_cmd.env("RUSTFLAGS", rustflags);
-
-    Ok(())
-}
-
-/// Locate the Android NDK from the usual environment variables.
-fn android_ndk_home() -> anyhow::Result<PathBuf> {
-    for var in [
-        "ANDROID_NDK_HOME",
-        "ANDROID_NDK_ROOT",
-        "ANDROID_NDK",
-        "NDK_HOME",
-        "NDK_PATH",
-    ] {
-        if let Ok(value) = std::env::var(var) {
-            if !value.is_empty() {
-                let path = PathBuf::from(value);
-                if path.exists() {
-                    return Ok(path);
-                }
-            }
-        }
-    }
-    anyhow::bail!(
-        "Could not locate the Android NDK. Set ANDROID_NDK_HOME to your NDK install; it is \
-         required to link the Noir adapter for Android with Zig."
-    );
-}
-
-/// NDK prebuilt host directory tag. Apple Silicon uses the x86_64 tools.
-fn ndk_host_tag() -> &'static str {
-    match std::env::consts::OS {
-        "macos" => "darwin-x86_64",
-        "windows" => "windows-x86_64",
-        _ => "linux-x86_64",
-    }
-}
-
-/// Resolve the pinned barretenberg-rs version from `project_dir`'s `Cargo.lock`
-/// (generating one if absent). `None` when the crate is not a dependency.
-fn barretenberg_rs_version(project_dir: &Path) -> anyhow::Result<Option<String>> {
-    let lock_path = project_dir.join("Cargo.lock");
-    if !lock_path.exists() {
-        // We need the resolved version before cargo ndk would create the lock.
-        let status = Command::new("cargo")
-            .arg("generate-lockfile")
-            .arg("--manifest-path")
-            .arg(project_dir.join("Cargo.toml"))
-            .status()
-            .context("Failed to run cargo generate-lockfile")?;
-        if !status.success() {
-            anyhow::bail!(
-                "cargo generate-lockfile failed; cannot resolve the barretenberg-rs version \
-                 needed to fetch the correct Android prebuilt"
-            );
-        }
-    }
-    // A missing/unreadable lock is a real error, not "crate absent": returning
-    // None would silently relink the wrong (glibc) prebuilt and break dlopen.
-    let lock = fs::read_to_string(&lock_path)
-        .with_context(|| format!("Failed to read {}", lock_path.display()))?;
-    Ok(parse_barretenberg_rs_version(&lock))
-}
-
-/// Extract the `barretenberg-rs` package version from a `Cargo.lock` body.
-fn parse_barretenberg_rs_version(lock: &str) -> Option<String> {
-    let mut lines = lock.lines();
-    while let Some(line) = lines.next() {
-        if line.trim() == r#"name = "barretenberg-rs""# {
-            for next in lines.by_ref() {
-                let trimmed = next.trim();
-                if let Some(rest) = trimmed.strip_prefix(r#"version = ""#) {
-                    return rest.strip_suffix('"').map(str::to_string);
-                }
-                if trimmed == "[[package]]" {
-                    break;
-                }
-            }
-        }
-    }
-    None
 }
 
 fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
@@ -531,68 +320,4 @@ fn reformat_kotlin_package(
     );
     fs::write(&out_android_kt_file, modified_content)
         .context("Failed to write modified Kotlin file")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::parse_barretenberg_rs_version;
-
-    #[test]
-    fn parses_barretenberg_rs_version_from_lockfile() {
-        let lock = r#"
-[[package]]
-name = "anyhow"
-version = "1.0.86"
-
-[[package]]
-name = "barretenberg-rs"
-version = "4.2.0-aztecnr-rc.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "camino"
-version = "1.1.9"
-"#;
-        assert_eq!(
-            parse_barretenberg_rs_version(lock).as_deref(),
-            Some("4.2.0-aztecnr-rc.2")
-        );
-    }
-
-    #[test]
-    fn returns_none_when_barretenberg_rs_absent() {
-        let lock = r#"
-[[package]]
-name = "anyhow"
-version = "1.0.86"
-
-[[package]]
-name = "camino"
-version = "1.1.9"
-"#;
-        assert_eq!(parse_barretenberg_rs_version(lock), None);
-    }
-
-    #[test]
-    fn does_not_confuse_a_dependency_mention_with_the_package_entry() {
-        let lock = r#"
-[[package]]
-name = "noir"
-version = "1.0.0-beta.19"
-dependencies = [
- "barretenberg-rs",
-]
-
-[[package]]
-name = "barretenberg-rs"
-version = "4.3.0"
-"#;
-        assert_eq!(
-            parse_barretenberg_rs_version(lock).as_deref(),
-            Some("4.3.0")
-        );
-    }
 }
