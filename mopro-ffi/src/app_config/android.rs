@@ -96,8 +96,8 @@ impl PlatformBuilder for AndroidPlatform {
         // A custom linker can strip the `.symtab` uniffi-bindgen needs, so when
         // asked, generate bindings from a separate NDK-linked build.
         let bindgen_lib_path = if params.relink_with_ndk_for_bindgen {
-            let arch = bindgen_arch
-                .context("No target architectures provided for binding generation")?;
+            let arch =
+                bindgen_arch.context("No target architectures provided for binding generation")?;
             build_bindgen_lib(arch, &lib_name, &build_dir, &params)
                 .context("Failed to build NDK lib for binding generation")?
         } else {
@@ -140,7 +140,10 @@ fn build_for_arch(
     if let Some(min_sdk) = params.min_sdk_version {
         build_cmd.arg("--platform").arg(min_sdk.to_string());
     }
-    build_cmd.arg("build").arg("--link-libcxx-shared").arg("--lib");
+    build_cmd
+        .arg("build")
+        .arg("--link-libcxx-shared")
+        .arg("--lib");
     if mode == Mode::Release {
         build_cmd.arg("--release");
     }
@@ -219,7 +222,10 @@ fn build_bindgen_lib(
     if let Some(min_sdk) = params.min_sdk_version {
         build_cmd.arg("--platform").arg(min_sdk.to_string());
     }
-    build_cmd.arg("build").arg("--link-libcxx-shared").arg("--lib");
+    build_cmd
+        .arg("build")
+        .arg("--link-libcxx-shared")
+        .arg("--lib");
 
     if let Some(config) = params.arch_overrides.get(arch_str) {
         for (key, value) in &config.extra_env {
