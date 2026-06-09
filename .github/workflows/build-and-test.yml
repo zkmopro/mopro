@@ -261,7 +261,7 @@ jobs:
             matrix:
                 adapter: [circom, halo2, noir, gnark]
         runs-on: ubuntu-latest
-        timeout-minutes: 15
+        timeout-minutes: 30
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
             - uses: actions/checkout@v6
@@ -279,6 +279,14 @@ jobs:
               uses: nttld/setup-ndk@v1
               with:
                   ndk-version: r26d
+
+            # The barretenberg prebuilt is Zig-built instead of NDK
+            # link libc++ with Zig so it resolves.
+            - name: Setup Zig (for noir/barretenberg libc++ ABI)
+              if: matrix.adapter == 'noir'
+              uses: mlugg/setup-zig@v2
+              with:
+                  version: 0.16.0
 
             - name: Prepare template project
               uses: ./.github/actions/mopro-init-project
@@ -317,7 +325,7 @@ jobs:
             - name: Run tests
               uses: reactivecircus/android-emulator-runner@v2
               with:
-                  api-level: 29
+                  api-level: 30
                   target: google_apis
                   arch: x86_64
                   disable-animations: true

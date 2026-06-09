@@ -427,8 +427,7 @@ See [Downloading SRS](https://github.com/zkmopro/noir-rs?tab=readme-ov-file#down
 [dependencies]
 noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
     "barretenberg",
-    "android-compat",
-], branch = "v1.0.0-beta.8-3" }
+], tag = "v1.0.0-beta.19" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.94"
 
@@ -437,7 +436,7 @@ serial_test = "3.0.0"
 ```
 
 :::warning
-Noir and its dependencies are not yet published as crates on crates.io. Therefore, we can only import them directly from GitHub.
+`noir-rs` is not yet published on crates.io, so it must be imported directly from GitHub. Its Barretenberg backend (`barretenberg-rs`) is published on crates.io and is pulled in transitively.
 :::
 
 You’re now ready to generate a Noir proof using mopro-ffi.

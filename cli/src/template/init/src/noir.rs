@@ -76,7 +76,7 @@ pub fn verify_noir_proof(
 /// on the intended use case:
 ///
 /// - `on_chain = true`: Uses Keccak hash for Solidity verifier compatibility
-/// - `on_chain = false`: Uses Poseidon hash fotr better performance
+/// - `on_chain = false`: Uses Poseidon hash for better performance
 #[cfg_attr(feature = "uniffi", uniffi::export)]
 pub fn get_noir_verification_key(
     circuit_path: String,
@@ -235,6 +235,7 @@ mod tests {
     const MULTIPLIER2_CIRCUIT_FILE: &str = "./test-vectors/noir/noir_multiplier2.json";
     const SRS_FILE: &str = "./test-vectors/noir/noir_multiplier2.srs";
     const VK_FILE: &str = "./test-vectors/noir/noir_multiplier2.vk";
+    const VK_POSEIDON_FILE: &str = "./test-vectors/noir/noir_multiplier2_poseidon.vk";
 
     use super::*;
 
@@ -440,7 +441,7 @@ mod tests {
     #[serial_test::serial]
     fn test_noir_proof_with_poseidon_and_vk() {
         let witness = vec!["3".to_string(), "5".to_string()];
-        let vk = std::fs::read(VK_FILE).unwrap();
+        let vk = std::fs::read(VK_POSEIDON_FILE).unwrap();
         let proof = generate_noir_proof_with_poseidon(
             MULTIPLIER2_CIRCUIT_FILE.to_string(),
             Some(SRS_FILE.to_string()),
@@ -518,7 +519,7 @@ mod tests {
     #[serial_test::serial]
     fn test_high_level_noir_proof_poseidon_with_vk() {
         let witness = vec!["3".to_string(), "5".to_string()];
-        let vk = std::fs::read(VK_FILE).unwrap();
+        let vk = std::fs::read(VK_POSEIDON_FILE).unwrap();
         let proof = generate_noir_proof(
             MULTIPLIER2_CIRCUIT_FILE.to_string(),
             Some(SRS_FILE.to_string()),

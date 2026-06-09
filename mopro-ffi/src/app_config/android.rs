@@ -1,5 +1,6 @@
 use anyhow::Context;
 use camino::Utf8Path;
+use std::collections::HashMap;
 use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::{Path, PathBuf};
@@ -23,7 +24,31 @@ pub fn build() {
     super::build_from_env::<AndroidPlatform>()
 }
 
-pub type AndroidBindingsParams = ();
+/// Per-architecture build overrides a caller can inject into the `cargo ndk`
+/// invocation (e.g. the CLI, on behalf of an adapter that needs special linking).
+/// Keyed in [`AndroidBindingsParams::arch_overrides`] by target triple.
+#[derive(Default, Clone)]
+pub struct ArchBuildConfig {
+    /// Extra environment variables for this arch's `cargo ndk` invocation.
+    pub extra_env: Vec<(String, String)>,
+    /// Flags appended to `RUSTFLAGS` for this arch (e.g. `-Clinker=<wrapper>`).
+    pub extra_rustflags: Vec<String>,
+}
+
+/// Generic knobs that let a caller tailor the Android build without `mopro-ffi`
+/// knowing about any specific adapter. Defaults to a plain, unmodified build.
+#[derive(Default)]
+pub struct AndroidBindingsParams {
+    /// Per-target-triple overrides, keyed by [`AndroidArch::as_str`].
+    pub arch_overrides: HashMap<String, ArchBuildConfig>,
+    /// `--platform` (min Android API) passed to `cargo ndk`; cargo-ndk's own
+    /// default is used when `None`.
+    pub min_sdk_version: Option<u32>,
+    /// Generate uniffi bindings from a separate NDK-linked build. Needed when the
+    /// shipped lib is produced by a custom linker that strips the `.symtab`
+    /// uniffi-bindgen reads (e.g. Zig); the shipped jniLibs are left untouched.
+    pub relink_with_ndk_for_bindgen: bool,
+}
 
 impl PlatformBuilder for AndroidPlatform {
     type Arch = AndroidArch;
@@ -33,7 +58,7 @@ impl PlatformBuilder for AndroidPlatform {
         mode: Mode,
         project_dir: &Path,
         target_archs: Vec<Self::Arch>,
-        _params: Self::Params,
+        params: Self::Params,
     ) -> anyhow::Result<PathBuf> {
         let uniffi_style_identifier = project_name_from_toml(project_dir)
             .expect("Failed to get project name from Cargo.toml");
@@ -59,14 +84,27 @@ impl PlatformBuilder for AndroidPlatform {
 
         install_ndk();
         let mut latest_out_lib_path = PathBuf::new();
+        let mut bindgen_arch: Option<AndroidArch> = None;
         for arch in target_archs {
             latest_out_lib_path =
-                build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode).context(
+                build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode, &params).context(
                     format!("Failed to build for architecture: {}", arch.as_str()),
                 )?;
+            bindgen_arch.get_or_insert(arch);
         }
 
-        generate_android_bindings(&latest_out_lib_path, &bindings_out)
+        // A custom linker can strip the `.symtab` uniffi-bindgen needs, so when
+        // asked, generate bindings from a separate NDK-linked build.
+        let bindgen_lib_path = if params.relink_with_ndk_for_bindgen {
+            let arch =
+                bindgen_arch.context("No target architectures provided for binding generation")?;
+            build_bindgen_lib(arch, &lib_name, &build_dir, &params)
+                .context("Failed to build NDK lib for binding generation")?
+        } else {
+            latest_out_lib_path
+        };
+
+        generate_android_bindings(&bindgen_lib_path, &bindings_out)
             .expect("Failed to generate bindings");
 
         reformat_kotlin_package(
@@ -91,23 +129,28 @@ fn build_for_arch(
     build_dir: &Path,
     bindings_out: &Path,
     mode: Mode,
+    params: &AndroidBindingsParams,
 ) -> anyhow::Result<PathBuf> {
     let arch_str = arch.as_str();
     install_arch(arch_str.to_string());
     let cpp_lib_dest = bindings_out.join("jniLibs");
 
     let mut build_cmd = Command::new("cargo");
+    build_cmd.arg("ndk").arg("-t").arg(arch_str);
+    if let Some(min_sdk) = params.min_sdk_version {
+        build_cmd.arg("--platform").arg(min_sdk.to_string());
+    }
     build_cmd
-        .arg("ndk")
-        .arg("-t")
-        .arg(arch_str)
         .arg("build")
         .arg("--link-libcxx-shared")
         .arg("--lib");
     if mode == Mode::Release {
         build_cmd.arg("--release");
     }
-    build_cmd
+
+    apply_arch_config(&mut build_cmd, params.arch_overrides.get(arch_str));
+
+    let status = build_cmd
         .env("CARGO_BUILD_TARGET_DIR", build_dir)
         .env("CARGO_BUILD_TARGET", arch_str)
         .env("CARGO_NDK_OUTPUT_PATH", cpp_lib_dest)
@@ -115,6 +158,9 @@ fn build_for_arch(
         .expect("Failed to spawn cargo build")
         .wait()
         .expect("cargo build errored");
+    if !status.success() {
+        anyhow::bail!("cargo ndk build failed for {arch_str}");
+    }
 
     let folder = match arch {
         AndroidArch::X8664Linux => ARCH_X86_64,
@@ -123,13 +169,7 @@ fn build_for_arch(
         AndroidArch::Aarch64Linux => ARCH_ARM_64_V8,
     };
 
-    let out_lib_path = build_dir.join(format!(
-        "{}/{}/{}/{}",
-        build_dir.display(),
-        arch_str,
-        mode.as_str(),
-        lib_name
-    ));
+    let out_lib_path = build_dir.join(arch_str).join(mode.as_str()).join(lib_name);
     let out_lib_dest = bindings_out.join(format!("jniLibs/{folder}/{lib_name}"));
 
     let parent_dir = out_lib_dest.parent().context(format!(
@@ -140,6 +180,78 @@ fn build_for_arch(
     fs::create_dir_all(parent_dir).context("Failed to create jniLibs directory")?;
     fs::copy(&out_lib_path, &out_lib_dest).context("Failed to copy file")?;
 
+    Ok(out_lib_path)
+}
+
+/// Apply caller-supplied env vars and `RUSTFLAGS` additions to a `cargo ndk` command.
+fn apply_arch_config(build_cmd: &mut Command, config: Option<&ArchBuildConfig>) {
+    let Some(config) = config else {
+        return;
+    };
+    for (key, value) in &config.extra_env {
+        build_cmd.env(key, value);
+    }
+    if !config.extra_rustflags.is_empty() {
+        let extra = config.extra_rustflags.join(" ");
+        // Preserve any RUSTFLAGS the caller already set in the environment.
+        let rustflags = match std::env::var("RUSTFLAGS") {
+            Ok(existing) if !existing.trim().is_empty() => format!("{existing} {extra}"),
+            _ => extra,
+        };
+        build_cmd.env("RUSTFLAGS", rustflags);
+    }
+}
+
+/// Build `arch` with the plain NDK linker only to extract uniffi metadata: a
+/// custom linker (e.g. Zig) can drop the `.symtab` uniffi-bindgen reads, which the
+/// NDK linker keeps. This lib may not run, but bindgen never runs it; a separate
+/// target dir keeps the shipped jniLibs untouched. Caller env (e.g. an overriding
+/// lib dir) is applied, but `extra_rustflags` is not — this build must use the NDK
+/// linker.
+fn build_bindgen_lib(
+    arch: AndroidArch,
+    lib_name: &str,
+    build_dir: &Path,
+    params: &AndroidBindingsParams,
+) -> anyhow::Result<PathBuf> {
+    let arch_str = arch.as_str();
+    let bindgen_target = build_dir.join("bindgen");
+
+    let mut build_cmd = Command::new("cargo");
+    build_cmd.arg("ndk").arg("-t").arg(arch_str);
+    if let Some(min_sdk) = params.min_sdk_version {
+        build_cmd.arg("--platform").arg(min_sdk.to_string());
+    }
+    build_cmd
+        .arg("build")
+        .arg("--link-libcxx-shared")
+        .arg("--lib");
+
+    if let Some(config) = params.arch_overrides.get(arch_str) {
+        for (key, value) in &config.extra_env {
+            build_cmd.env(key, value);
+        }
+    }
+
+    let status = build_cmd
+        .env("CARGO_BUILD_TARGET_DIR", &bindgen_target)
+        .env("CARGO_BUILD_TARGET", arch_str)
+        .env("CARGO_NDK_OUTPUT_PATH", bindgen_target.join("jniLibs"))
+        .spawn()
+        .expect("Failed to spawn cargo build for bindgen lib")
+        .wait()
+        .expect("cargo build (bindgen lib) errored");
+    if !status.success() {
+        anyhow::bail!("cargo ndk build (bindgen lib) failed for {arch_str}");
+    }
+
+    let out_lib_path = bindgen_target.join(arch_str).join("debug").join(lib_name);
+    if !out_lib_path.exists() {
+        anyhow::bail!(
+            "NDK bindgen lib missing at {} (needed for uniffi metadata)",
+            out_lib_path.display()
+        );
+    }
     Ok(out_lib_path)
 }
 

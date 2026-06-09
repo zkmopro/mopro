@@ -20,17 +20,16 @@ To get started, follow the [Rust Setup Guide](/setup/rust-setup.md) and ensure t
 [dependencies]
 noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
     "barretenberg",
-    "android-compat",
-], branch = "v1.0.0-beta.8-3" }
+], tag = "v1.0.0-beta.19" }
 # ...
 ```
 
 :::info
 The Noir adapter depends on [`zkmopro/noir-rs`](https://github.com/zkmopro/noir-rs). Please checkout the usage and the version here.
 
-**Current version**: Supports Noir `1.0.0-beta.8-3` with bb `1.0.0-nightly.20250723` with updated dependencies and enhanced functionality.
+**Current version**: Supports Noir `v1.0.0-beta.19` via the official [`barretenberg-rs`](https://crates.io/crates/barretenberg-rs) crate (`=4.2.0-aztecnr-rc.2`).
 
-**Backend**: The adapter uses the Barretenberg backend, which is automatically downloaded from the released GitHub artifacts at [zkmopro/aztec-packages](https://github.com/zkmopro/aztec-packages/releases).
+**Backend**: The adapter uses the Barretenberg backend via the official [`barretenberg-rs`](https://crates.io/crates/barretenberg-rs) crate from crates.io. Prebuilt FFI binaries are fetched automatically at build time — no separate download script required.
 :::
 
 ## Hash Function Selection
@@ -110,12 +109,11 @@ The Noir adapter supports the following target platforms with Barretenberg backe
 | macOS (M Series)        | `aarch64-apple-darwin`     | ✅     |
 | iOS Device              | `aarch64-apple-ios`        | ✅     |
 | iOS aarch64 Simulator   | `aarch64-apple-ios-sim`    | ✅     |
-| iOS x86_64 Simulator    | `x86_64-apple-ios`         | ✅     |
 | Android aarch64 Device  | `aarch64-linux-android`    | ✅     |
 | Android x86_64 Emulator | `x86_64-linux-android`     | ✅     |
 | Linux Desktop           | `x86_64-unknown-linux-gnu` | ✅     |
 
-All platforms use pre-compiled Barretenberg binaries automatically downloaded from [zkmopro/aztec-packages releases](https://github.com/zkmopro/aztec-packages/releases) during the build process.
+All platforms use pre-compiled Barretenberg binaries fetched by the official [`barretenberg-rs`](https://crates.io/crates/barretenberg-rs) crate from crates.io during the build process.
 
 ## Using the Library
 
