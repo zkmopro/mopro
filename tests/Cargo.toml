@@ -12,6 +12,12 @@ uniffi = ["mopro-ffi/uniffi"]
 flutter = ["mopro-ffi/flutter"]
 wasm = ["mopro-ffi/wasm"]
 
+[build-dependencies]
+mopro-wasm-backend          = { path = "../ffi/wasm" }
+mopro-uniffi-backend        = { path = "../ffi/uniffi" }
+mopro-flutter-backend       = { path = "../ffi/flutter" }
+mopro-react-native-backend  = { path = "../ffi/react-native" }
+
 [dependencies]
 mopro-ffi = { path = "../mopro-ffi" }
 thiserror = "2.0.12"

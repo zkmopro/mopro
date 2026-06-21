@@ -1,0 +1,7 @@
+rust:
+  directory: <%PATH_TO_PROJECT%>
+  manifestPath: Cargo.toml
+
+android:
+    apiLevel: 28
+    useSharedLibrary: true

@@ -1,0 +1,24 @@
+[package]
+name = "circom-prover-adapter"
+version = "0.1.0"
+edition = "2021"
+description = "mopro adapter that wires the circom-prover crate into the mopro-core::Prover trait"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zkmopro/mopro"
+
+[features]
+# Adds uniffi::Record / uniffi::Enum derives to output types.
+uniffi = ["dep:uniffi"]
+
+[dependencies]
+mopro-core    = { path = "../../core" }
+circom-prover = "0.1"
+num-bigint    = "0.4"
+
+# serde: needed by wasm-bindgen (serde_wasm_bindgen) and generally useful
+# for JSON serialisation of proof results.
+serde = { version = "1.0", features = ["derive"] }
+
+# uniffi: optional — only pulled in when the `uniffi` feature is enabled.
+# ffi/backends/uniffi enables this when building iOS/Android bindings.
+uniffi = { version = "=0.31.0", optional = true }

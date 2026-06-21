@@ -1,0 +1,11 @@
+[package]
+name = "mopro-wasm-backend"
+version = "0.1.0"
+edition = "2021"
+description = "mopro build-pipeline backend: WASM bindings via wasm-pack"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zkmopro/mopro"
+
+[dependencies]
+mopro-build-common = { path = "../common" }
+anyhow = "1.0"

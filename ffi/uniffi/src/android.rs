@@ -1,0 +1,238 @@
+use anyhow::Context;
+use camino::Utf8Path;
+use std::collections::HashMap;
+use std::fs;
+use std::io::{Error, ErrorKind};
+use std::path::{Path, PathBuf};
+use std::process::Command;
+use uniffi::{generate, GenerateOptions, TargetLanguage};
+
+use mopro_build_common::{
+    build_from_env, cleanup_tmp_local, install_arch, install_ndk, mktemp_local,
+    project_name_from_toml,
+    Arch, AndroidArch, Mode, PlatformBuilder,
+    ANDROID_BINDINGS_DIR, ANDROID_KT_FILE, ANDROID_PACKAGE_NAME,
+    ARCH_ARM_64_V8, ARCH_ARM_V7_ABI, ARCH_I686, ARCH_X86_64,
+};
+
+pub struct AndroidPlatform;
+
+pub fn build() {
+    build_from_env::<AndroidPlatform>()
+}
+
+#[derive(Default, Clone)]
+pub struct ArchBuildConfig {
+    pub extra_env: Vec<(String, String)>,
+    pub extra_rustflags: Vec<String>,
+}
+
+#[derive(Default)]
+pub struct AndroidBindingsParams {
+    pub arch_overrides: HashMap<String, ArchBuildConfig>,
+    pub min_sdk_version: Option<u32>,
+    pub relink_with_ndk_for_bindgen: bool,
+}
+
+impl PlatformBuilder for AndroidPlatform {
+    type Arch = AndroidArch;
+    type Params = AndroidBindingsParams;
+
+    fn identifier() -> &'static str { "android" }
+
+    fn build(
+        mode: Mode,
+        project_dir: &Path,
+        target_archs: Vec<Self::Arch>,
+        params: Self::Params,
+    ) -> anyhow::Result<PathBuf> {
+        let uniffi_style_identifier = project_name_from_toml(project_dir)
+            .expect("Failed to get project name from Cargo.toml");
+
+        let lib_name = format!("lib{}.so", &uniffi_style_identifier);
+        let gen_kt_file = format!("{}.kt", &uniffi_style_identifier);
+
+        #[cfg(feature = "witnesscalc")]
+        let _ = std::env::var("ANDROID_NDK").context("ANDROID_NDK is not set")?;
+
+        let build_dir = project_dir.join("build");
+        let work_dir = mktemp_local(&build_dir);
+        let bindings_out = work_dir.join(ANDROID_BINDINGS_DIR);
+        let bindings_dest = project_dir.join(ANDROID_BINDINGS_DIR);
+
+        install_ndk();
+        let mut latest_out_lib_path = PathBuf::new();
+        let mut bindgen_arch: Option<AndroidArch> = None;
+        for arch in target_archs {
+            latest_out_lib_path = build_for_arch(arch, &lib_name, &build_dir, &bindings_out, mode, &params)
+                .context(format!("Failed to build for architecture: {}", arch.as_str()))?;
+            bindgen_arch.get_or_insert(arch);
+        }
+
+        let bindgen_lib_path = if params.relink_with_ndk_for_bindgen {
+            let arch = bindgen_arch.context("No target architectures provided")?;
+            build_bindgen_lib(arch, &lib_name, &build_dir, &params)
+                .context("Failed to build NDK lib for bindgen")?
+        } else {
+            latest_out_lib_path
+        };
+
+        generate_android_bindings(&bindgen_lib_path, &bindings_out)
+            .expect("Failed to generate bindings");
+
+        reformat_kotlin_package(
+            &uniffi_style_identifier, &gen_kt_file,
+            ANDROID_PACKAGE_NAME, &ANDROID_KT_FILE,
+            &bindings_out,
+        ).expect("Failed to reformat Kotlin package");
+
+        move_bindings(&bindings_out, &bindings_dest);
+        cleanup_tmp_local(&build_dir);
+
+        Ok(bindings_out)
+    }
+}
+
+fn build_for_arch(
+    arch: AndroidArch,
+    lib_name: &str,
+    build_dir: &Path,
+    bindings_out: &Path,
+    mode: Mode,
+    params: &AndroidBindingsParams,
+) -> anyhow::Result<PathBuf> {
+    let arch_str = arch.as_str();
+    install_arch(arch_str.to_string());
+    let cpp_lib_dest = bindings_out.join("jniLibs");
+
+    let mut build_cmd = Command::new("cargo");
+    build_cmd.arg("ndk").arg("-t").arg(arch_str);
+    if let Some(min_sdk) = params.min_sdk_version {
+        build_cmd.arg("--platform").arg(min_sdk.to_string());
+    }
+    build_cmd.arg("build").arg("--link-libcxx-shared").arg("--lib");
+    if mode == Mode::Release { build_cmd.arg("--release"); }
+
+    apply_arch_config(&mut build_cmd, params.arch_overrides.get(arch_str));
+
+    let status = build_cmd
+        .env("CARGO_BUILD_TARGET_DIR", build_dir)
+        .env("CARGO_BUILD_TARGET", arch_str)
+        .env("CARGO_NDK_OUTPUT_PATH", cpp_lib_dest)
+        .spawn().expect("Failed to spawn cargo build")
+        .wait().expect("cargo build errored");
+    if !status.success() { anyhow::bail!("cargo ndk build failed for {arch_str}"); }
+
+    let folder = match arch {
+        AndroidArch::X8664Linux    => ARCH_X86_64,
+        AndroidArch::I686Linux     => ARCH_I686,
+        AndroidArch::Armv7LinuxAbi => ARCH_ARM_V7_ABI,
+        AndroidArch::Aarch64Linux  => ARCH_ARM_64_V8,
+    };
+
+    let out_lib_path = build_dir.join(arch_str).join(mode.as_str()).join(lib_name);
+    let out_lib_dest = bindings_out.join(format!("jniLibs/{folder}/{lib_name}"));
+    let parent_dir = out_lib_dest.parent().context("Failed to get parent dir")?;
+    fs::create_dir_all(parent_dir).context("Failed to create jniLibs directory")?;
+    fs::copy(&out_lib_path, &out_lib_dest).context("Failed to copy .so")?;
+
+    Ok(out_lib_path)
+}
+
+fn apply_arch_config(build_cmd: &mut Command, config: Option<&ArchBuildConfig>) {
+    let Some(config) = config else { return; };
+    for (key, value) in &config.extra_env { build_cmd.env(key, value); }
+    if !config.extra_rustflags.is_empty() {
+        let extra = config.extra_rustflags.join(" ");
+        let rustflags = match std::env::var("RUSTFLAGS") {
+            Ok(existing) if !existing.trim().is_empty() => format!("{existing} {extra}"),
+            _ => extra,
+        };
+        build_cmd.env("RUSTFLAGS", rustflags);
+    }
+}
+
+fn build_bindgen_lib(
+    arch: AndroidArch,
+    lib_name: &str,
+    build_dir: &Path,
+    params: &AndroidBindingsParams,
+) -> anyhow::Result<PathBuf> {
+    let arch_str = arch.as_str();
+    let bindgen_target = build_dir.join("bindgen");
+
+    let mut build_cmd = Command::new("cargo");
+    build_cmd.arg("ndk").arg("-t").arg(arch_str);
+    if let Some(min_sdk) = params.min_sdk_version {
+        build_cmd.arg("--platform").arg(min_sdk.to_string());
+    }
+    build_cmd.arg("build").arg("--link-libcxx-shared").arg("--lib");
+
+    if let Some(config) = params.arch_overrides.get(arch_str) {
+        for (key, value) in &config.extra_env { build_cmd.env(key, value); }
+    }
+
+    let status = build_cmd
+        .env("CARGO_BUILD_TARGET_DIR", &bindgen_target)
+        .env("CARGO_BUILD_TARGET", arch_str)
+        .env("CARGO_NDK_OUTPUT_PATH", bindgen_target.join("jniLibs"))
+        .spawn().expect("Failed to spawn cargo build for bindgen lib")
+        .wait().expect("cargo build (bindgen lib) errored");
+    if !status.success() { anyhow::bail!("cargo ndk build (bindgen lib) failed for {arch_str}"); }
+
+    let out_lib_path = bindgen_target.join(arch_str).join("debug").join(lib_name);
+    if !out_lib_path.exists() {
+        anyhow::bail!("NDK bindgen lib missing at {} (needed for uniffi metadata)", out_lib_path.display());
+    }
+    Ok(out_lib_path)
+}
+
+fn move_bindings(bindings_out: &Path, bindings_dest: &Path) {
+    if let Ok(info) = fs::metadata(bindings_dest) {
+        if !info.is_dir() { panic!("bindings directory exists and is not a directory"); }
+        fs::remove_dir_all(bindings_dest).expect("Failed to remove bindings directory");
+    }
+    fs::rename(bindings_out, bindings_dest).expect("Failed to move bindings into place");
+}
+
+fn generate_android_bindings(dylib_path: &Path, binding_dir: &Path) -> anyhow::Result<()> {
+    let content = "[bindings.kotlin]\nandroid = true";
+    let parent_dir = binding_dir.parent().context("Failed to get parent directory")?;
+    let config_path = parent_dir.join("uniffi_config.toml");
+    fs::write(&config_path, content).expect("Failed to write uniffi_config.toml");
+
+    generate(GenerateOptions {
+        languages: vec![TargetLanguage::Kotlin],
+        source: Utf8Path::from_path(dylib_path)
+            .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid dylib path"))?.to_path_buf(),
+        out_dir: Utf8Path::from_path(binding_dir)
+            .ok_or(Error::new(ErrorKind::InvalidInput, "Invalid kotlin files directory"))?.to_path_buf(),
+        crate_filter: None,
+        ..GenerateOptions::default()
+    }).map_err(|e| Error::other(e.to_string()))?;
+    Ok(())
+}
+
+fn reformat_kotlin_package(
+    gen_module: &str, gen_kt_file: &str,
+    out_module: &str, out_kt_file: &&str,
+    bindings_out: &Path,
+) -> anyhow::Result<()> {
+    let gen_path  = bindings_out.join("uniffi").join(gen_module).join(gen_kt_file);
+    let out_path  = bindings_out.join("uniffi").join(out_module).join(out_kt_file);
+
+    if gen_path == out_path { return Ok(()); }
+
+    fs::create_dir(bindings_out.join("uniffi").join(out_module))
+        .context("Failed to create new package directory")?;
+    fs::rename(&gen_path, &out_path).context("Failed to move kotlin file")?;
+    fs::remove_dir(bindings_out.join("uniffi").join(gen_module))
+        .context("Failed to remove gen kotlin package dir")?;
+
+    let content = fs::read_to_string(&out_path).context("Failed to read generated Kotlin file")?;
+    let modified = content.replace(
+        &format!("package uniffi.{gen_module}"),
+        &format!("package uniffi.{out_module}"),
+    );
+    fs::write(&out_path, modified).context("Failed to write modified Kotlin file")
+}
