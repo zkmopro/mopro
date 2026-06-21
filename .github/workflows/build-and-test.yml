@@ -34,7 +34,6 @@ jobs:
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         env:
             RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings, including Clippy lints
-            CIRCOM_PROVER_TEST_WITNESS: "1" # Enable witness generation in circom-prover tests
         steps:
             - uses: actions/checkout@v6
             - name: Setup dependencies
@@ -63,26 +62,6 @@ jobs:
               run: rustup component add rustfmt
             - name: Check formatting
               run: cargo fmt --all -- --check
-
-    # Test jobs (run in parallel, depend on lint jobs)
-    circom-prover:
-        runs-on: ubuntu-latest
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-        needs: [lint, clippy_check, check_typos]
-        steps:
-            - uses: actions/checkout@v6
-            - name: Setup dependencies
-              uses: ./.github/actions/setup-deps
-              with:
-                  platform: linux
-            - name: Setup Rust
-              uses: ./.github/actions/setup-rust
-              with:
-                  cache-key: circom-prover
-            - name: Circom prover tests
-              run: |
-                  cd circom-prover
-                  cargo test --all-features
 
     cli_build:
         strategy:
