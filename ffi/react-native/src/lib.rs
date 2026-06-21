@@ -15,6 +15,10 @@ pub fn build() {
     build_from_env::<ReactNativePlatform>()
 }
 
+pub fn build_at(project_dir: &std::path::Path) {
+    mopro_build_common::build_from_env_at::<ReactNativePlatform>(project_dir)
+}
+
 impl PlatformBuilder for ReactNativePlatform {
     type Arch = ReactNativeArch;
     type Params = ();

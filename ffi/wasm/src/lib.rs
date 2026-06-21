@@ -14,6 +14,10 @@ pub fn build() {
     build_from_env::<WebPlatform>()
 }
 
+pub fn build_at(project_dir: &Path) {
+    mopro_build_common::build_from_env_at::<WebPlatform>(project_dir)
+}
+
 impl PlatformBuilder for WebPlatform {
     type Arch = WebArch;
     type Params = ();

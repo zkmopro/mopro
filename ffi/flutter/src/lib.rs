@@ -16,6 +16,10 @@ pub fn build() {
     build_from_env::<FlutterPlatform>()
 }
 
+pub fn build_at(project_dir: &std::path::Path) {
+    mopro_build_common::build_from_env_at::<FlutterPlatform>(project_dir)
+}
+
 impl PlatformBuilder for FlutterPlatform {
     type Arch = FlutterArch;
     type Params = ();

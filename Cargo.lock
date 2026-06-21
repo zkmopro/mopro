@@ -4713,15 +4713,20 @@ dependencies = [
 ]
 
 [[package]]
-name = "tests"
+name = "test-app"
 version = "0.1.0"
 dependencies = [
  "mopro-ffi",
+]
+
+[[package]]
+name = "tests"
+version = "0.1.0"
+dependencies = [
  "mopro-flutter-backend",
  "mopro-react-native-backend",
  "mopro-uniffi-backend",
  "mopro-wasm-backend",
- "thiserror 2.0.12",
 ]
 
 [[package]]

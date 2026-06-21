@@ -92,14 +92,18 @@ pub fn raw_project_name_from_toml(project_dir: &Path) -> anyhow::Result<String> 
 // ---------------------------------------------------------------------------
 
 pub fn build_from_env<Builder: PlatformBuilder>() {
-    let mode = get_build_mode();
     let project_dir = get_project_dir();
+    build_from_env_at::<Builder>(&project_dir);
+}
+
+pub fn build_from_env_at<Builder: PlatformBuilder>(project_dir: &Path) {
+    let mode = get_build_mode();
     let target_archs: Vec<Builder::Arch> = get_target_archs();
     let params = Builder::Params::default();
 
     if target_archs.is_empty() { return; }
 
-    Builder::build(mode, &project_dir, target_archs, params)
+    Builder::build(mode, project_dir, target_archs, params)
         .context(format!("Failed to build {} bindings", Builder::identifier()))
         .unwrap();
 }

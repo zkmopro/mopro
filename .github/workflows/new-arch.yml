@@ -54,6 +54,9 @@ jobs:
             - name: ffi
               run: cargo check -p mopro-build-common -p mopro-uniffi-backend -p mopro-wasm-backend -p mopro-flutter-backend -p mopro-react-native-backend
 
+            - name: test-app (the library compiled for mobile/wasm; must not appear in ffi/* deps)
+              run: cargo check -p test-app
+
             - name: tests (verifies build.rs compiles; no arch env vars set so no external tools run)
               run: cargo check -p tests
 
@@ -124,13 +127,13 @@ jobs:
               run: IOS_ARCHS=aarch64-apple-ios-sim cargo build -p tests
 
             - name: Assert outputs exist
-              working-directory: tests
+              working-directory: test-app
               run: |
                   set -e
                   test -d MoproiOSBindings/MoproBindings.xcframework \
-                    || { echo "::error::MoproiOSBindings/MoproBindings.xcframework not found"; exit 1; }
+                    || { echo "::error::test-app/MoproiOSBindings/MoproBindings.xcframework not found"; exit 1; }
                   test -f MoproiOSBindings/mopro.swift \
-                    || { echo "::error::MoproiOSBindings/mopro.swift not found"; exit 1; }
+                    || { echo "::error::test-app/MoproiOSBindings/mopro.swift not found"; exit 1; }
                   echo "iOS bindings OK"
                   find MoproiOSBindings -type f | sort
 
@@ -139,7 +142,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: ios-bindings-debug
-                  path: tests/MoproiOSBindings
+                  path: test-app/MoproiOSBindings
                   if-no-files-found: ignore
 
     # ------------------------------------------------------------------
@@ -172,13 +175,13 @@ jobs:
               run: WEB_ARCHS=wasm32-unknown-unknown cargo build -p tests
 
             - name: Assert outputs exist
-              working-directory: tests
+              working-directory: test-app
               run: |
                   set -e
                   test -d MoproWasmBindings \
-                    || { echo "::error::MoproWasmBindings/ not found"; exit 1; }
+                    || { echo "::error::test-app/MoproWasmBindings/ not found"; exit 1; }
                   test -f MoproWasmBindings/mopro_wasm_lib_bg.wasm \
-                    || { echo "::error::MoproWasmBindings/mopro_wasm_lib_bg.wasm not found"; exit 1; }
+                    || { echo "::error::test-app/MoproWasmBindings/mopro_wasm_lib_bg.wasm not found"; exit 1; }
                   echo "Wasm bindings OK"
                   find MoproWasmBindings -type f | sort
 
@@ -187,5 +190,5 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: wasm-bindings-debug
-                  path: tests/MoproWasmBindings
+                  path: test-app/MoproWasmBindings
                   if-no-files-found: ignore

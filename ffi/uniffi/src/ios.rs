@@ -18,6 +18,10 @@ pub fn build() {
     build_from_env::<IosPlatform>()
 }
 
+pub fn build_at(project_dir: &std::path::Path) {
+    mopro_build_common::build_from_env_at::<IosPlatform>(project_dir)
+}
+
 #[derive(Default)]
 pub struct IosBindingsParams {
     pub using_noir: bool,

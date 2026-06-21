@@ -11,6 +11,7 @@ members = [
     "ffi/react-native",
     "mopro-ffi",
     "cli",
+    "test-app",
     "tests",
 ]
 resolver = "2"
