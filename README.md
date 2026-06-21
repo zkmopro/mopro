@@ -71,21 +71,6 @@ This repository contains the following components:
         </tr>
         <tr>
             <td>
-                <a href="https://github.com/zkmopro/mopro/tree/main/circom-prover">
-                    circom-prover
-                </a>
-            </td>
-            <td>
-                <a href="https://crates.io/crates/circom-prover">
-                    <img src="https://img.shields.io/crates/v/circom-prover?label=circom-prover&style=flat-square">
-                </a>
-            </td>
-            <td>
-                A Rust-based Groth16 prover for Circom. It supports multiple witness generators (<a href="https://github.com/chancehudson/rust-witness">rust-witness</a>, <a href="https://github.com/zkmopro/witnesscalc_adapter">witnesscalc</a>, and <a href="https://github.com/iden3/circom-witnesscalc">circom-witnesscalc</a>) and provers (<a href="https://github.com/arkworks-rs/circom-compat">arkworks</a>, <a href="https://github.com/zkmopro/rust-rapidsnark">rapidsnark</a>). It is designed to work across devices including desktop, iOS, and Android.
-            </td>
-        </tr>
-        <tr>
-            <td>
                 <a href="https://github.com/zkmopro/mopro/tree/main/tests">
                     tests
                 </a>
@@ -142,25 +127,6 @@ Run [rust-clippy](https://github.com/rust-lang/rust-clippy) to catch common mist
 ```sh
 cargo clippy --all-targets --all-features
 ```
-
-### `circom-prover`
-
-To test all witness generators and proof generators:
-
-```sh
-cd circom-prover
-cargo test --all-features
-```
-
-To run with specific witness generator and/or proof generator
-
-```sh
-cd circom-prover
-cargo test --features witnesscalc --features rapidsnark
-```
-
-> [!IMPORTANT]  
-> To learn more about `circom-prover`, please visit [circom-prover](./circom-prover/README.md)
 
 ### `mopro-ffi`
 

@@ -1,5 +1,5 @@
 [workspace]
-members = ["mopro-ffi", "cli", "circom-prover", "tests"]
+members = ["mopro-ffi", "cli", "tests"]
 resolver = "2"
 
 [workspace.dependencies]
