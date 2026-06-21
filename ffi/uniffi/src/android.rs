@@ -105,7 +105,8 @@ fn build_for_arch(
     install_arch(arch_str.to_string());
     let cpp_lib_dest = bindings_out.join("jniLibs");
 
-    let mut build_cmd = Command::new("cargo");
+    let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".to_string());
+    let mut build_cmd = Command::new(&cargo);
     build_cmd.arg("ndk").arg("-t").arg(arch_str);
     if let Some(min_sdk) = params.min_sdk_version {
         build_cmd.arg("--platform").arg(min_sdk.to_string());
@@ -161,7 +162,8 @@ fn build_bindgen_lib(
     let arch_str = arch.as_str();
     let bindgen_target = build_dir.join("bindgen");
 
-    let mut build_cmd = Command::new("cargo");
+    let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".to_string());
+    let mut build_cmd = Command::new(&cargo);
     build_cmd.arg("ndk").arg("-t").arg(arch_str);
     if let Some(min_sdk) = params.min_sdk_version {
         build_cmd.arg("--platform").arg(min_sdk.to_string());

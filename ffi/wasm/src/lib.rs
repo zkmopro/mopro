@@ -82,12 +82,52 @@ impl PlatformBuilder for WebPlatform {
 }
 
 fn patch_package_version(project_dir: &Path, package_name: &str, version: &str) -> anyhow::Result<()> {
-    let mut cmd = Command::new("cargo");
-    cmd.args(["update", "-p", package_name, "--precise", version]);
-    cmd.current_dir(project_dir);
-    let status = cmd.status().expect("Failed to update package");
+    let spec = package_spec_for_update(project_dir, package_name, version)?;
+    let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".to_string());
+    let status = Command::new(&cargo)
+        .args(["update", "-p", &spec, "--precise", version])
+        .current_dir(project_dir)
+        .status()
+        .with_context(|| format!("Failed to run cargo update for {package_name}"))?;
     if !status.success() {
-        return Err(anyhow::anyhow!("Failed to update package {package_name}"));
+        anyhow::bail!("Failed to update package {package_name} to {version}");
     }
     Ok(())
+}
+
+// Returns "name" when there is only one version in Cargo.lock, or "name@x.y.z"
+// when multiple versions exist (disambiguates by matching the major version of `target`).
+fn package_spec_for_update(project_dir: &Path, name: &str, target: &str) -> anyhow::Result<String> {
+    let lock_path = project_dir.join("Cargo.lock");
+    let content = std::fs::read_to_string(&lock_path)
+        .with_context(|| format!("Failed to read {:?}", lock_path))?;
+
+    // Collect all versions of `name` from the Cargo.lock [[package]] blocks.
+    let mut versions: Vec<String> = Vec::new();
+    let mut cur_name = String::new();
+    for line in content.lines() {
+        if line == "[[package]]" {
+            cur_name.clear();
+        } else if let Some(n) = line.strip_prefix("name = \"") {
+            cur_name = n.trim_end_matches('"').to_string();
+        } else if let Some(v) = line.strip_prefix("version = \"") {
+            if cur_name == name {
+                versions.push(v.trim_end_matches('"').to_string());
+            }
+        }
+    }
+
+    if versions.len() <= 1 {
+        return Ok(name.to_string());
+    }
+
+    // Multiple versions: pick the one whose major version matches `target`.
+    let target_major = target.split('.').next().unwrap_or("0");
+    let matched = versions.iter()
+        .find(|v| v.split('.').next().unwrap_or("") == target_major)
+        .or_else(|| versions.first())
+        .cloned()
+        .unwrap_or_else(|| name.to_string());
+
+    Ok(format!("{name}@{matched}"))
 }

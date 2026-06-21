@@ -57,7 +57,8 @@ impl PlatformBuilder for IosPlatform {
             }).collect();
             for arch in archs {
                 install_arch(arch.as_str().to_string());
-                let mut build_cmd = Command::new("cargo");
+                let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".to_string());
+                let mut build_cmd = Command::new(&cargo);
                 build_cmd.arg("build");
                 if mode == Mode::Release { build_cmd.arg("--release"); }
                 if params.using_noir { build_cmd.env("IPHONEOS_DEPLOYMENT_TARGET", "15.0"); }
