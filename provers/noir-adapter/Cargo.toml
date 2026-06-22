@@ -1,0 +1,25 @@
+[package]
+name = "noir-prover-adapter"
+version = "0.1.0"
+edition = "2021"
+description = "mopro adapter that wires noir-rs into the mopro-core::Prover trait"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zkmopro/mopro"
+
+[features]
+# Enable this feature to pull in the actual noir-rs engine.
+# Requires a compatible nightly toolchain (see noir-rs v1.0.0-beta.19 release notes).
+barretenberg = ["dep:noir_rs"]
+# Needed only if the adapter itself exports uniffi scaffolding (uncommon — usually the
+# ffi/backends/uniffi crate handles this).  Input/Output types are already FFI-primitive
+# (Vec<String> / Vec<u8>), so no Record/Enum derives are required.
+uniffi = ["dep:uniffi"]
+
+[dependencies]
+mopro-core = { path = "../../core" }
+serde_json  = "1.0"
+uniffi = { version = "=0.31.0", optional = true }
+
+noir_rs = { package = "noir", git = "https://github.com/zkmopro/noir-rs", features = [
+    "barretenberg",
+], tag = "v1.0.0-beta.19", optional = true }

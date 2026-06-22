@@ -1,0 +1,194 @@
+name: New Architecture (ffi / provers / tests)
+
+# Runs on the groundwork branch and on PRs targeting main that touch new-arch paths.
+# Intentionally separate from build-and-test.yml to avoid interfering with
+# the existing CLI / template / platform build pipeline.
+
+on:
+    push:
+        branches: [groundwork]
+        paths:
+            - "core/**"
+            - "provers/**"
+            - "ffi/**"
+            - "tests/**"
+            - "scripts/check-boundaries.sh"
+            - "Cargo.toml"
+            - "Cargo.lock"
+    pull_request:
+        types: [opened, synchronize, reopened, ready_for_review]
+        branches: [main]
+        paths:
+            - "core/**"
+            - "provers/**"
+            - "ffi/**"
+            - "tests/**"
+            - "scripts/check-boundaries.sh"
+            - "Cargo.toml"
+            - "Cargo.lock"
+
+env:
+    CARGO_TERM_COLOR: always
+
+jobs:
+    # ------------------------------------------------------------------
+    # 1. cargo check — all new crates, including the tests build.rs
+    # ------------------------------------------------------------------
+    check:
+        name: cargo check
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Rust
+              uses: ./.github/actions/setup-rust
+              with:
+                  cache-key: new-arch-check
+
+            - name: core
+              run: cargo check -p mopro-core
+
+            - name: provers
+              run: cargo check -p circom-prover-adapter -p halo2-prover-adapter -p noir-prover-adapter
+
+            - name: ffi
+              run: cargo check -p mopro-build-common -p mopro-uniffi-backend -p mopro-wasm-backend -p mopro-flutter-backend -p mopro-react-native-backend
+
+            - name: test-app (the library compiled for mobile/wasm; must not appear in ffi/* deps)
+              run: cargo check -p test-app
+
+            - name: tests (verifies build.rs compiles; no arch env vars set so no external tools run)
+              run: cargo check -p tests
+
+    # ------------------------------------------------------------------
+    # 2. cargo test — unit tests (pure Rust, no toolchain deps)
+    # ------------------------------------------------------------------
+    test:
+        name: cargo test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Rust
+              uses: ./.github/actions/setup-rust
+              with:
+                  cache-key: new-arch-test
+
+            - name: Run tests
+              run: |
+                  cargo test \
+                    -p mopro-core \
+                    -p mopro-build-common \
+                    -p circom-prover-adapter \
+                    -p halo2-prover-adapter \
+                    -p noir-prover-adapter \
+                    -p mopro-uniffi-backend \
+                    -p mopro-wasm-backend \
+                    -p mopro-flutter-backend \
+                    -p mopro-react-native-backend
+
+    # ------------------------------------------------------------------
+    # 3. Dependency boundary — ffi/* must not pull in core or provers
+    # ------------------------------------------------------------------
+    boundary:
+        name: dependency boundary check
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Rust
+              uses: ./.github/actions/setup-rust
+              with:
+                  cache-key: new-arch-boundary
+
+            - name: check ffi/* has no deps on core or provers
+              run: bash scripts/check-boundaries.sh
+
+    # ------------------------------------------------------------------
+    # 4. iOS bindings — build.rs triggers ios::build() via IOS_ARCHS
+    #    Output: tests/MoproiOSBindings/MoproBindings.xcframework
+    # ------------------------------------------------------------------
+    binding_ios:
+        name: iOS bindings (uniffi → xcframework + Swift)
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Rust
+              uses: ./.github/actions/setup-rust
+              with:
+                  cache-key: new-arch-binding-ios
+
+            - name: Add iOS simulator target
+              run: rustup target add aarch64-apple-ios-sim
+
+            - name: Build bindings
+              working-directory: tests
+              run: IOS_ARCHS=aarch64-apple-ios-sim cargo build -p tests
+
+            - name: Assert outputs exist
+              working-directory: test-app
+              run: |
+                  set -e
+                  test -d MoproiOSBindings/MoproBindings.xcframework \
+                    || { echo "::error::test-app/MoproiOSBindings/MoproBindings.xcframework not found"; exit 1; }
+                  test -f MoproiOSBindings/mopro.swift \
+                    || { echo "::error::test-app/MoproiOSBindings/mopro.swift not found"; exit 1; }
+                  echo "iOS bindings OK"
+                  find MoproiOSBindings -type f | sort
+
+            - name: Upload bindings (on failure)
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ios-bindings-debug
+                  path: test-app/MoproiOSBindings
+                  if-no-files-found: ignore
+
+    # ------------------------------------------------------------------
+    # 5. Wasm bindings — build.rs triggers wasm::build() via WEB_ARCHS
+    #    Output: tests/MoproWasmBindings/mopro_wasm_lib_bg.wasm
+    # ------------------------------------------------------------------
+    binding_wasm:
+        name: Wasm bindings (wasm-pack → pkg)
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Rust (nightly-2025-02-20 for wasm-pack)
+              uses: ./.github/actions/setup-rust
+              with:
+                  toolchain: nightly-2025-02-20
+                  cache-key: new-arch-binding-wasm
+
+            - name: Add rust-src component (required by wasm-pack atomics build)
+              run: rustup component add rust-src --toolchain nightly-2025-02-20
+
+            - name: Add wasm32 target
+              run: rustup target add wasm32-unknown-unknown --toolchain nightly-2025-02-20
+
+            - name: Install wasm-pack
+              run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+            - name: Build bindings
+              working-directory: tests
+              run: WEB_ARCHS=wasm32-unknown-unknown cargo build -p tests
+
+            - name: Assert outputs exist
+              working-directory: test-app
+              run: |
+                  set -e
+                  test -d MoproWasmBindings \
+                    || { echo "::error::test-app/MoproWasmBindings/ not found"; exit 1; }
+                  test -f MoproWasmBindings/mopro_wasm_lib_bg.wasm \
+                    || { echo "::error::test-app/MoproWasmBindings/mopro_wasm_lib_bg.wasm not found"; exit 1; }
+                  echo "Wasm bindings OK"
+                  find MoproWasmBindings -type f | sort
+
+            - name: Upload bindings (on failure)
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: wasm-bindings-debug
+                  path: test-app/MoproWasmBindings
+                  if-no-files-found: ignore

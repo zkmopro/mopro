@@ -1,0 +1,18 @@
+[package]
+name = "mopro-uniffi-backend"
+version = "0.1.0"
+edition = "2021"
+description = "mopro build-pipeline backend: iOS and Android bindings via uniffi-bindgen"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zkmopro/mopro"
+
+[features]
+# Set when the project being built uses witnesscalc native libs.
+witnesscalc = []
+
+[dependencies]
+mopro-build-common = { path = "../common" }
+uniffi  = { version = "=0.31.0", features = ["bindgen"] }
+anyhow  = "1.0"
+camino  = "1.1"
+fs_extra = "1.2"

@@ -1,0 +1,12 @@
+[package]
+name = "mopro-react-native-backend"
+version = "0.1.0"
+edition = "2021"
+description = "mopro build-pipeline backend: React Native bindings via uniffi-bindgen-react-native"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zkmopro/mopro"
+
+[dependencies]
+mopro-build-common = { path = "../common" }
+anyhow   = "1.0"
+fs_extra = "1.2"

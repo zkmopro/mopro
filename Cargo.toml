@@ -1,5 +1,19 @@
 [workspace]
-members = ["mopro-ffi", "cli", "tests"]
+members = [
+    "core",
+    "provers/circom-adapter",
+    "provers/halo2-adapter",
+    "provers/noir-adapter",
+    "ffi/common",
+    "ffi/uniffi",
+    "ffi/wasm",
+    "ffi/flutter",
+    "ffi/react-native",
+    "mopro-ffi",
+    "cli",
+    "test-app",
+    "tests",
+]
 resolver = "2"
 
 [workspace.dependencies]

@@ -1,0 +1,20 @@
+[package]
+name = "halo2-prover-adapter"
+version = "0.1.0"
+edition = "2021"
+description = "mopro adapter that wires user-supplied Halo2 circuit functions into the mopro-core::Prover trait"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zkmopro/mopro"
+
+[features]
+# Adds uniffi::Record derive to Halo2Output.
+uniffi = ["dep:uniffi"]
+
+[dependencies]
+mopro-core = { path = "../../core" }
+
+# serde: needed by wasm-bindgen (serde_wasm_bindgen) and JSON serialisation.
+serde = { version = "1.0", features = ["derive"] }
+
+# uniffi: optional — enabled by ffi/backends/uniffi when building iOS/Android bindings.
+uniffi = { version = "=0.31.0", optional = true }

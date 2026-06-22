@@ -1,0 +1,19 @@
+[package]
+name = "test-app"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[features]
+default = ["uniffi"]
+uniffi = ["mopro-ffi/uniffi"]
+flutter = ["mopro-ffi/flutter"]
+wasm = ["mopro-ffi/wasm"]
+
+[dependencies]
+mopro-ffi = { path = "../mopro-ffi" }
+
+[target.wasm32-unknown-unknown.dependencies]
+mopro-ffi = { path = "../mopro-ffi", features = ["wasm"] }

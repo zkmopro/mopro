@@ -3,21 +3,8 @@ name = "tests"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-crate-type = ["lib", "cdylib", "staticlib"]
-
-[features]
-default = ["uniffi"]
-uniffi = ["mopro-ffi/uniffi"]
-flutter = ["mopro-ffi/flutter"]
-wasm = ["mopro-ffi/wasm"]
-
-[dependencies]
-mopro-ffi = { path = "../mopro-ffi" }
-thiserror = "2.0.12"
-
-[target.wasm32-unknown-unknown.dependencies]
-mopro-ffi = { path = "../mopro-ffi", features = ["wasm"] }
-
-[target.wasm32-unknown-unknown.dev-dependencies]
-mopro-ffi = { path = "../mopro-ffi", features = ["wasm"] }
+[build-dependencies]
+mopro-wasm-backend          = { path = "../ffi/wasm" }
+mopro-uniffi-backend        = { path = "../ffi/uniffi" }
+mopro-flutter-backend       = { path = "../ffi/flutter" }
+mopro-react-native-backend  = { path = "../ffi/react-native" }
