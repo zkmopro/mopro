@@ -70,6 +70,7 @@ impl PlatformBuilder for IosPlatform {
                     .arg("--lib")
                     .env("CARGO_BUILD_TARGET_DIR", &build_dir_path)
                     .env("CARGO_BUILD_TARGET", arch.as_str())
+                    .current_dir(project_dir)
                     .spawn().expect("Failed to spawn cargo build")
                     .wait().expect("cargo build errored");
             }
