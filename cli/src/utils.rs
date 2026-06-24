@@ -56,9 +56,12 @@ impl PlatformSelector {
                 .iter()
                 .map(|&i| {
                     let p = Platform::from_idx(i);
+                    // `target_platforms` was initialized to `Some(HashSet::new())` above, so
+                    // `get_or_insert_with` is redundant here and makes the intent harder to read.
                     config
                         .target_platforms
-                        .get_or_insert_with(HashSet::new)
+                        .as_mut()
+                        .unwrap()
                         .insert(p.as_str().to_string());
                     p
                 })
@@ -74,7 +77,7 @@ impl PlatformSelector {
     /// For the better UX - users don't need to select again if failed build happens in the next step,
     /// `select_archs` updates `ios` and `android` in the config file.
     pub fn select_archs(&mut self, config: &mut Config) -> HashMap<String, Vec<String>> {
-        let mut archs: HashMap<String, Vec<String>> = HashMap::new();
+        let mut selected_archs_by_platform: HashMap<String, Vec<String>> = HashMap::new();
         Self::print_architecture_message();
         self.platforms.iter().for_each(|&p| match p {
             Platform::Ios => {
@@ -106,7 +109,7 @@ impl PlatformSelector {
                         arch.clone()
                     })
                     .collect::<Vec<String>>();
-                archs.insert(String::from(Platform::Ios.as_str()), sel_str.clone());
+                selected_archs_by_platform.insert(String::from(Platform::Ios.as_str()), sel_str.clone());
                 self.archs.extend_from_slice(&sel_str);
             }
             Platform::Android => {
@@ -138,12 +141,12 @@ impl PlatformSelector {
                         arch.clone()
                     })
                     .collect::<Vec<String>>();
-                archs.insert(String::from(Platform::Android.as_str()), sel_str.clone());
+                selected_archs_by_platform.insert(String::from(Platform::Android.as_str()), sel_str.clone());
                 self.archs.extend_from_slice(&sel_str);
             }
             Platform::Web => {}
         });
-        archs
+        selected_archs_by_platform
     }
 
     fn select_multi_archs(platform: &str, archs: &[&str], defaults: Vec<bool>) -> Vec<usize> {
