@@ -167,11 +167,6 @@ impl PlatformBuilder for IosPlatform {
         )
         .expect("Failed to generate header artifacts");
 
-        // Xcode 26+ no longer registers module maps from static-library XCFrameworks.
-        // Create a `module/` shim directory alongside the xcframework containing a copy
-        // of the FFI header and a module.modulemap, mirroring the COpenACFFI pattern.
-        // The xcodeproj passes `-Xcc -fmodule-map-file=…/module/module.modulemap` so
-        // Xcode 26 can find RustBuffer / ForeignBytes / RustCallStatus etc.
         create_module_shim(
             &bindings_out,
             &swift_bindings_dir.join(&header_name),
@@ -265,10 +260,12 @@ pub fn regroup_header_artifacts(
         let target_dir = headers_dir.join(project_name);
         fs::create_dir_all(&target_dir).with_context(|| format!("creating {target_dir:?}"))?;
 
-        // ── move & rename ────────────────────────────────────────
+        // Remove the embedded module map; the shim at MoproiOSBindings/module/
+        // (loaded via -Xcc -fmodule-map-file) is the sole definition for all
+        // Xcode versions, avoiding duplicate-module errors on Xcode < 26.
         if modmap_src.exists() {
-            fs::rename(&modmap_src, target_dir.join("module.modulemap"))
-                .with_context(|| format!("moving {modmap_src:?}"))?;
+            fs::remove_file(&modmap_src)
+                .with_context(|| format!("removing {modmap_src:?}"))?;
         }
         if header_src.exists() {
             fs::rename(&header_src, target_dir.join(header_name))
@@ -279,11 +276,9 @@ pub fn regroup_header_artifacts(
     Ok(())
 }
 
-/// Copy the FFI header next to the xcframework and write a bare module.modulemap.
-///
-/// Xcode 26 stopped auto-registering module maps that are embedded inside static-library
-/// XCFrameworks. The xcodeproj passes `-Xcc -fmodule-map-file=<bindings>/module/module.modulemap`
-/// to make this module visible again without changing the xcframework layout.
+/// Create MoproiOSBindings/module/ with the FFI header and a module.modulemap.
+/// Xcode 26+ no longer auto-registers module maps from static-library xcframeworks;
+/// the xcodeproj points to this shim via -Xcc -fmodule-map-file in OTHER_SWIFT_FLAGS.
 fn create_module_shim(
     bindings_out: &Path,
     header_src: &Path,
