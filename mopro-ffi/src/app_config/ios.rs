@@ -167,6 +167,19 @@ impl PlatformBuilder for IosPlatform {
         )
         .expect("Failed to generate header artifacts");
 
+        // Xcode 26+ no longer registers module maps from static-library XCFrameworks.
+        // Create a `module/` shim directory alongside the xcframework containing a copy
+        // of the FFI header and a module.modulemap, mirroring the COpenACFFI pattern.
+        // The xcodeproj passes `-Xcc -fmodule-map-file=…/module/module.modulemap` so
+        // Xcode 26 can find RustBuffer / ForeignBytes / RustCallStatus etc.
+        create_module_shim(
+            &bindings_out,
+            &swift_bindings_dir.join(&header_name),
+            &header_name,
+            &uniffi_style_identifier,
+        )
+        .expect("Failed to create module shim for Xcode 26");
+
         if let Ok(info) = fs::metadata(&bindings_dest) {
             if !info.is_dir() {
                 panic!("framework directory exists and is not a directory");
@@ -263,6 +276,27 @@ pub fn regroup_header_artifacts(
         }
     }
 
+    Ok(())
+}
+
+/// Copy the FFI header next to the xcframework and write a bare module.modulemap.
+///
+/// Xcode 26 stopped auto-registering module maps that are embedded inside static-library
+/// XCFrameworks. The xcodeproj passes `-Xcc -fmodule-map-file=<bindings>/module/module.modulemap`
+/// to make this module visible again without changing the xcframework layout.
+fn create_module_shim(
+    bindings_out: &Path,
+    header_src: &Path,
+    header_name: &str,
+    identifier: &str,
+) -> anyhow::Result<()> {
+    let module_dir = bindings_out.join("module");
+    fs::create_dir_all(&module_dir)?;
+    fs::copy(header_src, module_dir.join(header_name))?;
+    fs::write(
+        module_dir.join("module.modulemap"),
+        format!("module {identifier}FFI {{\n    header \"{header_name}\"\n    export *\n}}\n"),
+    )?;
     Ok(())
 }
 
