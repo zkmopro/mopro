@@ -119,6 +119,12 @@ jobs:
                   project-name: mopro-example-${{ matrix.adapter }}
                   destination: ${{ runner.temp }}
 
+            - name: Install Kotlin 1.9.24
+              run: |
+                  curl -fL https://github.com/JetBrains/kotlin/releases/download/v1.9.24/kotlin-compiler-1.9.24.zip -o kotlin.zip
+                  unzip -q kotlin.zip -d "$HOME"
+                  echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
+
             - name: Run tests with JNA
               working-directory: ${{ runner.temp }}/mopro-example-${{ matrix.adapter }}
               run: |
