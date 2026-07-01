@@ -264,8 +264,7 @@ pub fn regroup_header_artifacts(
         // (loaded via -Xcc -fmodule-map-file) is the sole definition for all
         // Xcode versions, avoiding duplicate-module errors on Xcode < 26.
         if modmap_src.exists() {
-            fs::remove_file(&modmap_src)
-                .with_context(|| format!("removing {modmap_src:?}"))?;
+            fs::remove_file(&modmap_src).with_context(|| format!("removing {modmap_src:?}"))?;
         }
         if header_src.exists() {
             fs::rename(&header_src, target_dir.join(header_name))
