@@ -3,7 +3,9 @@ use std::process::Command;
 use std::{fs, path::PathBuf};
 
 use crate::app_config::cleanup_tmp_local;
-use crate::app_config::constants::{Mode, PlatformBuilder, WebArch, WebPlatform, WEB_BINDINGS_DIR};
+use crate::app_config::constants::{
+    Mode, PlatformBuilder, WebArch, WebPlatform, WEB_BINDINGS_DIR, WASM_NIGHTLY_TOOLCHAIN,
+};
 
 use super::mktemp_local;
 
@@ -40,7 +42,7 @@ impl PlatformBuilder for WebPlatform {
         let mut cmd = Command::new("rustup");
         cmd.args([
             "run",
-            "nightly-2025-11-15",
+            WASM_NIGHTLY_TOOLCHAIN,
             "wasm-pack",
             "build",
             "--target",
@@ -57,7 +59,7 @@ impl PlatformBuilder for WebPlatform {
 
         cmd.env(
             "CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS",
-            "-C target-feature=+atomics,+bulk-memory \
+            "-C target-feature=+atomics,+bulk-memory,+mutable-globals \
              -C link-arg=--shared-memory \
              -C link-arg=--max-memory=1073741824 \
              -C link-arg=--import-memory \

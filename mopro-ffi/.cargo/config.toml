@@ -4,7 +4,7 @@ build-std = ["std", "panic_abort"]
 [target.wasm32-unknown-unknown]
 runner = "wasm-pack test --chrome --headless"
 rustflags = [
-    "-C", "target-feature=+atomics,+bulk-memory",
+    "-C", "target-feature=+atomics,+bulk-memory,+mutable-globals",
     "-C", "link-arg=--shared-memory",
     "-C", "link-arg=--max-memory=1073741824",
     "-C", "link-arg=--import-memory",
