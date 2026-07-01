@@ -4,7 +4,7 @@ use std::{fs, path::PathBuf};
 
 use crate::app_config::cleanup_tmp_local;
 use crate::app_config::constants::{
-    Mode, PlatformBuilder, WebArch, WebPlatform, WEB_BINDINGS_DIR, WASM_NIGHTLY_TOOLCHAIN,
+    Mode, PlatformBuilder, WebArch, WebPlatform, WASM_NIGHTLY_TOOLCHAIN, WEB_BINDINGS_DIR,
 };
 
 use super::mktemp_local;
