@@ -509,7 +509,7 @@ jobs:
                   CI: "true"
               run: |
                   set -euo pipefail
-                  rustup component add rust-src --toolchain nightly-2025-02-20
+                  rustup component add rust-src --toolchain nightly-2025-11-15
                   # TODO: allow mopro CLI to run fully non-interactive so we can drop the pseudo-tty workaround below
                   if [[ "$RUNNER_OS" == "macOS" ]]; then
                     printf 'y\n' | script -q /dev/null "$GITHUB_WORKSPACE/bin/mopro" build --mode release --platforms web
@@ -545,7 +545,7 @@ jobs:
             - name: Setup Rust
               uses: ./.github/actions/setup-rust
               with:
-                  toolchain: nightly-2025-02-20
+                  toolchain: nightly-2025-11-15
                   cache-key: wasm-env
             - name: Cache wasm-pack
               id: cache-wasm-pack
