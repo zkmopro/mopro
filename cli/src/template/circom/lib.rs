@@ -7,7 +7,10 @@ pub use circom::{
     generate_circom_proof, verify_circom_proof, CircomProof, CircomProofResult, ProofLib, G1, G2,
 };
 #[cfg(feature = "garaga")]
-pub use circom::generate_circom_groth16_garaga_calldata;
+pub use circom::{
+    generate_circom_groth16_garaga_calldata,
+    generate_circom_groth16_garaga_calldata_from_proof_result,
+};
 
 mod witness {
     rust_witness::witness!(multiplier2);

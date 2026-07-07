@@ -31,21 +31,63 @@ pub(crate) fn snarkjs_g2_to_garaga(rows: &[Vec<String>]) -> Result<G2PointBigUin
     })
 }
 
+pub(crate) fn public_inputs_to_biguint(public_inputs: &[String]) -> Result<Vec<BigUint>, String> {
+    if public_inputs.is_empty() {
+        return Err("public inputs must not be empty".to_string());
+    }
+    public_inputs
+        .iter()
+        .map(|s| parse_biguint(s))
+        .collect()
+}
+
+pub(crate) fn mopro_g2_to_garaga(
+    x: &[String],
+    y: &[String],
+) -> Result<G2PointBigUint, String> {
+    if x.len() < 2 || y.len() < 2 {
+        return Err("G2 point must have two x and two y coordinates".to_string());
+    }
+    Ok(G2PointBigUint {
+        x0: parse_biguint(&x[0])?,
+        x1: parse_biguint(&x[1])?,
+        y0: parse_biguint(&y[0])?,
+        y1: parse_biguint(&y[1])?,
+    })
+}
+
+pub(crate) fn to_groth16_proof_from_mopro(
+    a_x: &str,
+    a_y: &str,
+    b_x: &[String],
+    b_y: &[String],
+    c_x: &str,
+    c_y: &str,
+    public_inputs: &[String],
+) -> Result<Groth16Proof, String> {
+    Ok(Groth16Proof {
+        a: snarkjs_g1_to_garaga(&[a_x.to_string(), a_y.to_string()])?,
+        b: mopro_g2_to_garaga(b_x, b_y)?,
+        c: snarkjs_g1_to_garaga(&[c_x.to_string(), c_y.to_string()])?,
+        public_inputs: public_inputs_to_biguint(public_inputs)?,
+        image_id_journal_risc0: None,
+        vkey_public_values_sp1: None,
+    })
+}
+
 pub(crate) fn to_groth16_proof(
     proof: &SnarkJsProof,
     public_inputs: &[String],
 ) -> Result<Groth16Proof, String> {
-    Ok(Groth16Proof {
-        a: snarkjs_g1_to_garaga(&proof.pi_a)?,
-        b: snarkjs_g2_to_garaga(&proof.pi_b)?,
-        c: snarkjs_g1_to_garaga(&proof.pi_c)?,
-        public_inputs: public_inputs
-            .iter()
-            .map(|s| parse_biguint(s))
-            .collect::<Result<Vec<_>, _>>()?,
-        image_id_journal_risc0: None,
-        vkey_public_values_sp1: None,
-    })
+    to_groth16_proof_from_mopro(
+        &proof.pi_a[0],
+        &proof.pi_a[1],
+        &proof.pi_b[0],
+        &proof.pi_b[1],
+        &proof.pi_c[0],
+        &proof.pi_c[1],
+        public_inputs,
+    )
 }
 
 pub(crate) fn to_groth16_vk(vk: &SnarkJsVerificationKey) -> Result<Groth16VerificationKey, String> {

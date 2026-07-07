@@ -348,16 +348,44 @@ garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", tag = "v1
 
 The `garaga` feature is injected when you initialize a Circom project; enable it in your `Cargo.toml` before building bindings.
 
-### Prepare SnarkJS JSON artifacts
+### Prepare verification key
 
-Export or produce the same files snarkjs uses:
+Export the verification key once from your zkey (same format snarkjs uses):
 
 ```sh
-snarkjs groth16 prove circuit_final.zkey witness.wtns proof.json public.json
 snarkjs zkey export verificationkey circuit_final.zkey verification_key.json
 ```
 
-### `generateCircomGroth16GaragaCalldata`
+### `generateCircomGroth16GaragaCalldataFromProofResult` (recommended)
+
+Prove in-app with Mopro, then build Garaga calldata from the result. `CircomProofResult.inputs`
+is a `Vec<String>` with the same content as SnarkJS `public.json` — no separate public-inputs
+file is required.
+
+```rust
+let result = generate_circom_proof(
+    zkey_path,
+    circuit_inputs,
+    ProofLib::Arkworks,
+)?;
+
+let calldata = generate_circom_groth16_garaga_calldata_from_proof_result(
+    result,
+    std::fs::read_to_string("verification_key.json")?,
+)?;
+// calldata: Vec<String> — decimal Starknet felts for Garaga BN254 verifier
+```
+
+On mobile bindings, pass the `CircomProofResult` returned by `generateCircomProof` directly —
+`inputs` is already available as a string list.
+
+### `generateCircomGroth16GaragaCalldata` (SnarkJS JSON import)
+
+For proofs produced outside Mopro (e.g. via snarkjs), pass SnarkJS JSON artifacts:
+
+```sh
+snarkjs groth16 prove circuit_final.zkey witness.wtns proof.json public.json
+```
 
 ```rust
 let calldata = generate_circom_groth16_garaga_calldata(
@@ -365,8 +393,10 @@ let calldata = generate_circom_groth16_garaga_calldata(
     std::fs::read_to_string("public.json")?,
     std::fs::read_to_string("verification_key.json")?,
 )?;
-// calldata: Vec<String> — decimal Starknet felts for Garaga BN254 verifier
 ```
+
+If you already have public inputs as a `Vec<String>`, serialize them instead of reading
+`public.json`: `serde_json::to_string(&inputs)`.
 
 **BN254 only** (`curve: "bn128"` in SnarkJS JSON). The on-chain verifier contract must be generated with Garaga v1.1.0 (`garaga gen`).
 
@@ -375,9 +405,14 @@ let calldata = generate_circom_groth16_garaga_calldata(
 Pass the returned strings to your Starknet client — Mopro stops at calldata formatting:
 
 ```dart
-final calldata = await generateCircomGroth16GaragaCalldata(
-  proofJson: proofJson,
-  publicJson: publicJson,
+final proofResult = await generateCircomProof(
+  zkeyPath: zkeyPath,
+  circuitInputs: circuitInputs,
+  proofLib: ProofLib.arkworks,
+);
+
+final calldata = await generateCircomGroth16GaragaCalldataFromProofResult(
+  proofResult: proofResult,
   verificationKeyJson: vkJson,
 );
 
