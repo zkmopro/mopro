@@ -17,6 +17,7 @@ pub const ANDROID_PACKAGE_NAME: &str = "mopro";
 pub const ANDROID_KT_FILE: &str = "mopro.kt";
 
 pub const WEB_BINDINGS_DIR: &str = "MoproWasmBindings";
+pub const WASM_NIGHTLY_TOOLCHAIN: &str = "nightly-2025-11-15";
 
 pub const ARCH_X86_64: &str = "x86_64";
 pub const ARCH_ARM_64: &str = "aarch64";

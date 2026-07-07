@@ -3,7 +3,9 @@ use std::process::Command;
 use std::{fs, path::PathBuf};
 
 use crate::app_config::cleanup_tmp_local;
-use crate::app_config::constants::{Mode, PlatformBuilder, WebArch, WebPlatform, WEB_BINDINGS_DIR};
+use crate::app_config::constants::{
+    Mode, PlatformBuilder, WebArch, WebPlatform, WASM_NIGHTLY_TOOLCHAIN, WEB_BINDINGS_DIR,
+};
 
 use super::mktemp_local;
 
@@ -31,10 +33,6 @@ impl PlatformBuilder for WebPlatform {
         let bindings_out = work_dir.join(WEB_BINDINGS_DIR);
         fs::create_dir(&bindings_out).expect("Failed to create bindings out directory");
         let bindings_dest = Path::new(&project_dir).join(WEB_BINDINGS_DIR);
-        patch_package_version(project_dir, "indexmap", "2.11.4")?;
-        patch_package_version(project_dir, "backtrace", "0.3.73")?;
-        patch_package_version(project_dir, "blake2b_simd", "1.0.3")?;
-        patch_package_version(project_dir, "wasip2", "1.0.1+wasi-0.2.4")?;
 
         let mode_cmd = match mode {
             Mode::Release => "--release",
@@ -44,7 +42,7 @@ impl PlatformBuilder for WebPlatform {
         let mut cmd = Command::new("rustup");
         cmd.args([
             "run",
-            "nightly-2025-02-20",
+            WASM_NIGHTLY_TOOLCHAIN,
             "wasm-pack",
             "build",
             "--target",
@@ -60,9 +58,17 @@ impl PlatformBuilder for WebPlatform {
         ]);
 
         cmd.env(
-            "RUSTFLAGS",
-            "-C target-feature=+atomics,+bulk-memory -C link-arg=--max-memory=4294967296",
+            "CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS",
+            "-C target-feature=+atomics,+bulk-memory,+mutable-globals \
+             -C link-arg=--shared-memory \
+             -C link-arg=--max-memory=1073741824 \
+             -C link-arg=--import-memory \
+             -C link-arg=--export=__wasm_init_tls \
+             -C link-arg=--export=__tls_size \
+             -C link-arg=--export=__tls_align \
+             -C link-arg=--export=__tls_base",
         );
+
         cmd.current_dir(project_dir);
 
         let status = cmd.status().expect("Failed to run wasm-pack");
@@ -87,20 +93,4 @@ impl PlatformBuilder for WebPlatform {
 
         Ok(bindings_dest)
     }
-}
-
-fn patch_package_version(
-    project_dir: &Path,
-    package_name: &str,
-    version: &str,
-) -> anyhow::Result<()> {
-    let mut cmd = Command::new("cargo");
-    cmd.args(["update", "-p", package_name, "--precise", version]);
-    cmd.current_dir(project_dir);
-    let status = cmd.status().expect("Failed to update package");
-    if !status.success() {
-        eprintln!("Failed to update package");
-        return Err(anyhow::anyhow!("Failed to update package"));
-    }
-    Ok(())
 }

@@ -167,6 +167,14 @@ impl PlatformBuilder for IosPlatform {
         )
         .expect("Failed to generate header artifacts");
 
+        create_module_shim(
+            &bindings_out,
+            &swift_bindings_dir.join(&header_name),
+            &header_name,
+            &uniffi_style_identifier,
+        )
+        .expect("Failed to create module shim for Xcode 26");
+
         if let Ok(info) = fs::metadata(&bindings_dest) {
             if !info.is_dir() {
                 panic!("framework directory exists and is not a directory");
@@ -252,10 +260,11 @@ pub fn regroup_header_artifacts(
         let target_dir = headers_dir.join(project_name);
         fs::create_dir_all(&target_dir).with_context(|| format!("creating {target_dir:?}"))?;
 
-        // ── move & rename ────────────────────────────────────────
+        // Remove the embedded module map; the shim at MoproiOSBindings/module/
+        // (loaded via -Xcc -fmodule-map-file) is the sole definition for all
+        // Xcode versions, avoiding duplicate-module errors on Xcode < 26.
         if modmap_src.exists() {
-            fs::rename(&modmap_src, target_dir.join("module.modulemap"))
-                .with_context(|| format!("moving {modmap_src:?}"))?;
+            fs::remove_file(&modmap_src).with_context(|| format!("removing {modmap_src:?}"))?;
         }
         if header_src.exists() {
             fs::rename(&header_src, target_dir.join(header_name))
@@ -263,6 +272,25 @@ pub fn regroup_header_artifacts(
         }
     }
 
+    Ok(())
+}
+
+/// Create MoproiOSBindings/module/ with the FFI header and a module.modulemap.
+/// Xcode 26+ no longer auto-registers module maps from static-library xcframeworks;
+/// the xcodeproj points to this shim via -Xcc -fmodule-map-file in OTHER_SWIFT_FLAGS.
+fn create_module_shim(
+    bindings_out: &Path,
+    header_src: &Path,
+    header_name: &str,
+    identifier: &str,
+) -> anyhow::Result<()> {
+    let module_dir = bindings_out.join("module");
+    fs::create_dir_all(&module_dir)?;
+    fs::copy(header_src, module_dir.join(header_name))?;
+    fs::write(
+        module_dir.join("module.modulemap"),
+        format!("module {identifier}FFI {{\n    header \"{header_name}\"\n    export *\n}}\n"),
+    )?;
     Ok(())
 }
 
