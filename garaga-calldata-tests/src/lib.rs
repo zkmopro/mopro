@@ -10,15 +10,19 @@ pub enum MoproError {
 
 mod circom;
 
-pub use circom::generate_circom_groth16_garaga_calldata;
+pub use circom::{
+    generate_circom_groth16_garaga_calldata,
+    generate_circom_groth16_garaga_calldata_from_proof_result,
+};
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use circom::garaga_convert::{to_groth16_proof, to_groth16_vk};
     use circom::snarkjs_types::{
-        parse_snarkjs_proof_json, parse_snarkjs_public_json, parse_snarkjs_vk_json,
+        parse_snarkjs_proof_json, parse_snarkjs_public_json, parse_snarkjs_vk_json, SnarkJsProof,
     };
+    use circom::{CircomProof, CircomProofResult, G1, G2};
 
     fn fixture_dir() -> std::path::PathBuf {
         std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -68,6 +72,58 @@ mod tests {
 
         let garaga_vk = to_groth16_vk(&vk).unwrap();
         assert_eq!(garaga_vk.ic.len(), vk.n_public + 1);
+    }
+
+    fn snarkjs_proof_to_circom_proof(proof: &SnarkJsProof) -> CircomProof {
+        CircomProof {
+            a: G1 {
+                x: proof.pi_a[0].clone(),
+                y: proof.pi_a[1].clone(),
+                z: proof.pi_a.get(2).cloned().unwrap_or_else(|| "1".to_string()),
+            },
+            b: G2 {
+                x: proof.pi_b[0].clone(),
+                y: proof.pi_b[1].clone(),
+                z: proof
+                    .pi_b
+                    .get(2)
+                    .cloned()
+                    .unwrap_or_else(|| vec!["1".to_string(), "0".to_string()]),
+            },
+            c: G1 {
+                x: proof.pi_c[0].clone(),
+                y: proof.pi_c[1].clone(),
+                z: proof.pi_c.get(2).cloned().unwrap_or_else(|| "1".to_string()),
+            },
+            protocol: proof.protocol.clone(),
+            curve: proof.curve.clone(),
+        }
+    }
+
+    #[test]
+    fn test_public_inputs_match_serialized_vec() {
+        let inputs = parse_snarkjs_public_json(&read_fixture("public.json")).unwrap();
+        let round_trip: Vec<String> =
+            serde_json::from_str(&serde_json::to_string(&inputs).unwrap()).unwrap();
+        assert_eq!(inputs, round_trip);
+    }
+
+    #[test]
+    fn test_generate_circom_groth16_garaga_calldata_from_proof_result_bn254_golden() {
+        let snarkjs_proof = parse_snarkjs_proof_json(&read_fixture("proof.json")).unwrap();
+        let public_inputs = parse_snarkjs_public_json(&read_fixture("public.json")).unwrap();
+        let vk = read_fixture("verification_key.json");
+        let expected: Vec<String> =
+            serde_json::from_str(&read_fixture("expected_garaga_calldata.json")).unwrap();
+
+        let proof_result = CircomProofResult {
+            proof: snarkjs_proof_to_circom_proof(&snarkjs_proof),
+            inputs: public_inputs,
+        };
+
+        let got =
+            generate_circom_groth16_garaga_calldata_from_proof_result(proof_result, vk).unwrap();
+        assert_eq!(got, expected);
     }
 
     #[test]

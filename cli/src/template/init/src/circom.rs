@@ -6,7 +6,10 @@ mod garaga_convert;
 mod snarkjs_types;
 
 #[cfg(feature = "garaga")]
-pub use circom_garaga::generate_circom_groth16_garaga_calldata;
+pub use circom_garaga::{
+    generate_circom_groth16_garaga_calldata,
+    generate_circom_groth16_garaga_calldata_from_proof_result,
+};
 
 use crate::MoproError;
 use circom_prover::{

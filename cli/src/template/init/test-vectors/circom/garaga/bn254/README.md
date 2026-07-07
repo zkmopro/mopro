@@ -7,7 +7,7 @@ against [Garaga v1.1.0](https://github.com/keep-starknet-strange/garaga/tree/v1.
 | File | Source |
 |------|--------|
 | `proof.json` | Garaga `snarkjs_proof_bn254.json` example |
-| `public.json` | Garaga `snarkjs_public_bn254.json` example |
+| `public.json` | Garaga `snarkjs_public_bn254.json` example (SnarkJS JSON import path only) |
 | `verification_key.json` | Garaga `snarkjs_vk_bn254.json` example |
 | `expected_garaga_calldata.json` | Generated via `cargo run -p garaga-calldata-tests --bin gen-garaga-calldata-fixture` |
 
