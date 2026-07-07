@@ -14,6 +14,7 @@ default = ["uniffi"]
 uniffi = ["mopro-ffi/uniffi"]
 flutter = ["mopro-ffi/flutter"]
 wasm = ["mopro-ffi/wasm"]
+garaga = ["garaga_rs"]
 
 [dependencies]
 mopro-ffi = { version = "=0.3.6" }
