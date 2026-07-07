@@ -1,5 +1,5 @@
 [workspace]
-members = ["mopro-ffi", "cli", "tests"]
+members = ["mopro-ffi", "cli", "tests", "garaga-calldata-tests"]
 resolver = "2"
 
 [workspace.dependencies]

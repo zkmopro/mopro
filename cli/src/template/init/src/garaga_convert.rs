@@ -1,0 +1,61 @@
+use super::snarkjs_types::{SnarkJsProof, SnarkJsVerificationKey};
+use garaga_rs::calldata::full_proof_with_hints::groth16::{Groth16Proof, Groth16VerificationKey};
+use garaga_rs::calldata::{G1PointBigUint, G2PointBigUint};
+use num_bigint::BigUint;
+use std::str::FromStr;
+
+pub(crate) fn parse_biguint(s: &str) -> Result<BigUint, String> {
+    BigUint::from_str(s).map_err(|e| format!("invalid coordinate '{s}': {e}"))
+}
+
+pub(crate) fn snarkjs_g1_to_garaga(coords: &[String]) -> Result<G1PointBigUint, String> {
+    if coords.len() < 2 {
+        return Err("G1 point must have at least two coordinates".to_string());
+    }
+    Ok(G1PointBigUint {
+        x: parse_biguint(&coords[0])?,
+        y: parse_biguint(&coords[1])?,
+    })
+}
+
+/// SnarkJS G2 layout: `[[x0, x1], [y0, y1], [z0, z1]]` → Garaga `[x0, x1, y0, y1]`.
+pub(crate) fn snarkjs_g2_to_garaga(rows: &[Vec<String>]) -> Result<G2PointBigUint, String> {
+    if rows.len() < 2 || rows[0].len() < 2 || rows[1].len() < 2 {
+        return Err("G2 point must have two rows of two coordinates".to_string());
+    }
+    Ok(G2PointBigUint {
+        x0: parse_biguint(&rows[0][0])?,
+        x1: parse_biguint(&rows[0][1])?,
+        y0: parse_biguint(&rows[1][0])?,
+        y1: parse_biguint(&rows[1][1])?,
+    })
+}
+
+pub(crate) fn to_groth16_proof(
+    proof: &SnarkJsProof,
+    public_inputs: &[String],
+) -> Result<Groth16Proof, String> {
+    Ok(Groth16Proof {
+        a: snarkjs_g1_to_garaga(&proof.pi_a)?,
+        b: snarkjs_g2_to_garaga(&proof.pi_b)?,
+        c: snarkjs_g1_to_garaga(&proof.pi_c)?,
+        public_inputs: public_inputs
+            .iter()
+            .map(|s| parse_biguint(s))
+            .collect::<Result<Vec<_>, _>>()?,
+        image_id_journal_risc0: None,
+        vkey_public_values_sp1: None,
+    })
+}
+
+pub(crate) fn to_groth16_vk(vk: &SnarkJsVerificationKey) -> Result<Groth16VerificationKey, String> {
+    let mut values: Vec<BigUint> = Vec::new();
+    values.extend(snarkjs_g1_to_garaga(&vk.vk_alpha_1)?.flatten());
+    values.extend(snarkjs_g2_to_garaga(&vk.vk_beta_2)?.flatten());
+    values.extend(snarkjs_g2_to_garaga(&vk.vk_gamma_2)?.flatten());
+    values.extend(snarkjs_g2_to_garaga(&vk.vk_delta_2)?.flatten());
+    for ic_point in &vk.ic {
+        values.extend(snarkjs_g1_to_garaga(ic_point)?.flatten());
+    }
+    Ok(Groth16VerificationKey::from(values))
+}
