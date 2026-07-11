@@ -69,9 +69,9 @@ impl PlatformBuilder for AndroidPlatform {
         let out_android_kt_file_name = ANDROID_KT_FILE;
 
         // Names for the generated files by uniffi
-        let lib_name = format!("lib{}.so", &uniffi_style_identifier);
+        let lib_name = format!("lib{}.so", uniffi_style_identifier);
         let gen_android_module_name = &uniffi_style_identifier;
-        let gen_android_kt_file_name = format!("{}.kt", &uniffi_style_identifier);
+        let gen_android_kt_file_name = format!("{}.kt", uniffi_style_identifier);
 
         #[cfg(feature = "witnesscalc")]
         let _ = std::env::var("ANDROID_NDK").context("ANDROID_NDK is not set")?;
