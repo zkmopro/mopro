@@ -13,10 +13,7 @@ pub fn print_footer_message() {
 }
 
 pub(crate) fn print_init_instructions(project_name: String) {
-    println!(
-        "🚀 Project '{}' initialized successfully! 🎉",
-        project_name
-    );
+    println!("🚀 Project '{}' initialized successfully! 🎉", project_name);
     println!();
     println!("To get started, follow these steps:");
     println!();
