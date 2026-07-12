@@ -24,6 +24,7 @@ use target_resolver::TargetSelection;
 
 mod android_noir;
 mod mode_resolver;
+mod react_native_noir;
 mod target_resolver;
 
 pub fn build_project(
@@ -192,7 +193,52 @@ pub fn build_project(
             Platform::ReactNative => {
                 let arch_strings = selection.architecture_strings();
                 let arch_refs: Vec<&String> = arch_strings.iter().collect();
-                build_from_str_arch::<ReactNativePlatform>(mode, &current_dir, arch_refs, ())?;
+
+                // Mirrors generate_react_native_bindings' own iOS-takes-precedence
+                // rule: only look at adapter-specific Android overrides when no
+                // iOS arch was requested alongside it.
+                let has_ios = arch_strings.iter().any(|a| a.contains("ios"));
+                let android_arch_strings: Vec<String> = arch_strings
+                    .iter()
+                    .filter(|a| a.contains("android"))
+                    .cloned()
+                    .collect();
+
+                let params = if has_ios
+                    || android_arch_strings.is_empty()
+                    || !config.adapter_contains(Adapter::Noir)
+                {
+                    AndroidBindingsParams::default()
+                } else {
+                    let android_arch_refs: Vec<&String> = android_arch_strings.iter().collect();
+                    android_noir::android_bindings_params(&current_dir, &android_arch_refs)?
+                };
+
+                if params.arch_overrides.is_empty() {
+                    build_from_str_arch::<ReactNativePlatform>(mode, &current_dir, arch_refs, ())?;
+                } else {
+                    let bindings_dir =
+                        mopro_ffi::app_config::react_native::setup_bindings_dir(&current_dir)?;
+                    mopro_ffi::app_config::react_native::generate_jsi_bindings(&bindings_dir)?;
+                    react_native_noir::build(
+                        &current_dir,
+                        &bindings_dir,
+                        &android_arch_strings,
+                        mode,
+                        &params,
+                    )?;
+                    mopro_ffi::app_config::react_native::patch_android_cmake_lists_uniffi_bindgen_resolve(&bindings_dir)?;
+                    mopro_ffi::app_config::react_native::set_xcframework_package_files(
+                        &bindings_dir,
+                    )?;
+                }
+
+                if !android_arch_strings.is_empty() {
+                    mopro_ffi::app_config::react_native::patch_gradle_properties_architectures(
+                        &current_dir,
+                        &android_arch_strings,
+                    )?;
+                }
             }
             Platform::Web => {
                 build_from_str_arch::<WebPlatform>(

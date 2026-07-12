@@ -27,6 +27,7 @@ pub const ARCH_ARM_64_V8: &str = "arm64-v8a";
 
 pub const FLUTTER_BINDINGS_DIR: &str = "mopro_flutter_bindings";
 pub const REACT_NATIVE_BINDINGS_DIR: &str = "MoproReactNativeBindings";
+pub const REACT_NATIVE_APP_DIR: &str = "react-native";
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Mode {

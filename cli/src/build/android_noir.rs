@@ -7,6 +7,13 @@
 //! glibc prebuilt Android can't `dlopen`. We pre-fetch the right prebuilt, point
 //! `BB_LIB_DIR` at it, and link with Zig so the prebuilt's libc++ (`std::__1`)
 //! resolves (the NDK's `std::__ndk1` is ABI-incompatible).
+//!
+//! Lives in the CLI (not `mopro-ffi`) and is only invoked when the project's
+//! `Config.toml` declares the Noir adapter: computing these params touches
+//! `Cargo.lock` (see `barretenberg_rs_version`), and forcing that on every
+//! Android/React Native build — Noir or not — would force a full dependency
+//! resolution (including unrelated optional deps like `flutter_rust_bridge`)
+//! on projects that never asked for it.
 
 use anyhow::Context;
 use mopro_ffi::app_config::android::{AndroidBindingsParams, ArchBuildConfig};
@@ -41,7 +48,7 @@ pub fn android_bindings_params(
 
     for (triple, bb_arch) in &bb_targets {
         let bb_lib_dir = download_barretenberg_android_lib(bb_arch, &version, &build_dir)?;
-        let linker_flag = zig_linker_flag(triple, &build_dir)?;
+        let linker = zig_linker_path(triple, &build_dir)?;
         params.arch_overrides.insert(
             triple.clone(),
             ArchBuildConfig {
@@ -49,7 +56,7 @@ pub fn android_bindings_params(
                     "BB_LIB_DIR".to_string(),
                     bb_lib_dir.to_string_lossy().into_owned(),
                 )],
-                extra_rustflags: vec![linker_flag],
+                linker: Some(linker),
             },
         );
     }
@@ -145,10 +152,10 @@ fn ensure_zig_available() -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Write a Zig-cc linker wrapper for `triple` and return the `-Clinker=<wrapper>`
-/// flag. Zig provides the barretenberg prebuilt's `std::__1` libc++ symbols; only
-/// the linker is overridden, so the NDK still compiles everything else.
-fn zig_linker_flag(triple: &str, build_dir: &Path) -> anyhow::Result<String> {
+/// Write a Zig-cc linker wrapper for `triple` and return its path. Zig provides
+/// the barretenberg prebuilt's `std::__1` libc++ symbols; only the linker is
+/// overridden, so the NDK still compiles everything else.
+fn zig_linker_path(triple: &str, build_dir: &Path) -> anyhow::Result<String> {
     let ndk = android_ndk_home()?;
     let host = ndk_host_tag();
     let sysroot = ndk
@@ -204,7 +211,7 @@ fn zig_linker_flag(triple: &str, build_dir: &Path) -> anyhow::Result<String> {
         fs::set_permissions(&wrapper, perms)?;
     }
 
-    Ok(format!("-Clinker={}", wrapper.display()))
+    Ok(wrapper.to_string_lossy().into_owned())
 }
 
 /// Locate the Android NDK from the usual environment variables.

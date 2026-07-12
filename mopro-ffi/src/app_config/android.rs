@@ -31,8 +31,13 @@ pub fn build() {
 pub struct ArchBuildConfig {
     /// Extra environment variables for this arch's `cargo ndk` invocation.
     pub extra_env: Vec<(String, String)>,
-    /// Flags appended to `RUSTFLAGS` for this arch (e.g. `-Clinker=<wrapper>`).
-    pub extra_rustflags: Vec<String>,
+    /// Path to a linker (or linker wrapper script) to use for this arch, if
+    /// overridden. Kept separate from raw `RUSTFLAGS` so callers that can't use
+    /// the `RUSTFLAGS`/`CARGO_TARGET_<triple>_RUSTFLAGS` env channel (e.g.
+    /// uniffi-bindgen-react-native, which sets its own target-specific
+    /// `CARGO_TARGET_<triple>_RUSTFLAGS` and would clobber anything set there)
+    /// can instead pass it as a `--config target.<triple>.linker=<path>` arg.
+    pub linker: Option<String>,
 }
 
 /// Generic knobs that let a caller tailor the Android build without `mopro-ffi`
@@ -183,7 +188,7 @@ fn build_for_arch(
     Ok(out_lib_path)
 }
 
-/// Apply caller-supplied env vars and `RUSTFLAGS` additions to a `cargo ndk` command.
+/// Apply caller-supplied env vars and a linker override to a `cargo ndk` command.
 fn apply_arch_config(build_cmd: &mut Command, config: Option<&ArchBuildConfig>) {
     let Some(config) = config else {
         return;
@@ -191,8 +196,8 @@ fn apply_arch_config(build_cmd: &mut Command, config: Option<&ArchBuildConfig>) 
     for (key, value) in &config.extra_env {
         build_cmd.env(key, value);
     }
-    if !config.extra_rustflags.is_empty() {
-        let extra = config.extra_rustflags.join(" ");
+    if let Some(linker) = &config.linker {
+        let extra = format!("-Clinker={linker}");
         // Preserve any RUSTFLAGS the caller already set in the environment.
         let rustflags = match std::env::var("RUSTFLAGS") {
             Ok(existing) if !existing.trim().is_empty() => format!("{existing} {extra}"),
@@ -206,8 +211,7 @@ fn apply_arch_config(build_cmd: &mut Command, config: Option<&ArchBuildConfig>) 
 /// custom linker (e.g. Zig) can drop the `.symtab` uniffi-bindgen reads, which the
 /// NDK linker keeps. This lib may not run, but bindgen never runs it; a separate
 /// target dir keeps the shipped jniLibs untouched. Caller env (e.g. an overriding
-/// lib dir) is applied, but `extra_rustflags` is not — this build must use the NDK
-/// linker.
+/// lib dir) is applied, but `linker` is not — this build must use the NDK linker.
 fn build_bindgen_lib(
     arch: AndroidArch,
     lib_name: &str,
