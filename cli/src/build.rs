@@ -194,32 +194,45 @@ pub fn build_project(
                 let arch_strings = selection.architecture_strings();
                 let arch_refs: Vec<&String> = arch_strings.iter().collect();
 
-                // Mirrors generate_react_native_bindings' own iOS-takes-precedence
-                // rule: only look at adapter-specific Android overrides when no
-                // iOS arch was requested alongside it.
-                let has_ios = arch_strings.iter().any(|a| a.contains("ios"));
+                let ios_arch_strings: Vec<String> = arch_strings
+                    .iter()
+                    .filter(|a| a.contains("ios"))
+                    .cloned()
+                    .collect();
                 let android_arch_strings: Vec<String> = arch_strings
                     .iter()
                     .filter(|a| a.contains("android"))
                     .cloned()
                     .collect();
 
-                let params = if has_ios
-                    || android_arch_strings.is_empty()
-                    || !config.adapter_contains(Adapter::Noir)
-                {
-                    AndroidBindingsParams::default()
-                } else {
-                    let android_arch_refs: Vec<&String> = android_arch_strings.iter().collect();
-                    android_noir::android_bindings_params(&current_dir, &android_arch_refs)?
-                };
+                let params =
+                    if android_arch_strings.is_empty() || !config.adapter_contains(Adapter::Noir) {
+                        AndroidBindingsParams::default()
+                    } else {
+                        let android_arch_refs: Vec<&String> = android_arch_strings.iter().collect();
+                        android_noir::android_bindings_params(&current_dir, &android_arch_refs)?
+                    };
 
                 if params.arch_overrides.is_empty() {
+                    // Noir doesn't need any special handling here: mopro-ffi builds
+                    // iOS and Android independently, so both run in one pass.
                     build_from_str_arch::<ReactNativePlatform>(mode, &current_dir, arch_refs, ())?;
                 } else {
+                    // Android needs the Zig-linked Noir build; iOS (if requested)
+                    // still goes through the normal path since Noir only affects
+                    // Android linking.
                     let bindings_dir =
                         mopro_ffi::app_config::react_native::setup_bindings_dir(&current_dir)?;
                     mopro_ffi::app_config::react_native::generate_jsi_bindings(&bindings_dir)?;
+                    if !ios_arch_strings.is_empty() {
+                        let ios_target_string = ios_arch_strings.join(",");
+                        mopro_ffi::app_config::react_native::build_for_arch(
+                            "ios",
+                            mode,
+                            &ios_target_string,
+                            &bindings_dir,
+                        )?;
+                    }
                     react_native_noir::build(
                         &current_dir,
                         &bindings_dir,

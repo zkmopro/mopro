@@ -151,9 +151,9 @@ fn generate_react_native_bindings(
         .join(",");
 
     if !ios_target_string.is_empty() {
-        let platform = "ios";
-        build_for_arch(platform, mode, &ios_target_string, bindings_dir)?;
-    } else if !android_target_string.is_empty() {
+        build_for_arch("ios", mode, &ios_target_string, bindings_dir)?;
+    }
+    if !android_target_string.is_empty() {
         build_for_arch("android", mode, &android_target_string, bindings_dir)?;
         patch_android_cmake_lists_uniffi_bindgen_resolve(bindings_dir)?;
     }
@@ -176,7 +176,9 @@ pub fn set_xcframework_package_files(bindings_dir: &Path) -> anyhow::Result<()> 
     Ok(())
 }
 
-fn build_for_arch(
+/// Run `uniffi-bindgen-react-native build <platform> --and-generate --targets <target_string>`
+/// in `bindings_dir`. `platform` is `"ios"` or `"android"`.
+pub fn build_for_arch(
     platform: &str,
     mode: Mode,
     target_string: &str,
