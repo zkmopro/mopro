@@ -99,8 +99,8 @@ Follow the steps below to integrate mopro plugin.
     dependencies:
     flutter:
         sdk: flutter
-    mopro_flutter_plugin:
-        path: ./mopro_flutter_plugin
+    mopro_flutter_bindings:
+        path: ./mopro_flutter_bindings
     ```
 
 ### 2-2. Copy keys in the `assets` folder like this
