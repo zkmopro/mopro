@@ -5,7 +5,7 @@ use crate::create::utils::{check_bindings, copy_dir, copy_keys, download_and_ext
 use crate::print::print_footer_message;
 use crate::style::print_green_bold;
 
-use anyhow::{Error, Result};
+use anyhow::{Context, Error, Result};
 use mopro_ffi::app_config::constants::{REACT_NATIVE_APP_DIR, REACT_NATIVE_BINDINGS_DIR};
 use mopro_ffi::app_config::react_native::patch_gradle_properties_architectures;
 use std::{fs, path::PathBuf};
@@ -54,16 +54,22 @@ impl Create for ReactNative {
         // reintroduce the "missing .so, no known rule to make it" ninja
         // failure for ABIs that were never built.
         let config_path = project_dir.join("Config.toml");
-        if let Ok(config) = read_config(&config_path) {
-            if let Some(react_native_archs) = config.react_native {
-                let android_archs: Vec<String> = react_native_archs
-                    .into_iter()
-                    .filter(|a| a.contains("android"))
-                    .collect();
-                if !android_archs.is_empty() {
-                    patch_gradle_properties_architectures(&project_dir, &android_archs)?;
+        match read_config(&config_path) {
+            Ok(config) => {
+                if let Some(react_native_archs) = config.react_native {
+                    let android_archs: Vec<String> = react_native_archs
+                        .into_iter()
+                        .filter(|a| a.contains("android"))
+                        .collect();
+                    if !android_archs.is_empty() {
+                        patch_gradle_properties_architectures(&project_dir, &android_archs)?;
+                    }
                 }
             }
+            Err(e)
+                if e.downcast_ref::<std::io::Error>()
+                    .is_some_and(|io_err| io_err.kind() == std::io::ErrorKind::NotFound) => {}
+            Err(e) => return Err(e).with_context(|| format!("Failed to read {:?}", config_path)),
         }
 
         Self::print_message();

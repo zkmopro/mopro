@@ -219,8 +219,10 @@ pub fn build_for_arch(
 // no-op once the upstream fix ships in a published release.
 pub fn patch_android_cmake_lists_uniffi_bindgen_resolve(bindings_dir: &Path) -> anyhow::Result<()> {
     let cmake_lists_path = bindings_dir.join("android").join("CMakeLists.txt");
-    let Ok(contents) = fs::read_to_string(&cmake_lists_path) else {
-        return Ok(());
+    let contents = match fs::read_to_string(&cmake_lists_path) {
+        Ok(contents) => contents,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+        Err(e) => return Err(e).with_context(|| format!("Failed to read {:?}", cmake_lists_path)),
     };
 
     const BROKEN: &str = "require.resolve('uniffi-bindgen-react-native/package.json')";
@@ -276,8 +278,12 @@ pub fn patch_gradle_properties_architectures(
         .join(REACT_NATIVE_APP_DIR)
         .join("android")
         .join("gradle.properties");
-    let Ok(contents) = fs::read_to_string(&gradle_properties_path) else {
-        return Ok(());
+    let contents = match fs::read_to_string(&gradle_properties_path) {
+        Ok(contents) => contents,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+        Err(e) => {
+            return Err(e).with_context(|| format!("Failed to read {:?}", gradle_properties_path))
+        }
     };
 
     const PREFIX: &str = "reactNativeArchitectures=";
