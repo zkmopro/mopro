@@ -1,18 +1,18 @@
 {
-    "name": "mopro-ffi",
-    "version": "0.1.0",
-    "description": "Mopro FFI bindings for React Native",
-    "main": "./lib/module/index.js",
-    "types": "./lib/typescript/src/index.d.ts",
-    "exports": {
+  "name": "mopro-ffi",
+  "version": "0.1.0",
+  "description": "Mopro FFI bindings for React Native",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
       ".": {
-        "source": "./src/index.tsx",
-        "types": "./lib/typescript/src/index.d.ts",
-        "default": "./lib/module/index.js"
+          "source": "./src/index.tsx",
+          "types": "./lib/typescript/src/index.d.ts",
+          "default": "./lib/module/index.js"
       },
       "./package.json": "./package.json"
-    },
-    "files": [
+  },
+  "files": [
       "src",
       "lib",
       "android",
@@ -29,9 +29,10 @@
       "!**/__tests__",
       "!**/__fixtures__",
       "!**/__mocks__",
-      "!**/.*"
-    ],
-    "scripts": {
+      "!**/.*",
+      "*.xcframework/**"
+  ],
+  "scripts": {
       "ubrn:ios": "ubrn build ios --and-generate --release && (cd example/ios && pod install)",
       "ubrn:android": "ubrn build android --and-generate --release --targets aarch64-linux-android",
       "test": "jest",
@@ -40,26 +41,26 @@
       "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
       "prepare": "bob build",
       "release": "release-it --only-version"
-    },
-    "keywords": [
+  },
+  "keywords": [
       "react-native",
       "ios",
       "android"
-    ],
-    "repository": {
+  ],
+  "repository": {
       "type": "git",
       "url": "git+https://github.com/zkmopro/react-native-app.git"
-    },
-    "author": "ZK Mopro Team (https://zkmopro.com)",
-    "license": "MIT",
-    "bugs": {
+  },
+  "author": "ZK Mopro Team (https://zkmopro.com)",
+  "license": "MIT",
+  "bugs": {
       "url": "https://github.com/zkmopro/react-native-app/issues"
-    },
-    "homepage": "https://github.com/zkmopro/react-native-app#readme",
-    "publishConfig": {
+  },
+  "homepage": "https://github.com/zkmopro/react-native-app#readme",
+  "publishConfig": {
       "registry": "https://registry.npmjs.org/"
-    },
-    "devDependencies": {
+  },
+  "devDependencies": {
       "@commitlint/config-conventional": "^19.8.1",
       "@eslint/compat": "^1.3.2",
       "@eslint/eslintrc": "^3.3.1",
@@ -84,86 +85,86 @@
       "release-it": "^19.0.4",
       "turbo": "^2.5.6",
       "typescript": "^5.9.2"
-    },
-    "peerDependencies": {
+  },
+  "peerDependencies": {
       "react": "*",
       "react-native": "*"
-    },
-    "workspaces": [
+  },
+  "workspaces": [
       "example"
-    ],
-    "packageManager": "yarn@3.6.1",
-    "jest": {
+  ],
+  "packageManager": "yarn@3.6.1",
+  "jest": {
       "preset": "react-native",
       "modulePathIgnorePatterns": [
-        "<rootDir>/example/node_modules",
-        "<rootDir>/lib/"
+          "<rootDir>/example/node_modules",
+          "<rootDir>/lib/"
       ]
-    },
-    "commitlint": {
+  },
+  "commitlint": {
       "extends": [
-        "@commitlint/config-conventional"
+          "@commitlint/config-conventional"
       ]
-    },
-    "release-it": {
+  },
+  "release-it": {
       "git": {
-        "commitMessage": "chore: release ${version}",
-        "tagName": "v${version}"
+          "commitMessage": "chore: release ${version}",
+          "tagName": "v${version}"
       },
       "npm": {
-        "publish": true
+          "publish": true
       },
       "github": {
-        "release": true
+          "release": true
       },
       "plugins": {
-        "@release-it/conventional-changelog": {
-          "preset": {
-            "name": "angular"
+          "@release-it/conventional-changelog": {
+              "preset": {
+                  "name": "angular"
+              }
           }
-        }
       }
-    },
-    "prettier": {
+  },
+  "prettier": {
       "quoteProps": "consistent",
       "singleQuote": true,
       "tabWidth": 2,
       "trailingComma": "es5",
       "useTabs": false
-    },
-    "react-native-builder-bob": {
+  },
+  "react-native-builder-bob": {
       "source": "src",
       "output": "lib",
       "targets": [
-        [
-          "module",
-          {
-            "esm": true
-          }
-        ],
-        [
-          "typescript",
-          {
-            "project": "tsconfig.build.json"
-          }
-        ]
+          [
+              "module",
+              {
+                  "esm": true
+              }
+          ],
+          [
+              "typescript",
+              {
+                  "project": "tsconfig.build.json"
+              }
+          ]
       ]
-    },
-    "codegenConfig": {
+  },
+  "codegenConfig": {
       "name": "MoproFFISpec",
       "type": "modules",
       "jsSrcsDir": "src",
       "android": {
-        "javaPackageName": "com.moproffi"
+          "javaPackageName": "com.moproffi"
       }
-    },
-    "create-react-native-library": {
+  },
+  "create-react-native-library": {
       "languages": "kotlin-objc",
       "type": "turbo-module",
       "version": "0.54.5"
-    },
-    "dependencies": {
-      "uniffi-bindgen-react-native": "^0.29.3-1"
-    }
+  },
+  "dependencies": {
+      "@ubjs/core": "^0.31.0-3",
+      "uniffi-bindgen-react-native": "^0.31.0-3"
   }
-  
+}

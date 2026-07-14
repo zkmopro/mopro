@@ -13,3 +13,4 @@ MoproAndroidBindings
 MoproiOSBindings
 MoproReactNativeBindings
 build/
+!cli/src/build/

@@ -18,7 +18,7 @@ pub(crate) fn print_init_instructions(project_name: String) {
     println!("To get started, follow these steps:");
     println!();
     print_green_bold("1. Navigate to your project directory:".to_string());
-    print_bold(format!("   cd {}", project_name));
+    print_bold(format!("   cd {project_name}"));
     println!();
     print_green_bold("2. Run the following commands to build and run the project:".to_string());
     print_bold("   mopro build".to_string());

@@ -24,6 +24,7 @@ use target_resolver::TargetSelection;
 
 mod android_noir;
 mod mode_resolver;
+mod react_native_noir;
 mod target_resolver;
 
 pub fn build_project(
@@ -192,7 +193,65 @@ pub fn build_project(
             Platform::ReactNative => {
                 let arch_strings = selection.architecture_strings();
                 let arch_refs: Vec<&String> = arch_strings.iter().collect();
-                build_from_str_arch::<ReactNativePlatform>(mode, &current_dir, arch_refs, ())?;
+
+                let ios_arch_strings: Vec<String> = arch_strings
+                    .iter()
+                    .filter(|a| a.contains("ios"))
+                    .cloned()
+                    .collect();
+                let android_arch_strings: Vec<String> = arch_strings
+                    .iter()
+                    .filter(|a| a.contains("android"))
+                    .cloned()
+                    .collect();
+
+                let params =
+                    if android_arch_strings.is_empty() || !config.adapter_contains(Adapter::Noir) {
+                        AndroidBindingsParams::default()
+                    } else {
+                        let android_arch_refs: Vec<&String> = android_arch_strings.iter().collect();
+                        android_noir::android_bindings_params(&current_dir, &android_arch_refs)?
+                    };
+
+                if params.arch_overrides.is_empty() {
+                    // Noir doesn't need any special handling here: mopro-ffi builds
+                    // iOS and Android independently, so both run in one pass.
+                    build_from_str_arch::<ReactNativePlatform>(mode, &current_dir, arch_refs, ())?;
+                } else {
+                    // Android needs the Zig-linked Noir build; iOS (if requested)
+                    // still goes through the normal path since Noir only affects
+                    // Android linking.
+                    let bindings_dir =
+                        mopro_ffi::app_config::react_native::setup_bindings_dir(&current_dir)?;
+                    mopro_ffi::app_config::react_native::generate_jsi_bindings(&bindings_dir)?;
+                    if !ios_arch_strings.is_empty() {
+                        let ios_target_string = ios_arch_strings.join(",");
+                        mopro_ffi::app_config::react_native::build_for_arch(
+                            "ios",
+                            mode,
+                            &ios_target_string,
+                            &bindings_dir,
+                        )?;
+                    }
+                    react_native_noir::build(
+                        &current_dir,
+                        &bindings_dir,
+                        &android_arch_strings,
+                        mode,
+                        &params,
+                    )?;
+                    mopro_ffi::app_config::react_native::patch_android_cmake_lists_uniffi_bindgen_resolve(&bindings_dir)?;
+                    mopro_ffi::app_config::react_native::set_xcframework_package_files(
+                        &bindings_dir,
+                    )?;
+                }
+
+                if !android_arch_strings.is_empty() {
+                    mopro_ffi::app_config::react_native::patch_gradle_properties_architectures(
+                        &current_dir,
+                        &android_arch_strings,
+                    )?;
+                }
             }
             Platform::Web => {
                 build_from_str_arch::<WebPlatform>(

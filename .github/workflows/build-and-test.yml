@@ -380,7 +380,7 @@ jobs:
             matrix:
                 adapter: [circom, halo2, noir, gnark]
         runs-on: macos-latest
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
             - uses: actions/checkout@v6
 
@@ -389,6 +389,14 @@ jobs:
               uses: actions/setup-go@v5
               with:
                   go-version: "1.24"
+
+            # The barretenberg prebuilt is Zig-built instead of NDK
+            # link libc++ with Zig so it resolves.
+            - name: Setup Zig (for noir/barretenberg libc++ ABI)
+              if: matrix.adapter == 'noir'
+              uses: mlugg/setup-zig@v2
+              with:
+                  version: 0.16.0
 
             # Build mopro example project for iOS + Android first, and create RN frameworks
             - name: Prepare template project
@@ -488,7 +496,7 @@ jobs:
             matrix:
                 adapter: [halo2] # web build only for halo2
         runs-on: ubuntu-latest
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo_full_name
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         steps:
             - uses: actions/checkout@v6
 
