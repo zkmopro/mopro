@@ -27,11 +27,11 @@ pub struct CircomProofResult {
     pub inputs: Vec<String>,
 }
 
-#[path = "../../../cli/src/template/init/src/circom_garaga.rs"]
+#[path = "../../../cli/src/template/init/src/circom/circom_garaga.rs"]
 pub mod circom_garaga;
-#[path = "../../../cli/src/template/init/src/garaga_convert.rs"]
+#[path = "../../../cli/src/template/init/src/circom/garaga_convert.rs"]
 pub mod garaga_convert;
-#[path = "../../../cli/src/template/init/src/snarkjs_types.rs"]
+#[path = "../../../cli/src/template/init/src/circom/snarkjs_types.rs"]
 pub mod snarkjs_types;
 
 pub use circom_garaga::{
