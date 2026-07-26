@@ -329,6 +329,103 @@ let result = generate_circom_proof(
 );
 ```
 
+## Starknet calldata (Garaga, optional)
+
+Mopro can format Circom Groth16 proofs as Starknet verifier calldata using
+[Garaga v1.1.0](https://github.com/keep-starknet-strange/garaga/tree/v1.1.0). This is **calldata generation only** —
+Mopro does not send transactions, manage accounts, estimate fees, or handle nonces.
+
+### Enable the feature
+
+```toml
+[features]
+default = ["uniffi"]
+garaga = ["garaga_rs"]
+
+[dependencies]
+garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", tag = "v1.1.0", package = "garaga_rs", optional = true }
+```
+
+The `garaga` feature is injected when you initialize a Circom project; enable it in your `Cargo.toml` before building bindings.
+
+### Prepare verification key
+
+Export the verification key once from your zkey (same format snarkjs uses):
+
+```sh
+snarkjs zkey export verificationkey circuit_final.zkey verification_key.json
+```
+
+### `generateCircomGroth16GaragaCalldataFromProofResult` (recommended)
+
+Prove in-app with Mopro, then build Garaga calldata from the result. `CircomProofResult.inputs`
+is a `Vec<String>` with the same content as SnarkJS `public.json` — no separate public-inputs
+file is required.
+
+```rust
+let result = generate_circom_proof(
+    zkey_path,
+    circuit_inputs,
+    ProofLib::Arkworks,
+)?;
+
+let calldata = generate_circom_groth16_garaga_calldata_from_proof_result(
+    result,
+    std::fs::read_to_string("verification_key.json")?,
+)?;
+// calldata: Vec<String> — decimal Starknet felts for Garaga BN254 verifier
+```
+
+On mobile bindings, pass the `CircomProofResult` returned by `generateCircomProof` directly —
+`inputs` is already available as a string list.
+
+### `generateCircomGroth16GaragaCalldata` (SnarkJS JSON import)
+
+For proofs produced outside Mopro (e.g. via snarkjs), pass SnarkJS JSON artifacts:
+
+```sh
+snarkjs groth16 prove circuit_final.zkey witness.wtns proof.json public.json
+```
+
+```rust
+let calldata = generate_circom_groth16_garaga_calldata(
+    std::fs::read_to_string("proof.json")?,
+    std::fs::read_to_string("public.json")?,
+    std::fs::read_to_string("verification_key.json")?,
+)?;
+```
+
+If you already have public inputs as a `Vec<String>`, serialize them instead of reading
+`public.json`: `serde_json::to_string(&inputs)`.
+
+**BN254 only** (`curve: "bn128"` in SnarkJS JSON). The on-chain verifier contract must be generated with Garaga v1.1.0 (`garaga gen`).
+
+### Flutter / `starknet.dart`
+
+Pass the returned strings to your Starknet client — Mopro stops at calldata formatting:
+
+```dart
+final proofResult = await generateCircomProof(
+  zkeyPath: zkeyPath,
+  circuitInputs: circuitInputs,
+  proofLib: ProofLib.arkworks,
+);
+
+final calldata = await generateCircomGroth16GaragaCalldataFromProofResult(
+  proofResult: proofResult,
+  verificationKeyJson: vkJson,
+);
+
+// Invoke your Garaga Groth16 verifier contract outside Mopro, e.g. with starknet.dart:
+// await provider.invoke(
+//   contractAddress: verifierAddress,
+//   entrypoint: 'verify_groth16_proof_bn254',
+//   calldata: calldata.map((s) => BigInt.parse(s)).toList(),
+// );
+```
+
+Use your preferred Starknet account/wallet layer (`starknet.dart`, AVNU, etc.) for signing, submission, and RPC.
+
 ## Using the Library
 
 After you have specified the circuits you want to use, you can follow the usual steps to build the library and use it in your project.
