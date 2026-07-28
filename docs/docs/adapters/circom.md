@@ -392,6 +392,9 @@ final proofResult = await generateCircomProof(
   proofLib: ProofLib.arkworks,
 );
 
+// Contents of snarkjs verification_key.json (asset / file / network).
+final vkJson = await rootBundle.loadString('assets/verification_key.json');
+
 final calldata = await generateCircomGroth16GaragaCalldata(
   proofResult: proofResult,
   verificationKeyJson: vkJson,
