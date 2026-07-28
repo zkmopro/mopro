@@ -356,11 +356,11 @@ Export the verification key once from your zkey (same format snarkjs uses):
 snarkjs zkey export verificationkey circuit_final.zkey verification_key.json
 ```
 
-### `generateCircomGroth16GaragaCalldataFromProofResult` (recommended)
+### `generateCircomGroth16GaragaCalldata`
 
 Prove in-app with Mopro, then build Garaga calldata from the result. `CircomProofResult.inputs`
 is a `Vec<String>` with the same content as SnarkJS `public.json` — no separate public-inputs
-file is required.
+file is required. The only required file input is `verification_key.json`.
 
 ```rust
 let result = generate_circom_proof(
@@ -369,7 +369,7 @@ let result = generate_circom_proof(
     ProofLib::Arkworks,
 )?;
 
-let calldata = generate_circom_groth16_garaga_calldata_from_proof_result(
+let calldata = generate_circom_groth16_garaga_calldata(
     result,
     std::fs::read_to_string("verification_key.json")?,
 )?;
@@ -379,26 +379,7 @@ let calldata = generate_circom_groth16_garaga_calldata_from_proof_result(
 On mobile bindings, pass the `CircomProofResult` returned by `generateCircomProof` directly —
 `inputs` is already available as a string list.
 
-### `generateCircomGroth16GaragaCalldata` (SnarkJS JSON import)
-
-For proofs produced outside Mopro (e.g. via snarkjs), pass SnarkJS JSON artifacts:
-
-```sh
-snarkjs groth16 prove circuit_final.zkey witness.wtns proof.json public.json
-```
-
-```rust
-let calldata = generate_circom_groth16_garaga_calldata(
-    std::fs::read_to_string("proof.json")?,
-    std::fs::read_to_string("public.json")?,
-    std::fs::read_to_string("verification_key.json")?,
-)?;
-```
-
-If you already have public inputs as a `Vec<String>`, serialize them instead of reading
-`public.json`: `serde_json::to_string(&inputs)`.
-
-**BN254 only** (`curve: "bn128"` in SnarkJS JSON). The on-chain verifier contract must be generated with Garaga v1.1.0 (`garaga gen`).
+**BN254 only** (`curve: "bn128"` / `"bn254"`). The on-chain verifier contract must be generated with Garaga v1.1.0 (`garaga gen`).
 
 ### Flutter / `starknet.dart`
 
@@ -411,7 +392,7 @@ final proofResult = await generateCircomProof(
   proofLib: ProofLib.arkworks,
 );
 
-final calldata = await generateCircomGroth16GaragaCalldataFromProofResult(
+final calldata = await generateCircomGroth16GaragaCalldata(
   proofResult: proofResult,
   verificationKeyJson: vkJson,
 );

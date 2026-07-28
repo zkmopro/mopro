@@ -1,8 +1,5 @@
-use super::garaga_convert::{to_groth16_proof, to_groth16_proof_from_mopro, to_groth16_vk};
-use super::snarkjs_types::{
-    parse_snarkjs_proof_json, parse_snarkjs_public_json, parse_snarkjs_vk_json, GROTH16_PROTOCOL,
-    SNARKJS_BN128_CURVE,
-};
+use super::garaga_convert::{to_groth16_proof_from_mopro, to_groth16_vk};
+use super::snarkjs_types::{parse_snarkjs_vk_json, GROTH16_PROTOCOL, SNARKJS_BN128_CURVE};
 use super::{CircomProof, CircomProofResult};
 use crate::MoproError;
 use garaga_rs::calldata::full_proof_with_hints::groth16::{
@@ -18,6 +15,20 @@ fn garaga_calldata_core(
         .map_err(|e| MoproError::CircomError(format!("Garaga calldata error: {e}")))?;
 
     Ok(felts.into_iter().map(|f| f.to_string()).collect())
+}
+
+fn validate_public_input_count(
+    public_inputs: &[String],
+    n_public: usize,
+) -> Result<(), MoproError> {
+    if public_inputs.len() != n_public {
+        return Err(MoproError::CircomError(format!(
+            "Garaga calldata error: public input count mismatch: got {}, nPublic {}",
+            public_inputs.len(),
+            n_public
+        )));
+    }
+    Ok(())
 }
 
 fn validate_mopro_groth16_bn254(proof: &CircomProof) -> Result<(), String> {
@@ -53,51 +64,25 @@ fn circom_proof_to_groth16(
     )
 }
 
-/// Build Starknet-compatible Groth16 calldata (BN254) from SnarkJS JSON artifacts.
-///
-/// `proof_json` — contents of snarkjs `proof.json`
-/// `public_json` — contents of snarkjs `public.json` (array of decimal field elements)
-/// `verification_key_json` — contents of snarkjs `verification_key.json`
-///
-/// Returns each Starknet felt as a decimal string, suitable for Flutter/Dart and
-/// `starknet.dart` invoke calldata. Does not send transactions.
-///
-/// Prefer [`generate_circom_groth16_garaga_calldata_from_proof_result`] when you already
-/// have output from [`super::generate_circom_proof`].
-#[cfg_attr(feature = "uniffi", uniffi::export)]
-pub fn generate_circom_groth16_garaga_calldata(
-    proof_json: String,
-    public_json: String,
-    verification_key_json: String,
-) -> Result<Vec<String>, MoproError> {
-    let proof = parse_snarkjs_proof_json(&proof_json)
-        .map_err(|e| MoproError::CircomError(format!("Garaga calldata error: {e}")))?;
-    let public_inputs = parse_snarkjs_public_json(&public_json)
-        .map_err(|e| MoproError::CircomError(format!("Garaga calldata error: {e}")))?;
-    let vk = parse_snarkjs_vk_json(&verification_key_json)
-        .map_err(|e| MoproError::CircomError(format!("Garaga calldata error: {e}")))?;
-
-    let garaga_proof = to_groth16_proof(&proof, &public_inputs)
-        .map_err(|e| MoproError::CircomError(format!("Garaga calldata error: {e}")))?;
-    let garaga_vk = to_groth16_vk(&vk)
-        .map_err(|e| MoproError::CircomError(format!("Garaga calldata error: {e}")))?;
-
-    garaga_calldata_core(garaga_proof, garaga_vk)
-}
-
 /// Build Starknet-compatible Groth16 calldata (BN254) from a [`CircomProofResult`].
+///
+/// Prove with [`super::generate_circom_proof`], then pass the result here together with
+/// `verification_key_json` (contents of snarkjs `verification_key.json` from a one-time
+/// zkey export).
 ///
 /// `proof_result.inputs` has the same content as SnarkJS `public.json` (decimal field
 /// elements). No separate public-inputs file is required.
 ///
-/// `verification_key_json` — contents of snarkjs `verification_key.json` (one-time zkey export).
+/// Returns each Starknet felt as a decimal string, suitable for Flutter/Dart and
+/// `starknet.dart` invoke calldata. Does not send transactions.
 #[cfg_attr(feature = "uniffi", uniffi::export)]
-pub fn generate_circom_groth16_garaga_calldata_from_proof_result(
+pub fn generate_circom_groth16_garaga_calldata(
     proof_result: CircomProofResult,
     verification_key_json: String,
 ) -> Result<Vec<String>, MoproError> {
     let vk = parse_snarkjs_vk_json(&verification_key_json)
         .map_err(|e| MoproError::CircomError(format!("Garaga calldata error: {e}")))?;
+    validate_public_input_count(&proof_result.inputs, vk.n_public)?;
 
     let garaga_proof = circom_proof_to_groth16(&proof_result.proof, &proof_result.inputs)
         .map_err(|e| MoproError::CircomError(format!("Garaga calldata error: {e}")))?;

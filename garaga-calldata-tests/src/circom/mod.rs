@@ -34,7 +34,4 @@ pub mod garaga_convert;
 #[path = "../../../cli/src/template/init/src/circom/snarkjs_types.rs"]
 pub mod snarkjs_types;
 
-pub use circom_garaga::{
-    generate_circom_groth16_garaga_calldata,
-    generate_circom_groth16_garaga_calldata_from_proof_result,
-};
+pub use circom_garaga::generate_circom_groth16_garaga_calldata;

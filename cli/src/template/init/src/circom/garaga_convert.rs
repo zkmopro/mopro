@@ -1,11 +1,40 @@
-use super::snarkjs_types::{SnarkJsProof, SnarkJsVerificationKey};
+use super::snarkjs_types::SnarkJsVerificationKey;
 use garaga_rs::calldata::full_proof_with_hints::groth16::{Groth16Proof, Groth16VerificationKey};
 use garaga_rs::calldata::{G1PointBigUint, G2PointBigUint};
+use garaga_rs::definitions::{get_modulus_from_curve_id, CurveID};
 use num_bigint::BigUint;
 use std::str::FromStr;
+use std::sync::LazyLock;
 
+/// BN254 base-field modulus (Fq). Coordinates must be in `[0, p)`.
+static BN254_BASE_FIELD: LazyLock<BigUint> =
+    LazyLock::new(|| get_modulus_from_curve_id(CurveID::BN254));
+
+/// BN254 scalar-field order (Fr). Public inputs must be in `[0, n)`.
+/// Same value as `BN254PrimeField::get_curve_params().n` in garaga_rs.
+static BN254_SCALAR_FIELD: LazyLock<BigUint> = LazyLock::new(|| {
+    BigUint::parse_bytes(
+        b"30644E72E131A029B85045B68181585D2833E84879B9709143E1F593F0000001",
+        16,
+    )
+    .expect("valid BN254 scalar-field hex")
+});
+
+/// Parse a decimal field element and require it to lie in the BN254 base field (Fq).
 pub(crate) fn parse_biguint(s: &str) -> Result<BigUint, String> {
-    BigUint::from_str(s).map_err(|e| format!("invalid coordinate '{s}': {e}"))
+    let value = BigUint::from_str(s).map_err(|e| format!("invalid coordinate '{s}': {e}"))?;
+    if value >= *BN254_BASE_FIELD {
+        return Err(format!("coordinate '{s}' is outside BN254 base field"));
+    }
+    Ok(value)
+}
+
+fn parse_public_input_biguint(s: &str) -> Result<BigUint, String> {
+    let value = BigUint::from_str(s).map_err(|e| format!("invalid coordinate '{s}': {e}"))?;
+    if value >= *BN254_SCALAR_FIELD {
+        return Err(format!("public input '{s}' is outside BN254 scalar field"));
+    }
+    Ok(value)
 }
 
 pub(crate) fn snarkjs_g1_to_garaga(coords: &[String]) -> Result<G1PointBigUint, String> {
@@ -32,19 +61,13 @@ pub(crate) fn snarkjs_g2_to_garaga(rows: &[Vec<String>]) -> Result<G2PointBigUin
 }
 
 pub(crate) fn public_inputs_to_biguint(public_inputs: &[String]) -> Result<Vec<BigUint>, String> {
-    if public_inputs.is_empty() {
-        return Err("public inputs must not be empty".to_string());
-    }
     public_inputs
         .iter()
-        .map(|s| parse_biguint(s))
+        .map(|s| parse_public_input_biguint(s))
         .collect()
 }
 
-pub(crate) fn mopro_g2_to_garaga(
-    x: &[String],
-    y: &[String],
-) -> Result<G2PointBigUint, String> {
+pub(crate) fn mopro_g2_to_garaga(x: &[String], y: &[String]) -> Result<G2PointBigUint, String> {
     if x.len() < 2 || y.len() < 2 {
         return Err("G2 point must have two x and two y coordinates".to_string());
     }
@@ -73,21 +96,6 @@ pub(crate) fn to_groth16_proof_from_mopro(
         image_id_journal_risc0: None,
         vkey_public_values_sp1: None,
     })
-}
-
-pub(crate) fn to_groth16_proof(
-    proof: &SnarkJsProof,
-    public_inputs: &[String],
-) -> Result<Groth16Proof, String> {
-    to_groth16_proof_from_mopro(
-        &proof.pi_a[0],
-        &proof.pi_a[1],
-        &proof.pi_b[0],
-        &proof.pi_b[1],
-        &proof.pi_c[0],
-        &proof.pi_c[1],
-        public_inputs,
-    )
 }
 
 pub(crate) fn to_groth16_vk(vk: &SnarkJsVerificationKey) -> Result<Groth16VerificationKey, String> {
