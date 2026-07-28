@@ -337,16 +337,30 @@ Mopro does not send transactions, manage accounts, estimate fees, or handle nonc
 
 ### Enable the feature
 
+The `garaga` feature and optional `garaga_rs` dependency are injected when you initialize a Circom project. Declaring them is not enough — you must turn the feature on for the target you build.
+
 ```toml
 [features]
 default = ["uniffi"]
+uniffi = ["mopro-ffi/uniffi"]
+flutter = ["mopro-ffi/flutter"]
+wasm = ["mopro-ffi/wasm"]
 garaga = ["garaga_rs"]
 
 [dependencies]
 garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", tag = "v1.1.0", package = "garaga_rs", optional = true }
 ```
 
-The `garaga` feature is injected when you initialize a Circom project; enable it in your `Cargo.toml` before building bindings.
+Enable it for your bindings target:
+
+- **iOS / Android (UniFFI):** add `garaga` to `default`, e.g. `default = ["uniffi", "garaga"]`.
+- **Flutter:** `mopro build` uses `--no-default-features --features flutter`, so `default` is ignored. Wire Garaga into the Flutter feature instead:
+
+```toml
+flutter = ["mopro-ffi/flutter", "garaga"]
+```
+
+Then rebuild bindings so `generateCircomGroth16GaragaCalldata` is included.
 
 ### Prepare verification key
 
