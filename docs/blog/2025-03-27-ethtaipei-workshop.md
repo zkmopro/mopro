@@ -236,8 +236,8 @@ Alternatively, you can watch this video to see how to run the app.
 This section explains how to update circuits with alternative witness generators and corresponding zkey files. We use the [Keccak256 circuit](https://github.com/zkmopro/circuit-registry/blob/main/keccak256/keccak256_256_test.circom) as a reference example here.
 
 1.  Add wasm and zkey file in the `test-vectors/circom` folder
-    -   wasm: https://ci-keys.zkmopro.org/keccak256_256_test.wasm
-    -   zkey: https://ci-keys.zkmopro.org/keccak256_256_test_final.zkey
+    -   wasm: https://raw.githubusercontent.com/zkmopro/rust-rapidsnark/v0.1.4/tests/test-vectors/keccak256_256_test.wasm
+    -   zkey: https://raw.githubusercontent.com/zkmopro/rust-rapidsnark/v0.1.4/tests/test-vectors/keccak256_256_test_final.zkey
 2.  In `src/lib.rs` file, update the circuit's witness generator function definition.
 
     ```diff
@@ -315,7 +315,7 @@ This section explains how to update circuits with alternative witness generators
     + val zkeyPath = getFilePathFromAssets("keccak256_256_test_final.zkey")
     ```
 
--   Update circuit inputs: https://ci-keys.zkmopro.org/keccak256.json
+-   Update circuit inputs: https://raw.githubusercontent.com/zkmopro/circuit-registry/aab2ee1290ecd5d2b7dff985520bd1f3ce8a9750/keccak256/input.json
 
     -   **iOS:**<br/>
 

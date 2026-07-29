@@ -132,6 +132,18 @@ jobs:
                   export CLASSPATH="$PWD/jna-5.13.0.jar"
                   cargo test --all --all-features
 
+            - name: Build with the rapidsnark feature
+              if: matrix.adapter == 'circom'
+              working-directory: ${{ runner.temp }}/mopro-example-circom
+              run: |
+                  sed -i.bak 's/^circom-prover = "0.1"$/circom-prover = { version = "0.1", features = ["rapidsnark"] }/' Cargo.toml
+                  rm Cargo.toml.bak
+                  grep -q 'features = \["rapidsnark"\]' Cargo.toml || {
+                      echo "::error::failed to enable the rapidsnark feature; the circom-prover entry in write_toml.rs may have changed"
+                      exit 1
+                  }
+                  cargo build
+
     cli_build_ios_prepare:
         needs: cli_build
         strategy:

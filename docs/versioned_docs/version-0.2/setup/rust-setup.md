@@ -154,8 +154,8 @@ fn main() {
 Learn more about `.wasm` files in [Circom documentation](https://docs.circom.io/getting-started/compiling-circuits/). <br/>
 Here are the example WASM and Zkey files to be downloaded.
 
--   http://ci-keys.zkmopro.org/multiplier2.wasm
--   http://ci-keys.zkmopro.org/multiplier2_final.zkey
+-   [multiplier2.wasm](https://raw.githubusercontent.com/zkmopro/mopro/mopro-cli-v0.3.7/cli/src/template/init/test-vectors/circom/multiplier2.wasm)
+-   [multiplier2_final.zkey](https://raw.githubusercontent.com/zkmopro/mopro/mopro-cli-v0.3.7/cli/src/template/init/test-vectors/circom/multiplier2_final.zkey)
 
 :::
 

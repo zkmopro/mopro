@@ -117,7 +117,7 @@ To learn how to read a .zkey file from an app, please refer to the [`loadAssets`
 :::warning
 The default bindings are built specifically for the `multiplier2` circom circuit. If you'd like to update the circuit or switch to a different proving scheme, please refer to the [How to Build the Package](#how-to-build-the-package) section.<br/>
 Circuit source code: https://github.com/zkmopro/circuit-registry/tree/main/multiplier2<br/>
-Example .zkey file for the circuit: http://ci-keys.zkmopro.org/multiplier2_final.zkey<br/>
+Example .zkey file for the circuit: https://raw.githubusercontent.com/zkmopro/mopro/mopro-cli-v0.3.7/cli/src/template/init/test-vectors/circom/multiplier2_final.zkey<br/>
 :::
 
 And in `index.js`, for example, replace this with
