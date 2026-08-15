@@ -64,7 +64,7 @@ fn load_proof_result(fixture_dir: &Path) -> CircomProofResult {
 }
 
 fn main() {
-    let fixture_dir = PathBuf::from("cli/src/template/init/test-vectors/circom/garaga/bn254");
+    let fixture_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("fixtures/bn254");
     let vk =
         fs::read_to_string(fixture_dir.join("verification_key.json")).expect("verification_key");
     let proof_result = load_proof_result(&fixture_dir);

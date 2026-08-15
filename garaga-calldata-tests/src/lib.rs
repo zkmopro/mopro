@@ -35,7 +35,7 @@ mod tests {
 
     fn fixture_dir() -> std::path::PathBuf {
         std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../cli/src/template/init/test-vectors/circom/garaga/bn254")
+            .join("fixtures/bn254")
     }
 
     fn read_fixture(name: &str) -> String {
