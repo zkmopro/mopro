@@ -18,7 +18,7 @@ use anyhow::Context;
 use mopro_ffi::app_config::android::AndroidBindingsParams;
 use mopro_ffi::app_config::constants::Mode;
 use mopro_ffi::app_config::project_name_from_toml;
-use mopro_ffi::app_config::react_native::remove_unrequested_wasm_stubs;
+use mopro_ffi::app_config::react_native::{remove_unrequested_wasm_stubs, android_abi_for_triple};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -36,13 +36,31 @@ pub fn build(
 ) -> anyhow::Result<()> {
     patch_ubrn_config_for_noir(bindings_dir, params)?;
 
+    let lib_name = format!(
+        "lib{}.so", 
+        project_name_from_toml(project_dir)
+            .context("Failed to get project name from Cargo.toml")?
+    );
+    
+    let target_dir = project_dir.join("target");
+    let jni_libs = bindings_dir.join("android/src/main/jniLibs");
+
+    // `ubrn build android` wipes jniLibs on every invocation, and Noir needs one
+    // invocation per arch (each has its own BB_LIB_DIR and Zig linker), so the
+    // last arch would be the only survivor. Wipe once here and install each arch
+    // below, with the builds themselves run under `--no-jniLibs`
+    if jni_libs.exists() {
+        fs::remove_dir_all(&jni_libs).context("Failed to clear jniLibs")?;
+    }
+
     for arch in android_arch_strings {
         let env = params
             .arch_overrides
             .get(arch)
             .map(|config| config.extra_env.clone())
             .unwrap_or_default();
-        build_android_once(mode, arch, bindings_dir, &env)?;
+        build_android_once(mode, arch, bindings_dir, &target_dir, &env)?;
+        install_jni_lib(arch, mode, &target_dir, &jni_libs, &lib_name)?;
     }
 
     let bindgen_arch = android_arch_strings
@@ -87,6 +105,7 @@ fn build_android_once(
     mode: Mode,
     target_string: &str,
     bindings_dir: &Path,
+    target_dir: &Path,
     env: &[(String, String)],
 ) -> anyhow::Result<()> {
     let mut args = vec![
@@ -94,13 +113,16 @@ fn build_android_once(
         "android".to_string(),
         "--targets".to_string(),
         target_string.to_string(),
+        "--no-jniLibs".to_string(),
     ];
     if mode == Mode::Release {
         args.push("--release".to_string());
     }
 
     let mut cmd = Command::new("uniffi-bindgen-react-native");
-    cmd.args(&args).current_dir(bindings_dir);
+    cmd.args(&args)
+        .current_dir(bindings_dir)
+        .env("CARGO_TARGET_DIR", target_dir);
     for (key, value) in env {
         cmd.env(key, value);
     }
@@ -152,11 +174,7 @@ fn build_ndk_linked_lib_for_bindgen(
         anyhow::bail!("cargo ndk build (bindgen lib) failed for {arch}");
     }
 
-    let profile_dir = if mode == Mode::Release {
-        "release"
-    } else {
-        "debug"
-    };
+    let profile_dir = mode.as_str();
     let out_lib_path = bindgen_target.join(arch).join(profile_dir).join(&lib_name);
     if !out_lib_path.exists() {
         anyhow::bail!(
@@ -218,5 +236,25 @@ fn patch_ubrn_config_for_noir(
     }
 
     fs::write(&config_path, contents).context("Failed to write ubrn.config.yaml")?;
+    Ok(())
+}
+
+/// helper to copy the built library through ubrn into `jniLibs/<abi>/`
+/// The copying step was suppressed in `build_android_once` by `--no-jniLibs`.
+fn install_jni_lib(
+    arch: &str,
+    mode: Mode,
+    target_dir: &Path,
+    jni_libs: &Path,
+    lib_name: &str,
+) -> anyhow::Result<()> {
+    let abi = android_abi_for_triple(arch)
+        .with_context(|| format!("No Android ABI known for target triple {arch}"))?;
+    let src = target_dir.join(arch).join(mode.as_str()).join(lib_name);
+    let dst_dir = jni_libs.join(abi);
+
+    fs::create_dir_all(&dst_dir).context("Failed to create jniLibs directory")?;
+    fs::copy(&src, dst_dir.join(lib_name))
+        .with_context(|| format!("Failed to copy {} into {}", src.display(), dst_dir.display()))?;
     Ok(())
 }
