@@ -243,7 +243,7 @@ get_filename_component(UNIFFI_BINDGEN_PATH \"${UNIFFI_BINDGEN_PATH}\" DIRECTORY)
     Ok(())
 }
 
-fn android_abi_for_triple(triple: &str) -> Option<&'static str> {
+pub fn android_abi_for_triple(triple: &str) -> Option<&'static str> {
     match triple {
         "aarch64-linux-android" => Some(ARCH_ARM_64_V8),
         "armv7-linux-androideabi" => Some(ARCH_ARM_V7_ABI),
