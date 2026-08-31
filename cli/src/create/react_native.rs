@@ -7,7 +7,7 @@ use crate::style::print_green_bold;
 
 use anyhow::{Context, Error, Result};
 use mopro_ffi::app_config::constants::{REACT_NATIVE_APP_DIR, REACT_NATIVE_BINDINGS_DIR};
-use mopro_ffi::app_config::react_native::patch_gradle_properties_architectures;
+use mopro_ffi::app_config::react_native::{patch_gradle_properties_architectures, remove_unrequested_wasm_stubs};
 use std::{fs, path::PathBuf};
 
 pub struct ReactNative;
@@ -39,7 +39,7 @@ impl Create for ReactNative {
             react_native_bindings_dir.as_ref().unwrap(),
             &mopro_module_dir,
         )?;
-        remove_stale_web_entrypoint(&mopro_module_dir)?;
+        remove_unrequested_wasm_stubs(&mopro_module_dir)?;
 
         let assets_dir = target_dir.join("assets/keys");
         fs::remove_dir_all(&assets_dir)?;
@@ -86,20 +86,4 @@ impl Create for ReactNative {
         );
         print_footer_message();
     }
-}
-
-/// The downloaded `zkmopro/react-native-app` scaffold ships a static
-/// `src/index.web.ts` (for optional web/wasm support) that imports from
-/// `./generated/wasm-bindgen/index.js` and `index_bg.wasm`. `mopro build` never
-/// generates that `generated/wasm-bindgen` directory — React Native builds only
-/// target iOS/Android — so the file is always a dangling reference. Since
-/// `copy_dir` only overwrites files present in the built bindings dir, it can't
-/// remove this pre-existing one; left in place, it breaks `npm install`'s
-/// `prepare: bob build` step (`tsc` fails to resolve the missing module).
-fn remove_stale_web_entrypoint(mopro_module_dir: &std::path::Path) -> Result<()> {
-    let index_web_ts = mopro_module_dir.join("src").join("index.web.ts");
-    if index_web_ts.exists() {
-        fs::remove_file(&index_web_ts)?;
-    }
-    Ok(())
 }
