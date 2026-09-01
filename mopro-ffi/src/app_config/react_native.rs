@@ -319,20 +319,19 @@ pub fn patch_gradle_properties_architectures(
     Ok(())
 }
 
-
 /// Remove leftover WASM scaffolding that `uniffi-bindgen-react-native generate all`
 /// writes into the React Native bindings dir (`src/index.web.ts` and `rust_modules/wasm/`).
-/// 
+///
 /// Mopro's React Native path only targets iOS/Android. `generate all` with no
 /// platform still emits ubrn's web templates, but never runs wasm-pack, so
 /// `src/generated/wasm-bindgen/` is missing. Left in place, `src/index.web.ts`
 /// is a dangling import and `bob build` / `tsc` fails.
-pub fn remove_unrequested_wasm_stubs(bindings_dir: &Path) -> anyhow::Result<()> {   
+pub fn remove_unrequested_wasm_stubs(bindings_dir: &Path) -> anyhow::Result<()> {
     let index_web_file = bindings_dir.join("src").join("index.web.ts");
     if index_web_file.exists() {
         fs::remove_file(&index_web_file)?;
     }
-    
+
     let wasm_crate = bindings_dir.join("rust_modules").join("wasm");
     if wasm_crate.exists() {
         fs::remove_dir_all(&wasm_crate)?;

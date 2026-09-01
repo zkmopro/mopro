@@ -7,7 +7,9 @@ use crate::style::print_green_bold;
 
 use anyhow::{Context, Error, Result};
 use mopro_ffi::app_config::constants::{REACT_NATIVE_APP_DIR, REACT_NATIVE_BINDINGS_DIR};
-use mopro_ffi::app_config::react_native::{patch_gradle_properties_architectures, remove_unrequested_wasm_stubs};
+use mopro_ffi::app_config::react_native::{
+    patch_gradle_properties_architectures, remove_unrequested_wasm_stubs,
+};
 use std::{fs, path::PathBuf};
 
 pub struct ReactNative;
