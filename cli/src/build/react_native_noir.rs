@@ -37,11 +37,11 @@ pub fn build(
     patch_ubrn_config_for_noir(bindings_dir, params)?;
 
     let lib_name = format!(
-        "lib{}.so", 
+        "lib{}.so",
         project_name_from_toml(project_dir)
             .context("Failed to get project name from Cargo.toml")?
     );
-    
+
     let target_dir = project_dir.join("target");
     let jni_libs = bindings_dir.join("android/src/main/jniLibs");
 
@@ -163,7 +163,7 @@ fn build_ndk_linked_lib_for_bindgen(
     for (key, value) in extra_env {
         cmd.env(key, value);
     }
-    cmd.env("CARGO_BUILD_TARGET_DIR", &bindgen_target)
+    cmd.env("CARGO_TARGET_DIR", &bindgen_target)
         .env("CARGO_BUILD_TARGET", arch)
         .env("CARGO_NDK_OUTPUT_PATH", bindgen_target.join("jniLibs"));
 
@@ -254,7 +254,12 @@ fn install_jni_lib(
     let dst_dir = jni_libs.join(abi);
 
     fs::create_dir_all(&dst_dir).context("Failed to create jniLibs directory")?;
-    fs::copy(&src, dst_dir.join(lib_name))
-        .with_context(|| format!("Failed to copy {} into {}", src.display(), dst_dir.display()))?;
+    fs::copy(&src, dst_dir.join(lib_name)).with_context(|| {
+        format!(
+            "Failed to copy {} into {}",
+            src.display(),
+            dst_dir.display()
+        )
+    })?;
     Ok(())
 }
