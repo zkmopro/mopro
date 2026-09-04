@@ -18,7 +18,7 @@ use anyhow::Context;
 use mopro_ffi::app_config::android::AndroidBindingsParams;
 use mopro_ffi::app_config::constants::Mode;
 use mopro_ffi::app_config::project_name_from_toml;
-use mopro_ffi::app_config::react_native::{remove_unrequested_wasm_stubs, android_abi_for_triple};
+use mopro_ffi::app_config::react_native::{android_abi_for_triple, remove_unrequested_wasm_stubs};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -47,10 +47,13 @@ pub fn build(
 
     // `ubrn build android` wipes jniLibs on every invocation, and Noir needs one
     // invocation per arch (each has its own BB_LIB_DIR and Zig linker), so the
-    // last arch would be the only survivor. Wipe once here and install each arch
-    // below, with the builds themselves run under `--no-jniLibs`
-    if jni_libs.exists() {
-        fs::remove_dir_all(&jni_libs).context("Failed to clear jniLibs")?;
+    // last arch would be the only survivor. --no-jnilibs avoids this. `jni_libs_next`
+    // is used to install each arch's library from target dir before replacing live
+    // jniLibs dir with it, creating a single tree.
+    let jni_libs_next = bindings_dir.join("android/src/main/jniLibs_next");
+
+    if jni_libs_next.exists() {
+        fs::remove_dir_all(&jni_libs_next).context("Failed to clear jniLibs staging")?;
     }
 
     for arch in android_arch_strings {
@@ -60,8 +63,10 @@ pub fn build(
             .map(|config| config.extra_env.clone())
             .unwrap_or_default();
         build_android_once(mode, arch, bindings_dir, &target_dir, &env)?;
-        install_jni_lib(arch, mode, &target_dir, &jni_libs, &lib_name)?;
+        install_jni_lib(arch, mode, &target_dir, &jni_libs_next, &lib_name)?;
     }
+
+    publish_jni_libs(&jni_libs_next, &jni_libs)?;
 
     let bindgen_arch = android_arch_strings
         .first()
@@ -239,8 +244,7 @@ fn patch_ubrn_config_for_noir(
     Ok(())
 }
 
-/// helper to copy the built library through ubrn into `jniLibs/<abi>/`
-/// The copying step was suppressed in `build_android_once` by `--no-jniLibs`.
+/// Copy the built library into the temporary sibling directory `jniLibs_next/`.
 fn install_jni_lib(
     arch: &str,
     mode: Mode,
@@ -261,5 +265,14 @@ fn install_jni_lib(
             dst_dir.display()
         )
     })?;
+    Ok(())
+}
+
+///publish the temporary sibling directory `jniLibs_next/` to the live `jniLibs/` directory.
+fn publish_jni_libs(staging: &Path, live: &Path) -> anyhow::Result<()> {
+    if live.exists() {
+        fs::remove_dir_all(live).context("Failed to replace jniLibs")?;
+    }
+    fs::rename(staging, live).context("Failed to publish jniLibs")?;
     Ok(())
 }
