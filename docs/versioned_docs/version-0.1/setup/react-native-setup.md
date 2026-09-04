@@ -487,7 +487,7 @@ export default function HomeScreen() {
     const [proof, setProof] = useState<string>("");
     async function genProof(): Promise<void> {
         const asset = Asset.fromURI(
-            "https://ci-keys.zkmopro.org/multiplier2_final.zkey"
+            "https://raw.githubusercontent.com/zkmopro/mopro/mopro-cli-v0.3.7/cli/src/template/init/test-vectors/circom/multiplier2_final.zkey"
         );
         const newFileName = "multiplier2_final.zkey";
         const newFilePath = `${FileSystem.documentDirectory}${newFileName}`;

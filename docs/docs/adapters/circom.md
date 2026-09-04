@@ -302,6 +302,7 @@ Mopro now supports 2 Circom provers. You can find more information in [the blog 
 
 -   `rust-rapidsnark` is based on the original C++ implementation of [rapidsnark](https://github.com/iden3/rapidsnark), with the binary wrapped and integrated in Rust.
 -   Activate `rapidsnark` Feature for both `[dependencies]` and `[build-dependencies]`
+-   No prebuilt covers `x86_64-apple-ios`. To build for the Intel Mac simulator, point `RAPIDSNARK_LIB_DIR` at your own build of those libraries.
 
 ```toml
 [dependencies]
