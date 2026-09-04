@@ -1,0 +1,19 @@
+[package]
+name = "garaga-calldata-tests"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", tag = "v1.1.0", package = "garaga_rs" }
+num-bigint = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+
+[[bin]]
+name = "gen-garaga-calldata-fixture"
+path = "src/bin/gen_garaga_calldata_fixture.rs"

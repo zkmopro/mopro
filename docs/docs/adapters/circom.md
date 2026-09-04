@@ -330,6 +330,101 @@ let result = generate_circom_proof(
 );
 ```
 
+## Starknet calldata (Garaga, optional)
+
+Mopro can format Circom Groth16 proofs as Starknet verifier calldata using
+[Garaga v1.1.0](https://github.com/keep-starknet-strange/garaga/tree/v1.1.0). This is **calldata generation only** —
+Mopro does not send transactions, manage accounts, estimate fees, or handle nonces.
+
+### Enable the feature
+
+The `garaga` feature and optional `garaga_rs` dependency are injected when you initialize a Circom project. Declaring them is not enough — you must turn the feature on for the target you build.
+
+```toml
+[features]
+default = ["uniffi"]
+uniffi = ["mopro-ffi/uniffi"]
+flutter = ["mopro-ffi/flutter"]
+wasm = ["mopro-ffi/wasm"]
+garaga = ["garaga_rs"]
+
+[dependencies]
+garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", tag = "v1.1.0", package = "garaga_rs", optional = true }
+```
+
+Enable it for your bindings target:
+
+- **iOS / Android (UniFFI):** add `garaga` to `default`, e.g. `default = ["uniffi", "garaga"]`.
+- **Flutter:** `mopro build` uses `--no-default-features --features flutter`, so `default` is ignored. Wire Garaga into the Flutter feature instead:
+
+```toml
+flutter = ["mopro-ffi/flutter", "garaga"]
+```
+
+Then rebuild bindings so `generateCircomGroth16GaragaCalldata` is included.
+
+### Prepare verification key
+
+Export the verification key once from your zkey (same format snarkjs uses):
+
+```sh
+snarkjs zkey export verificationkey circuit_final.zkey verification_key.json
+```
+
+### `generateCircomGroth16GaragaCalldata`
+
+Prove in-app with Mopro, then build Garaga calldata from the result. `CircomProofResult.inputs`
+is a `Vec<String>` with the same content as SnarkJS `public.json` — no separate public-inputs
+file is required. The only required file input is `verification_key.json`.
+
+```rust
+let result = generate_circom_proof(
+    zkey_path,
+    circuit_inputs,
+    ProofLib::Arkworks,
+)?;
+
+let calldata = generate_circom_groth16_garaga_calldata(
+    result,
+    std::fs::read_to_string("verification_key.json")?,
+)?;
+// calldata: Vec<String> — decimal Starknet felts for Garaga BN254 verifier
+```
+
+On mobile bindings, pass the `CircomProofResult` returned by `generateCircomProof` directly —
+`inputs` is already available as a string list.
+
+**BN254 only** (`curve: "bn128"` / `"bn254"`). The on-chain verifier contract must be generated with Garaga v1.1.0 (`garaga gen`).
+
+### Flutter / `starknet.dart`
+
+Pass the returned strings to your Starknet client — Mopro stops at calldata formatting:
+
+```dart
+final proofResult = await generateCircomProof(
+  zkeyPath: zkeyPath,
+  circuitInputs: circuitInputs,
+  proofLib: ProofLib.arkworks,
+);
+
+// Contents of snarkjs verification_key.json (asset / file / network).
+final vkJson = await rootBundle.loadString('assets/verification_key.json');
+
+final calldata = await generateCircomGroth16GaragaCalldata(
+  proofResult: proofResult,
+  verificationKeyJson: vkJson,
+);
+
+// Invoke your Garaga Groth16 verifier contract outside Mopro, e.g. with starknet.dart:
+// await provider.invoke(
+//   contractAddress: verifierAddress,
+//   entrypoint: 'verify_groth16_proof_bn254',
+//   calldata: calldata.map((s) => BigInt.parse(s)).toList(),
+// );
+```
+
+Use your preferred Starknet account/wallet layer (`starknet.dart`, AVNU, etc.) for signing, submission, and RPC.
+
 ## Using the Library
 
 After you have specified the circuits you want to use, you can follow the usual steps to build the library and use it in your project.
