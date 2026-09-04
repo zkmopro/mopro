@@ -34,6 +34,10 @@ pub fn build(
     mode: Mode,
     params: &AndroidBindingsParams,
 ) -> anyhow::Result<()> {
+    let bindgen_arch = android_arch_strings
+        .first()
+        .context("No Android architectures provided for binding generation")?;
+
     patch_ubrn_config_for_noir(bindings_dir, params)?;
 
     let lib_name = format!(
@@ -68,9 +72,6 @@ pub fn build(
 
     publish_jni_libs(&jni_libs_next, &jni_libs)?;
 
-    let bindgen_arch = android_arch_strings
-        .first()
-        .context("No Android architectures provided for binding generation")?;
     let bindgen_env = params
         .arch_overrides
         .get(bindgen_arch)
@@ -125,12 +126,12 @@ fn build_android_once(
     }
 
     let mut cmd = Command::new("uniffi-bindgen-react-native");
-    cmd.args(&args)
-        .current_dir(bindings_dir)
-        .env("CARGO_TARGET_DIR", target_dir);
+    cmd.args(&args).current_dir(bindings_dir);
     for (key, value) in env {
         cmd.env(key, value);
     }
+    cmd.env("CARGO_TARGET_DIR", target_dir);
+
     let status = cmd.status().expect("failed to build react native bindings");
     if !status.success() {
         anyhow::bail!("Failed to build react native bindings for {target_string}");
