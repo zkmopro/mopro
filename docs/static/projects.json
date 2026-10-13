@@ -198,5 +198,15 @@
             "github": "https://github.com/kidneyweakx/solidarity",
             "ios": "https://apps.apple.com/us/app/solid-ar-ity/id6752410250"
         }
+    },
+    {
+        "name": "ZKProofport",
+        "description": "An iOS and Android app built with Mopro and Noir for on-device proofs of KYC, country eligibility, and email-domain membership, without disclosing the underlying wallet address or full email address.",
+        "links": {
+            "github": "https://github.com/zkproofport/proofport-app",
+            "website": "https://zkproofport.com",
+            "ios": "https://apps.apple.com/kr/app/zkproofport/id6803903114",
+            "android": "https://play.google.com/store/apps/details?id=com.masselabs.zkproofport"
+        }
     }
 ]
