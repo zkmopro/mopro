@@ -90,11 +90,13 @@ The iOS simulator build encountered a transitive `backtrace`/`libc` dependency i
 
 We measured the initial implementation at three Merkle depths. Every run included membership verification, full-width balance comparison, wallet signature verification, and request binding.
 
-| Merkle depth | Median adapter call | Median peak process memory |
-|---|---:|---:|
-| 8 | 4.62 s | 2.17 GiB |
-| 12 | 6.19 s | 2.26 GiB |
-| 16 | 7.90 s | 2.35 GiB |
+| Merkle depth | Barretenberg finalized size (pre-padding) | Median adapter call | Median peak process memory |
+| ------------ | ------------------------------- | ------------------- | -------------------------- |
+| 8            | 311,356                         | 4.62 s              | 2.17 GiB                   |
+| 12           | 383,248                         | 6.19 s              | 2.26 GiB                   |
+| 16           | 455,140                         | 7.90 s              | 2.35 GiB                   |
+
+Circuit sizes were extracted using the benchmark’s pinned toolchain and hash-matched ACIR artifacts. All three circuits have a padded size of 524,288 (2¹⁹).
 
 Measurements used an Apple M4 with 16 GiB RAM, three measured runs per depth, and a preparatory run excluded.
 
