@@ -49,7 +49,6 @@ enum Commands {
         architectures: Option<Vec<String>>,
         #[arg(
             long,
-            num_args = 1..,
             help = "Automatically run mopro update after build",
             conflicts_with = "no_auto_update"
         )]
@@ -164,6 +163,18 @@ fn main() {
             if *show {
                 print::print_init_instructions("<PROJECT NAME>".to_string());
                 return;
+            }
+            if project_name.is_none()
+                && matches!(adapter.as_deref(), None | Some("none of the above"))
+            {
+                match init::existing::try_init() {
+                    Ok(true) => return,
+                    Ok(false) => {}
+                    Err(error) => {
+                        style::print_red_bold(format!("Failed to initialize project: {error:#}"));
+                        std::process::exit(1);
+                    }
+                }
             }
             match init::init_project(adapter, project_name, false) {
                 Ok(_) => {}

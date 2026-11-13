@@ -19,6 +19,7 @@ mopro-ffi = { path = "../mopro-ffi", version = "=0.3.7", features = [
     "uniffi",
 ], default-features = false }
 
+cargo_metadata = "0.23"
 clap = { version = "4.0", features = ["derive"] }
 fs_extra = "1.2.0"
 include_dir = "0.7"
@@ -30,4 +31,6 @@ zip = "2.2.1"
 reqwest = { version = "0.12.9", features = ["blocking"] }
 indicatif = "0.17.9"
 serde = { version = "1.0.216", features = ["derive"] }
+tempfile = "3"
+toml_edit = "0.22"
 walkdir = "2"

@@ -11,6 +11,7 @@ use std::{env, fs, io::Write, path::Path};
 
 pub mod adapter;
 mod circom;
+pub(crate) mod existing;
 mod gnark;
 mod halo2;
 mod noir;
