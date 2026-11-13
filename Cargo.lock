@@ -1726,6 +1726,7 @@ name = "mopro-cli"
 version = "0.3.7"
 dependencies = [
  "anyhow",
+ "cargo_metadata",
  "clap",
  "console",
  "dialoguer",

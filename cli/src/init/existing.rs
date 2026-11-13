@@ -1,4 +1,6 @@
 use anyhow::{bail, Context, Result};
+use cargo_metadata::{semver::Version, DependencyKind, MetadataCommand, Package};
+use std::collections::HashSet;
 use std::fs;
 use std::io::{ErrorKind, Write};
 use std::path::Path;
@@ -6,6 +8,8 @@ use tempfile::NamedTempFile;
 use toml_edit::{Array, DocumentMut, InlineTable, Item, Table, TableLike, Value};
 
 const MOPRO_VERSION: &str = concat!("=", env!("CARGO_PKG_VERSION"));
+const UNIFFI_VERSION: &str = "0.32.0";
+const _: () = assert!(mopro_ffi::check_compatible_version(UNIFFI_VERSION));
 
 pub(crate) fn try_init() -> Result<bool> {
     let project_dir = std::env::current_dir()?;
@@ -44,6 +48,13 @@ fn init_existing_project(
         }
     };
 
+    let has_uniffi = doc
+        .get("dependencies")
+        .is_some_and(|dependencies| dependencies.get("uniffi").is_some());
+    if has_uniffi {
+        validate_uniffi(project_dir)?;
+    }
+
     let lib = manifest_table(doc, "lib")?;
     let crate_types = array(
         lib.entry("crate-type").or_insert(Item::None),
@@ -57,7 +68,6 @@ fn init_existing_project(
     }
 
     let dependencies = manifest_table(doc, "dependencies")?;
-    let has_uniffi = dependencies.contains_key("uniffi");
     let dependency = dependencies.entry("mopro-ffi").or_insert(Item::None);
     if dependency.is_none() || dependency.is_str() {
         let mut table = InlineTable::new();
@@ -95,6 +105,7 @@ fn init_existing_project(
             "mopro_ffi::app!",
             "mopro_ffi::uniffi_setup!",
             "uniffi::setup_scaffolding!",
+            "uniffi::include_scaffolding!",
         ]
         .iter()
         .any(|macro_name| line.starts_with(macro_name))
@@ -137,6 +148,80 @@ fn init_existing_project(
         }
     }
     Ok(())
+}
+
+fn validate_uniffi(project_dir: &Path) -> Result<()> {
+    let manifest = project_dir.join("Cargo.toml");
+    // Cargo expands workspace dependencies and implicit optional features without resolving crates.
+    let metadata = MetadataCommand::new()
+        .current_dir(project_dir)
+        .manifest_path(&manifest)
+        .no_deps()
+        .exec()
+        .context("Failed to read Cargo metadata for the existing UniFFI dependency")?;
+    let manifest = manifest.canonicalize()?;
+    let package = metadata
+        .packages
+        .iter()
+        .find(|package| package.manifest_path.canonicalize().ok().as_ref() == Some(&manifest))
+        .context("The current Rust package was not found in Cargo metadata")?;
+    let dependency = package
+        .dependencies
+        .iter()
+        .find(|dep| {
+            dep.kind == DependencyKind::Normal
+                && dep.target.is_none()
+                && dep.rename.as_deref().unwrap_or(&dep.name) == "uniffi"
+        })
+        .context("The existing `uniffi` dependency must be available for mobile targets")?;
+
+    if dependency.name != "uniffi" {
+        bail!("The existing `uniffi` dependency must refer to the UniFFI crate");
+    }
+    if dependency.optional && !default_features_enable_uniffi(package) {
+        bail!("Enable the optional `uniffi` dependency in the package's default features or make it required before running `mopro init`");
+    }
+
+    let version = Version::parse(UNIFFI_VERSION)?;
+    // Cargo unifies compatible versions with Mopro's exact pin. A requirement
+    // spanning release lines can still resolve to a separate UniFFI version.
+    let previous_minor = Version::new(version.major, version.minor - 1, u64::MAX);
+    let next_minor = Version::new(version.major, version.minor + 1, 0);
+    if dependency.path.is_some()
+        || dependency.registry.is_some()
+        || dependency
+            .source
+            .as_ref()
+            .is_some_and(|source| source.repr.starts_with("git+"))
+        || !dependency.req.matches(&version)
+        || dependency.req.matches(&previous_minor)
+        || dependency.req.matches(&next_minor)
+    {
+        bail!(
+            "Mopro's bindings generator uses UniFFI {UNIFFI_VERSION}. Use a crates.io `uniffi` requirement on the same release line that includes this version (found `{}`)",
+            dependency.req,
+        );
+    }
+    Ok(())
+}
+
+fn default_features_enable_uniffi(package: &Package) -> bool {
+    let mut pending = vec!["default"];
+    let mut visited = HashSet::new();
+    while let Some(feature) = pending.pop() {
+        if !visited.insert(feature) {
+            continue;
+        }
+        if let Some(entries) = package.features.get(feature) {
+            for entry in entries {
+                if entry == "dep:uniffi" || entry.starts_with("uniffi/") {
+                    return true;
+                }
+                pending.push(entry.as_str());
+            }
+        }
+    }
+    false
 }
 
 fn manifest_table<'a>(doc: &'a mut DocumentMut, name: &str) -> Result<&'a mut dyn TableLike> {
@@ -265,14 +350,81 @@ custom = []
         let manifest = root.join("Cargo.toml");
         let original_manifest = "[package]\nname = \"my-project\"\nversion = \"0.1.0\"\n\n[dependencies]\nuniffi = \"0.32.0\"\n";
         let lib = root.join("src/lib.rs");
-        let original_source = "uniffi::setup_scaffolding!();\n";
         fs::create_dir(root.join("src"))?;
-        fs::write(&manifest, original_manifest)?;
-        fs::write(&lib, original_source)?;
 
-        init_existing_project(root, original_manifest, &mut original_manifest.parse()?)?;
+        for source in [
+            "uniffi::setup_scaffolding!();\n",
+            "uniffi::include_scaffolding!(\"api\");\n",
+        ] {
+            fs::write(&manifest, original_manifest)?;
+            fs::write(&lib, source)?;
+            init_existing_project(root, original_manifest, &mut original_manifest.parse()?)?;
+            assert_eq!(fs::read_to_string(&lib)?, source);
+        }
+        Ok(())
+    }
 
-        assert_eq!(fs::read_to_string(lib)?, original_source);
+    #[test]
+    fn rejects_unavailable_or_incompatible_uniffi_without_writing() -> Result<()> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        let manifest = root.join("Cargo.toml");
+        let lib = root.join("src/lib.rs");
+        let source = "pub fn existing() {}\n";
+        fs::create_dir(root.join("src"))?;
+        fs::write(&lib, source)?;
+
+        for (dependency, error) in [
+            (
+                r#"{ version = "0.32.0", optional = true }"#,
+                "Enable the optional",
+            ),
+            (r#""0.29""#, "generator uses UniFFI 0.32.0"),
+            (r#""*""#, "generator uses UniFFI 0.32.0"),
+        ] {
+            let contents = format!(
+                "[package]\nname = \"my-project\"\nversion = \"0.1.0\"\n\n[dependencies]\nuniffi = {dependency}\n"
+            );
+            fs::write(&manifest, &contents)?;
+            let result = init_existing_project(root, &contents, &mut contents.parse()?);
+
+            assert!(result.unwrap_err().to_string().contains(error));
+            assert_eq!(fs::read_to_string(&manifest)?, contents);
+            assert_eq!(fs::read_to_string(&lib)?, source);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn accepts_workspace_uniffi_enabled_through_default_features() -> Result<()> {
+        let temp = tempfile::tempdir()?;
+        let workspace = temp.path();
+        let root = workspace.join("member");
+        let manifest = root.join("Cargo.toml");
+        let lib = root.join("src/lib.rs");
+        let contents = r#"[package]
+name = "member"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+uniffi = { workspace = true, optional = true }
+
+[features]
+default = ["ffi"]
+ffi = ["uniffi/build"]
+"#;
+        fs::create_dir_all(root.join("src"))?;
+        fs::write(
+            workspace.join("Cargo.toml"),
+            "[workspace]\nmembers = [\"member\"]\nresolver = \"2\"\n\n[workspace.dependencies]\nuniffi = \"0.32\"\n",
+        )?;
+        fs::write(&manifest, contents)?;
+        fs::write(&lib, "pub fn existing() {}\n")?;
+
+        init_existing_project(&root, contents, &mut contents.parse()?)?;
+        assert!(fs::read_to_string(lib)?.ends_with("uniffi::setup_scaffolding!();\n"));
+        assert!(fs::read_to_string(manifest)?.contains("workspace = true, optional = true"));
         Ok(())
     }
 }

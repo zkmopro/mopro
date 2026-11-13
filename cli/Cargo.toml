@@ -19,6 +19,7 @@ mopro-ffi = { path = "../mopro-ffi", version = "=0.3.7", features = [
     "uniffi",
 ], default-features = false }
 
+cargo_metadata = "0.23"
 clap = { version = "4.0", features = ["derive"] }
 fs_extra = "1.2.0"
 include_dir = "0.7"

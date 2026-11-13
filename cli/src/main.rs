@@ -49,7 +49,6 @@ enum Commands {
         architectures: Option<Vec<String>>,
         #[arg(
             long,
-            num_args = 1..,
             help = "Automatically run mopro update after build",
             conflicts_with = "no_auto_update"
         )]
