@@ -50,6 +50,8 @@ to see instructions for each command.
 mopro init
 ```
 
+Run `mopro init` from an existing Rust package's root to set up UniFFI bindings in that package. Add `#[uniffi::export]` to the library functions you want to expose, then run `mopro build --platforms android` or `mopro build --platforms ios`. Use `mopro init --project-name <name>` to scaffold a separate example project.
+
 ### Build bindings
 
 ```sh

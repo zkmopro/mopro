@@ -30,4 +30,6 @@ zip = "2.2.1"
 reqwest = { version = "0.12.9", features = ["blocking"] }
 indicatif = "0.17.9"
 serde = { version = "1.0.216", features = ["derive"] }
+tempfile = "3"
+toml_edit = "0.22"
 walkdir = "2"

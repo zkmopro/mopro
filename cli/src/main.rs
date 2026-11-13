@@ -165,6 +165,18 @@ fn main() {
                 print::print_init_instructions("<PROJECT NAME>".to_string());
                 return;
             }
+            if project_name.is_none()
+                && matches!(adapter.as_deref(), None | Some("none of the above"))
+            {
+                match init::existing::try_init() {
+                    Ok(true) => return,
+                    Ok(false) => {}
+                    Err(error) => {
+                        style::print_red_bold(format!("Failed to initialize project: {error:#}"));
+                        std::process::exit(1);
+                    }
+                }
+            }
             match init::init_project(adapter, project_name, false) {
                 Ok(_) => {}
                 Err(e) => style::print_red_bold(format!("Failed to initialize project: {e:?}")),
